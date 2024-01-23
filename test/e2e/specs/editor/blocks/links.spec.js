@@ -1126,11 +1126,10 @@ test.describe( 'Links', () => {
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
+			await pageUtils.pressKeys( 'Escape' );
 
 			// Move cursor next to the **end** of `linkTextOne`
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: linkedTextTwo.length,
-			} );
+			await pageUtils.pressKeys( 'ArrowLeft' );
 
 			// Select `linkTextOne`
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
@@ -1143,6 +1142,8 @@ test.describe( 'Links', () => {
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
+			await pageUtils.pressKeys( 'Escape' );
+			await pageUtils.pressKeys( 'ArrowRight' );
 
 			// Move cursor within `linkTextOne`
 			await pageUtils.pressKeys( 'ArrowLeft', {
@@ -1155,8 +1156,8 @@ test.describe( 'Links', () => {
 			await expect( linkPopover ).toBeVisible();
 
 			// Expand selection so that it overlaps with `linkTextTwo`
-			await pageUtils.pressKeys( 'ArrowRight', {
-				times: 3,
+			await pageUtils.pressKeys( 'Shift+ArrowRight', {
+				times: 6,
 			} );
 
 			// Link UI should be inactive.
