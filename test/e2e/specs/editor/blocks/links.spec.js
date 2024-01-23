@@ -1260,6 +1260,8 @@ class LinkUtils {
 
 		// Click on the Submit button.
 		await this.pageUtils.pressKeys( 'Enter' );
+		await this.pageUtils.pressKeys( 'Escape' );
+		await this.pageUtils.pressKeys( 'End' );
 
 		// Reselect the link.
 		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
