@@ -140,7 +140,7 @@ export default function MoreMenu( { showIconLabels } ) {
 									'https://wordpress.org/documentation/article/site-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
 								<VisuallyHidden as="span">

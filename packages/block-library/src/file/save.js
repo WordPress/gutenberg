@@ -60,7 +60,7 @@ export default function save( { attributes } ) {
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={
-							textLinkTarget ? 'noreferrer noopener' : undefined
+							textLinkTarget ? 'noopener' : undefined
 						}
 					>
 						<RichText.Content value={ fileName } />
