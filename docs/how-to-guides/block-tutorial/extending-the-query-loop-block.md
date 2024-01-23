@@ -208,13 +208,13 @@ export const withBookQueryControls = ( BlockEdit ) => ( props ) => {
 	// function to handle that.
 	return isMyBooksVariation( props ) ? (
 		<>
-			<BlockEdit { ...props } />
+			<BlockEdit key="edit" { ...props } />
 			<InspectorControls>
 				<BookAuthorSelector /> { /** Our custom component */ }
 			</InspectorControls>
 		</>
 	) : (
-		<BlockEdit { ...props } />
+		<BlockEdit key="edit" { ...props } />
 	);
 };
 
