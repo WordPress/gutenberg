@@ -163,7 +163,11 @@ function Preview( { content, viewType } ) {
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || item.title }
 				>
-					{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+					{ isEmpty ? (
+						__( 'Empty template' )
+					) : (
+						<BlockPreview blocks={ blocks } />
+					) }
 				</button>
 			</div>
 		</ExperimentalBlockEditorProvider>
