@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -21,6 +26,8 @@ export default function ViewGrid( {
 	actions,
 	getItemId,
 	deferredRendering,
+	selection,
+	onSelectionChange,
 } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
@@ -44,59 +51,90 @@ export default function ViewGrid( {
 			alignment="top"
 			className="dataviews-view-grid"
 		>
-			{ usedData.map( ( item ) => (
-				<VStack
-					spacing={ 0 }
-					key={ getItemId( item ) }
-					className="dataviews-view-grid__card"
-				>
-					<div className="dataviews-view-grid__media">
-						{ mediaField?.render( { item } ) }
-					</div>
-					<HStack
-						justify="space-between"
-						className="dataviews-view-grid__title-actions"
-					>
-						<HStack className="dataviews-view-grid__primary-field">
-							{ primaryField?.render( { item } ) }
-						</HStack>
-						<ItemActions
-							item={ item }
-							actions={ actions }
-							isCompact
-						/>
-					</HStack>
+			{ usedData.map( ( item ) => {
+				const id = getItemId( item );
+				const isSelected = selection.includes( getItemId( item ) );
+				return (
 					<VStack
-						className="dataviews-view-grid__fields"
-						spacing={ 3 }
-					>
-						{ visibleFields.map( ( field ) => {
-							const renderedValue = field.render( {
-								item,
-							} );
-							if ( ! renderedValue ) {
-								return null;
-							}
-							return (
-								<VStack
-									className="dataviews-view-grid__field"
-									key={ field.id }
-									spacing={ 1 }
-								>
-									<Tooltip
-										text={ field.header }
-										placement="left"
-									>
-										<div className="dataviews-view-grid__field-value">
-											{ renderedValue }
-										</div>
-									</Tooltip>
-								</VStack>
-							);
+						spacing={ 0 }
+						key={ id }
+						className={ classnames( 'dataviews-view-grid__card', {
+							'is-selected': isSelected,
 						} ) }
+						onClick={ ( event ) => {
+							if ( event.ctrlKey || event.metaKey ) {
+								if ( ! isSelected ) {
+									onSelectionChange(
+										data.filter( ( _item ) => {
+											const itemId = getItemId?.( _item );
+											return (
+												itemId === id ||
+												selection.includes( itemId )
+											);
+										} )
+									);
+								} else {
+									onSelectionChange(
+										data.filter( ( _item ) => {
+											const itemId = getItemId?.( _item );
+											return (
+												itemId !== id &&
+												selection.includes( itemId )
+											);
+										} )
+									);
+								}
+							}
+						} }
+					>
+						<div className="dataviews-view-grid__media">
+							{ mediaField?.render( { item } ) }
+						</div>
+						<HStack
+							justify="space-between"
+							className="dataviews-view-grid__title-actions"
+						>
+							<HStack className="dataviews-view-grid__primary-field">
+								{ primaryField?.render( { item } ) }
+							</HStack>
+							<ItemActions
+								item={ item }
+								actions={ actions }
+								isCompact
+							/>
+						</HStack>
+						<VStack
+							className="dataviews-view-grid__fields"
+							spacing={ 3 }
+						>
+							{ visibleFields.map( ( field ) => {
+								const renderedValue = field.render( {
+									item,
+								} );
+								if ( ! renderedValue ) {
+									return null;
+								}
+								return (
+									<VStack
+										className="dataviews-view-grid__field"
+										key={ field.id }
+										spacing={ 1 }
+									>
+										<Tooltip
+											text={ field.header }
+											placement="left"
+										>
+											<div className="dataviews-view-grid__field-value">
+												{ renderedValue }
+											</div>
+										</Tooltip>
+									</VStack>
+								);
+							} ) }
+						</VStack>
 					</VStack>
-				</VStack>
-			) ) }
+				);
+			} ) }
 		</Grid>
 	);
 }
