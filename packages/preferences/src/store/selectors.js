@@ -38,6 +38,7 @@ const withDeprecatedKeys = ( originalGet ) => ( state, scope, name ) => {
 		// migrated to core in 17.5 (i.e: `editorMode`, https://github.com/WordPress/gutenberg/pull/57642))
 		// so we should fallback to the passed scope to avoid unexpected `undefined` values.
 		if ( value === undefined ) {
+			console.error('KAWABANGA', name );
 			return originalGet( state, scope, name );
 		}
 
