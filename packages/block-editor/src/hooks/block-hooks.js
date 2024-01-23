@@ -83,7 +83,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 					}
 
 					const hookedBlock = candidates?.find(
-						( candidate ) => name === candidate.name
+						( candidate ) => candidate.name === block.name
 					);
 
 					// If the block exists in the designated location, we consider it hooked

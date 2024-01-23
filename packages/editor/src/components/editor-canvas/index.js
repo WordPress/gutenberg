@@ -12,7 +12,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
-	__experimentalRecursionProvider as RecursionProvider,
+	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
@@ -364,7 +364,8 @@ function EditorCanvas( {
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+							: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+						renderingMode !== 'all' && 'is-' + renderingMode
 					) }
 					layout={ blockListLayout }
 					dropZoneElement={

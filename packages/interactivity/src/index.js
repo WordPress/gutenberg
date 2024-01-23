@@ -5,9 +5,10 @@ import registerDirectives from './directives';
 import { init } from './router';
 
 export { store } from './store';
-export { directive, getContext, getElement } from './hooks';
+export { directive, getContext, getElement, getNamespace } from './hooks';
 export { navigate, prefetch } from './router';
 export {
+	withScope,
 	useWatch,
 	useInit,
 	useEffect,
