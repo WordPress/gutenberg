@@ -778,7 +778,8 @@ export default function Image( {
 	}
 
 	if ( ! url && ! temporaryURL ) {
-		return sizeControls;
+		// Add all controls if the image attributes are connected.
+		return metadata?.bindings ? controls : sizeControls;
 	}
 
 	return (
