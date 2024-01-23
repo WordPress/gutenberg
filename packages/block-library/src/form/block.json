@@ -63,8 +63,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalSelector": "form",
-		"clientNavigation": true
+		"__experimentalSelector": "form"
 	},
 	"viewScript": "file:./view.min.js"
 }
