@@ -166,7 +166,9 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	const defaultView = useMemo( () => {
 		return {
 			...DEFAULT_VIEW,
-			type: layout ?? DEFAULT_VIEW.type,
+			type: window?.__experimentalAdminViews
+				? layout ?? DEFAULT_VIEW.type
+				: DEFAULT_VIEW.type,
 		};
 	}, [ layout ] );
 	const [ view, setView ] = useState( defaultView );
