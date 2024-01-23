@@ -15,7 +15,7 @@ import { DataViews } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
+import { default as Link, useLink } from '../routes/link';
 import {
 	DEFAULT_VIEWS,
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
@@ -40,6 +40,7 @@ import {
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -150,6 +151,42 @@ const STATUSES = [
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
+function FeaturedImage( { item, viewType } ) {
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+	const hasMedia = !! item.featured_media;
+	return (
+		<span
+			className={ {
+				'edit-site-page-pages__media-wrapper':
+					viewType === LAYOUT_TABLE,
+			} }
+		>
+			<button
+				className="page-pages-preview-field__button"
+				type="button"
+				onClick={ onClick }
+				aria-label={ item.title?.rendered || __( '(no title)' ) }
+			>
+				{ hasMedia && (
+					<Media
+						className="edit-site-page-pages__featured-image"
+						id={ item.featured_media }
+						size={
+							viewType === LAYOUT_GRID
+								? [ 'large', 'full', 'medium', 'thumbnail' ]
+								: [ 'thumbnail', 'medium', 'large', 'full' ]
+						}
+					/>
+				) }
+			</button>
+		</span>
+	);
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
@@ -243,35 +280,7 @@ export default function PagePages() {
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
 				render: ( { item } ) => (
-					<span
-						className={
-							view.type === LAYOUT_TABLE
-								? 'edit-site-page-pages__media-wrapper'
-								: ''
-						}
-					>
-						{ !! item.featured_media ? (
-							<Media
-								className="edit-site-page-pages__featured-image"
-								id={ item.featured_media }
-								size={
-									view.type === LAYOUT_GRID
-										? [
-												'large',
-												'full',
-												'medium',
-												'thumbnail',
-										  ]
-										: [
-												'thumbnail',
-												'medium',
-												'large',
-												'full',
-										  ]
-								}
-							/>
-						) : null }
-					</span>
+					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
 			},

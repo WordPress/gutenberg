@@ -24,3 +24,22 @@
 		width: 100%;
 	}
 }
+
+.page-pages-preview-field__button {
+	box-shadow: none;
+	border: none;
+	padding: 0;
+	background-color: unset;
+	box-sizing: border-box;
+	cursor: pointer;
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+	border-radius: 3px 3px 0 0;
+
+	&:focus-visible {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+}

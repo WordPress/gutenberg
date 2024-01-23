@@ -32,7 +32,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
+import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import {
@@ -132,15 +132,18 @@ function AuthorField( { item, viewType } ) {
 	);
 }
 
-function Preview( { content, viewType } ) {
+function Preview( { item, viewType } ) {
 	const settings = usePatternSettings();
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
-		return parse( content );
-	}, [ content ] );
-	if ( ! blocks?.length ) {
-		return null;
-	}
+		return parse( item.content.raw );
+	}, [ item.content.raw ] );
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+	const isEmpty = ! blocks?.length;
 	// Wrap everything in a block editor provider to ensure 'styles' that are needed
 	// for the previews are synced between the site editor store and the block editor store.
 	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
@@ -154,7 +157,18 @@ function Preview( { content, viewType } ) {
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
 			>
-				<BlockPreview blocks={ blocks } />
+				<button
+					className="page-templates-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || item.title }
+				>
+					{ isEmpty &&
+						( item.type === TEMPLATE_POST_TYPE
+							? __( 'Empty template' )
+							: __( 'Empty template part' ) ) }
+					{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+				</button>
 			</div>
 		</ExperimentalBlockEditorProvider>
 	);
@@ -212,12 +226,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => {
-					return (
-						<Preview
-							content={ item.content.raw }
-							viewType={ view.type }
-						/>
-					);
+					return <Preview item={ item } viewType={ view.type } />;
 				},
 				minWidth: 120,
 				maxWidth: 120,
