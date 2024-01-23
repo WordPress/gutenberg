@@ -35,7 +35,7 @@ function getEditorCanvasContainerTitle( view ) {
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
 		case 'global-styles-revisions:style-book':
-			return __( 'Global styles revisions' );
+			return __( 'Style Revisions' );
 		default:
 			return '';
 	}
