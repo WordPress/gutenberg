@@ -19,7 +19,7 @@ import {
 	concat,
 } from '@wordpress/rich-text';
 import {
-	__experimentalLinkControl as LinkControl,
+	LinkControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
