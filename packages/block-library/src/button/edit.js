@@ -232,9 +232,6 @@ function ButtonEdit( props ) {
 	const lockUrlControls =
 		!! metadata?.bindings?.url &&
 		metadata?.bindings?.url?.lockEditorUI !== false;
-	const lockTextControls =
-		!! metadata?.bindings?.text &&
-		metadata?.bindings?.text?.lockEditorUI !== false;
 
 	return (
 		<>
@@ -284,7 +281,6 @@ function ButtonEdit( props ) {
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
-					isContentBound={ lockTextControls }
 				/>
 			</div>
 			<BlockControls group="block">

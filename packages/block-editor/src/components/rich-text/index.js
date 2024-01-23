@@ -19,6 +19,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -113,7 +114,11 @@ export function RichTextWrapper(
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const { clientId, isSelected: isBlockSelected } = useBlockEditContext();
+	const {
+		clientId,
+		isSelected: isBlockSelected,
+		name: blockName,
+	} = useBlockEditContext();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -149,8 +154,12 @@ export function RichTextWrapper(
 		originalIsSelected,
 		isBlockSelected,
 	] );
-	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getSelectionStart,
+		getSelectionEnd,
+		getBlockRootClientId,
+		getBlockAttributes,
+	} = useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -289,6 +298,22 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	const bindings = getBlockAttributes( clientId )?.metadata?.bindings;
+	const blockTypeAttributes = getBlockType( blockName ).attributes;
+	let shouldDisableEditing = false;
+	if ( bindings )
+		for ( const [ attribute, settings ] of Object.entries( bindings ) ) {
+			// If any of the attributes with source "rich-text" is part of the bindings,
+			// disable editing unless it is specified otherwise.
+			if (
+				blockTypeAttributes?.[ attribute ]?.source === 'rich-text' &&
+				settings.lockEditorUI !== false
+			) {
+				shouldDisableEditing = true;
+				break;
+			}
+		}
+
 	const TagName = tagName;
 	return (
 		<>
@@ -376,7 +401,7 @@ export function RichTextWrapper(
 					useFirefoxCompat(),
 					anchorRef,
 				] ) }
-				contentEditable={ props.isContentBound ? false : true }
+				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',

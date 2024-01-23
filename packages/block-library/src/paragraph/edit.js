@@ -100,8 +100,7 @@ function ParagraphBlock( {
 	setAttributes,
 	clientId,
 } ) {
-	const { align, content, direction, dropCap, placeholder, metadata } =
-		attributes;
+	const { align, content, direction, dropCap, placeholder } = attributes;
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
@@ -181,10 +180,6 @@ function ParagraphBlock( {
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }
-				isContentBound={
-					!! metadata?.bindings?.content &&
-					metadata?.bindings?.content?.lockEditorUI !== false
-				}
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>
