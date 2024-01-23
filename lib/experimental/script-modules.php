@@ -1,4 +1,46 @@
 <?php
+/**
+ * Add module fields from block metadata to WP_Block_Type settings.
+ *
+ * This filter allows us to register modules from block metadata and attach additional fields to
+ * WP_Block_Type instances.
+ *
+ * @param array $settings Array of determined settings for registering a block type.
+ * @param array $metadata Metadata provided for registering a block type.
+ */
+function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
+	$module_fields = array(
+		'viewModule' => 'view_module_ids',
+	);
+	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
+		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
+			$metadata[ $metadata_field_name ] = $settings[ $metadata_field_name ];
+		}
+		if ( ! empty( $metadata[ $metadata_field_name ] ) ) {
+			$modules           = $metadata[ $metadata_field_name ];
+			$processed_modules = array();
+			if ( is_array( $modules ) ) {
+				for ( $index = 0; $index < count( $modules ); $index++ ) {
+					$processed_modules[] = gutenberg_register_block_module_id(
+						$metadata,
+						$metadata_field_name,
+						$index
+					);
+				}
+			} else {
+				$processed_modules[] = gutenberg_register_block_module_id(
+					$metadata,
+					$metadata_field_name
+				);
+			}
+			$settings[ $settings_field_name ] = $processed_modules;
+		}
+	}
+
+	return $settings;
+}
+
+add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 10, 2 );
 
 /**
  * Enqueue modules associated with the block.
