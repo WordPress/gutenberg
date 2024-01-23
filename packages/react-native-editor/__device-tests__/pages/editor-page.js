@@ -674,46 +674,6 @@ class EditorPage {
 		await moveDownButton.click();
 	}
 
-	// Position of the block to remove
-	// Block will no longer be present if this succeeds.
-	async removeBlockAtPosition( blockName = '', position = 1 ) {
-		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
-			throw Error( `No Block at position ${ position }` );
-		}
-
-		const buttonElementName = isAndroid()
-			? '//*'
-			: '//XCUIElementTypeButton';
-		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
-		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position );
-			let checkList = await this.driver.$$(
-				blockActionsMenuButtonLocator
-			);
-			while ( checkList.length === 0 ) {
-				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
-				checkList = await this.driver.$$(
-					blockActionsMenuButtonLocator
-				);
-			}
-		}
-
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
-		await blockActionsMenuButton.click();
-		const removeActionButtonIdentifier = 'Remove block';
-		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
-		const removeActionButton = await waitForVisible(
-			this.driver,
-			removeActionButtonLocator
-		);
-
-		await removeActionButton.click();
-	}
-
 	// =========================
 	// Formatting toolbar functions
 	// =========================
