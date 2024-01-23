@@ -93,10 +93,11 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 		// eslint-disable-next-line no-undef
 	} else if ( source instanceof File ) {
 		dataSource = await source.arrayBuffer();
+	} else {
+		return;
 	}
 
-	// eslint-disable-next-line no-undef
-	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
+	const newFont = new window.FontFace( fontFace.fontFamily, dataSource, {
 		style: fontFace.fontStyle,
 		weight: fontFace.fontWeight,
 	} );
