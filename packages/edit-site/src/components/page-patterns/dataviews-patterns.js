@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	Button,
-	__experimentalHeading as Heading,
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
@@ -105,7 +104,24 @@ const SYNC_FILTERS = [
 	},
 ];
 
-function Preview( { item, viewType } ) {
+function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
+	if ( item.type === PATTERN_TYPES.theme ) {
+		return children;
+	}
+	return (
+		<button
+			className="page-patterns-preview-field__button"
+			type="button"
+			onClick={ onClick }
+			aria-label={ item.title }
+			aria-describedby={ ariaDescribedBy }
+		>
+			{ children }
+		</button>
+	);
+}
+
+function Preview( { item, categoryId, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
@@ -130,15 +146,37 @@ function Preview( { item, viewType } ) {
 		);
 	}
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+	const { onClick } = useLink( {
+		postType: item.type,
+		postId: isUserPattern ? item.id : item.name,
+		categoryId,
+		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+	} );
+
 	return (
 		<>
 			<div
 				className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
 			>
-				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
-				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+				<PreviewWrapper
+					item={ item }
+					onClick={ onClick }
+					ariaDescribedBy={
+						ariaDescriptions.length
+							? ariaDescriptions
+									.map(
+										( _, index ) =>
+											`${ descriptionId }-${ index }`
+									)
+									.join( ' ' )
+							: undefined
+					}
+				>
+					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
+					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+				</PreviewWrapper>
 			</div>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
 				<div
@@ -197,24 +235,24 @@ function Title( { item, categoryId } ) {
 					/>
 				</Tooltip>
 			) }
-			<Flex as="span" gap={ 0 } justify="left">
+			<Flex
+				as="div"
+				gap={ 0 }
+				justify="left"
+				className="edit-site-patterns__pattern-title"
+			>
 				{ item.type === PATTERN_TYPES.theme ? (
-					<span className="dataviews-view-grid__title-field">
-						{ item.title }
-					</span>
+					item.title
 				) : (
-					<Heading level={ 5 }>
-						<Button
-							variant="link"
-							onClick={ onClick }
-							// Required for the grid's roving tab index system.
-							// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
-							tabIndex="-1"
-							className="dataviews-view-grid__title-field"
-						>
-							{ item.title || item.name }
-						</Button>
-					</Heading>
+					<Button
+						variant="link"
+						onClick={ onClick }
+						// Required for the grid's roving tab index system.
+						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+						tabIndex="-1"
+					>
+						{ item.title || item.name }
+					</Button>
 				) }
 			</Flex>
 		</HStack>
@@ -246,7 +284,11 @@ export default function DataviewsPatterns() {
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => (
-					<Preview item={ item } viewType={ view.type } />
+					<Preview
+						item={ item }
+						categoryId={ categoryId }
+						viewType={ view.type }
+					/>
 				),
 				enableSorting: false,
 				enableHiding: false,

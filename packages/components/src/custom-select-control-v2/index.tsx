@@ -49,7 +49,7 @@ export function CustomSelect( {
 	onChange,
 	size = 'default',
 	value,
-	renderSelectedValue = defaultRenderSelectedValue,
+	renderSelectedValue,
 	...props
 }: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
 	const store = Ariakit.useSelectStore( {
@@ -59,6 +59,9 @@ export function CustomSelect( {
 	} );
 
 	const { value: currentValue } = store.useState();
+
+	const computedRenderSelectedValue =
+		renderSelectedValue ?? defaultRenderSelectedValue;
 
 	return (
 		<>
@@ -71,7 +74,7 @@ export function CustomSelect( {
 				hasCustomRenderProp={ !! renderSelectedValue }
 				store={ store }
 			>
-				{ renderSelectedValue( currentValue ) }
+				{ computedRenderSelectedValue( currentValue ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
 			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>

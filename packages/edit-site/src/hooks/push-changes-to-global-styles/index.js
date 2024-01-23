@@ -389,30 +389,36 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const blockEditingMode = useBlockEditingMode();
-		const isBlockBasedTheme = useSelect(
-			( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
-			[]
-		);
-		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
-			hasBlockSupport( props.name, feature )
-		);
+function PushChangesToGlobalStyles( props ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+		hasBlockSupport( props.name, feature )
+	);
+	const isDisplayed =
+		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' &&
-					supportsStyles &&
-					isBlockBasedTheme && (
-						<InspectorAdvancedControls>
-							<PushChangesToGlobalStylesControl { ...props } />
-						</InspectorAdvancedControls>
-					) }
-			</>
-		);
+	if ( ! isDisplayed ) {
+		return null;
 	}
+
+	return (
+		<InspectorAdvancedControls>
+			<PushChangesToGlobalStylesControl { ...props } />
+		</InspectorAdvancedControls>
+	);
+}
+
+const withPushChangesToGlobalStyles = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => (
+		<>
+			<BlockEdit { ...props } />
+			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
+		</>
+	)
 );
 
 addFilter(

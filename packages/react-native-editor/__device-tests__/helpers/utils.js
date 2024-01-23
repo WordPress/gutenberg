@@ -306,19 +306,11 @@ const clickBeginningOfElement = async ( driver, element ) => {
 		.perform();
 };
 
-// Long press to activate context menu.
-const longPressMiddleOfElement = async (
+async function longPressElement(
 	driver,
 	element,
-	waitTime = 1000,
-	customElementSize
-) => {
-	const location = await element.getLocation();
-	const size = customElementSize || ( await element.getSize() );
-
-	const x = location.x + size.width / 2;
-	const y = location.y + size.height / 2;
-
+	{ waitTime = 1000, offset = { x: 0, y: 0 } } = {}
+) {
 	// Focus on the element first, otherwise on iOS it fails to open the context menu.
 	// We can't do it all in one action because it detects it as a force press and it
 	// is not supported by the simulator.
@@ -331,16 +323,43 @@ const longPressMiddleOfElement = async (
 		.up()
 		.perform();
 
+	const location = await element.getLocation();
+	const size = await element.getSize();
+
+	let offsetX = offset.x;
+	if ( typeof offset.x === 'function' ) {
+		offsetX = offset.x( size.width );
+	}
+	let offsetY = offset.y;
+	if ( typeof offset.y === 'function' ) {
+		offsetY = offset.y( size.height );
+	}
+
 	// Long-press
 	await driver
 		.action( 'pointer', {
 			parameters: { pointerType: 'touch' },
 		} )
-		.move( { x, y } )
+		.move( { x: location.x + offsetX, y: location.y + offsetY } )
 		.down()
 		.pause( waitTime )
 		.up()
 		.perform();
+}
+
+// Long press to activate context menu.
+const longPressMiddleOfElement = async (
+	driver,
+	element,
+	{ waitTime = 1000 } = {}
+) => {
+	await longPressElement( driver, element, {
+		waitTime,
+		offset: {
+			x: ( width ) => width / 2,
+			y: ( height ) => height / 2,
+		},
+	} );
 };
 
 const tapStatusBariOS = async ( driver ) => {
@@ -717,6 +736,7 @@ module.exports = {
 	isElementVisible,
 	isLocalEnvironment,
 	launchApp,
+	longPressElement,
 	longPressMiddleOfElement,
 	selectTextFromElement,
 	setupDriver,

@@ -212,7 +212,7 @@ class VideoEdit extends Component {
 	render() {
 		const { setAttributes, attributes, isSelected, wasBlockJustInserted } =
 			this.props;
-		const { id, src } = attributes;
+		const { id, src, guid } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -236,7 +236,10 @@ class VideoEdit extends Component {
 			></MediaUpload>
 		);
 
-		if ( ! src ) {
+		// NOTE: `guid` is not part of the block's attribute definition. This case
+		// handled here is a temporary fix until a we find a better approach.
+		const isSourcePresent = src || ( guid && id );
+		if ( ! isSourcePresent ) {
 			return (
 				<View style={ { flex: 1 } }>
 					<MediaPlaceholder

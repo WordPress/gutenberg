@@ -34,9 +34,7 @@ export default function SaveButton( {
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			const { isSaveViewOpened } = select( editSiteStore );
 			const isActivatingTheme = isResolving( 'activateTheme' );
-			const previewingTheme = select( coreStore ).getTheme(
-				currentlyPreviewingTheme()
-			);
+			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
 
 			return {
 				isDirty: dirtyEntityRecords.length > 0,
@@ -49,7 +47,12 @@ export default function SaveButton( {
 						)
 					) || isActivatingTheme,
 				isSaveViewOpen: isSaveViewOpened(),
-				previewingThemeName: previewingTheme?.name?.rendered,
+				// Do not call `getTheme` with null, it will cause a request to
+				// the server.
+				previewingThemeName: currentlyPreviewingThemeId
+					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
+							?.name?.rendered
+					: undefined,
 			};
 		}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );

@@ -53,11 +53,40 @@ test.describe( 'List View', () => {
 			name: 'Paragraph',
 			exact: true,
 		} );
+		const imageBlockItem = listView.getByRole( 'gridcell', {
+			name: 'Image',
+			exact: true,
+		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
 			name: 'Heading',
 			exact: true,
 		} );
-		await paragraphBlockItem.dragTo( headingBlockItem, { x: 0, y: 0 } );
+
+		await paragraphBlockItem.hover();
+		await page.mouse.down();
+
+		// To work around a drag and drop bug in Safari, the list view applies
+		// `pointer-events: none` to the list view while dragging, so that
+		// `onDragLeave` is not fired when dragging within the list view.
+		// Without the `force: true` option, the `hover` action will fail
+		// as playwright will complain that pointer-events are intercepted.
+		// https://bugs.webkit.org/show_bug.cgi?id=66547
+		// See: https://github.com/WordPress/gutenberg/pull/56625
+
+		// Hover over each block to mimic moving up the list view.
+		// Also, hover twice to ensure a dragover event is dispatched.
+		// See: https://playwright.dev/docs/input#dragging-manually
+		await imageBlockItem.hover( { force: true } );
+		await imageBlockItem.hover( { force: true } );
+		await headingBlockItem.hover( { force: true } );
+		await headingBlockItem.hover( { force: true } );
+
+		// Disable reason: Need to wait until the throttle timeout of 250ms has passed.
+		/* eslint-disable playwright/no-wait-for-timeout */
+		await editor.page.waitForTimeout( 300 );
+		/* eslint-enable playwright/no-wait-for-timeout */
+
+		await page.mouse.up();
 
 		// Ensure the block was dropped correctly.
 		await expect
@@ -820,7 +849,7 @@ test.describe( 'List View', () => {
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Options for Heading' } )
-			.getByRole( 'menuitem', { name: 'Delete blocks' } )
+			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
 			.poll(

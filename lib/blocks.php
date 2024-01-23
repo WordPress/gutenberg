@@ -440,27 +440,6 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
 
 
-/**
- * Registers the metadata block attribute for all block types.
- *
- * @param array $args Array of arguments for registering a block type.
- * @return array $args
- */
-function gutenberg_register_metadata_attribute( $args ) {
-	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
-		$args['attributes'] = array();
-	}
-
-	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
-		$args['attributes']['metadata'] = array(
-			'type' => 'object',
-		);
-	}
-
-	return $args;
-}
-add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 /**
  * Strips all HTML from the content of footnotes, and sanitizes the ID.
