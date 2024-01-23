@@ -56,8 +56,13 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 		if (
 			support === 'textTransform' &&
 			! name &&
-			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
-				element
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
 			)
 		) {
 			return false;
@@ -67,8 +72,13 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 		if (
 			support === 'letterSpacing' &&
 			! name &&
-			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
-				element
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
 			)
 		) {
 			return false;
