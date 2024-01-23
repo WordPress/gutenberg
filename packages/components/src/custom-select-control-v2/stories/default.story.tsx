@@ -70,6 +70,7 @@ const ControlledTemplate: StoryFn< typeof NewCustomSelect > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Label',
+	defaultValue: 'Select a size...',
 	children: (
 		<>
 			<CustomSelectItem value="Small">
@@ -136,6 +137,7 @@ const renderControlledValue = ( gravatar: string | string[] ) => {
 export const Controlled = ControlledTemplate.bind( {} );
 Controlled.args = {
 	label: 'Default Gravatars',
+	defaultValue: 'wavatar',
 	renderSelectedValue: renderControlledValue,
 	children: (
 		<>

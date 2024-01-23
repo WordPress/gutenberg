@@ -15,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '..';
 import * as Styled from './styles';
 import type {
-	CustomSelectProps,
+	DefaultCustomSelectProps,
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
 } from './types';
@@ -24,7 +24,9 @@ import type { WordPressComponentProps } from '../context';
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
 
-function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
+function defaultRenderSelectedValue(
+	value: DefaultCustomSelectProps[ 'value' ]
+) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
 		: value === undefined || value === null;
@@ -55,7 +57,7 @@ export function _CustomSelect( {
 	store,
 	...props
 }: WordPressComponentProps<
-	CustomSelectProps & CustomSelectStore,
+	DefaultCustomSelectProps & CustomSelectStore,
 	'button',
 	false
 > ) {
@@ -84,7 +86,12 @@ export function _CustomSelect( {
 				{ computedRenderSelectedValue( currentValue ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
-			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
+			<Styled.CustomSelectPopover
+				gutter={ 12 }
+				store={ store }
+				sameWidth
+				unmountOnHide
+			>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
 				</CustomSelectContext.Provider>

@@ -52,6 +52,7 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 			};
 			onChange( changeObject );
 		},
+		defaultValue: options[ 0 ].name,
 	} );
 
 	const children = options.map(

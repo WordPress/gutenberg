@@ -27,7 +27,7 @@ export type CustomSelectProps = {
 	 * An optional default value for the control. If left `undefined`, the first
 	 * non-disabled item will be used.
 	 */
-	defaultValue?: string | string[];
+	defaultValue: string | string[];
 	/**
 	 * Used to visually hide the label. It will always be visible to screen readers.
 	 *
@@ -59,6 +59,12 @@ export type CustomSelectProps = {
 	 */
 	value?: string | string[];
 };
+
+export type DefaultCustomSelectProps = Omit<
+	CustomSelectProps,
+	'defaultValue'
+>;
+
 /**
  * The legacy object structure for the options array.
  */
