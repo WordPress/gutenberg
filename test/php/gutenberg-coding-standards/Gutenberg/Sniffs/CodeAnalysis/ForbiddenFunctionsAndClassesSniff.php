@@ -165,12 +165,12 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	}
 
 	/**
-	 * Checks if the function/class are guarded against being used in
-	 * non-Gutenberg context.
+	 * This function looks for a specific if condition that wraps the token
+	 * to determine if it's protected from execution outside of Gutenberg.
 	 *
 	 * Example of a guarded function (works similarly for classes):
 	 * if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-	 *  // gutenberg_prefixed_i_am_allowed_to_be_called_since_i_am_guarded_function();
+	 * // gutenberg_prefixed_i_am_allowed_to_be_called_since_i_am_guarded_function();
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
@@ -183,10 +183,12 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 			return false;
 		}
 
-		$tokens     = $phpcs_file->getTokens();
-		$conditions = $tokens[ $stack_pointer ]['conditions'];
-		$conditions = array_reverse( $conditions, true );
+		$tokens = $phpcs_file->getTokens();
 
+		// It has to start from the matched condition closest to the passed token.
+		$conditions = array_reverse( $tokens[ $stack_pointer ]['conditions'], true );
+
+		// if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$regexp = '/if\s*\(\s*defined\(\s*(\'|")IS_GUTENBERG_PLUGIN(\'|")\s*\)\s*&&\s*IS_GUTENBERG_PLUGIN/';
 
 		foreach ( $conditions as $wrapping_if_token => $condition ) {
@@ -196,6 +198,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 
 			$end_of_wrapping_if_token = $phpcs_file->findEndOfStatement( $wrapping_if_token );
 			$content                  = $phpcs_file->getTokensAsString( $wrapping_if_token, $end_of_wrapping_if_token - $wrapping_if_token );
+
 			if ( 1 === preg_match( $regexp, $content ) ) {
 				return true;
 			}
