@@ -181,7 +181,10 @@ function ParagraphBlock( {
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }
-				isContentBound={ metadata?.bindings?.content }
+				isContentBound={
+					!! metadata?.bindings?.content &&
+					metadata?.bindings?.content?.lockEditorUI !== false
+				}
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

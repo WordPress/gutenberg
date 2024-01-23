@@ -229,6 +229,13 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
+	const lockUrlControls =
+		!! metadata?.bindings?.url &&
+		metadata?.bindings?.url?.lockEditorUI !== false;
+	const lockTextControls =
+		!! metadata?.bindings?.text &&
+		metadata?.bindings?.text?.lockEditorUI !== false;
+
 	return (
 		<>
 			<div
@@ -277,7 +284,7 @@ function ButtonEdit( props ) {
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
-					isContentBound={ metadata?.bindings?.text }
+					isContentBound={ lockTextControls }
 				/>
 			</div>
 			<BlockControls group="block">
@@ -289,7 +296,7 @@ function ButtonEdit( props ) {
 						} }
 					/>
 				) }
-				{ ! isURLSet && isLinkTag && ! metadata?.bindings?.url && (
+				{ ! isURLSet && isLinkTag && ! lockUrlControls && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -298,7 +305,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && isLinkTag && ! metadata?.bindings?.url && (
+				{ isURLSet && isLinkTag && ! lockUrlControls && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }

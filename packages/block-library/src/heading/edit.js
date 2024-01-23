@@ -139,7 +139,10 @@ function HeadingEdit( {
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
-				isContentBound={ metadata?.bindings?.content }
+				isContentBound={
+					!! metadata?.bindings?.content &&
+					metadata?.bindings?.content?.lockEditorUI !== false
+				}
 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
 				{ ...blockProps }
 			/>

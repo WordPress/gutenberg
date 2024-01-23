@@ -411,16 +411,22 @@ export default function Image( {
 		</InspectorControls>
 	);
 
-	const isUrlAttributeConnected = !! metadata?.bindings?.url;
-	const isAltAttributeConnected = !! metadata?.bindings?.alt;
-	const isTitleAttributeConnected = !! metadata?.bindings?.title;
+	const lockUrlControls =
+		!! metadata?.bindings?.url &&
+		metadata?.bindings?.url?.lockEditorUI !== false;
+	const lockAltControls =
+		!! metadata?.bindings?.alt &&
+		metadata?.bindings?.alt?.lockEditorUI !== false;
+	const lockTitleControls =
+		!! metadata?.bindings?.title &&
+		metadata?.bindings?.title?.lockEditorUI !== false;
 
 	const controls = (
 		<>
 			<BlockControls group="block">
 				{ ! multiImageSelection &&
 					! isEditingImage &&
-					! isUrlAttributeConnected && (
+					! lockUrlControls && (
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
@@ -449,7 +455,7 @@ export default function Image( {
 			</BlockControls>
 			{ ! multiImageSelection &&
 				! isEditingImage &&
-				! isUrlAttributeConnected && (
+				! lockUrlControls && (
 					<BlockControls group="other">
 						<MediaReplaceFlow
 							mediaId={ id }
@@ -492,9 +498,9 @@ export default function Image( {
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
-								disabled={ isAltAttributeConnected }
+								disabled={ lockAltControls }
 								help={
-									isAltAttributeConnected ? (
+									lockAltControls ? (
 										<>
 											{ __(
 												'Connected to a custom field'
@@ -562,9 +568,9 @@ export default function Image( {
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
-					disabled={ isTitleAttributeConnected }
+					disabled={ lockTitleControls }
 					help={
-						isTitleAttributeConnected ? (
+						lockTitleControls ? (
 							<>{ __( 'Connected to a custom field' ) }</>
 						) : (
 							<>
