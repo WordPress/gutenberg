@@ -350,11 +350,18 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
+		label: __( 'Toggle List View' ),
 		icon: listView,
 		callback: ( { close } ) => {
 			setIsListViewOpened( ! isListViewOpen );
 			close();
+			createInfoNotice(
+				isListViewOpen ? __( 'List View off.' ) : __( 'List View on.' ),
+				{
+					id: 'core/edit-site/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
