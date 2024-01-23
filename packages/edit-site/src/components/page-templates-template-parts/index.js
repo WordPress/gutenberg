@@ -160,11 +160,10 @@ function Preview( { content, viewType } ) {
 			>
 				<button
 					className={ classNames(
-						'page-templates-preview-field__button',
-						{ 'is-inactive': isEmpty }
+						'page-templates-preview-field__button'
 					) }
 					type="button"
-					onClick={ ! isEmpty ? onClick : undefined }
+					onClick={ onClick }
 					aria-label={ item.title?.rendered || item.title }
 					aria-disabled={ isEmpty }
 				>

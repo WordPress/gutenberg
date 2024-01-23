@@ -171,11 +171,9 @@ function FeaturedImage( { item, viewType } ) {
 			} }
 		>
 			<button
-				className={ classNames( 'page-pages-preview-field__button', {
-					'is-inactive': ! hasMedia,
-				} ) }
+				className={ classNames( 'page-pages-preview-field__button' ) }
 				type="button"
-				onClick={ hasMedia ? onClick : undefined }
+				onClick={ onClick }
 				aria-label={ item.title?.rendered || item.title }
 				aria-disabled={ ! hasMedia }
 			>
