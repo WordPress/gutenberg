@@ -8,8 +8,8 @@ import type { Meta, StoryFn } from '@storybook/react';
  */
 import {
 	Composite,
-	CompositeItem,
 	CompositeGroup,
+	CompositeItem,
 	useCompositeState,
 } from '..';
 import { UseCompositeStatePlaceholder, transform } from './utils';
@@ -18,6 +18,11 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 	title: 'Components/Composite/Composite (Legacy)',
 	id: 'components-composite-legacy',
 	component: UseCompositeStatePlaceholder,
+	subcomponents: {
+		Composite,
+		CompositeGroup,
+		CompositeItem,
+	},
 	args: {},
 	parameters: { controls: { exclude: /^unstable_/ } },
 	argTypes: {
