@@ -83,28 +83,3 @@ function register_block_core_block() {
 	);
 }
 add_action( 'init', 'register_block_core_block' );
-
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments ) ) {
-	/**
-	 * Registers the overrides attribute for core/block.
-	 *
-	 * @param array  $args       Array of arguments for registering a block type.
-	 * @param string $block_name Block name including namespace.
-	 * @return array $args
-	 */
-	function register_block_core_block_args( $args, $block_name ) {
-		if ( 'core/block' === $block_name ) {
-			$args['attributes'] = array_merge(
-				$args['attributes'],
-				array(
-					'overrides' => array(
-						'type' => 'object',
-					),
-				)
-			);
-		}
-		return $args;
-	}
-	add_filter( 'register_block_type_args', 'register_block_core_block_args', 10, 2 );
-}
