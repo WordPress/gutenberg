@@ -296,7 +296,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state ) => {
 		// This setting is left for back compat.
 		const {
-			__experimentalBlockPatterns,
+			__experimentalBlockPatterns = [],
 			__experimentalFetchBlockPatterns,
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
