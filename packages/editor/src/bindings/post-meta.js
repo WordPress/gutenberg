@@ -13,7 +13,6 @@ const { getCurrentPostType } = select( editorStore );
 export default {
 	name: 'post_meta',
 	label: 'Post Meta',
-	component: null,
 	useSource( props, sourceAttributes ) {
 		const { context } = props;
 		const { value: metaKey } = sourceAttributes;

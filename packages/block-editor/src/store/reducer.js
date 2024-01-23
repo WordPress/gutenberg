@@ -2023,7 +2023,6 @@ function blockBindingsSources( state = {}, action ) {
 			...state,
 			[ action.sourceName ]: {
 				label: action.sourceLabel,
-				component: action.sourceComponent,
 				useSource: action.useSource,
 			},
 		};
