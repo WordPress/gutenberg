@@ -24,7 +24,10 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 		CompositeItem,
 	},
 	args: {},
-	parameters: { controls: { exclude: /^unstable_/ } },
+	parameters: {
+		controls: { exclude: /^unstable_/ },
+		docs: { source: { transform } },
+	},
 	argTypes: {
 		orientation: { control: 'select' },
 		rtl: { control: 'select', options: [ true, false ] },
@@ -89,9 +92,6 @@ export const TwoDimensionsWithStateProp: StoryFn<
 	);
 };
 TwoDimensionsWithStateProp.args = {};
-TwoDimensionsWithStateProp.parameters = {
-	docs: { source: { transform } },
-};
 
 export const TwoDimensionsWithSpreadProps: StoryFn<
 	typeof UseCompositeStatePlaceholder
@@ -141,9 +141,6 @@ export const TwoDimensionsWithSpreadProps: StoryFn<
 	);
 };
 TwoDimensionsWithSpreadProps.args = {};
-TwoDimensionsWithSpreadProps.parameters = {
-	docs: { source: { transform } },
-};
 
 export const OneDimensionWithStateProp: StoryFn<
 	typeof UseCompositeStatePlaceholder
@@ -175,9 +172,6 @@ export const OneDimensionWithStateProp: StoryFn<
 	);
 };
 OneDimensionWithStateProp.args = {};
-OneDimensionWithStateProp.parameters = {
-	docs: { source: { transform } },
-};
 
 export const OneDimensionWithSpreadProps: StoryFn<
 	typeof UseCompositeStatePlaceholder
@@ -209,6 +203,3 @@ export const OneDimensionWithSpreadProps: StoryFn<
 	);
 };
 OneDimensionWithSpreadProps.args = {};
-OneDimensionWithSpreadProps.parameters = {
-	docs: { source: { transform } },
-};
