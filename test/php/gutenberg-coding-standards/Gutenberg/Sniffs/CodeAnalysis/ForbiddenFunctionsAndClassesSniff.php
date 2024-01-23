@@ -111,6 +111,16 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * @return void
 	 */
 	private function check_class_usage( File $phpcs_file, $stack_pointer ) {
+		if ( empty( $this->forbidden_classes ) ) {
+			// Nothing to process.
+			return;
+		}
+
+		if ( $this->check_if_token_guarded( $phpcs_file, $stack_pointer ) ) {
+			// The token is guarded. Nothing to process.
+			return;
+		}
+
 		$tokens     = $phpcs_file->getTokens();
 		$class_name = $tokens[ $stack_pointer ]['content'];
 
@@ -131,10 +141,18 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
-	 *
-	 * @return void
 	 */
 	private function check_function_usage( File $phpcs_file, $stack_pointer ) {
+		if ( empty( $this->forbidden_functions ) ) {
+			// Nothing to process.
+			return;
+		}
+
+		if ( $this->check_if_token_guarded( $phpcs_file, $stack_pointer ) ) {
+			// The token is guarded. Nothing to process.
+			return;
+		}
+
 		$tokens        = $phpcs_file->getTokens();
 		$function_name = $tokens[ $stack_pointer ]['content'];
 
@@ -148,6 +166,32 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 
 		$error_message = 'It\'s not allowed to call the "' . $function_name . '()" function as its name matches the forbidden pattern: "' . $regexp . '".';
 		$phpcs_file->addError( $error_message, $stack_pointer, 'ForbiddenFunctionCall' );
+	}
+
+	/**
+	 * Checks if the function/class are guarded against being used in
+	 * non-Gutenberg context.
+	 *
+	 * Example of a guarded function (works similarly for classes):
+	 * if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	 *  // gutenberg_prefixed_i_am_allowed_to_be_called_since_i_am_guarded_function();
+	 *
+	 * @param File $phpcs_file    File being scanned.
+	 * @param int  $stack_pointer Position of the text token in the token stack.
+	 *
+	 * @return bool
+	 */
+	private function check_if_token_guarded( File $phpcs_file, $stack_pointer ) {
+		$wrapping_if_token = $phpcs_file->getCondition( $stack_pointer, T_IF, false );
+		if ( false === $wrapping_if_token ) {
+			return false;
+		}
+
+		$end_of_wrapping_if_token = $phpcs_file->findEndOfStatement( $wrapping_if_token );
+		$content                  = $phpcs_file->getTokensAsString( $wrapping_if_token, $end_of_wrapping_if_token - $wrapping_if_token );
+		$regexp                   = '/if\s*\(\s*defined\(\s*(\'|")IS_GUTENBERG_PLUGIN(\'|")\s*\)\s*&&\s*IS_GUTENBERG_PLUGIN/';
+
+		return 1 === preg_match( $regexp, $content );
 	}
 
 	/**
