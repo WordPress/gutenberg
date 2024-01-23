@@ -8,7 +8,7 @@ test.describe( 'Pattern Overrides', () => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
 			requestUtils.setGutenbergExperiments( [
-				'gutenberg-custom-fields',
+				'gutenberg-block-bindings',
 			] ),
 			requestUtils.deleteAllBlocks(),
 		] );
