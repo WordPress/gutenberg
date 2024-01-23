@@ -10,8 +10,6 @@ import { useState, useCallback } from '@wordpress/element';
 /**
  * Hook which allows to listen the resize event of any target element when it changes sizes.
  *
- * @return {Array} An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
- *
  * @example
  *
  * ```js
@@ -26,7 +24,6 @@ import { useState, useCallback } from '@wordpress/element';
  * 	);
  * };
  * ```
- *
  */
 const useResizeObserver = () => {
 	const [ measurements, setMeasurements ] = useState( null );
@@ -39,14 +36,21 @@ const useResizeObserver = () => {
 				prevState.width !== width ||
 				prevState.height !== height
 			) {
-				return { width, height };
+				return {
+					width: Math.floor( width ),
+					height: Math.floor( height ),
+				};
 			}
 			return prevState;
 		} );
 	}, [] );
 
 	const observer = (
-		<View style={ StyleSheet.absoluteFill } onLayout={ onLayout } />
+		<View
+			testID="resize-observer"
+			style={ StyleSheet.absoluteFill }
+			onLayout={ onLayout }
+		/>
 	);
 
 	return [ observer, measurements ];

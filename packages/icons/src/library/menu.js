@@ -4,8 +4,8 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const menu = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
-		<Path d="M17 7V5H3v2h14zm0 4V9H3v2h14zm0 4v-2H3v2h14z" />
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" />
 	</SVG>
 );
 

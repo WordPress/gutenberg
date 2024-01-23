@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -31,7 +31,7 @@ export const MEDIA_SAVE_STATE_RESET = 8;
 export const MEDIA_SAVE_FINAL_STATE_RESULT = 9;
 export const MEDIA_SAVE_MEDIAID_CHANGED = 10;
 
-export class BlockMediaUpdateProgress extends React.Component {
+export class BlockMediaUpdateProgress extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -124,7 +124,7 @@ export class BlockMediaUpdateProgress extends React.Component {
 		}
 	}
 
-	// ---- Block media save actions
+	// ---- Block media save actions.
 	updateMediaSaveProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
@@ -184,7 +184,7 @@ export class BlockMediaUpdateProgress extends React.Component {
 		}
 	}
 
-	// ---- Block media upload actions
+	// ---- Block media upload actions.
 	updateMediaUploadProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
@@ -220,7 +220,7 @@ export class BlockMediaUpdateProgress extends React.Component {
 	}
 
 	addMediaUploadListener() {
-		//if we already have a subscription not worth doing it again
+		// If we already have a subscription not worth doing it again.
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}
@@ -238,7 +238,7 @@ export class BlockMediaUpdateProgress extends React.Component {
 	}
 
 	addMediaSaveListener() {
-		//if we already have a subscription not worth doing it again
+		// If we already have a subscription not worth doing it again.
 		if ( this.subscriptionParentMediaSave ) {
 			return;
 		}
@@ -281,7 +281,7 @@ export class BlockMediaUpdateProgress extends React.Component {
 			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
 				{ showSpinner && (
 					<View style={ styles.progressBar }>
-						<Spinner progress={ progress } />
+						<Spinner progress={ progress } testID="spinner" />
 					</View>
 				) }
 				{ renderContent( {

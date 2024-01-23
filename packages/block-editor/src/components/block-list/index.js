@@ -6,55 +6,145 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, forwardRef } from '@wordpress/element';
+import {
+	AsyncModeProvider,
+	useSelect,
+	useDispatch,
+	useRegistry,
+} from '@wordpress/data';
+import {
+	useViewportMatch,
+	useMergeRefs,
+	useDebounce,
+} from '@wordpress/compose';
+import {
+	createContext,
+	useMemo,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import BlockListAppender, {
-	AppenderNodesContext,
-} from '../block-list-appender';
-import RootContainer from './root-container';
-import useBlockDropZone from '../use-block-drop-zone';
+import BlockListAppender from '../block-list-appender';
+import { useInBetweenInserter } from './use-in-between-inserter';
+import { store as blockEditorStore } from '../../store';
+import { LayoutProvider, defaultLayout } from './layout';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useInnerBlocksProps } from '../inner-blocks';
+import {
+	BlockEditContextProvider,
+	DEFAULT_BLOCK_EDIT_CONTEXT,
+} from '../block-edit/context';
+import { useTypingObserver } from '../observe-typing';
+import { unlock } from '../../lock-unlock';
 
-/**
- * A map to store the reference of each "Appenders" rendered with `rootClientId` as key.
- */
-const appenderNodesMap = new Map();
+export const IntersectionObserver = createContext();
+const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
+function Root( { className, ...settings } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetEditorMode } =
+				select( blockEditorStore );
+			const { outlineMode, focusMode } = getSettings();
+			return {
+				isOutlineMode: outlineMode,
+				isFocusMode: focusMode,
+				editorMode: __unstableGetEditorMode(),
+			};
+		},
+		[]
+	);
+	const registry = useRegistry();
+	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
-function BlockList(
-	{ className, placeholder, rootClientId, renderAppender },
-	ref
-) {
-	const Container = rootClientId ? 'div' : RootContainer;
-	const fallbackRef = useRef();
-	const wrapperRef = ref || fallbackRef;
+	const delayedBlockVisibilityUpdates = useDebounce(
+		useCallback( () => {
+			const updates = {};
+			pendingBlockVisibilityUpdatesPerRegistry
+				.get( registry )
+				.forEach( ( [ id, isIntersecting ] ) => {
+					updates[ id ] = isIntersecting;
+				} );
+			setBlockVisibility( updates );
+		}, [ registry ] ),
+		300,
+		{
+			trailing: true,
+		}
+	);
+	const intersectionObserver = useMemo( () => {
+		const { IntersectionObserver: Observer } = window;
 
+		if ( ! Observer ) {
+			return;
+		}
+
+		return new Observer( ( entries ) => {
+			if ( ! pendingBlockVisibilityUpdatesPerRegistry.get( registry ) ) {
+				pendingBlockVisibilityUpdatesPerRegistry.set( registry, [] );
+			}
+			for ( const entry of entries ) {
+				const clientId = entry.target.getAttribute( 'data-block' );
+				pendingBlockVisibilityUpdatesPerRegistry
+					.get( registry )
+					.push( [ clientId, entry.isIntersecting ] );
+			}
+			delayedBlockVisibilityUpdates();
+		} );
+	}, [] );
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			ref: useMergeRefs( [
+				useBlockSelectionClearer(),
+				useInBetweenInserter(),
+				useTypingObserver(),
+			] ),
+			className: classnames( 'is-root-container', className, {
+				'is-outline-mode': isOutlineMode,
+				'is-focus-mode': isFocusMode && isLargeViewport,
+				'is-navigate-mode': editorMode === 'navigation',
+			} ),
+		},
+		settings
+	);
 	return (
-		<AppenderNodesContext.Provider value={ appenderNodesMap }>
-			<Container
-				ref={ wrapperRef }
-				className={ classnames(
-					'block-editor-block-list__layout',
-					className
-				) }
-			>
-				<BlockListItems
-					placeholder={ placeholder }
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-					wrapperRef={ wrapperRef }
-				/>
-			</Container>
-		</AppenderNodesContext.Provider>
+		<IntersectionObserver.Provider value={ intersectionObserver }>
+			<div { ...innerBlocksProps } />
+		</IntersectionObserver.Provider>
+	);
+}
+
+function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
+	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+	const isBlockOrDescendantSelected = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return (
+				isBlockSelected( clientId ) ||
+				hasSelectedInnerBlock( clientId, true )
+			);
+		},
+		[ clientId ]
+	);
+	useEffect( () => {
+		if ( ! isBlockOrDescendantSelected ) {
+			stopEditingAsBlocks( clientId );
+		}
+	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	return null;
+}
+
+export default function BlockList( settings ) {
+	return (
+		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
+			<Root { ...settings } />
+		</BlockEditContextProvider>
 	);
 }
 
@@ -63,102 +153,58 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	wrapperRef,
+	layout = defaultLayout,
 } ) {
-	function selector( select ) {
-		const {
-			getBlockOrder,
-			getBlockListSettings,
-			getSettings,
-			getSelectedBlockClientId,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-			getGlobalBlockCount,
-			isTyping,
-			__experimentalGetActiveBlockIdByBlockNames,
-		} = select( 'core/block-editor' );
-
-		// Determine if there is an active entity area to spotlight.
-		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
-			getSettings().__experimentalSpotlightEntityBlocks
+	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockOrder,
+					getSelectedBlockClientIds,
+					__unstableGetVisibleBlocks,
+					__unstableGetTemporarilyEditingAsBlocks,
+				} = select( blockEditorStore );
+				return {
+					order: getBlockOrder( rootClientId ),
+					selectedBlocks: getSelectedBlockClientIds(),
+					visibleBlocks: __unstableGetVisibleBlocks(),
+					temporarilyEditingAsBlocks:
+						__unstableGetTemporarilyEditingAsBlocks(),
+				};
+			},
+			[ rootClientId ]
 		);
 
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			orientation: getBlockListSettings( rootClientId )?.orientation,
-			hasMultiSelection: hasMultiSelection(),
-			enableAnimation:
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			activeEntityBlockId,
-		};
-	}
-
-	const {
-		blockClientIds,
-		selectedBlockClientId,
-		multiSelectedBlockClientIds,
-		orientation,
-		hasMultiSelection,
-		enableAnimation,
-		activeEntityBlockId,
-	} = useSelect( selector, [ rootClientId ] );
-
-	const dropTargetIndex = useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
-
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
-
 	return (
-		<>
-			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection
-					? multiSelectedBlockClientIds.includes( clientId )
-					: selectedBlockClientId === clientId;
-
-				const isDropTarget = dropTargetIndex === index;
-
-				return (
-					<AsyncModeProvider
-						key={ clientId }
-						value={ ! isBlockInSelection }
-					>
-						<BlockListBlock
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							// This prop is explicitely computed and passed down
-							// to avoid being impacted by the async mode
-							// otherwise there might be a small delay to trigger the animation.
-							index={ index }
-							enableAnimation={ enableAnimation }
-							className={ classnames( {
-								'is-drop-target': isDropTarget,
-								'is-dropping-horizontally':
-									isDropTarget &&
-									orientation === 'horizontal',
-								'has-active-entity': activeEntityBlockId,
-							} ) }
-							activeEntityBlockId={ activeEntityBlockId }
-						/>
-					</AsyncModeProvider>
-				);
-			} ) }
-			{ blockClientIds.length < 1 && placeholder }
+		<LayoutProvider value={ layout }>
+			{ order.map( ( clientId ) => (
+				<AsyncModeProvider
+					key={ clientId }
+					value={
+						// Only provide data asynchronously if the block is
+						// not visible and not selected.
+						! visibleBlocks.has( clientId ) &&
+						! selectedBlocks.includes( clientId )
+					}
+				>
+					<BlockListBlock
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+					/>
+				</AsyncModeProvider>
+			) ) }
+			{ order.length < 1 && placeholder }
+			{ !! temporarilyEditingAsBlocks && (
+				<StopEditingAsBlocksOnOutsideSelect
+					clientId={ temporarilyEditingAsBlocks }
+				/>
+			) }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ classnames( {
-					'is-drop-target': isAppenderDropTarget,
-					'is-dropping-horizontally':
-						isAppenderDropTarget && orientation === 'horizontal',
-				} ) }
 			/>
-		</>
+		</LayoutProvider>
 	);
 }
 
@@ -171,5 +217,3 @@ export function BlockListItems( props ) {
 		</AsyncModeProvider>
 	);
 }
-
-export default forwardRef( BlockList );

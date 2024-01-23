@@ -11,6 +11,8 @@ module.exports = ( api ) => {
 					extensions: [ 'css', 'scss', 'sass' ],
 				},
 			],
+			'react-native-reanimated/plugin',
+			'@babel/plugin-proposal-export-namespace-from',
 		],
 		overrides: [
 			{
@@ -27,7 +29,7 @@ module.exports = ( api ) => {
 				exclude: /node_modules\/react-native/,
 			},
 			{
-				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
+				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found.
 				plugins: [
 					[
 						'../../packages/babel-plugin-import-jsx-pragma',

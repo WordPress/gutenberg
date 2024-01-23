@@ -8,23 +8,23 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
 	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
-			'core/edit-widgets'
-		);
+		const { getEditedWidgetAreas, isSavingWidgetAreas } =
+			select( editWidgetsStore );
 
 		return {
 			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
 			isSaving: isSavingWidgetAreas(),
 		};
 	}, [] );
-	const { saveEditedWidgetAreas } = useDispatch( 'core/edit-widgets' );
+	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	return (
 		<Button
-			isPrimary
+			variant="primary"
 			isBusy={ isSaving }
 			aria-disabled={ isSaving }
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }

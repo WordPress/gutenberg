@@ -17,6 +17,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			item_scheduled: 'scheduled',
 			item_updated: 'updated',
 			view_item: 'view',
+			item_trashed: 'trash',
 		},
 		viewable: false,
 	};
@@ -34,7 +35,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		[
 			'when previous post is not published and post will not be published',
 			[ 'draft', 'draft', false ],
-			[],
+			[ 'Draft saved.', defaultExpectedAction ],
 		],
 		[
 			'when previous post is published and post will be unpublished',
@@ -74,12 +75,18 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				},
 			],
 		],
+		[
+			'when post will be trashed',
+			[ 'publish', 'trash', true ],
+			[ 'trash', defaultExpectedAction ],
+		],
 	].forEach(
 		( [
 			description,
 			[ previousPostStatus, postStatus, isViewable ],
 			expectedValue,
 		] ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				previousPost.status = previousPostStatus;
 				post.status = postStatus;
@@ -147,6 +154,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ postStatus, editsStatus ],
 			expectedValue,
 		] ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
@@ -180,6 +188,7 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			'Trashing failed',
 		],
 	].forEach( ( [ description, error, message ] ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const expectedValue = [ message, { id: TRASH_POST_NOTICE_ID } ];
 			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(

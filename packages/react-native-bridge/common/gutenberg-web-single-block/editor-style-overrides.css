@@ -8,7 +8,7 @@
     display: none;
 }
 
-.edit-post-visual-editor__post-title-wrapper {
+.editor-editor-canvas__post-title-wrapper {
     display: none;
 }
 
@@ -17,14 +17,22 @@
     display: none;
 }
 
-/*
- Hiddes the top bar header by setting its height to 0
- We can\'t remove it since the block toolbar is a child of it.
- */
+/* Right align post header children as we will only display one child */
 .edit-post-header {
-    height: 0px;
-    padding: 0px;
-    overflow: hidden;
+	justify-content: flex-end;
+}
+
+/* Hide post controls unrelated to editing a single block */
+.edit-post-header__toolbar,
+.edit-post-layout .edit-post-header .edit-post-header__settings > *,
+.interface-pinned-items > * {
+	display: none;
+}
+
+/* Display the sidebar toggle button whenever a block is selected */
+.edit-post-layout .edit-post-header .edit-post-header__settings .interface-pinned-items,
+.is-block-selected .edit-post-header__settings .interface-pinned-items > button:first-child {
+	display: flex;
 }
 
 /* Move the block toolbar to the top */
@@ -34,6 +42,11 @@
 
 .interface-interface-skeleton {
     top: 0px;
+}
+
+/* Hide block actions unrelated to editing a single block */
+.block-editor-block-settings-menu {
+	display: none;
 }
 
 /*
@@ -66,11 +79,6 @@
 
 /* Remove all buttons from the component menu group inside \'...\' button in block toolbar */
 .components-menu-group > div > button:not(:first-child) {
-    display: none;
-}
-
-/* Remove \'delete block\' button inside \'...\' button in block toolbar */
-.components-dropdown-menu__menu > div:not(:first-child) {
     display: none;
 }
 

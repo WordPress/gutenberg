@@ -27,7 +27,6 @@ class GutenbergViewController: UIViewController {
         super.viewDidLoad()
         configureNavigationBar()
         gutenberg.delegate = self
-        navigationController?.navigationBar.isTranslucent = false
         registerLongPressGestureRecognizer()
 
         _ = try! FallbackJavascriptInjection(blockHTML: "Hello", userId: "1")
@@ -41,18 +40,77 @@ class GutenbergViewController: UIViewController {
         gutenberg.requestHTML()
     }
     
+    lazy var undoButton: UIButton = {
+        let isRTL = UIView.userInterfaceLayoutDirection(for: .unspecified) == .rightToLeft
+        let undoImage = UIImage(named: "undo")
+        let button = UIButton(type: .system)
+        button.setImage(isRTL ? undoImage?.withHorizontallyFlippedOrientation() : undoImage, for: .normal)
+        button.accessibilityIdentifier = "editor-undo-button"
+        button.accessibilityLabel = "Undo"
+        button.accessibilityHint = "Double tap to undo last change"
+        button.addTarget(self, action: #selector(undoButtonPressed(sender:)), for: .touchUpInside)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        button.sizeToFit()
+        button.alpha = 0.3
+        button.isUserInteractionEnabled = false
+        return button
+    }()
+    
+    lazy var redoButton: UIButton = {
+        let isRTL = UIView.userInterfaceLayoutDirection(for: .unspecified) == .rightToLeft
+        let redoImage = UIImage(named: "redo")
+        let button = UIButton(type: .system)
+        button.setImage(isRTL ? redoImage?.withHorizontallyFlippedOrientation() : redoImage, for: .normal)
+        button.accessibilityIdentifier = "editor-redo-button"
+        button.accessibilityLabel = "Redo"
+        button.accessibilityHint = "Double tap to redo last change"
+        button.addTarget(self, action: #selector(redoButtonPressed(sender:)), for: .touchUpInside)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        button.sizeToFit()
+        button.alpha = 0.3
+        button.isUserInteractionEnabled = false
+        return button
+    }()
+    
+    lazy var moreButton: UIButton = {
+        let moreImage = UIImage(named: "more")
+        let button = UIButton(type: .system)
+        button.setImage(moreImage, for: .normal)
+        button.titleLabel?.minimumScaleFactor = 0.5
+        button.accessibilityIdentifier = "editor-menu-button"
+        button.accessibilityLabel = "More options"
+        button.accessibilityHint = "Double tap to see options"
+        button.addTarget(self, action: #selector(moreButtonPressed(sender:)), for: .touchUpInside)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        button.sizeToFit()
+        return button
+    }()
+
+    
+    @objc func undoButtonPressed(sender: UIBarButtonItem) {
+        self.onUndoPressed()
+    }
+    
+    @objc func redoButtonPressed(sender: UIBarButtonItem) {
+        self.onRedoPressed()
+    }
+
     func registerLongPressGestureRecognizer() {
         longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         view.addGestureRecognizer(longPressGesture)
     }
-    
+
     @objc func handleLongPress() {
         NotificationCenter.default.post(Notification(name: MediaUploadCoordinator.failUpload ))
     }
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-    func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+    func gutenbergDidGetRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+        completion(Result.success([:]))
+    }
+    
+    func gutenbergDidPostRequestFetch(path: String, data: [String: AnyObject]?, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
 
@@ -89,19 +147,22 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             case .image:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image"),
-                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 } else {
-                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 }
             case .video:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video"),
                               MediaInfo(id: 4, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video")])
                 } else {
-                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
+                    let metadata = ["extraID": "AbCdE"]
+                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup", metadata: metadata)])
                 }
-            default:
-                break
+            case .other, .any:
+                 callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
+            case .audio:
+                callback([MediaInfo(id: 5, url: "https://cldup.com/59IrU0WJtq.mp3", type: "audio", caption: "Summer presto")])
             }
         case .deviceLibrary:
             print("Gutenberg did request a device media picker, opening the device picker")
@@ -110,7 +171,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
 
-        case .filesApp:
+        case .filesApp, .otherApps:
             pickAndUploadFromFilesApp(filter: currentFilter, callback: callback)
         default: break
         }
@@ -139,6 +200,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidRequestMediaUploadSync() {
         print("Gutenberg request for media uploads to be resync")
+    }
+
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32) {
+        print("Gutenberg request to set featured image")
     }
 
     func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int32) {
@@ -207,10 +272,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
         callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
-    
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
-        print("Gutenberg loged user event")
-    }
 
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) {
         print("Requesting Fallback for \(block)")
@@ -223,32 +284,70 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
-        return false;
-    }
-
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
-        print("Gutenberg requested setting tooltip flag")
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
     }
 
     func gutenbergDidRequestMediaSaveSync() {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+    func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool {
+        return false;
+    }
+
+    func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
+        print("Gutenberg requested setting tooltip flag")
+    }
+
+    func gutenbergDidRequestPreview() {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int] {
+        return [:]
+    }
+
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
+        print("Gutenberg requested setting block type impressions to \(impressions).")
+    }
+
+    func gutenbergDidRequestContactCustomerSupport() {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+    func gutenbergDidRequestGotoCustomerSupportOptions() {
         print(#function)
+    }
+
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
+        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+    }
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool) -> Void {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.2) {
+                self.undoButton.isUserInteractionEnabled = isDisabled ? false : true
+                self.undoButton.alpha = isDisabled ? 0.3 : 1.0
+            }
+        }
+    }
+   
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool) -> Void {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.2) {
+                self.redoButton.isUserInteractionEnabled = isDisabled ? false : true
+                self.redoButton.alpha = isDisabled ? 0.3 : 1.0
+            }
+        }
+    }
+
+    func gutenbergDidRequestConnectionStatus() -> Bool {
+        return true
     }
 }
 
@@ -273,32 +372,63 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    var isPreview: Bool {
-        return false
+    class EditorSettings: GutenbergEditorSettings {
+        var isFSETheme: Bool = true
+        var galleryWithImageBlocks: Bool = true
+        var quoteBlockV2: Bool = true
+        var listBlockV2: Bool = true
+        var rawStyles: String? = nil
+        var rawFeatures: String? = nil
+        var colors: [[String: String]]? = nil
+        var gradients: [[String: String]]? = nil
     }
-
+    
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
-    
+
     func gutenbergTranslations() -> [String : [String]]? {
         return nil
     }
-    
+
     func gutenbergInitialContent() -> String? {
-        return nil
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        return initialProps["initialData"]
     }
-    
+
     func gutenbergInitialTitle() -> String? {
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        return initialProps["initialTitle"]
+    }
+
+    func gutenbergHostAppNamespace() -> String {
+        return "WordPress"
+    }
+
+    func gutenbergFeaturedImageId() -> NSNumber? {
         return nil
     }
 
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
+            .tiledGalleryBlock: true,
+            .videoPressBlock: true,
+            .isAudioBlockMediaUploadEnabled: true,
+            .reusableBlock: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
+            .supportSection: true
         ]
     }
 
@@ -306,17 +436,48 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return ExampleAttachmentDelegate()
     }
 
-    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
-        return nil
+    func gutenbergEditorSettings() -> GutenbergEditorSettings? {
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        let settings = EditorSettings()
+        settings.rawStyles = initialProps["rawStyles"]
+        settings.rawFeatures = initialProps["rawFeatures"]
+
+        return settings
     }
 
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
-        return [.filesApp]
+        return [.filesApp, .otherApps]
+    }
+    
+    private func isUITesting() -> Bool {
+        guard ProcessInfo.processInfo.arguments.count >= 2 else {
+            return false
+        }
+        return ProcessInfo.processInfo.arguments[1] == "uitesting"
+    }
+    
+    private func getInitialPropsFromArgs() -> [String:String]? {
+        guard ProcessInfo.processInfo.arguments.count >= 3 else {
+            return nil
+        }
+        let initialProps = ProcessInfo.processInfo.arguments[2]
+        
+        if let data = initialProps.data(using: .utf8) {
+            do {
+                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: String]
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        return nil
     }
 }
 
 extension Gutenberg.MediaSource {
-    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Pick a file", types: [.image, .video, .audio, .other])
+    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Choose from device", types: [.any])
+    static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
 }
 
 //MARK: - Navigation bar
@@ -325,7 +486,22 @@ extension GutenbergViewController {
 
     func configureNavigationBar() {
         addSaveButton()
-        addMoreButton()
+        addRightButtons()
+        
+        navigationController?.navigationBar.tintColor = UIColor(named: "Primary")
+        
+        // Add a bottom border to the navigation bar
+        let borderBottom = UIView()
+        borderBottom.backgroundColor = UIColor(named: "HeaderLine")
+        borderBottom.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        borderBottom.frame = CGRect(
+            x: 0,
+            y: navigationController?.navigationBar.frame.height ?? 0 - (1.0 / UIScreen.main.scale),
+            width: navigationController?.navigationBar.frame.width ?? 0,
+            height: 1.0 / UIScreen.main.scale
+        )
+        
+        navigationController?.navigationBar.addSubview(borderBottom)
     }
 
     func addSaveButton() {
@@ -334,11 +510,12 @@ extension GutenbergViewController {
                                                            action: #selector(saveButtonPressed(sender:)))
     }
 
-    func addMoreButton() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "...",
-                                                            style: .plain,
-                                                            target: self,
-                                                            action: #selector(moreButtonPressed(sender:)))
+    func addRightButtons() {
+        let undoButton = UIBarButtonItem(customView: self.undoButton)
+        let redoButton = UIBarButtonItem(customView: self.redoButton)
+        let moreButton = UIBarButtonItem(customView: self.moreButton)
+        
+        navigationItem.rightBarButtonItems = [moreButton, redoButton, undoButton]
     }
 }
 
@@ -356,11 +533,12 @@ extension GutenbergViewController {
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
         alert.addAction(unsupportedBlockUIAction)
+        alert.addAction(showEditorHelpAction)
         alert.addAction(cancelAction)
 
         present(alert, animated: true)
     }
-    
+
     var toggleHTMLModeAction: UIAlertAction {
         return UIAlertAction(
             title: htmlMode ? "Switch To Visual" : "Switch to HTML",
@@ -370,6 +548,16 @@ extension GutenbergViewController {
         })
     }
     
+    var showEditorHelpAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Help & Support",
+            style: .default,
+            handler: { [unowned self] action in
+                self.showEditorHelp()
+            }
+        )
+    }
+
     var updateHtmlAction: UIAlertAction {
         return UIAlertAction(
             title: "Update HTML",
@@ -398,7 +586,7 @@ extension GutenbergViewController {
                 self.gutenberg.updateCapabilities()
         })
     }
-    
+
     func alertWithTextInput(using handler: ((String?) -> Void)?) -> UIAlertController {
         let alert = UIAlertController(title: "Enter HTML", message: nil, preferredStyle: .alert)
         alert.addTextField()
@@ -409,9 +597,25 @@ extension GutenbergViewController {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         return alert
     }
-    
+
     func toggleHTMLMode(_ action: UIAlertAction) {
+        if !htmlMode {
+            self.gutenbergDidRequestToggleUndoButton(true)
+            self.gutenbergDidRequestToggleRedoButton(true)
+        }
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
+    }
+    
+    func showEditorHelp() {
+        gutenberg.showEditorHelp()
+    }
+    
+    func onUndoPressed() {
+        gutenberg.onUndoPressed()
+    }
+    
+    func onRedoPressed() {
+        gutenberg.onRedoPressed()
     }
 }

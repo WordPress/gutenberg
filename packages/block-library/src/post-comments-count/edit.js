@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	Warning,
 	useBlockProps,
@@ -49,18 +49,26 @@ export default function PostCommentsCountEdit( {
 		} );
 	}, [ postId ] );
 
+	const hasPostAndComments = postId && commentsCount !== undefined;
+	const blockStyles = {
+		...blockProps.style,
+		textDecoration: hasPostAndComments
+			? blockProps.style?.textDecoration
+			: undefined,
+	};
+
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
-				{ postId && commentsCount !== undefined ? (
+			<div { ...blockProps } style={ blockStyles }>
+				{ hasPostAndComments ? (
 					commentsCount
 				) : (
 					<Warning>

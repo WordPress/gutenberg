@@ -1,148 +1,254 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockControls, useBlockProps } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import {
-	Dropdown,
-	ToolbarGroup,
-	ToolbarButton,
-	Spinner,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { chevronUp, chevronDown } from '@wordpress/icons';
-import { serialize } from '@wordpress/blocks';
+	BlockSettingsMenuControls,
+	useBlockProps,
+	Warning,
+	store as blockEditorStore,
+	RecursionProvider,
+	useHasRecursion,
+	InspectorControls,
+} from '@wordpress/block-editor';
+import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
-import useTemplatePartPost from './use-template-part-post';
-import TemplatePartNamePanel from './name-panel';
-import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
-import TemplatePartSelection from './selection';
+import TemplatePartSelectionModal from './selection-modal';
+import { TemplatePartAdvancedControls } from './advanced-controls';
+import TemplatePartInnerBlocks from './inner-blocks';
+import { createTemplatePartId } from './utils/create-template-part-id';
+import {
+	useAlternativeBlockPatterns,
+	useAlternativeTemplateParts,
+	useTemplatePartArea,
+} from './utils/hooks';
+
+function ReplaceButton( {
+	isEntityAvailable,
+	area,
+	clientId,
+	templatePartId,
+	isTemplatePartSelectionOpen,
+	setIsTemplatePartSelectionOpen,
+} ) {
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+	const canReplace =
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
+
+	if ( ! canReplace ) {
+		return null;
+	}
+
+	return (
+		<MenuItem
+			onClick={ () => {
+				setIsTemplatePartSelectionOpen( true );
+			} }
+			aria-expanded={ isTemplatePartSelectionOpen }
+			aria-haspopup="dialog"
+		>
+			{ __( 'Replace' ) }
+		</MenuItem>
+	);
+}
 
 export default function TemplatePartEdit( {
-	attributes: { postId: _postId, slug, theme, tagName: TagName = 'div' },
+	attributes,
 	setAttributes,
 	clientId,
 } ) {
-	const initialSlug = useRef( slug );
-	const initialTheme = useRef( theme );
-	const initialContent = useRef();
-
-	// Resolve the post ID if not set, and load its post.
-	const postId = useTemplatePartPost( _postId, slug, theme );
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
+	const templatePartId = createTemplatePartId( theme, slug );
+	const hasAlreadyRendered = useHasRecursion( templatePartId );
+	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
+		useState( false );
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { innerBlocks, expectedContent } = useSelect(
+	const { isResolved, innerBlocks, isMissing, area } = useSelect(
 		( select ) => {
-			const { getBlocks } = select( 'core/block-editor' );
-			const entityRecord = select( 'core' ).getEntityRecord(
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const { getBlocks } = select( blockEditorStore );
+
+			const getEntityArgs = [
 				'postType',
 				'wp_template_part',
-				postId
-			);
+				templatePartId,
+			];
+			const entityRecord = templatePartId
+				? getEditedEntityRecord( ...getEntityArgs )
+				: null;
+			const _area = entityRecord?.area || attributes.area;
+			const hasResolvedEntity = templatePartId
+				? hasFinishedResolution(
+						'getEditedEntityRecord',
+						getEntityArgs
+				  )
+				: false;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
-				expectedContent: entityRecord?.content.raw,
+				isResolved: hasResolvedEntity,
+				isMissing:
+					hasResolvedEntity &&
+					( ! entityRecord ||
+						Object.keys( entityRecord ).length === 0 ),
+				area: _area,
 			};
 		},
-		[ clientId, postId ]
+		[ templatePartId, attributes.area, clientId ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
-	useEffect( () => {
-		// If postId (entity) has not resolved or _postId (block attr) is set,
-		// then we have no need for this effect.
-		if ( ! postId || _postId ) {
-			return;
-		}
 
-		const innerContent = serialize( innerBlocks );
-
-		// If we havent set initialContent, check if innerBlocks are loaded.
-		if ( ! initialContent.current ) {
-			// If the content of innerBlocks and the content from entity match,
-			// then we can consider innerBlocks as loaded and set initialContent.
-			if ( innerContent === expectedContent ) {
-				initialContent.current = innerContent;
-			}
-			// Continue to return early until this effect is triggered
-			// with innerBlocks already loaded (as denoted by initialContent being set).
-			return;
-		}
-
-		// After initialContent is set and the content is updated, we can set the
-		// postId block attribute and set the post status to 'publish'.
-		// After this is done the hook will no longer run due to the first return above.
-		if ( initialContent.current !== innerContent ) {
-			setAttributes( { postId } );
-			editEntityRecord( 'postType', 'wp_template_part', postId, {
-				status: 'publish',
-			} );
-		}
-	}, [ innerBlocks, expectedContent ] );
-
+	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
+	const isPlaceholder = ! slug;
+	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
+	const TagName = tagName || areaObject.tagName;
 
-	// Part of a template file, post ID already resolved.
-	const isTemplateFile = !! postId;
-	// Fresh new block.
-	const isPlaceholder =
-		! postId && ! initialSlug.current && ! initialTheme.current;
-	// Part of a template file, post ID not resolved yet.
-	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
+	// We don't want to render a missing state if we have any inner blocks.
+	// A new template part is automatically created if we have any inner blocks but no entity.
+	if (
+		innerBlocks.length === 0 &&
+		( ( slug && ! theme ) || ( slug && isMissing ) )
+	) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ sprintf(
+						/* translators: %s: Template part slug */
+						__(
+							'Template part has been deleted or is unavailable: %s'
+						),
+						slug
+					) }
+				</Warning>
+			</TagName>
+		);
+	}
+
+	if ( isEntityAvailable && hasAlreadyRendered ) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</TagName>
+		);
+	}
 
 	return (
-		<TagName { ...blockProps }>
-			{ isPlaceholder && (
-				<TemplatePartPlaceholder
-					setAttributes={ setAttributes }
-					innerBlocks={ innerBlocks }
-				/>
-			) }
-			{ isTemplateFile && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<TemplatePartNamePanel
-							postId={ postId }
+		<>
+			<RecursionProvider uniqueId={ templatePartId }>
+				<InspectorControls group="advanced">
+					<TemplatePartAdvancedControls
+						tagName={ tagName }
+						setAttributes={ setAttributes }
+						isEntityAvailable={ isEntityAvailable }
+						templatePartId={ templatePartId }
+						defaultWrapper={ areaObject.tagName }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+					/>
+				</InspectorControls>
+				{ isPlaceholder && (
+					<TagName { ...blockProps }>
+						<TemplatePartPlaceholder
+							area={ attributes.area }
+							templatePartId={ templatePartId }
+							clientId={ clientId }
 							setAttributes={ setAttributes }
+							onOpenSelectionModal={ () =>
+								setIsTemplatePartSelectionOpen( true )
+							}
 						/>
-						<Dropdown
-							className="wp-block-template-part__preview-dropdown-button"
-							contentClassName="wp-block-template-part__preview-dropdown-content"
-							position="bottom right left"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<ToolbarButton
-									aria-expanded={ isOpen }
-									icon={ isOpen ? chevronUp : chevronDown }
-									label={ __( 'Choose another' ) }
-									onClick={ onToggle }
-									// Disable when open to prevent odd FireFox bug causing reopening.
-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-									disabled={ isOpen }
-								/>
-							) }
-							renderContent={ ( { onClose } ) => (
-								<TemplatePartSelection
-									setAttributes={ setAttributes }
-									onClose={ onClose }
-								/>
-							) }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
+					</TagName>
+				) }
+				<BlockSettingsMenuControls>
+					{ ( { selectedClientIds } ) => {
+						// Only enable for single selection that matches the current block.
+						// Ensures menu item doesn't render multiple times.
+						if (
+							! (
+								selectedClientIds.length === 1 &&
+								clientId === selectedClientIds[ 0 ]
+							)
+						) {
+							return null;
+						}
+
+						return (
+							<ReplaceButton
+								{ ...{
+									isEntityAvailable,
+									area,
+									clientId,
+									templatePartId,
+									isTemplatePartSelectionOpen,
+									setIsTemplatePartSelectionOpen,
+								} }
+							/>
+						);
+					} }
+				</BlockSettingsMenuControls>
+				{ isEntityAvailable && (
+					<TemplatePartInnerBlocks
+						tagName={ TagName }
+						blockProps={ blockProps }
+						postId={ templatePartId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+						layout={ layout }
+					/>
+				) }
+				{ ! isPlaceholder && ! isResolved && (
+					<TagName { ...blockProps }>
+						<Spinner />
+					</TagName>
+				) }
+			</RecursionProvider>
+			{ isTemplatePartSelectionOpen && (
+				<Modal
+					overlayClassName="block-editor-template-part__selection-modal"
+					title={ sprintf(
+						// Translators: %s as template part area title ("Header", "Footer", etc.).
+						__( 'Choose a %s' ),
+						areaObject.label.toLowerCase()
+					) }
+					onRequestClose={ () =>
+						setIsTemplatePartSelectionOpen( false )
+					}
+					isFullScreen={ true }
+				>
+					<TemplatePartSelectionModal
+						templatePartId={ templatePartId }
+						clientId={ clientId }
+						area={ area }
+						setAttributes={ setAttributes }
+						onClose={ () =>
+							setIsTemplatePartSelectionOpen( false )
+						}
+					/>
+				</Modal>
 			) }
-			{ isTemplateFile && (
-				<TemplatePartInnerBlocks
-					postId={ postId }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-				/>
-			) }
-			{ isUnresolvedTemplateFile && <Spinner /> }
-		</TagName>
+		</>
 	);
 }

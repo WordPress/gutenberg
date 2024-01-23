@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { View } from 'react-native';
-import Hr from 'react-native-hr';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { HorizontalRule } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,15 +36,13 @@ export class MoreEdit extends Component {
 		);
 
 		return (
-			<View>
-				<Hr
-					text={ content }
-					marginLeft={ 0 }
-					marginRight={ 0 }
-					textStyle={ textStyle }
-					lineStyle={ lineStyle }
-				/>
-			</View>
+			<HorizontalRule
+				text={ content }
+				marginLeft={ 0 }
+				marginRight={ 0 }
+				textStyle={ textStyle }
+				lineStyle={ lineStyle }
+			/>
 		);
 	}
 }

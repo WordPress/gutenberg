@@ -1,40 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { symbolFilled } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import CreateTemplatePartModal from '../create-template-part-modal';
+import { store as editSiteStore } from '../../store';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
-	const { replaceBlocks } = useDispatch( 'core/block-editor' );
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const { canCreate } = useSelect( ( select ) => {
+		const { supportsTemplatePartsMode } =
+			select( editSiteStore ).getSettings();
+		return {
+			canCreate: ! supportsTemplatePartsMode,
+		};
+	}, [] );
+
+	if ( ! canCreate ) {
+		return null;
+	}
+
+	const onConvert = async ( templatePart ) => {
+		replaceBlocks(
+			clientIds,
+			createBlock( 'core/template-part', {
+				slug: templatePart.slug,
+				theme: templatePart.theme,
+			} )
+		);
+		createSuccessNotice( __( 'Template part created.' ), {
+			type: 'snackbar',
+		} );
+
+		// The modal and this component will be unmounted because of `replaceBlocks` above,
+		// so no need to call `closeModal` or `onClose`.
+	};
 
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<MenuItem
-					onClick={ () => {
-						replaceBlocks(
-							clientIds,
-							createBlock(
-								'core/template-part',
-								{},
-								blocks.map( ( block ) =>
-									createBlock(
-										block.name,
-										block.attributes,
-										block.innerBlocks
-									)
-								)
-							)
-						);
-						onClose();
+		<>
+			<MenuItem
+				icon={ symbolFilled }
+				onClick={ () => {
+					setIsModalOpen( true );
+				} }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
+			>
+				{ __( 'Create template part' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<CreateTemplatePartModal
+					closeModal={ () => {
+						setIsModalOpen( false );
 					} }
-				>
-					{ __( 'Make template part' ) }
-				</MenuItem>
+					blocks={ blocks }
+					onCreate={ onConvert }
+				/>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }

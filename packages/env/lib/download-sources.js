@@ -3,7 +3,7 @@
  * External dependencies
  */
 const util = require( 'util' );
-const NodeGit = require( 'nodegit' );
+const SimpleGit = require( 'simple-git' );
 const fs = require( 'fs' );
 const got = require( 'got' );
 const path = require( 'path' );
@@ -14,10 +14,9 @@ const path = require( 'path' );
 const pipeline = util.promisify( require( 'stream' ).pipeline );
 const extractZip = util.promisify( require( 'extract-zip' ) );
 const rimraf = util.promisify( require( 'rimraf' ) );
-const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPConfig} WPConfig
  * @typedef {import('./config').WPSource} WPSource
  */
 
@@ -25,8 +24,8 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  * Download each source for each environment. If the same source is used in
  * multiple environments, it will only be downloaded once.
  *
- * @param {Config} config  The wp-env configuration object.
- * @param {Object} spinner The spinner object to show progress.
+ * @param {WPConfig} config  The wp-env configuration object.
+ * @param {Object}   spinner The spinner object to show progress.
  * @return {Promise} Returns a promise which resolves when the downloads finish.
  */
 module.exports = function downloadSources( config, spinner ) {
@@ -56,6 +55,7 @@ module.exports = function downloadSources( config, spinner ) {
 	for ( const env of Object.values( config.env ) ) {
 		env.pluginSources.forEach( addSource );
 		env.themeSources.forEach( addSource );
+		Object.values( env.mappings ).forEach( addSource );
 		addSource( env.coreSource );
 	}
 
@@ -100,69 +100,40 @@ async function downloadSource( source, options ) {
 async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	const log = debug
 		? ( message ) => {
-				spinner.info( `NodeGit: ${ message }` );
+				spinner.info( `SimpleGit: ${ message }` );
 				spinner.start();
 		  }
 		: () => {};
 	onProgress( 0 );
 
-	const gitFetchOptions = {
-		fetchOpts: {
-			callbacks: {
-				transferProgress( progress ) {
-					// Fetches are finished when all objects are received and indexed,
-					// so received objects plus indexed objects should equal twice
-					// the total number of objects when done.
-					onProgress(
-						( progress.receivedObjects() +
-							progress.indexedObjects() ) /
-							( progress.totalObjects() * 2 )
-					);
-				},
-				certificateCheck: () => 0,
-				credentials: ( url, userName ) => {
-					try {
-						return NodeGit.Cred.sshKeyFromAgent( userName );
-					} catch {
-						return NodeGit.Cred.defaultNew();
-					}
-				},
-			},
-		},
+	const progressHandler = ( { progress } ) => {
+		onProgress( progress / 100 );
 	};
 
 	log( 'Cloning or getting the repo.' );
-	const repository = await NodeGit.Clone(
-		source.url,
-		source.clonePath,
-		gitFetchOptions
-	).catch( () => {
-		log( 'Repo already exists, get it.' );
-		return NodeGit.Repository.open( source.clonePath );
-	} );
+	const git = SimpleGit( { progress: progressHandler } );
+
+	const isRepo =
+		fs.existsSync( source.clonePath ) &&
+		( await git.cwd( source.clonePath ).checkIsRepo( 'root' ) );
+
+	if ( isRepo ) {
+		log( 'Repo already exists, using it.' );
+	} else {
+		await git.clone( source.url, source.clonePath, {
+			'--depth': '1',
+			'--no-single-branch': null,
+		} );
+		await git.cwd( source.clonePath );
+	}
 
 	log( 'Fetching the specified ref.' );
-	const remote = await repository.getRemote( 'origin' );
-	await remote.fetch( source.ref, gitFetchOptions.fetchOpts );
-	await remote.disconnect();
-	try {
-		log( 'Checking out the specified ref.' );
-		await repository.checkoutRef(
-			await repository
-				.getReference( 'FETCH_HEAD' )
-				// Sometimes git doesn't update FETCH_HEAD for things
-				// like tags so we try another method here.
-				.catch(
-					repository.getReference.bind( repository, source.ref )
-				),
-			{
-				checkoutStrategy: NodeGit.Checkout.STRATEGY.FORCE,
-			}
-		);
-	} catch ( error ) {
-		log( 'Ref needs to be set as detached.' );
-		await repository.setHeadDetached( source.ref );
-	}
+	await git.fetch( 'origin', source.ref, {
+		'--tags': null,
+	} );
+
+	log( 'Checking out the specified ref.' );
+	await git.checkout( source.ref );
 
 	onProgress( 1 );
 }
@@ -195,18 +166,41 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 	);
 	await pipeline( responseStream, zipFile );
 
-	log( 'Extracting to temporary folder.' );
-	const dirName = `${ source.path }.temp`;
-	await extractZip( zipName, { dir: dirName } );
+	log( 'Extracting to temporary directory.' );
+	const tempDir = `${ source.path }.temp`;
+	await extractZip( zipName, { dir: tempDir } );
 
-	log( 'Copying to mounted folder and cleaning up.' );
-	await Promise.all( [
-		rimraf( zipName ),
-		...( await fs.promises.readdir( dirName ) ).map( ( file ) =>
-			copyDir( path.join( dirName, file ), source.path )
-		),
-	] );
-	await rimraf( dirName );
+	const files = (
+		await Promise.all( [
+			rimraf( zipName ),
+			rimraf( source.path ),
+			fs.promises.readdir( tempDir ),
+		] )
+	)[ 2 ];
+
+	/**
+	 * The plugin container is the extracted directory which is the direct parent
+	 * of the contents of the plugin. It seems a zip file can have two fairly
+	 * common approaches to where the content lives:
+	 * 1. The .zip is the direct container of the files. So after extraction, the
+	 *    extraction directory contains plugin contents.
+	 * 2. The .zip contains a directory with the same name which is the container.
+	 *    So after extraction, the extraction directory contains another directory.
+	 *    That subdirectory is the actual container of the plugin contents.
+	 *
+	 * We support both situations with the following check.
+	 */
+	let pluginContainer = tempDir;
+	const firstSubItem = path.join( tempDir, files[ 0 ] );
+	if (
+		files.length === 1 &&
+		( await fs.promises.lstat( firstSubItem ) ).isDirectory()
+	) {
+		// In this case, only one sub directory exists, so use that as the container.
+		pluginContainer = firstSubItem;
+	}
+	await fs.promises.rename( pluginContainer, source.path );
+	await rimraf( tempDir );
 
 	onProgress( 1 );
 }

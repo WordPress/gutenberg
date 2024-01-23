@@ -228,9 +228,9 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 
 	it( 'should not convert inline shortcodes', () => {
 		const originalInASentence = `<p>Here is a nice [foo shortcode].</p>`;
-		expect(
-			segmentHTMLToShortcodeBlock( originalInASentence, 0 )
-		).toEqual( [ originalInASentence ] );
+		expect( segmentHTMLToShortcodeBlock( originalInASentence, 0 ) ).toEqual(
+			[ originalInASentence ]
+		);
 
 		const originalMultipleShortcodes = `<p>[foo bar] [baz quux]</p>`;
 		expect(

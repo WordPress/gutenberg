@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import {
-	__experimentalGetSettings,
+	getSettings,
 	date as dateNoI18n,
 	dateI18n,
 	getDate,
@@ -10,6 +10,7 @@ import {
 	gmdateI18n,
 	isInTheFuture,
 	setSettings,
+	humanTimeDiff,
 } from '../';
 
 describe( 'isInTheFuture', () => {
@@ -28,9 +29,9 @@ describe( 'isInTheFuture', () => {
 	} );
 
 	it( 'should ignore the timezone', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Set a timezone in the future
+		// Set a timezone in the future.
 		setSettings( {
 			...settings,
 			timezone: { offset: '4', string: '' },
@@ -43,54 +44,82 @@ describe( 'isInTheFuture', () => {
 		date = new Date( Number( getDate() ) + 1000 * 60 );
 		expect( isInTheFuture( date ) ).toBe( true );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 } );
 
 describe( 'Function date', () => {
-	it( 'should format date in English, ignoring locale settings', () => {
-		const settings = __experimentalGetSettings();
+	test.each( [
+		[ 'j/n/y', '18/6/19' ],
+		[ 'd/m/y', '18/06/19' ],
+		[ 'D j M Y', 'Tue 18 Jun 2019' ],
+		[ 'l jS F Y', 'Tuesday 18th June 2019' ],
+		[ 'N w', '2 2' ],
+		[ 'z', '168' ],
+		[ 'W', '25' ],
+		[ 't', '30' ],
+		[ 'L', '0' ],
+		[ 'o', '2019' ],
+		[ 'g:i a', '11:00 am' ],
+		[ 'h:i A', '11:00 AM' ],
+		[ 'G:i:s', '11:00:00' ],
+		[ 'H:i:s', '11:00:00' ],
+		[ 'B', '499' ],
+		[ 'u', '000000' ],
+		[ 'v', '000' ],
+		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'O P Z', '+0000 +00:00 0' ],
+		[ 'c', '2019-06-18T11:00:00+00:00' ],
+		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ],
+		[ 'U', '1560855600' ],
+	] )(
+		'should format date as "%s", ignoring locale settings',
+		( formatString, expected ) => {
+			const settings = getSettings();
 
-		// Simulate different locale
-		const l10n = settings.l10n;
-		setSettings( {
-			...settings,
-			l10n: {
-				...l10n,
-				locale: 'es',
-				months: l10n.months.map( ( month ) => `es_${ month }` ),
-				monthsShort: l10n.monthsShort.map(
-					( month ) => `es_${ month }`
-				),
-				weekdays: l10n.weekdays.map( ( weekday ) => `es_${ weekday }` ),
-				weekdaysShort: l10n.weekdaysShort.map(
-					( weekday ) => `es_${ weekday }`
-				),
-			},
-		} );
+			// Simulate different locale.
+			const l10n = settings.l10n;
+			setSettings( {
+				...settings,
+				l10n: {
+					...l10n,
+					locale: 'es',
+					months: l10n.months.map( ( month ) => `es_${ month }` ),
+					monthsShort: l10n.monthsShort.map(
+						( month ) => `es_${ month }`
+					),
+					weekdays: l10n.weekdays.map(
+						( weekday ) => `es_${ weekday }`
+					),
+					weekdaysShort: l10n.weekdaysShort.map(
+						( weekday ) => `es_${ weekday }`
+					),
+				},
+			} );
 
-		// Check
-		const formattedDate = dateNoI18n(
-			'F M l D',
-			'2019-06-18T11:00:00.000Z'
-		);
-		expect( formattedDate ).toBe( 'June Jun Tuesday Tue' );
+			// Check.
+			const formattedDate = dateNoI18n(
+				formatString,
+				'2019-06-18T11:00:00.000Z'
+			);
+			expect( formattedDate ).toBe( expected );
 
-		// Restore default settings
-		setSettings( settings );
-	} );
+			// Restore default settings.
+			setSettings( settings );
+		}
+	);
 
 	it( 'should format date into a date that uses site’s timezone, if no timezone was provided and there’s a site timezone set', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const winterFormattedDate = dateNoI18n(
 			'Y-m-d H:i',
 			'2019-01-18T11:00:00.000Z'
@@ -103,20 +132,20 @@ describe( 'Function date', () => {
 		);
 		expect( summerFormattedDate ).toBe( '2019-06-18 07:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses site’s UTC offset setting, if no timezone was provided and there isn’t a timezone set in the site', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: '' },
 		} );
 
-		// Check
+		// Check.
 		const winterFormattedDate = dateNoI18n(
 			'Y-m-d H:i',
 			'2019-01-18T11:00:00.000Z'
@@ -129,20 +158,20 @@ describe( 'Function date', () => {
 		);
 		expect( summerFormattedDate ).toBe( '2019-06-18 07:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses the given timezone, if said timezone is valid', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const formattedDate = dateNoI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z',
@@ -150,20 +179,20 @@ describe( 'Function date', () => {
 		);
 		expect( formattedDate ).toBe( '2019-06-18 19:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses the given UTC offset, if given timezone is actually a UTC offset', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		let formattedDate;
 		formattedDate = dateNoI18n(
 			'Y-m-d H:i',
@@ -186,416 +215,162 @@ describe( 'Function date', () => {
 		);
 		expect( formattedDate ).toBe( '2019-06-18 19:00' );
 
-		// Restore default settings
-		setSettings( settings );
-	} );
-} );
-
-// Custom formatting  token functions, in order to support PHP formatting tokens
-describe( 'PHP Format Tokens', () => {
-	it( 'should support "d" to obtain day of the month, 2 digits with leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'd', '2019-06-06T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '06' );
-	} );
-
-	it( 'should support "D" to obtain textual representation of a day, three letters', () => {
-		const formattedDate = dateNoI18n( 'D', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'Tue' );
-	} );
-
-	it( 'should support "j" to obtain day of the month without leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'j', '2019-06-06T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '6' );
-	} );
-
-	it( 'should support "l" to obtain full textual representation of the day of the week', () => {
-		const formattedDate = dateNoI18n( 'l', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'Tuesday' );
-	} );
-
-	it( 'should support "N" to obtain ISO-8601 numeric representation of the day of the week', () => {
-		const formattedDate = dateNoI18n( 'N', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '2' ); // 2 === Tuesday
-	} );
-
-	it( 'should support "S" to obtain ordinal suffix of day of the month', () => {
-		const formattedDate = dateNoI18n( 'S', '2019-06-18T11:00:00.000Z' );
-
-		// th for 18th
-		expect( formattedDate ).toBe( 'th' );
-	} );
-
-	it( 'should support "w" to obtain day of the week starting from 0', () => {
-		const formattedDate = dateNoI18n( 'w', '2020-01-01T12:00:00.000Z' ); // Wednesday Jan 1st, 2020
-
-		expect( formattedDate ).toBe( '2' );
-	} );
-
-	it( 'should support "z" to obtain zero-indexed day of the year', () => {
-		const formattedDate = dateNoI18n( 'z', '2019-01-01' );
-
-		expect( formattedDate ).toBe( '0' );
-	} );
-
-	it( 'should support "W" to obtain ISO-8601 week number of year, weeks starting on Monday', () => {
-		const formattedDate = dateNoI18n( 'W', '2019-01-06T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '01' );
-	} );
-
-	it( 'should support "F" to obtain a full textual representation of a month', () => {
-		const formattedDate = dateNoI18n( 'F', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'June' );
-	} );
-
-	it( 'should support "m" to obtain the numeric representation of a month, with leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'm', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '06' );
-	} );
-
-	it( 'should support "M" to obtain a three letter textual representation of a month', () => {
-		const formattedDate = dateNoI18n( 'M', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'Jun' );
-	} );
-
-	it( 'should "n" to obtain the numeric representation of a month without leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'n', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '6' );
-	} );
-
-	it( 'should support "t" to obtain the days in a given month', () => {
-		const formattedDate = dateNoI18n( 't', '2019-02' );
-
-		expect( formattedDate ).toBe( '28' );
-	} );
-
-	it( 'should support "L" to obtain whether or not the year is a leap year', () => {
-		const formattedDate = dateNoI18n( 'L', '2020' );
-
-		expect( formattedDate ).toBe( '1' );
-	} );
-
-	it( 'should support "o" to obtain the ISO-8601 week-numbering year. This has the same value as Y, except that if the ISO week number (W) belongs to the previous or next year, that year is used instead.', () => {
-		const formattedDate = dateNoI18n( 'o', '2019-01-01T11:00:00.000Z' );
-		const formattedDatePreviousYear = dateNoI18n(
-			'o',
-			'2017-01-01T11:00:00.000Z'
-		); // ISO week number belongs to previous year
-
-		expect( formattedDate ).toBe( '2019' );
-		expect( formattedDatePreviousYear ).toBe( '2016' );
-	} );
-
-	it( 'should support "Y" to obtain a full numeric representation of a year', () => {
-		const formattedDate = dateNoI18n( 'Y', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '2019' );
-	} );
-
-	it( 'should support "y" to obtain a two digit representation of a year', () => {
-		const formattedDate = dateNoI18n( 'y', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '19' );
-	} );
-
-	it( 'should support "a" to obtain a lowercase ante meridiem and post meridiem', () => {
-		const formattedDate = dateNoI18n( 'a', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'am' );
-	} );
-
-	it( 'should support "A" to obtain uppercase ante meridiem and post meridiem', () => {
-		const formattedDate = dateNoI18n( 'A', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'AM' );
-	} );
-
-	it( 'should support "B" to obtain the time in Swatch Internet Time (.beats)', () => {
-		const formattedDate = dateNoI18n( 'B', '2020-10-09T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '500' );
-	} );
-
-	it( 'should support "g" to obtain the 12-hour format of an hour without leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'g', '2019-06-18T14:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '2' );
-	} );
-
-	it( 'should support "G" to obtain the 24-hour format of an hour without leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'G', '2019-06-18T09:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '9' );
-	} );
-
-	it( 'should support "h" 12-hour format of an hour with leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'h', '2019-06-18T14:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '02' );
-	} );
-
-	it( 'should support "H" 24-hour format of an hour with leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'H', '2019-06-18T09:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '09' );
-	} );
-
-	it( 'should support "i" to obtain the minutes with leading zeroes', () => {
-		const formattedDate = dateNoI18n( 'i', '2019-06-18T11:01:00.000Z' );
-
-		expect( formattedDate ).toBe( '01' );
-	} );
-
-	it( 'should support "s" to obtain seconds with leading zeroes', () => {
-		const formattedDate = dateNoI18n( 's', '2019-06-18T11:00:04.000Z' );
-
-		expect( formattedDate ).toBe( '04' );
-	} );
-
-	/**
-	 * This format is not fully compatible with JavaScript out of the box,
-	 * as Date doesn't support sub-millisecond precision.
-	 */
-	it( 'should support "u" to obtain microseconds', () => {
-		const formattedDate = dateNoI18n(
-			'u',
-			'2019-06-18T11:00:00.123456789Z'
-		);
-
-		expect( formattedDate ).toBe( '123000' );
-	} );
-
-	it( 'should support "v" to obtain milliseconds', () => {
-		const formattedDate = dateNoI18n(
-			'v',
-			'2019-06-18T11:00:00.123456789Z'
-		);
-
-		expect( formattedDate ).toBe( '123' );
-	} );
-
-	it( 'should support "e" to obtain timezone identifier', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
-		} );
-
-		const formattedDate = dateNoI18n( 'e', '2020-10-09T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( 'Eastern Daylight Time' );
-
-		setSettings( settings );
-	} );
-
-	it.skip( 'should support "I" to obtain whether or not the timezone is observing DST', () => {
-		const formattedFall = dateNoI18n( 'I', '2020-10-09T11:00:00.000Z' );
-
-		expect( formattedFall ).toBe( '1' );
-
-		const formattedWinter = dateNoI18n( 'I', '2020-01-09T11:00:00.000Z' );
-
-		expect( formattedWinter ).toBe( '0' );
-	} );
-
-	it( 'should support "O" to obtain difference to Greenwich time (GMT) without colon between hours and minutes', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { offset: -6 },
-		} );
-
-		const formattedDate = dateNoI18n( 'O', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '-0600' );
-
-		setSettings( settings );
-	} );
-
-	it( 'should support "P" to obtain difference to Greenwich time (GMT) without colon between hours and minutes', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { offset: -6 },
-		} );
-
-		const formattedDate = dateNoI18n( 'P', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '-06:00' );
-
-		setSettings( settings );
-	} );
-
-	it( 'should support "T" to obtain the timezone abbreviation for the given date', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
-		} );
-
-		const formattedDateStandard = dateNoI18n(
-			'T',
-			'2020-01-01T11:00:00.000Z'
-		);
-
-		expect( formattedDateStandard ).toBe( 'EST' );
-
-		setSettings( settings );
-	} );
-
-	it.skip( 'should support "Z" to obtain timezone offset in seconds', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { offset: -1 },
-		} );
-
-		const formattedDate = dateNoI18n( 'Z', '2020-10-09T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '3600' );
-
-		setSettings( settings );
-	} );
-
-	it.skip( 'should support "c" to obtain ISO 8601 date', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { offset: -2 },
-		} );
-
-		const formattedDate = dateNoI18n( 'c', '2019-06-18T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '2019-06-18T11:00:00-02:00' );
-
-		setSettings( settings );
-	} );
-
-	it( 'should support "r" RFC 2822 formatted date', () => {} );
-
-	it( 'should support "U" to get epoc for given date', () => {
-		const settings = __experimentalGetSettings();
-
-		setSettings( {
-			...settings,
-			timezone: { string: 'UTC' },
-		} );
-
-		const formattedDate = dateNoI18n( 'U', '2020-10-09T11:00:00.000Z' );
-
-		expect( formattedDate ).toBe( '1602241200' );
-
+		// Restore default settings.
 		setSettings( settings );
 	} );
 } );
 
 describe( 'Function gmdate', () => {
-	it( 'should format date in English, ignoring locale settings', () => {
-		const settings = __experimentalGetSettings();
+	test.each( [
+		[ 'j/n/y', '18/6/19' ],
+		[ 'd/m/y', '18/06/19' ],
+		[ 'D j M Y', 'Tue 18 Jun 2019' ],
+		[ 'l jS F Y', 'Tuesday 18th June 2019' ],
+		[ 'N w', '2 2' ],
+		[ 'z', '168' ],
+		[ 'W', '25' ],
+		[ 't', '30' ],
+		[ 'L', '0' ],
+		[ 'o', '2019' ],
+		[ 'g:i a', '11:00 am' ],
+		[ 'h:i A', '11:00 AM' ],
+		[ 'G:i:s', '11:00:00' ],
+		[ 'H:i:s', '11:00:00' ],
+		[ 'B', '499' ],
+		[ 'u', '000000' ],
+		[ 'v', '000' ],
+		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'O P Z', '+0000 +00:00 0' ],
+		[ 'c', '2019-06-18T11:00:00+00:00' ],
+		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ],
+		[ 'U', '1560855600' ],
+	] )(
+		'should format date as "%s", ignoring locale settings',
+		( formatString, expected ) => {
+			const settings = getSettings();
 
-		// Simulate different locale
-		const l10n = settings.l10n;
-		setSettings( {
-			...settings,
-			l10n: {
-				...l10n,
-				locale: 'es',
-				months: l10n.months.map( ( month ) => `es_${ month }` ),
-				monthsShort: l10n.monthsShort.map(
-					( month ) => `es_${ month }`
-				),
-				weekdays: l10n.weekdays.map( ( weekday ) => `es_${ weekday }` ),
-				weekdaysShort: l10n.weekdaysShort.map(
-					( weekday ) => `es_${ weekday }`
-				),
-			},
-		} );
+			// Simulate different locale.
+			const l10n = settings.l10n;
+			setSettings( {
+				...settings,
+				l10n: {
+					...l10n,
+					locale: 'es',
+					months: l10n.months.map( ( month ) => `es_${ month }` ),
+					monthsShort: l10n.monthsShort.map(
+						( month ) => `es_${ month }`
+					),
+					weekdays: l10n.weekdays.map(
+						( weekday ) => `es_${ weekday }`
+					),
+					weekdaysShort: l10n.weekdaysShort.map(
+						( weekday ) => `es_${ weekday }`
+					),
+				},
+			} );
 
-		// Check
-		const formattedDate = gmdate( 'F M l D', '2019-06-18T11:00:00.000Z' );
-		expect( formattedDate ).toBe( 'June Jun Tuesday Tue' );
+			// Check.
+			const formattedDate = gmdate(
+				formatString,
+				'2019-06-18T11:00:00.000Z'
+			);
+			expect( formattedDate ).toBe( expected );
 
-		// Restore default settings
-		setSettings( settings );
-	} );
+			// Restore default settings.
+			setSettings( settings );
+		}
+	);
 
 	it( 'should format date into a UTC date', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const formattedDate = gmdate( 'Y-m-d H:i', '2019-06-18T11:00:00.000Z' );
 		expect( formattedDate ).toBe( '2019-06-18 11:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 } );
 
 describe( 'Function dateI18n', () => {
-	it( 'should format date using locale settings', () => {
-		const settings = __experimentalGetSettings();
+	test.each( [
+		[ 'j/n/y', '18/6/19' ],
+		[ 'd/m/y', '18/06/19' ],
+		[ 'D j M Y', 'es_Tue 18 es_Jun 2019' ],
+		[ 'l jS F Y', 'es_Tuesday 18th es_June 2019' ], // Day ordinal should be in English, matching wp_date().
+		[ 'N w', '2 2' ],
+		[ 'z', '168' ],
+		[ 'W', '25' ],
+		[ 't', '30' ],
+		[ 'L', '0' ],
+		[ 'o', '2019' ],
+		[ 'g:i a', '11:00 am' ],
+		[ 'h:i A', '11:00 AM' ],
+		[ 'G:i:s', '11:00:00' ],
+		[ 'H:i:s', '11:00:00' ],
+		[ 'B', '499' ],
+		[ 'u', '000000' ],
+		[ 'v', '000' ],
+		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'O P Z', '+0000 +00:00 0' ],
+		[ 'c', '2019-06-18T11:00:00+00:00' ],
+		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ], // Day and month should be in English, as per RFC 2822.
+		[ 'U', '1560855600' ],
+	] )(
+		'should format date as "%s", using locale settings',
+		( formatString, expected ) => {
+			const settings = getSettings();
 
-		// Simulate different locale
-		const l10n = settings.l10n;
-		setSettings( {
-			...settings,
-			l10n: {
-				...l10n,
-				locale: 'es',
-				months: l10n.months.map( ( month ) => `es_${ month }` ),
-				monthsShort: l10n.monthsShort.map(
-					( month ) => `es_${ month }`
-				),
-				weekdays: l10n.weekdays.map( ( weekday ) => `es_${ weekday }` ),
-				weekdaysShort: l10n.weekdaysShort.map(
-					( weekday ) => `es_${ weekday }`
-				),
-			},
-		} );
+			// Simulate different locale.
+			const l10n = settings.l10n;
+			setSettings( {
+				...settings,
+				l10n: {
+					...l10n,
+					locale: 'es',
+					months: l10n.months.map( ( month ) => `es_${ month }` ),
+					monthsShort: l10n.monthsShort.map(
+						( month ) => `es_${ month }`
+					),
+					weekdays: l10n.weekdays.map(
+						( weekday ) => `es_${ weekday }`
+					),
+					weekdaysShort: l10n.weekdaysShort.map(
+						( weekday ) => `es_${ weekday }`
+					),
+				},
+			} );
 
-		// Check
-		const formattedDate = dateI18n(
-			'F M l D',
-			'2019-06-18T11:00:00.000Z',
-			true
-		);
-		expect( formattedDate ).toBe( 'es_June es_Jun es_Tuesday es_Tue' );
+			// Check.
+			const formattedDate = dateI18n(
+				formatString,
+				'2019-06-18T11:00:00.000Z',
+				true
+			);
+			expect( formattedDate ).toBe( expected );
 
-		// Restore default settings
-		setSettings( settings );
-	} );
+			// Restore default settings.
+			setSettings( settings );
+		}
+	);
 
 	it( 'should format date into a date that uses site’s timezone, if no timezone was provided and there’s a site timezone set', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const winterFormattedDate = dateI18n(
 			'Y-m-d H:i',
 			'2019-01-18T11:00:00.000Z'
@@ -608,20 +383,20 @@ describe( 'Function dateI18n', () => {
 		);
 		expect( summerFormattedDate ).toBe( '2019-06-18 07:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses site’s UTC offset setting, if no timezone was provided and there isn’t a timezone set in the site', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: '' },
 		} );
 
-		// Check
+		// Check.
 		const winterFormattedDate = dateI18n(
 			'Y-m-d H:i',
 			'2019-01-18T11:00:00.000Z'
@@ -634,20 +409,20 @@ describe( 'Function dateI18n', () => {
 		);
 		expect( summerFormattedDate ).toBe( '2019-06-18 07:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses the given timezone, if said timezone is valid', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const formattedDate = dateI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z',
@@ -655,20 +430,20 @@ describe( 'Function dateI18n', () => {
 		);
 		expect( formattedDate ).toBe( '2019-06-18 19:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses the given UTC offset, if given timezone is actually a UTC offset', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		let formattedDate;
 		formattedDate = dateI18n(
 			'Y-m-d H:i',
@@ -687,20 +462,20 @@ describe( 'Function dateI18n', () => {
 		);
 		expect( formattedDate ).toBe( '2019-06-18 19:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a UTC date if `gmt` is set to `true`', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const formattedDate = dateI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z',
@@ -708,20 +483,20 @@ describe( 'Function dateI18n', () => {
 		);
 		expect( formattedDate ).toBe( '2019-06-18 11:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 
 	it( 'should format date into a date that uses site’s timezone if `gmt` is set to `false`', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const formattedDate = dateI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z',
@@ -729,68 +504,96 @@ describe( 'Function dateI18n', () => {
 		);
 		expect( formattedDate ).toBe( '2019-06-18 07:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 } );
 
 describe( 'Function gmdateI18n', () => {
-	it( 'should format date using locale settings', () => {
-		const settings = __experimentalGetSettings();
+	test.each( [
+		[ 'j/n/y', '18/6/19' ],
+		[ 'd/m/y', '18/06/19' ],
+		[ 'D j M Y', 'es_Tue 18 es_Jun 2019' ],
+		[ 'l jS F Y', 'es_Tuesday 18th es_June 2019' ], // Day ordinal should be in English, matching wp_date().
+		[ 'N w', '2 2' ],
+		[ 'z', '168' ],
+		[ 'W', '25' ],
+		[ 't', '30' ],
+		[ 'L', '0' ],
+		[ 'o', '2019' ],
+		[ 'g:i a', '11:00 am' ],
+		[ 'h:i A', '11:00 AM' ],
+		[ 'G:i:s', '11:00:00' ],
+		[ 'H:i:s', '11:00:00' ],
+		[ 'B', '499' ],
+		[ 'u', '000000' ],
+		[ 'v', '000' ],
+		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'O P Z', '+0000 +00:00 0' ],
+		[ 'c', '2019-06-18T11:00:00+00:00' ],
+		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ], // Day and month should be in English, as per RFC 2822.
+		[ 'U', '1560855600' ],
+	] )(
+		'should format date as "%s", using locale settings',
+		( formatString, expected ) => {
+			const settings = getSettings();
 
-		// Simulate different locale
-		const l10n = settings.l10n;
-		setSettings( {
-			...settings,
-			l10n: {
-				...l10n,
-				locale: 'es',
-				months: l10n.months.map( ( month ) => `es_${ month }` ),
-				monthsShort: l10n.monthsShort.map(
-					( month ) => `es_${ month }`
-				),
-				weekdays: l10n.weekdays.map( ( weekday ) => `es_${ weekday }` ),
-				weekdaysShort: l10n.weekdaysShort.map(
-					( weekday ) => `es_${ weekday }`
-				),
-			},
-		} );
+			// Simulate different locale.
+			const l10n = settings.l10n;
+			setSettings( {
+				...settings,
+				l10n: {
+					...l10n,
+					locale: 'es',
+					months: l10n.months.map( ( month ) => `es_${ month }` ),
+					monthsShort: l10n.monthsShort.map(
+						( month ) => `es_${ month }`
+					),
+					weekdays: l10n.weekdays.map(
+						( weekday ) => `es_${ weekday }`
+					),
+					weekdaysShort: l10n.weekdaysShort.map(
+						( weekday ) => `es_${ weekday }`
+					),
+				},
+			} );
 
-		// Check
-		const formattedDate = gmdateI18n(
-			'F M l D',
-			'2019-06-18T11:00:00.000Z'
-		);
-		expect( formattedDate ).toBe( 'es_June es_Jun es_Tuesday es_Tue' );
+			// Check.
+			const formattedDate = gmdateI18n(
+				formatString,
+				'2019-06-18T11:00:00.000Z'
+			);
+			expect( formattedDate ).toBe( expected );
 
-		// Restore default settings
-		setSettings( settings );
-	} );
+			// Restore default settings.
+			setSettings( settings );
+		}
+	);
 
 	it( 'should format date into a UTC date', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
-		// Simulate different timezone
+		// Simulate different timezone.
 		setSettings( {
 			...settings,
 			timezone: { offset: -4, string: 'America/New_York' },
 		} );
 
-		// Check
+		// Check.
 		const formattedDate = gmdateI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z'
 		);
 		expect( formattedDate ).toBe( '2019-06-18 11:00' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
 	} );
 } );
 
 describe( 'Moment.js Localization', () => {
 	it( 'should change the relative time strings', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Change the locale strings for tests.
 		setSettings( {
@@ -806,7 +609,7 @@ describe( 'Moment.js Localization', () => {
 		} );
 
 		// Get the freshly changed setings.
-		const newSettings = __experimentalGetSettings();
+		const newSettings = getSettings();
 
 		// Test the unchanged values.
 		expect( newSettings.l10n.locale ).toBe( settings.l10n.locale );
@@ -815,7 +618,45 @@ describe( 'Moment.js Localization', () => {
 		expect( newSettings.l10n.relative.mm ).toBe( '%d localized minutes' );
 		expect( newSettings.l10n.relative.hh ).toBe( '%d localized hours' );
 
-		// Restore default settings
+		// Restore default settings.
 		setSettings( settings );
+	} );
+
+	describe( 'humanTimeDiff', () => {
+		it( 'should return human readable time differences in the past', () => {
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-28T12:00:00.000Z'
+				)
+			).toBe( 'an hour ago' );
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-28T13:00:00.000Z'
+				)
+			).toBe( '2 hours ago' );
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-30T13:00:00.000Z'
+				)
+			).toBe( '2 days ago' );
+		} );
+
+		it( 'should return human readable time differences in the future', () => {
+			// Future.
+			const now = new Date();
+			const twoHoursLater = new Date(
+				now.getTime() + 2 * 60 * 60 * 1000
+			);
+			expect( humanTimeDiff( twoHoursLater ) ).toBe( 'in 2 hours' );
+
+			const twoDaysLater = new Date(
+				now.getTime() + 2 * 24 * 60 * 60 * 1000
+			); // Adding 2 days in milliseconds
+
+			expect( humanTimeDiff( twoDaysLater ) ).toBe( 'in 2 days' );
+		} );
 	} );
 } );

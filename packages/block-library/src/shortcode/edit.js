@@ -23,6 +23,7 @@ export default function ShortcodeEdit( { attributes, setAttributes } ) {
 				className="blocks-shortcode__textarea"
 				id={ inputId }
 				value={ attributes.text }
+				aria-label={ __( 'Shortcode text' ) }
 				placeholder={ __( 'Write shortcode here…' ) }
 				onChange={ ( text ) => setAttributes( { text } ) }
 			/>

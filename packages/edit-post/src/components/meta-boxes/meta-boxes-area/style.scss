@@ -19,6 +19,11 @@
 		box-sizing: border-box;
 	}
 
+	.postbox-header {
+		border-top: $border-width solid $gray-300;
+		border-bottom: 0;
+	}
+
 	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
@@ -34,7 +39,7 @@
 		color: inherit;
 		font-weight: 600;
 		outline: none;
-		padding: 15px;
+		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
 	}
@@ -46,9 +51,8 @@
 	}
 
 	.postbox > .inside {
-		border-bottom: $border-width solid $gray-300;
 		color: inherit;
-		padding: 0 $block-padding $block-padding;
+		padding: 0 $grid-unit-30 $grid-unit-30;
 		margin: 0;
 	}
 

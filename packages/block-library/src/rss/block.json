@@ -1,7 +1,12 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/rss",
+	"title": "RSS",
 	"category": "widgets",
+	"description": "Display entries from any RSS or Atom feed.",
+	"keywords": [ "atom", "feed" ],
+	"textdomain": "default",
 	"attributes": {
 		"columns": {
 			"type": "number",
@@ -39,5 +44,7 @@
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-rss-editor",
+	"style": "wp-block-rss"
 }

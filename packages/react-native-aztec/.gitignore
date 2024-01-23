@@ -43,7 +43,7 @@ node_modules/
 yarn-error.log
 
 ###
-### Starting at this point, the Swift .gitignore rules from https://github.com/github/gitignore/blob/master/Swift.gitignore
+### Starting at this point, the Swift .gitignore rules from https://github.com/github/gitignore/blob/HEAD/Swift.gitignore
 ###
 
 # Xcode

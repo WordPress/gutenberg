@@ -1,5 +1,5 @@
 /**
- * Defines as extensibility slot for the Status & visibility panel.
+ * Defines as extensibility slot for the Summary panel.
  */
 
 /**
@@ -7,26 +7,25 @@
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 
-export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
+const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
 /**
- * Renders a row in the Status & visibility panel of the Document sidebar.
+ * Renders a row in the Summary panel of the Document sidebar.
  * It should be noted that this is named and implemented around the function it serves
  * and not its location, which may change in future iterations.
  *
- * @param {Object}    props             Component properties.
- * @param {string}    [props.className] An optional class name added to the row.
- * @param {WPElement} props.children    Children to be rendered.
+ * @param {Object}  props             Component properties.
+ * @param {string}  [props.className] An optional class name added to the row.
+ * @param {Element} props.children    Children to be rendered.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
  *
  * function MyPluginPostStatusInfo() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginPostStatusInfo,
  * 		{
  * 			className: 'my-plugin-post-status-info',
@@ -37,7 +36,6 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
@@ -52,7 +50,7 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const PluginPostStatusInfo = ( { children, className } ) => (
 	<Fill>

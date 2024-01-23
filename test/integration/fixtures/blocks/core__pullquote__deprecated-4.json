@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "pullquote",
+			"className": "is-style-solid-color",
+			"backgroundColor": "black",
+			"textAlign": "left",
+			"citation": "before block supports",
+			"textColor": "white"
+		},
+		"innerBlocks": []
+	}
+]

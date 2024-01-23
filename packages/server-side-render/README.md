@@ -18,12 +18,11 @@ Install the module
 npm install @wordpress/server-side-render --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
 The props accepted by the component are described below.
-
 
 ## Props
 
@@ -31,54 +30,97 @@ The props accepted by the component are described below.
 
 An object containing the attributes of the block to be server-side rendered.
 E.g: `{ displayAsDropdown: true }`, `{ showHierarchy: true }`, etc...
-- Type: `Object`
-- Required: No
+
+-   Type: `Object`
+-   Required: No
 
 ### block
 
 The identifier of the block to be server-side rendered.
 Examples: "core/archives", "core/latest-comments", "core/rss", etc...
-- Type: `String`
-- Required: Yes
+
+-   Type: `String`
+-   Required: Yes
 
 ### className
 
 A class added to the DOM element that wraps the server side rendered block.
 Examples: "my-custom-server-side-rendered".
-- Type: `String`
-- Required: No
+
+-   Type: `String`
+-   Required: No
 
 ### httpMethod
 
 The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. The 'POST' value will cause an error on WP earlier than 5.5, unless 'rest_endpoints' is filtered in PHP to allow this. If 'POST', this sends the attributes in the request body, not in the URL. This can allow a bigger attributes object.
-- Type: `String`
-- Required: No
+
+-   Type: `String`
+-   Required: No
+-   Default: 'GET'
+
+#### Example:
+
+```php
+function add_rest_method( $endpoints ) {
+    if ( is_wp_version_compatible( '5.5' ) ) {
+        return $endpoints;
+    }
+
+    foreach ( $endpoints as $route => $handler ) {
+        if ( isset( $endpoints[ $route ][0] ) ) {
+            $endpoints[ $route ][0]['methods'] = [ WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ];
+        }
+    }
+
+    return $endpoints;
+}
+add_filter( 'rest_endpoints', 'add_rest_method');
+```
+
+### skipBlockSupportAttributes
+
+Remove attributes and style properties applied by the block supports. This prevents duplication of styles in the block wrapper and the `ServerSideRender` components. Even if certain features skip serialization to HTML markup by `__experimentalSkipSerialization`, all attributes and style properties are removed.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: false
 
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
 E.g: `{ post_id: 12 }`.
-- Type: `Object`
-- Required: No
+
+-   Type: `Object`
+-   Required: No
 
 ### EmptyResponsePlaceholder
 
-This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is empty, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
-- Type: `WPElement`
-- Required: No
+The component is rendered when the API response is empty. The component will receive the value of the API response, and all props passed into `ServerSideRenderer`.
+
+-   Type: `Component`
+-   Required: No
 
 ### ErrorResponsePlaceholder
 
-This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is an error, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
-- Type: `WPElement`
-- Required: No
+The component is rendered when the API response is an error. The component will receive the value of the API response, and all props passed into `ServerSideRenderer`.
+
+-   Type: `Component`
+-   Required: No
 
 ### LoadingResponsePlaceholder
 
-This is a [render prop](https://reactjs.org/docs/render-props.html). While the request is being processed (loading state), the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
-- Type: `WPElement`
-- Required: No
+The component is rendered while the API request is being processed (loading state). The component will receive the value of the API response, and all props passed into `ServerSideRenderer`.
 
+-   Type: `Component`
+-   Required: No
+
+#### Example usage
+
+```jsx
+const MyServerSideRender = () => (
+	<ServerSideRender LoadingResponsePlaceholder={ MyAmazingPlaceholder } />
+);
+```
 
 ## Usage
 
@@ -97,9 +139,10 @@ const MyServerSideRender = () => (
 	/>
 );
 ```
+
 If imported from the `wp` global, an alias is required to work in JSX.
 
-```jsx 
+```jsx
 const { serverSideRender: ServerSideRender } = wp;
 
 const MyServerSideRender = () => (
@@ -127,6 +170,7 @@ If you pass `attributes` to `ServerSideRender`, the block must also be registere
 register_block_type(
 	'core/archives',
 	array(
+		'api_version' => 3,
 		'attributes'      => array(
 			'showPostCounts'    => array(
 				'type'      => 'boolean',
@@ -141,3 +185,11 @@ register_block_type(
 	)
 );
 ```
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

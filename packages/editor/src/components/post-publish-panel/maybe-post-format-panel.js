@@ -1,25 +1,22 @@
 /**
- * External dependencies
- */
-import { find, get, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { POST_FORMATS } from '../post-format';
+import { store as editorStore } from '../../store';
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
 	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
+		supportedFormats?.includes( format.id )
 	);
-	return find( formats, ( format ) => format.id === suggestedPostFormat );
+	return formats.find( ( format ) => format.id === suggestedPostFormat );
 };
 
 const PostFormatSuggestion = ( {
@@ -27,21 +24,20 @@ const PostFormatSuggestion = ( {
 	suggestionText,
 	onUpdatePostFormat,
 } ) => (
-	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
+	<Button
+		variant="link"
+		onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }
+	>
 		{ suggestionText }
 	</Button>
 );
 
 export default function PostFormatPanel() {
 	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
-			'core/editor'
-		);
-		const supportedFormats = get(
-			select( 'core' ).getThemeSupports(),
-			[ 'formats' ],
-			[]
-		);
+		const { getEditedPostAttribute, getSuggestedPostFormat } =
+			select( editorStore );
+		const supportedFormats =
+			select( coreStore ).getThemeSupports().formats ?? [];
 		return {
 			currentPostFormat: getEditedPostAttribute( 'format' ),
 			suggestion: getSuggestion(
@@ -51,7 +47,7 @@ export default function PostFormatPanel() {
 		};
 	}, [] );
 
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 
 	const onUpdatePostFormat = ( format ) => editPost( { format } );
 

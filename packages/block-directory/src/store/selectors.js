@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,13 +18,7 @@ import hasBlockType from './utils/has-block-type';
  * @return {boolean} Whether a request is in progress for the blocks list.
  */
 export function isRequestingDownloadableBlocks( state, filterValue ) {
-	if (
-		! state.downloadableBlocks[ filterValue ] ||
-		! state.downloadableBlocks[ filterValue ].isRequesting
-	) {
-		return false;
-	}
-	return state.downloadableBlocks[ filterValue ].isRequesting;
+	return state.downloadableBlocks[ filterValue ]?.isRequesting ?? false;
 }
 
 /**
@@ -35,13 +30,7 @@ export function isRequestingDownloadableBlocks( state, filterValue ) {
  * @return {Array} Downloadable blocks.
  */
 export function getDownloadableBlocks( state, filterValue ) {
-	if (
-		! state.downloadableBlocks[ filterValue ] ||
-		! state.downloadableBlocks[ filterValue ].results
-	) {
-		return [];
-	}
-	return state.downloadableBlocks[ filterValue ].results;
+	return state.downloadableBlocks[ filterValue ]?.results ?? [];
 }
 
 /**
@@ -66,7 +55,7 @@ export function getInstalledBlockTypes( state ) {
  */
 export const getNewBlockTypes = createRegistrySelector(
 	( select ) => ( state ) => {
-		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+		const usedBlockTree = select( blockEditorStore ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
 		return installedBlockTypes.filter( ( blockType ) =>
@@ -85,7 +74,7 @@ export const getNewBlockTypes = createRegistrySelector(
  */
 export const getUnusedBlockTypes = createRegistrySelector(
 	( select ) => ( state ) => {
-		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+		const usedBlockTree = select( blockEditorStore ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
 		return installedBlockTypes.filter(

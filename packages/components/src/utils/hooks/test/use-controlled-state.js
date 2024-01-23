@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { render, fireEvent, screen } from '@testing-library/react';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import useControlledState from '../use-controlled-state';
+
+const noop = () => {};
 
 describe( 'hooks', () => {
 	const getInput = () => screen.getByTestId( 'input' );
@@ -117,7 +118,7 @@ describe( 'hooks', () => {
 			expect( input.value ).toBe( 'There' );
 			expect( spy ).toHaveBeenCalledWith( 'There' );
 
-			// Input is now controlled
+			// Input is now controlled.
 			rerender( <Example value="New Value" /> );
 			expect( input.value ).toBe( 'New Value' );
 

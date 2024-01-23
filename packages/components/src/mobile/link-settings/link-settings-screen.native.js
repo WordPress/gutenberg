@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
+
 /**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -15,23 +16,30 @@ import LinkSettings from './';
 const LinkSettingsScreen = ( props ) => {
 	const navigation = useNavigation();
 	const route = useRoute();
-	const { url = '' } = props.attributes || {};
+	const { url = '' } = props;
 	const { inputValue = url } = route.params || {};
 
 	const onLinkCellPressed = () => {
-		navigation.navigate( 'linkPicker', { inputValue } );
+		if ( props.onLinkCellPressed ) {
+			props.onLinkCellPressed( { navigation } );
+		} else {
+			navigation.navigate( 'linkPicker', { inputValue } );
+		}
 	};
 
 	return useMemo( () => {
 		return (
 			<LinkSettings
+				{ ...props }
 				onLinkCellPressed={
 					props.hasPicker ? onLinkCellPressed : undefined
 				}
 				urlValue={ inputValue }
-				{ ...props }
 			/>
 		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ props, inputValue, navigation, route ] );
 };
 

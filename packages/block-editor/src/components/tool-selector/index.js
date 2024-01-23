@@ -14,6 +14,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { Icon, edit as editIcon } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 const selectIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
@@ -26,15 +31,11 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const isNavigationTool = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+	const mode = useSelect(
+		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-
-	const onSwitchMode = ( mode ) => {
-		setNavigationMode( mode === 'edit' ? false : true );
-	};
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -42,21 +43,23 @@ function ToolSelector( props, ref ) {
 				<Button
 					{ ...props }
 					ref={ ref }
-					icon={ isNavigationTool ? selectIcon : editIcon }
+					icon={ mode === 'navigation' ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
 					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Modes' ) }
+					label={ __( 'Tools' ) }
 				/>
 			) }
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			renderContent={ () => (
 				<>
-					<NavigableMenu role="menu" aria-label={ __( 'Modes' ) }>
+					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={ isNavigationTool ? 'select' : 'edit' }
-							onSelect={ onSwitchMode }
+							value={
+								mode === 'navigation' ? 'navigation' : 'edit'
+							}
+							onSelect={ __unstableSetEditorMode }
 							choices={ [
 								{
 									value: 'edit',
@@ -68,7 +71,7 @@ function ToolSelector( props, ref ) {
 									),
 								},
 								{
-									value: 'select',
+									value: 'navigation',
 									label: (
 										<>
 											{ selectIcon }
@@ -81,7 +84,7 @@ function ToolSelector( props, ref ) {
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools offer different interactions for block selection & editing. To select, press Escape, to go back to editing, press Enter.'
+							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
 						) }
 					</div>
 				</>

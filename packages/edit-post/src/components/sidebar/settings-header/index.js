@@ -1,70 +1,40 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
-const SettingsHeader = ( { sidebarName } ) => {
-	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
-	const openDocumentSettings = () =>
-		openGeneralSidebar( 'edit-post/document' );
-	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+import { sidebars } from '../settings-sidebar';
 
-	const documentLabel = useSelect( ( select ) => {
-		const currentPostType = select( 'core/editor' ).getCurrentPostType();
-		const postType = select( 'core' ).getPostType( currentPostType );
+const { Tabs } = unlock( componentsPrivateApis );
 
-		return (
-			// Disable reason: Post type labels object is shaped like this.
-			// eslint-disable-next-line camelcase
-			postType?.labels?.singular_name ??
+const SettingsHeader = () => {
+	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
+		const { getPostTypeLabel, getRenderingMode } = select( editorStore );
+
+		return {
 			// translators: Default label for the Document sidebar tab, not selected.
-			__( 'Document' )
-		);
-	} );
+			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
+			isTemplateMode: getRenderingMode() === 'template-only',
+		};
+	}, [] );
 
-	const [ documentAriaLabel, documentActiveClass ] =
-		sidebarName === 'edit-post/document'
-			? // translators: ARIA label for the Document sidebar tab, selected. %s: Document label.
-			  [ sprintf( __( '%s (selected)' ), documentLabel ), 'is-active' ]
-			: [ documentLabel, '' ];
-
-	const [ blockAriaLabel, blockActiveClass ] =
-		sidebarName === 'edit-post/block'
-			? // translators: ARIA label for the Block Settings Sidebar tab, selected.
-			  [ __( 'Block (selected)' ), 'is-active' ]
-			: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
-			  [ __( 'Block' ), '' ];
-
-	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
-		<ul>
-			<li>
-				<Button
-					onClick={ openDocumentSettings }
-					className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
-					aria-label={ documentAriaLabel }
-					data-label={ documentLabel }
-				>
-					{ documentLabel }
-				</Button>
-			</li>
-			<li>
-				<Button
-					onClick={ openBlockSettings }
-					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
-					aria-label={ blockAriaLabel }
-					// translators: Data label for the Block Settings Sidebar tab.
-					data-label={ __( 'Block' ) }
-				>
-					{
-						// translators: Text label for the Block Settings Sidebar tab.
-						__( 'Block' )
-					}
-				</Button>
-			</li>
-		</ul>
+		<Tabs.TabList>
+			<Tabs.Tab tabId={ sidebars.document }>
+				{ isTemplateMode ? __( 'Template' ) : documentLabel }
+			</Tabs.Tab>
+			<Tabs.Tab tabId={ sidebars.block }>
+				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
+				{ __( 'Block' ) }
+			</Tabs.Tab>
+		</Tabs.TabList>
 	);
 };
 

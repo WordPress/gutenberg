@@ -9,11 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
 
 /**
- * External dependencies
- */
-import { get, includes } from 'lodash';
-
-/**
  * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
@@ -24,56 +19,60 @@ import { get, includes } from 'lodash';
 export function getNotificationArgumentsForSaveSuccess( data ) {
 	const { previousPost, post, postType } = data;
 	// Autosaves are neither shown a notice nor redirected.
-	if ( get( data.options, [ 'isAutosave' ] ) ) {
+	if ( data.options?.isAutosave ) {
 		return [];
 	}
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
-	const isPublished = includes( publishStatus, previousPost.status );
-	const willPublish = includes( publishStatus, post.status );
+	const isPublished = publishStatus.includes( previousPost.status );
+	const willPublish = publishStatus.includes( post.status );
+	const willTrash =
+		post.status === 'trash' && previousPost.status !== 'trash';
 
 	let noticeMessage;
-	let shouldShowLink = get( postType, [ 'viewable' ], false );
+	let shouldShowLink = postType?.viewable ?? false;
+	let isDraft;
 
-	if ( ! isPublished && ! willPublish ) {
+	// Always should a notice, which will be spoken for accessibility.
+	if ( willTrash ) {
+		noticeMessage = postType.labels.item_trashed;
+		shouldShowLink = false;
+	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = null;
+		noticeMessage = __( 'Draft saved.' );
+		isDraft = true;
 	} else if ( isPublished && ! willPublish ) {
-		// If undoing publish status, show specific notice
+		// If undoing publish status, show specific notice.
 		noticeMessage = postType.labels.item_reverted_to_draft;
 		shouldShowLink = false;
 	} else if ( ! isPublished && willPublish ) {
 		// If publishing or scheduling a post, show the corresponding
-		// publish message
+		// publish message.
 		noticeMessage = {
 			publish: postType.labels.item_published,
 			private: postType.labels.item_published_privately,
 			future: postType.labels.item_scheduled,
 		}[ post.status ];
 	} else {
-		// Generic fallback notice
+		// Generic fallback notice.
 		noticeMessage = postType.labels.item_updated;
 	}
 
-	if ( noticeMessage ) {
-		const actions = [];
-		if ( shouldShowLink ) {
-			actions.push( {
-				label: postType.labels.view_item,
-				url: post.link,
-			} );
-		}
-		return [
-			noticeMessage,
-			{
-				id: SAVE_POST_NOTICE_ID,
-				type: 'snackbar',
-				actions,
-			},
-		];
+	const actions = [];
+	if ( shouldShowLink ) {
+		actions.push( {
+			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
+			url: post.link,
+		} );
 	}
-
-	return [];
+	return [
+		noticeMessage,
+		{
+			id: SAVE_POST_NOTICE_ID,
+			type: 'snackbar',
+			actions,
+		},
+	];
 }
 
 /**
@@ -95,7 +94,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
 	// If the post was being published, we show the corresponding publish error message
-	// Unless we publish an "updating failed" message
+	// Unless we publish an "updating failed" message.
 	const messages = {
 		publish: __( 'Publishing failed.' ),
 		private: __( 'Publishing failed.' ),

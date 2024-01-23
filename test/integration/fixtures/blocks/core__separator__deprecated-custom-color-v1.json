@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/separator",
+		"isValid": true,
+		"attributes": {
+			"opacity": "css",
+			"style": {
+				"color": {
+					"background": "#cc1d1d"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

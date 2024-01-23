@@ -13,17 +13,22 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 export default function VerseEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
+	onRemove,
+	insertBlocksAfter,
+	style,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
+		style,
 	} );
 
 	return (
@@ -46,10 +51,16 @@ export default function VerseEdit( {
 						content: nextContent,
 					} );
 				} }
-				placeholder={ __( 'Write…' ) }
+				aria-label={ __( 'Verse text' ) }
+				placeholder={ __( 'Write verse…' ) }
+				onRemove={ onRemove }
 				onMerge={ mergeBlocks }
 				textAlign={ textAlign }
 				{ ...blockProps }
+				__unstablePastePlainText
+				__unstableOnSplitAtDoubleLineEnd={ () =>
+					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				}
 			/>
 		</>
 	);

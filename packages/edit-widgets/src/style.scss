@@ -1,21 +1,18 @@
 @import "../../interface/src/style.scss";
 
-@import "./blocks/legacy-widget/editor.scss";
 @import "./blocks/widget-area/editor.scss";
+@import "./components/error-boundary/style.scss";
 @import "./components/header/style.scss";
+@import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/welcome-guide/style.scss";
 @import "./components/widget-areas-block-editor-content/style.scss";
+@import "./components/secondary-sidebar/style.scss";
 
-// In order to use mix-blend-mode, this element needs to have an explicitly set background-color
-// We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
-html.wp-toolbar {
-	background: $white;
-}
-
-body.appearance_page_gutenberg-widgets,
-body.widgets-php {
+body.js.appearance_page_gutenberg-widgets,
+body.js.widgets-php {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 
@@ -43,16 +40,12 @@ body.widgets-php {
 		min-height: calc(100vh - #{ $admin-bar-height });
 	}
 
-	> .components-navigate-regions {
-		height: 100%;
-	}
-
 	.interface-interface-skeleton__content {
-		background-color: #f1f1f1;
+		background-color: $gray-100;
 	}
 }
 
-.blocks-widgets-container .editor-style-wrapper {
+.blocks-widgets-container .editor-styles-wrapper {
 	max-width: $widget-area-width;
 	margin: auto;
 }
@@ -61,5 +54,10 @@ body.widgets-php {
 	display: none;
 }
 
+// Don't display admin notices on the Widgets screen.
+// Needs !important because plugins may add inline styles to notices.
+.js .widgets-php .notice {
+	display: none !important;
+}
 
 @include wordpress-admin-schemes();

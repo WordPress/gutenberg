@@ -4,11 +4,9 @@
 	padding-left: 1em;
 
 	cite,
-	footer,
-	&__citation {
+	footer {
 		color: currentColor;
 		font-size: 0.8125em;
-		margin-top: 1em;
 		position: relative;
 		font-style: normal;
 	}
@@ -24,7 +22,8 @@
 		border: none;
 		padding-left: 0;
 	}
-
+	// .is-style-large and .is-large are kept for backwards compatibility.
+	&.is-style-plain,
 	&.is-style-large,
 	&.is-large {
 		border: none;

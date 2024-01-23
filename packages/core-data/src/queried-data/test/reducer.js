@@ -64,6 +64,17 @@ describe( 'getMergedItemIds', () => {
 
 		expect( result ).toEqual( [ 1, 3, 4 ] );
 	} );
+	it( 'should update a page properly if less items are provided than previously stored', () => {
+		let original = deepFreeze( [ 1, 2, 3 ] );
+		let result = getMergedItemIds( original, [ 1, 2 ], 1, 3 );
+
+		expect( result ).toEqual( [ 1, 2 ] );
+
+		original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
+		result = getMergedItemIds( original, [ 9 ], 2, 2 );
+
+		expect( result ).toEqual( [ 1, 2, 9, undefined, 5, 6 ] );
+	} );
 } );
 
 describe( 'itemIsComplete', () => {
@@ -75,7 +86,7 @@ describe( 'itemIsComplete', () => {
 		} );
 
 		expect( state ).toEqual( {
-			1: true,
+			default: { 1: true },
 		} );
 	} );
 
@@ -85,12 +96,13 @@ describe( 'itemIsComplete', () => {
 			type: 'RECEIVE_ITEMS',
 			query: {
 				per_page: 5,
+				context: 'edit',
 			},
 			items: [ { id: 1, content: 'chicken', author: 'bob' } ],
 		} );
 
 		expect( state ).toEqual( {
-			1: true,
+			edit: { 1: true },
 		} );
 	} );
 
@@ -105,13 +117,13 @@ describe( 'itemIsComplete', () => {
 		} );
 
 		expect( state ).toEqual( {
-			1: false,
+			default: { 1: false },
 		} );
 	} );
 
 	it( 'should defer to existing completeness when receiving filtered query', () => {
 		const original = deepFreeze( {
-			1: true,
+			default: { 1: true },
 		} );
 		const state = itemIsComplete( original, {
 			type: 'RECEIVE_ITEMS',
@@ -122,7 +134,7 @@ describe( 'itemIsComplete', () => {
 		} );
 
 		expect( state ).toEqual( {
-			1: true,
+			default: { 1: true },
 		} );
 	} );
 } );
@@ -133,16 +145,16 @@ describe( 'reducer', () => {
 
 		expect( state ).toEqual( {
 			items: {},
-			itemIsComplete: {},
 			queries: {},
+			itemIsComplete: {},
 		} );
 	} );
 
 	it( 'receives a page of queried data', () => {
 		const original = deepFreeze( {
-			items: {},
+			items: { default: {} },
 			queries: {},
-			itemIsComplete: {},
+			itemIsComplete: { default: {} },
 		} );
 		const state = reducer( original, {
 			type: 'RECEIVE_ITEMS',
@@ -152,22 +164,22 @@ describe( 'reducer', () => {
 
 		expect( state ).toEqual( {
 			items: {
-				1: { id: 1, name: 'abc' },
+				default: { 1: { id: 1, name: 'abc' } },
 			},
 			itemIsComplete: {
-				1: true,
+				default: { 1: true },
 			},
 			queries: {
-				's=a': [ 1 ],
+				default: { 's=a': { itemIds: [ 1 ] } },
 			},
 		} );
 	} );
 
 	it( 'receives an unqueried page of items', () => {
 		const original = deepFreeze( {
-			items: {},
+			items: { default: {} },
 			queries: {},
-			itemIsComplete: {},
+			itemIsComplete: { default: {} },
 		} );
 		const state = reducer( original, {
 			type: 'RECEIVE_ITEMS',
@@ -176,10 +188,10 @@ describe( 'reducer', () => {
 
 		expect( state ).toEqual( {
 			items: {
-				1: { id: 1, name: 'abc' },
+				default: { 1: { id: 1, name: 'abc' } },
 			},
 			itemIsComplete: {
-				1: true,
+				default: { 1: true },
 			},
 			queries: {},
 		} );
@@ -190,14 +202,18 @@ describe( 'reducer', () => {
 		const name = 'menu';
 		const original = deepFreeze( {
 			items: {
-				1: { id: 1, name: 'abc' },
-				2: { id: 2, name: 'def' },
-				3: { id: 3, name: 'ghi' },
-				4: { id: 4, name: 'klm' },
+				default: {
+					1: { id: 1, name: 'abc' },
+					2: { id: 2, name: 'def' },
+					3: { id: 3, name: 'ghi' },
+					4: { id: 4, name: 'klm' },
+				},
 			},
 			queries: {
-				'': [ 1, 2, 3, 4 ],
-				's=a': [ 1, 3 ],
+				default: {
+					'': { itemIds: [ 1, 2, 3, 4 ] },
+					's=a': { itemIds: [ 1, 3 ] },
+				},
 			},
 		} );
 		const state = reducer( original, removeItems( kind, name, 3 ) );
@@ -205,13 +221,57 @@ describe( 'reducer', () => {
 		expect( state ).toEqual( {
 			itemIsComplete: {},
 			items: {
-				1: { id: 1, name: 'abc' },
-				2: { id: 2, name: 'def' },
-				4: { id: 4, name: 'klm' },
+				default: {
+					1: { id: 1, name: 'abc' },
+					2: { id: 2, name: 'def' },
+					4: { id: 4, name: 'klm' },
+				},
 			},
 			queries: {
-				'': [ 1, 2, 4 ],
-				's=a': [ 1 ],
+				default: {
+					'': { itemIds: [ 1, 2, 4 ] },
+					's=a': { itemIds: [ 1 ] },
+				},
+			},
+		} );
+	} );
+
+	it( 'deletes an item with string ID', () => {
+		const kind = 'postType';
+		const name = 'wp_template';
+		const original = deepFreeze( {
+			items: {
+				default: {
+					'foo//bar1': { id: 'foo//bar1', name: 'Foo Bar 1' },
+					'foo//bar2': { id: 'foo//bar2', name: 'Foo Bar 2' },
+					'foo//bar3': { id: 'foo//bar3', name: 'Foo Bar 3' },
+				},
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ 'foo//bar1', 'foo//bar2', 'foo//bar3' ] },
+					's=2': { itemIds: [ 'foo//bar2' ] },
+				},
+			},
+		} );
+		const state = reducer(
+			original,
+			removeItems( kind, name, 'foo//bar2' )
+		);
+
+		expect( state ).toEqual( {
+			itemIsComplete: {},
+			items: {
+				default: {
+					'foo//bar1': { id: 'foo//bar1', name: 'Foo Bar 1' },
+					'foo//bar3': { id: 'foo//bar3', name: 'Foo Bar 3' },
+				},
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ 'foo//bar1', 'foo//bar3' ] },
+					's=2': { itemIds: [] },
+				},
 			},
 		} );
 	} );

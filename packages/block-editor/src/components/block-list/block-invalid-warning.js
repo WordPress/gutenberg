@@ -4,48 +4,96 @@
 import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { getBlockType, createBlock, rawHandler } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { createBlock, rawHandler } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import Warning from '../warning';
 import BlockCompare from '../block-compare';
+import { store as blockEditorStore } from '../../store';
 
-export function BlockInvalidWarning( {
-	convertToHTML,
-	convertToBlocks,
-	convertToClassic,
-	attemptBlockRecovery,
-	block,
-} ) {
-	const hasHTMLBlock = !! getBlockType( 'core/html' );
+const blockToBlocks = ( block ) =>
+	rawHandler( {
+		HTML: block.originalContent,
+	} );
+
+export default function BlockInvalidWarning( { clientId } ) {
+	const { block, canInsertHTMLBlock, canInsertClassicBlock } = useSelect(
+		( select ) => {
+			const { canInsertBlockType, getBlock, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				block: getBlock( clientId ),
+				canInsertHTMLBlock: canInsertBlockType(
+					'core/html',
+					rootClientId
+				),
+				canInsertClassicBlock: canInsertBlockType(
+					'core/freeform',
+					rootClientId
+				),
+			};
+		},
+		[ clientId ]
+	);
+	const { replaceBlock } = useDispatch( blockEditorStore );
+
 	const [ compare, setCompare ] = useState( false );
-
-	const onCompare = useCallback( () => setCompare( true ), [] );
 	const onCompareClose = useCallback( () => setCompare( false ), [] );
 
-	// We memo the array here to prevent the children components from being updated unexpectedly
-	const hiddenActions = useMemo(
+	const convert = useMemo(
+		() => ( {
+			toClassic() {
+				const classicBlock = createBlock( 'core/freeform', {
+					content: block.originalContent,
+				} );
+				return replaceBlock( block.clientId, classicBlock );
+			},
+			toHTML() {
+				const htmlBlock = createBlock( 'core/html', {
+					content: block.originalContent,
+				} );
+				return replaceBlock( block.clientId, htmlBlock );
+			},
+			toBlocks() {
+				const newBlocks = blockToBlocks( block );
+				return replaceBlock( block.clientId, newBlocks );
+			},
+			toRecoveredBlock() {
+				const recoveredBlock = createBlock(
+					block.name,
+					block.attributes,
+					block.innerBlocks
+				);
+				return replaceBlock( block.clientId, recoveredBlock );
+			},
+		} ),
+		[ block, replaceBlock ]
+	);
+
+	const secondaryActions = useMemo(
 		() =>
 			[
 				{
 					// translators: Button to fix block content
 					title: _x( 'Resolve', 'imperative verb' ),
-					onClick: onCompare,
+					onClick: () => setCompare( true ),
 				},
-				hasHTMLBlock && {
+				canInsertHTMLBlock && {
 					title: __( 'Convert to HTML' ),
-					onClick: convertToHTML,
+					onClick: convert.toHTML,
 				},
-				{
+				canInsertClassicBlock && {
 					title: __( 'Convert to Classic Block' ),
-					onClick: convertToClassic,
+					onClick: convert.toClassic,
 				},
 			].filter( Boolean ),
-		[ onCompare, convertToHTML, convertToClassic ]
+		[ canInsertHTMLBlock, canInsertClassicBlock, convert ]
 	);
 
 	return (
@@ -54,13 +102,13 @@ export function BlockInvalidWarning( {
 				actions={ [
 					<Button
 						key="recover"
-						onClick={ attemptBlockRecovery }
-						isPrimary
+						onClick={ convert.toRecoveredBlock }
+						variant="primary"
 					>
 						{ __( 'Attempt Block Recovery' ) }
 					</Button>,
 				] }
-				secondaryActions={ hiddenActions }
+				secondaryActions={ secondaryActions }
 			>
 				{ __( 'This block contains unexpected or invalid content.' ) }
 			</Warning>
@@ -75,8 +123,8 @@ export function BlockInvalidWarning( {
 				>
 					<BlockCompare
 						block={ block }
-						onKeep={ convertToHTML }
-						onConvert={ convertToBlocks }
+						onKeep={ convert.toHTML }
+						onConvert={ convert.toBlocks }
 						convertor={ blockToBlocks }
 						convertButtonText={ __( 'Convert to Blocks' ) }
 					/>
@@ -85,42 +133,3 @@ export function BlockInvalidWarning( {
 		</>
 	);
 }
-
-const blockToClassic = ( block ) =>
-	createBlock( 'core/freeform', {
-		content: block.originalContent,
-	} );
-const blockToHTML = ( block ) =>
-	createBlock( 'core/html', {
-		content: block.originalContent,
-	} );
-const blockToBlocks = ( block ) =>
-	rawHandler( {
-		HTML: block.originalContent,
-	} );
-const recoverBlock = ( { name, attributes, innerBlocks } ) =>
-	createBlock( name, attributes, innerBlocks );
-
-export default compose( [
-	withSelect( ( select, { clientId } ) => ( {
-		block: select( 'core/block-editor' ).getBlock( clientId ),
-	} ) ),
-	withDispatch( ( dispatch, { block } ) => {
-		const { replaceBlock } = dispatch( 'core/block-editor' );
-
-		return {
-			convertToClassic() {
-				replaceBlock( block.clientId, blockToClassic( block ) );
-			},
-			convertToHTML() {
-				replaceBlock( block.clientId, blockToHTML( block ) );
-			},
-			convertToBlocks() {
-				replaceBlock( block.clientId, blockToBlocks( block ) );
-			},
-			attemptBlockRecovery() {
-				replaceBlock( block.clientId, recoverBlock( block ) );
-			},
-		};
-	} ),
-] )( BlockInvalidWarning );

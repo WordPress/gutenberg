@@ -1,4 +1,5 @@
 import UIKit
+import Network
 import Aztec
 
 // IMPORTANT: if you're seeing a warning with this import, keep in mind it's marked as a Swift
@@ -8,7 +9,7 @@ import Aztec
 import RNTAztecView
 
 @objc
-public class Gutenberg: NSObject {
+public class Gutenberg: UIResponder {
     public static func supportedBlocks(isDev: Bool = false) -> [String] {
         guard let json = try? SourceFile.supportedBlocks.getContent() else { return [] }
         let data = Data(json.utf8)
@@ -45,15 +46,6 @@ public class Gutenberg: NSObject {
         return !bridge.isLoading
     }
 
-    public var logThreshold: LogLevel {
-        get {
-            return LogLevel(RCTGetLogThreshold())
-        }
-        set {
-            RCTSetLogThreshold(RCTLogLevel(newValue))
-        }
-    }
-
     private let bridgeModule = RNReactNativeGutenbergBridge()
     private unowned let dataSource: GutenbergBridgeDataSource
 
@@ -63,21 +55,25 @@ public class Gutenberg: NSObject {
 
     private var initialProps: [String: Any]? {
         var initialProps = [String: Any]()
-        
+
         if let initialContent = dataSource.gutenbergInitialContent() {
             initialProps["initialData"] = initialContent
         }
-        
+
         if let initialTitle = dataSource.gutenbergInitialTitle() {
             initialProps["initialTitle"] = initialTitle
         }
 
+        initialProps["featuredImageId"] = dataSource.gutenbergFeaturedImageId()
+
         initialProps["postType"] = dataSource.gutenbergPostType()
+
+        initialProps["hostAppNamespace"] = dataSource.gutenbergHostAppNamespace()
 
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
-        
+
         if let translations = dataSource.gutenbergTranslations() {
             initialProps["translations"] = translations
         }
@@ -87,16 +83,11 @@ public class Gutenberg: NSObject {
             initialProps["capabilities"] = capabilities.toJSPayload()
         }
 
-        let editorTheme = dataSource.gutenbergEditorTheme()
-        if let colors = editorTheme?.colors {
-            initialProps["colors"] = colors
+        let editorSettings = dataSource.gutenbergEditorSettings()
+        let settingsUpdates = properties(from: editorSettings)
+        initialProps.merge(settingsUpdates) { (intialProp, settingsUpdates) -> Any in
+            settingsUpdates
         }
-
-        if let gradients = editorTheme?.gradients {
-            initialProps["gradients"] = gradients
-        }
-
-        initialProps["editorMode"] = dataSource.isPreview ? "preview" : "editor"
 
         return initialProps
     }
@@ -106,7 +97,6 @@ public class Gutenberg: NSObject {
         self.extraModules = extraModules
         super.init()
         bridgeModule.dataSource = dataSource
-        logThreshold = isPackagerRunning ? .trace : .error
     }
 
     public func invalidate() {
@@ -120,17 +110,29 @@ public class Gutenberg: NSObject {
     public func toggleHTMLMode() {
         sendEvent(.toggleHTMLMode)
     }
-    
+
     public func setTitle(_ title: String) {
         sendEvent(.setTitle, body: ["title": title])
     }
-    
+
     public func updateHtml(_ html: String) {
         sendEvent(.updateHtml, body: ["html": html])
     }
 
+    public func featuredImageIdNativeUpdated(mediaId: Int32) {
+        sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
+    }
+
+    public func postHasBeenJustSaved() {
+        sendEvent(.postHasBeenJustSaved)
+    }
+
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
+    }
+
+    public func replace(blockID: String, content: String) {
+        sendEvent(.replaceBlock, body: ["html": content, "clientId": blockID])
     }
 
     public func updateCapabilities() {
@@ -142,8 +144,8 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEvent(withName: event.rawValue, body: body)
     }
 
-    public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?) {
-        mediaUpdate(event: .mediaUpload, id: id, state: state, progress: progress, url: url, serverID: serverID)
+    public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?, metadata: [String: Any] = [:]) {
+        mediaUpdate(event: .mediaUpload, id: id, state: state, progress: progress, url: url, serverID: serverID, metadata: metadata)
     }
 
     public func updateMediaSaveStatus(id: Int32, state: MediaSaveState, progress: Float, url: URL?, serverID: Int32?) {
@@ -167,8 +169,8 @@ public class Gutenberg: NSObject {
         ])
     }
 
-    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State, progress: Float, url: URL?, serverID: Int32?)  {
-        var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress];
+    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State, progress: Float, url: URL?, serverID: Int32?, metadata: [String: Any] = [:])  {
+        var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress, "metadata": metadata ];
         if let url = url {
             data["mediaUrl"] = url.absoluteString
         }
@@ -191,24 +193,61 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
     }
 
-    private var isPackagerRunning: Bool {
-        let url = sourceURL(for: bridge)
-        return !(url?.isFileURL ?? true)
+    public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
+        let settingsUpdates = properties(from: editorSettings)
+        sendEvent(.updateEditorSettings, body: settingsUpdates)
     }
 
-    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
+    public func showEditorHelp() {
+        bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
+    }
+    
+    public func onUndoPressed() {
+        bridgeModule.sendEventIfNeeded(.onUndoPressed, body: nil)
+    }
+    
+    public func onRedoPressed() {
+        bridgeModule.sendEventIfNeeded(.onRedoPressed, body: nil)
+    }
 
-        var themeUpdates = [String : Any]()
+    public func connectionStatusChange(isConnected: Bool) {
+        var data: [String: Any] = ["isConnected": isConnected]
+        bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
+    }
 
-        if let colors = editorTheme?.colors {
-            themeUpdates["colors"] = colors
+    private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
+        var settingsUpdates = [String : Any]()
+        settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
+        
+        if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
+            settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
         }
 
-        if let gradients = editorTheme?.gradients {
-            themeUpdates["gradients"] = gradients
+        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
+            settingsUpdates["quoteBlockV2"] = quoteBlockV2
         }
 
-        bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
+        if let listBlockV2 = editorSettings?.listBlockV2 {
+            settingsUpdates["listBlockV2"] = listBlockV2
+        }
+
+        if let rawStyles = editorSettings?.rawStyles {
+            settingsUpdates["rawStyles"] = rawStyles
+        }
+
+        if let rawFeatures = editorSettings?.rawFeatures {
+            settingsUpdates["rawFeatures"] = rawFeatures
+        }
+
+        if let colors = editorSettings?.colors {
+            settingsUpdates["colors"] = colors
+        }
+
+        if let gradients = editorSettings?.gradients {
+            settingsUpdates["gradients"] = gradients
+        }
+
+        return settingsUpdates
     }
 
     public func showNotice(_ message: String) {
@@ -218,7 +257,27 @@ public class Gutenberg: NSObject {
 
 extension Gutenberg: RCTBridgeDelegate {
     public func sourceURL(for bridge: RCTBridge!) -> URL! {
-        return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackResource: "")
+        #if DEBUG
+        var isOnCellularNetwork = false
+        let monitor = NWPathMonitor()
+        let semaphore = DispatchSemaphore(value: 0)
+        monitor.pathUpdateHandler = { path in
+            isOnCellularNetwork = path.isExpensive
+            semaphore.signal()
+        }
+        let monitorQueue = DispatchQueue(label: "org.wordpress.network-path-monitor")
+        monitor.start(queue: monitorQueue)
+        _ = semaphore.wait(timeout: .distantFuture)
+        monitor.cancel()
+        if isOnCellularNetwork {
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        }
+        #endif
+        
+        guard let localBundle = RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackExtension: "") else {
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        }
+        return localBundle
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
@@ -237,6 +296,7 @@ extension Gutenberg {
         case succeeded = 2
         case failed = 3
         case reset = 4
+        case paused = 11
     }
 
     public enum MediaSaveState: Int, MediaState {
@@ -258,6 +318,7 @@ extension Gutenberg {
         case video
         case audio
         case other
+        case any
     }
 }
 

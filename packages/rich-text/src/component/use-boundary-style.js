@@ -1,17 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /*
  * Calculates and renders the format boundary style when the active formats
  * change.
  */
-export function useBoundaryStyle( { activeFormats, ref } ) {
+export function useBoundaryStyle( { record } ) {
+	const ref = useRef();
+	const { activeFormats = [], replacements, start } = record.current;
+	const activeReplacement = replacements[ start ];
 	useEffect( () => {
 		// There's no need to recalculate the boundary styles if no formats are
 		// active, because no boundary styles will be visible.
-		if ( ! activeFormats || ! activeFormats.length ) {
+		if (
+			( ! activeFormats || ! activeFormats.length ) &&
+			! activeReplacement
+		) {
 			return;
 		}
 
@@ -44,5 +50,6 @@ export function useBoundaryStyle( { activeFormats, ref } ) {
 		if ( globalStyle.innerHTML !== style ) {
 			globalStyle.innerHTML = style;
 		}
-	}, [ activeFormats ] );
+	}, [ activeFormats, activeReplacement ] );
+	return ref;
 }

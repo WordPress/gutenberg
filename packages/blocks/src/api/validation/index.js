@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { identity, xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -14,7 +15,17 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { createLogger, createQueuedLogger } from './logger';
 import { getSaveContent } from '../serializer';
+import {
+	getFreeformContentHandlerName,
+	getUnregisteredTypeHandlerName,
+} from '../registration';
 import { normalizeBlockType } from '../utils';
+
+/** @typedef {import('../parser').WPBlock} WPBlock */
+/** @typedef {import('../registration').WPBlockType} WPBlockType */
+/** @typedef {import('./logger').LoggerItem} LoggerItem */
+
+const identity = ( x ) => x;
 
 /**
  * Globally matches any consecutive whitespace
@@ -215,7 +226,7 @@ export function isValidCharacterReference( text ) {
  * implementation of `decodeEntities` from `html-entities`, in order to avoid
  * bundling a massive named character reference.
  *
- * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
+ * @see https://github.com/tildeio/simple-html-tokenizer/tree/HEAD/src/entity-parser.ts
  */
 export class DecodeEntityParser {
 	/**
@@ -224,7 +235,7 @@ export class DecodeEntityParser {
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
-	 * @return {?string} Entity substitute value.
+	 * @return {string | undefined} Entity substitute value.
 	 */
 	parse( entity ) {
 		if ( isValidCharacterReference( entity ) ) {
@@ -278,7 +289,7 @@ export function getMeaningfulAttributePairs( token ) {
 		return (
 			value ||
 			key.indexOf( 'data-' ) === 0 ||
-			includes( MEANINGFUL_ATTRIBUTES, key )
+			MEANINGFUL_ATTRIBUTES.includes( key )
 		);
 	} );
 }
@@ -326,6 +337,26 @@ export function isEquivalentTextTokens(
 }
 
 /**
+ * Given a CSS length value, returns a normalized CSS length value for strict equality
+ * comparison.
+ *
+ * @param {string} value CSS length value.
+ *
+ * @return {string} Normalized CSS length value.
+ */
+export function getNormalizedLength( value ) {
+	if ( 0 === parseFloat( value ) ) {
+		return '0';
+	}
+	// Normalize strings with floats to always include a leading zero.
+	if ( value.indexOf( '.' ) === 0 ) {
+		return '0' + value;
+	}
+
+	return value;
+}
+
+/**
  * Given a style value, returns a normalized style value for strict equality
  * comparison.
  *
@@ -334,9 +365,13 @@ export function isEquivalentTextTokens(
  * @return {string} Normalized style value.
  */
 export function getNormalizedStyleValue( value ) {
+	const textPieces = getTextPiecesSplitOnWhitespace( value );
+	const normalizedPieces = textPieces.map( getNormalizedLength );
+	const result = normalizedPieces.join( ' ' );
+
 	return (
-		value
-			// Normalize URL type to omit whitespace or quotes
+		result
+			// Normalize URL type to omit whitespace or quotes.
 			.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' )
 	);
 }
@@ -352,18 +387,18 @@ export function getStyleProperties( text ) {
 	const pairs = text
 		// Trim ending semicolon (avoid including in split)
 		.replace( /;?\s*$/, '' )
-		// Split on property assignment
+		// Split on property assignment.
 		.split( ';' )
 		// For each property assignment...
 		.map( ( style ) => {
-			// ...split further into key-value pairs
+			// ...split further into key-value pairs.
 			const [ key, ...valueParts ] = style.split( ':' );
 			const value = valueParts.join( ':' );
 
 			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
 		} );
 
-	return fromPairs( pairs );
+	return Object.fromEntries( pairs );
 }
 
 /**
@@ -375,17 +410,27 @@ export const isEqualAttributesOfName = {
 	class: ( actual, expected ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
-		return ! xor(
-			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
-		).length;
+		const [ actualPieces, expectedPieces ] = [ actual, expected ].map(
+			getTextPiecesSplitOnWhitespace
+		);
+		const actualDiff = actualPieces.filter(
+			( c ) => ! expectedPieces.includes( c )
+		);
+		const expectedDiff = expectedPieces.filter(
+			( c ) => ! actualPieces.includes( c )
+		);
+
+		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+		return fastDeepEqual(
+			...[ actual, expected ].map( getStyleProperties )
+		);
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
-	...fromPairs(
-		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] )
+	...Object.fromEntries(
+		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, () => true ] )
 	),
 };
 
@@ -429,7 +474,7 @@ export function isEqualTagAttributePairs(
 		const [ name, actualValue ] = actual[ i ];
 		const nameLower = name.toLowerCase();
 
-		// As noted above, if missing member in B, assume different
+		// As noted above, if missing member in B, assume different.
 		if ( ! expectedAttributes.hasOwnProperty( nameLower ) ) {
 			logger.warning( 'Encountered unexpected attribute `%s`.', name );
 			return false;
@@ -439,7 +484,7 @@ export function isEqualTagAttributePairs(
 		const isEqualAttributes = isEqualAttributesOfName[ nameLower ];
 
 		if ( isEqualAttributes ) {
-			// Defer custom attribute equality handling
+			// Defer custom attribute equality handling.
 			if ( ! isEqualAttributes( actualValue, expectedValue ) ) {
 				logger.warning(
 					'Expected attribute `%s` of value `%s`, saw `%s`.',
@@ -450,7 +495,7 @@ export function isEqualTagAttributePairs(
 				return false;
 			}
 		} else if ( actualValue !== expectedValue ) {
-			// Otherwise strict inequality should bail
+			// Otherwise strict inequality should bail.
 			logger.warning(
 				'Expected attribute `%s` of value `%s`, saw `%s`.',
 				name,
@@ -503,7 +548,7 @@ export const isEqualTokensOfType = {
  *
  * @param {Object[]} tokens Set of tokens to search.
  *
- * @return {Object} Next non-whitespace token.
+ * @return {Object | undefined} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;
@@ -540,18 +585,18 @@ function getHTMLTokens( html, logger = createLogger() ) {
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object} currentToken Current token to compare with.
- * @param {Object|undefined} nextToken Next token to compare against.
+ * @param {Object}           currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken    Next token to compare against.
  *
  * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */
 export function isClosedByToken( currentToken, nextToken ) {
-	// Ensure this is a self closed token
+	// Ensure this is a self closed token.
 	if ( ! currentToken.selfClosing ) {
 		return false;
 	}
 
-	// Check token names and determine if nextToken is the closing tag for currentToken
+	// Check token names and determine if nextToken is the closing tag for currentToken.
 	if (
 		nextToken &&
 		nextToken.tagName === currentToken.tagName &&
@@ -580,13 +625,12 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 		return true;
 	}
 
-	// Tokenize input content and reserialized save content
-	const [ actualTokens, expectedTokens ] = [
-		actual,
-		expected,
-	].map( ( html ) => getHTMLTokens( html, logger ) );
+	// Tokenize input content and reserialized save content.
+	const [ actualTokens, expectedTokens ] = [ actual, expected ].map(
+		( html ) => getHTMLTokens( html, logger )
+	);
 
-	// If either is malformed then stop comparing - the strings are not equivalent
+	// If either is malformed then stop comparing - the strings are not equivalent.
 	if ( ! actualTokens || ! expectedTokens ) {
 		return false;
 	}
@@ -595,7 +639,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	while ( ( actualToken = getNextNonWhitespaceToken( actualTokens ) ) ) {
 		expectedToken = getNextNonWhitespaceToken( expectedTokens );
 
-		// Inequal if exhausted all expected tokens
+		// Inequal if exhausted all expected tokens.
 		if ( ! expectedToken ) {
 			logger.warning(
 				'Expected end of content, instead saw %o.',
@@ -604,7 +648,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 			return false;
 		}
 
-		// Inequal if next non-whitespace token of each set are not same type
+		// Inequal if next non-whitespace token of each set are not same type.
 		if ( actualToken.type !== expectedToken.type ) {
 			logger.warning(
 				'Expected token of type `%s` (%o), instead saw `%s` (%o).',
@@ -617,7 +661,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 		}
 
 		// Defer custom token type equality handling, otherwise continue and
-		// assume as equal
+		// assume as equal.
 		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
 		if (
 			isEqualTokens &&
@@ -627,21 +671,21 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 		}
 
 		// Peek at the next tokens (actual and expected) to see if they close
-		// a self-closing tag
+		// a self-closing tag.
 		if ( isClosedByToken( actualToken, expectedTokens[ 0 ] ) ) {
 			// Consume the next expected token that closes the current actual
-			// self-closing token
+			// self-closing token.
 			getNextNonWhitespaceToken( expectedTokens );
 		} else if ( isClosedByToken( expectedToken, actualTokens[ 0 ] ) ) {
 			// Consume the next actual token that closes the current expected
-			// self-closing token
+			// self-closing token.
 			getNextNonWhitespaceToken( actualTokens );
 		}
 	}
 
 	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
-		// indicates inequality
+		// indicates inequality.
 		logger.warning(
 			'Expected %o, instead saw end of content.',
 			expectedToken
@@ -661,51 +705,63 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
- * @param {Object}        logger           	   Validation logger object.
+ * @param {Object}        logger               Validation logger object.
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult(
-	blockTypeOrName,
-	attributes,
-	originalBlockContent,
-	logger = createQueuedLogger()
-) {
+
+/**
+ * Returns an object with `isValid` property set to `true` if the parsed block
+ * is valid given the input content. A block is considered valid if, when serialized
+ * with assumed attributes, the content matches the original value. If block is
+ * invalid, this function returns all validations issues as well.
+ *
+ * @param {WPBlock}            block                          block object.
+ * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
+ *
+ * @return {[boolean,Array<LoggerItem>]} validation results.
+ */
+export function validateBlock( block, blockTypeOrName = block.name ) {
+	const isFallbackBlock =
+		block.name === getFreeformContentHandlerName() ||
+		block.name === getUnregisteredTypeHandlerName();
+
+	// Shortcut to avoid costly validation.
+	if ( isFallbackBlock ) {
+		return [ true, [] ];
+	}
+
+	const logger = createQueuedLogger();
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
-		generatedBlockContent = getSaveContent( blockType, attributes );
+		generatedBlockContent = getSaveContent( blockType, block.attributes );
 	} catch ( error ) {
 		logger.error(
 			'Block validation failed because an error occurred while generating block content:\n\n%s',
 			error.toString()
 		);
 
-		return {
-			isValid: false,
-			validationIssues: logger.getItems(),
-		};
+		return [ false, logger.getItems() ];
 	}
 
 	const isValid = isEquivalentHTML(
-		originalBlockContent,
+		block.originalContent,
 		generatedBlockContent,
 		logger
 	);
+
 	if ( ! isValid ) {
 		logger.error(
 			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 			blockType.name,
 			blockType,
 			generatedBlockContent,
-			originalBlockContent
+			block.originalContent
 		);
 	}
 
-	return {
-		isValid,
-		validationIssues: logger.getItems(),
-	};
+	return [ isValid, logger.getItems() ];
 }
 
 /**
@@ -714,6 +770,8 @@ export function getBlockContentValidationResult(
  * matches the original value.
  *
  * Logs to console in development environments when invalid.
+ *
+ * @deprecated Use validateBlock instead to avoid data loss.
  *
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
@@ -726,12 +784,20 @@ export function isValidBlockContent(
 	attributes,
 	originalBlockContent
 ) {
-	const { isValid } = getBlockContentValidationResult(
-		blockTypeOrName,
+	deprecated( 'isValidBlockContent introduces opportunity for data loss', {
+		since: '12.6',
+		plugin: 'Gutenberg',
+		alternative: 'validateBlock',
+	} );
+
+	const blockType = normalizeBlockType( blockTypeOrName );
+	const block = {
+		name: blockType.name,
 		attributes,
-		originalBlockContent,
-		createLogger()
-	);
+		innerBlocks: [],
+		originalContent: originalBlockContent,
+	};
+	const [ isValid ] = validateBlock( block, blockType );
 
 	return isValid;
 }

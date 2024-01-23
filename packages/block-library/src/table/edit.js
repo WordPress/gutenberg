@@ -6,27 +6,27 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
 	RichText,
-	PanelColorSettings,
-	createCustomColorsHOC,
 	BlockIcon,
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
 	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarGroup,
-	ToolbarItem,
+	ToolbarDropdownMenu,
+	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -41,7 +41,7 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -57,29 +57,6 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
-
-const BACKGROUND_COLORS = [
-	{
-		color: '#f3f4f5',
-		name: 'Subtle light gray',
-		slug: 'subtle-light-gray',
-	},
-	{
-		color: '#e9fbe5',
-		name: 'Subtle pale green',
-		slug: 'subtle-pale-green',
-	},
-	{
-		color: '#e7f5fe',
-		name: 'Subtle pale blue',
-		slug: 'subtle-pale-blue',
-	},
-	{
-		color: '#fcf0ef',
-		name: 'Subtle pale pink',
-		slug: 'subtle-pale-pink',
-	},
-];
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -99,7 +76,11 @@ const ALIGNMENT_CONTROLS = [
 	},
 ];
 
-const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
+const cellAriaLabel = {
+	head: __( 'Header cell text' ),
+	body: __( 'Body cell text' ),
+	foot: __( 'Footer cell text' ),
+};
 
 const placeholder = {
 	head: __( 'Header label' ),
@@ -113,8 +94,6 @@ function TSection( { name, ...props } ) {
 
 function TableEdit( {
 	attributes,
-	backgroundColor,
-	setBackgroundColor,
 	setAttributes,
 	insertBlocksAfter,
 	isSelected,
@@ -123,6 +102,12 @@ function TableEdit( {
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
+
+	const colorProps = useColorProps( attributes );
+	const borderProps = useBorderProps( attributes );
+
+	const tableRef = useRef();
+	const [ hasTableCreated, setHasTableCreated ] = useState( false );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -156,6 +141,7 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
+		setHasTableCreated( true );
 	}
 
 	/**
@@ -218,7 +204,7 @@ function TableEdit( {
 	/**
 	 * Get the alignment of the currently selected cell.
 	 *
-	 * @return {string} The new alignment to apply to the column.
+	 * @return {string | undefined} The new alignment to apply to the column.
 	 */
 	function getCellAlignment() {
 		if ( ! selectedCell ) {
@@ -261,7 +247,7 @@ function TableEdit( {
 				rowIndex: newRowIndex,
 			} )
 		);
-		// Select the first cell of the new row
+		// Select the first cell of the new row.
 		setSelectedCell( {
 			sectionName,
 			rowIndex: newRowIndex,
@@ -316,7 +302,7 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column
+		// Select the first cell of the new column.
 		setSelectedCell( {
 			rowIndex: 0,
 			columnIndex: newColumnIndex,
@@ -359,6 +345,15 @@ function TableEdit( {
 			setSelectedCell();
 		}
 	}, [ isSelected ] );
+
+	useEffect( () => {
+		if ( hasTableCreated ) {
+			tableRef?.current
+				?.querySelector( 'td div[contentEditable="true"]' )
+				?.focus();
+			setHasTableCreated( false );
+		}
+	}, [ hasTableCreated ] );
 
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
@@ -403,37 +398,49 @@ function TableEdit( {
 		},
 	];
 
-	const renderedSections = [ 'head', 'body', 'foot' ].map( ( name ) => (
+	const renderedSections = sections.map( ( name ) => (
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
 				<tr key={ rowIndex }>
 					{ cells.map(
 						(
-							{ content, tag: CellTag, scope, align },
+							{
+								content,
+								tag: CellTag,
+								scope,
+								align,
+								colspan,
+								rowspan,
+							},
 							columnIndex
 						) => (
-							<RichText
-								tagName={ CellTag }
+							<CellTag
 								key={ columnIndex }
+								scope={ CellTag === 'th' ? scope : undefined }
+								colSpan={ colspan }
+								rowSpan={ rowspan }
 								className={ classnames(
 									{
 										[ `has-text-align-${ align }` ]: align,
 									},
 									'wp-block-table__cell-content'
 								) }
-								scope={ CellTag === 'th' ? scope : undefined }
-								value={ content }
-								onChange={ onChange }
-								unstableOnFocus={ () => {
-									setSelectedCell( {
-										sectionName: name,
-										rowIndex,
-										columnIndex,
-										type: 'cell',
-									} );
-								} }
-								placeholder={ placeholder[ name ] }
-							/>
+							>
+								<RichText
+									value={ content }
+									onChange={ onChange }
+									onFocus={ () => {
+										setSelectedCell( {
+											sectionName: name,
+											rowIndex,
+											columnIndex,
+											type: 'cell',
+										} );
+									} }
+									aria-label={ cellAriaLabel[ name ] }
+									placeholder={ placeholder[ name ] }
+								/>
+							</CellTag>
 						)
 					) }
 				</tr>
@@ -444,91 +451,95 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...useBlockProps( { ref: tableRef } ) }>
 			{ ! isEmpty && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ table }
-									toggleProps={ toggleProps }
-									label={ __( 'Edit table' ) }
-									controls={ tableControls }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<AlignmentToolbar
-						label={ __( 'Change column alignment' ) }
-						alignmentControls={ ALIGNMENT_CONTROLS }
-						value={ getCellAlignment() }
-						onChange={ ( nextAlign ) =>
-							onChangeColumnAlignment( nextAlign )
-						}
-					/>
-				</BlockControls>
+				<>
+					<BlockControls group="block">
+						<AlignmentControl
+							label={ __( 'Change column alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS }
+							value={ getCellAlignment() }
+							onChange={ ( nextAlign ) =>
+								onChangeColumnAlignment( nextAlign )
+							}
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarDropdownMenu
+							hasArrowIndicator
+							icon={ table }
+							label={ __( 'Edit table' ) }
+							controls={ tableControls }
+						/>
+					</BlockControls>
+				</>
 			) }
-			{ ! isEmpty && (
-				<InspectorControls>
-					<PanelBody
-						title={ __( 'Table settings' ) }
-						className="blocks-table-settings"
-					>
-						<ToggleControl
-							label={ __( 'Fixed width table cells' ) }
-							checked={ !! hasFixedLayout }
-							onChange={ onChangeFixedLayout }
-						/>
-						<ToggleControl
-							label={ __( 'Header section' ) }
-							checked={ !! ( head && head.length ) }
-							onChange={ onToggleHeaderSection }
-						/>
-						<ToggleControl
-							label={ __( 'Footer section' ) }
-							checked={ !! ( foot && foot.length ) }
-							onChange={ onToggleFooterSection }
-						/>
-					</PanelBody>
-					<PanelColorSettings
-						title={ __( 'Color settings' ) }
-						initialOpen={ false }
-						colorSettings={ [
-							{
-								value: backgroundColor.color,
-								onChange: setBackgroundColor,
-								label: __( 'Background color' ),
-								disableCustomColors: true,
-								colors: BACKGROUND_COLORS,
-							},
-						] }
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Settings' ) }
+					className="blocks-table-settings"
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Fixed width table cells' ) }
+						checked={ !! hasFixedLayout }
+						onChange={ onChangeFixedLayout }
 					/>
-				</InspectorControls>
-			) }
+					{ ! isEmpty && (
+						<>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Header section' ) }
+								checked={ !! ( head && head.length ) }
+								onChange={ onToggleHeaderSection }
+							/>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Footer section' ) }
+								checked={ !! ( foot && foot.length ) }
+								onChange={ onToggleFooterSection }
+							/>
+						</>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			{ ! isEmpty && (
 				<table
-					className={ classnames( backgroundColor.class, {
-						'has-fixed-layout': hasFixedLayout,
-						'has-background': !! backgroundColor.color,
-					} ) }
+					className={ classnames(
+						colorProps.className,
+						borderProps.className,
+						{
+							'has-fixed-layout': hasFixedLayout,
+							// This is required in the editor only to overcome
+							// the fact the editor rewrites individual border
+							// widths into a shorthand format.
+							'has-individual-borders': hasSplitBorders(
+								attributes?.style?.border
+							),
+						}
+					) }
+					style={ { ...colorProps.style, ...borderProps.style } }
 				>
 					{ renderedSections }
 				</table>
 			) }
 			{ ! isEmpty && (
 				<RichText
+					identifier="caption"
 					tagName="figcaption"
-					placeholder={ __( 'Write caption…' ) }
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					aria-label={ __( 'Table caption text' ) }
+					placeholder={ __( 'Add caption' ) }
 					value={ caption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
 					// Deselect the selected table cell when the caption is focused.
-					unstableOnFocus={ () => setSelectedCell() }
+					onFocus={ () => setSelectedCell() }
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }
@@ -543,6 +554,8 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -551,6 +564,8 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }
@@ -559,8 +574,8 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<Button
-							className="blocks-table__placeholder-button"
-							isPrimary
+							__next40pxDefaultSize
+							variant="primary"
 							type="submit"
 						>
 							{ __( 'Create Table' ) }
@@ -572,4 +587,4 @@ function TableEdit( {
 	);
 }
 
-export default withCustomBackgroundColors( 'backgroundColor' )( TableEdit );
+export default TableEdit;

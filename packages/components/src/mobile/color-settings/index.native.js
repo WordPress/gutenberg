@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import { useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext } from '@wordpress/element';
+import { memo, useEffect, useContext } from '@wordpress/element';
 import { BottomSheetContext, BottomSheet } from '@wordpress/components';
-import { useRoute } from '@react-navigation/native';
 
 /**
  * Internal dependencies
@@ -19,7 +18,7 @@ import PaletteScreen from './palette.screen';
 
 import { colorsUtils } from './utils';
 
-const ColorSettingsMemo = React.memo(
+const ColorSettingsMemo = memo(
 	( {
 		defaultSettings,
 		onHandleClosingBottomSheet,
@@ -28,11 +27,16 @@ const ColorSettingsMemo = React.memo(
 		colorValue,
 		gradientValue,
 		onGradientChange,
+		onColorCleared,
 		label,
+		hideNavigation,
 	} ) => {
 		useEffect( () => {
 			shouldEnableBottomSheetMaxHeight( true );
 			onHandleClosingBottomSheet( null );
+			// Disable reason: deferring this refactor to the native team.
+			// see https://github.com/WordPress/gutenberg/pull/41166
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] );
 		return (
 			<BottomSheet.NavigationContainer>
@@ -44,7 +48,9 @@ const ColorSettingsMemo = React.memo(
 						colorValue,
 						gradientValue,
 						onGradientChange,
+						onColorCleared,
 						label,
+						hideNavigation,
 					} }
 				>
 					<PaletteScreen />
@@ -65,10 +71,8 @@ const ColorSettingsMemo = React.memo(
 );
 function ColorSettings( props ) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetMaxHeight,
-	} = useContext( BottomSheetContext );
+	const { onHandleClosingBottomSheet, shouldEnableBottomSheetMaxHeight } =
+		useContext( BottomSheetContext );
 
 	return (
 		<ColorSettingsMemo

@@ -2,25 +2,55 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useRefEffect } from '@wordpress/compose';
 
-function useBlockSelectionClearer() {
-	const hasSelection = useSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select(
-			'core/block-editor'
-		);
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
-		return hasSelectedBlock() || hasMultiSelection();
-	} );
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+/**
+ * Pass the returned ref callback to an element that should clear block
+ * selection. Selection will only be cleared if the element is clicked directly,
+ * not if a child element is clicked.
+ *
+ * @return {import('react').RefCallback} Ref callback.
+ */
+export function useBlockSelectionClearer() {
+	const { getSettings, hasSelectedBlock, hasMultiSelection } =
+		useSelect( blockEditorStore );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { clearBlockSelection: isEnabled } = getSettings();
 
-	return ( event ) => {
-		if ( event.target === event.currentTarget && hasSelection ) {
-			clearSelectedBlock();
-		}
-	};
+	return useRefEffect(
+		( node ) => {
+			if ( ! isEnabled ) {
+				return;
+			}
+
+			function onMouseDown( event ) {
+				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+					return;
+				}
+
+				// Only handle clicks on the element, not the children.
+				if ( event.target !== node ) {
+					return;
+				}
+
+				clearSelectedBlock();
+			}
+
+			node.addEventListener( 'mousedown', onMouseDown );
+
+			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
+			};
+		},
+		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock, isEnabled ]
+	);
 }
 
 export default function BlockSelectionClearer( props ) {
-	const onFocus = useBlockSelectionClearer();
-	return <div tabIndex={ -1 } onFocus={ onFocus } { ...props } />;
+	return <div ref={ useBlockSelectionClearer() } { ...props } />;
 }

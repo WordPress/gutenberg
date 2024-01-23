@@ -1,5 +1,4 @@
-Block Context
-=============
+# Block Context
 
 Block Context is a React implementation of WordPress's block context. Block context, much like [React's context](https://reactjs.org/docs/context.html), is a method for passing and inheriting values deeply through a hierarchy of blocks. Because of the similarities with React's context, the client-side implementation here is quite minimal. It is complemented by equivalent behaviors in the server-side rendering of a block.
 
@@ -24,7 +23,7 @@ function MyCustomPostEditor() {
 Internal to the `@wordpress/block-editor` module, a component can access the [full Context object](https://reactjs.org/docs/context.html#api), typically for use in combination with [`useContext`](https://reactjs.org/docs/hooks-reference.html#usecontext).
 
 ```js
-import { useContext } from '@wordpress/element';
+import { useContext } from 'react';
 
 // Only available internally within `@wordpress/block-editor`!
 import BlockContext from '../block-context';
@@ -44,14 +43,14 @@ The reason `BlockContext` is only internally available within the `@wordpress/bl
 
 ### `value`
 
-- Type: `Record<string,*>`
-- Required: Yes
+-   Type: `Record<string,*>`
+-   Required: Yes
 
 Context value to merge with current value.
 
 ### `children`
 
-- Type: `ReactNode`
-- Required: Yes
+-   Type: `ReactNode`
+-   Required: Yes
 
 Component children.

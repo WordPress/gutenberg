@@ -9,6 +9,9 @@
 		height: auto;
 		line-height: 0;
 
+		// This rule ensures social link buttons display correctly in template parts.
+		opacity: 1;
+
 		// This rule is duplicated from the style.scss and needs to be the same as there.
 		padding: 0.25em;
 	}
@@ -17,4 +20,8 @@
 .wp-block-social-links.is-style-pill-shape .wp-social-link button {
 	padding-left: calc((2/3) * 1em);
 	padding-right: calc((2/3) * 1em);
+}
+
+.wp-block-social-links.is-style-logos-only .wp-social-link button {
+	padding: 0;
 }

@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/post-author-name",
+		"isValid": true,
+		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self"
+		},
+		"innerBlocks": []
+	}
+]

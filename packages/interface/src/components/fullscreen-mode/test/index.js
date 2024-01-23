@@ -1,69 +1,53 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-
+import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { FullscreenMode } from '..';
+import FullscreenMode from '..';
 
 describe( 'FullscreenMode', () => {
 	it( 'fullscreen mode to be added to document body when active', () => {
-		shallow( <FullscreenMode isActive={ true } /> );
+		const { baseElement } = render( <FullscreenMode isActive /> );
 
-		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
-			true
-		);
+		expect( baseElement ).toHaveClass( 'is-fullscreen-mode' );
 	} );
 
 	it( 'fullscreen mode not to be added to document body when active', () => {
-		shallow( <FullscreenMode isActive={ false } /> );
+		const { baseElement } = render( <FullscreenMode isActive={ false } /> );
 
-		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
-			false
-		);
+		expect( baseElement ).not.toHaveClass( 'is-fullscreen-mode' );
 	} );
 
 	it( 'sticky-menu to be removed from the body class if present', () => {
 		document.body.classList.add( 'sticky-menu' );
 
-		shallow( <FullscreenMode isActive={ false } /> );
+		const { baseElement } = render( <FullscreenMode isActive={ false } /> );
 
-		expect( document.body.classList.contains( 'sticky-menu' ) ).toBe(
-			false
-		);
+		expect( baseElement ).not.toHaveClass( 'sticky-menu' );
 	} );
 
 	it( 'sticky-menu to be restored when component unmounted and originally present', () => {
 		document.body.classList.add( 'sticky-menu' );
-
-		const mode = shallow( <FullscreenMode isActive={ false } /> );
-		mode.unmount();
-
-		expect( document.body.classList.contains( 'sticky-menu' ) ).toBe(
-			true
+		const { baseElement, unmount } = render(
+			<FullscreenMode isActive={ false } />
 		);
+
+		unmount();
+
+		expect( baseElement ).toHaveClass( 'sticky-menu' );
 	} );
 
 	it( 'fullscreen mode to be removed from document body when component unmounted', () => {
-		// not present initially
-		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
-			false
-		);
+		const { baseElement, unmount } = render( <FullscreenMode isActive /> );
 
-		const mode = shallow( <FullscreenMode isActive /> );
+		// Present after mounting with `isActive`
+		expect( baseElement ).toHaveClass( 'is-fullscreen-mode' );
 
-		// present after mounting with `isActive`
-		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
-			true
-		);
+		unmount();
 
-		mode.unmount();
-
-		// removed after unmounting
-		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
-			false
-		);
+		// Removed after unmounting.
+		expect( baseElement ).not.toHaveClass( 'is-fullscreen-mode' );
 	} );
 } );

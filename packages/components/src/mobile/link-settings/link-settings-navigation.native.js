@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+/**
  * Internal dependencies
  */
 import BottomSheet from '../bottom-sheet';
@@ -18,6 +22,8 @@ function LinkSettingsNavigation( props ) {
 		<BottomSheet
 			isVisible={ props.isVisible }
 			onClose={ props.onClose }
+			onDismiss={ props.onDismiss }
+			testID="link-settings-navigation"
 			hideHeader
 			hasNavigation
 		>
@@ -41,4 +47,4 @@ function LinkSettingsNavigation( props ) {
 	);
 }
 
-export default LinkSettingsNavigation;
+export default memo( LinkSettingsNavigation );

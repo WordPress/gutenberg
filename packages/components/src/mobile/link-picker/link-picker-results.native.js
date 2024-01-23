@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { ActivityIndicator, FlatList, View } from 'react-native';
-import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -34,7 +34,7 @@ export default function LinkPickerResults( {
 		pendingRequest.current = null;
 	};
 
-	// a stable debounced function to fetch suggestions and append
+	// A stable debounced function to fetch suggestions and append.
 	const { fetchMoreSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const fetchLinkSuggestions = async ( { search } ) => {
@@ -49,8 +49,8 @@ export default function LinkPickerResults( {
 			query: search,
 			links: currentSuggestions,
 		} ) => {
-			// return early if we've already detected the end of data or we are
-			// already awaiting a response
+			// Return early if we've already detected the end of data or we are
+			// already awaiting a response.
 			if ( hasAllSuggestions || pendingRequest.current ) {
 				return;
 			}
@@ -58,10 +58,10 @@ export default function LinkPickerResults( {
 			pendingRequest.current = request;
 			const suggestions = await request;
 
-			// only update links for the most recent request
+			// Only update links for the most recent request.
 			if ( suggestions && request === pendingRequest.current ) {
-				// since we don't have the response header, we check if the results
-				// are truncated to determine we've reached the end
+				// Since we don't have the response header, we check if the results
+				// are truncated to determine we've reached the end.
 				if ( suggestions.length < PER_PAGE ) {
 					setHasAllSuggestions( true );
 				}
@@ -74,24 +74,30 @@ export default function LinkPickerResults( {
 		return {
 			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
 		};
+		// Disable eslint rule for now, to avoid introducing a regression
+		// (see https://github.com/WordPress/gutenberg/pull/23922#discussion_r1170634879).
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	// prevent setting state when unmounted
+	// Prevent setting state when unmounted.
 	useEffect( () => clearRequest, [] );
 
-	// any time the query changes, we reset pagination
+	// Any time the query changes, we reset pagination.
 	useEffect( () => {
 		clearRequest();
 		nextPage.current = 1;
 		setHasAllSuggestions( false );
 		setLinks( [ directEntry ] );
 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ query ] );
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
 	const spinner = ! hasAllSuggestions && meetsThreshold( query ) && (
-		<View style={ styles.spinner }>
+		<View style={ styles.spinner } testID="link-picker-loading">
 			<ActivityIndicator animating />
 		</View>
 	);

@@ -13,7 +13,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { storeConfig } from '../../store';
-import applyMiddlewares from '../../store/middlewares';
+import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) => {
@@ -28,12 +28,10 @@ const withRegistryProvider = createHigherOrderComponent(
 				const [ subRegistry, setSubRegistry ] = useState( null );
 				useEffect( () => {
 					const newRegistry = createRegistry( {}, registry );
-					const store = newRegistry.registerStore(
-						'core/block-editor',
+					newRegistry.registerStore(
+						blockEditorStoreName,
 						storeConfig
 					);
-					// This should be removed after the refactoring of the effects to controls.
-					applyMiddlewares( store );
 					setSubRegistry( newRegistry );
 				}, [ registry ] );
 

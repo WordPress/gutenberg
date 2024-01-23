@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
-import { controls as dataControls } from '@wordpress/data-controls';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,13 +9,15 @@ import { controls as dataControls } from '@wordpress/data-controls';
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
-import controls from './controls';
-import { STORE_KEY } from './constants';
+import * as privateActions from './private-actions';
+import * as privateSelectors from './private-selectors';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /**
  * Post editor data store configuration.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
  *
  * @type {Object}
  */
@@ -24,15 +25,19 @@ export const storeConfig = {
 	reducer,
 	selectors,
 	actions,
-	controls: {
-		...dataControls,
-		...controls,
-	},
 };
 
-const store = registerStore( STORE_KEY, {
+/**
+ * Store definition for the editor namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
-	persist: [ 'preferences' ],
 } );
 
-export default store;
+register( store );
+unlock( store ).registerPrivateActions( privateActions );
+unlock( store ).registerPrivateSelectors( privateSelectors );

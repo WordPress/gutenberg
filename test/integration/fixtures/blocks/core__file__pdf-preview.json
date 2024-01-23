@@ -1,0 +1,17 @@
+[
+	{
+		"name": "core/file",
+		"isValid": true,
+		"attributes": {
+			"href": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
+			"fileId": "wp-block-file--media-_clientId_0",
+			"fileName": "yolo",
+			"textLinkHref": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
+			"showDownloadButton": true,
+			"downloadButtonText": "Download",
+			"displayPreview": true,
+			"previewHeight": 370
+		},
+		"innerBlocks": []
+	}
+]

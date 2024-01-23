@@ -1,204 +1,146 @@
 name: End-to-End Tests
 
 on:
-  pull_request:
-    paths-ignore:
-    - '**.md'
-  push:
-    branches: [master]
-    paths-ignore:
-    - '**.md'
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
-  admin-1:
-    name: Admin - 1
+    e2e-puppeteer:
+        name: Puppeteer
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+            - name: Npm build
+              run: npm run build
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
+            - name: Install WordPress
+              run: |
+                  npm run wp-env start
 
-    - name: Npm install and build
-      run: |
-        npm ci
-        FORCE_REDUCED_MOTION=true npm run build
+            - name: Running the tests
+              run: |
+                  npx wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache"
 
-    - name: Install WordPress
-      run: |
-        chmod -R 767 ./ # TODO: Possibly integrate in wp-env
-        npm run wp-env start
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: artifacts
+                  if-no-files-found: ignore
 
-    - name: Running the tests
-      run: |
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              if: always()
+              with:
+                  name: flaky-tests-report
+                  path: flaky-tests
+                  if-no-files-found: ignore
 
-    - name: Archive debug artifacts (screenshots, HTML snapshots)
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: failures-artifacts
-        path: artifacts
+    e2e-playwright:
+        name: Playwright - ${{ matrix.part }}
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4, 5, 6, 7, 8]
+                totalParts: [8]
 
-  admin-2:
-    name: Admin - 2
+        steps:
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-    runs-on: ubuntu-latest
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Npm build
+              run: npm run build
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+            - name: Install Playwright dependencies
+              run: |
+                  npx playwright install chromium firefox webkit --with-deps
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env start
 
-    - name: Npm install and build
-      run: |
-        npm ci
-        FORCE_REDUCED_MOTION=true npm run build
+            - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
-    - name: Install WordPress
-      run: |
-        chmod -R 767 ./ # TODO: Possibly integrate in wp-env
-        npm run wp-env start
+            - name: Archive debug artifacts (screenshots, traces)
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: artifacts/test-results
+                  if-no-files-found: ignore
 
-    - name: Running the tests
-      run: |
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              if: always()
+              with:
+                  name: flaky-tests-report
+                  path: flaky-tests
+                  if-no-files-found: ignore
 
-    - name: Archive debug artifacts (screenshots, HTML snapshots)
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: failures-artifacts
-        path: artifacts
+    report-to-issues:
+        name: Report to GitHub
+        needs: [e2e-puppeteer, e2e-playwright]
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout defaults to using the branch which triggered the event, which
+            # isn't necessarily `trunk` (e.g. in the case of a merge).
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-  admin-3:
-    name: Admin - 3
+            - uses: actions/download-artifact@v4.1.0
+              id: download_artifact
+              # Don't fail the job if there isn't any flaky tests report.
+              continue-on-error: true
+              with:
+                  name: flaky-tests-report
+                  path: flaky-tests
 
-    runs-on: ubuntu-latest
+            - name: Setup Node.js and install dependencies
+              if: ${{ steps.download_artifact.outcome == 'success' }}
+              uses: ./.github/setup-node
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Npm build
+              if: ${{ steps.download_artifact.outcome == 'success' }}
+              # TODO: We don't have to build the entire project, just the action itself.
+              run: npm run build:packages
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-
-    - name: Npm install and build
-      run: |
-        npm ci
-        FORCE_REDUCED_MOTION=true npm run build
-
-    - name: Install WordPress
-      run: |
-        chmod -R 767 ./ # TODO: Possibly integrate in wp-env
-        npm run wp-env start
-
-    - name: Running the tests
-      run: |
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
-
-    - name: Archive debug artifacts (screenshots, HTML snapshots)
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: failures-artifacts
-        path: artifacts
-
-  admin-4:
-    name: Admin - 4
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-
-    - name: Npm install and build
-      run: |
-        npm ci
-        FORCE_REDUCED_MOTION=true npm run build
-
-    - name: Install WordPress
-      run: |
-        chmod -R 767 ./ # TODO: Possibly integrate in wp-env
-        npm run wp-env start
-
-    - name: Running the tests
-      run: |
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
-
-    - name: Archive debug artifacts (screenshots, HTML snapshots)
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: failures-artifacts
-        path: artifacts
-
+            - name: Report flaky tests
+              if: ${{ steps.download_artifact.outcome == 'success' }}
+              uses: ./packages/report-flaky-tests
+              with:
+                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
+                  label: '[Type] Flaky Test'
+                  artifact-path: flaky-tests

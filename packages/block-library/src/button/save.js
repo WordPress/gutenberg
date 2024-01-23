@@ -6,34 +6,56 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
 	const {
-		borderRadius,
+		tagName,
+		type,
+		textAlign,
+		fontSize,
 		linkTarget,
 		rel,
+		style,
 		text,
 		title,
 		url,
 		width,
 	} = attributes;
-	const colorProps = getColorAndStyleProps( attributes );
+
+	if ( RichText.isEmpty( text ) ) {
+		return null;
+	}
+
+	const TagName = tagName || 'a';
+	const isButtonTag = 'button' === TagName;
+	const buttonType = type || 'button';
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const colorProps = getColorClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
+		borderProps.className,
 		{
-			'no-border-radius': borderRadius === 0,
-		}
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+			// For backwards compatibility add style that isn't provided via
+			// block support.
+			'no-border-radius': style?.border?.radius === 0,
+		},
+		__experimentalGetElementClassName( 'button' )
 	);
 	const buttonStyle = {
-		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		...borderProps.style,
 		...colorProps.style,
+		...spacingProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
@@ -42,19 +64,21 @@ export default function save( { attributes, className } ) {
 
 	const wrapperClasses = classnames( className, {
 		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );
 
 	return (
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
-				tagName="a"
+				tagName={ TagName }
+				type={ isButtonTag ? buttonType : null }
 				className={ buttonClasses }
-				href={ url }
+				href={ isButtonTag ? null : url }
 				title={ title }
 				style={ buttonStyle }
 				value={ text }
-				target={ linkTarget }
-				rel={ rel }
+				target={ isButtonTag ? null : linkTarget }
+				rel={ isButtonTag ? null : rel }
 			/>
 		</div>
 	);

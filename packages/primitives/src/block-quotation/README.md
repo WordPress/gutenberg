@@ -8,8 +8,6 @@ A drop-in replacement for the HTML [blockquote](https://developer.mozilla.org/en
 import { BlockQuotation } from '@wordpress/components';
 
 const MyBlockQuotation = () => (
-	<BlockQuotation>
-	   ...Quote content
-	</BlockQuotation>
+	<BlockQuotation>...Quote content</BlockQuotation>
 );
 ```

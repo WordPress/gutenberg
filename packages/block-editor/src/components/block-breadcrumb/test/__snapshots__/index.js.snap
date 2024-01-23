@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockBreadcrumb should render correctly 1`] = `
+<div>
+  <ul
+    aria-label="Block breadcrumb"
+    class="block-editor-block-breadcrumb"
+    role="list"
+  >
+    <li
+      aria-current="true"
+      class="block-editor-block-breadcrumb__current"
+    >
+      Document
+    </li>
+  </ul>
+</div>
+`;

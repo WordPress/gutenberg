@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	const { InnerBlocks } = wp.blockEditor;
 	const { createElement: el } = wp.element;
 	const { registerBlockType } = wp.blocks;
@@ -9,19 +9,11 @@
 		category: 'text',
 
 		edit() {
-			return el(
-				'div',
-				{},
-				el( InnerBlocks )
-			);
+			return el( 'div', {}, el( InnerBlocks ) );
 		},
 
 		save() {
-			return el(
-				'div',
-				{},
-				el( InnerBlocks.Content )
-			);
+			return el( 'div', {}, el( InnerBlocks.Content ) );
 		},
 	} );
 
@@ -34,19 +26,14 @@
 			return el(
 				'div',
 				{},
-				el(
-					InnerBlocks,
-					{ allowedBlocks: [ 'core/paragraph', 'core/image' ] }
-				)
+				el( InnerBlocks, {
+					allowedBlocks: [ 'core/paragraph', 'core/image' ],
+				} )
 			);
 		},
 
 		save() {
-			return el(
-				'div',
-				{},
-				el( InnerBlocks.Content )
-			);
+			return el( 'div', {}, el( InnerBlocks.Content ) );
 		},
 	} );
 
@@ -61,19 +48,11 @@
 		],
 
 		edit() {
-			return el(
-				'div',
-				{},
-				'Child'
-			);
+			return el( 'div', {}, 'Child' );
 		},
 
 		save() {
-			return el(
-				'div',
-				{},
-				'Child'
-			);
+			return el( 'div', {}, 'Child' );
 		},
 	} );
 } )();

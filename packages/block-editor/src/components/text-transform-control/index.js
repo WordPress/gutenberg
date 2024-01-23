@@ -1,79 +1,80 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	reset,
 	formatCapitalize,
 	formatLowercase,
 	formatUppercase,
 } from '@wordpress/icons';
 
+const TEXT_TRANSFORMS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
+	{
+		name: __( 'Uppercase' ),
+		value: 'uppercase',
+		icon: formatUppercase,
+	},
+	{
+		name: __( 'Lowercase' ),
+		value: 'lowercase',
+		icon: formatLowercase,
+	},
+	{
+		name: __( 'Capitalize' ),
+		value: 'capitalize',
+		icon: formatCapitalize,
+	},
+];
+
 /**
  * Control to facilitate text transform selections.
  *
- * @param  {Object}   props                Component props.
- * @param  {string}   props.value          Currently selected text transform.
- * @param  {Array}    props.textTransforms Text transforms available for selection.
- * @param  {Function} props.onChange       Handles change in text transform selection.
- * @return {WPElement}                     Text transform control.
+ * @param {Object}   props           Component props.
+ * @param {string}   props.className Class name to add to the control.
+ * @param {string}   props.value     Currently selected text transform.
+ * @param {Function} props.onChange  Handles change in text transform selection.
+ *
+ * @return {Element} Text transform control.
  */
-export default function TextTransformControl( {
-	value: textTransform,
-	textTransforms,
-	onChange,
-} ) {
-	/**
-	 * Determines what the new text transform is as a result of a user
-	 * interaction with the control. Then passes this on to the supplied
-	 * onChange handler.
-	 *
-	 * @param {string} newTransform Slug for selected text transform.
-	 */
-	const handleOnChange = ( newTransform ) => {
-		// Check if we are toggling a transform off.
-		const transform =
-			textTransform === newTransform ? undefined : newTransform;
-
-		// Ensure only defined text transforms are allowed.
-		const presetTransform = textTransforms.find(
-			( { slug } ) => slug === transform
-		);
-
-		// Create string that will be turned into CSS custom property
-		const newTextTransform = presetTransform
-			? `var:preset|text-transform|${ presetTransform.slug }`
-			: undefined;
-
-		onChange( newTextTransform );
-	};
-
-	// Text transform icons to use.
-	// Icons still to be created/designed.
-	const icons = {
-		capitalize: formatCapitalize,
-		lowercase: formatLowercase,
-		uppercase: formatUppercase,
-	};
-
+export default function TextTransformControl( { className, value, onChange } ) {
 	return (
-		<fieldset className="block-editor-text-transform-control">
-			<legend>{ __( 'Letter case' ) }</legend>
+		<fieldset
+			className={ classnames(
+				'block-editor-text-transform-control',
+				className
+			) }
+		>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Letter case' ) }
+			</BaseControl.VisualLabel>
 			<div className="block-editor-text-transform-control__buttons">
-				{ textTransforms.map( ( presetTransform ) => {
+				{ TEXT_TRANSFORMS.map( ( textTransform ) => {
 					return (
 						<Button
-							key={ presetTransform.slug }
-							icon={ icons[ presetTransform.slug ] }
-							isSmall
-							isPressed={ textTransform === presetTransform.slug }
-							onClick={ () =>
-								handleOnChange( presetTransform.slug )
-							}
-						>
-							{ ! icons[ presetTransform.slug ] &&
-								presetTransform.name }
-						</Button>
+							key={ textTransform.value }
+							icon={ textTransform.icon }
+							label={ textTransform.name }
+							isPressed={ textTransform.value === value }
+							onClick={ () => {
+								onChange(
+									textTransform.value === value
+										? undefined
+										: textTransform.value
+								);
+							} }
+						/>
 					);
 				} ) }
 			</div>

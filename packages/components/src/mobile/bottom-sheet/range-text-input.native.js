@@ -39,8 +39,11 @@ class RangeTextInput extends Component {
 		this.onSubmitEditing = this.onSubmitEditing.bind( this );
 		this.onChangeText = this.onChangeText.bind( this );
 
-		const { value, defaultValue, min } = props;
-		const initialValue = value || defaultValue || min;
+		const { value, defaultValue, min, decimalNum } = props;
+		const initialValue = toFixed(
+			value || defaultValue || min,
+			decimalNum
+		);
 
 		const fontScale = this.getFontScale();
 
@@ -53,11 +56,14 @@ class RangeTextInput extends Component {
 	}
 
 	componentDidMount() {
-		AppState.addEventListener( 'change', this.handleChangePixelRatio );
+		this.appStateChangeSubscription = AppState.addEventListener(
+			'change',
+			this.handleChangePixelRatio
+		);
 	}
 
 	componentWillUnmount() {
-		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
+		this.appStateChangeSubscription.remove();
 		clearTimeout( this.timeoutAnnounceValue );
 	}
 
@@ -128,13 +134,6 @@ class RangeTextInput extends Component {
 		onChange( validValue );
 	}
 
-	onChangeValue( initialValue ) {
-		const { decimalNum } = this.props;
-		initialValue = toFixed( initialValue, decimalNum );
-		this.setState( { inputValue: initialValue } );
-		this.updateValue( initialValue );
-	}
-
 	onChangeText( textValue ) {
 		const { decimalNum } = this.props;
 		const inputValue = removeNonDigit( textValue, decimalNum );
@@ -172,7 +171,7 @@ class RangeTextInput extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, children } = this.props;
+		const { getStylesFromColorScheme, children, label } = this.props;
 		const { fontScale, inputValue, hasFocus } = this.state;
 
 		const textInputStyle = getStylesFromColorScheme(
@@ -180,9 +179,9 @@ class RangeTextInput extends Component {
 			styles.textInputDark
 		);
 
-		const verticalBorderStyle = getStylesFromColorScheme(
-			styles.verticalBorder,
-			styles.verticalBorderDark
+		const textInputIOSStyle = getStylesFromColorScheme(
+			styles.textInputIOS,
+			styles.textInputIOSDark
 		);
 
 		const inputBorderStyles = [
@@ -192,9 +191,13 @@ class RangeTextInput extends Component {
 		];
 
 		const valueFinalStyle = [
-			! isIOS ? inputBorderStyles : verticalBorderStyle,
+			Platform.select( {
+				android: inputBorderStyles,
+				ios: textInputIOSStyle,
+			} ),
 			{
-				width: 40 * fontScale,
+				width: 50 * fontScale,
+				borderRightWidth: children ? 1 : 0,
 			},
 		];
 
@@ -212,6 +215,7 @@ class RangeTextInput extends Component {
 				>
 					{ isIOS || hasFocus ? (
 						<TextInput
+							accessibilityLabel={ label }
 							ref={ ( c ) => ( this._valueTextInput = c ) }
 							style={ valueFinalStyle }
 							onChangeText={ this.onChangeText }
@@ -222,7 +226,7 @@ class RangeTextInput extends Component {
 							returnKeyType="done"
 							numberOfLines={ 1 }
 							defaultValue={ `${ inputValue }` }
-							value={ inputValue }
+							value={ inputValue.toString() }
 							pointerEvents={ hasFocus ? 'auto' : 'none' }
 						/>
 					) : (

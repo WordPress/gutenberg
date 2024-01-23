@@ -1,0 +1,23 @@
+<!-- wp:paragraph -->
+<p>block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:paragraph -->
+<p>B </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>A block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:paragraph -->
+<p>B block</p>
+<!-- /wp:paragraph -->

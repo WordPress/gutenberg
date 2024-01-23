@@ -1,0 +1,6 @@
+/**
+ * The following styles get applied inside the editor only.
+ */
+.wp-block-test-iframed-inline-styles {
+	border: 1px dotted #f00;
+}

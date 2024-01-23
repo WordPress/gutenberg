@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/file",
+		"attrs": {
+			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"showDownloadButton": true
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\"\n\t\trel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\"\n\t\tclass=\"wp-block-file__button\" download>Download</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\"\n\t\trel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\"\n\t\tclass=\"wp-block-file__button\" download>Download</a></div>\n"
+		]
+	}
+]

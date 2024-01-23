@@ -1,0 +1,559 @@
+.block-editor-list-view-tree {
+	width: 100%;
+	border-collapse: collapse;
+	padding: 0;
+	margin: 0;
+
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
+		width: calc(100% + #{ $grid-unit-15 });
+	}
+
+	// Without setting `pointer-events: none`, when dragging over list view items,
+	// Safari calls onDropZoneLeave causing flickering in the position of the drop indicator.
+	// https://bugs.webkit.org/show_bug.cgi?id=66547
+	// See: https://github.com/WordPress/gutenberg/pull/56625
+	&.is-dragging tbody {
+		pointer-events: none;
+	}
+}
+
+.block-editor-list-view-leaf {
+	// Use position relative for row animation.
+	position: relative;
+	// Set the initial translate position to ensure the UI in Safari doesn't jump
+	// when rows later receive the is-displacement-up or is-displacement-down class.
+	transform: translateY(0);
+
+	&.is-draggable,
+	&.is-draggable .block-editor-list-view-block-contents {
+		cursor: grab;
+	}
+
+	.block-editor-list-view-block-select-button {
+		// When a row is expanded, retain the dark color.
+		&[aria-expanded="true"] {
+			color: inherit;
+		}
+
+		// Ensure that on hover, the admin color is still used.
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+
+	&:not(.is-selected) .block-editor-list-view-block-select-button {
+		// While components are being dragged, ensure that hover styles are not applied.
+		// This resolves a bug where while dragging, the hover styles would be applied to
+		// the wrong list item while scrolling long lists, particularly in Chrome.
+		.is-dragging-components-draggable & {
+			&:hover {
+				color: inherit;
+			}
+		}
+	}
+
+	// The background has to be applied to the td, not tr, or border-radius won't work.
+	&.is-selected td {
+		background: var(--wp-admin-theme-color);
+	}
+	&.is-selected.is-synced td {
+		background: var(--wp-block-synced-color);
+	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
+		&:hover,
+		&:focus,
+		.block-editor-block-icon {
+			color: var(--wp-block-synced-color);
+		}
+
+		&:focus::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+		}
+	}
+	&.is-selected .block-editor-list-view-block-contents,
+	&.is-selected .components-button.has-icon {
+		color: $white;
+	}
+	&.is-selected .block-editor-list-view-block-contents:focus {
+		&::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
+		&::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+		}
+	}
+	&.is-selected .block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+	}
+
+	// Border radius for corners of the selected item.
+	&.is-first-selected td:first-child {
+		border-top-left-radius: $radius-block-ui;
+	}
+	&.is-first-selected td:last-child {
+		border-top-right-radius: $radius-block-ui;
+	}
+	&.is-last-selected td:first-child {
+		border-bottom-left-radius: $radius-block-ui;
+	}
+	&.is-last-selected td:last-child {
+		border-bottom-right-radius: $radius-block-ui;
+	}
+	&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	}
+	&.is-synced-branch.is-branch-selected {
+		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+	}
+	&.is-branch-selected.is-first-selected td:first-child {
+		border-top-left-radius: $radius-block-ui;
+	}
+	&.is-branch-selected.is-first-selected td:last-child {
+		border-top-right-radius: $radius-block-ui;
+	}
+	&[data-expanded="false"] {
+		&.is-branch-selected.is-first-selected td:first-child {
+			border-top-left-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-first-selected td:last-child {
+			border-top-right-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-last-selected td:first-child {
+			border-bottom-left-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-last-selected td:last-child {
+			border-bottom-right-radius: $radius-block-ui;
+		}
+	}
+	&.is-branch-selected:not(.is-selected) td {
+		border-radius: 0;
+	}
+
+	// List view items will be displaced up or down relative to their original position
+	// when a user is dragging a block within the list view. This creates a space for a
+	// visual indicator of where the block will be placed when dropped. The `normal` state
+	// is used to allow rows to smoothly transition back into their original position,
+	// without attaching the transition to the list view leaf itself. This prevents rows
+	// from animating too much once the user has dropped the block.
+	&.is-displacement-normal {
+		transition: transform 0.2s;
+		transform: translateY(0);
+		@include reduce-motion("transition");
+	}
+
+	&.is-displacement-up {
+		transition: transform 0.2s;
+		transform: translateY(-36px);
+		@include reduce-motion("transition");
+	}
+
+	&.is-displacement-down {
+		transition: transform 0.2s;
+		transform: translateY(36px);
+		@include reduce-motion("transition");
+	}
+
+	// Collapse multi-selections down into a single row space while dragging. The following
+	// rules ensure that during a multi-selection, the space for additional blocks is factored in
+	// when displacing up and down. The result is that there should only ever be a single row's
+	// worth of space for the visual indicator of where a block will be placed when dropped.
+	&.is-after-dragged-blocks {
+		transition: transform 0.2s;
+		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
+	}
+
+	&.is-after-dragged-blocks.is-displacement-up {
+		transition: transform 0.2s;
+		transform: translateY(calc(-36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
+	}
+
+	&.is-after-dragged-blocks.is-displacement-down {
+		transition: transform 0.2s;
+		transform: translateY(calc(36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
+	}
+
+	// To ensure displaced rows behave correctly, ensure that blocks that are currently being dragged
+	// are visually hidden. The below rules are used in favor of `display: none` to ensure that
+	// there is no flicker when a user begins to drag a block.
+	&.is-dragging {
+		opacity: 0;
+		// The row's left position is set to 0 to ensure that the animation
+		// when dropping a block animates from the correct position.
+		left: 0;
+		// Ensure the dragged element does not otherwise affect dropping to
+		// other positions.
+		pointer-events: none;
+		z-index: -9999;
+	}
+
+	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+	.block-editor-list-view-block-contents {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: auto;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
+		text-align: left;
+		border-radius: $radius-block-ui;
+		position: relative;
+		white-space: nowrap;
+
+		&.is-dropping-before::before {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+			top: -2px;
+			right: 0;
+			left: 0;
+			border-top: 4px solid var(--wp-admin-theme-color);
+		}
+
+		.components-modal__content & {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+
+	&.is-nesting .block-editor-list-view-block-contents,
+	.block-editor-list-view-block-contents:focus {
+		box-shadow: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: -(24px + 5px); // Icon size + padding.
+			bottom: 0;
+			left: 0;
+			border-radius: inherit;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			z-index: 2;
+			pointer-events: none;
+		}
+	}
+
+	// Fix focus styling width when one row has fewer cells.
+	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
+		right: 0;
+	}
+
+	&.is-nesting .block-editor-list-view__menu,
+	.block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		z-index: 1;
+	}
+
+	&.is-visible .block-editor-list-view-block-contents {
+		opacity: 1;
+		@include edit-post__fade-in-animation;
+	}
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-10;
+		flex: 0 0 $icon-size;
+	}
+
+	.block-editor-list-view-block__menu-cell,
+	.block-editor-list-view-block__mover-cell,
+	.block-editor-list-view-block__contents-cell {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	.block-editor-list-view-block__menu-cell,
+	.block-editor-list-view-block__mover-cell {
+		line-height: 0;
+		width: $button-size;
+		vertical-align: middle;
+
+		> * {
+			opacity: 0;
+		}
+
+		// Show on hover, visible, when focused, and show above to keep the hit area size.
+		&:hover,
+		&:focus-within,
+		&.is-visible {
+			> * {
+				opacity: 1;
+			}
+		}
+
+		&,
+		.components-button.has-icon {
+			width: 24px;
+			min-width: 24px;
+			padding: 0;
+		}
+	}
+
+	.block-editor-list-view-block__menu-cell {
+		padding-right: $grid-unit-05;
+
+		.components-button.has-icon {
+			height: 24px;
+		}
+	}
+
+	.block-editor-list-view-block__mover-cell-alignment-wrapper {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	// Keep the tap target large but the focus target small.
+	.block-editor-block-mover-button {
+		position: relative;
+		width: $button-size;
+		height: $button-size-small;
+
+		// Position the icon.
+		svg {
+			position: relative;
+			height: $button-size-small;
+		}
+
+		&.is-up-button {
+			margin-top: -$grid-unit-15 * 0.5;
+			align-items: flex-end;
+			svg {
+				bottom: -$grid-unit-05;
+			}
+		}
+
+		&.is-down-button {
+			margin-bottom: -$grid-unit-15 * 0.5;
+			align-items: flex-start;
+			svg {
+				top: -$grid-unit-05;
+			}
+		}
+
+		// Tweak size and position of focus ring.
+		&::before {
+			height: 16px;
+			min-width: 100%;
+			left: 0;
+			right: 0;
+		}
+	}
+
+	.block-editor-inserter__toggle {
+		background: $gray-900;
+		color: $white;
+		height: $grid-unit-30;
+		margin: 6px 6px 6px 1px;
+		min-width: $grid-unit-30;
+
+		&:active {
+			color: $white;
+		}
+	}
+
+	.block-editor-list-view-block-select-button__label-wrapper {
+		min-width: 120px;
+	}
+
+	.block-editor-list-view-block-select-button__title {
+		flex: 1;
+		position: relative;
+
+		.components-truncate {
+			position: absolute;
+			width: 100%;
+			transform: translateY(-50%);
+		}
+	}
+
+	.block-editor-list-view-block-select-button__anchor-wrapper {
+		position: relative;
+		max-width: min(110px, 40%);
+		width: 100%;
+	}
+
+	.block-editor-list-view-block-select-button__anchor {
+		position: absolute;
+		right: 0;
+		transform: translateY(-50%);
+		background: rgba($black, 0.1);
+		border-radius: $radius-block-ui;
+		padding: 2px 6px;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	&.is-selected .block-editor-list-view-block-select-button__anchor {
+		background: rgba($black, 0.3);
+	}
+
+	.block-editor-list-view-block-select-button__lock {
+		line-height: 0;
+	}
+
+	.block-editor-list-view-block-select-button__images {
+		display: flex;
+	}
+
+	.block-editor-list-view-block-select-button__image {
+		background-size: cover;
+		width: 18px;
+		height: 18px;
+		border-radius: $radius-block-ui;
+
+		&:not(:only-child) {
+			box-shadow: 0 0 0 $radius-block-ui $white;
+		}
+
+		&:not(:first-child) {
+			margin-left: #{$grid-unit-15 * -0.5};
+		}
+	}
+
+	&.is-selected .block-editor-list-view-block-select-button__image {
+		&:not(:only-child) {
+			box-shadow: 0 0 0 $radius-block-ui var(--wp-admin-theme-color);
+		}
+	}
+}
+
+// First level of indentation is aria-level 2, max indent is 8.
+// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
+$block-navigation-max-indent: 8;
+
+.block-editor-list-view-draggable-chip {
+	opacity: 0.8;
+}
+
+.block-editor-list-view-block__contents-cell,
+.block-editor-list-view-appender__cell {
+	.block-editor-list-view-block__contents-container,
+	.block-editor-list-view-appender__container {
+		display: flex;
+	}
+}
+
+// Chevron container metrics.
+.block-editor-list-view__expander {
+	height: $icon-size;
+	margin-left: $grid-unit-05;
+	width: $icon-size;
+	cursor: pointer;
+}
+
+.block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
+	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
+}
+
+.block-editor-list-view-leaf:not([aria-level="1"]) {
+	.block-editor-list-view__expander {
+		margin-right: 4px;
+	}
+}
+
+// When updating the margin for each indentation level, the corresponding
+// indentation in `use-list-view-drop-zone.js` must be updated as well
+// to ensure the drop zone is aligned with the indentation.
+@for $i from 0 to $block-navigation-max-indent {
+	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"] .block-editor-list-view__expander {
+		@if $i - 1 >= 0 {
+			margin-left: ( $icon-size * $i ) + 4 * ($i - 1);
+		}
+		@else {
+			margin-left: ( $icon-size * $i );
+		}
+	}
+}
+
+.block-editor-list-view-leaf .block-editor-list-view__expander {
+	visibility: hidden;
+}
+
+// Point downwards when open.
+.block-editor-list-view-leaf[data-expanded="true"] .block-editor-list-view__expander svg {
+	visibility: visible;
+	transition: transform 0.2s ease;
+	transform: rotate(90deg);
+	@include reduce-motion("transition");
+}
+
+// Point rightwards when closed
+.block-editor-list-view-leaf[data-expanded="false"] .block-editor-list-view__expander svg {
+	visibility: visible;
+	transform: rotate(0deg);
+	transition: transform 0.2s ease;
+	@include reduce-motion("transition");
+}
+
+.block-editor-list-view-drop-indicator {
+	pointer-events: none;
+
+	.block-editor-list-view-drop-indicator__line {
+		background: var(--wp-admin-theme-color);
+		height: 4px;
+		border-radius: 4px;
+	}
+}
+
+.block-editor-list-view-drop-indicator--preview {
+	pointer-events: none;
+
+	// If the drop indicator's popover ever extends to the edge of the screen,
+	// avoid any scrollbars by hiding the overflow.
+	.components-popover__content {
+		overflow: hidden !important;
+	}
+
+	.block-editor-list-view-drop-indicator__line {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		height: 36px;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.block-editor-list-view-drop-indicator__line--darker {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.09);
+	}
+}
+
+.block-editor-list-view-placeholder {
+	padding: 0;
+	margin: 0;
+	height: 36px;
+}
+
+.list-view-appender .block-editor-inserter__toggle {
+	background-color: #1e1e1e;
+	color: #fff;
+	margin: $grid-unit-10 0 0 24px;
+	border-radius: 2px;
+	height: 24px;
+	min-width: 24px;
+	padding: 0;
+
+	&:hover,
+	&:focus {
+		background: var(--wp-admin-theme-color);
+		color: #fff;
+	}
+}
+
+.list-view-appender__description {
+	display: none;
+}

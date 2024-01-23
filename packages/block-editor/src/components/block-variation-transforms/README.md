@@ -4,11 +4,6 @@ This component allows to display the selected block's variations which have the 
 
 By selecting such a variation an update to the selected block's attributes happen, based on the variation's attributes.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
@@ -17,27 +12,17 @@ Renders the block's variations which have the `transform` option set in `scope` 
 
 ```jsx
 import { useSelect } from '@wordpress/data';
-import {
-	__experimentalBlockVariationTransforms as BlockVariationTransforms,
-} from '@wordpress/block-editor';
+import { __experimentalBlockVariationTransforms as BlockVariationTransforms } from '@wordpress/block-editor';
 
 const MyBlockVariationTransforms = () => {
-	const { selectedBlockClientId } = useSelect(
-		( select ) => {
-			const { getSelectedBlockClientId } = select(
-				'core/block-editor'
-			);
-			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
-		}
-	);
+	const { selectedBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		return {
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	} );
 
-	return (
-		<BlockVariationTransforms
-			blockClientId={ selectedBlockClientId }
-		/>
-	);
+	return <BlockVariationTransforms blockClientId={ selectedBlockClientId } />;
 };
 ```
 
@@ -47,8 +32,8 @@ const MyBlockVariationTransforms = () => {
 
 The block's client id.
 
-- Type: `string`
+-   Type: `string`
 
 ## Related components
 
-Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [BlockEditorProvider](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [BlockEditorProvider](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.

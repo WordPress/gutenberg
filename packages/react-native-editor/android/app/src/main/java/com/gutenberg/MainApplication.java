@@ -11,7 +11,10 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -19,6 +22,7 @@ import com.facebook.react.devsupport.interfaces.DevOptionHandler;
 import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.horcrux.svg.SvgPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeInterface;
@@ -26,19 +30,23 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergWebViewActivity;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
-import org.wordpress.mobile.WPAndroidGlue.Media;
 
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
+import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.swmansion.gesturehandler.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import org.wordpress.mobile.WPAndroidGlue.Media;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -72,10 +80,28 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 List<RNMedia> rnMediaList = new ArrayList<>();
-                if (mediaType == MediaType.IMAGE) {
-                    rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain",""));
-                } else if (mediaType == MediaType.VIDEO) {
-                    rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup","" ));
+                WritableNativeMap emptyMetadata = new WritableNativeMap();
+
+                switch (mediaType) {
+                    case IMAGE:
+                        Media image = new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", "", "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground", emptyMetadata);
+                        rnMediaList.add(image);
+                        break;
+                    case VIDEO:
+                        WritableNativeMap metadata = new WritableNativeMap();
+                        metadata.putString("extraID", "AbCdE");
+                        Media video = new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", "", "", metadata);
+                        rnMediaList.add(video);
+                        break;
+                    case ANY:
+                    case OTHER:
+                        Media other = new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip", "", emptyMetadata);
+                        rnMediaList.add(other);
+                        break;
+                    case AUDIO:
+                        Media audio = new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", "", "", emptyMetadata);
+                        rnMediaList.add(audio);
+                        break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
@@ -102,6 +128,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void setFeaturedImage(int mediaId) {
+            }
+
+            @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
             }
 
@@ -111,7 +141,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType) {
-                if (mediaType == MediaType.OTHER) {
+                if (mediaType == MediaType.ANY) {
                     ArrayList<MediaOption> mediaOptions = new ArrayList<>();
                     mediaOptions.add(new MediaOption("1", "Choose from device"));
                     otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(mediaOptions);
@@ -122,7 +152,8 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection) {
                 if (mediaSource.equals("1")) {
                     List<RNMedia> rnMediaList = new ArrayList<>();
-                    rnMediaList.add(new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
+                    Media pdf = new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf", "", new WritableNativeMap());
+                    rnMediaList.add(pdf);
                     mediaSelectedCallback.onMediaFileSelected(rnMediaList);
                 }
             }
@@ -133,20 +164,22 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestEmbedFullscreenPreview(String content, String title) {
+
+            }
+
+            @Override
             public void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl) {
 
             }
 
             @Override
-            public void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties) {
+            public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
             }
 
             @Override
-            public void setStarterPageTemplatesTooltipShown(boolean tooltipShown) {
-            }
-
-            @Override
-            public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
+            public void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback) {
+                focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(false);
             }
 
             @Override
@@ -168,7 +201,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+            public void performGetRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+
+            @Override
+            public void performPostRequest(String path, ReadableMap data, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
@@ -181,13 +217,17 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void onAddMention(Consumer<String> onSuccess) {
-                onSuccess.accept("matt");
+            public void onShowUserSuggestions(Consumer<String> onResult) {
+                onResult.accept("matt");
+            }
+
+            @Override
+            public void onShowXpostSuggestions(Consumer<String> onResult) {
+                onResult.accept("ma.tt");
             }
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
@@ -210,13 +250,72 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void mediaFilesBlockReplaceSync(
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }
 
+            @Override
+            public void requestPreview() {
+                Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                ReadableMap impressions = Arguments.createMap();
+                blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void setBlockTypeImpressions(ReadableMap impressions) {
+                Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting block type impression to %s.", impressions));
+            }
+
+            @Override
+            public void requestContactCustomerSupport() {
+                Toast.makeText(MainApplication.this, "requestContactCustomerSupport called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestGotoCustomerSupportOptions() {
+                Toast.makeText(MainApplication.this, "requestGotoCustomerSupportOptions called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void sendEventToHost(final String eventName, final ReadableMap properties) {
+                Log.d("SendEventToHost", String.format("Gutenberg requested sending '%s' event to host with properties: %s", eventName, properties));
+            }
+
+            @Override
+            public void toggleUndoButton(boolean isDisabled) {
+                MainActivity mainActivity = MainActivity.getInstance();
+                if (mainActivity != null) {
+                    mainActivity.updateUndoItem(isDisabled);
+                }
+            }
+
+            @Override
+            public void toggleRedoButton(boolean isDisabled) {
+                MainActivity mainActivity = MainActivity.getInstance();
+                if (mainActivity != null) {
+                    mainActivity.updateRedoItem(isDisabled);
+                }
+            }
+
+            @Override
+            public void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback) {
+                connectionStatusCallback.onRequestConnectionStatus(true);
+            }
         }, isDarkMode());
 
-        return new ReactNativeHost(this) {
+        return new DefaultReactNativeHost(this) {
             @Override
             public boolean getUseDeveloperSupport() {
                 return BuildConfig.DEBUG;
@@ -238,12 +337,24 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReanimatedPackage(),
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
+                        new RNCWebViewPackage(),
+                        new ClipboardPackage(),
+                        new FastImageViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
             @Override
             protected String getJSMainModuleName() {
                 return "index";
+            }
+
+            @Override
+            protected boolean isNewArchEnabled() {
+                return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+            }
+            @Override
+            protected Boolean isHermesEnabled() {
+                return BuildConfig.IS_HERMES_ENABLED;
             }
         };
     }
@@ -253,6 +364,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
         int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
         return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    public void toggleUndo() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onUndoPressed();
+    }
+
+    public void toggleRedo() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onRedoPressed();
     }
 
     private void openGutenbergWebView(String content,
@@ -280,6 +399,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
     public void onCreate() {
         super.onCreate();
         SoLoader.init(this, /* native exopackage */ false);
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            // If you opted-in for the New Architecture, we load the native entry point for this app.
+            DefaultNewArchitectureEntryPoint.load();
+        }
+        ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     }
 
     private void createCustomDevOptions(ReactNativeHost reactNativeHost) {
@@ -289,6 +413,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onOptionSelected() {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+            }
+        });
+
+        devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
     }

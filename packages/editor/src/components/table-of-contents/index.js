@@ -6,6 +6,7 @@ import { Dropdown, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { info } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,12 +18,14 @@ function TableOfContents(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
 	);
 	return (
 		<Dropdown
-			position={ repositionDropdown ? 'middle right right' : 'bottom' }
+			popoverProps={ {
+				placement: repositionDropdown ? 'right' : 'bottom',
+			} }
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (

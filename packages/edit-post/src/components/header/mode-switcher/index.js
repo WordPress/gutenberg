@@ -4,6 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
 
 /**
  * Set of available mode options.
@@ -26,28 +33,54 @@ function ModeSwitcher() {
 		shortcut,
 		isRichEditingEnabled,
 		isCodeEditingEnabled,
+		isEditingTemplate,
 		mode,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
-				.richEditingEnabled,
-			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings()
-				.codeEditingEnabled,
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			isRichEditingEnabled:
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select( editorStore ).getEditorSettings().codeEditingEnabled,
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() === 'template-only',
+			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( 'core/edit-post' );
+	const { switchEditorMode } = useDispatch( editPostStore );
 
-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
+	if ( isEditingTemplate ) {
 		return null;
 	}
 
+	let selectedMode = mode;
+	if ( ! isRichEditingEnabled && mode === 'visual' ) {
+		selectedMode = 'text';
+	}
+	if ( ! isCodeEditingEnabled && mode === 'text' ) {
+		selectedMode = 'visual';
+	}
+
 	const choices = MODES.map( ( choice ) => {
-		if ( choice.value !== mode ) {
+		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+			};
+		}
+		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: __(
+					'You can enable the visual editor in your profile settings.'
+				),
+			};
+		}
+		if ( choice.value !== selectedMode && ! choice.disabled ) {
 			return { ...choice, shortcut };
 		}
 		return choice;
@@ -57,7 +90,7 @@ function ModeSwitcher() {
 		<MenuGroup label={ __( 'Editor' ) }>
 			<MenuItemsChoice
 				choices={ choices }
-				value={ mode }
+				value={ selectedMode }
 				onSelect={ switchEditorMode }
 			/>
 		</MenuGroup>

@@ -1,0 +1,16 @@
+.badgeContainer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+
+.badge {
+	padding: 3px 6px;
+	margin: 8px;
+	color: #fff;
+	border-radius: 3px;
+	background-color: $gray-dark;
+	border-color: $gray-dark;
+	overflow: hidden;
+}

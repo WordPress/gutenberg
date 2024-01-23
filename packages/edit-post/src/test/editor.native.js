@@ -1,63 +1,149 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import {
+	act,
+	addBlock,
+	fireEvent,
+	getBlock,
+	getEditorHtml,
+	initializeEditor,
+	screen,
+	setupCoreBlocks,
+} from 'test/helpers';
+import { BackHandler } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { registerCoreBlocks } from '@wordpress/block-library';
-import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
-// Force register 'core/editor' store.
-import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
+import {
+	requestMediaImport,
+	subscribeMediaAppend,
+	subscribeParentToggleHTMLMode,
+} from '@wordpress/react-native-bridge';
 
-jest.mock( '../components/layout', () => () => 'Layout' );
+setupCoreBlocks();
 
-/**
- * Internal dependencies
- */
-import '..';
-import Editor from '../editor';
-
-const unsupportedBlock = `
-<!-- wp:notablock -->
-<p>Not supported</p>
-<!-- /wp:notablock -->
-`;
-
-describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
-
-	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
-		jest.useFakeTimers();
-		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
-
-		const appContainer = renderEditorWith( unsupportedBlock );
-		// for some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord
-		act( () => {
-			jest.runAllTicks();
-		} );
-		appContainer.unmount();
-
-		expect(
-			RNReactNativeGutenbergBridge.editorDidMount
-		).toHaveBeenCalledTimes( 1 );
-		expect(
-			RNReactNativeGutenbergBridge.editorDidMount
-		).toHaveBeenCalledWith( [ 'core/notablock' ] );
-	} );
+let toggleModeCallback;
+subscribeParentToggleHTMLMode.mockImplementation( ( callback ) => {
+	toggleModeCallback = callback;
 } );
 
-// Utilities
-const renderEditorWith = ( content ) => {
-	return mount(
-		<Editor
-			initialHtml={ content }
-			initialHtmlModeEnabled={ false }
-			initialTitle={ '' }
-			postType="post"
-			postId="1"
-		/>
-	);
-};
+let mediaAppendCallback;
+subscribeMediaAppend.mockImplementation( ( callback ) => {
+	mediaAppendCallback = callback;
+} );
+
+const MEDIA = [
+	{
+		localId: 1,
+		mediaUrl: 'file:///local-image-1.jpeg',
+		mediaType: 'image',
+		serverId: 2000,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-1.jpeg',
+	},
+	{
+		localId: 2,
+		mediaUrl: 'file:///local-file-1.pdf',
+		mediaType: 'other',
+		serverId: 2001,
+		serverUrl: 'https://test-site.files.wordpress.com/local-file-1.pdf',
+	},
+	{
+		localId: 3,
+		mediaUrl: 'file:///local-image-3.jpeg',
+		mediaType: 'image',
+		serverId: 2002,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-3.jpeg',
+	},
+	{
+		localId: 4,
+		mediaUrl: 'file:///local-video-4.mp4',
+		mediaType: 'video',
+		serverId: 2003,
+		serverUrl: 'https://test-site.files.wordpress.com/local-video-4.mp4',
+	},
+];
+
+describe( 'Editor', () => {
+	afterEach( () => {
+		jest.clearAllMocks();
+	} );
+
+	it( 'toggles the editor from Visual to HTML mode', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		act( () => {
+			toggleModeCallback();
+		} );
+
+		// Assert
+		const htmlEditor = screen.getByLabelText( 'html-view-content' );
+		expect( htmlEditor ).toBeVisible();
+
+		act( () => {
+			toggleModeCallback();
+		} );
+	} );
+
+	it( 'appends media correctly for allowed types', async () => {
+		// Arrange
+		requestMediaImport
+			.mockImplementationOnce( ( _, callback ) =>
+				callback( MEDIA[ 0 ].id, MEDIA[ 0 ].serverUrl )
+			)
+			.mockImplementationOnce( ( _, callback ) =>
+				callback( MEDIA[ 2 ].id, MEDIA[ 2 ].serverUrl )
+			);
+		await initializeEditor();
+
+		// Act
+		await act( () => mediaAppendCallback( MEDIA[ 0 ] ) );
+		await act( () => mediaAppendCallback( MEDIA[ 2 ] ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'appends media correctly for allowed types and skips unsupported ones', async () => {
+		// Arrange
+		requestMediaImport
+			.mockImplementationOnce( ( _, callback ) =>
+				callback( MEDIA[ 0 ].id, MEDIA[ 0 ].serverUrl )
+			)
+			.mockImplementationOnce( ( _, callback ) =>
+				callback( MEDIA[ 3 ].id, MEDIA[ 3 ].serverUrl )
+			);
+		await initializeEditor();
+
+		// Act
+		await act( () => mediaAppendCallback( MEDIA[ 0 ] ) );
+		// Unsupported type (PDF file)
+		await act( () => mediaAppendCallback( MEDIA[ 1 ] ) );
+		await act( () => mediaAppendCallback( MEDIA[ 3 ] ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'unselects current block when tapping on the hardware back button', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Spacer' );
+
+		// Act
+		act( () => {
+			BackHandler.mockPressBack();
+		} );
+
+		// Assert
+		const openBlockSettingsButton =
+			screen.queryAllByLabelText( 'Open Settings' );
+		expect( openBlockSettingsButton.length ).toBe( 0 );
+	} );
+} );

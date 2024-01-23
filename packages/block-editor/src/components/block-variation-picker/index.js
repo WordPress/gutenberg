@@ -42,17 +42,18 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							isSecondary
-							icon={ variation.icon }
+							variant="secondary"
+							icon={
+								variation.icon && variation.icon.src
+									? variation.icon.src
+									: variation.icon
+							}
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"
 							label={ variation.description || variation.title }
 						/>
-						<span
-							className="block-editor-block-variation-picker__variation-label"
-							role="presentation"
-						>
+						<span className="block-editor-block-variation-picker__variation-label">
 							{ variation.title }
 						</span>
 					</li>
@@ -61,7 +62,7 @@ function BlockVariationPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
-					<Button isLink onClick={ () => onSelect() }>
+					<Button variant="link" onClick={ () => onSelect() }>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>

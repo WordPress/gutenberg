@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import {
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
+	resetPreferences,
 	setBrowserViewport,
 	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
@@ -64,8 +65,15 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = {
  */
 const pageEvents = [];
 
-// The Jest timeout is increased because these tests are a bit slow
+// The Jest timeout is increased because these tests are a bit slow.
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
+
+// Retry failed tests at most 2 times in CI.
+// This enables `flaky-tests-reporter` and `report-flaky-tests` GitHub action
+// to mark test as flaky and automatically create a tracking issue about it.
+if ( process.env.CI ) {
+	jest.retryTimes( 2 );
+}
 
 async function setupBrowser() {
 	await clearLocalStorage();
@@ -145,6 +153,20 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// Ignore all JQMIGRATE (jQuery migrate) deprecation warnings.
+		if ( text.includes( 'JQMIGRATE' ) ) {
+			return;
+		}
+
+		// Ignore framer-motion warnings about reduced motion.
+		if (
+			text.includes(
+				'You have Reduced Motion enabled on your device. Animations may not appear as expected.'
+			)
+		) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of
@@ -158,11 +180,7 @@ function observeConsoleLogging() {
 		// correctly. Instead, the logic here synchronously inspects the
 		// internal object shape of the JSHandle to find the error text. If it
 		// cannot be found, the default text value is used instead.
-		text = get(
-			message.args(),
-			[ 0, '_remoteObject', 'description' ],
-			text
-		);
+		text = message.args()[ 0 ]?._remoteObject?.description ?? text;
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via
@@ -175,54 +193,6 @@ function observeConsoleLogging() {
 }
 
 /**
- * Runs Axe tests when the block editor is found on the current page.
- *
- * @return {?Promise} Promise resolving once Axe texts are finished.
- */
-async function runAxeTestsForBlockEditor() {
-	if ( ! ( await page.$( '.block-editor' ) ) ) {
-		return;
-	}
-
-	await expect( page ).toPassAxeTests( {
-		// Temporary disabled rules to enable initial integration.
-		// See: https://github.com/WordPress/gutenberg/pull/15018.
-		disabledRules: [
-			'aria-allowed-role',
-			'aria-allowed-attr',
-			'aria-hidden-focus',
-			'aria-input-field-name',
-			'aria-valid-attr-value',
-			'button-name',
-			'color-contrast',
-			'dlitem',
-			'duplicate-id',
-			'label',
-			'landmark-one-main',
-			'link-name',
-			'listitem',
-			'region',
-			'aria-required-children',
-			'aria-required-parent',
-			'frame-title',
-		],
-		exclude: [
-			// Ignores elements created by metaboxes.
-			'.edit-post-layout__metaboxes',
-			// Ignores elements created by TinyMCE.
-			'.mce-container',
-			// These properties were not included in the 1.1 spec
-			// through error, they should be allowed on role="row":
-			// https://github.com/w3c/aria/issues/558
-			'[role="treegrid"] [aria-posinset]',
-			'[role="treegrid"] [aria-setsize]',
-			// Ignore block previews.
-			'.block-editor-block-preview__content',
-		],
-	} );
-}
-
-/**
  * Simulate slow network or throttled CPU if provided via environment variables.
  */
 async function simulateAdverseConditions() {
@@ -230,18 +200,18 @@ async function simulateAdverseConditions() {
 		return;
 	}
 
-	const client = await page.target().createCDPSession();
+	if ( OFFLINE ) {
+		await page.setOfflineMode( true );
+	}
 
-	if ( SLOW_NETWORK || OFFLINE ) {
+	if ( SLOW_NETWORK ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
 		// The values below simulate fast 3G conditions as per https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
-		await client.send( 'Network.emulateNetworkConditions', {
-			// Network connectivity is absent
-			offline: Boolean( OFFLINE || false ),
+		await page.emulateNetworkConditions( {
 			// Download speed (bytes/s)
-			downloadThroughput: ( ( 1.6 * 1024 * 1024 ) / 8 ) * 0.9,
+			download: ( ( 1.6 * 1024 * 1024 ) / 8 ) * 0.9,
 			// Upload speed (bytes/s)
-			uploadThroughput: ( ( 750 * 1024 ) / 8 ) * 0.9,
+			upload: ( ( 750 * 1024 ) / 8 ) * 0.9,
 			// Latency (ms)
 			latency: 150 * 3.75,
 		} );
@@ -249,11 +219,25 @@ async function simulateAdverseConditions() {
 
 	if ( THROTTLE_CPU ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
-		await client.send( 'Emulation.setCPUThrottlingRate', {
-			rate: Number( THROTTLE_CPU ),
-		} );
+		await page.emulateCPUThrottling( Number( THROTTLE_CPU ) );
 	}
 }
+
+// Override snapshot matchers to throw errors as soon as possible,
+// See https://jestjs.io/docs/expect#bail-out
+// This is to fix a bug in Jest that snapshot failures won't trigger `test_fn_failure` events.
+expect.extend( {
+	toMatchInlineSnapshot( ...args ) {
+		this.dontThrow = () => {};
+
+		return toMatchInlineSnapshot.call( this, ...args );
+	},
+	toMatchSnapshot( ...args ) {
+		this.dontThrow = () => {};
+
+		return toMatchSnapshot.call( this, ...args );
+	},
+} );
 
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
@@ -263,15 +247,19 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
+	await resetPreferences();
 	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
 	await setupBrowser();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
+	await page.emulateMediaFeatures( [
+		{ name: 'prefers-reduced-motion', value: 'reduce' },
+	] );
 } );
 
 afterEach( async () => {
-	await runAxeTestsForBlockEditor();
+	await resetPreferences();
 	await setupBrowser();
 } );
 

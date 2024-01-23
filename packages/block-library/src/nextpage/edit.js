@@ -7,9 +7,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 export default function NextPageEdit() {
 	return (
 		<div { ...useBlockProps() }>
-			<div className="wp-block-nextpage">
-				<span>{ __( 'Page break' ) }</span>
-			</div>
+			<span>{ __( 'Page break' ) }</span>
 		</div>
 	);
 }

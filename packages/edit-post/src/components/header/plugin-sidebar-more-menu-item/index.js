@@ -8,20 +8,19 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * and can be used to activate the corresponding `PluginSidebar` component.
  * The text within the component appears as the menu item label.
  *
- * @param {Object} props Component props.
- * @param {string} props.target A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
+ * @param {Object}                props                                 Component props.
+ * @param {string}                props.target                          A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
- * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+ * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function MySidebarMoreMenuItem() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginSidebarMoreMenuItem,
  * 		{
  * 			target: 'my-sidebar',
@@ -33,7 +32,6 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
@@ -50,11 +48,17 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 
 export default function PluginSidebarMoreMenuItem( props ) {
 	return (
-		<ComplementaryAreaMoreMenuItem scope="core/edit-post" { ...props } />
+		<ComplementaryAreaMoreMenuItem
+			// Menu item is marked with unstable prop for backward compatibility.
+			// @see https://github.com/WordPress/gutenberg/issues/14457
+			__unstableExplicitMenuItem
+			scope="core/edit-post"
+			{ ...props }
+		/>
 	);
 }

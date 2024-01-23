@@ -22,7 +22,9 @@ import GlobalStylesContext from '../global-styles-context';
 const getValueAndUnit = ( value, unit ) => {
 	const regex = /(\d+\.?\d*)(.*)/;
 
-	const splitValue = `${ value }`?.match( regex );
+	const splitValue = `${ value }`
+		?.match( regex )
+		?.filter( ( v ) => v !== '' );
 
 	if ( splitValue ) {
 		return {
@@ -30,51 +32,75 @@ const getValueAndUnit = ( value, unit ) => {
 			valueUnit: unit || splitValue[ 2 ],
 		};
 	}
-	return null;
+	return undefined;
+};
+
+const convertUnitToMobile = ( containerSize, globalStyles, value, unit ) => {
+	const { width, height } = containerSize;
+	const { valueToConvert, valueUnit } = getValueAndUnit( value, unit ) || {};
+	const { fontSize = 16 } = globalStyles || {};
+
+	if ( valueToConvert === undefined ) {
+		return undefined;
+	}
+
+	switch ( valueUnit ) {
+		case 'rem':
+		case 'em':
+			return valueToConvert * fontSize;
+		case '%':
+			return Number( valueToConvert / 100 ) * width;
+		case 'px':
+			return Number( valueToConvert );
+		case 'vw':
+			const vw = width / 100;
+			return Math.round( valueToConvert * vw );
+		case 'vh':
+			const vh = height / 100;
+			return Math.round( valueToConvert * vh );
+		default:
+			return Number( valueToConvert / 100 ) * width;
+	}
 };
 
 const useConvertUnitToMobile = ( value, unit ) => {
+	const { globalStyles: styles } = useContext( GlobalStylesContext );
 	const [ windowSizes, setWindowSizes ] = useState(
 		Dimensions.get( 'window' )
 	);
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onDimensionsChange
+		);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
+			dimensionsChangeSubscription.remove();
 		};
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
-	const { globalStyles: styles } = useContext( GlobalStylesContext );
 
 	const onDimensionsChange = useCallback( ( { window } ) => {
 		setWindowSizes( window );
 	}, [] );
 
 	return useMemo( () => {
-		const { width, height } = windowSizes;
-		const { fontSize = 16 } = styles || {};
+		const { valueToConvert, valueUnit } =
+			getValueAndUnit( value, unit ) || {};
 
-		const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
-
-		switch ( valueUnit ) {
-			case 'rem':
-			case 'em':
-				return valueToConvert * fontSize;
-			case '%':
-				return Number( valueToConvert / 100 ) * width;
-			case 'px':
-				return Number( valueToConvert );
-			case 'vw':
-				const vw = width / 100;
-				return Math.round( valueToConvert * vw );
-			case 'vh':
-				const vh = height / 100;
-				return Math.round( valueToConvert * vh );
-			default:
-				return Number( valueToConvert / 100 ) * width;
-		}
+		return convertUnitToMobile(
+			windowSizes,
+			styles,
+			valueToConvert,
+			valueUnit
+		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ windowSizes, value, unit ] );
 };
 
-export { useConvertUnitToMobile, getValueAndUnit };
+export { convertUnitToMobile, useConvertUnitToMobile, getValueAndUnit };

@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { column as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -17,10 +17,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Column' ),
 	icon,
-	description: __( 'A single column within a columns block.' ),
 	edit,
 	save,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

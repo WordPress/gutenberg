@@ -1,8 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { TabPanel } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const blocksTab = {
 	name: 'blocks',
@@ -11,38 +18,49 @@ const blocksTab = {
 };
 const patternsTab = {
 	name: 'patterns',
-	/* translators: Patterns tab title in the block inserter. */
+	/* translators: Theme and Directory Patterns tab title in the block inserter. */
 	title: __( 'Patterns' ),
 };
-const reusableBlocksTab = {
-	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+
+const mediaTab = {
+	name: 'media',
+	/* translators: Media tab title in the block inserter. */
+	title: __( 'Media' ),
 };
 
 function InserterTabs( {
-	children,
 	showPatterns = false,
-	showReusableBlocks = false,
+	showMedia = false,
 	onSelect,
+	tabsContents,
 } ) {
-	const tabs = [ blocksTab ];
-
-	if ( showPatterns ) {
-		tabs.push( patternsTab );
-	}
-	if ( showReusableBlocks ) {
-		tabs.push( reusableBlocksTab );
-	}
+	const tabs = [
+		blocksTab,
+		showPatterns && patternsTab,
+		showMedia && mediaTab,
+	].filter( Boolean );
 
 	return (
-		<TabPanel
-			className="block-editor-inserter__tabs"
-			tabs={ tabs }
-			onSelect={ onSelect }
-		>
-			{ children }
-		</TabPanel>
+		<div className="block-editor-inserter__tabs">
+			<Tabs onSelect={ onSelect }>
+				<Tabs.TabList>
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.name } tabId={ tab.name }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
+				{ tabs.map( ( tab ) => (
+					<Tabs.TabPanel
+						key={ tab.name }
+						tabId={ tab.name }
+						focusable={ false }
+					>
+						{ tabsContents[ tab.name ] }
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
+		</div>
 	);
 }
 

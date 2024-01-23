@@ -4,12 +4,7 @@ The `LineHeightControl` component adds a lineHeight attribute to the core Paragr
 
 ![Line height control in a paragraph block](https://make.wordpress.org/core/files/2020/09/line-height-for-paragraph-block.png)
 
-_Note:_ It is worth noting that the line height setting option is an opt-in feature. [Themes need to declare support for it](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#supporting-custom-line-heights) before it'll be available.
-
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
+_Note:_ It is worth noting that the line height setting option is an opt-in feature. [Themes need to declare support for it](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights) before it'll be available.
 
 ## Development guidelines
 
@@ -18,9 +13,13 @@ _Note:_ It is worth noting that the line height setting option is an opt-in feat
 Renders the markup for the line height setting option in the block inspector.
 
 ```jsx
-import { KeyboardShortcuts } from '@wordpress/block-editor';
+import { LineHeightControl } from '@wordpress/block-editor';
 const MyLineHeightControl = () => (
-	<LineHeightControl value={ lineHeight } onChange={ onChange } />
+	<LineHeightControl
+		value={ lineHeight }
+		onChange={ onChange }
+		__nextHasNoMarginBottom={ true }
+	/>
 );
 ```
 
@@ -38,7 +37,13 @@ The value of the line height.
 
 A callback function that handles the application of the line height value.
 
+#### `__nextHasNoMarginBottom`
+
+-   **Type:** `boolean`
+-   **Default:** `false`
+
+Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
 
 ## Related components
 
-Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.

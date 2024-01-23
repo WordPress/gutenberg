@@ -5,7 +5,7 @@ const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 const hasWordPressProfile = require( '../../has-wordpress-profile' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
 /** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
@@ -34,26 +34,36 @@ function getPromptMessageText( author ) {
 
 /**
  * Prompts the user to link their GitHub account to their WordPress.org profile
- * if neccessary for props credit.
+ * if necessary for props credit.
  *
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function firstTimeContributorAccountLink( payload, octokit ) {
-	if ( payload.ref !== 'refs/heads/master' ) {
+	if ( payload.ref !== 'refs/heads/trunk' ) {
 		debug(
-			'first-time-contributor-account-link: Commit is not to `master`. Aborting'
+			'first-time-contributor-account-link: Commit is not to `trunk`. Aborting'
 		);
 		return;
 	}
 
-	const commit = /** @type {WebhookPayloadPushCommit} */ ( payload
-		.commits[ 0 ] );
+	const commit = /** @type {WebhookPayloadPushCommit} */ (
+		payload.commits[ 0 ]
+	);
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
 			'first-time-contributor-account-link: Cannot determine pull request associated with commit. Aborting'
 		);
+		return;
+	}
+
+	const { data: user } = await octokit.rest.users.getByUsername( {
+		username: commit.author.username,
+	} );
+
+	if ( user.type === 'Bot' ) {
+		debug( 'first-time-contributor-account-link: User is a bot. Aborting' );
 		return;
 	}
 
@@ -65,7 +75,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const { data: commits } = await octokit.repos.listCommits( {
+	const { data: commits } = await octokit.rest.repos.listCommits( {
 		owner,
 		repo,
 		author,
@@ -86,9 +96,11 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	try {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
-		debug(
-			`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
-		);
+		if ( error instanceof Object ) {
+			debug(
+				`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
+			);
+		}
 		return;
 	}
 
@@ -103,7 +115,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		'first-time-contributor-account-link: User not known. Adding comment to prompt for account link.'
 	);
 
-	await octokit.issues.createComment( {
+	await octokit.rest.issues.createComment( {
 		owner,
 		repo,
 		issue_number: pullRequest,

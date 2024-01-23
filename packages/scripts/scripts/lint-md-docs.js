@@ -20,7 +20,7 @@ const args = getArgsFromCLI();
 const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.md' ];
 
 // See: https://github.com/igorshubovych/markdownlint-cli#configuration
-// Check if specified on command-line or project file for config
+// Check if specified on command-line or project file for config.
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
@@ -36,19 +36,15 @@ const defaultConfigArgs = ! hasLintConfig
 	: [];
 
 // See: https://github.com/igorshubovych/markdownlint-cli#ignoring-files
-// Check if ignore specified on command-line or project file
+// Check if ignore specified on command-line or project file.
 const hasIgnoredFiles =
 	hasArgInCLI( '--ignore' ) ||
 	hasArgInCLI( '-i' ) ||
 	hasProjectFile( '.markdownlintignore' );
 
-// Default ignore [ build, node_modules ] directories
-// TODO: Once https://github.com/igorshubovych/markdownlint-cli/issues/46 is in
-// we can switch this to specify an ignore file on the command-line. By default,
-// markdownlint looks for .markdownlintignore in project direcotry, but how our
-// scripts work we store the configs in the scripts/config directory
+// Default ignore [ build, node_modules ] directories.
 const defaultIgnoreArgs = ! hasIgnoredFiles
-	? [ '--ignore', '**/build/**', '--ignore', '**/node_modules/**' ]
+	? [ '--ignore-path', fromConfigRoot( '.markdownlintignore' ) ]
 	: [];
 
 const result = spawn(

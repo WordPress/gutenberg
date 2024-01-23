@@ -3,17 +3,29 @@
  */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 
-function PostPingbacks( { pingStatus = 'open', ...props } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+function PostPingbacks() {
+	const pingStatus = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'ping_status' ) ??
+			'open',
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
 	const onTogglePingback = () =>
-		props.editPost( {
+		editPost( {
 			ping_status: pingStatus === 'open' ? 'closed' : 'open',
 		} );
 
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
@@ -21,15 +33,4 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			pingStatus: select( 'core/editor' ).getEditedPostAttribute(
-				'ping_status'
-			),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( 'core/editor' ).editPost,
-	} ) ),
-] )( PostPingbacks );
+export default PostPingbacks;

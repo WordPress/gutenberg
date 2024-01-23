@@ -1,16 +1,17 @@
 /**
  * External dependencies
  */
-import { Image, Text, View } from 'react-native';
+import { Image as RNImage, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
-import { image as icon } from '@wordpress/icons';
+import { image, offline } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,12 +22,11 @@ import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
 
 const ICON_TYPE = {
+	OFFLINE: 'offline',
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
-
-export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 const ImageComponent = ( {
 	align,
@@ -34,10 +34,14 @@ const ImageComponent = ( {
 	editButton = true,
 	focalPoint,
 	height: imageHeight,
+	highlightSelected = true,
 	isSelected,
+	shouldUseFastImage,
 	isUploadFailed,
+	isUploadPaused,
 	isUploadInProgress,
 	mediaPickerOptions,
+	onImageDataLoad,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	resizeMode,
@@ -45,21 +49,42 @@ const ImageComponent = ( {
 	retryIcon,
 	url,
 	shapeStyle,
+	style,
 	width: imageWidth,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
 
+	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
+	const Image =
+		! shouldUseFastImage || Platform.isAndroid ? RNImage : FastImage;
+	const imageResizeMode =
+		! shouldUseFastImage || Platform.isAndroid
+			? resizeMode
+			: FastImage.resizeMode[ resizeMode ];
+
 	useEffect( () => {
+		let isCurrent = true;
 		if ( url ) {
-			Image.getSize( url, ( imgWidth, imgHeight ) => {
-				setImageData( {
+			RNImage.getSize( url, ( imgWidth, imgHeight ) => {
+				if ( ! isCurrent ) {
+					return;
+				}
+				const metaData = {
 					aspectRatio: imgWidth / imgHeight,
 					width: imgWidth,
 					height: imgHeight,
-				} );
+				};
+				setImageData( metaData );
+				if ( onImageDataLoad ) {
+					onImageDataLoad( metaData );
+				}
 			} );
 		}
+		return () => ( isCurrent = false );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {
@@ -76,19 +101,23 @@ const ImageComponent = ( {
 	};
 
 	const getIcon = ( iconType ) => {
+		let icon;
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return (
-					<Icon
-						icon={ retryIcon || SvgIconRetry }
-						{ ...styles.iconRetry }
-					/>
-				);
+				icon = retryIcon || SvgIconRetry;
+				iconStyle = iconRetryStyles;
+				break;
+			case ICON_TYPE.OFFLINE:
+				icon = offline;
+				iconStyle = iconOfflineStyles;
+				break;
 			case ICON_TYPE.PLACEHOLDER:
+				icon = image;
 				iconStyle = iconPlaceholderStyles;
 				break;
 			case ICON_TYPE.UPLOAD:
+				icon = image;
 				iconStyle = iconUploadStyles;
 				break;
 		}
@@ -105,6 +134,31 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
+	const iconOfflineStyles = usePreferredColorSchemeStyle(
+		styles.iconOffline,
+		styles.iconOfflineDark
+	);
+
+	const retryIconStyles = usePreferredColorSchemeStyle(
+		styles.retryIcon,
+		styles.retryIconDark
+	);
+
+	const iconRetryStyles = usePreferredColorSchemeStyle(
+		styles.iconRetry,
+		styles.iconRetryDark
+	);
+
+	const retryContainerStyles = usePreferredColorSchemeStyle(
+		styles.retryContainer,
+		styles.retryContainerDark
+	);
+
+	const uploadFailedTextStyles = usePreferredColorSchemeStyle(
+		styles.uploadFailedText,
+		styles.uploadFailedTextDark
+	);
+
 	const placeholderStyles = [
 		usePreferredColorSchemeStyle(
 			styles.imageContainerUpload,
@@ -117,20 +171,20 @@ const ImageComponent = ( {
 	const customWidth =
 		imageData?.width < containerSize?.width
 			? imageData?.width
-			: styles.wide.width;
+			: styles.wide?.width;
 
 	const imageContainerStyles = [
 		styles.imageContent,
 		{
 			width:
-				imageWidth === styles.wide.width ||
+				imageWidth === styles.wide?.width ||
 				( imageData &&
 					imageWidth > 0 &&
 					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},
-		resizeMode && { width: styles.wide.width },
+		resizeMode && { width: styles.wide?.width },
 		focalPoint && styles.focalPointContainer,
 	];
 
@@ -138,6 +192,9 @@ const ImageComponent = ( {
 		{
 			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
+		},
+		! resizeMode && {
+			aspectRatio: imageData?.aspectRatio,
 		},
 		focalPoint && styles.focalPoint,
 		focalPoint &&
@@ -150,22 +207,30 @@ const ImageComponent = ( {
 			imageData &&
 			containerSize && {
 				height:
-					imageData?.width > containerSize?.width
+					imageData?.width > containerSize?.width && ! imageWidth
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
 		imageHeight && { height: imageHeight },
 		shapeStyle,
 	];
+	const imageSelectedStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageBorder,
+			styles.imageBorderDark
+		),
+		{ height: containerSize?.height },
+	];
 
 	return (
 		<View
 			style={ [
 				styles.container,
-				// only set alignItems if an image exists because alignItems causes the placeholder
+				// Only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
 				imageData && align && { alignItems: align },
+				style,
 			] }
 			onLayout={ onContainerLayout }
 		>
@@ -178,14 +243,13 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
-					<View
-						style={ [
-							styles.imageBorder,
-							{ height: containerSize?.height },
-						] }
-					/>
-				) }
+				{ isSelected &&
+					highlightSelected &&
+					! (
+						isUploadInProgress ||
+						isUploadFailed ||
+						isUploadPaused
+					) && <View style={ imageSelectedStyles } /> }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -196,49 +260,52 @@ const ImageComponent = ( {
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
-							{ ...( ! resizeMode && {
-								aspectRatio: imageData?.aspectRatio,
-							} ) }
 							style={ imageStyles }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
-							resizeMode={ resizeMode }
+							resizeMode={ imageResizeMode }
 						/>
 					</View>
 				) }
 
-				{ isUploadFailed && retryMessage && (
+				{ ( isUploadFailed || isUploadPaused ) && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
-							styles.retryContainer,
+							retryContainerStyles,
 						] }
 					>
 						<View
 							style={ [
-								styles.retryIcon,
+								retryIconStyles,
 								retryIcon && styles.customRetryIcon,
 							] }
 						>
-							{ getIcon( ICON_TYPE.RETRY ) }
+							{ isUploadPaused
+								? getIcon( ICON_TYPE.OFFLINE )
+								: getIcon( ICON_TYPE.RETRY ) }
 						</View>
-						<Text style={ styles.uploadFailedText }>
+						<Text style={ uploadFailedTextStyles }>
 							{ retryMessage }
 						</Text>
 					</View>
 				) }
-
-				{ editButton && isSelected && ! isUploadInProgress && (
-					<ImageEditingButton
-						onSelectMediaUploadOption={ onSelectMediaUploadOption }
-						openMediaOptions={ openMediaOptions }
-						url={ ! isUploadFailed && imageData && url }
-						pickerOptions={ mediaPickerOptions }
-					/>
-				) }
 			</View>
+
+			{ editButton && isSelected && ! isUploadInProgress && (
+				<ImageEditingButton
+					onSelectMediaUploadOption={ onSelectMediaUploadOption }
+					openMediaOptions={ openMediaOptions }
+					url={
+						! ( isUploadFailed || isUploadPaused ) &&
+						imageData &&
+						url
+					}
+					pickerOptions={ mediaPickerOptions }
+				/>
+			) }
 		</View>
 	);
 };

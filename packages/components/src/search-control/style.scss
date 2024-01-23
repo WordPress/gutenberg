@@ -1,0 +1,71 @@
+.components-search-control {
+	position: relative;
+
+	input[type="search"].components-search-control__input {
+		@include input-control;
+		display: block;
+		padding: 0 $grid-unit-60 0 $grid-unit-20;
+		background: $gray-100;
+		border: none;
+		width: 100%;
+		height: $grid-unit-60;
+
+		// Unset inherited values.
+		margin-left: 0;
+		margin-right: 0;
+
+		/* Fonts smaller than 16px causes mobile safari to zoom. */
+		font-size: $mobile-text-min-font-size;
+		@include break-small {
+			font-size: $default-font-size;
+		}
+
+		&:focus {
+			background: $white;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		}
+
+		&::placeholder {
+			color: $gray-700;
+		}
+
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
+	}
+
+	&.is-next-40px-default-size input[type="search"].components-search-control__input {
+		height: $grid-unit-50;
+	}
+
+	&.is-size-compact input[type="search"].components-search-control__input {
+		height: $grid-unit-40;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-40;
+	}
+
+}
+
+.components-search-control__icon {
+	position: absolute;
+	right: ( $grid-unit-60 - $icon-size ) * 0.5;
+	top: 50%;
+	transform: translateY(-50%);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: $icon-size;
+
+	.is-size-compact & {
+		right: $grid-unit-05;
+	}
+}
+
+.components-search-control__input-wrapper {
+	position: relative;
+}

@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	wp.blocks.registerBlockType( 'test/container-without-paragraph', {
 		title: 'Container without paragraph',
 		category: 'text',

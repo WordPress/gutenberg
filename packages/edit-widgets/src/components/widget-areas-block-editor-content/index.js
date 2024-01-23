@@ -1,14 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
 import {
 	BlockList,
-	BlockEditorKeyboardShortcuts,
+	BlockToolbar,
+	BlockTools,
 	BlockSelectionClearer,
 	WritingFlow,
-	ObserveTyping,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -16,28 +20,39 @@ import {
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-export default function WidgetAreasBlockEditorContent() {
+export default function WidgetAreasBlockEditorContent( {
+	blockEditorSettings,
+} ) {
+	const hasThemeStyles = useSelect(
+		( select ) =>
+			!! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'themeStyles'
+			),
+		[]
+	);
+	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const styles = useMemo( () => {
+		return hasThemeStyles ? blockEditorSettings.styles : [];
+	}, [ blockEditorSettings, hasThemeStyles ] );
+
 	return (
-		<BlockSelectionClearer>
-			<div
-				className="edit-widgets-block-editor editor-styles-wrapper"
-				onFocus={ ( event ) => {
-					// Stop propagation of the focus event to avoid the parent
-					// widget layout component catching the event and removing the selected area.
-					event.stopPropagation();
-					event.preventDefault();
-				} }
-			>
+		<div className="edit-widgets-block-editor">
+			<Notices />
+			{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
+			<BlockTools>
 				<KeyboardShortcuts />
-				<BlockEditorKeyboardShortcuts />
-				<Notices />
-				<Popover.Slot name="block-toolbar" />
-				<WritingFlow>
-					<ObserveTyping>
+				<EditorStyles
+					styles={ styles }
+					scope=".editor-styles-wrapper"
+				/>
+				<BlockSelectionClearer>
+					<WritingFlow>
 						<BlockList className="edit-widgets-main-block-list" />
-					</ObserveTyping>
-				</WritingFlow>
-			</div>
-		</BlockSelectionClearer>
+					</WritingFlow>
+				</BlockSelectionClearer>
+			</BlockTools>
+		</div>
 	);
 }

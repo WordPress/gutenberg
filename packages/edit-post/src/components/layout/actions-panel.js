@@ -1,9 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
+import {
+	EntitiesSavedStates,
+	PostPublishPanel,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 /**
@@ -11,32 +15,33 @@ import { useCallback } from '@wordpress/element';
  */
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import { store as editPostStore } from '../../store';
+
+const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
+
+export const ActionsPanelFill = Fill;
 
 export default function ActionsPanel( {
 	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
 } ) {
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
-		'core/edit-post'
-	);
+	const { closePublishSidebar, togglePublishSidebar } =
+		useDispatch( editPostStore );
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
-		isSavingMetaBoxes,
 		hasNonPostEntityChanges,
-	} = useSelect( ( select ) => {
-		return {
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSavingMetaBoxes: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			hasNonPostEntityChanges: select(
-				'core/editor'
-			).hasNonPostEntityChanges(),
-		};
-	}, [] );
+	} = useSelect(
+		( select ) => ( {
+			publishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			hasNonPostEntityChanges:
+				select( editorStore ).hasNonPostEntityChanges(),
+		} ),
+		[]
+	);
 
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),
@@ -51,7 +56,6 @@ export default function ActionsPanel( {
 			<PostPublishPanel
 				onClose={ closePublishSidebar }
 				forceIsDirty={ hasActiveMetaboxes }
-				forceIsSaving={ isSavingMetaBoxes }
 				PrePublishExtension={ PluginPrePublishPanel.Slot }
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
@@ -60,7 +64,7 @@ export default function ActionsPanel( {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-entities-saved-states-panel">
 				<Button
-					isSecondary
+					variant="secondary"
 					className="edit-post-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
@@ -73,7 +77,7 @@ export default function ActionsPanel( {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-publish-panel">
 				<Button
-					isSecondary
+					variant="secondary"
 					className="edit-post-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
 					aria-expanded={ false }
@@ -88,10 +92,10 @@ export default function ActionsPanel( {
 	// always mounted to retain its own component state (such as checkboxes).
 	return (
 		<>
-			<EntitiesSavedStates
-				isOpen={ isEntitiesSavedStatesOpen }
-				close={ closeEntitiesSavedStates }
-			/>
+			{ isEntitiesSavedStatesOpen && (
+				<EntitiesSavedStates close={ closeEntitiesSavedStates } />
+			) }
+			<Slot bubblesVirtually />
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }
 		</>
 	);

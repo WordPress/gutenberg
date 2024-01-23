@@ -1,0 +1,9 @@
+[
+	{
+		"blockName": "core/query",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-query\"></div>\n",
+		"innerContent": [ "\n<div class=\"wp-block-query\"></div>\n" ]
+	}
+]

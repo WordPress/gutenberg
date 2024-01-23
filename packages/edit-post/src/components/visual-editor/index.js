@@ -1,63 +1,95 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
-	PostTitle,
-	VisualEditorGlobalKeyboardShortcuts,
+	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import {
-	WritingFlow,
-	Typewriter,
-	ObserveTyping,
-	BlockList,
-	CopyHandler,
-	BlockSelectionClearer,
-	MultiSelectScrollIntoView,
-	__experimentalBlockSettingsMenuFirstItem,
-	__experimentalUseResizeCanvas as useResizeCanvas,
-} from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import BlockInspectorButton from './block-inspector-button';
-import { useSelect } from '@wordpress/data';
+import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-function VisualEditor() {
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+const { EditorCanvas } = unlock( editorPrivateApis );
+
+const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+
+export default function VisualEditor( { styles } ) {
+	const {
+		isWelcomeGuideVisible,
+		renderingMode,
+		isBlockBasedTheme,
+		hasV3BlocksOnly,
+	} = useSelect( ( select ) => {
+		const { isFeatureActive } = select( editPostStore );
+		const { getEditorSettings, getRenderingMode } = select( editorStore );
+		const { getBlockTypes } = select( blocksStore );
+		const editorSettings = getEditorSettings();
+
+		return {
+			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
+			renderingMode: getRenderingMode(),
+			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
+			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
+				return type.apiVersion >= 3;
+			} ),
+		};
 	}, [] );
+	const hasMetaBoxes = useSelect(
+		( select ) => select( editPostStore ).hasMetaBoxes(),
+		[]
+	);
 
-	const inlineStyles = useResizeCanvas( deviceType );
+	let paddingBottom;
+
+	// Add a constant padding for the typewritter effect. When typing at the
+	// bottom, there needs to be room to scroll up.
+	if ( ! hasMetaBoxes && renderingMode === 'post-only' ) {
+		paddingBottom = '40vh';
+	}
+
+	styles = useMemo(
+		() => [
+			...styles,
+			{
+				// We should move this in to future to the body.
+				css: paddingBottom
+					? `body{padding-bottom:${ paddingBottom }}`
+					: '',
+			},
+		],
+		[ styles, paddingBottom ]
+	);
+
+	const isToBeIframed =
+		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
+			! hasMetaBoxes ) ||
+		renderingMode === 'template-only';
 
 	return (
-		<BlockSelectionClearer
-			className="edit-post-visual-editor editor-styles-wrapper"
-			style={ inlineStyles }
+		<div
+			className={ classnames( 'edit-post-visual-editor', {
+				'is-template-mode': renderingMode === 'template-only',
+				'has-inline-canvas': ! isToBeIframed,
+			} ) }
 		>
-			<VisualEditorGlobalKeyboardShortcuts />
-			<MultiSelectScrollIntoView />
-			<Popover.Slot name="block-toolbar" />
-			<Typewriter>
-				<CopyHandler>
-					<WritingFlow>
-						<ObserveTyping>
-							<div className="edit-post-visual-editor__post-title-wrapper">
-								<PostTitle />
-							</div>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</CopyHandler>
-			</Typewriter>
-			<__experimentalBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => (
-					<BlockInspectorButton onClick={ onClose } />
-				) }
-			</__experimentalBlockSettingsMenuFirstItem>
-		</BlockSelectionClearer>
+			<EditorCanvas
+				disableIframe={ ! isToBeIframed }
+				styles={ styles }
+				// We should auto-focus the canvas (title) on load.
+				// eslint-disable-next-line jsx-a11y/no-autofocus
+				autoFocus={ ! isWelcomeGuideVisible }
+			/>
+		</div>
 	);
 }
-
-export default VisualEditor;

@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { find, isEmpty, each, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState, useCallback } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	ToolbarButton,
 	Button,
@@ -17,8 +12,8 @@ import {
 	TextControl,
 	SVG,
 	Path,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { link as linkIcon, close } from '@wordpress/icons';
 
 /**
@@ -52,31 +47,19 @@ const ImageURLInputUI = ( {
 	rel,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const openLinkUI = useCallback( () => {
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const openLinkUI = () => {
 		setIsOpen( true );
-	} );
+	};
 
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
 
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const stopPropagationRelevantKeys = ( event ) => {
-		if (
-			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
-				event.keyCode
-			) > -1
-		) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
-
-	const startEditLink = useCallback( () => {
+	const startEditLink = () => {
 		if (
 			linkDestination === LINK_DESTINATION_MEDIA ||
 			linkDestination === LINK_DESTINATION_ATTACHMENT
@@ -84,50 +67,37 @@ const ImageURLInputUI = ( {
 			setUrlInput( '' );
 		}
 		setIsEditingLink( true );
-	} );
+	};
 
-	const stopEditLink = useCallback( () => {
+	const stopEditLink = () => {
 		setIsEditingLink( false );
-	} );
+	};
 
-	const closeLinkUI = useCallback( () => {
+	const closeLinkUI = () => {
 		setUrlInput( null );
 		stopEditLink();
 		setIsOpen( false );
-	} );
-
-	const removeNewTabRel = ( currentRel ) => {
-		let newRel = currentRel;
-
-		if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-			if ( ! isEmpty( newRel ) ) {
-				each( NEW_TAB_REL, ( relVal ) => {
-					const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-					newRel = newRel.replace( regExp, '' );
-				} );
-
-				// Only trim if NEW_TAB_REL values was replaced.
-				if ( newRel !== currentRel ) {
-					newRel = newRel.trim();
-				}
-
-				if ( isEmpty( newRel ) ) {
-					newRel = undefined;
-				}
-			}
-		}
-
-		return newRel;
 	};
 
 	const getUpdatedLinkTargetSettings = ( value ) => {
 		const newLinkTarget = value ? '_blank' : undefined;
 
 		let updatedRel;
-		if ( ! newLinkTarget && ! rel ) {
-			updatedRel = undefined;
+		if ( newLinkTarget ) {
+			const rels = ( rel ?? '' ).split( ' ' );
+			NEW_TAB_REL.forEach( ( relVal ) => {
+				if ( ! rels.includes( relVal ) ) {
+					rels.push( relVal );
+				}
+			} );
+			updatedRel = rels.join( ' ' );
 		} else {
-			updatedRel = removeNewTabRel( rel );
+			const rels = ( rel ?? '' )
+				.split( ' ' )
+				.filter(
+					( relVal ) => NEW_TAB_REL.includes( relVal ) === false
+				);
+			updatedRel = rels.length ? rels.join( ' ' ) : undefined;
 		}
 
 		return {
@@ -136,7 +106,7 @@ const ImageURLInputUI = ( {
 		};
 	};
 
-	const onFocusOutside = useCallback( () => {
+	const onFocusOutside = () => {
 		return ( event ) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
 			// so onFocusOutside fails to detect that a click on a suggestion occurred in the
@@ -153,25 +123,35 @@ const ImageURLInputUI = ( {
 			setUrlInput( null );
 			stopEditLink();
 		};
-	} );
+	};
 
-	const onSubmitLinkChange = useCallback( () => {
+	const onSubmitLinkChange = () => {
 		return ( event ) => {
 			if ( urlInput ) {
-				onChangeUrl( { href: urlInput } );
+				// It is possible the entered URL actually matches a named link destination.
+				// This check will ensure our link destination is correct.
+				const selectedDestination =
+					getLinkDestinations().find(
+						( destination ) => destination.url === urlInput
+					)?.linkDestination || LINK_DESTINATION_CUSTOM;
+
+				onChangeUrl( {
+					href: urlInput,
+					linkDestination: selectedDestination,
+				} );
 			}
 			stopEditLink();
 			setUrlInput( null );
 			event.preventDefault();
 		};
-	} );
+	};
 
-	const onLinkRemove = useCallback( () => {
+	const onLinkRemove = () => {
 		onChangeUrl( {
 			linkDestination: LINK_DESTINATION_NONE,
 			href: '',
 		} );
-	} );
+	};
 
 	const getLinkDestinations = () => {
 		const linkDestinations = [
@@ -205,7 +185,7 @@ const ImageURLInputUI = ( {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
 			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
+				linkDestinations.find( ( destination ) => {
 					return destination.url === value;
 				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
 			).linkDestination;
@@ -230,34 +210,34 @@ const ImageURLInputUI = ( {
 	};
 
 	const advancedOptions = (
-		<>
+		<VStack spacing="3">
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				label={ __( 'Link Rel' ) }
-				value={ removeNewTabRel( rel ) || '' }
+				__nextHasNoMarginBottom
+				label={ __( 'Link rel' ) }
+				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
-				onKeyPress={ stopPropagation }
-				onKeyDown={ stopPropagationRelevantKeys }
 			/>
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link CSS Class' ) }
 				value={ linkClass || '' }
-				onKeyPress={ stopPropagation }
-				onKeyDown={ stopPropagationRelevantKeys }
 				onChange={ onSetLinkClass }
 			/>
-		</>
+		</VStack>
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
 
 	const urlLabel = (
-		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
-		{}
+		getLinkDestinations().find(
+			( destination ) => destination.linkDestination === linkDestination
+		) || {}
 	).title;
 
 	return (
@@ -268,16 +248,19 @@ const ImageURLInputUI = ( {
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
+				ref={ setPopoverAnchor }
+				isActive={ !! url }
 			/>
 			{ isOpen && (
 				<URLPopover
+					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={ () => advancedOptions }
 					additionalControls={
 						! linkEditorValue && (
 							<NavigableMenu>
-								{ map( getLinkDestinations(), ( link ) => (
+								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }
@@ -299,8 +282,6 @@ const ImageURLInputUI = ( {
 							className="block-editor-format-toolbar__link-container-content"
 							value={ linkEditorValue }
 							onChangeInputValue={ setUrlInput }
-							onKeyDown={ stopPropagationRelevantKeys }
-							onKeyPress={ stopPropagation }
 							onSubmit={ onSubmitLinkChange() }
 							autocompleteRef={ autocompleteRef }
 						/>
@@ -309,7 +290,6 @@ const ImageURLInputUI = ( {
 						<>
 							<URLPopover.LinkViewer
 								className="block-editor-format-toolbar__link-container-content"
-								onKeyPress={ stopPropagation }
 								url={ url }
 								onEditLinkClick={ startEditLink }
 								urlLabel={ urlLabel }

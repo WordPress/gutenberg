@@ -23,7 +23,7 @@ Locks are stored like this:
 ```
 
 A more complete, but still simplified, tree looks like this:
- 
+
 ```jsx
 {
 	"locks": [],
@@ -46,9 +46,10 @@ A more complete, but still simplified, tree looks like this:
 ```
 
 Let's imagine we want to fetch a list of books. One way to control concurrency would be to acquire a shared lock on `book`. The lock will be granted once there are **no exclusive locks** on:
-* `book` itself
-* All its parents (`root`)
-* All its descendants (`book > 1`, `book > 2`)
+
+-   `book` itself
+-   All its parents (`root`)
+-   All its descendants (`book > 1`, `book > 2`)
 
 In the case above we're good to grab the lock, let's do it then:
 
@@ -74,6 +75,7 @@ In the case above we're good to grab the lock, let's do it then:
 ```
 
 Let's imagine that another fetch was triggered to get a filtered list of entities. By checking the criteria above, it's okay to grab a shared lock on books so now we have two:
+
 ```jsx
 /* ... */
 		"book": {
@@ -83,9 +85,10 @@ Let's imagine that another fetch was triggered to get a filtered list of entitie
 ```
 
 While these are running, the user triggered an update of book id=1. Now an update operation requests an exclusive lock. It will be able to acquire one once there are **no locks at all** on:
-* `book > 1` itself
-* All its parents (`root`, `book`)
-* All its descendants (an empty list in this case)
+
+-   `book > 1` itself
+-   All its parents (`root`, `book`)
+-   All its descendants (an empty list in this case)
 
 Since there are two shared locks on `book`, the operation is delayed until both of them are released. Once that happens, an exclusive lock is granted on a specific book:
 

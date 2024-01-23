@@ -1,13 +1,16 @@
 .wp-block-social-links {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-start;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>
 	text-indent: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
+
+	// Unset background colors that can be inherited from Global Styles.
+	background: none;
 
 	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
 	.wp-social-link a,
@@ -17,13 +20,7 @@
 		box-shadow: none;
 	}
 
-	// Vertically balance the margin of each icon.
 	.wp-social-link {
-		// This needs specificity to override some themes.
-		&.wp-social-link.wp-social-link {
-			margin: 4px 8px 4px 0;
-		}
-
 		// By setting the font size, we can scale icons and paddings consistently based on that.
 		// This also allows themes to override this, if need be.
 		a {
@@ -33,6 +30,12 @@
 		svg {
 			width: 1em;
 			height: 1em;
+		}
+
+		span:not(.screen-reader-text) {
+			margin-left: 0.5em;
+			margin-right: 0.5em;
+			font-size: 0.65em;
 		}
 	}
 
@@ -57,9 +60,20 @@
 	&.has-huge-icon-size {
 		font-size: 48px;
 	}
+
+	// Center flex items. This has an equivalent in editor.scss.
+	// It also needs to override some of the default classes usually applied to the centering class.
+	// align left must not be set, because this is the default (flex-start).
+	&.aligncenter {
+		justify-content: center;
+		display: flex;
+	}
+	&.alignright {
+		justify-content: flex-end;
+	}
 }
 
-.wp-social-link {
+.wp-block-social-link {
 	display: block;
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
 	transition: transform 0.1s ease;
@@ -69,18 +83,10 @@
 	height: auto;
 
 	a {
-		display: block;
+		align-items: center;
+		display: flex;
 		line-height: 0;
 		transition: transform 0.1s ease;
-	}
-
-	a,
-	a:hover,
-	a:active,
-	a:visited,
-	svg {
-		color: currentColor;
-		fill: currentColor;
 	}
 
 	&:hover {
@@ -88,13 +94,23 @@
 	}
 }
 
-// Center flex items. This has an equivalent in editor.scss.
-// It also needs to override some of the default classes usually applied to the centering class.
-.wp-block-social-links.aligncenter {
-	justify-content: center;
-	display: flex;
-}
+// This needs specificity because themes usually override it with things like .widget-area a.
+.wp-block-social-links .wp-block-social-link.wp-social-link {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
 
+	.wp-block-social-link-anchor {
+		&,
+		&:hover,
+		&:active,
+		&:visited,
+		svg {
+			color: currentColor;
+			fill: currentColor;
+		}
+	}
+}
 
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
@@ -107,8 +123,15 @@
 	.wp-social-link {
 		background: none;
 
+		a {
+			padding: 0;
+		}
+
 		// Make these bigger.
-		padding: 4px;
+		svg {
+			width: 1.25em;
+			height: 1.25em;
+		}
 	}
 
 	@import "../social-link/socials-without-bg.scss";
@@ -123,5 +146,15 @@
 	.wp-social-link a {
 		padding-left: calc((2/3) * 1em);
 		padding-right: calc((2/3) * 1em);
+	}
+}
+
+// Ensure the Snapchat label is visible when no custom
+// icon color or background color is set.
+.wp-block-social-links:not(.has-icon-color):not(.has-icon-background-color) {
+	.wp-social-link-snapchat {
+		.wp-block-social-link-label {
+			color: #000;
+		}
 	}
 }

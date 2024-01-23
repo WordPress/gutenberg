@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/block",
+		"isValid": true,
+		"attributes": {
+			"ref": 123
+		},
+		"innerBlocks": []
+	}
+]

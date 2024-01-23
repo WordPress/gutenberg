@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"href": "https://wordpress.org/",
+			"linkDestination": "custom"
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,0 +1,11 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ],
+		"checkJs": false
+	},
+	"references": [ { "path": "../a11y" }, { "path": "../data" } ],
+	"include": [ "src/**/*" ]
+}

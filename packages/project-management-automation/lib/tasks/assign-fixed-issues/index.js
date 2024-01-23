@@ -3,7 +3,7 @@
  */
 const debug = require( '../../debug' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
 
 /**
@@ -13,7 +13,8 @@ const debug = require( '../../debug' );
  * @param {GitHub}                    octokit Initialized Octokit REST client.
  */
 async function assignFixedIssues( payload, octokit ) {
-	const regex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
+	const regex =
+		/(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
 
 	let match;
 	while ( ( match = regex.exec( payload.pull_request.body ) ) ) {
@@ -23,7 +24,7 @@ async function assignFixedIssues( payload, octokit ) {
 			`assign-fixed-issues: Assigning issue #${ issue } to @${ payload.pull_request.user.login }`
 		);
 
-		await octokit.issues.addAssignees( {
+		await octokit.rest.issues.addAssignees( {
 			owner: payload.repository.owner.login,
 			repo: payload.repository.name,
 			issue_number: +issue,
@@ -34,7 +35,7 @@ async function assignFixedIssues( payload, octokit ) {
 			`assign-fixed-issues: Applying '[Status] In Progress' label to issue #${ issue }`
 		);
 
-		await octokit.issues.addLabels( {
+		await octokit.rest.issues.addLabels( {
 			owner: payload.repository.owner.login,
 			repo: payload.repository.name,
 			issue_number: +issue,

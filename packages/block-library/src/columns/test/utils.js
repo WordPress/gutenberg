@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import {
@@ -114,7 +119,7 @@ describe( 'getColumnWidths', () => {
 
 describe( 'getRedistributedColumnWidths', () => {
 	describe( 'explicit width', () => {
-		const blocks = [
+		let blocks = [
 			{ clientId: 'a', attributes: { width: 30 } },
 			{ clientId: 'b', attributes: { width: 40 } },
 		];
@@ -123,8 +128,8 @@ describe( 'getRedistributedColumnWidths', () => {
 			const widths = getRedistributedColumnWidths( blocks, 60 );
 
 			expect( widths ).toEqual( {
-				a: 25,
-				b: 35,
+				a: 25.71,
+				b: 34.29,
 			} );
 		} );
 
@@ -132,8 +137,36 @@ describe( 'getRedistributedColumnWidths', () => {
 			const widths = getRedistributedColumnWidths( blocks, 80 );
 
 			expect( widths ).toEqual( {
-				a: 35,
-				b: 45,
+				a: 34.29,
+				b: 45.71,
+			} );
+		} );
+
+		it( 'should decrease proportionally for third column', () => {
+			blocks = [
+				{ clientId: 'a', attributes: { width: 99 } },
+				{ clientId: 'b', attributes: { width: 1 } },
+			];
+			const widths = getRedistributedColumnWidths( blocks, 66.67 );
+
+			expect( widths ).toEqual( {
+				a: 66,
+				b: 0.67,
+			} );
+		} );
+
+		it( 'should decrease proportionally for fourth column', () => {
+			blocks = [
+				{ clientId: 'a', attributes: { width: 98 } },
+				{ clientId: 'b', attributes: { width: 1 } },
+				{ clientId: 'c', attributes: { width: 1 } },
+			];
+			const widths = getRedistributedColumnWidths( blocks, 75 );
+
+			expect( widths ).toEqual( {
+				a: 73.5,
+				b: 0.75,
+				c: 0.75,
 			} );
 		} );
 	} );
@@ -248,8 +281,57 @@ describe( 'getMappedColumnWidths', () => {
 		const result = getMappedColumnWidths( blocks, widths );
 
 		expect( result ).toEqual( [
-			{ clientId: 'a', attributes: { width: 25 } },
-			{ clientId: 'b', attributes: { width: 35 } },
+			{ clientId: 'a', attributes: { width: '25%' } },
+			{ clientId: 'b', attributes: { width: '35%' } },
+		] );
+	} );
+
+	it( 'always returns new objects and does not mutate input blocks', () => {
+		const blocks = [
+			deepFreeze( { clientId: 'a', attributes: { width: 30 } } ),
+			deepFreeze( { clientId: 'b', attributes: { width: 40 } } ),
+		];
+		const widths = {
+			a: 25,
+			b: 35,
+		};
+
+		const result = getMappedColumnWidths( blocks, widths );
+
+		expect( blocks[ 0 ] ).not.toBe( result[ 0 ] );
+		expect( blocks[ 1 ] ).not.toBe( result[ 1 ] );
+	} );
+
+	it( 'merges to block attributes if original blocks do not have any attributes', () => {
+		const blocks = [ { clientId: 'a' }, { clientId: 'b' } ];
+		const widths = {
+			a: 25,
+			b: 35,
+		};
+
+		const result = getMappedColumnWidths( blocks, widths );
+
+		expect( result ).toEqual( [
+			{ clientId: 'a', attributes: { width: '25%' } },
+			{ clientId: 'b', attributes: { width: '35%' } },
+		] );
+	} );
+
+	it( 'merges to block attributes if original blocks do not have a width attribute', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: { align: 'left' } },
+			{ clientId: 'b', attributes: { align: 'right' } },
+		];
+		const widths = {
+			a: 25,
+			b: 35,
+		};
+
+		const result = getMappedColumnWidths( blocks, widths );
+
+		expect( result ).toEqual( [
+			{ clientId: 'a', attributes: { align: 'left', width: '25%' } },
+			{ clientId: 'b', attributes: { align: 'right', width: '35%' } },
 		] );
 	} );
 } );

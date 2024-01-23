@@ -8,7 +8,6 @@ Examples of **incorrect** code for this rule:
 
 ```js
 __( 'Continue...' );
-
 ```
 
 Examples of **correct** code for this rule:

@@ -1,0 +1,18 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ]
+	},
+	"references": [
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
+		{ "path": "../element" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../keycodes" },
+		{ "path": "../priority-queue" },
+		{ "path": "../undo-manager" }
+	],
+	"include": [ "src/**/*" ]
+}

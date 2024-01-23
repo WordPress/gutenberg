@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render alignment 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 2);
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.emotion-0>* {
+  min-height: 0;
+}
+
+<div>
+  <div
+    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="VStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
+</div>
+`;
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 2);
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.emotion-0>* {
+  min-height: 0;
+}
+
+<div>
+  <div
+    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="VStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
+</div>
+`;
+
+exports[`props should render spacing 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 5);
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.emotion-0>* {
+  min-height: 0;
+}
+
+<div>
+  <div
+    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="VStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
+</div>
+`;

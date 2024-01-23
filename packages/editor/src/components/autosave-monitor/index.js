@@ -4,6 +4,12 @@
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 /**
  * AutosaveMonitor invokes `props.autosave()` within at most `interval` seconds after an unsaved change is detected.
@@ -14,7 +20,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  *
  * There are two caveats:
  * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
- * * The timer may be disabled by setting `props.disableIntervalChecks` to `false`. In that mode, any change will immediately trigger `props.autosave()`.
+ * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
  */
 export class AutosaveMonitor extends Component {
 	constructor( props ) {
@@ -29,15 +35,19 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if (
-			this.props.disableIntervalChecks &&
-			this.props.editsReference !== prevProps.editsReference
-		) {
-			this.props.autosave();
+		if ( this.props.disableIntervalChecks ) {
+			if ( this.props.editsReference !== prevProps.editsReference ) {
+				this.props.autosave();
+			}
 			return;
 		}
 
-		if ( ! this.props.isDirty && prevProps.isDirty ) {
+		if ( this.props.interval !== prevProps.interval ) {
+			clearTimeout( this.timerId );
+			this.setAutosaveTimer();
+		}
+
+		if ( ! this.props.isDirty ) {
 			this.needsAutosave = false;
 			return;
 		}
@@ -83,14 +93,14 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getReferenceByDistinctEdits } = select( 'core' );
+		const { getReferenceByDistinctEdits } = select( coreStore );
 
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			isAutosavingPost,
 			getEditorSettings,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
@@ -104,7 +114,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		autosave() {
-			const { autosave = dispatch( 'core/editor' ).autosave } = ownProps;
+			const { autosave = dispatch( editorStore ).autosave } = ownProps;
 			autosave();
 		},
 	} ) ),

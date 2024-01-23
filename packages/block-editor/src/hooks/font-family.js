@@ -1,88 +1,108 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import TokenList from '@wordpress/token-list';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { cleanEmptyObject } from './utils';
-import useEditorFeature from '../components/use-editor-feature';
-import FontFamilyControl from '../components/font-family';
+import { shouldSkipSerialization } from './utils';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import { unlock } from '../lock-unlock';
 
-export const FONT_FAMILY_SUPPORT_KEY = '__experimentalFontFamily';
+export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
-const getFontFamilyFromAttributeValue = ( fontFamilies, value ) => {
-	const attributeParsed = /var:preset\|font-family\|(.+)/.exec( value );
-	if ( attributeParsed && attributeParsed[ 1 ] ) {
-		return find( fontFamilies, ( { slug } ) => {
-			return slug === attributeParsed[ 1 ];
-		} ).fontFamily;
-	}
-	return value;
-};
-
-export function FontFamilyEdit( {
-	name,
-	setAttributes,
-	attributes: { style = {} },
-} ) {
-	const fontFamilies = useEditorFeature( 'typography.fontFamilies' );
-	const isDisable = useIsFontFamilyDisabled( { name } );
-
-	if ( isDisable ) {
-		return null;
+/**
+ * Filters registered block settings, extending attributes to include
+ * the `fontFamily` attribute.
+ *
+ * @param {Object} settings Original block settings
+ * @return {Object}         Filtered block settings
+ */
+function addAttributes( settings ) {
+	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
+		return settings;
 	}
 
-	const value = getFontFamilyFromAttributeValue(
-		fontFamilies,
-		style.typography?.fontFamily
-	);
-
-	function onChange( newValue ) {
-		const predefinedFontFamily = find(
-			fontFamilies,
-			( { fontFamily } ) => fontFamily === newValue
-		);
-		setAttributes( {
-			style: cleanEmptyObject( {
-				...style,
-				typography: {
-					...( style.typography || {} ),
-					fontFamily: predefinedFontFamily
-						? `var:preset|font-family|${ predefinedFontFamily.slug }`
-						: newValue || undefined,
-				},
-			} ),
+	// Allow blocks to specify a default value if needed.
+	if ( ! settings.attributes.fontFamily ) {
+		Object.assign( settings.attributes, {
+			fontFamily: {
+				type: 'string',
+			},
 		} );
 	}
 
-	return (
-		<FontFamilyControl
-			className="block-editor-hooks-font-family-control"
-			fontFamilies={ fontFamilies }
-			value={ value }
-			onChange={ onChange }
-		/>
-	);
+	return settings;
 }
 
 /**
- * Custom hook that checks if font-family functionality is disabled.
+ * Override props assigned to save component to inject font family.
  *
- * @param {string} name The name of the block.
- * @return {boolean} Whether setting is disabled.
+ * @param {Object} props      Additional props applied to save element
+ * @param {Object} blockType  Block type
+ * @param {Object} attributes Block attributes
+ * @return {Object}           Filtered props applied to save element
  */
-export function useIsFontFamilyDisabled( { name } ) {
-	const fontFamilies = useEditorFeature( 'typography.fontFamilies' );
-	return (
-		! fontFamilies ||
-		fontFamilies.length === 0 ||
-		! hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY )
-	);
+function addSaveProps( props, blockType, attributes ) {
+	if ( ! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) ) {
+		return props;
+	}
+
+	if (
+		shouldSkipSerialization(
+			blockType,
+			TYPOGRAPHY_SUPPORT_KEY,
+			'fontFamily'
+		)
+	) {
+		return props;
+	}
+
+	if ( ! attributes?.fontFamily ) {
+		return props;
+	}
+
+	// Use TokenList to dedupe classes.
+	const classes = new TokenList( props.className );
+	const { kebabCase } = unlock( componentsPrivateApis );
+	classes.add( `has-${ kebabCase( attributes?.fontFamily ) }-font-family` );
+	const newClassName = classes.value;
+	props.className = newClassName ? newClassName : undefined;
+
+	return props;
 }
+
+function useBlockProps( { name, fontFamily } ) {
+	return addSaveProps( {}, name, { fontFamily } );
+}
+
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'fontFamily' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
+	},
+};
+
+/**
+ * Resets the font family block support attribute. This can be used when
+ * disabling the font family support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetFontFamily( { setAttributes } ) {
+	setAttributes( { fontFamily: undefined } );
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/fontFamily/addAttribute',
+	addAttributes
+);

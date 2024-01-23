@@ -1,5 +1,9 @@
 # NumberControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
 
 ## Usage
@@ -40,13 +44,18 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
 -   Required: No
 -   Default: `10`
 
-### hideHTMLArrows
+### spinControls
 
-If true, the default `input` HTML arrows will be hidden.
+ The type of spin controls to display. These are buttons that allow the user to
+ quickly increment and decrement the number.
 
--   Type: `Boolean`
+ - 'none' - Do not show spin controls.
+ - 'native' - Use browser's native HTML `input` controls.
+ - 'custom' - Use plus and minus icon buttons.
+
+-   Type: `String`
 -   Required: No
--   Default: `false`
+-   Default: `'native'`
 
 ### isDragEnabled
 
@@ -77,6 +86,44 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 -   Type: `String`
 -   Required: No
 
+### max
+
+The maximum `value` allowed.
+
+-   Type: `Number`
+-   Required: No
+-   Default: `Infinity`
+
+### min
+
+The minimum `value` allowed.
+
+-   Type: `Number`
+-   Required: No
+-   Default: `-Infinity`
+
+### onChange
+
+Callback fired whenever the value of the input changes.
+
+The callback receives two arguments:
+
+1. `newValue`: the new value of the input
+2. `extra`: an object containing, under the `event` key, the original browser event.
+
+Note that the value received as the first argument of the callback is _not_ guaranteed to be a valid value (e.g. it could be outside of the range defined by the [`min`, `max`] props, or it could not match the `step`). In order to check the value's validity, check the `event.target?.validity.valid` property from the callback's second argument.
+
+-   Type: `(newValue, extra) => void`
+-   Required: No
+
+### required
+
+If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### shiftStep
 
 Amount to increment by when the `SHIFT` key is held down. This shift value is a multiplier to the `step` value. For example, if the `step` value is `5`, and `shiftStep` is `10`, each jump would increment/decrement by `50`.
@@ -87,8 +134,8 @@ Amount to increment by when the `SHIFT` key is held down. This shift value is a 
 
 ### step
 
-Amount to increment by when incrementing/decrementing.
+Amount by which the `value` is changed when incrementing/decrementing. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`, if specified) to be valid. Accepts the special string value `any` that voids the validation constraint and causes stepping actions to increment/decrement by `1`.
 
--   Type: `Number`
+-   Type: `Number | "any"`
 -   Required: No
 -   Default: `1`

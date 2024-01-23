@@ -10,7 +10,7 @@ import {
 export function PostFormat() {
 	return (
 		<PostFormatCheck>
-			<PanelRow>
+			<PanelRow className="edit-post-post-format">
 				<PostFormatForm />
 			</PanelRow>
 		</PostFormatCheck>

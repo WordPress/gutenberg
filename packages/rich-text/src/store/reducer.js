@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { keyBy, omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -21,10 +16,21 @@ export function formatTypes( state = {}, action ) {
 		case 'ADD_FORMAT_TYPES':
 			return {
 				...state,
-				...keyBy( action.formatTypes, 'name' ),
+				// Key format types by their name.
+				...action.formatTypes.reduce(
+					( newFormatTypes, type ) => ( {
+						...newFormatTypes,
+						[ type.name ]: type,
+					} ),
+					{}
+				),
 			};
 		case 'REMOVE_FORMAT_TYPES':
-			return omit( state, action.names );
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ key ] ) => ! action.names.includes( key )
+				)
+			);
 	}
 
 	return state;

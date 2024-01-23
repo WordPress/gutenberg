@@ -1,16 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
+import {
+	Path,
+	SVG,
+	Popover,
+	Button,
+	__experimentalNumberControl as NumberControl,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { insertObject, useAnchorRef } from '@wordpress/rich-text';
+import { insertObject, useAnchor } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -34,44 +40,23 @@ export const image = {
 	edit: Edit,
 };
 
-function stopKeyPropagation( event ) {
-	event.stopPropagation();
-}
-
-function onKeyDown( event ) {
-	if (
-		[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) >
-		-1
-	) {
-		// Stop the key event from propagating up to
-		// ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-}
-
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style } = activeObjectAttributes;
-	const [ width, setWidth ] = useState( style.replace( /\D/g, '' ) );
-	const anchorRef = useAnchorRef( {
-		ref: contentRef,
-		value,
+	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
 		settings: image,
 	} );
 
 	return (
 		<Popover
-			position="bottom center"
+			placement="bottom"
 			focusOnMount={ false }
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
+			className="block-editor-format-toolbar__image-popover"
 		>
-			{
-				// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			 }
 			<form
 				className="block-editor-format-toolbar__image-container-content"
-				onKeyPress={ stopKeyPropagation }
-				onKeyDown={ onKeyDown }
 				onSubmit={ ( event ) => {
 					const newReplacements = value.replacements.slice();
 
@@ -79,7 +64,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							style: `width: ${ width }px;`,
+							style: width ? `width: ${ width }px;` : '',
 						},
 					};
 
@@ -91,21 +76,22 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<TextControl
-					className="block-editor-format-toolbar__image-container-value"
-					type="number"
-					label={ __( 'Width' ) }
-					value={ width }
-					min={ 1 }
-					onChange={ ( newWidth ) => setWidth( newWidth ) }
-				/>
-				<Button
-					icon={ keyboardReturn }
-					label={ __( 'Apply' ) }
-					type="submit"
-				/>
+				<HStack alignment="bottom" spacing="0">
+					<NumberControl
+						className="block-editor-format-toolbar__image-container-value"
+						label={ __( 'Width' ) }
+						value={ width }
+						min={ 1 }
+						onChange={ ( newWidth ) => setWidth( newWidth ) }
+					/>
+					<Button
+						className="block-editor-format-toolbar__image-container-button"
+						icon={ keyboardReturn }
+						label={ __( 'Apply' ) }
+						type="submit"
+					/>
+				</HStack>
 			</form>
-			{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
 		</Popover>
 	);
 }

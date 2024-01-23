@@ -1,35 +1,39 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import { store as blockEditorStore } from '../../store';
 
-function InserterLibrary( {
-	rootClientId,
-	clientId,
-	isAppender,
-	showInserterHelpPanel,
-	showMostUsedBlocks = false,
-	__experimentalSelectBlockOnInsert,
-	__experimentalInsertionIndex,
-	onSelect = noop,
-} ) {
-	const destinationRootClientId = useSelect(
+const noop = () => {};
+
+function InserterLibrary(
+	{
+		rootClientId,
+		clientId,
+		isAppender,
+		showInserterHelpPanel,
+		showMostUsedBlocks = false,
+		__experimentalInsertionIndex,
+		__experimentalFilterValue,
+		onSelect = noop,
+		shouldFocusBlock = false,
+	},
+	ref
+) {
+	const { destinationRootClientId } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( 'core/block-editor' );
-
-			return (
-				rootClientId || getBlockRootClientId( clientId ) || undefined
-			);
+			const { getBlockRootClientId } = select( blockEditorStore );
+			const _rootClientId =
+				rootClientId || getBlockRootClientId( clientId ) || undefined;
+			return {
+				destinationRootClientId: _rootClientId,
+			};
 		},
 		[ clientId, rootClientId ]
 	);
@@ -42,12 +46,12 @@ function InserterLibrary( {
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
-			__experimentalSelectBlockOnInsert={
-				__experimentalSelectBlockOnInsert
-			}
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
+			__experimentalFilterValue={ __experimentalFilterValue }
+			shouldFocusBlock={ shouldFocusBlock }
+			ref={ ref }
 		/>
 	);
 }
 
-export default InserterLibrary;
+export default forwardRef( InserterLibrary );

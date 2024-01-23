@@ -1,4 +1,9 @@
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/**
+ * Internal dependencies
+ */
+import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
+
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Get the textual content of a Rich Text value. This is similar to
@@ -9,5 +14,5 @@
  * @return {string} The text content.
  */
 export function getTextContent( { text } ) {
-	return text;
+	return text.replace( OBJECT_REPLACEMENT_CHARACTER, '' );
 }

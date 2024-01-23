@@ -61,9 +61,7 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em
-    data-rich-text-format-boundary="true"
-  >
+  <em>
     
     <img
       src=""
@@ -118,6 +116,26 @@ exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
   
   ﻿
+</body>
+`;
+
+exports[`recordToDom should disarm on* attribute 1`] = `
+<body>
+  
+  <img
+    data-disable-rich-text-onerror="alert('1')"
+  />
+  
+</body>
+`;
+
+exports[`recordToDom should disarm script 1`] = `
+<body>
+  
+  <script
+    data-rich-text-script="alert(%221%22)"
+  />
+  
 </body>
 `;
 
@@ -183,114 +201,6 @@ exports[`recordToDom should handle double br 1`] = `
 </body>
 `;
 
-exports[`recordToDom should handle empty list value 1`] = `
-<body>
-  <li>
-    
-    ﻿
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle empty multiline value 1`] = `
-<body>
-  <p>
-    
-    ﻿
-  </p>
-</body>
-`;
-
-exports[`recordToDom should handle middle empty list value 1`] = `
-<body>
-  <li>
-    
-    ﻿
-  </li>
-  <li>
-    
-    ﻿
-  </li>
-  <li>
-    
-    ﻿
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle multiline list value 1`] = `
-<body>
-  <li>
-    one
-    <ul>
-      <li>
-        a
-      </li>
-      <li>
-        b
-        <ol>
-          <li>
-            1
-          </li>
-          <li>
-            2
-          </li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-  <li>
-    three
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle multiline value 1`] = `
-<body>
-  <p>
-    one
-  </p>
-  <p>
-    two
-  </p>
-</body>
-`;
-
-exports[`recordToDom should handle multiline value with element selection 1`] = `
-<body>
-  <li>
-    one
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle multiline value with empty 1`] = `
-<body>
-  <p>
-    one
-  </p>
-  <p>
-    
-    ﻿
-  </p>
-</body>
-`;
-
-exports[`recordToDom should handle nested empty list value 1`] = `
-<body>
-  <li>
-    
-    ﻿
-    <ul>
-      <li>
-        
-        ﻿
-      </li>
-    </ul>
-  </li>
-</body>
-`;
-
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
@@ -305,19 +215,20 @@ exports[`recordToDom should handle selection before br 1`] = `
 </body>
 `;
 
-exports[`recordToDom should ignore formats at line separator 1`] = `
+exports[`recordToDom should ignore manually added object replacement character 1`] = `
 <body>
-  <p>
-    <em>
-      one
-    </em>
-  </p>
-  <p>
-    <em>
-      two
-    </em>
-    
-  </p>
+  test
+</body>
+`;
+
+exports[`recordToDom should ignore manually added object replacement character with formatting 1`] = `
+<body>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    hi
+  </em>
+  
 </body>
 `;
 
@@ -388,11 +299,5 @@ exports[`recordToDom should remove padding 1`] = `
 <body>
   
   ﻿
-</body>
-`;
-
-exports[`recordToDom should replace characters to format HTML with space 1`] = `
-<body>
-   
 </body>
 `;

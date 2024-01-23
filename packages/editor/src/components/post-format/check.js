@@ -1,24 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
-function PostFormatCheck( { disablePostFormats, ...props } ) {
+function PostFormatCheck( { children } ) {
+	const disablePostFormats = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().disablePostFormats,
+		[]
+	);
+
+	if ( disablePostFormats ) {
+		return null;
+	}
+
 	return (
-		! disablePostFormats && (
-			<PostTypeSupportCheck { ...props } supportKeys="post-formats" />
-		)
+		<PostTypeSupportCheck supportKeys="post-formats">
+			{ children }
+		</PostTypeSupportCheck>
 	);
 }
 
-export default withSelect( ( select ) => {
-	const editorSettings = select( 'core/editor' ).getEditorSettings();
-	return {
-		disablePostFormats: editorSettings.disablePostFormats,
-	};
-} )( PostFormatCheck );
+export default PostFormatCheck;

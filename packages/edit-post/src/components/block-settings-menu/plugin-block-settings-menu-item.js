@@ -1,18 +1,12 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { plugins } from '@wordpress/icons';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
-	difference( selected, allowed ).length === 0;
+	selected.filter( ( id ) => ! allowed.includes( id ) ).length === 0;
 
 /**
  * Plugins may want to add an item to the menu either for every block
@@ -22,7 +16,7 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) =>
  * is of one allowed type (not necessarily the same).
  *
  * @param {string[]} selectedBlocks Array containing the names of the blocks selected
- * @param {string[]} allowedBlocks Array containing the names of the blocks allowed
+ * @param {string[]} allowedBlocks  Array containing the names of the blocks allowed
  * @return {boolean} Whether the item will be rendered or not.
  */
 const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
@@ -41,7 +35,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {string}                [props.role]          The ARIA role for the menu item.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -52,7 +45,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * }
  *
  * function MyPluginBlockSettingsMenuItem() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginBlockSettingsMenuItem,
  * 		{
  * 			allowedBlocks: [ 'core/paragraph' ],
@@ -65,7 +58,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
@@ -84,7 +76,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const PluginBlockSettingsMenuItem = ( {
 	allowedBlocks,
@@ -102,7 +94,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
-					icon={ icon || plugins }
+					icon={ icon }
 					label={ small ? label : undefined }
 					role={ role }
 				>

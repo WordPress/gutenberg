@@ -1,0 +1,25 @@
+.block-types-list__row-separator {
+	height: 12px;
+}
+
+.block-types-list__column {
+	padding: $grid-unit-20;
+}
+
+.block-types-list__section-header {
+	align-items: center;
+	flex-direction: row;
+	justify-content: center;
+	padding-bottom: 16;
+	padding-top: 32;
+}
+
+.block-types-list__section-header-title {
+	color: $black;
+	font-size: 16px;
+	margin-left: 10px;
+}
+
+.block-types-list__section-header-title--dark {
+	color: $white;
+}

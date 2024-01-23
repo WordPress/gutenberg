@@ -1,139 +1,164 @@
-.wp-block-gallery,
-.blocks-gallery-grid {
-	display: flex;
-	flex-wrap: wrap;
-	list-style-type: none;
-	padding: 0;
-	// Some themes give all <ul> default margin instead of padding.
-	margin: 0;
+// Import styles for rendering the static content of deprecated gallery versions.
+@import "./deprecated.scss";
 
-	.blocks-gallery-image,
-	.blocks-gallery-item {
-		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 1em 1em 0;
+// The following is a temporary override until flex layout supports
+// an align items setting of normal.
+figure.wp-block-gallery.has-nested-images {
+	align-items: normal;
+}
+// Styles for current version of gallery block.
+.wp-block-gallery.has-nested-images {
+	// Need bogus :not(#individual-image) to override long :not()
+	// specificity chain on default image block on front end.
+	figure.wp-block-image:not(#individual-image) {
+		width: calc(50% - (var(--wp--style--unstable-gallery-gap, #{$grid-unit-20}) / 2));
+		margin: 0;
+	}
+
+	figure.wp-block-image {
 		display: flex;
 		flex-grow: 1;
-		flex-direction: column;
 		justify-content: center;
 		position: relative;
+		flex-direction: column;
+		max-width: 100%;
+		// Prevents theme.json and global styles borders that apply to the outer
+		// wrapper from incorrectly enlarging gallery images to a point they
+		// result in a single column gallery.
+		box-sizing: border-box;
 
-		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-		width: calc(50% - 1em);
-
-		&:nth-of-type(even) {
-			margin-right: 0;
-		}
-
-		figure {
+		> div,
+		> a {
 			margin: 0;
-			height: 100%;
-
-			// IE doesn't support flex so omit that.
-			@supports (position: sticky) {
-				display: flex;
-				align-items: flex-end;
-				justify-content: flex-start;
-			}
+			flex-direction: column;
+			flex-grow: 1;
 		}
 
 		img {
 			display: block;
-			max-width: 100%;
 			height: auto;
-
-			// IE doesn't handle cropping, so we need an explicit width here.
-			width: 100%;
-
-			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports (position: sticky) {
-				width: auto;
-			}
+			// Ensure max-width is not overridden on the img when the parent gallery has
+			// wide or full alignment.
+			max-width: 100% !important;
+			width: auto;
 		}
 
 		figcaption {
-			position: absolute;
-			bottom: 0;
-			width: 100%;
-			max-height: 100%;
-			overflow: auto;
-			padding: 3em 0.77em 0.7em;
-			color: $white;
-			text-align: center;
-			font-size: 0.8em;
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+			bottom: 0;
+			color: $white;
+			font-size: $default-font-size;
+			left: 0;
+			margin-bottom: 0;
+			max-height: 60%;
+			overflow: auto;
+			padding: 0 8px 8px;
+			position: absolute;
+			text-align: center;
+			width: 100%;
 			box-sizing: border-box;
-			margin: 0;
+			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
 
 			img {
 				display: inline;
+			}
+
+			a {
+				color: inherit;
+			}
+		}
+
+		&.has-custom-border img {
+			box-sizing: border-box;
+		}
+
+		&.is-style-rounded,
+		&.has-custom-border {
+			> div,
+			> a {
+				flex: 1 1 auto;
+			}
+			figcaption {
+				flex: initial;
+				background: none;
+				color: inherit;
+				margin: 0;
+				padding: 10px 10px 9px;
+				position: relative;
 			}
 		}
 	}
 
 	figcaption {
 		flex-grow: 1;
+		flex-basis: 100%;
+		text-align: center;
 	}
 
-	// Cropped
-	&.is-cropped .blocks-gallery-image,
-	&.is-cropped .blocks-gallery-item {
-		a,
-		img {
-			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
-			// The following rules are for all browsers.
-			width: 100%;
-
-			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports (position: sticky) {
-				height: 100%;
-				flex: 1;
-				object-fit: cover;
-			}
+	// Non cropped images.
+	&:not(.is-cropped) {
+		figure.wp-block-image:not(#individual-image) {
+			margin-top: 0;
+			margin-bottom: auto;
 		}
 	}
 
-	&.columns-1 .blocks-gallery-image,
-	&.columns-1 .blocks-gallery-item {
+	// Cropped Images.
+	&.is-cropped figure.wp-block-image:not(#individual-image) {
+		align-self: inherit;
+		> div:not(.components-drop-zone),
+		> a {
+			display: flex;
+		}
+
+		a,
+		img {
+			width: 100%;
+			flex: 1 0 0%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	&.columns-1 figure.wp-block-image:not(#individual-image) {
 		width: 100%;
-		margin-right: 0;
 	}
 
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .blocks-gallery-image,
-			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ 100% / $i } - #{ 1em * ( $i - 1 ) / $i });
-				margin-right: 1em;
+			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
+				width: calc(#{math.div(100%, $i)} - (var(--wp--style--unstable-gallery-gap, #{$grid-unit-20}) * #{math.div($i - 1, $i)}));
+
 			}
 		}
+		// If number of columns not explicitly set default to 3 columns if 3 or more images.
+		&.columns-default {
+			figure.wp-block-image:not(#individual-image) {
 
-		// Unset the right margin on every rightmost gallery item to ensure center balance.
-		@for $column-count from 1 through 8 {
-			&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
-			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
-				margin-right: 0;
+				width: calc(33.33% - (var(--wp--style--unstable-gallery-gap, 16px) * #{math.div(2, 3)}));
+			}
+			// If only 2 child images use 2 columns.
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
+				width: calc(50% - (var(--wp--style--unstable-gallery-gap, 16px) * 0.5));
+			}
+			// For a single image set to 100%.
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
+				width: 100%;
 			}
 		}
-	}
-
-	// Last item always needs margins reset.
-	.blocks-gallery-image:last-child,
-	.blocks-gallery-item:last-child {
-		margin-right: 0;
 	}
 
 	// Apply max-width to floated items that have no intrinsic width.
 	&.alignleft,
 	&.alignright {
-		max-width: $content-width / 2;
+		max-width: $content-width * 0.5;
 		width: 100%;
 	}
 
 	// If the gallery is centered, center the content inside as well.
 	&.aligncenter {
-		.blocks-gallery-item figure {
-			justify-content: center;
-		}
+		justify-content: center;
 	}
 }

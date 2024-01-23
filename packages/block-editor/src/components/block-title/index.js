@@ -1,16 +1,8 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { truncate } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-import {
-	getBlockType,
-	__experimentalGetBlockLabel as getBlockLabel,
-} from '@wordpress/blocks';
+import useBlockDisplayTitle from './use-block-display-title';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -19,47 +11,16 @@ import {
  * @example
  *
  * ```jsx
- * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+ * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" maximumLength={ 17 }/>
  * ```
  *
- * @param {Object} props
- * @param {string} props.clientId Client ID of block.
+ * @param {Object}           props
+ * @param {string}           props.clientId      Client ID of block.
+ * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
+ * @param {string|undefined} props.context       The context to pass to `getBlockLabel`.
  *
- * @return {?string} Block title.
+ * @return {JSX.Element} Block title.
  */
-export default function BlockTitle( { clientId } ) {
-	const { attributes, name } = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
-				return {};
-			}
-			const { getBlockName, getBlockAttributes } = select(
-				'core/block-editor'
-			);
-			return {
-				attributes: getBlockAttributes( clientId ),
-				name: getBlockName( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	if ( ! name ) {
-		return null;
-	}
-
-	const blockType = getBlockType( name );
-	if ( ! blockType ) {
-		return null;
-	}
-
-	const { title } = blockType;
-	const label = getBlockLabel( blockType, attributes );
-
-	// Label will often fall back to the title if no label is defined for the
-	// current label context. We do not want "Paragraph: Paragraph".
-	if ( label !== title ) {
-		return `${ title }: ${ truncate( label, { length: 15 } ) }`;
-	}
-	return title;
+export default function BlockTitle( { clientId, maximumLength, context } ) {
+	return useBlockDisplayTitle( { clientId, maximumLength, context } );
 }

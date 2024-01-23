@@ -7,8 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__unstableUseAnimate as useAnimate,
+	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
+	Tooltip,
 } from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -16,29 +17,23 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { store as editorStore } from '../../store';
 
 /**
  * Component showing whether the post is saved or not and providing save
  * buttons.
  *
- * @param {Object} props               Component props.
- * @param {?boolean} props.forceIsDirty  Whether to force the post to be marked
- * as dirty.
- * @param {?boolean} props.forceIsSaving Whether to force the post to be marked
- * as being saved.
- * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
- * @return {import('@wordpress/element').WPComponent} The component.
+ * @param {Object}   props              Component props.
+ * @param {?boolean} props.forceIsDirty Whether to force the post to be marked
+ *                                      as dirty.
+ * @return {import('react').ComponentType} The component.
  */
-export default function PostSavedState( {
-	forceIsDirty,
-	forceIsSaving,
-	showIconLabels = false,
-} ) {
+export default function PostSavedState( { forceIsDirty } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
 	const isLargeViewport = useViewportMatch( 'small' );
 
@@ -52,6 +47,7 @@ export default function PostSavedState( {
 		isSaving,
 		isScheduled,
 		hasPublishAction,
+		showIconLabels,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -64,7 +60,8 @@ export default function PostSavedState( {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
-			} = select( 'core/editor' );
+			} = select( editorStore );
+			const { get } = select( preferencesStore );
 
 			return {
 				isAutosaving: isAutosavingPost(),
@@ -72,18 +69,18 @@ export default function PostSavedState( {
 				isNew: isEditedPostNew(),
 				isPending: 'pending' === getEditedPostAttribute( 'status' ),
 				isPublished: isCurrentPostPublished(),
-				isSaving: forceIsSaving || isSavingPost(),
+				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
-					getCurrentPost()?.[ '_links' ]?.[ 'wp:action-publish' ] ??
-					false,
+					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
+				showIconLabels: get( 'core', 'showIconLabels' ),
 			};
 		},
-		[ forceIsDirty, forceIsSaving ]
+		[ forceIsDirty ]
 	);
 
-	const { savePost } = useDispatch( 'core/editor' );
+	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
 
@@ -100,45 +97,13 @@ export default function PostSavedState( {
 		return () => clearTimeout( timeoutId );
 	}, [ isSaving ] );
 
-	const animateClassName = useAnimate( { type: 'loading' } );
-
-	if ( isSaving ) {
-		// TODO: Classes generation should be common across all return
-		// paths of this function, including proper naming convention for
-		// the "Save Draft" button.
-		const classes = classnames( 'editor-post-saved-state', 'is-saving', {
-			'is-autosaving': isAutosaving,
-		} );
-
-		return (
-			<span className={ classnames( classes, animateClassName ) }>
-				<Icon icon={ cloud } />
-				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
-			</span>
-		);
-	}
-
-	if ( isPublished || isScheduled ) {
-		return <PostSwitchToDraftButton />;
-	}
-
-	if ( ! isSaveable ) {
+	// Once the post has been submitted for review this button
+	// is not needed for the contributor role.
+	if ( ! hasPublishAction && isPending ) {
 		return null;
 	}
 
-	if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
-		return (
-			<span className="editor-post-saved-state is-saved">
-				<Icon icon={ check } />
-				{ __( 'Saved' ) }
-			</span>
-		);
-	}
-
-	// Once the post has been submitted for review this button
-	// is not needed for the contributor role.
-
-	if ( ! hasPublishAction && isPending ) {
+	if ( isPublished || isScheduled ) {
 		return null;
 	}
 
@@ -148,28 +113,70 @@ export default function PostSavedState( {
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const shortLabel = __( 'Save' );
 
-	if ( ! isLargeViewport ) {
-		return (
-			<Button
-				className="editor-post-save-draft"
-				label={ label }
-				onClick={ () => savePost() }
-				shortcut={ displayShortcut.primary( 's' ) }
-				icon={ cloudUpload }
-			>
-				{ showIconLabels && shortLabel }
-			</Button>
-		);
+	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
+	const isSavedState = isSaving || isSaved;
+	const isDisabled = isSaving || isSaved || ! isSaveable;
+
+	let text;
+
+	if ( isSaving ) {
+		text = isAutosaving ? __( 'Autosaving' ) : __( 'Saving' );
+	} else if ( isSaved ) {
+		text = __( 'Saved' );
+	} else if ( isLargeViewport ) {
+		text = label;
+	} else if ( showIconLabels ) {
+		text = shortLabel;
 	}
 
+	const buttonAccessibleLabel = text || label;
+
+	/**
+	 * The tooltip needs to be enabled only if the button is not disabled. When
+	 * relying on the internal Button tooltip functionality, this causes the
+	 * resulting `button` element to be always removed and re-added to the DOM,
+	 * causing focus loss. An alternative approach to circumvent the issue
+	 * is not to use the `label` and `shortcut` props on `Button` (which would
+	 * trigger the tooltip), and instead manually wrap the `Button` in a separate
+	 * `Tooltip` component.
+	 */
+	const tooltipProps = isDisabled
+		? undefined
+		: {
+				text: buttonAccessibleLabel,
+				shortcut: displayShortcut.primary( 's' ),
+		  };
+
+	// Use common Button instance for all saved states so that focus is not
+	// lost.
 	return (
-		<Button
-			className="editor-post-save-draft"
-			onClick={ () => savePost() }
-			shortcut={ displayShortcut.primary( 's' ) }
-			isTertiary
-		>
-			{ label }
-		</Button>
+		<Tooltip { ...tooltipProps }>
+			<Button
+				className={
+					isSaveable || isSaving
+						? classnames( {
+								'editor-post-save-draft': ! isSavedState,
+								'editor-post-saved-state': isSavedState,
+								'is-saving': isSaving,
+								'is-autosaving': isAutosaving,
+								'is-saved': isSaved,
+								[ getAnimateClassName( {
+									type: 'loading',
+								} ) ]: isSaving,
+						  } )
+						: undefined
+				}
+				onClick={ isDisabled ? undefined : () => savePost() }
+				variant="tertiary"
+				size="compact"
+				icon={ isLargeViewport ? undefined : cloudUpload }
+				// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
+				aria-label={ buttonAccessibleLabel }
+				aria-disabled={ isDisabled }
+			>
+				{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
+				{ text }
+			</Button>
+		</Tooltip>
 	);
 }

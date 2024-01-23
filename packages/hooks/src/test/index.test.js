@@ -268,7 +268,7 @@ test( 'filters with the same and different priorities', () => {
 	addFilter( 'test_order', 'my_callback_fn_1d', callbacks.fn_1d, 1 );
 
 	expect( applyFilters( 'test_order', [] ) ).toEqual( [
-		// all except 2b and 3a, which we removed earlier
+		// All except 2b and 3a, which we removed earlier.
 		'1a',
 		'1b',
 		'1c',
@@ -516,7 +516,7 @@ test( 'remove all filter callbacks', () => {
 } );
 
 // Test doingAction, didAction, hasAction.
-test( 'Test doingAction, didAction and hasAction.', () => {
+test( 'doingAction, didAction and hasAction.', () => {
 	let actionCalls = 0;
 
 	addAction( 'another.action', 'my_callback', () => {} );
@@ -566,7 +566,7 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	doAction( 'another.action' );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 
-	// Verify an action with no handlers is still counted
+	// Verify an action with no handlers is still counted.
 	expect( didAction( 'unattached.action' ) ).toBe( 0 );
 	doAction( 'unattached.action' );
 	expect( doingAction( 'unattached.action' ) ).toBe( false );
@@ -711,7 +711,7 @@ test( 'adding hooks as a mixin', () => {
 } );
 
 // Test context.
-test( 'Test `this` context via composition', () => {
+test( '`this` context via composition', () => {
 	const testObject = { test: 'test this' };
 
 	testObject.hooks = createHooks();
@@ -742,6 +742,23 @@ test( 'adding an action triggers a hookAdded action passing all callback details
 		actionA,
 		9
 	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookAdded', 'my_callback' );
+	hookAddedSpy.mockClear();
+
+	hooksPrivateInstance.addAction( 'hookAdded', 'my_callback', hookAddedSpy );
+	hooksPrivateInstance.addAction( 'testAction', 'my_callback2', actionA, 9 );
+
+	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookAddedSpy ).toHaveBeenCalledWith(
+		'testAction',
+		'my_callback2',
+		actionA,
+		9
+	);
 } );
 
 test( 'adding a filter triggers a hookAdded action passing all callback details', () => {
@@ -750,6 +767,23 @@ test( 'adding a filter triggers a hookAdded action passing all callback details'
 	setupActionListener( 'hookAdded', hookAddedSpy );
 
 	addFilter( 'testFilter', 'my_callback3', filterA, 8 );
+	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookAddedSpy ).toHaveBeenCalledWith(
+		'testFilter',
+		'my_callback3',
+		filterA,
+		8
+	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookAdded', 'my_callback' );
+	hookAddedSpy.mockClear();
+
+	hooksPrivateInstance.addAction( 'hookAdded', 'my_callback', hookAddedSpy );
+	hooksPrivateInstance.addFilter( 'testFilter', 'my_callback3', filterA, 8 );
+
 	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
 	expect( hookAddedSpy ).toHaveBeenCalledWith(
 		'testFilter',
@@ -772,6 +806,27 @@ test( 'removing an action triggers a hookRemoved action passing all callback det
 		'testAction',
 		'my_callback2'
 	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookRemoved', 'my_callback' );
+	hookRemovedSpy.mockClear();
+
+	hooksPrivateInstance.addAction(
+		'hookRemoved',
+		'my_callback',
+		hookRemovedSpy
+	);
+
+	hooksPrivateInstance.addAction( 'testAction', 'my_callback2', actionA, 9 );
+	hooksPrivateInstance.removeAction( 'testAction', 'my_callback2' );
+
+	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookRemovedSpy ).toHaveBeenCalledWith(
+		'testAction',
+		'my_callback2'
+	);
 } );
 
 test( 'removing a filter triggers a hookRemoved action passing all callback details', () => {
@@ -781,6 +836,27 @@ test( 'removing a filter triggers a hookRemoved action passing all callback deta
 
 	addFilter( 'testFilter', 'my_callback3', filterA, 8 );
 	removeFilter( 'testFilter', 'my_callback3' );
+
+	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookRemovedSpy ).toHaveBeenCalledWith(
+		'testFilter',
+		'my_callback3'
+	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookRemoved', 'my_callback' );
+	hookRemovedSpy.mockClear();
+
+	hooksPrivateInstance.addAction(
+		'hookRemoved',
+		'my_callback',
+		hookRemovedSpy
+	);
+
+	hooksPrivateInstance.addFilter( 'testFilter', 'my_callback3', filterA, 8 );
+	hooksPrivateInstance.removeFilter( 'testFilter', 'my_callback3' );
 
 	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
 	expect( hookRemovedSpy ).toHaveBeenCalledWith(

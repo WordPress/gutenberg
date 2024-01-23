@@ -3,20 +3,33 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+function PostExcerpt() {
+	const excerpt = useSelect(
+		( select ) => select( editorStore ).getEditedPostAttribute( 'excerpt' ),
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
+
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
+				__nextHasNoMarginBottom
 				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
-				onChange={ ( value ) => onUpdateExcerpt( value ) }
+				onChange={ ( value ) => editPost( { excerpt: value } ) }
 				value={ excerpt }
 			/>
 			<ExternalLink
-				href={ __( 'https://wordpress.org/support/article/excerpt/' ) }
+				href={ __(
+					'https://wordpress.org/documentation/article/page-post-settings-sidebar/#excerpt'
+				) }
 			>
 				{ __( 'Learn more about manual excerpts' ) }
 			</ExternalLink>
@@ -24,17 +37,4 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			excerpt: select( 'core/editor' ).getEditedPostAttribute(
-				'excerpt'
-			),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateExcerpt( excerpt ) {
-			dispatch( 'core/editor' ).editPost( { excerpt } );
-		},
-	} ) ),
-] )( PostExcerpt );
+export default PostExcerpt;

@@ -1,8 +1,34 @@
+
 .block-editor-block-types-list__list-item {
 	display: block;
 	width: 33.33%;
 	padding: 0;
 	margin: 0;
+
+	&.is-synced {
+		.components-button.block-editor-block-types-list__item {
+			&:not(:disabled) {
+				.block-editor-block-icon.has-colors {
+					color: var(--wp-block-synced-color);
+				}
+
+				&:hover {
+					.block-editor-block-types-list__item-title {
+						color: var(--wp-block-synced-color) !important;
+						filter: brightness(0.95);
+					}
+
+					svg {
+						color: var(--wp-block-synced-color) !important;
+					}
+				}
+
+				&::after {
+					background: var(--wp-block-synced-color);
+				}
+			}
+		}
+	}
 }
 
 .components-button.block-editor-block-types-list__item {
@@ -18,7 +44,6 @@
 	background: transparent;
 	word-break: break-word;
 	border-radius: $radius-block-ui;
-	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 	position: relative;
@@ -31,8 +56,32 @@
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: var(--wp-admin-theme-color);
-			color: var(--wp-admin-theme-color) !important;
+			.block-editor-block-types-list__item-title {
+				color: var(--wp-admin-theme-color) !important;
+				filter: brightness(0.95);
+			}
+
+			svg {
+				color: var(--wp-admin-theme-color) !important;
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+				// This fixes drag-and-drop in Firefox.
+				pointer-events: none;
+			}
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&.is-active {
@@ -61,6 +110,10 @@
 	svg {
 		transition: all 0.15s ease-out;
 		@include reduce-motion("transition");
+	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
 	}
 }
 

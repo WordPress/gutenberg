@@ -5,38 +5,44 @@
 	display: none;
 }
 
-// Forcing some space above the list of options in
-// the dropdown to visually balance them.
-.block-editor-media-replace-flow__options .components-popover__content > div {
-	padding-top: $grid-unit-20;
-}
-
 .block-editor-media-replace-flow__indicator {
 	margin-left: 4px;
 }
 
 .block-editor-media-flow__url-input {
-	border-top: $border-width solid $gray-900;
-	margin-top: $grid-unit-15;
-	margin-right: -$grid-unit-15;
-	margin-left: -$grid-unit-15;
-	padding: $grid-unit-15 $grid-unit-30 0;
+	margin-right: -$grid-unit-10;
+	margin-left: -$grid-unit-10;
+	padding: $grid-unit-20;
+
+	&.has-siblings {
+		border-top: $border-width solid $gray-900;
+		margin-top: $grid-unit-10;
+		padding-bottom: $grid-unit-10;
+	}
 
 	.block-editor-media-replace-flow__image-url-label {
+		display: block;
 		top: $grid-unit-20;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.block-editor-link-control {
-		margin-top: -16px;
-		width: auto;
+		width: 300px; // Hardcoded width avoids resizing of control when switching between preview/edit.
 
-		.components-base-control .components-base-control__field {
-			margin-bottom: 0;
+		.block-editor-url-input {
+			padding: 0; // Cancel unnecessary default 1px padding in this case.
+			margin: 0; // Reset default LinkControl margins.
 		}
 
-		.block-editor-link-control__search-item-title {
-			max-width: 180px;
-			margin-top: $grid-unit-20;
+		.block-editor-link-control__search-item-title,
+		.block-editor-link-control__search-item-info {
+			max-width: 200px;
+			white-space: nowrap;
+		}
+
+		.block-editor-link-control__tools {
+			justify-content: flex-end;
+			padding: $grid-unit-20 var(--wp-admin-border-width-focus) var(--wp-admin-border-width-focus);
 		}
 
 		.block-editor-link-control__search-item.is-current {
@@ -45,12 +51,12 @@
 		}
 
 		.block-editor-link-control__search-input.block-editor-link-control__search-input input[type="text"] {
-			margin: 16px 0 0 0;
+			margin: 0;
 			width: 100%;
 		}
 
 		.block-editor-link-control__search-actions {
-			right: 4px;
+			padding: $grid-unit-10 0 0;
 		}
 	}
 }

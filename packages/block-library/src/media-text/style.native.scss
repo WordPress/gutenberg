@@ -116,6 +116,7 @@ $media-to-text: 12px;
 	color: #fff;
 	font-size: 14;
 	margin-top: 5;
+	text-align: center;
 }
 
 .uploadFailedTextVideo {
@@ -139,6 +140,10 @@ $media-to-text: 12px;
 .innerBlock {
 	padding-right: $media-to-text;
 	padding-left: $media-to-text;
+}
+
+.innerBlockPaddings {
+	padding: 0 $media-to-text $media-to-text;
 }
 
 // Media STACK

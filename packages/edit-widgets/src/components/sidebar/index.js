@@ -7,10 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEffect, Platform } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-import { ComplementaryArea } from '@wordpress/interface';
-import { BlockInspector } from '@wordpress/block-editor';
-import { cog } from '@wordpress/icons';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
+import {
+	ComplementaryArea,
+	store as interfaceStore,
+} from '@wordpress/interface';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+
+import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -29,13 +36,14 @@ const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
  * Internal dependencies
  */
 import WidgetAreas from './widget-areas';
+import { store as editWidgetsStore } from '../../store';
 
 function ComplementaryAreaTab( { identifier, label, isActive } ) {
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	return (
 		<Button
 			onClick={ () =>
-				enableComplementaryArea( 'core/edit-widgets', identifier )
+				enableComplementaryArea( editWidgetsStore.name, identifier )
 			}
 			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
 				'is-active': isActive,
@@ -54,32 +62,29 @@ function ComplementaryAreaTab( { identifier, label, isActive } ) {
 }
 
 export default function Sidebar() {
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const {
 		currentArea,
 		hasSelectedNonAreaBlock,
 		isGeneralSidebarOpen,
 		selectedWidgetAreaBlock,
 	} = useSelect( ( select ) => {
-		const {
-			getSelectedBlock,
-			getBlock,
-			getBlockParentsByBlockName,
-		} = select( 'core/block-editor' );
-		const { getActiveComplementaryArea } = select( 'core/interface' );
+		const { getSelectedBlock, getBlock, getBlockParentsByBlockName } =
+			select( blockEditorStore );
+		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();
 
-		let activeArea = getActiveComplementaryArea( 'core/edit-widgets' );
-		if ( ! activeArea ) {
+		const activeArea = getActiveComplementaryArea( editWidgetsStore.name );
+
+		let currentSelection = activeArea;
+		if ( ! currentSelection ) {
 			if ( selectedBlock ) {
-				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
+				currentSelection = BLOCK_INSPECTOR_IDENTIFIER;
 			} else {
-				activeArea = WIDGET_AREAS_IDENTIFIER;
+				currentSelection = WIDGET_AREAS_IDENTIFIER;
 			}
 		}
-
-		const isSidebarOpen = !! activeArea;
 
 		let widgetAreaBlock;
 		if ( selectedBlock ) {
@@ -96,11 +101,11 @@ export default function Sidebar() {
 		}
 
 		return {
-			currentArea: activeArea,
+			currentArea: currentSelection,
 			hasSelectedNonAreaBlock: !! (
 				selectedBlock && selectedBlock.name !== 'core/widget-area'
 			),
-			isGeneralSidebarOpen: isSidebarOpen,
+			isGeneralSidebarOpen: !! activeArea,
 			selectedWidgetAreaBlock: widgetAreaBlock,
 		};
 	}, [] );
@@ -160,10 +165,10 @@ export default function Sidebar() {
 			headerClassName="edit-widgets-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
-			closeLabel={ __( 'Close settings' ) }
+			closeLabel={ __( 'Close Settings' ) }
 			scope="core/edit-widgets"
 			identifier={ currentArea }
-			icon={ cog }
+			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ currentArea === WIDGET_AREAS_IDENTIFIER && (

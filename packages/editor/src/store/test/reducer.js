@@ -11,11 +11,14 @@ import {
 	isUpdatingSamePostProperty,
 	shouldOverwriteState,
 	getPostRawValue,
-	preferences,
 	saving,
 	postSavingLock,
 	postAutosavingLock,
+	removedPanels,
+	blockInserterPanel,
+	listViewPanel,
 } from '../reducer';
+import { setIsInserterOpened } from '../actions';
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -163,36 +166,6 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'preferences()', () => {
-		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
-			expect( state ).toEqual( {
-				insertUsage: {},
-				isPublishSidebarEnabled: true,
-			} );
-		} );
-
-		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, {} ) );
-			const state = preferences( original, {
-				type: 'DISABLE_PUBLISH_SIDEBAR',
-			} );
-
-			expect( state.isPublishSidebarEnabled ).toBe( false );
-		} );
-
-		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze(
-				preferences( { isPublishSidebarEnabled: false }, {} )
-			);
-			const state = preferences( original, {
-				type: 'ENABLE_PUBLISH_SIDEBAR',
-			} );
-
-			expect( state.isPublishSidebarEnabled ).toBe( true );
-		} );
-	} );
-
 	describe( 'saving()', () => {
 		it( 'should update when a request is started', () => {
 			const state = saving( null, {
@@ -293,6 +266,100 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'removedPanels', () => {
+		it( 'should remove panel', () => {
+			const original = deepFreeze( [] );
+			const state = removedPanels( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state ).toEqual( [ 'post-status' ] );
+		} );
+
+		it( 'should not remove already removed panel', () => {
+			const original = deepFreeze( [ 'post-status' ] );
+			const state = removedPanels( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state ).toBe( original );
+		} );
+	} );
+
+	describe( 'blockInserterPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( blockInserterPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should set the open state of the inserter panel', () => {
+			expect(
+				blockInserterPanel( false, setIsInserterOpened( true ) )
+			).toBe( true );
+			expect(
+				blockInserterPanel( true, setIsInserterOpened( false ) )
+			).toBe( false );
+		} );
+
+		it( 'should close the inserter when opening the list view panel', () => {
+			expect(
+				blockInserterPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'should not change the state when closing the list view panel', () => {
+			expect(
+				blockInserterPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: false,
+				} )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'listViewPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( listViewPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( listViewPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should set the open state of the list view panel', () => {
+			expect(
+				listViewPanel( false, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: true,
+				} )
+			).toBe( true );
+			expect(
+				listViewPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: false,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'should close the list view when opening the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should not change the state when closing the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
+				true
+			);
 		} );
 	} );
 } );
