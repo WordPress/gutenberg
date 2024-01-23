@@ -1060,6 +1060,9 @@ test.describe( 'Links', () => {
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
+			await pageUtils.pressKeys( 'Escape' );
+			await pageUtils.pressKeys( 'ArrowRight' );
+
 			// Reactivate the link.
 			await pageUtils.pressKeys( 'ArrowLeft' );
 			await pageUtils.pressKeys( 'ArrowLeft' );
