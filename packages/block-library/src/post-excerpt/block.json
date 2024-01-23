@@ -50,7 +50,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",
 	"style": "wp-block-post-excerpt"

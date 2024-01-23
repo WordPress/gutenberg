@@ -59,7 +59,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-query-pagination-editor",
 	"style": "wp-block-query-pagination"

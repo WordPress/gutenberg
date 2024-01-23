@@ -40,7 +40,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"style": "wp-block-preformatted"
 }

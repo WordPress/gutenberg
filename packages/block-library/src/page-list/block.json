@@ -48,7 +48,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

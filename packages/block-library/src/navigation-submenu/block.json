@@ -58,7 +58,8 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-navigation-submenu-editor",
 	"style": "wp-block-navigation-submenu"

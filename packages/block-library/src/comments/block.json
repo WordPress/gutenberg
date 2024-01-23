@@ -45,7 +45,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-comments-editor",
 	"usesContext": [ "postId", "postType" ]

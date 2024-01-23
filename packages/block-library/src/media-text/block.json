@@ -123,7 +123,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-media-text-editor",
 	"style": "wp-block-media-text"

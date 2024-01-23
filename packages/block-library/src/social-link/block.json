@@ -31,7 +31,8 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-social-link-editor"
 }

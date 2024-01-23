@@ -69,7 +69,8 @@
 				"fontSize": "1.5em",
 				"lineHeight": "1.6"
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-pullquote-editor",
 	"style": "wp-block-pullquote"

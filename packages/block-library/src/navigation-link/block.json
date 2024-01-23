@@ -77,7 +77,8 @@
 				"fontSize": true
 			}
 		},
-		"renaming": false
+		"renaming": false,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-navigation-link-editor",
 	"style": "wp-block-navigation-link"

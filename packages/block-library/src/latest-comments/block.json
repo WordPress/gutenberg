@@ -46,7 +46,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-latest-comments-editor",
 	"style": "wp-block-latest-comments"

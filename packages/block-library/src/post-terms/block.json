@@ -54,7 +54,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"style": "wp-block-post-terms"
 }

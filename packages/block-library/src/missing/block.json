@@ -23,6 +23,7 @@
 		"customClassName": false,
 		"inserter": false,
 		"html": false,
-		"reusable": false
+		"reusable": false,
+		"clientNavigation": true
 	}
 }

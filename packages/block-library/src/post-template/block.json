@@ -48,7 +48,8 @@
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"style": "wp-block-post-template",
 	"editorStyle": "wp-block-post-template-editor"

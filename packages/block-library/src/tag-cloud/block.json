@@ -48,7 +48,8 @@
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
 			"__experimentalLetterSpacing": true
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-tag-cloud-editor"
 }

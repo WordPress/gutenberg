@@ -19,6 +19,7 @@
 		"customClassName": false,
 		"html": false,
 		"inserter": false,
-		"renaming": false
+		"renaming": false,
+		"clientNavigation": true
 	}
 }

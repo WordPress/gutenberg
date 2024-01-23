@@ -78,7 +78,8 @@
 				"margin": true,
 				"padding": false
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

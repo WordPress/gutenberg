@@ -71,7 +71,8 @@
 		"__unstablePasteTextInline": true,
 		"__experimentalSelector": "ol,ul",
 		"__experimentalOnMerge": true,
-		"__experimentalSlashInserter": true
+		"__experimentalSlashInserter": true,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

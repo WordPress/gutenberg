@@ -54,7 +54,8 @@
 				"margin": false,
 				"padding": false
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-audio-editor",
 	"style": "wp-block-audio"

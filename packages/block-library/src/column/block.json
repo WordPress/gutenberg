@@ -68,6 +68,7 @@
 				"fontSize": true
 			}
 		},
-		"layout": true
+		"layout": true,
+		"clientNavigation": true
 	}
 }

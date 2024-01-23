@@ -45,7 +45,8 @@
 				"margin": false,
 				"padding": false
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"styles": [
 		{

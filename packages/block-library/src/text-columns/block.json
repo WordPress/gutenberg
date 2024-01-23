@@ -29,7 +29,8 @@
 		}
 	},
 	"supports": {
-		"inserter": false
+		"inserter": false,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-text-columns-editor",
 	"style": "wp-block-text-columns"

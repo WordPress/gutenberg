@@ -117,7 +117,8 @@
 				"radius": true,
 				"width": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"selectors": {
 		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",

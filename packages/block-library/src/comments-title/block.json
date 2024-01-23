@@ -61,6 +61,7 @@
 				"__experimentalFontStyle": true,
 				"__experimentalFontWeight": true
 			}
-		}
+		},
+		"clientNavigation": true
 	}
 }

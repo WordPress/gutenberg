@@ -50,7 +50,8 @@
 			"text": false,
 			"background": false,
 			"__experimentalDuotone": "img"
-		}
+		},
+		"clientNavigation": true
 	},
 	"selectors": {
 		"border": ".wp-block-avatar img"

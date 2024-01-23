@@ -58,7 +58,8 @@
 		},
 		"spacing": {
 			"blockGap": true
-		}
+		},
+		"clientNavigation": true
 	},
 	"styles": [
 		{

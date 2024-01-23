@@ -25,6 +25,7 @@
 	},
 	"supports": {
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"clientNavigation": true
 	}
 }

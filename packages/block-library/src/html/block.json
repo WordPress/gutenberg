@@ -16,7 +16,8 @@
 	"supports": {
 		"customClassName": false,
 		"className": false,
-		"html": false
+		"html": false,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-html-editor"
 }

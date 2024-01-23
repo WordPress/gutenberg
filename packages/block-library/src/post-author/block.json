@@ -61,7 +61,8 @@
 				"background": true,
 				"text": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"style": "wp-block-post-author"
 }

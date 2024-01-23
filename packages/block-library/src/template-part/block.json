@@ -24,7 +24,8 @@
 		"align": true,
 		"html": false,
 		"reusable": false,
-		"renaming": false
+		"renaming": false,
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }

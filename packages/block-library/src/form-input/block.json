@@ -67,7 +67,8 @@
 			"__experimentalDefaultControls": {
 				"radius": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"style": [ "wp-block-form-input" ]
 }

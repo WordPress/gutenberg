@@ -11,5 +11,8 @@
 	"description": "A submission button for forms.",
 	"keywords": [ "submit", "button", "form" ],
 	"textdomain": "default",
-	"style": [ "wp-block-form-submit-button" ]
+	"style": [ "wp-block-form-submit-button" ],
+	"supports": {
+		"clientNavigation": true
+	}
 }

@@ -87,7 +87,8 @@
 		},
 		"layout": {
 			"allowSizingOnChildren": true
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

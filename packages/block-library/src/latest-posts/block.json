@@ -110,7 +110,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-latest-posts-editor",
 	"style": "wp-block-latest-posts"

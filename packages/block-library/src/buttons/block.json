@@ -39,7 +39,8 @@
 			"default": {
 				"type": "flex"
 			}
-		}
+		},
+		"clientNavigation": true
 	},
 	"editorStyle": "wp-block-buttons-editor",
 	"style": "wp-block-buttons"

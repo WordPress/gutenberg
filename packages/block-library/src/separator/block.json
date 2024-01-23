@@ -28,7 +28,8 @@
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ]
-		}
+		},
+		"clientNavigation": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

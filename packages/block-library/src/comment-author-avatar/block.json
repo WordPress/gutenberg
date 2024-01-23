@@ -39,6 +39,7 @@
 			"__experimentalSkipSerialization": true,
 			"margin": true,
 			"padding": true
-		}
+		},
+		"clientNavigation": true
 	}
 }
