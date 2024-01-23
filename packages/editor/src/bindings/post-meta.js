@@ -2,19 +2,22 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
 
-const { getCurrentPostType } = select( editorStore );
-
 export default {
 	name: 'post_meta',
 	label: __( 'Post Meta' ),
 	useSource( props, sourceAttributes ) {
+		const { getCurrentPostType } = useSelect( ( select ) => {
+			return {
+				getCurrentPostType: select( editorStore ).getCurrentPostType,
+			};
+		} );
 		const { context } = props;
 		const { value: metaKey } = sourceAttributes;
 		const postType = context.postType
