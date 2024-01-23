@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Collection::get_config_and_data().
+ * Test WP_Font_Collection::get_content().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,9 +8,9 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Collection::get_config_and_data
+ * @covers WP_Font_Collection::get_content
  */
-class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
+class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
@@ -34,8 +34,8 @@ class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
 
 		// Mock the response body.
 		$mock_collection_data = array(
-			'fontFamilies' => 'mock',
-			'categories'   => 'mock',
+			'font_families' => array( 'mock' ),
+			'categories'    => array( 'mock' ),
 		);
 
 		return array(
@@ -47,14 +47,14 @@ class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_should_get_config_and_data
+	 * @dataProvider data_should_get_content
 	 *
 	 * @param array $config Font collection config options.
-	 * @param array $expected_data Expected data.
+	 * @param array $expected_data Expected output data.
 	 */
-	public function test_should_get_config_and_data( $config, $expected_data ) {
+	public function test_should_get_content( $config, $expected_data ) {
 		$collection = new WP_Font_Collection( $config );
-		$this->assertSame( $expected_data, $collection->get_config_and_data() );
+		$this->assertSame( $expected_data, $collection->get_content() );
 	}
 
 	/**
@@ -62,12 +62,12 @@ class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_should_get_config_and_data() {
+	public function data_should_get_content() {
 		$mock_file = wp_tempnam( 'my-collection-data-' );
-		file_put_contents( $mock_file, '{"this is mock data":true}' );
+		file_put_contents( $mock_file, '{"font_families":[ "mock" ], "categories":[ "mock" ] }' );
 
 		return array(
-			'with a file' => array(
+			'with a file'                           => array(
 				'config'        => array(
 					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
@@ -75,13 +75,11 @@ class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
 					'src'         => $mock_file,
 				),
 				'expected_data' => array(
-					'slug'        => 'my-collection',
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-					'data'        => array( 'this is mock data' => true ),
+					'font_families' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
 				),
 			),
-			'with a url'  => array(
+			'with a url'                            => array(
 				'config'        => array(
 					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
@@ -89,27 +87,33 @@ class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
 					'src'         => 'https://localhost/fonts/mock-font-collection.json',
 				),
 				'expected_data' => array(
-					'slug'        => 'my-collection-with-url',
-					'name'        => 'My Collection with URL',
-					'description' => 'My collection description',
-					'data'        => array(
-						'fontFamilies' => 'mock',
-						'categories'   => 'mock',
-					),
+					'font_families' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
 				),
 			),
-			'with data'   => array(
+			'with font_families and categories'     => array(
 				'config'        => array(
-					'slug'        => 'my-collection',
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-					'data'        => array( 'this is mock data' => true ),
+					'slug'          => 'my-collection',
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
 				),
 				'expected_data' => array(
-					'slug'        => 'my-collection',
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-					'data'        => array( 'this is mock data' => true ),
+					'font_families' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
+				),
+			),
+			'with font_families without categories' => array(
+				'config'        => array(
+					'slug'          => 'my-collection',
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( 'mock' ),
+				),
+				'expected_data' => array(
+					'font_families' => array( 'mock' ),
+					'categories'    => array(),
 				),
 			),
 		);
