@@ -99,6 +99,22 @@ export const decorators = [
 ];
 
 export const parameters = {
+	// For @geometricpanda/storybook-addon-badges
+	badgesConfig: {
+		private: {
+			title: '🔒 Private',
+			tooltip: {
+				title: 'Component is locked as a private API',
+				desc: 'We do not yet recommend using this outside of the Gutenberg codebase.',
+				links: [
+					{
+						title: 'About @wordpress/private-apis',
+						href: 'https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/',
+					},
+				],
+			},
+		},
+	},
 	controls: {
 		sort: 'requiredFirst',
 	},

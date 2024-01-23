@@ -107,6 +107,7 @@
 		"@emotion/babel-plugin": "11.3.0",
 		"@emotion/jest": "11.7.1",
 		"@emotion/native": "11.0.0",
+		"@geometricpanda/storybook-addon-badges": "2.0.1",
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
