@@ -35,6 +35,8 @@ const prefixFunctions = [
 	'wp_get_global_settings',
 ];
 
+const suffixClasses = [ 'WP_Navigation_Block_Renderer' ];
+
 /**
  * Escapes the RegExp special characters.
  *
@@ -125,23 +127,35 @@ module.exports = [
 							'build/widgets/blocks/',
 					} ).flatMap( ( [ from, to ] ) => [
 						{
-							from: `${ from }/**/index.php`,
+							from: `${ from }/**/*.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname ] = absoluteFilename.match(
-									new RegExp(
-										`([\\w-]+)${ escapeRegExp(
-											sep
-										) }index\\.php$`
-									)
-								);
+								const [ , dirname, filename ] =
+									absoluteFilename.match(
+										new RegExp(
+											`([\\w-]+)${ escapeRegExp(
+												sep
+											) }([\\w-]+)\\.php$`
+										)
+									);
 
-								return join( to, `${ dirname }.php` );
+								// This assumes every file has a unique name.
+								// This should be true if the only extra files we add are classes
+								// and the class files are named correctly.
+								return join(
+									to,
+									`${
+										filename === 'index'
+											? dirname
+											: filename
+									}.php`
+								);
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
+								const suffix = '_Gutenberg';
 								content = content.toString();
 
-								// Within content, search and prefix any function calls from
+								// Within content, search and prefix any function calls from the
 								// `prefixFunctions` list. This is needed because some functions
 								// are called inside block files, but have been declared elsewhere.
 								// So with the rename we can call Gutenberg override functions, but the
@@ -156,6 +170,19 @@ module.exports = [
 											/^wp_/,
 											''
 										) }`
+								);
+
+								// Within content, search and prefix any classes calls from the
+								// `suffixClasses` list. This is needed because some classes
+								// are called inside block files, but also exist in core.
+								// With the rename we can use the Gutenberg class in the plugin,
+								// without having to worry about duplicate class names with core.
+								content = content.replace(
+									new RegExp(
+										suffixClasses.join( '|' ),
+										'g'
+									),
+									( match ) => `${ match }${ suffix }`
 								);
 
 								// Within content, search for any function definitions. For
