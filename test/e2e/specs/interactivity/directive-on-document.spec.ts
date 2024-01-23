@@ -41,9 +41,12 @@ test.describe( 'data-wp-on-document', () => {
 		// Add the element back.
 		await visibilityButton.click();
 		await expect( counter ).toHaveText( '1' );
+		// Wait for the JS to reattach the event listener.
+		// https://github.com/WordPress/gutenberg/pull/58008
+		await page.evaluate(
+			() => new Promise( ( resolve ) => requestAnimationFrame( resolve ) )
+		);
 		await page.keyboard.press( 'ArrowDown' );
-		// Force a new locator to prevent flaky tests.
-		const updatedCounter = page.getByTestId( 'counter' );
-		await expect( updatedCounter ).toHaveText( '2' );
+		await expect( counter ).toHaveText( '2' );
 	} );
 } );
