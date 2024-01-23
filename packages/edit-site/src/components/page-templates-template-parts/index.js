@@ -13,7 +13,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -162,23 +162,46 @@ function Preview( { content, viewType } ) {
 
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
-	const { layout } = params;
+	const { activeView = 'all', layout } = params;
+	const { records: allTemplates, isResolving: isLoadingData } =
+		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+			per_page: -1,
+		} );
 	const defaultView = useMemo( () => {
 		return {
 			...DEFAULT_VIEW,
 			type: window?.__experimentalAdminViews
 				? layout ?? DEFAULT_VIEW.type
 				: DEFAULT_VIEW.type,
+			filters:
+				activeView !== 'all'
+					? [
+							{
+								field: 'author',
+								operator: 'in',
+								value: activeView,
+							},
+					  ]
+					: [],
 		};
-	}, [ layout ] );
+	}, [ layout, activeView ] );
 	const [ view, setView ] = useState( defaultView );
-	const { records, isResolving: isLoadingData } = useEntityRecords(
-		'postType',
-		postType,
-		{
-			per_page: -1,
-		}
-	);
+	useEffect( () => {
+		setView( ( currentView ) => ( {
+			...currentView,
+			filters:
+				activeView !== 'all'
+					? [
+							{
+								field: 'author',
+								operator: 'in',
+								value: activeView,
+							},
+					  ]
+					: [],
+		} ) );
+	}, [ activeView ] );
+
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
