@@ -13,11 +13,7 @@ export default {
 	name: 'post_meta',
 	label: __( 'Post Meta' ),
 	useSource( props, sourceAttributes ) {
-		const { getCurrentPostType } = useSelect( ( select ) => {
-			return {
-				getCurrentPostType: select( editorStore ).getCurrentPostType,
-			};
-		} );
+		const { getCurrentPostType } = useSelect( editorStore );
 		const { context } = props;
 		const { value: metaKey } = sourceAttributes;
 		const postType = context.postType

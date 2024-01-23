@@ -33,21 +33,11 @@ const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
 			const { clientId, name: blockName } = useBlockEditContext();
-
-			const {
-				getBlockBindingsSource,
-				getBlockAttributes,
-				updateBlockAttributes,
-			} = useSelect( ( select ) => {
-				return {
-					getBlockBindingsSource: unlock( select( blockEditorStore ) )
-						.getBlockBindingsSource,
-					getBlockAttributes:
-						select( blockEditorStore ).getBlockAttributes,
-					updateBlockAttributes:
-						select( blockEditorStore ).updateBlockAttributes,
-				};
-			}, [] );
+			const { getBlockBindingsSource } = unlock(
+				useSelect( blockEditorStore )
+			);
+			const { getBlockAttributes, updateBlockAttributes } =
+				useSelect( blockEditorStore );
 
 			const updatedAttributes = getBlockAttributes( clientId );
 			if ( updatedAttributes?.metadata?.bindings ) {
