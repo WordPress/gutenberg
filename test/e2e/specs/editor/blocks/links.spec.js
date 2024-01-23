@@ -452,6 +452,7 @@ test.describe( 'Links', () => {
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
 		await pageUtils.pressKeys( 'End' );
+		await expect( linkPopover ).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
@@ -614,6 +615,13 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'w.org' );
 
 		await page.keyboard.press( 'Enter' );
+		// Close the link control to return the caret to the canvas
+		const linkPopover = LinkUtils.getLinkPopover();
+		await pageUtils.pressKeys( 'Escape' );
+		// Deselect the link text by moving the caret to the end of the line
+		// and the link popover should not be displayed.
+		await pageUtils.pressKeys( 'End' );
+		await expect( linkPopover ).toBeHidden();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -636,17 +644,12 @@ test.describe( 'Links', () => {
 		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
-		const linkPopover = LinkUtils.getLinkPopover();
-
 		// Update the link.
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
-		// Navigate back to the popover.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Navigate back to inputs to verify appears as changed.
-		await pageUtils.pressKeys( 'primary+k' );
+		// Navigate back to the link editing state inputs to verify appears as changed.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
 
 		expect(
 			await page
