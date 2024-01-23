@@ -120,6 +120,8 @@ export default function useSyncPathWithURL() {
 				( navigatorLocation.path === '/page' &&
 					window?.__experimentalAdminViews ) ||
 				( navigatorLocation.path === '/wp_template/all' &&
+					window?.__experimentalAdminViews ) ||
+				( navigatorLocation.path === '/wp_template_part/all' &&
 					window?.__experimentalAdminViews )
 			) {
 				updateUrlParams( {
