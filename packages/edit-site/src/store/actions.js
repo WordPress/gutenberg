@@ -582,6 +582,16 @@ export const toggleDistractionFree =
 					{
 						id: 'core/edit-site/distraction-free-mode/notice',
 						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry
+										.dispatch( preferencesStore )
+										.toggle( 'core', 'distractionFree' );
+								},
+							},
+						],
 					}
 				);
 		} );
