@@ -200,7 +200,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 
 	const { records, isResolving: isLoadingData } = useEntityRecords(
 		'postType',
-		TEMPLATE_POST_TYPE,
+		postType,
 		{
 			per_page: -1,
 		}

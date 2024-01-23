@@ -56,7 +56,7 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 			// accessed the Patterns page, return to the dashboard.
 			isRoot={ isTemplatePartsMode && ! didAccessPatternsPage }
 			title={ config[ postType ].title }
-			description={ config[ postType ].description + 'ok' }
+			description={ config[ postType ].description }
 			backPath={ config[ postType ].backPath }
 			content={
 				<DataviewsTemplatesSidebarContent activeView={ activeView } />
