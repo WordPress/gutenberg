@@ -20,31 +20,30 @@ const withDeprecatedKeys = ( originalGet ) => ( state, scope, name ) => {
 		'showListViewByDefault',
 	];
 
+	// Check if setting is in the list and scope is either 'core/edit-post' or 'core/edit-site'
 	if (
 		settingsToMoveToCore.includes( name ) &&
 		[ 'core/edit-post', 'core/edit-site' ].includes( scope )
 	) {
-		deprecated(
-			`wp.data.select( 'core/preferences' ).get( '${ scope }', '${ name }' )`,
-			{
-				since: '6.5',
-				alternative: `wp.data.select( 'core/preferences' ).get( 'core', '${ name }' )`,
-			}
-		);
-
 		const value = originalGet( state, 'core', name );
 
-		// Hotfix for 17.5. Some of the preferences in the list above haven't been
-		// migrated to core in 17.5 (i.e: `editorMode`, https://github.com/WordPress/gutenberg/pull/57642))
-		// so we should fallback to the passed scope to avoid unexpected `undefined` values.
-		if ( value === undefined ) {
-			console.error('KAWABANGA', name );
-			return originalGet( state, scope, name );
+		// If the value is found in the 'core' scope, return it and show deprecation message
+		if ( value !== undefined ) {
+			deprecated(
+				`wp.data.select( 'core/preferences' ).get( '${ scope }', '${ name }' )`,
+				{
+					since: '6.5',
+					alternative: `wp.data.select( 'core/preferences' ).get( 'core', '${ name }' )`,
+				}
+			);
+
+			return value;
 		}
 
-		return originalGet( state, 'core', name );
+		// If the value is not found in the 'core' scope, return it from the original scope without deprecation message
 	}
 
+	// Fallback to original scope for other cases
 	return originalGet( state, scope, name );
 };
 
