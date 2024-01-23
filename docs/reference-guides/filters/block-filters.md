@@ -189,7 +189,7 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				<InspectorControls>
 					<PanelBody>My custom control</PanelBody>
 				</InspectorControls>
