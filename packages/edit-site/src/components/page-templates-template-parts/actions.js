@@ -168,6 +168,8 @@ export const renameTemplateAction = {
 	id: 'rename-template',
 	label: __( 'Rename' ),
 	isEligible: ( template ) => {
+		// We can only remove templates or template parts that can be removed.
+		// Additionally in the case of templates, we can only remove custom templates.
 		if (
 			! isTemplateRemovable( template ) ||
 			( template.type === TEMPLATE_POST_TYPE && ! template.is_custom )
