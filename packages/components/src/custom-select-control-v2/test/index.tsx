@@ -46,7 +46,6 @@ const props = {
 			},
 		},
 	],
-	__nextUnconstrainedWidth: true,
 };
 
 const ControlledCustomSelect = ( { options }: any ) => {
