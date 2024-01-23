@@ -9,7 +9,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { unlock } from '../../lock-unlock';
 import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
-import DataviewsPatterns from '../page-patterns/dataviews-patterns';
+import PagePatterns from '../page-patterns';
 import PagePages from '../page-pages';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
 
@@ -111,7 +111,7 @@ export default function useLayoutAreas() {
 	if ( path === '/patterns' ) {
 		return {
 			areas: {
-				content: <DataviewsPatterns />,
+				content: <PagePatterns />,
 			},
 		};
 	}
