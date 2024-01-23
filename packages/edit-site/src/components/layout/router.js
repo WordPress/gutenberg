@@ -27,23 +27,28 @@ export default function useLayoutAreas() {
 	const { postType, postId, path, layout, isCustom } = params ?? {};
 	// Regular page
 	if ( path === '/page' ) {
-		const isListLayout =
-			isCustom !== 'true' && ( ! layout || layout === 'list' );
 		return {
 			areas: {
-				content: window.__experimentalAdminViews ? (
-					<PagePages />
-				) : undefined,
-				preview: ( isListLayout ||
-					! window.__experimentalAdminViews ) && (
+				content: undefined,
+				preview: <Editor isLoading={ isSiteEditorLoading } />,
+			},
+			widths: {
+				content: undefined,
+			},
+		};
+	}
+
+	if ( path === '/pages' && window?.__experimentalAdminViews ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
+		return {
+			areas: {
+				content: <PagePages />,
+				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
 			},
 			widths: {
-				content:
-					window.__experimentalAdminViews && isListLayout
-						? 380
-						: undefined,
+				content: isListLayout ? 380 : undefined,
 			},
 		};
 	}

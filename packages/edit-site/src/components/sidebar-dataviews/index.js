@@ -15,7 +15,7 @@ import DataViewItem from './dataview-item';
 import CustomDataViewsList from './custom-dataviews-list';
 
 const PATH_TO_TYPE = {
-	'/page': 'page',
+	'/pages': 'page',
 };
 
 export default function DataViewsSidebarContent() {
