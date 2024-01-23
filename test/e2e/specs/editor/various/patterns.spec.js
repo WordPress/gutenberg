@@ -141,7 +141,16 @@ test.describe( 'Synced pattern', () => {
 				{
 					name: 'core/block',
 					attributes: { ref: expect.any( Number ) },
-					innerBlocks: [],
+					innerBlocks: [
+						{
+							attributes: {
+								content: 'A useful paragraph to reuse',
+								dropCap: false,
+							},
+							innerBlocks: [],
+							name: 'core/paragraph',
+						},
+					],
 				},
 			] );
 		const after = await editor.getBlocks();
