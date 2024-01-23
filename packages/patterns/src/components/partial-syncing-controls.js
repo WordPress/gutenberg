@@ -62,7 +62,6 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 					source: {
 						name: 'pattern_attributes',
 					},
-					lockEditorUI: false,
 				};
 			}
 		}

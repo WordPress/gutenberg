@@ -45,6 +45,7 @@ import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
+import { unlock } from '../../lock-unlock';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -300,14 +301,16 @@ export function RichTextWrapper(
 
 	const bindings = getBlockAttributes( clientId )?.metadata?.bindings;
 	const blockTypeAttributes = getBlockType( blockName ).attributes;
+	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
 	let shouldDisableEditing = false;
 	if ( bindings )
 		for ( const [ attribute, settings ] of Object.entries( bindings ) ) {
 			// If any of the attributes with source "rich-text" is part of the bindings,
-			// disable editing unless it is specified otherwise.
+			// has a source with `lockAttributesEditing`, disable it.
 			if (
 				blockTypeAttributes?.[ attribute ]?.source === 'rich-text' &&
-				settings.lockEditorUI !== false
+				getBlockBindingsSource( settings.source.name )
+					?.lockAttributesEditing
 			) {
 				shouldDisableEditing = true;
 				break;

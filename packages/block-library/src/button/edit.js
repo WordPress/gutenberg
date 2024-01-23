@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { unlock } from '../lock-unlock';
 
 /**
  * WordPress dependencies
@@ -229,9 +230,11 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
+	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
 	const lockUrlControls =
 		!! metadata?.bindings?.url &&
-		metadata?.bindings?.url?.lockEditorUI !== false;
+		getBlockBindingsSource( metadata?.bindings?.url?.source?.name )
+			?.lockAttributesEditing === true;
 
 	return (
 		<>

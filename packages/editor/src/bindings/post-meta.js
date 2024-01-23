@@ -38,4 +38,5 @@ export default {
 			useValue: [ metaValue, updateMetaValue ],
 		};
 	},
+	lockAttributesEditing: true,
 };

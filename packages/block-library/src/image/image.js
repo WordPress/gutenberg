@@ -411,15 +411,24 @@ export default function Image( {
 		</InspectorControls>
 	);
 
+	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
+	const {
+		url: urlBinding,
+		alt: altBinding,
+		title: titleBinding,
+	} = metadata?.bindings || {};
 	const lockUrlControls =
-		!! metadata?.bindings?.url &&
-		metadata?.bindings?.url?.lockEditorUI !== false;
+		!! urlBinding &&
+		getBlockBindingsSource( urlBinding?.source?.name )
+			?.lockAttributesEditing === true;
 	const lockAltControls =
-		!! metadata?.bindings?.alt &&
-		metadata?.bindings?.alt?.lockEditorUI !== false;
+		!! altBinding &&
+		getBlockBindingsSource( altBinding?.source?.name )
+			?.lockAttributesEditing === true;
 	const lockTitleControls =
-		!! metadata?.bindings?.title &&
-		metadata?.bindings?.title?.lockEditorUI !== false;
+		!! titleBinding &&
+		getBlockBindingsSource( titleBinding?.source?.name )
+			?.lockAttributesEditing === true;
 
 	const controls = (
 		<>

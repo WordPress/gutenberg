@@ -2024,6 +2024,7 @@ function blockBindingsSources( state = {}, action ) {
 			[ action.sourceName ]: {
 				label: action.sourceLabel,
 				useSource: action.useSource,
+				lockAttributesEditing: action.lockAttributesEditing,
 			},
 		};
 	}

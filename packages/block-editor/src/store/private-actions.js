@@ -367,5 +367,6 @@ export function registerBlockBindingsSource( source ) {
 		sourceName: source.name,
 		sourceLabel: source.label,
 		useSource: source.useSource,
+		lockAttributesEditing: source.lockAttributesEditing,
 	};
 }
