@@ -11,7 +11,6 @@ import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
 import DataviewsPatterns from '../page-patterns/dataviews-patterns';
 import PagePages from '../page-pages';
-import PagePatterns from '../page-patterns';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
 
 import {
@@ -112,11 +111,7 @@ export default function useLayoutAreas() {
 	if ( path === '/patterns' ) {
 		return {
 			areas: {
-				content: window?.__experimentalAdminViews ? (
-					<DataviewsPatterns />
-				) : (
-					<PagePatterns />
-				),
+				content: <DataviewsPatterns />,
 			},
 		};
 	}
