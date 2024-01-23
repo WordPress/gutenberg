@@ -39,11 +39,6 @@ test.describe( 'data-wp-on-window', () => {
 		// Add the element back.
 		await visibilityButton.click();
 		await expect( counter ).toHaveText( '1' );
-		// Wait for the JS to reattach the event listener.
-		// https://github.com/WordPress/gutenberg/pull/58008
-		await page.evaluate(
-			() => new Promise( ( resolve ) => requestAnimationFrame( resolve ) )
-		);
 		await page.setViewportSize( { width: 200, height: 600 } );
 		await expect( counter ).toHaveText( '2' );
 	} );
