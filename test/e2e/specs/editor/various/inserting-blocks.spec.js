@@ -698,6 +698,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 					)
 				)
 				.toBe( 'core/image' );
+
+			// Restore the viewport.
+			await pageUtils.setBrowserViewport( 'large' );
 		} );
 	} );
 } );
