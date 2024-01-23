@@ -309,6 +309,8 @@ export function BlockSettingsDropdown( {
 				blocks,
 			} ) => (
 				<DropdownMenu
+					// TODO: should we partially enable features from the modal behaviour?
+					modal={ false }
 					open={ open }
 					// TODO: will this work?
 					onOpenChange={ onToggle }

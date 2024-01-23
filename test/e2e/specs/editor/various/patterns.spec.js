@@ -66,9 +66,6 @@ test.describe( 'Unsynced pattern', () => {
 			)
 			.toEqual( before );
 
-		// Dimiss "Options" dropdown menu
-		await page.keyboard.press( 'Escape' );
-
 		// Check that the new pattern is available in the inserter and that it gets inserted as
 		// a plain paragraph block.
 		await page.getByLabel( 'Toggle block inserter' ).click();

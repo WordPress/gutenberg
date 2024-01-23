@@ -78,9 +78,6 @@ test.describe( 'Block Locking', () => {
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
-		// Hide options dropdown menu.
-		await page.keyboard.press( 'Escape' );
-
 		await editor.clickBlockToolbarButton( 'Unlock' );
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
