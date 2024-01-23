@@ -10,7 +10,6 @@ import { __unstableSerializeAndClean } from '@wordpress/blocks';
  */
 import { STORE_NAME } from './name';
 import { updateFootnotesFromMeta } from './footnotes';
-import { unlock } from './private-apis';
 
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
@@ -152,14 +151,8 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecordWithBlocks } = unlock(
-				select( STORE_NAME )
-			);
-			const editedRecord = getEditedEntityRecordWithBlocks(
-				kind,
-				name,
-				id
-			);
+			const { getEditedEntityRecord } = select( STORE_NAME );
+			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
 				blocks: editedRecord.blocks,
 				content: editedRecord.content,

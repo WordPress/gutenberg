@@ -9,6 +9,7 @@ import createSelector from 'rememo';
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -426,6 +427,9 @@ export function __experimentalGetEntityRecordNoResolver<
 	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
 
+const EMPTY_BLOCKS = [];
+const entityBlocksCache = new Map();
+
 /**
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
@@ -450,22 +454,36 @@ export const getRawEntityRecord = createSelector(
 			name,
 			key
 		);
-		return (
-			record &&
-			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if (
-					isRawAttribute( getEntityConfig( state, kind, name ), _key )
-				) {
-					// Because edits are the "raw" attribute values,
-					// we return those from record selectors to make rendering,
-					// comparisons, and joins with edits easier.
-					accumulator[ _key ] = record[ _key ]?.raw ?? record[ _key ];
-				} else {
-					accumulator[ _key ] = record[ _key ];
+		if ( ! record ) {
+			return;
+		}
+		const output = Object.keys( record ).reduce( ( accumulator, _key ) => {
+			if (
+				isRawAttribute( getEntityConfig( state, kind, name ), _key )
+			) {
+				// Because edits are the "raw" attribute values,
+				// we return those from record selectors to make rendering,
+				// comparisons, and joins with edits easier.
+				accumulator[ _key ] = record[ _key ]?.raw ?? record[ _key ];
+			} else {
+				accumulator[ _key ] = record[ _key ];
+			}
+			return accumulator;
+		}, {} as any );
+
+		if ( ! output.blocks ) {
+			if ( output.content && typeof output.content !== 'function' ) {
+				if ( ! entityBlocksCache.has( record ) ) {
+					entityBlocksCache.set( record, parse( output.content ) );
 				}
-				return accumulator;
-			}, {} as any )
-		);
+
+				output.blocks = entityBlocksCache.get( record );
+			} else {
+				output.blocks = EMPTY_BLOCKS;
+			}
+		}
+
+		return output;
 	},
 	(
 		state: State,
