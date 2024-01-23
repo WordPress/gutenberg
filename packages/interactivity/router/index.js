@@ -150,7 +150,7 @@ export const { state, actions } = store( 'core/router', {
 		 * @param {string}  [options.html]  HTML string to be used instead of
 		 *                                  fetching the requested URL.
 		 */
-		*prefetch( url, options = {} ) {
+		prefetch( url, options = {} ) {
 			url = cleanUrl( url );
 			if ( options.force || ! pages.has( url ) ) {
 				pages.set( url, fetchPage( url, options ) );
