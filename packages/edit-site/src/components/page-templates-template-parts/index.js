@@ -132,7 +132,7 @@ function AuthorField( { item, viewType } ) {
 	);
 }
 
-function Preview( { content, viewType } ) {
+function Preview( { item, viewType } ) {
 	const settings = usePatternSettings();
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
@@ -163,11 +163,11 @@ function Preview( { content, viewType } ) {
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || item.title }
 				>
-					{ isEmpty ? (
-						__( 'Empty template' )
-					) : (
-						<BlockPreview blocks={ blocks } />
-					) }
+					{ isEmpty &&
+						( item.type === TEMPLATE_POST_TYPE
+							? __( 'Empty template' )
+							: __( 'Empty template part' ) ) }
+					{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
 				</button>
 			</div>
 		</ExperimentalBlockEditorProvider>
@@ -224,12 +224,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => {
-					return (
-						<Preview
-							content={ item.content.raw }
-							viewType={ view.type }
-						/>
-					);
+					return <Preview item={ item } viewType={ view.type } />;
 				},
 				minWidth: 120,
 				maxWidth: 120,
