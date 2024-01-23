@@ -150,10 +150,8 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
-		// If ! clientNavigation && !interactivity. Post-content is the only core block without clientNavigation.
-		( ! str_starts_with( $block_name, 'core/' ) || 'core/post-content' === $block_name )
+		( ! $client_navigation_compatible && ! $is_interactive )
 	) {
-		var_dump( 'patata' );
 		foreach ( $enhanced_query_stack as $query_id ) {
 			$dirty_enhanced_queries[ $query_id ] = true;
 		}
