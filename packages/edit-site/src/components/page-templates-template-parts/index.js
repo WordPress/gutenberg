@@ -13,7 +13,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -176,16 +176,42 @@ function Preview( { item, viewType } ) {
 
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
-	const { layout } = params;
+	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
 		return {
 			...DEFAULT_VIEW,
 			type: window?.__experimentalAdminViews
 				? layout ?? DEFAULT_VIEW.type
 				: DEFAULT_VIEW.type,
+			filters:
+				activeView !== 'all'
+					? [
+							{
+								field: 'author',
+								operator: 'in',
+								value: activeView,
+							},
+					  ]
+					: [],
 		};
-	}, [ layout ] );
+	}, [ layout, activeView ] );
 	const [ view, setView ] = useState( defaultView );
+	useEffect( () => {
+		setView( ( currentView ) => ( {
+			...currentView,
+			filters:
+				activeView !== 'all'
+					? [
+							{
+								field: 'author',
+								operator: 'in',
+								value: activeView,
+							},
+					  ]
+					: [],
+		} ) );
+	}, [ activeView ] );
+
 	const { records, isResolving: isLoadingData } = useEntityRecords(
 		'postType',
 		postType,
