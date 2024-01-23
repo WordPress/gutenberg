@@ -688,20 +688,21 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Escape' );
 
 		// Move to edge of text "Gutenberg".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await pageUtils.pressKeys( 'ArrowLeft' );
 
 		// Select "Gutenberg".
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowRight' );
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
-
+		await page.keyboard.press( 'Escape' );
+		await pageUtils.pressKeys( 'End' );
 		// Move back into the link.
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+k' );
