@@ -57,10 +57,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 								settings.source.attributes
 							);
 
-							if (
-								placeholder &&
-								( ! metaValue || metaValue === '' )
-							) {
+							if ( placeholder && ! metaValue ) {
 								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
 								// Adding this workaround until attributes and metadata fields types are improved and include `url`.
 								const htmlAttribute =
