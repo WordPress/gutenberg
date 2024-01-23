@@ -92,6 +92,10 @@ describe( 'actions', () => {
 			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
 				'visual'
 			);
+			// Expecation added due to a 17.5.1-specific hotifx: https://github.com/WordPress/gutenberg/pull/58031
+			expect( console ).toHaveWarnedWith(
+				"wp.data.select( 'core/preferences' ).get( 'core/edit-post', 'editorMode' ) is deprecated since version 6.5. Please use wp.data.select( 'core/preferences' ).get( 'core', 'editorMode' ) instead."
+			);
 		} );
 
 		it( 'to text', () => {
