@@ -411,24 +411,41 @@ export default function Image( {
 		</InspectorControls>
 	);
 
-	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
 	const {
-		url: urlBinding,
-		alt: altBinding,
-		title: titleBinding,
-	} = metadata?.bindings || {};
-	const lockUrlControls =
-		!! urlBinding &&
-		getBlockBindingsSource( urlBinding?.source?.name )
-			?.lockAttributesEditing === true;
-	const lockAltControls =
-		!! altBinding &&
-		getBlockBindingsSource( altBinding?.source?.name )
-			?.lockAttributesEditing === true;
-	const lockTitleControls =
-		!! titleBinding &&
-		getBlockBindingsSource( titleBinding?.source?.name )
-			?.lockAttributesEditing === true;
+		lockUrlControls = false,
+		lockAltControls = false,
+		lockTitleControls = false,
+	} = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+			const {
+				url: urlBinding,
+				alt: altBinding,
+				title: titleBinding,
+			} = metadata?.bindings || {};
+			return {
+				lockUrlControls:
+					!! urlBinding &&
+					getBlockBindingsSource( urlBinding?.source?.name )
+						?.lockAttributesEditing === true,
+				lockAltControls:
+					!! altBinding &&
+					getBlockBindingsSource( altBinding?.source?.name )
+						?.lockAttributesEditing === true,
+				lockTitleControls:
+					!! titleBinding &&
+					getBlockBindingsSource( titleBinding?.source?.name )
+						?.lockAttributesEditing === true,
+			};
+		},
+		[ isSelected ]
+	);
 
 	const controls = (
 		<>

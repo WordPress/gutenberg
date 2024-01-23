@@ -230,11 +230,26 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
-	const lockUrlControls =
-		!! metadata?.bindings?.url &&
-		getBlockBindingsSource( metadata?.bindings?.url?.source?.name )
-			?.lockAttributesEditing === true;
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					getBlockBindingsSource(
+						metadata?.bindings?.url?.source?.name
+					)?.lockAttributesEditing === true,
+			};
+		},
+		[ isSelected ]
+	);
 
 	return (
 		<>
