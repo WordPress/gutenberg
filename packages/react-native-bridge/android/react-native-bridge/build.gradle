@@ -39,7 +39,7 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -88,12 +88,12 @@ dependencies {
     def packageJson = '../../../react-native-editor/package.json'
 
     implementation "com.facebook.react:react-android:$rnVersion"
-    implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-video:update~android-14-SNAPSHOT"
+    implementation "com.github.wordpress-mobile:react-native-slider:update~android-14-SNAPSHOT"
 
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
-    def reactNativeLibrariesPublisherVersion = "v3"
+    def reactNativeLibrariesPublisherVersion = "v4"
     def reactNativeLibrariesGroupId = "org.wordpress-mobile.react-native-libraries.$reactNativeLibrariesPublisherVersion"
     implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
