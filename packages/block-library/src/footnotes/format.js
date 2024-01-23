@@ -15,7 +15,7 @@ import {
 	privateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -54,43 +54,42 @@ export const format = {
 			getBlockName,
 			getBlockParentsByBlockName,
 		} = registry.select( blockEditorStore );
-		const hasFootnotesBlockType = useSelect(
-			( select ) =>
-				!! select( blocksStore ).getBlockType( 'core/footnotes' ),
-			[]
-		);
-		/*
-		 * This useSelect exists because we need to use its return value
-		 * outside the event callback.
-		 */
-		const isBlockWithinPattern = useSelect( ( select ) => {
-			const {
-				getBlockParentsByBlockName: _getBlockParentsByBlockName,
-				getSelectedBlockClientId: _getSelectedBlockClientId,
-			} = select( blockEditorStore );
-			const parentCoreBlocks = _getBlockParentsByBlockName(
-				_getSelectedBlockClientId(),
-				SYNCED_PATTERN_BLOCK_NAME
-			);
-			return parentCoreBlocks && parentCoreBlocks.length > 0;
-		}, [] );
+		const isFootnotesSupported = useSelect(
+			( select ) => {
+				if (
+					! select( blocksStore ).getBlockType( 'core/footnotes' )
+				) {
+					return false;
+				}
 
-		const [ meta ] = useEntityProp( 'postType', postType, 'meta', postId );
-		const footnotesSupported = 'string' === typeof meta?.footnotes;
+				const entityRecord = select( coreDataStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				);
+
+				if ( 'string' !== typeof entityRecord?.meta?.footnotes ) {
+					return false;
+				}
+
+				// Checks if the selected block lives within a pattern.
+				const {
+					getBlockParentsByBlockName: _getBlockParentsByBlockName,
+					getSelectedBlockClientId: _getSelectedBlockClientId,
+				} = select( blockEditorStore );
+				const parentCoreBlocks = _getBlockParentsByBlockName(
+					_getSelectedBlockClientId(),
+					SYNCED_PATTERN_BLOCK_NAME
+				);
+				return ! parentCoreBlocks || parentCoreBlocks.length === 0;
+			},
+			[ postType, postId ]
+		);
 
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
 
-		if ( ! hasFootnotesBlockType ) {
-			return null;
-		}
-
-		if ( ! footnotesSupported ) {
-			return null;
-		}
-
-		// Checks if the selected block lives within a pattern.
-		if ( isBlockWithinPattern ) {
+		if ( ! isFootnotesSupported ) {
 			return null;
 		}
 
