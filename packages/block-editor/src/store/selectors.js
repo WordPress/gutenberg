@@ -27,7 +27,7 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	getUserPatterns,
+	getAllPatterns,
 	checkAllowListRecursive,
 	checkAllowList,
 } from './utils';
@@ -2015,7 +2015,7 @@ export const getInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId,
+		state.blocks.byClientId.get( rootClientId ),
 		state.blocks.order,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
@@ -2086,7 +2086,7 @@ export const getBlockTransformItems = createSelector(
 	},
 	( state, blocks, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId,
+		state.blocks.byClientId.get( rootClientId ),
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -2118,7 +2118,7 @@ export const hasInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId,
+		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getReusableBlocks( state ),
@@ -2143,18 +2143,20 @@ export const getAllowedBlocks = createSelector(
 		const blockTypes = getBlockTypes().filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
+
 		const hasReusableBlock =
 			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
 			getReusableBlocks( state ).length > 0;
 
-		return [
-			...blockTypes,
-			...( hasReusableBlock ? [ 'core/block' ] : [] ),
-		];
+		if ( hasReusableBlock ) {
+			blockTypes.push( 'core/block' );
+		}
+
+		return blockTypes;
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId,
+		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getReusableBlocks( state ),
@@ -2237,21 +2239,10 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 	]
 );
 
-export const __experimentalUserPatternCategories = createSelector(
-	( state ) => {
-		return state?.settings?.__experimentalUserPatternCategories;
-	},
-	( state ) => [ state.settings.__experimentalUserPatternCategories ]
-);
-
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		const userPatterns = getUserPatterns( state );
-
-		const pattern = [ ...patterns, ...userPatterns ].find(
-			( { name } ) => name === patternName
-		);
+		const patterns = getAllPatterns( state );
+		const pattern = patterns.find( ( { name } ) => name === patternName );
 		if ( ! pattern ) {
 			return null;
 		}
@@ -2262,21 +2253,15 @@ export const __experimentalGetParsedPattern = createSelector(
 			} ),
 		};
 	},
-	( state ) => [
-		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalReusableBlocks,
-		state?.settings?.__experimentalUserPatternCategories,
-	]
+	( state ) => [ getAllPatterns( state ) ]
 );
 
 const getAllAllowedPatterns = createSelector(
 	( state ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		const userPatterns = getUserPatterns( state );
-
+		const patterns = getAllPatterns( state );
 		const { allowedBlockTypes } = getSettings( state );
 
-		const parsedPatterns = [ ...userPatterns, ...patterns ]
+		const parsedPatterns = patterns
 			.filter( ( { inserter = true } ) => !! inserter )
 			.map( ( { name } ) =>
 				__experimentalGetParsedPattern( state, name )
@@ -2286,12 +2271,7 @@ const getAllAllowedPatterns = createSelector(
 		);
 		return allowedPatterns;
 	},
-	( state ) => [
-		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalReusableBlocks,
-		state.settings.allowedBlockTypes,
-		state?.settings?.__experimentalUserPatternCategories,
-	]
+	( state ) => [ getAllPatterns( state ), state.settings.allowedBlockTypes ]
 );
 
 /**
@@ -2315,9 +2295,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		return patternsAllowed;
 	},
 	( state, rootClientId ) => [
-		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalReusableBlocks,
-		state.settings.allowedBlockTypes,
+		getAllAllowedPatterns( state ),
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId.get( rootClientId ),
@@ -2566,7 +2544,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  * @return {Array} Reusable blocks
  */
 function getReusableBlocks( state ) {
-	return state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+	return state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 
 /**

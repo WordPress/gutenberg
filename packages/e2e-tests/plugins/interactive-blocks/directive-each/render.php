@@ -13,6 +13,7 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<template data-wp-each="state.letters">
 			<p data-wp-text="context.item" data-testid="item"></p>
 		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
 		<p data-testid="item" data-wp-each-child>A</p>
 		<p data-testid="item" data-wp-each-child>B</p>
 		<p data-testid="item" data-wp-each-child>C</p>
@@ -122,6 +123,85 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<p data-testid="item" data-wp-each-child>3</p>
 		<p data-testid="item">four</p>
 		<p data-testid="item">4</p>
+	</div>
+
+	<div data-testid="nested">
+		<button
+			data-testid="add animal"
+			data-wp-on--click="actions.addAnimal"
+		>Add animal</button>
+		<button
+			data-testid="add breeds"
+			data-wp-on--click="actions.addBreeds"
+		>Add breeds</button>
+
+		<ul>
+			<template
+				data-wp-each--animal="state.animalBreeds"
+				data-wp-each-key="context.animal.name"
+			>
+				<li data-testid="animal">
+					<span
+						data-testid="name"
+						data-wp-text="context.animal.name"
+					></span>
+					<ul>
+						<template data-wp-each--breed="context.animal.breeds">
+							<li data-wp-text="context.breed"></li>
+						</template>
+					</ul>
+				</li>
+			</template>
+			<!-- SSRed elements; they should be removed on hydration -->
+			<li data-testid="animal" data-wp-each-child>
+				<span data-testid="name">Dog</span>
+				<ul>
+					<template data-wp-each--breed="context.animal.breeds">
+						<li data-wp-text="context.breed"></li>
+					</template>
+					<li data-wp-each-child>Chihuahua</li>
+					<li data-wp-each-child>Rottweiler</li>
+				</ul>
+			</li>
+			<li data-testid="animal" data-wp-each-child>
+				<span data-testid="name">Cat</span>
+				<ul>
+					<template data-wp-each--breed="context.animal.breeds">
+						<li data-wp-text="context.breed"></li>
+					</template>
+					<li data-wp-each-child>Sphynx</li>
+					<li data-wp-each-child>Siamese</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<div data-testid="invalid tag">
+		<div data-wp-each="state.letters">
+			<p data-wp-text="context.item" data-testid="item"></p>
+		</div>
+	</div>
+
+
+	<div data-testid="derived state">
+		<button
+			data-testid="rotate" data-wp-on--click="actions.rotateFruits"
+		>Rotate</button>
+		<template
+			data-wp-context='{ "idPrefix": "fruit-" }'
+			data-wp-each--fruit="state.fruits"
+			data-wp-each-key="state.fruitId"
+		>
+			<p
+				data-testid="item"
+				data-wp-text="context.fruit"
+				data-wp-bind--data-fruit-id="state.fruitId"
+			></p>
+		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>avocado</p>
+		<p data-testid="item" data-wp-each-child>banana</p>
+		<p data-testid="item" data-wp-each-child>cherimoya</p>
 	</div>
 </div>
 

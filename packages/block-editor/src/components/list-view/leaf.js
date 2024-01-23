@@ -21,6 +21,7 @@ const AnimatedTreeGridRow = animated( TreeGridRow );
 const ListViewLeaf = forwardRef(
 	(
 		{
+			isDragged,
 			isSelected,
 			position,
 			level,
@@ -33,8 +34,7 @@ const ListViewLeaf = forwardRef(
 		ref
 	) => {
 		const animationRef = useMovingAnimation( {
-			isSelected,
-			adjustScrolling: false,
+			clientId: props[ 'data-block' ],
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
 		} );

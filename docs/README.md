@@ -1,6 +1,6 @@
 # Block Editor Handbook
 
-👋 Welcome to the Block Editor Handbook.
+Welcome to the Block Editor Handbook.
 
 The [**Block Editor**](https://wordpress.org/gutenberg/) is a modern and up-to-date paradigm for WordPress site building and publishing. It uses a modular system of **Blocks** to compose and format content and is designed to create rich and flexible layouts for websites and digital products.
 

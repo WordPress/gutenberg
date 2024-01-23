@@ -14,6 +14,10 @@ store( 'directive-each', {
 store( 'directive-each', {
 	state: {
 		fruits: [ 'avocado', 'banana', 'cherimoya' ],
+		get fruitId() {
+			const { idPrefix, fruit } = getContext();
+			return `${idPrefix}${fruit}`;
+		}
 	},
 	actions: {
 		removeFruit() {
@@ -124,6 +128,31 @@ store( 'directive-each', {
 			state.numbersAndNames.unshift( { name: "one", value: 1 } );
 		}
 	},
+} );
+
+store( 'directive-each', {
+	state: {
+		animalBreeds: [
+			{ name: "Dog", breeds: [ 'chihuahua', 'rottweiler' ] },
+			{ name: "Cat", breeds: [ 'sphynx', 'siamese' ] },
+		],
+	},
+	actions: {
+		addAnimal() {
+			state.animalBreeds.unshift( {
+				name: "Rat", breeds: [ 'dumbo', 'rex' ]
+			} );
+		},
+		addBreeds() {
+			state
+				.animalBreeds
+				.forEach( ( { name, breeds } ) => {
+					if ( name === 'Dog') breeds.unshift( 'german shepherd' );
+					if ( name === 'Cat') breeds.unshift( 'maine coon' );
+					if ( name === 'Rat') breeds.unshift( 'satin' );
+				} );
+		}
+	}
 } );
 
 const html = `

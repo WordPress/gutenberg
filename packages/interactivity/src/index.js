@@ -5,8 +5,9 @@ import registerDirectives from './directives';
 import { init } from './init';
 
 export { store } from './store';
-export { directive, getContext, getElement } from './hooks';
+export { directive, getContext, getElement, getNamespace } from './hooks';
 export {
+	withScope,
 	useWatch,
 	useInit,
 	useEffect,

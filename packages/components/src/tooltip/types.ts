@@ -61,5 +61,5 @@ export type TooltipProps = {
 };
 
 export type TooltipInternalContext = {
-	isNestedInTooltip?: boolean;
+	isNestedInTooltip: boolean;
 };

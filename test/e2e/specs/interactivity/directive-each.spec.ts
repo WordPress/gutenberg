@@ -327,4 +327,160 @@ test.describe( 'data-wp-each', () => {
 		await expect( gamma ).toHaveAttribute( 'data-tag', '1' );
 		await expect( delta ).toHaveAttribute( 'data-tag', '2' );
 	} );
+
+	test( 'should work with nested lists', async ( { page } ) => {
+		const mainElement = page.getByTestId( 'nested' );
+
+		// These tags are included to check that the elements are not unmounted
+		// and mounted again. If an element remounts, its tag should be missing.
+		const listItems = mainElement.getByRole( 'listitem' );
+		await listItems.evaluateAll( ( refs ) =>
+			refs.forEach( ( ref, index ) => {
+				if ( ref instanceof HTMLElement ) {
+					ref.dataset.tag = `${ index }`;
+				}
+			} )
+		);
+
+		const animals = mainElement.getByTestId( 'animal' );
+
+		{
+			// Ensure it hydrates correctly.
+			const [ dog, cat ] = await animals.all();
+			await expect( dog.getByTestId( 'name' ) ).toHaveText( 'Dog' );
+			await expect( dog.getByRole( 'listitem' ) ).toHaveText( [
+				'chihuahua',
+				'rottweiler',
+			] );
+			await expect( cat.getByTestId( 'name' ) ).toHaveText( 'Cat' );
+			await expect( cat.getByRole( 'listitem' ) ).toHaveText( [
+				'sphynx',
+				'siamese',
+			] );
+		}
+
+		await mainElement.getByTestId( 'add animal' ).click();
+
+		{
+			// Ensure it works when the top list is modified.
+			const [ rat, dog, cat ] = await animals.all();
+			await expect( rat.getByTestId( 'name' ) ).toHaveText( 'Rat' );
+			await expect( rat.getByRole( 'listitem' ) ).toHaveText( [
+				'dumbo',
+				'rex',
+			] );
+			await expect( dog.getByTestId( 'name' ) ).toHaveText( 'Dog' );
+			await expect( dog.getByRole( 'listitem' ) ).toHaveText( [
+				'chihuahua',
+				'rottweiler',
+			] );
+			await expect( cat.getByTestId( 'name' ) ).toHaveText( 'Cat' );
+			await expect( cat.getByRole( 'listitem' ) ).toHaveText( [
+				'sphynx',
+				'siamese',
+			] );
+			await expect( rat ).not.toHaveAttribute( 'data-tag' );
+			const [ d1, d2 ] = await dog.getByRole( 'listitem' ).all();
+			await expect( dog ).toHaveAttribute( 'data-tag', '0' );
+			await expect( d1 ).toHaveAttribute( 'data-tag', '1' );
+			await expect( d2 ).toHaveAttribute( 'data-tag', '2' );
+			const [ c1, c2 ] = await cat.getByRole( 'listitem' ).all();
+			await expect( cat ).toHaveAttribute( 'data-tag', '3' );
+			await expect( c1 ).toHaveAttribute( 'data-tag', '4' );
+			await expect( c2 ).toHaveAttribute( 'data-tag', '5' );
+		}
+
+		// Reset tags so the added elements have one.
+		await listItems.evaluateAll( ( refs ) =>
+			refs.forEach( ( ref, index ) => {
+				if ( ref instanceof HTMLElement ) {
+					ref.dataset.tag = `${ index }`;
+				}
+			} )
+		);
+
+		await mainElement.getByTestId( 'add breeds' ).click();
+
+		{
+			// Ensure it works when the top list is modified.
+			const [ rat, dog, cat ] = await animals.all();
+			await expect( rat.getByTestId( 'name' ) ).toHaveText( 'Rat' );
+			await expect( rat.getByRole( 'listitem' ) ).toHaveText( [
+				'satin',
+				'dumbo',
+				'rex',
+			] );
+			await expect( dog.getByTestId( 'name' ) ).toHaveText( 'Dog' );
+			await expect( dog.getByRole( 'listitem' ) ).toHaveText( [
+				'german shepherd',
+				'chihuahua',
+				'rottweiler',
+			] );
+			await expect( cat.getByTestId( 'name' ) ).toHaveText( 'Cat' );
+			await expect( cat.getByRole( 'listitem' ) ).toHaveText( [
+				'maine coon',
+				'sphynx',
+				'siamese',
+			] );
+			const [ r1, r2, r3 ] = await rat.getByRole( 'listitem' ).all();
+			await expect( rat ).toHaveAttribute( 'data-tag', '0' );
+			await expect( r1 ).not.toHaveAttribute( 'data-tag' );
+			await expect( r2 ).toHaveAttribute( 'data-tag', '1' );
+			await expect( r3 ).toHaveAttribute( 'data-tag', '2' );
+			const [ d1, d2, d3 ] = await dog.getByRole( 'listitem' ).all();
+			await expect( dog ).toHaveAttribute( 'data-tag', '3' );
+			await expect( d1 ).not.toHaveAttribute( 'data-tag' );
+			await expect( d2 ).toHaveAttribute( 'data-tag', '4' );
+			await expect( d3 ).toHaveAttribute( 'data-tag', '5' );
+			const [ c1, c2, c3 ] = await cat.getByRole( 'listitem' ).all();
+			await expect( cat ).toHaveAttribute( 'data-tag', '6' );
+			await expect( c1 ).not.toHaveAttribute( 'data-tag' );
+			await expect( c2 ).toHaveAttribute( 'data-tag', '7' );
+			await expect( c3 ).toHaveAttribute( 'data-tag', '8' );
+		}
+	} );
+
+	test( 'should do nothing when used on non-template elements', async ( {
+		page,
+	} ) => {
+		const elements = page
+			.getByTestId( 'invalid tag' )
+			.getByTestId( 'item' );
+
+		await expect( elements ).toHaveCount( 1 );
+		await expect( elements ).toBeEmpty();
+	} );
+
+	test( 'should work with derived state as keys', async ( { page } ) => {
+		const elements = page
+			.getByTestId( 'derived state' )
+			.getByTestId( 'item' );
+
+		// These tags are included to check that the elements are not unmounted
+		// and mounted again. If an element remounts, its tag should be missing.
+		await elements.evaluateAll( ( refs ) =>
+			refs.forEach( ( ref, index ) => {
+				if ( ref instanceof HTMLElement ) {
+					ref.dataset.tag = `${ index }`;
+				}
+			} )
+		);
+
+		await page
+			.getByTestId( 'derived state' )
+			.getByTestId( 'rotate' )
+			.click();
+
+		await expect( elements ).toHaveText( [
+			'cherimoya',
+			'avocado',
+			'banana',
+		] );
+
+		// Get the tags. They should not have disappeared or changed.
+		const [ cherimoya, avocado, banana ] = await elements.all();
+		await expect( cherimoya ).toHaveAttribute( 'data-tag', '2' );
+		await expect( avocado ).toHaveAttribute( 'data-tag', '0' );
+		await expect( banana ).toHaveAttribute( 'data-tag', '1' );
+	} );
 } );
