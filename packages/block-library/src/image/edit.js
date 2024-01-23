@@ -331,7 +331,7 @@ export function ImageEdit( {
 	// Much of this description is duplicated from MediaPlaceholder.
 	const { lockUrlControls = false } = useSelect(
 		( select ) => {
-			if ( ! isSelected ) {
+			if ( ! isSingleSelected ) {
 				return {};
 			}
 
@@ -347,7 +347,7 @@ export function ImageEdit( {
 					)?.lockAttributesEditing === true,
 			};
 		},
-		[ isSelected ]
+		[ isSingleSelected ]
 	);
 	const placeholder = ( content ) => {
 		return (
@@ -395,7 +395,7 @@ export function ImageEdit( {
 				temporaryURL={ temporaryURL }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
+				isSingleSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				onReplace={ onReplace }
 				onSelectImage={ onSelectImage }
