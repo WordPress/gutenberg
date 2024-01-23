@@ -40,6 +40,7 @@ import {
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
 import { unlock } from '../../lock-unlock';
+import { useIsHovered } from './use-block-props/use-is-hovered';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -103,6 +104,7 @@ function Root( { className, ...settings } ) {
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				useTypingObserver(),
+				useIsHovered( { isEnabled: true } ),
 			] ),
 			className: classnames( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,

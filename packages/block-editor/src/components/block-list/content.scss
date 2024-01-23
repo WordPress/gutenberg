@@ -305,30 +305,27 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 // Indicate which blocks are editable within a locked context.
 // 1. User must be hovering an editor with renderingMode = 'template-lock'; or...
-.is-template-locked:hover,
-// ...a container block.
-.block-editor-block-list__block:hover {
-	// 2. Look for locked blocks; or...
-	.block-editor-block-list__block.is-editing-disabled,
-	// ...container blocks that have locked children.
-	&:has(> .block-editor-block-list__block.is-editing-disabled) {
-		// 3. Highlight any unlocked children of that locked block.
-		& > .block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
-			&::after {
-				content: "";
-				border-style: dotted;
-				position: absolute;
-				pointer-events: none;
-				top: $border-width;
-				left: $border-width;
-				right: $border-width;
-				bottom: $border-width;
-				border: 1px dotted var(--wp-admin-theme-color);
-				border-radius: $radius-block-ui - $border-width;
-			}
+.is-template-locked.is-hovered,
+// ...a pattern block.
+.is-reusable.is-hovered {
+	// 2. Highlight any unlocked children.
+	.block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
+		&::after {
+			content: "";
+			border-style: dotted;
+			position: absolute;
+			pointer-events: none;
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			border: 1px dotted var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width;
+		}
 
-			&.is-hovered::after {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+		// 3. Don't do grandchildren.
+		.block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
+			&::after {
 				border: none;
 			}
 		}
