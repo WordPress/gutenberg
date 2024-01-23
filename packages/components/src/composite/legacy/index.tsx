@@ -23,14 +23,53 @@ import { useInstanceId } from '@wordpress/compose';
 type Orientation = 'horizontal' | 'vertical';
 
 export interface InitialStateProps {
+	/**
+	 * ID that will serve as a base for all the items IDs.
+	 */
 	baseId?: string;
-	unstable_virtual?: boolean;
+	/**
+	 * Determines how next and previous functions will behave. If `rtl` is set
+	 * to `true`, they will be inverted. This only affects the composite widget
+	 * behavior. You still need to set `dir="rtl"` on HTML/CSS.
+	 *
+	 * @default false
+	 */
 	rtl?: boolean;
+	/**
+	 * Defines the orientation of the composite widget. If the composite has a
+	 * single row or column (one-dimensional), the orientation value determines
+	 * which arrow keys can be used to move focus.
+	 */
 	orientation?: Orientation;
+	/**
+	 * The current focused item `id`.
+	 */
 	currentId?: string;
+	/**
+	 * Determines how focus moves from the start and end of rows and columns.
+	 *
+	 * @default false
+	 */
 	loop?: boolean | Orientation;
+	/**
+	 * If enabled, moving to the next item from the last one in a row or column
+	 * will focus the first item in the next row or column and vice-versa.
+	 *
+	 * ** Has effect only on two-dimensional composites. **
+	 *
+	 * @default false
+	 */
 	wrap?: boolean | Orientation;
+	/**
+	 * If enabled, moving up or down when there's no next item or the next item
+	 * is disabled will shift to the item right before it.
+	 *
+	 * ** Has effect only on two-dimensional composites. **
+	 *
+	 * @default false
+	 */
 	shift?: boolean;
+	unstable_virtual?: boolean;
 }
 
 type Component = React.FunctionComponent< any >;
