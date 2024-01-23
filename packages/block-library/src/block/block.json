@@ -10,13 +10,7 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
-		},
-		"overrides": {
-			"type": "object"
 		}
-	},
-	"providesContext": {
-		"pattern/overrides": "overrides"
 	},
 	"supports": {
 		"customClassName": false,
