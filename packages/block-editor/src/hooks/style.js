@@ -27,7 +27,11 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
-import { EFFECTS_SUPPORT_KEYS, EffectsPanel } from './effects';
+import {
+	EFFECTS_SUPPORT_KEYS,
+	SHADOW_SUPPORT_KEY,
+	EffectsPanel,
+} from './effects';
 import {
 	shouldSkipSerialization,
 	useStyleOverride,
@@ -112,6 +116,7 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
+	[ `${ SHADOW_SUPPORT_KEY }` ]: [ SHADOW_SUPPORT_KEY ],
 };
 
 /**

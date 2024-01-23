@@ -12,7 +12,8 @@ import StylesEffectsPanel, {
 import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
-export const EFFECTS_SUPPORT_KEYS = [ 'shadow' ];
+export const SHADOW_SUPPORT_KEY = 'shadow';
+export const EFFECTS_SUPPORT_KEYS = [ SHADOW_SUPPORT_KEY ];
 
 export function hasEffectsSupport( blockName ) {
 	return EFFECTS_SUPPORT_KEYS.some( ( key ) =>
