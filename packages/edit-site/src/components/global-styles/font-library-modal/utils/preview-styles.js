@@ -36,7 +36,11 @@ export function formatFontFamily( input ) {
 		.map( ( font ) => {
 			font = font.trim(); // Remove any leading or trailing white spaces
 			// If the font doesn't start with quotes and contains a space, then wrap in quotes.
-			if ( ! font.startsWith( '"\'' ) && font.indexOf( ' ' ) !== -1 ) {
+			// Check that string starts with a single or double quote and not a space
+			if (
+				! ( font.startsWith( '"' ) || font.startsWith( "'" ) ) &&
+				font.indexOf( ' ' ) !== -1
+			) {
 				return `"${ font }"`;
 			}
 			return font; // Return font as is if no transformation is needed
