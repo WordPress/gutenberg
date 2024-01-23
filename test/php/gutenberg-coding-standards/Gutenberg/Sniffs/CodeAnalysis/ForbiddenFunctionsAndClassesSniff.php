@@ -97,6 +97,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		}
 
 		if ( false !== $next_token && ( $tokens[ $next_token ]['code'] === T_OPEN_PARENTHESIS ) ) {
+			// Function.
 			$this->check_function_usage( $phpcs_file, $stack_pointer );
 		}
 	}
@@ -122,7 +123,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		}
 
 		$error_message = 'It\'s not allowed to use the "' . $class_name . '" class as its name matches the forbidden pattern: "' . $regexp . '".';
-		$phpcs_file->addError( $error_message, $stack_pointer, 'UsedClassInvalid' );
+		$phpcs_file->addError( $error_message, $stack_pointer, 'ForbiddenClassUsage' );
 	}
 
 	/**
@@ -146,7 +147,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		}
 
 		$error_message = 'It\'s not allowed to call the "' . $function_name . '()" function as its name matches the forbidden pattern: "' . $regexp . '".';
-		$phpcs_file->addError( $error_message, $stack_pointer, 'CalledFunctionInvalid' );
+		$phpcs_file->addError( $error_message, $stack_pointer, 'ForbiddenFunctionCall' );
 	}
 
 	/**
