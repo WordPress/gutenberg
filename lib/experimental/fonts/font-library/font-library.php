@@ -137,7 +137,7 @@ $default_font_collection = array(
 	'name'        => 'Google Fonts',
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 	// TODO: This URL needs to be updated to the wporg hosted one prior to the Gutenberg 17.6 release.
-	'src'         => 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/main/releases/gutenberg-17.6/google-fonts.json',
+	'src'         => 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/main/releases/gutenberg-17.6/collections/google-fonts.json',
 );
 
 wp_register_font_collection( $default_font_collection );
