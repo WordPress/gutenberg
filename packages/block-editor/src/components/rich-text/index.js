@@ -127,10 +127,13 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd } =
+		const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
+		const blockBindings =
+			getBlockAttributes( clientId )?.metadata?.bindings;
+		const { getBlockBindingsSource } = unlock( select( blockEditorStore ) );
 
 		let isSelected;
 
@@ -147,20 +150,24 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			blockBindings,
+			getBlockBindingsSource,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+	const {
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		blockBindings,
+		getBlockBindingsSource,
+	} = useSelect( selector, [
 		clientId,
 		identifier,
 		originalIsSelected,
 		isBlockSelected,
 	] );
-	const {
-		getSelectionStart,
-		getSelectionEnd,
-		getBlockRootClientId,
-		getBlockAttributes,
-	} = useSelect( blockEditorStore );
+	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -299,23 +306,22 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
-	const bindings = getBlockAttributes( clientId )?.metadata?.bindings;
-	const blockTypeAttributes = getBlockType( blockName ).attributes;
-	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
 	let shouldDisableEditing = false;
-	if ( bindings )
-		for ( const [ attribute, settings ] of Object.entries( bindings ) ) {
+	if ( blockBindings ) {
+		const blockTypeAttributes = getBlockType( blockName ).attributes;
+		for ( const [ attribute, args ] of Object.entries( blockBindings ) ) {
 			// If any of the attributes with source "rich-text" is part of the bindings,
 			// has a source with `lockAttributesEditing`, disable it.
 			if (
 				blockTypeAttributes?.[ attribute ]?.source === 'rich-text' &&
-				getBlockBindingsSource( settings.source.name )
+				getBlockBindingsSource( args.source.name )
 					?.lockAttributesEditing
 			) {
 				shouldDisableEditing = true;
 				break;
 			}
 		}
+	}
 
 	const TagName = tagName;
 	return (
