@@ -10,6 +10,9 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
+		},
+		"overrides": {
+			"type": "object"
 		}
 	},
 	"supports": {
