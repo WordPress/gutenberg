@@ -76,11 +76,7 @@ function SidebarScreens() {
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
-				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreenTemplatesBrowse />
-				) : (
-					<SidebarNavigationScreenTemplates />
-				) }
+				<SidebarNavigationScreenTemplates />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/patterns">
 				<SidebarNavigationScreenPatterns />
