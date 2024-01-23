@@ -139,7 +139,12 @@ export function getDropTargetPosition(
 	}
 
 	blocksData.forEach(
-		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
+		( {
+			isUnmodifiedDefaultBlock,
+			getBoundingClientRect,
+			blockIndex,
+			blockOrientation,
+		} ) => {
 			const rect = getBoundingClientRect();
 
 			let [ distance, edge ] = getDistanceToNearestEdge(
@@ -161,6 +166,7 @@ export function getDropTargetPosition(
 				distance = 0;
 			} else if (
 				orientation === 'vertical' &&
+				blockOrientation !== 'horizontal' &&
 				( ( isPointInsideRect && sideDistance < THRESHOLD_DISTANCE ) ||
 					( ! isPointInsideRect &&
 						isPointWithinTopAndBottomBoundariesOfRect(
@@ -363,6 +369,8 @@ export default function useBlockDropZone( {
 								.getElementById( `block-${ clientId }` )
 								.getBoundingClientRect(),
 						blockIndex: getBlockIndex( clientId ),
+						blockOrientation:
+							getBlockListSettings( clientId )?.orientation,
 					};
 				} );
 

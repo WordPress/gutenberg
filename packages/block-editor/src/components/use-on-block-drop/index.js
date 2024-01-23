@@ -232,7 +232,6 @@ export default function useOnBlockDrop(
 		getBlocksByClientId,
 		getSettings,
 		getBlock,
-		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 	const { getBlockType, getGroupingBlockName } = useSelect( blocksStore );
 	const {
@@ -255,15 +254,10 @@ export default function useOnBlockDrop(
 			const clientIds = getBlockOrder( targetRootClientId );
 			const clientId = clientIds[ targetBlockIndex ];
 
-			// For grouping operation to proceed, the target shouldn't be a Row block.
-			const targetBlock = getBlock( clientId );
-			const isTargetBlockRow =
-				getBlockListSettings( clientId )?.orientation ===
-					'horizontal' && targetBlock.name === 'core/group';
-
 			if ( operation === 'replace' ) {
 				replaceBlocks( clientId, blocks, undefined, initialPosition );
-			} else if ( operation === 'group' && ! isTargetBlockRow ) {
+			} else if ( operation === 'group' ) {
+				const targetBlock = getBlock( clientId );
 				if ( nearestSide === 'left' ) {
 					blocks.push( targetBlock );
 				} else {
