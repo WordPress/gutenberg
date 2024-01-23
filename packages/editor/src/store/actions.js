@@ -313,8 +313,14 @@ export const trashPost =
 export const autosave =
 	( { local = false, ...options } = {} ) =>
 	async ( { select, dispatch } ) => {
+		const post = select.getCurrentPost();
+
+		// Currently template autosaving is not supported.
+		if ( post.type === 'wp_template' ) {
+			return;
+		}
+
 		if ( local ) {
-			const post = select.getCurrentPost();
 			const isPostNew = select.isEditedPostNew();
 			const title = select.getEditedPostAttribute( 'title' );
 			const content = select.getEditedPostAttribute( 'content' );
