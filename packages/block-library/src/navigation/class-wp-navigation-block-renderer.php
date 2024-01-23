@@ -195,7 +195,7 @@ class WP_Navigation_Block_Renderer {
 
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
 			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+			$compacted_blocks = gutenberg_block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
