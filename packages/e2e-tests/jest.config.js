@@ -12,6 +12,7 @@ module.exports = {
 		'@wordpress/jest-console',
 		'@wordpress/jest-puppeteer-axe',
 		'expect-puppeteer',
+		'../../test/setup-after-env-global.js',
 	],
 	testPathIgnorePatterns: [ '/node_modules/' ],
 	snapshotFormat: {
