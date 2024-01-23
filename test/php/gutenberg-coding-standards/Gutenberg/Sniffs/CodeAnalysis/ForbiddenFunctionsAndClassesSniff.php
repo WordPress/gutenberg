@@ -69,8 +69,6 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * @param File $phpcsFile The file being scanned.
 	 * @param int  $stackPtr  The position of the current token
 	 *                        in the stack passed in $tokens.
-	 *
-	 * @return void
 	 */
 	private function process_string_token( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->forbidden_functions ) && empty( $this->forbidden_classes ) ) {
@@ -107,8 +105,6 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
-	 *
-	 * @return void
 	 */
 	private function check_class_usage( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->forbidden_classes ) ) {
@@ -179,19 +175,33 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
 	 *
-	 * @return bool
+	 * @return bool               Returns true if the token is guarded.
 	 */
 	private function check_if_token_guarded( File $phpcs_file, $stack_pointer ) {
-		$wrapping_if_token = $phpcs_file->getCondition( $stack_pointer, T_IF, false );
-		if ( false === $wrapping_if_token ) {
+		if ( false === $phpcs_file->hasCondition( $stack_pointer, T_IF ) ) {
+			// No wrapping IF tokens. Stop processing.
 			return false;
 		}
 
-		$end_of_wrapping_if_token = $phpcs_file->findEndOfStatement( $wrapping_if_token );
-		$content                  = $phpcs_file->getTokensAsString( $wrapping_if_token, $end_of_wrapping_if_token - $wrapping_if_token );
-		$regexp                   = '/if\s*\(\s*defined\(\s*(\'|")IS_GUTENBERG_PLUGIN(\'|")\s*\)\s*&&\s*IS_GUTENBERG_PLUGIN/';
+		$tokens     = $phpcs_file->getTokens();
+		$conditions = $tokens[ $stack_pointer ]['conditions'];
+		$conditions = array_reverse( $conditions, true );
 
-		return 1 === preg_match( $regexp, $content );
+		$regexp = '/if\s*\(\s*defined\(\s*(\'|")IS_GUTENBERG_PLUGIN(\'|")\s*\)\s*&&\s*IS_GUTENBERG_PLUGIN/';
+
+		foreach ( $conditions as $wrapping_if_token => $condition ) {
+			if ( $condition !== T_IF ) {
+				continue;
+			}
+
+			$end_of_wrapping_if_token = $phpcs_file->findEndOfStatement( $wrapping_if_token );
+			$content                  = $phpcs_file->getTokensAsString( $wrapping_if_token, $end_of_wrapping_if_token - $wrapping_if_token );
+			if ( 1 === preg_match( $regexp, $content ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
