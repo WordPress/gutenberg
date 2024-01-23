@@ -36,7 +36,10 @@ module.exports = {
 	clearMocks: true,
 	preset: 'react-native',
 	setupFiles: [ '<rootDir>/test/native/setup.js' ],
-	setupFilesAfterEnv: [ '<rootDir>/test/native/setup-after-env.js' ],
+	setupFilesAfterEnv: [
+		'<rootDir>/test/native/setup-after-env.js',
+		'<rootDir>/test/setup-after-env-global.js',
+	],
 	testMatch: [
 		'<rootDir>/test/**/*.native.[jt]s?(x)',
 		'<rootDir>/**/test/!(helper)*.native.[jt]s?(x)',
