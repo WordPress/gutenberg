@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'with-scope-view' );
+wp_enqueue_script_module( 'with-scope-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "with-scope" }' data-wp-context='{"asyncCounter": 0, "syncCounter": 0}' data-wp-init--a='callbacks.asyncInit' data-wp-init--b='callbacks.syncInit'>
