@@ -321,13 +321,10 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				};
 			}
 		);
-		return [
-			...userPatterns,
-			...__experimentalBlockPatterns,
-			...unlock( select( store ) ).getFetchedPatterns(
-				__experimentalFetchBlockPatterns
-			),
-		];
+		const blockPatterns = __experimentalFetchBlockPatterns
+			? unlock( select( store ) ).getFetchedPatterns()
+			: __experimentalBlockPatterns;
+		return [ ...userPatterns, ...blockPatterns ];
 	}, getAllPatternsDependants )
 );
 
