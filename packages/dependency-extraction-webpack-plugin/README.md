@@ -118,7 +118,7 @@ const webpackConfig = {
 				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
 		),
 		new DependencyExtractionWebpackPlugin( {
-			// With modules, we use `requestToExternalModule`:
+			// With modules, use `requestToExternalModule`:
 			requestToExternalModule( request ) {
 				if ( request === 'my-registered-module' ) {
 					return request;
@@ -276,7 +276,7 @@ function requestToExternalModule( request ) {
 		return 'myModule';
 	}
 
-	// If the script module ID in source is the same as the external script module, we can return `true`.
+    // If the script module ID in source is the same as the external script module, `true` can be returned.
 	return request === 'external-module-id-no-change-required';
 }
 
