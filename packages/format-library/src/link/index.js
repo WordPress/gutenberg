@@ -39,6 +39,7 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
+	const [ openedBy, setOpenedBy ] = useState( null );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -56,6 +57,7 @@ function Edit( {
 			if ( event.target.tagName !== 'A' || ! isActive ) {
 				return;
 			}
+
 			setAddingLink( true );
 		}
 
@@ -89,11 +91,26 @@ function Edit( {
 		}
 	}
 
-	function stopAddingLink( returnFocus = true ) {
+	function onClose() {
+		// Don't let the click handler on the toolbar button trigger again.
+
+		// There are two places for us to return focus to on Escape keypress:
+		// 1. The rich text field.
+		// 2. The toolbar button.
+
+		// The toolbar button is the only one we need to handle returning focus to.
+		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
+
+		// Close the popover
 		setAddingLink( false );
-		if ( returnFocus ) {
+		// Return focus to the toolbar button or the rich text field
+		if ( openedBy?.tagName === 'BUTTON' ) {
+			openedBy.focus();
+		} else {
 			onFocus();
 		}
+		// Remove the openedBy state
+		setOpenedBy( null );
 	}
 
 	function onRemoveFormat() {
@@ -113,7 +130,10 @@ function Edit( {
 				name="link"
 				icon={ linkIcon }
 				title={ isActive ? __( 'Edit Link' ) : title }
-				onClick={ addLink }
+				onClick={ ( event ) => {
+					setOpenedBy( event.currentTarget );
+					setAddingLink( true );
+				} }
 				isActive={ isActive || addingLink }
 				shortcutType="primary"
 				shortcutCharacter="k"
@@ -122,8 +142,7 @@ function Edit( {
 			/>
 			{ addingLink && (
 				<InlineLinkUI
-					addingLink={ addingLink }
-					stopAddingLink={ stopAddingLink }
+					stopAddingLink={ onClose }
 					isActive={ isActive }
 					activeAttributes={ activeAttributes }
 					value={ value }
