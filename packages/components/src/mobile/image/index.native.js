@@ -85,6 +85,15 @@ const ImageComponent = ( {
 			} );
 
 			if ( url.startsWith( 'file:///' ) ) {
+				if ( ! isCurrent ) {
+					return;
+				}
+
+				if ( url !== localURL ) {
+					setNetworkImageLoaded( false );
+					setNetworkURL( false );
+				}
+
 				setLocalURL( url );
 			} else if ( url.startsWith( 'https://' ) ) {
 				if ( Platform.isIOS ) {
@@ -92,10 +101,11 @@ const ImageComponent = ( {
 				} else if ( Platform.isAndroid ) {
 					const result = RNImage.prefetch( url );
 					if ( result ) {
-						RNImage.prefetch( url ).then( () => {
-							setNetworkURL( url );
-							setNetworkImageLoaded( true );
-						} );
+						if ( ! isCurrent ) {
+							return;
+						}
+						setNetworkURL( url );
+						setNetworkImageLoaded( true );
 					}
 				}
 			}
