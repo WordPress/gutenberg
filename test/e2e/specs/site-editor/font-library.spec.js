@@ -19,10 +19,10 @@ test.describe( 'Font Library', () => {
 			await page
 				.getByRole( 'button', { name: /typography styles/i } )
 				.click();
-			const manageFontsIcon = page.getByRole( 'button', {
-				name: /manage fonts/i,
+			const manageFontsButton = page.getByRole( 'button', {
+				name: /Manage all fonts/i,
 			} );
-			await expect( manageFontsIcon ).toBeVisible();
+			await expect( manageFontsButton ).toBeVisible();
 		} );
 	} );
 
@@ -41,10 +41,10 @@ test.describe( 'Font Library', () => {
 			await page
 				.getByRole( 'button', { name: /typography styles/i } )
 				.click();
-			const manageFontsIcon = page.getByRole( 'button', {
-				name: /manage fonts/i,
+			const manageFontsButton = page.getByRole( 'button', {
+				name: /Manage all fonts/i,
 			} );
-			await expect( manageFontsIcon ).toBeVisible();
+			await expect( manageFontsButton ).toBeVisible();
 		} );
 
 		test( 'should open the "Manage Fonts" modal when clicking the "Manage Fonts" icon', async ( {
@@ -56,7 +56,7 @@ test.describe( 'Font Library', () => {
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: /manage fonts/i,
+					name: /Manage all fonts/i,
 				} )
 				.click();
 			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
@@ -74,7 +74,7 @@ test.describe( 'Font Library', () => {
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: /manage fonts/i,
+					name: /Manage all fonts/i,
 				} )
 				.click();
 			await page.getByRole( 'button', { name: /system font/i } ).click();
