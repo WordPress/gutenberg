@@ -415,8 +415,6 @@ if ( hasExperimentalModulesFlag ) {
 			},
 		},
 
-		externalsType: 'module',
-
 		plugins: [
 			new webpack.DefinePlugin( {
 				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
