@@ -2,6 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -10,7 +11,7 @@ import Button from '../button';
 import { Heading } from '../heading';
 import { HStack } from '../h-stack';
 import { space } from '../utils/space';
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, font } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';
 import {
@@ -18,12 +19,14 @@ import {
 	Input,
 	BackdropUI as InputBackdropUI,
 } from '../input-control/styles/input-control-styles';
-import CircularOptionPicker from '../circular-option-picker';
+import ColorIndicator from '../color-indicator';
 
-export const IndicatorStyled = styled( CircularOptionPicker.Option )`
-	width: ${ space( 6 ) };
-	height: ${ space( 6 ) };
-	pointer-events: none;
+export const IndicatorStyled = styled( ColorIndicator )`
+	&& {
+		flex-shrink: 0;
+		width: ${ space( 6 ) };
+		height: ${ space( 6 ) };
+	}
 `;
 
 export const NameInputControl = styled( InputControl )`
@@ -40,20 +43,66 @@ export const NameInputControl = styled( InputControl )`
 	}
 `;
 
+const buttonStyleReset = ( {
+	as,
+}: {
+	as: React.ComponentProps< typeof View >[ 'as' ];
+} ) => {
+	if ( as === 'button' ) {
+		return css`
+			display: flex;
+			align-items: center;
+			width: 100%;
+			appearance: none;
+			background: transparent;
+			border: none;
+			border-radius: 0;
+			padding: 0;
+			cursor: pointer;
+
+			&:hover {
+				color: ${ COLORS.theme.accent };
+			}
+		`;
+	}
+	return null;
+};
+
 export const PaletteItem = styled( View )`
+	${ buttonStyleReset }
+
 	padding-block: 3px;
 	padding-inline-start: ${ space( 3 ) };
 	border: 1px solid ${ CONFIG.surfaceBorderColor };
 	border-bottom-color: transparent;
-	&:first-of-type {
-		border-top-left-radius: ${ CONFIG.controlBorderRadius };
-		border-top-right-radius: ${ CONFIG.controlBorderRadius };
+	font-size: ${ font( 'default.fontSize' ) };
+
+	&:focus-visible {
+		border-color: transparent;
+		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			var(
+				--wp-components-color-accent,
+				var( --wp-admin-theme-color, ${ COLORS.theme.accent } )
+			);
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: 0;
 	}
-	&:last-of-type {
+
+	border-top-left-radius: ${ CONFIG.controlBorderRadius };
+	border-top-right-radius: ${ CONFIG.controlBorderRadius };
+
+	& + & {
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+	}
+
+	&:last-child {
 		border-bottom-left-radius: ${ CONFIG.controlBorderRadius };
 		border-bottom-right-radius: ${ CONFIG.controlBorderRadius };
 		border-bottom-color: ${ CONFIG.surfaceBorderColor };
 	}
+
 	&.is-selected + & {
 		border-top-color: transparent;
 	}
@@ -68,9 +117,6 @@ export const NameContainer = styled.div`
 	margin-right: ${ space( 2 ) };
 	white-space: nowrap;
 	overflow: hidden;
-	${ PaletteItem }:hover & {
-		color: ${ COLORS.theme.accent };
-	}
 `;
 
 export const PaletteHeading = styled( Heading )`
