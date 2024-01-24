@@ -327,9 +327,9 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests the is_void_element method.
+	 * Tests the is_void method.
 	 *
-	 * @covers ::is_void_element
+	 * @covers ::is_void
 	 */
 	public function test_is_void_element() {
 		$void_elements = array( 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr' );
@@ -337,7 +337,7 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 			$content = "<{$tag_name} id={$tag_name}>";
 			$p       = new WP_Interactivity_API_Directives_Processor( $content );
 			$p->next_tag();
-			$this->assertTrue( $p->is_void_element() );
+			$this->assertTrue( $p->is_void() );
 		}
 
 		$non_void_elements = array( 'div', 'span', 'p', 'script', 'style' );
@@ -345,25 +345,25 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 			$content = "<{$tag_name} id={$tag_name}>Some content</{$tag_name}>";
 			$p       = new WP_Interactivity_API_Directives_Processor( $content );
 			$p->next_tag();
-			$this->assertFalse( $p->is_void_element() );
+			$this->assertFalse( $p->is_void() );
 		}
 
 		// Test an upercase tag.
 		$content = '<IMG src="example.jpg">';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$this->assertTrue( $p->is_void_element() );
+		$this->assertTrue( $p->is_void() );
 
 		// Test an empty string.
 		$content = '';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$this->assertFalse( $p->is_void_element() );
+		$this->assertFalse( $p->is_void() );
 
 		// Test on text nodes.
 		$content = 'This is just some text';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$this->assertFalse( $p->is_void_element() );
+		$this->assertFalse( $p->is_void() );
 	}
 }

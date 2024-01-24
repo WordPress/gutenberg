@@ -232,7 +232,7 @@ class WP_Interactivity_API {
 				 * If this is not a void element, it adds it to the tag stack so it can
 				 * process its closing tag and check for unbalanced tags.
 				 */
-				if ( ! $p->is_void_element() ) {
+				if ( ! $p->is_void() ) {
 					$tag_stack[] = array( $tag_name, $directives_prefixes );
 				}
 			}

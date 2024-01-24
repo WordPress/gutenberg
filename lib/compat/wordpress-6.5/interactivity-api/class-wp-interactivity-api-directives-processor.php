@@ -106,7 +106,7 @@ class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Proce
 		$depth    = 0;
 		$tag_name = $this->get_tag();
 
-		if ( $this->is_void_element() ) {
+		if ( $this->is_void() ) {
 			return false;
 		}
 
@@ -134,30 +134,12 @@ class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Proce
 	/**
 	 * Checks whether the current tag is void.
 	 *
-	 * @see https://html.spec.whatwg.org/#elements-2
-	 *
 	 * @access private
 	 *
 	 * @return bool Whether the current tag is void or not.
 	 */
-	public function is_void_element(): bool {
+	public function is_void(): bool {
 		$tag_name = $this->get_tag();
-		$tag_name = strtoupper( null !== $tag_name ? $tag_name : '' );
-
-		return (
-			'AREA' === $tag_name ||
-			'BASE' === $tag_name ||
-			'BR' === $tag_name ||
-			'COL' === $tag_name ||
-			'EMBED' === $tag_name ||
-			'HR' === $tag_name ||
-			'IMG' === $tag_name ||
-			'INPUT' === $tag_name ||
-			'LINK' === $tag_name ||
-			'META' === $tag_name ||
-			'SOURCE' === $tag_name ||
-			'TRACK' === $tag_name ||
-			'WBR' === $tag_name
-		);
+		return Gutenberg_HTML_Processor_6_5::is_void( null !== $tag_name ? $tag_name : '' );
 	}
 }
