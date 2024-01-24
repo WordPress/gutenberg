@@ -260,7 +260,6 @@ function InlineLinkUI( {
 			shift
 		>
 			<LinkControl
-				showInitialSuggestions={ true }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
@@ -271,6 +270,7 @@ function InlineLinkUI( {
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
 				settings={ LINK_SETTINGS }
+				showInitialSuggestions={ true }
 				suggestionsQuery={ {
 					// always show Pages as initial suggestions
 					initialSuggestionsSearchOptions: {
