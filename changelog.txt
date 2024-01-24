@@ -1,5 +1,40 @@
 == Changelog ==
 
+= 17.5.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- (Preferences)(17.5.1)(fix) Remove non-core-migrated preferences from the deprecation proxy for `get` ([58153](https://github.com/WordPress/gutenberg/pull/58153))
+- (editor)(fix) Append the `edit-post-header-toolbar` class in NavigableToolbar for backward compatibility with plugin GUI injections ([58154](https://github.com/WordPress/gutenberg/pull/58154))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@fullofcaffeine 
+
+
+
+
+= 17.5.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- (Preferences)(hotfix)(17.5) Hotfix for missing preferences in the `core` scope([58031](https://github.com/WordPress/gutenberg/pull/58031))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad @fullofcaffeine 
+
+
+
+
 = 17.5.0 =
 
 ## Changelog

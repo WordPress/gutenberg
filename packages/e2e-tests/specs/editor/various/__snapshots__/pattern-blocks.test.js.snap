@@ -1,11 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Pattern blocks allows conversion back to blocks when the reusable block has unsaved edits 1`] = `
-"<!-- wp:paragraph -->
-<p>12</p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Pattern blocks can be created from multiselection and converted back to regular blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>Hello there!</p>

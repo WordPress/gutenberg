@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate } from '@wordpress/interactivity';
+import { store } from '@wordpress/interactivity';
 
 const html = `
 		<div
 			data-wp-interactive='{ "namespace": "directive-key" }'
-			data-wp-navigation-id="some-id"
+			data-wp-router-region="some-id"
 		>
 			<ul>
 				<li data-wp-key="id-1">1</li>
@@ -17,8 +17,11 @@ const html = `
 
 store( 'directive-key', {
 	actions: {
-		navigate() {
-			navigate( window.location, {
+		*navigate() {
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );
