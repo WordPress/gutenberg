@@ -33,9 +33,11 @@ add_action(
 			}
 		}
 
-		// Disable the server directive processing during E2E testing. This is
-		// required to ensure that client hydration works even when the rendered
-		// HTML contains unbalanced tags and it couldn't be processed in the server.
+		/*
+		 * Disable the server directive processing during E2E testing. This is
+		 * required to ensure that client hydration works even when the rendered
+		 * HTML contains unbalanced tags and it couldn't be processed in the server.
+		 */
 		if ( 'true' === $_GET['disable_server_directive_processing'] ) {
 			// Ensure the interactivity API is loaded.
 			wp_interactivity();

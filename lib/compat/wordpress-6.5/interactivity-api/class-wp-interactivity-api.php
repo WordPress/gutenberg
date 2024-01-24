@@ -183,17 +183,25 @@ class WP_Interactivity_API {
 				list( $opening_tag_name, $directives_prefixes ) = end( $tag_stack );
 
 				if ( 0 === count( $tag_stack ) || $opening_tag_name !== $tag_name ) {
-					// If the tag stack is empty or the matching opening tag is not the
-					// same than the closing tag, it means the HTML is unbalanced and it
-					// stops processing it.
+
+					/*
+					 * If the tag stack is empty or the matching opening tag is not the
+					 * same than the closing tag, it means the HTML is unbalanced and it
+					 * stops processing it.
+					 */
 					$unbalanced = true;
 					continue;
 				} else {
-					// It removes the last tag from the stack.
+
+					/*
+					 * It removes the last tag from the stack.
+					 */
 					array_pop( $tag_stack );
 
-					// If the matching opening tag didn't have any directives, it can skip
-					// the processing.
+					/*
+					 * If the matching opening tag didn't have any directives, it can skip
+					 * the processing.
+					 */
 					if ( 0 === count( $directives_prefixes ) ) {
 						continue;
 					}
@@ -202,24 +210,31 @@ class WP_Interactivity_API {
 				$directives_prefixes = array();
 
 				foreach ( $p->get_attribute_names_with_prefix( 'data-wp-' ) as $attribute_name ) {
-					// Extracts the directive prefix to see if there is a server directive
-					// processor registered for that directive.
+
+					/*
+					 * Extracts the directive prefix to see if there is a server directive
+					 * processor registered for that directive.
+					 */
 					list( $directive_prefix ) = $this->extract_prefix_and_suffix( $attribute_name );
 					if ( array_key_exists( $directive_prefix, self::$directive_processors ) ) {
 						$directives_prefixes[] = $directive_prefix;
 					}
 				}
 
-				// If this is not a void element, it adds it to the tag stack so it can
-				// process its closing tag and check for unbalanced tags.
+				/*
+				 * If this is not a void element, it adds it to the tag stack so it can
+				 * process its closing tag and check for unbalanced tags.
+				 */
 				if ( ! $p->is_void_element() ) {
 					$tag_stack[] = array( $tag_name, $directives_prefixes );
 				}
 			}
 
-			// Sorts the attributes by the order of the `directives_processor` array
-			// and checks what directives are present in this element. The processing
-			// order is reversed for tag closers.
+			/*
+			 * Sorts the attributes by the order of the `directives_processor` array
+			 * and checks what directives are present in this element. The processing
+			 * order is reversed for tag closers.
+			 */
 			$directives_prefixes = array_intersect(
 				$p->is_tag_closer()
 					? $directive_processor_prefixes_reversed
@@ -239,9 +254,11 @@ class WP_Interactivity_API {
 			}
 		}
 
-		// It returns the original content if the HTML is unbalanced because
-		// unbalanced HTML is not safe to process. In that case, the Interactivity
-		// API runtime will update the HTML on the client side during the hydration.
+		/*
+		 * It returns the original content if the HTML is unbalanced because
+		 * unbalanced HTML is not safe to process. In that case, the Interactivity
+		 * API runtime will update the HTML on the client side during the hydration.
+		 */
 		return $unbalanced || 0 < count( $tag_stack ) ? $html : $p->get_updated_html();
 	}
 
@@ -347,9 +364,11 @@ class WP_Interactivity_API {
 			$directive_value   = isset( $matches[2] ) ? $matches[2] : null;
 		}
 
-		// Tries to decode the value as a JSON object. If it fails and the value
-		// isn't `null`, it returns the value as it is. Otherwise, it returns the
-		// decoded JSON or null for the string `null`.
+		/*
+		 * Tries to decode the value as a JSON object. If it fails and the value
+		 * isn't `null`, it returns the value as it is. Otherwise, it returns the
+		 * decoded JSON or null for the string `null`.
+		 */
 		$decoded_json = json_decode( $directive_value, true );
 		if ( null !== $decoded_json || 'null' === $directive_value ) {
 				$directive_value = $decoded_json;
@@ -383,12 +402,14 @@ class WP_Interactivity_API {
 		? json_decode( $attribute_value, true )
 		: null;
 
-		// Pushes the newly defined namespace or the current one if the
-		// `data-wp-interactive` definition was invalid or does not contain a
-		// namespace. It does so because the function pops out the current namespace
-		// from the stack whenever it finds a `data-wp-interactive`'s closing tag,
-		// independently of whether the previous `data-wp-interactive` definition
-		// contained a valid namespace.
+		/*
+		 * Pushes the newly defined namespace or the current one if the
+		 * `data-wp-interactive` definition was invalid or does not contain a
+		 * namespace. It does so because the function pops out the current namespace
+		 * from the stack whenever it finds a `data-wp-interactive`'s closing tag,
+		 * independently of whether the previous `data-wp-interactive` definition
+		 * contained a valid namespace.
+		 */
 		$namespace_stack[] = isset( $decoded_json['namespace'] )
 			? $decoded_json['namespace']
 			: end( $namespace_stack );
@@ -420,8 +441,10 @@ class WP_Interactivity_API {
 		? $this->extract_directive_value( $attribute_value, $namespace_value )
 		: array( $namespace_value, null );
 
-		// If there is a namespace, it adds a new context to the stack merging the
-		// previous context with the new one.
+		/*
+		 * If there is a namespace, it adds a new context to the stack merging the
+		 * previous context with the new one.
+		 */
 		if ( is_string( $namespace_value ) ) {
 			array_push(
 				$context_stack,
@@ -431,9 +454,11 @@ class WP_Interactivity_API {
 				)
 			);
 		} else {
-			// If there is no namespace, it pushes the current context to the stack.
-			// It needs to do so because the function pops out the current context
-			// from the stack whenever it finds a `data-wp-context`'s closing tag.
+			/*
+			 * If there is no namespace, it pushes the current context to the stack.
+			 * It needs to do so because the function pops out the current context
+			 * from the stack whenever it finds a `data-wp-context`'s closing tag.
+			 */
 			array_push( $context_stack, end( $context_stack ) );
 		}
 	}
@@ -464,11 +489,13 @@ class WP_Interactivity_API {
 				$result          = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
 
 				if ( null !== $result && ( false !== $result || '-' === $bound_attribute[4] ) ) {
-					// If the result of the evaluation is a boolean and the attribute is
-					// `aria-` or `data-, convert it to a string "true" or "false". It
-					// follows the exact same logic as Preact because it needs to
-					// replicate what Preact will later do in the client:
-					// https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+					/*
+					 * If the result of the evaluation is a boolean and the attribute is
+					 * `aria-` or `data-, convert it to a string "true" or "false". It
+					 * follows the exact same logic as Preact because it needs to
+					 * replicate what Preact will later do in the client:
+					 * https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+					 */
 					if ( is_bool( $result ) && '-' === $bound_attribute[4] ) {
 						$result = $result ? 'true' : 'false';
 					}
@@ -542,13 +569,17 @@ class WP_Interactivity_API {
 				$style_attribute_value     = $p->get_attribute( 'style' );
 				$style_attribute_value     = ( $style_attribute_value && ! is_bool( $style_attribute_value ) ) ? $style_attribute_value : '';
 
-				// Checks first if the style property is not falsy and the style
-				// attribute value is not empty because if it is, it doesn't need to
-				// update the attribute value.
+				/*
+				 * Checks first if the style property is not falsy and the style
+				 * attribute value is not empty because if it is, it doesn't need to
+				 * update the attribute value.
+				 */
 				if ( $style_property_value || ( ! $style_property_value && $style_attribute_value ) ) {
 					$style_attribute_value = $this->set_style_property( $style_attribute_value, $style_property, $style_property_value );
-					// If the style attribute value is not empty, it sets it. Otherwise,
-					// it removes it.
+					/*
+					 * If the style attribute value is not empty, it sets it. Otherwise,
+					 * it removes it.
+					 */
 					if ( ! empty( $style_attribute_value ) ) {
 						$p->set_attribute( 'style', $style_attribute_value );
 					} else {
@@ -626,9 +657,11 @@ class WP_Interactivity_API {
 			$attribute_value = $p->get_attribute( 'data-wp-text' );
 			$result          = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
 
-			// Follows the same logic as Preact in the client and only changes the
-			// content if the value is a string or a number. Otherwise, it removes the
-			// content.
+			/*
+			 * Follows the same logic as Preact in the client and only changes the
+			 * content if the value is a string or a number. Otherwise, it removes the
+			 * content.
+			 */
 			if ( is_string( $result ) || is_numeric( $result ) ) {
 				$p->set_content_between_balanced_tags( esc_html( $result ) );
 			} else {
