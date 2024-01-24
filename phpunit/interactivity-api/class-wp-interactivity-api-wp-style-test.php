@@ -67,7 +67,7 @@ class Tests_WP_Interactivity_API_WP_Style extends WP_UnitTestCase {
 
 		// Handles multiple existing properties.
 		$result = $this->set_style_property( 'color:red;margin:5px;', 'color', 'green' );
-		$this->assertEquals( 'color:green;margin:5px;', $result );
+		$this->assertEquals( 'margin:5px;color:green;', $result );
 
 		// Adds a new property when multiple existing properties do not match.
 		$result = $this->set_style_property( 'color:red;margin:5px;', 'padding', '10px' );
@@ -92,6 +92,10 @@ class Tests_WP_Interactivity_API_WP_Style extends WP_UnitTestCase {
 		// Handles empty properties in the input.
 		$result = $this->set_style_property( 'color:red;;margin:5px;;', 'padding', '10px' );
 		$this->assertEquals( 'color:red;margin:5px;padding:10px;', $result );
+
+		// Moves the modified property to the end.
+		$result = $this->set_style_property( 'border-style: dashed; border: 3px solid red;', 'border-style', 'inset' );
+		$this->assertEquals( 'border:3px solid red;border-style:inset;', $result );
 	}
 
 	/**

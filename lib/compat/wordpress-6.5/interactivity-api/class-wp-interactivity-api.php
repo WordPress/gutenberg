@@ -597,6 +597,9 @@ class WP_Interactivity_API {
 	 * Sets an individual style property in the `style` attribute of an HTML
 	 * element, updating or removing the property when necessary.
 	 *
+	 * If a property is modified, it is added at the end of the list to make sure
+	 * that it overrides the previous ones.
+	 *
 	 * @since 6.5.0
 	 *
 	 * Example:
@@ -614,31 +617,22 @@ class WP_Interactivity_API {
 	private function set_style_property( string $style_attribute_value, string $style_property_name, $style_property_value ): string {
 		$style_assignments    = explode( ';', $style_attribute_value );
 		$result               = array();
-		$style_property_found = false;
 		$style_property_value = ! empty( $style_property_value ) ? rtrim( trim( $style_property_value ), ';' ) : null;
+		$new_style_property   = $style_property_value ? $style_property_name . ':' . $style_property_value . ';' : '';
 
-		// Searches for the style property in the existing properties.
+		// Generate an array with all the properties but the modified one.
 		foreach ( $style_assignments as $style_assignment ) {
 			if ( empty( trim( $style_assignment ) ) ) {
 				continue;
 			}
 			list( $name, $value ) = explode( ':', $style_assignment );
-			if ( trim( $name ) === $style_property_name ) {
-				// If the value is false, it omits it to the result.
-				if ( $style_property_value ) {
-					$result[] = $style_property_name . ':' . $style_property_value . ';';
-				}
-				$style_property_found = true;
-			} else {
+			if ( trim( $name ) !== $style_property_name ) {
 				$result[] = trim( $name ) . ':' . trim( $value ) . ';';
 			}
 		}
 
-		// If it doesn't find the style property, it adds it at the end of the list.
-		if ( ! $style_property_found && $style_property_value ) {
-			$new_style_assignment = $style_property_name . ':' . $style_property_value . ';';
-			array_push( $result, $new_style_assignment );
-		}
+		// Add the new/modified property at the end of the list.
+		array_push( $result, $new_style_property );
 
 		return implode( '', $result );
 	}
