@@ -40,17 +40,6 @@ function Edit( {
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
-	const isSelectionCollapsed = isCollapsed( value );
-
-	const canMakeLink = ! isSelectionCollapsed && ! addingLink && ! isActive;
-
-	// There is a situation whereby there is an existing link in the rich text
-	// and the user clicks on the leftmost edge of that link and fails to activate
-	// the link format, but the click event still fires on the `<a>` element.
-	// This causes the `addingLink` state to be set to `true` and the link UI
-	// to be rendered in "creating" mode.
-	const collapsedSelectionInactiveLink = isSelectionCollapsed && ! isActive;
-
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
 		if ( ! editableContentElement ) {
@@ -108,20 +97,12 @@ function Edit( {
 
 	return (
 		<>
-			{ canMakeLink && (
-				<RichTextShortcut
-					type="primary"
-					character="k"
-					onUse={ addLink }
-				/>
-			) }
-
+			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
 			<RichTextShortcut
 				type="primaryShift"
 				character="k"
 				onUse={ onRemoveFormat }
 			/>
-
 			<RichTextToolbarButton
 				name="link"
 				icon={ linkIcon }
@@ -132,10 +113,8 @@ function Edit( {
 				shortcutCharacter="k"
 				aria-haspopup="true"
 				aria-expanded={ addingLink }
-				disabled={ collapsedSelectionInactiveLink }
 			/>
-
-			{ addingLink && ! collapsedSelectionInactiveLink && (
+			{ addingLink && (
 				<InlineLinkUI
 					addingLink={ addingLink }
 					stopAddingLink={ stopAddingLink }
