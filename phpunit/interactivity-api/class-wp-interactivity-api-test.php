@@ -289,6 +289,9 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 
 		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::1.2.3', 'myPlugin' );
 		$this->assertEquals( array( 'otherPlugin', '1.2.3' ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::[{"o":4}, null, 3e6]', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', array( array( 'o' => 4 ), null, 3000000.0 ) ), $result );
 	}
 
 	/**
@@ -537,6 +540,12 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 		$this->assertNull( $result );
 
 		$result = $this->evaluate( 'otherPlugin::context.nonExistentKey' );
+		$this->assertNull( $result );
+
+		$result = $this->evaluate( ' state.key' ); // Extra space.
+		$this->assertNull( $result );
+
+		$result = $this->evaluate( 'otherPlugin:: state.key' ); // Extra space.
 		$this->assertNull( $result );
 	}
 
