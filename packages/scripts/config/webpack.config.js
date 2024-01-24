@@ -116,6 +116,9 @@ const config = {
 	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
+		chunkFileName() {
+			return '[name].js?v=[chunkhash]';
+		},
 		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
