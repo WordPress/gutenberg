@@ -1599,13 +1599,19 @@ export function blocksMode( state = {}, action ) {
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index, __unstableWithInserter, operation } =
-				action;
+			const {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+				nearestSide,
+			} = action;
 			const nextState = {
 				rootClientId,
 				index,
 				__unstableWithInserter,
 				operation,
+				nearestSide,
 			};
 
 			// Bail out updates if the states are the same.
