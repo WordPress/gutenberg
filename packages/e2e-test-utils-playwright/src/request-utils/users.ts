@@ -5,6 +5,7 @@ import type { RequestUtils } from './index';
 
 export interface User {
 	id: number;
+	name: string;
 	email: string;
 }
 
@@ -73,13 +74,21 @@ async function createUser( this: RequestUtils, user: UserData ) {
 		userData.roles = user.roles;
 	}
 
-	const response = await this.rest< User >( {
-		method: 'POST',
-		path: '/wp/v2/users',
-		data: userData,
-	} );
+	try {
+		const response = await this.rest< User >( {
+			method: 'POST',
+			path: '/wp/v2/users',
+			data: userData,
+		} );
 
-	return response;
+		return response;
+	} catch ( error: any ) {
+		if ( error.code === 'existing_user_login' ) {
+			return null;
+		}
+
+		throw error;
+	}
 }
 
 /**
@@ -111,7 +120,7 @@ async function deleteAllUsers( this: RequestUtils ) {
 	const responses = await Promise.all(
 		users
 			// Do not delete root user.
-			.filter( ( user: User ) => user.id !== 1 )
+			.filter( ( user: User ) => user.name !== process.env.WP_USERNAME )
 			.map( ( user: User ) => deleteUser.bind( this )( user.id ) )
 	);
 
