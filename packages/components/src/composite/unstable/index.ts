@@ -7,8 +7,9 @@
  *
  * @see https://reakit.io/docs/composite/
  *
- * The plan is to build own API that accounts for future breaking changes
- * in Reakit (https://github.com/WordPress/gutenberg/pull/28085).
+ * This is now entirely deprecated in favor of [current](../current), which is
+ * based on Ariakit. A [legacy](../legacy) implementation of this API has been
+ * created for backwards-compatibility, which will eventually replace this.
  */
 /* eslint-disable-next-line no-restricted-imports */
 export {
