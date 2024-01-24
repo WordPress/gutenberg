@@ -2,8 +2,8 @@
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
 // that have not yet been included in Gutenberg's compatibility layer (lib/compat/wordpress-6.4/block-hooks.php).
 if ( function_exists( 'get_hooked_blocks' ) ) {
-	add_filter( 'rest_prepare_wp_navigation', 'gutenberg_hook_blocks_into_core_navigation_rest_response', 10, 3 );
-	add_action( 'rest_insert_wp_navigation', 'gutenberg_update_ignore_hooked_blocks_meta_core_navigation', 10, 3 );
+	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
+	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
 /**
@@ -11,7 +11,7 @@ if ( function_exists( 'get_hooked_blocks' ) ) {
  *
  * @param WP_Post $post Post object.
  */
-function gutenberg_update_ignore_hooked_blocks_meta_core_navigation( $post ) {
+function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	if ( ! isset( $post->ID ) ) {
 		return;
 	}
@@ -45,7 +45,7 @@ function gutenberg_update_ignore_hooked_blocks_meta_core_navigation( $post ) {
  * @param WP_REST_Request  $request  Request object.
  * @return WP_REST_Response The response object.
  */
-function gutenberg_hook_blocks_into_core_navigation_rest_response( $response, $post ) {
+function block_core_navigation_insert_hooked_blocks_into_rest_response( $response, $post ) {
 	if ( ! isset( $response->data['content']['raw'] ) || ! isset( $response->data['content']['rendered'] ) ) {
 		return $response;
 	}
