@@ -252,34 +252,6 @@ describe( 'Pattern blocks', () => {
 		);
 	} );
 
-	// Check for regressions of https://github.com/WordPress/gutenberg/issues/26421.
-	// Skip reason: This is broken at the time with Pattern Overrides.
-	// See https://github.com/WordPress/gutenberg/issues/58122
-	it.skip( 'allows conversion back to blocks when the reusable block has unsaved edits', async () => {
-		await createReusableBlock( '1', 'Edited block' );
-
-		// Make an edit to the reusable block and assert that there's only a
-		// paragraph in a reusable block.
-		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
-		await canvas().click( 'p[aria-label="Block: Paragraph"]' );
-		await page.keyboard.type( '2' );
-		const selector =
-			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Block: Paragraph"][.="12"]';
-		const reusableBlockWithParagraph = await page.$x( selector );
-		expect( reusableBlockWithParagraph ).toBeTruthy();
-
-		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select parent block: Edited block' );
-		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Detach' );
-		await page.waitForXPath( selector, {
-			hidden: true,
-		} );
-
-		// Check that there's only a paragraph.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/27243.
 	it( 'should allow a block with styles to be converted to a reusable block', async () => {
 		// Insert a quote and reload the page.

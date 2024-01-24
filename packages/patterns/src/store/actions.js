@@ -104,7 +104,12 @@ export const convertSyncedPatternToStatic =
 				}
 				return cloneBlock(
 					block,
-					{ metadata },
+					{
+						metadata:
+							Object.keys( metadata ).length > 0
+								? metadata
+								: undefined,
+					},
 					cloneBlocksAndRemoveBindings( block.innerBlocks )
 				);
 			} );
