@@ -158,6 +158,7 @@ function EditorCanvas( {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
+				expand: isZoomOutMode,
 				scale,
 				frameSize,
 				className: classnames(
