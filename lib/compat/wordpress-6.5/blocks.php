@@ -46,7 +46,6 @@ function gutenberg_register_metadata_attribute( $args ) {
 }
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
-require_once __DIR__ . '/block-bindings/index.php';
 
 if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 	/**
