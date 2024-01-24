@@ -19,7 +19,7 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 	wp_block_bindings_register_source(
 		'post_meta',
 		array(
-			'label' => __( 'Post Meta', 'gutenberg' ),
+			'label' => __( 'Post Meta' ),
 			'apply' => $post_meta_source_callback,
 		)
 	);

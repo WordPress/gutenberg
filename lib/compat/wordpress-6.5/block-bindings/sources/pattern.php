@@ -30,7 +30,7 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 	wp_block_bindings_register_source(
 		'pattern_attributes',
 		array(
-			'label' => __( 'Pattern Attributes', 'gutenberg' ),
+			'label' => __( 'Pattern Attributes' ),
 			'apply' => $pattern_source_callback,
 		)
 	);
