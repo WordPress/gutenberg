@@ -108,3 +108,10 @@ export const hideBlockTypes =
 			.dispatch( preferencesStore )
 			.set( 'core', 'hiddenBlockTypes', [ ...mergedBlockNames ] );
 	};
+
+export function setIsEditedPostBeingScheduled( isBeingScheduled ) {
+	return {
+		type: 'SET_IS_EDITED_POST_BEING_SCHEDULED',
+		isBeingScheduled,
+	};
+}

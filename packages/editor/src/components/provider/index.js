@@ -13,6 +13,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
+import { isInTheFuture, getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -133,17 +134,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			rootLevelPost?.slug,
 			shouldRenderTemplate,
 		] );
-		const { editorSettings, selection, isReady } = useSelect(
+		const { editorSettings, selection, isReady, date } = useSelect(
 			( select ) => {
 				const {
 					getEditorSettings,
 					getEditorSelection,
 					__unstableIsEditorReady,
+					getEditedPostAttribute,
 				} = select( editorStore );
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
 					selection: getEditorSelection(),
+					date: getEditedPostAttribute( 'date' ),
 				};
 			},
 			[]
@@ -160,6 +163,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode
 		);
 
+		const { isEditedPostBeingScheduled } = useSelect( editorStore );
 		const {
 			updatePostLock,
 			setupEditor,
@@ -167,6 +171,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setIsEditedPostBeingScheduled,
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
 
@@ -216,6 +221,47 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
+		// When the date changes, check if the post is being scheduled. We check
+		// here for two reasons instead of in the selector:
+		// - A selector is not reactive: it will only be called when the global
+		//   editor state changes, it's not recalculated when the time changes.
+		// - Doing the date calculations is relatively expensive for a selector
+		//   that is called hundreds of times.
+		useEffect( () => {
+			const ONE_MINUTE_IN_MS = 1000 * 60;
+
+			function adjust() {
+				// Offset the date by one minute (network latency).
+				const checkedDate = new Date(
+					Number( getDate( date ) ) - ONE_MINUTE_IN_MS
+				);
+				const isBeingScheduled = isInTheFuture( checkedDate );
+
+				if ( isBeingScheduled !== isEditedPostBeingScheduled() ) {
+					setIsEditedPostBeingScheduled( isBeingScheduled );
+				}
+
+				return isBeingScheduled;
+			}
+
+			const isBeingScheduled = adjust();
+
+			// If a post is not scheduled, don't bother to check again, because
+			// a date in the past can't suddently become in the future.
+			if ( ! isBeingScheduled ) {
+				return;
+			}
+
+			const intervalId = setInterval( adjust, ONE_MINUTE_IN_MS );
+			return () => {
+				clearInterval( intervalId );
+			};
+		}, [
+			date,
+			isEditedPostBeingScheduled,
+			setIsEditedPostBeingScheduled,
+		] );
 
 		if ( ! isReady ) {
 			return null;

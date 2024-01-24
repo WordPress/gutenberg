@@ -646,13 +646,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = getEditedPostAttribute( state, 'date' );
-	// Offset the date by one minute (network latency).
-	const checkedDate = new Date(
-		Number( getDate( date ) ) - ONE_MINUTE_IN_MS
-	);
-
-	return isInTheFuture( checkedDate );
+	return state.isEditedPostBeingScheduled;
 }
 
 /**

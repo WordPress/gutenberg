@@ -360,6 +360,14 @@ export function listViewToggleRef( state = { current: null } ) {
 	return state;
 }
 
+function isEditedPostBeingScheduled( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_EDITED_POST_BEING_SCHEDULED':
+			return action.isBeingScheduled;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -377,4 +385,5 @@ export default combineReducers( {
 	blockInserterPanel,
 	listViewPanel,
 	listViewToggleRef,
+	isEditedPostBeingScheduled,
 } );
