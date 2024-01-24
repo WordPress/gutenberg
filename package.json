@@ -184,7 +184,7 @@
 		"commander": "9.2.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "10.2.0",
-		"core-js-builder": "3.31.0",
+		"core-js-builder": "3.35.1",
 		"cross-env": "3.2.4",
 		"css-loader": "6.2.0",
 		"cssnano": "6.0.1",
