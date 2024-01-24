@@ -21,12 +21,11 @@ add_action(
 
 				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
-				gutenberg_register_module(
+				wp_register_script_module(
 					$name . '-view',
 					$view_file,
 					array( '@wordpress/interactivity' ),
-					filemtime( $view_file ),
-					true
+					filemtime( $view_file )
 				);
 
 				register_block_type_from_metadata( $block_folder );

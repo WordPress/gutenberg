@@ -7,7 +7,7 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-gutenberg_enqueue_module( 'router-regions-view' );
+wp_enqueue_script_module( 'router-regions-view' );
 ?>
 
 <section>

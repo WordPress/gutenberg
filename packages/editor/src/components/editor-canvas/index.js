@@ -12,7 +12,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
-	__experimentalRecursionProvider as RecursionProvider,
+	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';

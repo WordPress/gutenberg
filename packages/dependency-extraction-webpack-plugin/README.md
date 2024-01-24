@@ -94,14 +94,14 @@ By default, the following module requests are handled:
 
 This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
 
-### Behavior with modules
+### Behavior with script modules
 
-**Warning:** Modules support is considered experimental at this time.
+**Warning:** Script modules support is considered experimental at this time.
 
 This section describes the behavior of this package to bundle ECMAScript modules and generate asset
-files suitable for use with the WordPress Modules API.
+files suitable for use with the WordPress Script Modules API.
 
-Some of this plugin's options change, and webpack requires configuration to output modules. Refer to
+Some of this plugin's options change, and webpack requires configuration to output script modules. Refer to
 [webpack's documentation](https://webpack.js.org/configuration/output/#outputmodule) for up-to-date details.
 
 ```js
@@ -118,7 +118,7 @@ const webpackConfig = {
 				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
 		),
 		new DependencyExtractionWebpackPlugin( {
-			// With modules, we use `requestToExternalModule`:
+			// With modules, use `requestToExternalModule`:
 			requestToExternalModule( request ) {
 				if ( request === 'my-registered-module' ) {
 					return request;
@@ -129,7 +129,7 @@ const webpackConfig = {
 };
 ```
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
 
 For example:
 
@@ -144,15 +144,15 @@ import { store, getContext } from '@wordpress/interactivity';
 <?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
-By default, the following module requests are handled:
+By default, the following script module requests are handled:
 
 | Request                      |
 | ---------------------------- |
 | `@wordpress/interactivity  ` |
 
-(`@wordpress/interactivity` is currently the only available WordPress module.)
+(`@wordpress/interactivity` is currently the only available WordPress script module.)
 
-**Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract module handles from bundle compilation so that a list of module dependencies does not need to be manually maintained. If you don't need to extract a list of module dependencies, use the `externals` option directly.
+**Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script module identifiers from bundle compilation so that a list of script module dependencies does not need to be manually maintained. If you don't need to extract a list of script module dependencies, use the `externals` option directly.
 
 This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
 
@@ -210,7 +210,7 @@ Pass `useDefaults: false` to disable the default request handling.
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
 
-**Note**: This option is not available with modules.
+**Note**: This option is not available with script modules.
 
 ##### `externalizedReport`
 
@@ -222,7 +222,7 @@ You can provide a filename, or set it to `true` to report to a default `external
 
 ##### `requestToExternal`
 
-**Note**: This option is not available with modules. See [`requestToExternalModule`](#requestToExternalModule) for module usage.
+**Note**: This option is not available with script modules. See [`requestToExternalModule`](#requestToExternalModule) for module usage.
 
 -   Type: function
 
@@ -253,11 +253,11 @@ module.exports = {
 
 ##### `requestToExternalModule`
 
-**Note**: This option is only available with modules. See [`requestToExternal`](#requestToExternal) for script usage.
+**Note**: This option is only available with script modules. See [`requestToExternal`](#requestToExternal) for script usage.
 
 -   Type: function
 
-`requestToExternalModule` allows the module handling to be customized. The function should accept a module request string and may return a string representing the module to use. Often, the module will have the same name.
+`requestToExternalModule` allows the script module handling to be customized. The function should accept a script module request string and may return a string representing the script module to use. Often, the script module will have the same name.
 
 `requestToExternalModule` provided via configuration has precedence over default external handling. Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
 
@@ -265,9 +265,9 @@ module.exports = {
 /**
  * Externalize 'my-module'
  *
- * @param {string} request Requested module
+ * @param {string} request Requested script module
  *
- * @return {(string|boolean|undefined)} Module ID
+ * @return {(string|boolean|undefined)} Script module ID
  */
 function requestToExternalModule( request ) {
 	// Handle imports like `import myModule from 'my-module'`
@@ -276,7 +276,7 @@ function requestToExternalModule( request ) {
 		return 'myModule';
 	}
 
-	// If the Module ID in source is the same as the external module, we can return `true`.
+    // If the script module ID in source is the same as the external script module, `true` can be returned.
 	return request === 'external-module-id-no-change-required';
 }
 
@@ -289,7 +289,7 @@ module.exports = {
 
 ##### `requestToHandle`
 
-**Note**: This option is not available with modules. It has no corresponding module configuration.
+**Note**: This option is not available with script modules. It has no corresponding module configuration.
 
 -   Type: function
 
@@ -343,7 +343,7 @@ $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );
 ```
 
-Or with modules (the Module API is not yet stable):
+Or with modules (the Script Module API is only available in WordPress > 6.5):
 
 ```php
 $module_path       = 'path/to/module.js';
@@ -352,8 +352,8 @@ $module_asset      = file_exists( $module_asset_path )
 	? require( $module_asset_path )
 	: array( 'dependencies' => array(), 'version' => filemtime( $module_path ) );
 $module_url = plugins_url( $module_path, __FILE__ );
-wp_register_module( 'my-module', $module_url, $module_asset['dependencies'], $module_asset['version'] );
-wp_enqueue_module( 'my-module' );
+wp_register_script_module( 'my-module', $module_url, $module_asset['dependencies'], $module_asset['version'] );
+wp_enqueue_script_module( 'my-module' );
 ```
 
 ## Contributing to this package

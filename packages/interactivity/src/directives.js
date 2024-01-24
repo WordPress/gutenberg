@@ -9,7 +9,7 @@ import { deepSignal, peek } from 'deepsignal';
  */
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
-import { directive } from './hooks';
+import { directive, getScope, getEvaluate } from './hooks';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -331,4 +331,49 @@ export default () => {
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
 		run.forEach( ( entry ) => evaluate( entry ) );
 	} );
+
+	// data-wp-each--[item]
+	directive(
+		'each',
+		( {
+			directives: { each, 'each-key': eachKey },
+			context: inheritedContext,
+			element,
+			evaluate,
+		} ) => {
+			if ( element.type !== 'template' ) return;
+
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+
+			const [ entry ] = each;
+			const { namespace, suffix } = entry;
+
+			const list = evaluate( entry );
+			return list.map( ( item ) => {
+				const mergedContext = deepSignal( {} );
+
+				const itemProp = suffix === 'default' ? 'item' : suffix;
+				const newValue = deepSignal( {
+					[ namespace ]: { [ itemProp ]: item },
+				} );
+				mergeDeepSignals( newValue, inheritedValue );
+				mergeDeepSignals( mergedContext, newValue, true );
+
+				const scope = { ...getScope(), context: mergedContext };
+				const key = eachKey
+					? getEvaluate( { scope } )( eachKey[ 0 ] )
+					: item;
+
+				return (
+					<Provider value={ mergedContext } key={ key }>
+						{ element.props.content }
+					</Provider>
+				);
+			} );
+		},
+		{ priority: 20 }
+	);
+
+	directive( 'each-child', () => null );
 };

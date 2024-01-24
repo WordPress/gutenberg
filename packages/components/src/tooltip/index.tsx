@@ -25,7 +25,6 @@ import type {
 } from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
-import type { WordPressComponentProps } from '../context';
 
 const TooltipInternalContext = createContext< TooltipInternalContextType >( {
 	isNestedInTooltip: false,
@@ -41,7 +40,7 @@ const CONTEXT_VALUE = {
 };
 
 function UnforwardedTooltip(
-	props: WordPressComponentProps< TooltipProps, 'div', false >,
+	props: TooltipProps,
 	ref: React.ForwardedRef< any >
 ) {
 	const {
