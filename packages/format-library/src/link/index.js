@@ -39,6 +39,7 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
+	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
 	useLayoutEffect( () => {
@@ -91,6 +92,10 @@ function Edit( {
 		}
 	}
 
+	/**
+	 * Runs when the popover is closed via escape keypress, unlinking the selected text,
+	 * but _not_ on a click outside the popover. onFocusOutside handles that.
+	 */
 	function stopAddingLink() {
 		// Don't let the click handler on the toolbar button trigger again.
 
