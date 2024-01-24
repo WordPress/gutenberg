@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store,
-	getContext,
-	getElement,
-	navigate,
-	prefetch,
-} from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -52,7 +46,10 @@ store( 'core/query', {
 					ctx.animation = 'start';
 				}, 400 );
 
-				yield navigate( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.navigate( ref.href );
 
 				// Dismiss loading message if it hasn't been added yet.
 				clearTimeout( timeout );
@@ -77,7 +74,10 @@ store( 'core/query', {
 			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
 				.wpNavigationDisabled;
 			if ( isValidLink( ref ) && ! isDisabled ) {
-				yield prefetch( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.prefetch( ref.href );
 			}
 		},
 	},
@@ -86,7 +86,10 @@ store( 'core/query', {
 			const { url } = getContext();
 			const { ref } = getElement();
 			if ( url && isValidLink( ref ) ) {
-				yield prefetch( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.prefetch( ref.href );
 			}
 		},
 	},

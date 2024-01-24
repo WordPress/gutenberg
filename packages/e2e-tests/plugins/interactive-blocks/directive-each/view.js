@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, navigate } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'directive-each' );
 
@@ -178,8 +178,11 @@ const html = `
 
 store( 'directive-each', {
 	actions: {
-		navigate() {
-			return navigate( window.location, {
+		*navigate() {
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );

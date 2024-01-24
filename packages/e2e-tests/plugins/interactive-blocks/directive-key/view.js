@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate } from '@wordpress/interactivity';
+import { store } from '@wordpress/interactivity';
 
 const html = `
 		<div
@@ -17,8 +17,11 @@ const html = `
 
 store( 'directive-key', {
 	actions: {
-		navigate() {
-			navigate( window.location, {
+		*navigate() {
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );

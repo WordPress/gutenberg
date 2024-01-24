@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate, getContext } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
 store( 'directive-context', {
 	state: {
@@ -50,10 +50,14 @@ const { actions } = store( 'directive-context-navigate', {
 			ctx.newText = 'some new text';
 		},
 		navigate() {
-			return navigate( window.location, {
-				force: true,
-				html,
-			} );
+			return import( '@wordpress/interactivity-router' ).then(
+				( { actions: routerActions } ) =>
+					routerActions.navigate(
+						window.location,
+						{ force: true, html },
+					)
+			);
+
 		},
 		*asyncNavigate() {
 			yield actions.navigate();

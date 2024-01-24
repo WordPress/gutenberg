@@ -24,7 +24,13 @@ add_action(
 				wp_register_script_module(
 					$name . '-view',
 					$view_file,
-					array( '@wordpress/interactivity' ),
+					array(
+						'@wordpress/interactivity',
+						array(
+							'id'     => '@wordpress/interactivity-router',
+							'import' => 'dynamic',
+						),
+					),
 					filemtime( $view_file )
 				);
 
