@@ -5,11 +5,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
-import { typography } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -38,21 +35,7 @@ function FontFamilies() {
 			) }
 
 			<VStack spacing={ 3 }>
-				<HStack justify="space-between">
-					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<HStack justify="flex-end">
-						<Tooltip text={ __( 'Manage fonts' ) }>
-							<Button
-								onClick={ () =>
-									toggleModal( 'installed-fonts' )
-								}
-								aria-label={ __( 'Manage fonts' ) }
-								icon={ typography }
-								size={ 'small' }
-							/>
-						</Tooltip>
-					</HStack>
-				</HStack>
+				<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 				{ hasFonts ? (
 					<ItemGroup isBordered isSeparated>
 						{ customFonts.map( ( font ) => (
@@ -65,6 +48,14 @@ function FontFamilies() {
 				) : (
 					<>{ __( 'No fonts installed.' ) }</>
 				) }
+				<Button
+					className="edit-site-global-styles-font-families__manage-fonts-button"
+					variant="secondary"
+					onClick={ () => toggleModal( 'installed-fonts' ) }
+					size={ 'compact' }
+				>
+					{ __( 'Manage all fonts' ) }
+				</Button>
 			</VStack>
 		</>
 	);
