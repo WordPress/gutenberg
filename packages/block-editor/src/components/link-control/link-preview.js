@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit, copy } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -33,7 +33,6 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
-	additionalControls,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -127,7 +126,7 @@ export default function LinkPreview( {
 
 				<Button
 					icon={ edit }
-					label={ __( 'Edit' ) }
+					label={ __( 'Edit link' ) }
 					className="block-editor-link-control__search-item-action"
 					onClick={ onEditClick }
 					size="compact"
@@ -135,15 +134,15 @@ export default function LinkPreview( {
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
-						label={ __( 'Unlink' ) }
+						label={ __( 'Remove link' ) }
 						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
 						onClick={ onRemove }
 						size="compact"
 					/>
 				) }
 				<Button
-					icon={ copy }
-					label={ __( 'Copy URL' ) }
+					icon={ copySmall }
+					label={ __( 'Copy link' ) }
 					className="block-editor-link-control__search-item-action block-editor-link-control__copy"
 					ref={ ref }
 					disabled={ isEmptyURL }
@@ -151,7 +150,6 @@ export default function LinkPreview( {
 				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
-			{ additionalControls && additionalControls() }
 		</div>
 	);
 }
