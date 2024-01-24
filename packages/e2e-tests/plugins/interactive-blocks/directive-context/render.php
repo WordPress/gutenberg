@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-context-view' );
+wp_enqueue_script_module( 'directive-context-view' );
 ?>
 
 <div data-wp-interactive='{"namespace": "directive-context"}'>

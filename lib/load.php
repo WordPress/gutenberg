@@ -108,6 +108,8 @@ require __DIR__ . '/compat/wordpress-6.5/blocks.php';
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
+require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
+require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -116,6 +118,7 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
+require __DIR__ . '/experimental/script-modules.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
@@ -133,8 +136,6 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
-
-require __DIR__ . '/experimental/modules/class-gutenberg-modules.php';
 
 // Fonts API / Font Face.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.

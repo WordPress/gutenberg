@@ -7,7 +7,7 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-gutenberg_enqueue_module( 'store-tag-view' );
+wp_enqueue_script_module( 'store-tag-view' );
 
 // These variables simulates SSR.
 $test_store_tag_counter = 'ok' === $attributes['condition'] ? 3 : 0;
