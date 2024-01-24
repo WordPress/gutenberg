@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-bind-view' );
+wp_enqueue_script_module( 'directive-bind-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-bind" }'>

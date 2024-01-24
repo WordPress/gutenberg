@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-on-document-view' );
+wp_enqueue_script_module( 'directive-on-document-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-on-document" }'>

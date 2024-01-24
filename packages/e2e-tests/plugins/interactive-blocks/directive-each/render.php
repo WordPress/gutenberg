@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-each-view' );
+wp_enqueue_script_module( 'directive-each-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-each" }'>
