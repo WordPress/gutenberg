@@ -48,7 +48,7 @@ class WP_Block_Bindings {
 	 *
 	 * @return void
 	 */
-	public function register_source( $source_name, $source_properties ) {
+	public function register_source( $source_name, array $source_properties ) {
 			$this->sources[ $source_name ] = $source_properties;
 	}
 

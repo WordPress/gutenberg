@@ -43,7 +43,7 @@ if ( ! function_exists( 'wp_block_bindings' ) ) {
  * @return void
  */
 if ( ! function_exists( 'wp_block_bindings_register_source' ) ) {
-	function wp_block_bindings_register_source( string $source_name, array $source_args ) {
+	function wp_block_bindings_register_source( $source_name, array $source_args ) {
 		wp_block_bindings()->register_source( $source_name, $source_args );
 	}
 }
