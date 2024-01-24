@@ -24,9 +24,6 @@ export async function getBlocks(
 	{ clientId, full = false }: { clientId?: string; full?: boolean } = {}
 ) {
 	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
-	// await this.page.waitForFunction(
-	// 	() => window?.wp?.blocks && window?.wp?.data
-	// );
 
 	return await this.page.evaluate(
 		( [ _full, _clientId ] ) => {
