@@ -17,7 +17,11 @@
  * @return string Returns the modified output of the query block.
  */
 function render_block_core_query( $attributes, $content, $block ) {
-	$is_interactive = isset( $attributes['enhancedPagination'] ) && true === $attributes['enhancedPagination'] && isset( $attributes['queryId'] );
+	$is_interactive = isset( $attributes['enhancedPagination'] )
+		&& true === $attributes['enhancedPagination']
+		&& isset( $attributes['queryId'] )
+		&& isset( $block->block_type->supports['interactivity'] )
+		&& $block->block_type->supports['interactivity'];
 
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
@@ -102,8 +106,11 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
-	$is_interactive = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] );
 	$block_name     = $parsed_block['blockName'];
+	$block_object   = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+	$is_interactive = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) && isset( $block_object->supports['interactivity'] ) && $block_object->supports['interactivity'];
+
+	$client_navigation_compatible = isset( $block_object->supports['clientNavigation'] ) && $block_object->supports['clientNavigation'];
 
 	if ( 'core/query' === $block_name && $is_interactive ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];

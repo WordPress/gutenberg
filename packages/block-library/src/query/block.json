@@ -51,7 +51,8 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true,
-		"clientNavigation": true
+		"clientNavigation": true,
+		"interactivity": true
 	},
 	"editorStyle": "wp-block-query-editor"
 }
