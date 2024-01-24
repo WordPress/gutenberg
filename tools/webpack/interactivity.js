@@ -5,11 +5,6 @@ const { join } = require( 'path' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 
 /**
- * WordPress dependencies
- */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-
-/**
  * Internal dependencies
  */
 const { baseConfig, plugins } = require( './shared' );
@@ -73,11 +68,7 @@ module.exports = {
 		],
 	},
 	plugins: [
-		...plugins?.filter(
-			( plugin ) =>
-				plugin?.constructor?.name !==
-				'DependencyExtractionWebpackPlugin'
-		),
+		...plugins,
 		// TODO: Move it to a different Webpack file.
 		new CopyWebpackPlugin( {
 			patterns: [
@@ -86,10 +77,6 @@ module.exports = {
 					to: './build/modules/importmap-polyfill.min.js',
 				},
 			],
-		} ),
-		new DependencyExtractionWebpackPlugin( {
-			requestToExternalModule: ( request ) =>
-				request === '@wordpress/interactivity/router',
 		} ),
 	],
 	watchOptions: {
