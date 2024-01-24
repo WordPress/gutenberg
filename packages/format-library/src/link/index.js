@@ -91,7 +91,7 @@ function Edit( {
 		}
 	}
 
-	function onClose() {
+	function stopAddingLink() {
 		// Don't let the click handler on the toolbar button trigger again.
 
 		// There are two places for us to return focus to on Escape keypress:
@@ -153,7 +153,7 @@ function Edit( {
 			/>
 			{ addingLink && (
 				<InlineLinkUI
-					stopAddingLink={ onClose }
+					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }
 					isActive={ isActive }
 					activeAttributes={ activeAttributes }
