@@ -256,8 +256,6 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
-		$query_params['context']['default'] = 'view';
-
 		unset( $query_params['search'] );
 
 		/**
