@@ -413,6 +413,7 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 			'<div data-wp-bind--id="myPlugin::state.id"><span>Inner content</div>',
 			'<div data-wp-bind--id="myPlugin::state.id">Inner content</div></span>',
 			'<div data-wp-bind--id="myPlugin::state.id"><span>Inner content</div></span>',
+			'<div data-wp-bind--id="myPlugin::state.id">Inner conntent</ ></div>',
 		);
 
 		foreach ( $html_samples as $html ) {
