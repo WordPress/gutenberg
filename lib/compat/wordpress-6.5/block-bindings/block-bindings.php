@@ -27,7 +27,7 @@ if ( ! function_exists( 'wp_block_bindings' ) ) {
  * Registers a new source for block bindings.
  *
  * @param string   $source_name The name of the source.
- * @param array    $source_args   The array of arguments that are used to register a source. The array has two elements:
+ * @param array    $source_properties   The array of arguments that are used to register a source. The array has two elements:
  *                                1. string   $label        The label of the source.
  *                                2. callback $apply        A callback
  *                                executed when the source is processed during
@@ -43,8 +43,8 @@ if ( ! function_exists( 'wp_block_bindings' ) ) {
  * @return void
  */
 if ( ! function_exists( 'wp_block_bindings_register_source' ) ) {
-	function wp_block_bindings_register_source( $source_name, array $source_args ) {
-		wp_block_bindings()->register_source( $source_name, $source_args );
+	function wp_block_bindings_register_source( $source_name, array $source_properties ) {
+		wp_block_bindings()->register_source( $source_name, $source_properties );
 	}
 }
 
