@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0 (2024-01-24)
+
 ### Enhancements
 
 -   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
