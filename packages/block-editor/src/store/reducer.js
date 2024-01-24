@@ -2033,8 +2033,8 @@ function blockBindingsSources( state = {}, action ) {
 				lockAttributesEditing: action.lockAttributesEditing,
 			},
 		};
-  }
- 	return state;
+	}
+	return state;
 }
 
 function blockPatterns( state = [], action ) {
