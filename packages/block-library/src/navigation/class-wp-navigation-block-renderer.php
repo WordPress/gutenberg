@@ -270,7 +270,7 @@ class WP_Navigation_Block_Renderer {
 		 */
 		$inner_blocks = apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
 
-		$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
+		$post_ids = gutenberg_block_core_navigation_get_post_ids( $inner_blocks );
 		if ( $post_ids ) {
 			_prime_post_caches( $post_ids, false, false );
 		}
@@ -353,8 +353,8 @@ class WP_Navigation_Block_Renderer {
 	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
 		$layout_class       = static::get_layout_class( $attributes );
-		$colors             = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
+		$colors             = gutenberg_block_core_navigation_build_css_colors( $attributes );
+		$font_sizes         = gutenberg_block_core_navigation_build_css_font_sizes( $attributes );
 		$is_responsive_menu = static::is_responsive( $attributes );
 
 		// Manually add block support text decoration as CSS class.
@@ -387,8 +387,8 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the styles for the navigation block.
 	 */
 	private static function get_styles( $attributes ) {
-		$colors       = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
+		$colors       = gutenberg_block_core_navigation_build_css_colors( $attributes );
+		$font_sizes   = gutenberg_block_core_navigation_build_css_font_sizes( $attributes );
 		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
 	}
@@ -649,7 +649,7 @@ class WP_Navigation_Block_Renderer {
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
-		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
+		if ( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
 		}
 
