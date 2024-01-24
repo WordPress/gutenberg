@@ -390,7 +390,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Insert a link.
-		await editor.clickBlockToolbarButton( 'Link' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const urlInput = page.getByRole( 'combobox', {
 			name: 'Link',
@@ -421,6 +421,31 @@ test.describe( 'Links', () => {
 		// the link editor, with "Gutenberg" as an uncollapsed selection.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( ' and more!' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is Gutenberg and more!',
+				},
+			},
+		] );
+
+		// Test pressing escape from the toolbar button should return focus to the toolbar button
+		// Insert a link.
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		// Expect the "Link" combobox to be visible and focused
+		await expect( urlInput ).toBeVisible();
+		await expect( urlInput ).toBeFocused();
+
+		await page.keyboard.press( 'Escape' );
+		await expect( LinkUtils.getLinkPopover() ).toBeHidden();
+
+		// Focus should return to the Link Toolbar Button that opened the popover
+		await expect(
+			page.getByLabel( 'Link', { exact: true } )
+		).toBeFocused();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
