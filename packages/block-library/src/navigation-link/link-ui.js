@@ -223,7 +223,6 @@ function LinkUITools( { setAddingBlock } ) {
 			>
 				{ __( 'Add block' ) }
 			</Button>
-			<Button>{ __( 'Add Page' ) }</Button>
 		</VStack>
 	);
 }
