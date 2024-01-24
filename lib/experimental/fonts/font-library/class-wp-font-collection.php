@@ -146,27 +146,6 @@ class WP_Font_Collection {
 	}
 
 	/**
-	 * Gets the font collection config.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return array {
-	 *     An array of font collection config.
-	 *
-	 *     @type string $slug        The font collection's unique slug.
-	 *     @type string $name        The font collection's name.
-	 *     @type string $description The font collection's description.
-	 * }
-	 */
-	public function get_config() {
-		return array(
-			'slug'        => $this->slug,
-			'name'        => $this->name,
-			'description' => $this->description,
-		);
-	}
-
-	/**
 	 * Gets the font collection content.
 	 *
 	 * Load the font collection data from the src if it is not already loaded.
