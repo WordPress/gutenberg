@@ -13,7 +13,7 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useContext, useState, useEffect } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,16 +43,6 @@ function LocalFonts() {
 	const onFilesUpload = ( event ) => {
 		handleFilesUpload( event.target.files );
 	};
-
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
 
 	/**
 	 * Filters the selected files to only allow the ones with the allowed extensions
@@ -223,9 +213,9 @@ function LocalFonts() {
 					<FlexItem>
 						<Spacer margin={ 2 } />
 						<Notice
-							isDismissible={ false }
 							status={ notice.type }
 							className="font-library-modal__upload-area__notice"
+							onRemove={ () => setNotice( null ) }
 						>
 							{ notice.message }
 						</Notice>
