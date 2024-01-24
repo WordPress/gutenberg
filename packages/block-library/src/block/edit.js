@@ -14,6 +14,7 @@ import {
 	Spinner,
 	ToolbarButton,
 	ToolbarGroup,
+	Tooltip,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
+import { lock, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -348,18 +350,29 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
-				<BlockControls>
-					<ToolbarGroup>
+			<BlockControls group="other">
+				<ToolbarGroup>
+					{ userCanEdit && editOriginalProps && (
 						<ToolbarButton
 							href={ editOriginalProps.href }
 							onClick={ handleEditOriginal }
 						>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+					) }
+					{ ! userCanEdit && (
+						<Tooltip
+							text={ __(
+								'You do not have permission to edit the content of this block'
+							) }
+						>
+							<div className="components-button components-toolbar-button has-icon">
+								<Icon icon={ lock } />
+							</div>
+						</Tooltip>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
 
 			{ hasOverridableBlocks && (
 				<BlockControls>
