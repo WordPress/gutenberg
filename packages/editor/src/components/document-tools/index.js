@@ -105,7 +105,11 @@ function DocumentTools( {
 
 	return (
 		<NavigableToolbar
-			className={ classnames( 'editor-document-tools', className ) }
+			className={ classnames(
+				'editor-document-tools',
+				'edit-post-header-toolbar',
+				className
+			) }
 			aria-label={ toolbarAriaLabel }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 			variant="unstyled"
