@@ -106,7 +106,7 @@ export const convertSyncedPatternToStatic =
 					block,
 					{
 						metadata:
-							Object.keys( metadata ).length > 0
+							metadata && Object.keys( metadata ).length > 0
 								? metadata
 								: undefined,
 					},

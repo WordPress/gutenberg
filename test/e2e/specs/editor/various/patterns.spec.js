@@ -259,12 +259,10 @@ test.describe( 'Synced pattern', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		const paragraphId = 'paragraph-id';
 		const { id } = await requestUtils.createBlock( {
-			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":{"name":"pattern_attributes"}}}}} -->
-<p>Editable</p>
-<!-- /wp:paragraph -->`,
+			title: 'Synced pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Before Edit</p>\n<!-- /wp:paragraph -->',
 			status: 'publish',
 		} );
 
@@ -273,28 +271,54 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		// Make an edit to the pattern.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.focus();
-		await page.keyboard.type( 'edited ' );
-
-		// Convert back to regular blocks.
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'link', { name: 'Edit original' } )
+			.click();
 
-		// Check that the overrides remain.
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+
+		// Navigate to the pattern focus mode.
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Synced pattern',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		// Make an edit to the source pattern.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.fill( 'After Edit' );
+
+		// Go back to the post.
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		const expectedParagraphBlock = {
+			name: 'core/paragraph',
+			attributes: { content: 'After Edit' },
+		};
+
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'edited Editable',
-					metadata: undefined,
-				},
+				name: 'core/block',
+				attributes: { ref: id },
+				innerBlocks: [ expectedParagraphBlock ],
 			},
 		] );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ expectedParagraphBlock ] );
 	} );
 } );
