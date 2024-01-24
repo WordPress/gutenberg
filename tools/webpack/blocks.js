@@ -35,7 +35,7 @@ const prefixFunctions = [
 	'wp_get_global_settings',
 ];
 
-const suffixClasses = [ 'WP_Navigation_Block_Renderer' ];
+const classesToSuffix = [ 'WP_Navigation_Block_Renderer' ];
 
 /**
  * Escapes the RegExp special characters.
@@ -76,6 +76,8 @@ const createEntrypoints = () => {
 		};
 	}, {} );
 };
+
+const classSuffix = 'Gutenberg';
 
 module.exports = [
 	{
@@ -127,7 +129,7 @@ module.exports = [
 							'build/widgets/blocks/',
 					} ).flatMap( ( [ from, to ] ) => [
 						{
-							from: `${ from }/**/*.php`,
+							from: `${ from }/**/(index|class*).php`,
 							to( { absoluteFilename } ) {
 								const [ , dirname, filename ] =
 									absoluteFilename.match(
@@ -141,18 +143,16 @@ module.exports = [
 								// This assumes every file has a unique name.
 								// This should be true if the only extra files we add are classes
 								// and the class files are named correctly.
-								return join(
-									to,
-									`${
-										filename === 'index'
-											? dirname
-											: filename
-									}.php`
-								);
+								const newFileName =
+									filename === 'index'
+										? dirname
+										: filename +
+										  '-' +
+										  classSuffix.toLowerCase();
+								return join( to, `${ newFileName }.php` );
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
-								const suffix = '_Gutenberg';
 								content = content.toString();
 
 								// Within content, search and prefix any function calls from the
@@ -173,16 +173,34 @@ module.exports = [
 								);
 
 								// Within content, search and prefix any classes calls from the
-								// `suffixClasses` list. This is needed because some classes
+								// `classesToSuffix` list. This is needed because some classes
 								// are called inside block files, but also exist in core.
 								// With the rename we can use the Gutenberg class in the plugin,
 								// without having to worry about duplicate class names with core.
 								content = content.replace(
 									new RegExp(
-										suffixClasses.join( '|' ),
+										classesToSuffix.join( '|' ),
 										'g'
 									),
-									( match ) => `${ match }${ suffix }`
+									( match ) => `${ match }_${ classSuffix }`
+								);
+
+								// also convert the requires.
+								const regexForRequireStatment = new RegExp(
+									classesToSuffix
+										.map( ( className ) => {
+											return className
+												.replace( 'WP_', 'class-wp-' )
+												.replace( /_/g, '-' )
+												.toLowerCase();
+										} )
+										.join( '|' ),
+									'g'
+								);
+								content = content.replace(
+									regexForRequireStatment,
+									( match ) =>
+										`${ match }-${ classSuffix.toLowerCase() }`
 								);
 
 								// Within content, search for any function definitions. For
