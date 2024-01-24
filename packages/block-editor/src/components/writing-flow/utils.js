@@ -15,6 +15,13 @@ import {
  */
 import { getPasteEventData } from '../../utils/pasting';
 
+/**
+ * Sets the clipboard data for the provided blocks, with both HTML and plain
+ * text representations.
+ *
+ * @param {ClipboardEvent} event  Clipboard event.
+ * @param {WPBlock[]}      blocks Blocks to set as clipboard data.
+ */
 export function setClipboardBlocks( event, blocks ) {
 	let _blocks = blocks;
 	const wrapperBlockName = event.clipboardData.getData(
@@ -39,6 +46,13 @@ export function setClipboardBlocks( event, blocks ) {
 	event.clipboardData.setData( 'text/html', serialized );
 }
 
+/**
+ * Returns the blocks to be pasted from the clipboard event.
+ *
+ * @param {ClipboardEvent} event                    The clipboard event.
+ * @param {boolean}        canUserUseUnfilteredHTML Whether the user can or can't post unfiltered HTML.
+ * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
+ */
 export function getPasteBlocks( event, canUserUseUnfilteredHTML ) {
 	const { plainText, html, files } = getPasteEventData( event );
 	let blocks = [];
