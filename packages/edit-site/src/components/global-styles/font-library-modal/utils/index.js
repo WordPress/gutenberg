@@ -164,20 +164,25 @@ export function makeFontFacesFormData( font ) {
 		const fontFacesFormData = font.fontFace.map( ( face, faceIndex ) => {
 			const formData = new FormData();
 			if ( face.file ) {
-				// Slugified file name because the it might contain spaces or characters treated differently on the server.
-				const fileId = `file-${ faceIndex }`;
-				// Add the files to the formData
-				formData.append( fileId, face.file, face.file.name );
-				// remove the file object from the face object the file is referenced in src
-				const { file, ...faceWithoutFileProperty } = face;
-				const fontFaceSettings = {
-					...faceWithoutFileProperty,
-					src: fileId,
-				};
-				formData.append(
-					'font_face_settings',
-					JSON.stringify( fontFaceSettings )
-				);
+				// file may be a single file or a collection of files.
+				// make sure it's an array
+				const files = Array.isArray( face.file )
+					? face.file
+					: [ face.file ];
+				const src = [];
+
+				files.forEach( ( file, key ) => {
+					// Slugified file name because the it might contain spaces or characters treated differently on the server.
+					const fileId = `file-${ faceIndex }-${ key }`;
+					// Add the files to the formData
+					formData.append( fileId, file, file.name );
+					src.push( fileId );
+				} );
+
+				face.src = src.length === 1 ? src[ 0 ] : src;
+				delete face.file;
+
+				formData.append( 'font_face_settings', JSON.stringify( face ) );
 			} else {
 				formData.append( 'font_face_settings', JSON.stringify( face ) );
 			}
@@ -225,31 +230,34 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 /*
  * Downloads a font face asset from a URL to the client and returns a File object.
  */
-export async function downloadFontFaceAsset( url ) {
-	return fetch( new Request( url ) )
-		.then( ( response ) => {
-			if ( ! response.ok ) {
-				throw new Error(
-					`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
-				);
-			}
-			return response.blob();
+export async function downloadFontFaceAssets( src ) {
+	//src could be a single string or a collection of strings.
+	//here, just make sure it's an array
+	src = Array.isArray( src ) ? src : [ src ];
+
+	const files = await Promise.all(
+		src.map( async ( url ) => {
+			return await fetch( new Request( url ) )
+				.then( ( response ) => {
+					if ( ! response.ok ) {
+						throw new Error(
+							`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
+						);
+					}
+					return response.blob();
+				} )
+				.then( ( blob ) => {
+					const filename = url.split( '/' ).pop();
+					const file = new File( [ blob ], filename, {
+						type: blob.type,
+					} );
+					return file;
+				} );
 		} )
-		.then( ( blob ) => {
-			const filename = url.split( '/' ).pop();
-			const file = new File( [ blob ], filename, {
-				type: blob.type,
-			} );
-			return file;
-		} )
-		.catch( ( error ) => {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Error downloading font face asset from ${ url }:`,
-				error
-			);
-			throw error;
-		} );
+	);
+
+	// If we only have one file return it (not the array).  Otherwise return all of them in the array.
+	return files.length === 1 ? files[ 0 ] : files;
 }
 
 /*
