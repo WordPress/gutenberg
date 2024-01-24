@@ -152,7 +152,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			);
 
 			wp_register_script_module(
-				'@wordpress/interactivity/router',
+				'@wordpress/interactivity-router',
 				gutenberg_url( '/build/interactivity/router.min.js' ),
 				array( '@wordpress/interactivity' ),
 				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )

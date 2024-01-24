@@ -106,8 +106,8 @@ function register_block_core_query() {
 			array(
 				'@wordpress/interactivity',
 				array(
-					'id'   => '@wordpress/interactivity-router',
-					'type' => 'dynamic',
+					'id'     => '@wordpress/interactivity-router',
+					'import' => 'dynamic',
 				),
 			),
 		),
