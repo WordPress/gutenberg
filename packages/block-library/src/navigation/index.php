@@ -190,11 +190,19 @@ class WP_Navigation_Block_Renderer {
 
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
 			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+
+			if ( function_exists( 'get_hooked_blocks' ) ) {
+				// Run Block Hooks algorithm to inject hooked blocks.
+				$markup         = gutenberg_insert_hooked_blocks_into_navigation_block( $blocks, $navigation_post );
+				$root_nav_block = parse_blocks( $markup )[0];
+
+				$blocks = isset( $root_nav_block['innerBlocks'] ) ? $root_nav_block['innerBlocks'] : $blocks;
+			}
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
-			return new WP_Block_List( $compacted_blocks, $attributes );
+			return new WP_Block_List( $blocks, $attributes );
 		}
 	}
 
@@ -983,6 +991,17 @@ function block_core_navigation_get_fallback_blocks() {
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
+
+		if ( function_exists( 'get_hooked_blocks' ) ) {
+			// Run Block Hooks algorithm to inject hooked blocks.
+			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
+			$markup = gutenberg_insert_hooked_blocks_into_navigation_block( $fallback_blocks, $navigation_post );
+			$blocks = parse_blocks( $markup );
+
+			if ( isset( $blocks[0]['innerBlocks'] ) ) {
+				$fallback_blocks = $blocks[0]['innerBlocks'];
+			}
+		}
 	}
 
 	/**
@@ -994,7 +1013,7 @@ function block_core_navigation_get_fallback_blocks() {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param array[] default fallback blocks provided by the default block mechanic.
+	 * @param array[] $fallback_blocks default fallback blocks provided by the default block mechanic.
 	 */
 	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
 }
