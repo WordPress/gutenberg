@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalUseShadowProps as useShadowProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -316,6 +317,7 @@ export function ImageEdit( {
 	);
 
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
@@ -377,6 +379,7 @@ export function ImageEdit( {
 					height: width && aspectRatio ? '100%' : height,
 					objectFit: scale,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ lockUrlControls ? (

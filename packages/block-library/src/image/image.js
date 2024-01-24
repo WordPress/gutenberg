@@ -25,6 +25,7 @@ import {
 	useSettings,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalUseShadowProps as useShadowProps,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
@@ -594,6 +595,7 @@ export default function Image( {
 	}
 
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
 	let img = (
@@ -620,6 +622,7 @@ export default function Image( {
 						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			/>
 			{ temporaryURL && <Spinner /> }
