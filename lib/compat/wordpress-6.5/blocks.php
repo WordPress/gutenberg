@@ -71,23 +71,24 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 			return $block_content;
 		}
 
-		// Assuming the following format for the bindings property of the "metadata" attribute:
-		//
-		// "bindings": {
-		//   "title": {
-		//     "source": {
-		//       "name": "post_meta",
-		//       "attributes": { "value": "text_custom_field" }
-		//     }
-		//   },
-		//   "url": {
-		//     "source": {
-		//       "name": "post_meta",
-		//       "attributes": { "value": "text_custom_field" }
-		//     }
-		//   }
-		// }
-		//
+		/*
+		 * Assuming the following format for the bindings property of the "metadata" attribute:
+		 *
+		 * "bindings": {
+		 *   "title": {
+		 *     "source": {
+		 *       "name": "post_meta",
+		 *       "attributes": { "value": "text_custom_field" }
+		 *     }
+		 *   },
+		 *   "url": {
+		 *     "source": {
+		 *       "name": "post_meta",
+		 *       "attributes": { "value": "text_custom_field" }
+		 *     }
+		 *   }
+		 * }
+		 */
 
 		$block_bindings_sources = wp_block_bindings_get_sources();
 		$modified_block_content = $block_content;
