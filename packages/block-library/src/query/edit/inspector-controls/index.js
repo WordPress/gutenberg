@@ -27,6 +27,8 @@ import StickyControl from './sticky-control';
 import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
 import PerPageControl from './per-page-control';
+import OffsetControl from './offset-controls';
+import PagesControl from './pages-control';
 import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
@@ -47,6 +49,7 @@ export default function QueryInspectorControls( props ) {
 		order,
 		orderBy,
 		author: authorIds,
+		pages,
 		postType,
 		perPage,
 		offset,
@@ -104,8 +107,6 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const showPostCountControl =
-		! inherit && isControlAllowed( allowedControls, 'postCount' );
 	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
@@ -134,6 +135,16 @@ export default function QueryInspectorControls( props ) {
 		showSearchControl ||
 		showParentControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const showPostCountControl = isControlAllowed(
+		allowedControls,
+		'postCount'
+	);
+	const showOffSetControl = isControlAllowed( allowedControls, 'offset' );
+	const showPagesControl = isControlAllowed( allowedControls, 'pages' );
+
+	const showDisplayPanel =
+		showPostCountControl || showOffSetControl || showPagesControl;
 
 	return (
 		<>
@@ -169,13 +180,7 @@ export default function QueryInspectorControls( props ) {
 							) }
 						/>
 					) }
-					{ showPostCountControl && (
-						<PerPageControl
-							perPage={ perPage }
-							offset={ offset }
-							onChange={ setQuery }
-						/>
-					) }
+
 					{ showColumnsControl && (
 						<>
 							<RangeControl
@@ -222,6 +227,47 @@ export default function QueryInspectorControls( props ) {
 						clientId={ clientId }
 					/>
 				</PanelBody>
+			) }
+			{ ! inherit && showDisplayPanel && (
+				<ToolsPanel
+					className="block-library-query-toolspanel__display"
+					label={ __( 'Display Settings' ) }
+					resetAll={ () => {
+						setQuery( {
+							offset: 0,
+							pages: 0,
+						} );
+					} }
+					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				>
+					<ToolsPanelItem
+						label={ __( 'Items' ) }
+						hasValue={ () => perPage > 0 }
+					>
+						<PerPageControl
+							perPage={ perPage }
+							offset={ offset }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Offset' ) }
+						hasValue={ () => offset > 0 }
+						onDeselect={ () => setQuery( { offset: 0 } ) }
+					>
+						<OffsetControl
+							offset={ offset }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Max Pages to Show' ) }
+						hasValue={ () => pages > 0 }
+						onDeselect={ () => setQuery( { pages: 0 } ) }
+					>
+						<PagesControl pages={ pages } onChange={ setQuery } />
+					</ToolsPanelItem>
+				</ToolsPanel>
 			) }
 			{ ! inherit && showFiltersPanel && (
 				<ToolsPanel
