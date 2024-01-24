@@ -22,17 +22,16 @@ async function login( this: RequestUtils, user: User = this.user ) {
 	const response = await this.request.post(
 		'https://wordpress.com/wp-login.php?action=login-endpoint',
 		{
+			failOnStatusCode: true,
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
-			failOnStatusCode: true,
 			form: {
 				username: user.username,
 				password: user.password,
 				client_id: clientId,
 				client_secret: clientSecret,
-				get_bearer_token: '1',
 			},
 		}
 	);
@@ -41,13 +40,11 @@ async function login( this: RequestUtils, user: User = this.user ) {
 
 	await response.dispose();
 
-	if ( ! payload?.data?.bearer_token ) {
+	if ( ! payload.success ) {
 		throw new Error(
 			'Unable to log in. Please check your username and password.'
 		);
 	}
-
-	return payload.data.bearer_token as string;
 }
 
 export { login };
