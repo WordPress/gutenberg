@@ -23,23 +23,40 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 	function wp_interactivity_process_directives_of_interactive_blocks( $parsed_block ) {
 		static $root_interactive_block = null;
 
+		/**
+		 *  Checks whether a root interactive block is already annotated for
+		 *  processing, and if it is, it ignores the subsequent ones.
+		 */
 		if ( null === $root_interactive_block ) {
 			$block_name = $parsed_block['blockName'];
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
 			if ( isset( $block_name ) && isset( $block_type->supports['interactivity'] ) && $block_type->supports['interactivity'] ) {
+				// Annotates the root interactive block for processing.
 				$root_interactive_block = array( $block_name, md5( serialize( $parsed_block ) ) );
 
-				$process_interactive_blocks = static function ( $content, $parsed_block ) use ( &$root_interactive_block ) {
+				/**
+				 * Adds a filter to process the root interactive block once it has
+				 * finished rendering.
+				 */
+				$process_interactive_blocks = static function ( $content, $parsed_block ) use ( &$root_interactive_block, &$process_interactive_blocks ) {
+					// Checks whether the current block is the root interactive block.
 					list($root_block_name, $root_block_md5) = $root_interactive_block;
 					if ( $root_block_name === $parsed_block['blockName'] && md5( serialize( $parsed_block ) ) === $root_block_md5 ) {
+						// The root interactive blocks has finished rendering, process it.
+						$content = wp_interactivity_process_directives( $content );
+						// Removes the filter and reset the root interactive block.
+						remove_filter( 'render_block', $process_interactive_blocks );
 						$root_interactive_block = null;
-						$content                = wp_interactivity_process_directives( $content );
 					}
 					return $content;
 				};
 
-				add_filter( 'render_block', $process_interactive_blocks, 10, 2 );
+				/**
+				 * Uses a priority of 20 to ensure that other filters can add additional
+				 * directives before the processing starts.
+				 */
+				add_filter( 'render_block', $process_interactive_blocks, 20, 2 );
 			}
 		}
 
