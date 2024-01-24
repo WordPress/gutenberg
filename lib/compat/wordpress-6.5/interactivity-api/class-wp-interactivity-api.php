@@ -339,8 +339,8 @@ class WP_Interactivity_API {
 	 * directive attribute value.
 	 *
 	 * If the value doesn't contain an explicit namespace, it returns the default
-	 * one. If the value contains a JSON instead of a reference path, the function
-	 * tries to parse it and return the resulting array.
+	 * one. If the value contains a JSON object instead of a reference path, the
+	 * function tries to parse it and return the resulting array.
 	 *
 	 * Example:
 	 *
