@@ -276,9 +276,6 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 		$result = $extract_directive_value->invoke( $this->interactivity, '', 'myPlugin' );
 		$this->assertEquals( array( 'myPlugin', null ), $result );
 
-		$result = $extract_directive_value->invoke( $this->interactivity, 'myPlugin::', 'myPlugin' );
-		$this->assertEquals( array( 'myPlugin', null ), $result );
-
 		$result = $extract_directive_value->invoke( $this->interactivity, true, 'myPlugin' );
 		$this->assertEquals( array( 'myPlugin', null ), $result );
 
@@ -287,6 +284,15 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 
 		$result = $extract_directive_value->invoke( $this->interactivity, null, 'myPlugin' );
 		$this->assertEquals( array( 'myPlugin', null ), $result );
+
+		// A string ending in `::` without any extra characters is not considered a
+		// namespace.
+		$result = $extract_directive_value->invoke( $this->interactivity, 'myPlugin::', 'myPlugin' );
+		$this->assertEquals( array( 'myPlugin', 'myPlugin::' ), $result );
+
+		// A namespace with invalid characters is not considered a valid namespace.
+		$result = $extract_directive_value->invoke( $this->interactivity, '$myPlugin::state.foo', 'myPlugin' );
+		$this->assertEquals( array( 'myPlugin', '$myPlugin::state.foo' ), $result );
 	}
 
 	/**

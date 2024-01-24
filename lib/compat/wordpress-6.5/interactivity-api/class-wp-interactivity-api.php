@@ -362,13 +362,9 @@ class WP_Interactivity_API {
 			return array( $default_namespace, null );
 		}
 
-		$matches       = array();
-		$has_namespace = preg_match( '/^([\w\-_\/]+)::(.*)$/', isset( $directive_value ) ? $directive_value : '', $matches );
-
 		// Replaces the value and namespace if there is a namespace in the value.
-		if ( $has_namespace ) {
-			$default_namespace = $matches[1];
-			$directive_value   = isset( $matches[2] ) ? $matches[2] : null;
+		if ( 1 === preg_match( '/^([\w\-_\/]+)::./', $directive_value ) ) {
+			list($default_namespace, $directive_value) = explode( '::', $directive_value, 2 );
 		}
 
 		/*
