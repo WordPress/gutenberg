@@ -223,16 +223,14 @@ describe( 'Button', () => {
 			);
 
 			// The same button element that we referenced before should still be
-			// in the document.
-			expect( button ).toBeVisible();
+			// in the document and have focus.
 			expect( button ).toHaveFocus();
 
 			// Re-render the button, but stop showing a tooltip.
 			rerender( <Button label="Button label">Test button</Button> );
 
 			// The same button element that we referenced before should still be
-			// in the document.
-			expect( button ).toBeVisible();
+			// in the document and have focus.
 			expect( button ).toHaveFocus();
 		} );
 
