@@ -12,10 +12,6 @@ import type { Editor } from './index';
 async function setContent( this: Editor, html: string ) {
 	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 
-	// await this.page.waitForFunction(
-	// 	() => window?.wp?.blocks && window?.wp?.data
-	// );
-
 	await this.page.evaluate( ( _html ) => {
 		const blocks = window.wp.blocks.parse( _html );
 

@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import type {
-	Browser,
-	Page,
-	BrowserContext,
-	// FrameLocator,
-} from '@playwright/test';
+import type { Browser, Page, BrowserContext } from '@playwright/test';
 
 /**
  * Internal dependencies
@@ -45,8 +40,7 @@ export class Editor {
 	}
 
 	get canvas(): Page {
-		return this.page;
-		// return this.page.frameLocator( '[name="editor-canvas"]' );
+		return this.page; // ToDo: Find out why .com editor isn't iframed.
 	}
 
 	/** @borrows clickBlockOptionsMenuItem as this.clickBlockOptionsMenuItem */
