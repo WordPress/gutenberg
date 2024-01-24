@@ -21,7 +21,7 @@ function gutenberg_update_ignore_hooked_blocks_meta_core_navigation( $post ) {
 	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
 	// blocks inserted, whereas `$markup` will have them inserted twice.
 	$blocks                = parse_blocks( $post->post_content );
-	$markup                = gutenberg_insert_hooked_blocks_into_navigation_block( $blocks, $post );
+	$markup                = block_core_navigation_insert_hooked_blocks( $blocks, $post );
 	$root_nav_block        = parse_blocks( $markup )[0];
 	$ignored_hooked_blocks = isset( $root_nav_block['attrs']['metadata']['ignoredHookedBlocks'] )
 		? $root_nav_block['attrs']['metadata']['ignoredHookedBlocks']
@@ -50,7 +50,7 @@ function gutenberg_hook_blocks_into_core_navigation_rest_response( $response, $p
 		return $response;
 	}
 	$parsed_blocks = parse_blocks( $response->data['content']['raw'] );
-	$content       = gutenberg_insert_hooked_blocks_into_navigation_block( $parsed_blocks, $post );
+	$content       = block_core_navigation_insert_hooked_blocks( $parsed_blocks, $post );
 
 	// Remove mock Navigation block wrapper.
 	$start   = strpos( $content, '-->' ) + strlen( '-->' );
@@ -78,7 +78,7 @@ function gutenberg_hook_blocks_into_core_navigation_rest_response( $response, $p
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
  * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
  */
-function gutenberg_insert_hooked_blocks_into_navigation_block( $inner_blocks, $post = null ) {
+function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null ) {
 	$before_block_visitor = null;
 	$after_block_visitor  = null;
 	$hooked_blocks        = get_hooked_blocks();

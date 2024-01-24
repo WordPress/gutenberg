@@ -194,7 +194,7 @@ class WP_Navigation_Block_Renderer {
 
 			if ( function_exists( 'get_hooked_blocks' ) ) {
 				// Run Block Hooks algorithm to inject hooked blocks.
-				$markup         = gutenberg_insert_hooked_blocks_into_navigation_block( $blocks, $navigation_post );
+				$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
 				$root_nav_block = parse_blocks( $markup )[0];
 
 				$blocks = isset( $root_nav_block['innerBlocks'] ) ? $root_nav_block['innerBlocks'] : $blocks;
@@ -995,7 +995,7 @@ function block_core_navigation_get_fallback_blocks() {
 		if ( function_exists( 'get_hooked_blocks' ) ) {
 			// Run Block Hooks algorithm to inject hooked blocks.
 			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
-			$markup = gutenberg_insert_hooked_blocks_into_navigation_block( $fallback_blocks, $navigation_post );
+			$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
 			$blocks = parse_blocks( $markup );
 
 			if ( isset( $blocks[0]['innerBlocks'] ) ) {
