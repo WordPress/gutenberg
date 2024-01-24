@@ -42,8 +42,6 @@ function Edit( {
 
 	const isSelectionCollapsed = isCollapsed( value );
 
-	const canMakeLink = ! isSelectionCollapsed && ! addingLink && ! isActive;
-
 	// There is a situation whereby there is an existing link in the rich text
 	// and the user clicks on the leftmost edge of that link and fails to activate
 	// the link format, but the click event still fires on the `<a>` element.
@@ -108,13 +106,7 @@ function Edit( {
 
 	return (
 		<>
-			{ canMakeLink && (
-				<RichTextShortcut
-					type="primary"
-					character="k"
-					onUse={ addLink }
-				/>
-			) }
+			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
 
 			<RichTextShortcut
 				type="primaryShift"
