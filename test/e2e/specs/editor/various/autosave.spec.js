@@ -321,7 +321,7 @@ test.describe( 'Autosave', () => {
 		);
 	} );
 
-	test.skip( 'should clear sessionStorage upon user logout', async ( {
+	test( 'should clear sessionStorage upon user logout', async ( {
 		page,
 		pageUtils,
 	} ) => {
