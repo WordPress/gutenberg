@@ -38,8 +38,14 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	if ( path === '/pages' && window?.__experimentalAdminViews ) {
-		const isListLayout = isCustom !== 'true' && layout === 'list';
+	// List layout is still experimental.
+	// Extracted it here out of the conditionals so it doesn't unintentionally becomes stable.
+	const isListLayout =
+		isCustom !== 'true' &&
+		layout === 'list' &&
+		window?.__experimentalAdminViews;
+
+	if ( path === '/pages' ) {
 		return {
 			areas: {
 				content: <PagePages />,
@@ -64,10 +70,6 @@ export default function useLayoutAreas() {
 
 	// Templates
 	if ( path === '/wp_template/all' ) {
-		const isListLayout =
-			isCustom !== 'true' &&
-			layout === 'list' &&
-			window?.__experimentalAdminViews;
 		return {
 			areas: {
 				content: (
@@ -87,10 +89,6 @@ export default function useLayoutAreas() {
 
 	// Template parts
 	if ( path === '/wp_template_part/all' ) {
-		const isListLayout =
-			isCustom !== 'true' &&
-			layout === 'list' &&
-			window?.__experimentalAdminViews;
 		return {
 			areas: {
 				content: (
