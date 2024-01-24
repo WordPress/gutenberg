@@ -191,11 +191,15 @@ function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
 		useContext( FontLibraryContext );
 	return (
-		<HStack justify="space-between">
+		<HStack justify="flex-end">
 			{ isInstalling && <ProgressBar /> }
 			<div>
 				{ shouldDisplayDeleteButton && (
-					<Button variant="tertiary" onClick={ handleUninstallClick }>
+					<Button
+						isDestructive
+						variant="tertiary"
+						onClick={ handleUninstallClick }
+					>
 						{ __( 'Delete' ) }
 					</Button>
 				) }
