@@ -22,14 +22,12 @@ function splitRequestsToChunks( requests: BatchRequest[], chunkSize: number ) {
 }
 
 async function setupRest( this: RequestUtils ): Promise< StorageState > {
-	const rootURL = 'https://public-api.wordpress.com/';
-	const bearerToken = await this.login();
+	await this.login();
 
 	const { cookies } = await this.request.storageState();
-
+	const rootURL = new URL( '/wp-json/', WP_BASE_URL ).toString();
 	const storageState: StorageState = {
 		cookies,
-		bearerToken,
 		rootURL,
 	};
 
@@ -65,52 +63,29 @@ async function rest< RestResponse = any >(
 		throw new Error( '"path" is required to make a REST call' );
 	}
 
-	if ( ! this.storageState?.bearerToken || ! this.storageState?.rootURL ) {
-		await this.setupRest();
-	}
-
-	const wpcomPath = path.replace(
-		'/wp/v2/',
-		`/wp/v2/sites/${ new URL( WP_BASE_URL ).host }/`
-	);
-
-	const relativePath = wpcomPath.startsWith( '/' )
-		? wpcomPath.slice( 1 )
-		: wpcomPath;
+	const relativePath = path.startsWith( '/' ) ? path.slice( 1 ) : path;
 
 	const url = this.storageState!.rootURL + relativePath;
 
-	try {
-		const response = await this.request.fetch( url, {
-			...fetchOptions,
-			failOnStatusCode: false,
-			headers: {
-				Authorization: `Bearer ${ this.storageState!.bearerToken }`,
-				...( fetchOptions.headers || {} ),
-			},
-		} );
-		const json: RestResponse = await response.json();
+	const response = await this.request.fetch( url, {
+		...fetchOptions,
+		failOnStatusCode: false,
+		headers: {
+			Authorization:
+				'Basic ' +
+				btoa(
+					`${ process.env.WP_USERNAME }:${ process.env.WP_APP_PASSWORD }`
+				),
+		},
+	} );
 
-		if ( ! response.ok() ) {
-			throw json;
-		}
+	const json: RestResponse = await response.json();
 
-		return json;
-	} catch ( error ) {
-		// Nonce in invalid, retry again with a renewed nonce.
-		// if (
-		// 	typeof error === 'object' &&
-		// 	error !== null &&
-		// 	Object.prototype.hasOwnProperty.call( error, 'code' ) &&
-		// 	( error as { code: string } ).code === 'rest_cookie_invalid_nonce'
-		// ) {
-		// 	await this.setupRest();
-
-		// 	return this.rest( options );
-		// }
-
-		throw error;
+	if ( ! response.ok() ) {
+		throw json;
 	}
+
+	return json;
 }
 
 /**

@@ -40,7 +40,6 @@ import { setGutenbergExperiments } from './gutenberg-experiments';
 
 interface StorageState {
 	cookies: Cookie[];
-	bearerToken: string;
 	rootURL: string;
 }
 
