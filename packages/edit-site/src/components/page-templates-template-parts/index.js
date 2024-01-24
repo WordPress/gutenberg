@@ -374,7 +374,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				data: filteredData,
 				view,
 				fields,
-				textFields: [ 'title' ],
+				textFields: [ 'title', 'author' ],
 			} );
 		}
 		// Handle pagination.
