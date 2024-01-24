@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-body-view' );
+wp_enqueue_script_module( 'directive-body-view' );
 ?>
 
 <div

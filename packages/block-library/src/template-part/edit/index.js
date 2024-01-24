@@ -7,8 +7,8 @@ import {
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { Spinner, Modal, MenuItem } from '@wordpress/components';

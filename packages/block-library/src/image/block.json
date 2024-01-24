@@ -134,6 +134,5 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image",
-	"viewScript": "file:./view.min.js"
+	"style": "wp-block-image"
 }
