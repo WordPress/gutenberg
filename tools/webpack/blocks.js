@@ -127,21 +127,17 @@ module.exports = [
 							'build/widgets/blocks/',
 					} ).flatMap( ( [ from, to ] ) => [
 						{
-							from: `${ from }/**/(index|class*).php`,
+							from: `${ from }/**/index.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname, filename ] =
-									absoluteFilename.match(
-										new RegExp(
-											`([\\w-]+)${ escapeRegExp(
-												sep
-											) }([\\w-]+)\\.php$`
-										)
-									);
-
-								return join(
-									to,
-									`${ dirname }${ sep }${ filename }.php`
+								const [ , dirname ] = absoluteFilename.match(
+									new RegExp(
+										`([\\w-]+)${ escapeRegExp(
+											sep
+										) }index\\.php$`
+									)
 								);
+
+								return join( to, `${ dirname }.php` );
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
