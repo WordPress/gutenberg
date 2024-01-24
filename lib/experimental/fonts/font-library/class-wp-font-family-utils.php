@@ -165,7 +165,7 @@ class WP_Font_Family_Utils {
 			'semi-expanded'   => '112.5%',
 			'expanded'        => '125%',
 			'extra-expanded'  => '150%',
-			'untra-expanded'  => '200%',
+			'ultra-expanded'  => '200%',
 		);
 		$font_stretch     = str_replace( array_keys( $font_stretch_map ), array_values( $font_stretch_map ), $font_stretch );
 
