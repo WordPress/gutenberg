@@ -61,16 +61,6 @@ function FontLibraryProvider( { children } ) {
 		setRefreshKey( Date.now() );
 	};
 
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice && notice?.duration !== 0 ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, notice.duration ?? 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice, setNotice ] );
-
 	const {
 		records: libraryPosts = [],
 		isResolving: isResolvingLibrary,

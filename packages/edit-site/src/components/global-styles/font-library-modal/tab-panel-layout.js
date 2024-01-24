@@ -30,10 +30,7 @@ function TabPanelLayout( {
 						{ notice && (
 							<FlexBlock>
 								<Spacer margin={ 4 } />
-								<Notice
-									isDismissible={ false }
-									status={ notice.type }
-								>
+								<Notice status={ notice.type }>
 									{ notice.message }
 								</Notice>
 							</FlexBlock>
