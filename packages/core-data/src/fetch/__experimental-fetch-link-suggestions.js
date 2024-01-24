@@ -85,11 +85,7 @@ const fetchLinkSuggestions = async (
 ) => {
 	const {
 		isInitialSuggestions = false,
-		initialSuggestionsSearchOptions = {
-			type: 'post',
-			subtype: 'page',
-			perPage: 20,
-		},
+		initialSuggestionsSearchOptions = undefined,
 	} = searchOptions;
 
 	const { disablePostFormats = false } = settings;
