@@ -82,7 +82,7 @@ function defaultRequestToExternalModule( request ) {
 	}
 
 	if ( request === '@wordpress/interactivity-router' ) {
-		// Assumes this is usually giong to be used as a dynamic import.
+		// Assumes this is usually going to be used as a dynamic import.
 		return `import ${ request }`;
 	}
 
