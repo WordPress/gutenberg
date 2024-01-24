@@ -160,6 +160,20 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
 		settings.__experimentalBlockPatternCategories; // WP 5.9
 
+	const blockPatterns = useMemo(
+		() =>
+			[ ...( settingsBlockPatterns || [] ) ].filter(
+				( { postTypes } ) => {
+					return (
+						! postTypes ||
+						( Array.isArray( postTypes ) &&
+							postTypes.includes( postType ) )
+					);
+				}
+			),
+		[ settingsBlockPatterns, postType ]
+	);
+
 	const blockPatternCategories = useMemo(
 		() =>
 			[
@@ -232,24 +246,17 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			isDistractionFree,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalBlockPatterns: blockPatterns,
 			__experimentalFetchBlockPatterns: async () => {
-				const restPatterns = await fetchBlockPatterns();
-				return [
-					...( settingsBlockPatterns || [] ),
-					...( restPatterns || [] ),
-				]
-					.filter(
-						( x, index, arr ) =>
-							index ===
-							arr.findIndex( ( y ) => x.name === y.name )
-					)
-					.filter( ( { postTypes } ) => {
+				return ( await fetchBlockPatterns() ).filter(
+					( { postTypes } ) => {
 						return (
 							! postTypes ||
 							( Array.isArray( postTypes ) &&
 								postTypes.includes( postType ) )
 						);
-					} );
+					}
+				);
 			},
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
@@ -292,7 +299,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			hasUploadPermissions,
 			reusableBlocks,
 			userPatternCategories,
-			settingsBlockPatterns,
+			blockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,

@@ -297,7 +297,6 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		// This setting is left for back compat.
 		const {
 			__experimentalBlockPatterns = [],
-			__experimentalFetchBlockPatterns,
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
 		} = state.settings;
@@ -321,10 +320,14 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				};
 			}
 		);
-		const blockPatterns = __experimentalFetchBlockPatterns
-			? unlock( select( store ) ).getFetchedPatterns()
-			: __experimentalBlockPatterns;
-		return [ ...userPatterns, ...blockPatterns ];
+		return [
+			...userPatterns,
+			...__experimentalBlockPatterns,
+			...unlock( select( store ) ).getFetchedPatterns(),
+		].filter(
+			( x, index, arr ) =>
+				index === arr.findIndex( ( y ) => x.name === y.name )
+		);
 	}, getAllPatternsDependants )
 );
 

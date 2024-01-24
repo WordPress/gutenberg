@@ -3,7 +3,7 @@ export const getFetchedPatterns =
 	async ( { dispatch, select } ) => {
 		const { __experimentalFetchBlockPatterns } = select.getSettings();
 		if ( ! __experimentalFetchBlockPatterns ) {
-			return;
+			return [];
 		}
 		const patterns = await __experimentalFetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
