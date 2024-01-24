@@ -114,6 +114,14 @@ export const parameters = {
 				],
 			},
 		},
+		wip: {
+			title: '🚧 WIP',
+			styles: { backgroundColor: '#FFF0BD' },
+			tooltip: {
+				title: 'Component is a work in progress',
+				desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
+			},
+		},
 	},
 	controls: {
 		sort: 'requiredFirst',
