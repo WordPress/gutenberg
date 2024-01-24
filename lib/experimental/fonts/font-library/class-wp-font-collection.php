@@ -27,7 +27,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $slug;
+	public $slug;
 
 	/**
 	 * The name of the font collection.
@@ -36,7 +36,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $name;
+	public $name;
 
 	/**
 	 * Description of the font collection.
@@ -45,7 +45,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $description;
+	public $description;
 
 	/**
 	 * Source of the font collection.
@@ -54,7 +54,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $src;
+	public $src;
 
 	/**
 	 * Array of font families in the collection.
@@ -63,7 +63,7 @@ class WP_Font_Collection {
 	 *
 	 * @var array
 	 */
-	private $font_families;
+	public $font_families;
 
 	/**
 	 * Categories associated with the font collection.
@@ -72,7 +72,7 @@ class WP_Font_Collection {
 	 *
 	 * @var array
 	 */
-	private $categories;
+	public $categories;
 
 
 	/**
