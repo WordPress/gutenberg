@@ -26,7 +26,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title', 'alt' ],
-	'core/button': [ 'url', 'text' ],
+	'core/button': [ 'url', 'text', 'linkTarget' ],
 };
 
 const createEditFunctionWithBindingsAttribute = () =>
