@@ -37,14 +37,24 @@ type PlacementToInitialTranslationTuple = [
 	CSSProperties[ 'translate' ],
 ];
 
-jest.spyOn( HTMLElement.prototype, 'offsetHeight', 'get' ).mockImplementation(
-	function getOffsetHeight( this: HTMLElement ) {
-		if ( this.tagName === 'BODY' ) {
-			return window.outerHeight;
-		}
-		return 50;
-	}
-);
+let offsetHeightSpy: jest.SpiedGetter<
+	typeof HTMLElement.prototype.offsetHeight
+>;
+
+beforeAll( () => {
+	offsetHeightSpy = jest
+		.spyOn( HTMLElement.prototype, 'offsetHeight', 'get' )
+		.mockImplementation( function getOffsetHeight( this: HTMLElement ) {
+			if ( this.tagName === 'BODY' ) {
+				return window.outerHeight;
+			}
+			return 50;
+		} );
+} );
+
+afterAll( () => {
+	offsetHeightSpy?.mockRestore();
+} );
 
 // There's no matching `placement` for 'middle center' positions,
 // fallback to 'bottom' (same as `floating-ui`'s default.)
