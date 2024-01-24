@@ -3,6 +3,10 @@
  */
 const { join } = require( 'path' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+/**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 /**
  * Internal dependencies
@@ -78,6 +82,7 @@ module.exports = {
 				},
 			],
 		} ),
+		new DependencyExtractionWebpackPlugin(),
 	],
 	watchOptions: {
 		ignored: [ '**/node_modules' ],
