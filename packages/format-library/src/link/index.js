@@ -70,17 +70,17 @@ function Edit( {
 		};
 	}, [ contentRef, isActive ] );
 
-	function addLink() {
+	function addLink( target ) {
 		const text = getTextContent( slice( value ) );
 
-		if ( text && isURL( text ) && isValidHref( text ) ) {
+		if ( ! isActive && text && isURL( text ) && isValidHref( text ) ) {
 			onChange(
 				applyFormat( value, {
 					type: name,
 					attributes: { url: text },
 				} )
 			);
-		} else if ( text && isEmail( text ) ) {
+		} else if ( ! isActive && text && isEmail( text ) ) {
 			onChange(
 				applyFormat( value, {
 					type: name,
@@ -88,6 +88,9 @@ function Edit( {
 				} )
 			);
 		} else {
+			if ( target ) {
+				setOpenedBy( target );
+			}
 			setAddingLink( true );
 		}
 	}
@@ -147,8 +150,7 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Edit Link' ) : title }
 				onClick={ ( event ) => {
-					setOpenedBy( event.currentTarget );
-					setAddingLink( true );
+					addLink( event.currentTarget );
 				} }
 				isActive={ isActive || addingLink }
 				shortcutType="primary"
