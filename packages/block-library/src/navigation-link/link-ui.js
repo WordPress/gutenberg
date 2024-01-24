@@ -24,7 +24,7 @@ import {
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { plus } from '@wordpress/icons';
+import { chevronLeftSmall, plus } from '@wordpress/icons';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -83,10 +83,13 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 	return (
 		<div className="link-ui-block-inserter">
 			<Button
+				className="link-ui-block-inserter__back"
+				icon={ chevronLeftSmall }
 				onClick={ ( e ) => {
 					e.preventDefault();
 					onBack();
 				} }
+				size="small"
 			>
 				{ __( 'Back' ) }
 			</Button>

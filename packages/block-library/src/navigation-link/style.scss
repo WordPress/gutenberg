@@ -19,3 +19,11 @@
 	border-top: 1px solid $gray-100;
 	padding: $grid-unit-10;
 }
+
+.link-ui-block-inserter {
+	padding-top: $grid-unit-10;
+}
+
+.link-ui-block-inserter__back {
+	text-transform: uppercase;
+}
