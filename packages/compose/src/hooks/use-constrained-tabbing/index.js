@@ -33,9 +33,9 @@ import useRefEffect from '../use-ref-effect';
 function useConstrainedTabbing() {
 	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
-			const { keyCode, shiftKey, target } = event;
+			const { key, keyCode, shiftKey, target } = event;
 
-			if ( keyCode !== TAB ) {
+			if ( key !== 'Tab' || keyCode !== TAB ) {
 				return;
 			}
 
