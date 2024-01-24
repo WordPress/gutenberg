@@ -52,7 +52,16 @@
 	backdrop-filter: blur(6px);
 	padding: $grid-unit-15 $grid-unit-40;
 	border-top: $border-width solid $gray-100;
-	color: $gray-700;
+
+	.dataviews-pagination__page-selector {
+		.components-input-control__backdrop {
+			border: 0 !important;
+		}
+
+		.components-input-control__container {
+			background: transparent !important;
+		}
+	}
 }
 
 .dataviews-filters-options {
