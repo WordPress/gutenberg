@@ -24,6 +24,7 @@ import {
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { plus } from '@wordpress/icons';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -214,8 +215,9 @@ export function LinkUI( props ) {
 
 function LinkUITools( { setAddingBlock } ) {
 	return (
-		<VStack>
+		<VStack className="link-ui-tools">
 			<Button
+				icon={ plus }
 				onClick={ ( e ) => {
 					e.preventDefault();
 					setAddingBlock( true );
