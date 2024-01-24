@@ -261,7 +261,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		/**
 		 * Filters REST API collection parameters for the font collections controller.
 		 *
-		 * @since 5.5.0
+		 * @since 6.5.0
 		 *
 		 * @param array $query_params JSON Schema-formatted collection parameters.
 		 */
