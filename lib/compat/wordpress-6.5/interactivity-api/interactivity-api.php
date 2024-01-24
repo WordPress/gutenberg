@@ -10,10 +10,10 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 	/**
 	 * Processes the directives on the rendered HTML of the interactive blocks.
 	 *
-	 * It only processes one root interactive block at a time because the rendered
-	 * HTML of that block contains the rendered HTML of all its inner blocks,
-	 * including any interactive block. It does so by ignoring all the interactive
-	 * inner blocks until the root interactive block is processed.
+	 * This processes only one root interactive block at a time because the
+	 * rendered HTML of that block contains the rendered HTML of all its inner
+	 * blocks, including any interactive block. It does so by ignoring all the
+	 * interactive inner blocks until the root interactive block is processed.
 	 *
 	 * @since 6.5.0
 	 *
@@ -24,8 +24,8 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 		static $root_interactive_block = null;
 
 		/*
-		 *  Checks whether a root interactive block is already annotated for
-		 *  processing, and if it is, it ignores the subsequent ones.
+		 * Checks whether a root interactive block is already annotated for
+		 * processing, and if it is, it ignores the subsequent ones.
 		 */
 		if ( null === $root_interactive_block ) {
 			$block_name = $parsed_block['blockName'];
