@@ -17,7 +17,7 @@ export function usePostLinkProps() {
 	return ( params, state ) => {
 		return getPostLinkProps(
 			history,
-			{ ...params, focusMode: true },
+			{ ...params, focusMode: true, canvas: 'edit' },
 			state
 		);
 	};

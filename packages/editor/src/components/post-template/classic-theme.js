@@ -106,7 +106,6 @@ function PostTemplateDropdownContent( { onClose } ) {
 			? getPostLinkProps( {
 					postId: currentTemplateId,
 					postType: 'wp_template',
-					canvas: 'edit',
 			  } )
 			: {};
 

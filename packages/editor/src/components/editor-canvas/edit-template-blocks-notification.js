@@ -46,7 +46,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		? getPostLinkProps( {
 				postId: templateId,
 				postType: 'wp_template',
-				canvas: 'edit',
 		  } )
 		: {};
 	const { getNotices } = useSelect( noticesStore );

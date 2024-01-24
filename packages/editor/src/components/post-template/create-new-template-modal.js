@@ -101,7 +101,6 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			? getPostLinkProps( {
 					postId: newTemplate.id,
 					postType: 'wp_template',
-					canvas: 'edit',
 			  } )
 			: {};
 		editTemplate.onClick();

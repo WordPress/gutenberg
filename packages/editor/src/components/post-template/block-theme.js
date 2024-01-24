@@ -48,7 +48,6 @@ export default function BlockThemeControl( { id } ) {
 		? getPostLinkProps( {
 				postId: template.id,
 				postType: 'wp_template',
-				canvas: 'edit',
 		  } )
 		: {};
 
