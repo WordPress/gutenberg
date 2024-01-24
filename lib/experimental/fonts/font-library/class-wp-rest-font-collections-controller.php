@@ -82,7 +82,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		if ( $page > $max_pages && $total_items > 0 ) {
 			return new WP_Error(
 				'rest_post_invalid_page_number',
-				__( 'The page number requested is larger than the number of pages available.' ),
+				__( 'The page number requested is larger than the number of pages available.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -170,13 +170,13 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 
 		$config_fields = array( 'slug', 'name', 'description' );
 		foreach ( $config_fields as $field ) {
-			if ( in_array( $field, $fields ) ) {
+			if ( in_array( $field, $fields, true ) ) {
 				$item[ $field ] = $collection->$field;
 			}
 		}
 
 		$data_fields = array( 'font_families', 'categories' );
-		if ( in_array( 'font_families', $fields ) || in_array( 'categories', $fields ) ) {
+		if ( in_array( 'font_families', $fields, true ) || in_array( 'categories', $fields, true ) ) {
 			$content = $collection->get_content();
 
 			// If there was an error getting the collection data, return the error.
@@ -186,7 +186,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			}
 
 			foreach ( $data_fields as $field ) {
-				if ( in_array( $field, $fields ) ) {
+				if ( in_array( $field, $fields, true ) ) {
 					$item[ $field ] = $content[ $field ];
 				}
 			}
