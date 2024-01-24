@@ -135,9 +135,13 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 			) {
 				overrides[ blockId ] ??= {};
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Currently, we assume `undefined`, `null`, and an empty string are all equivalent.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				overrides[ blockId ][ attributeKey ] =
-					block.attributes[ attributeKey ];
+					block.attributes[ attributeKey ] === null ||
+					block.attributes[ attributeKey ] === undefined
+						? ''
+						: block.attributes[ attributeKey ];
 			}
 		}
 	}
