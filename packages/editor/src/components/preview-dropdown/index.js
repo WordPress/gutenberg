@@ -86,7 +86,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			icon={
+				isZoomedOutView
+					? chevronUpDown
+					: deviceIcons[ deviceType.toLowerCase() ]
+			}
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>
@@ -94,7 +98,10 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 				<>
 					<MenuGroup>
 						<MenuItem
-							onClick={ () => setDeviceType( 'Desktop' ) }
+							onClick={ () => {
+								setDeviceType( 'Desktop' );
+								__unstableSetEditorMode( 'edit' );
+							} }
 							icon={
 								deviceType === 'Desktop' &&
 								! isZoomedOutView &&
@@ -131,9 +138,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 										isZoomedOutView ? 'edit' : 'zoom-out'
 									);
 								} }
-								icon={ isZoomedOutView ? check : chevronUpDown }
+								icon={ isZoomedOutView && check }
 							>
-								{ __( 'Zoom out' ) }
+								{ __( 'Zoom to 50%' ) }
 							</MenuItem>
 						</MenuGroup>
 					) }
