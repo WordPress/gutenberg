@@ -52,7 +52,7 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
-		// This is only available for heading
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'textTransform' &&
 			! name &&
@@ -68,7 +68,7 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
-		// This is only available for headings
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'letterSpacing' &&
 			! name &&
