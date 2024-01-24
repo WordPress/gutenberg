@@ -77,11 +77,8 @@ class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Proce
 	 * @return array|null A pair of bookmarks, or null if there's no matching closing tag.
 	 */
 	private function get_balanced_tag_bookmarks() {
-		$i = 0;
-		while ( array_key_exists( 'start' . $i, $this->bookmarks ) ) {
-			++$i;
-		}
-		$start_name = 'start' . $i;
+		static $i   = 0;
+		$start_name = 'start_of_balanced_tag_' . ++$i;
 
 		$this->set_bookmark( $start_name );
 		if ( ! $this->next_balanced_closer() ) {
@@ -89,11 +86,7 @@ class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Proce
 			return null;
 		}
 
-		$i = 0;
-		while ( array_key_exists( 'end' . $i, $this->bookmarks ) ) {
-			++$i;
-		}
-		$end_name = 'end' . $i;
+		$end_name = 'end_of_balanced_tag_' . ++$i;
 		$this->set_bookmark( $end_name );
 
 		return array( $start_name, $end_name );
