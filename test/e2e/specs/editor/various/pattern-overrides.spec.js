@@ -7,9 +7,6 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.setGutenbergExperiments( [
-				'gutenberg-block-bindings',
-			] ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -20,7 +17,6 @@ test.describe( 'Pattern Overrides', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.setGutenbergExperiments( [] ),
 			requestUtils.activateTheme( 'twentytwentyone' ),
 		] );
 	} );
