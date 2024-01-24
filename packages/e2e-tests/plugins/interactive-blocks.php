@@ -27,8 +27,8 @@ add_action(
 					array(
 						'@wordpress/interactivity',
 						array(
-							'id'     => '@wordpress/interactivity/router',
-							'import' => 'dynamic',
+							'id'   => '@wordpress/interactivity-router',
+							'type' => 'dynamic',
 						),
 					),
 					filemtime( $view_file )

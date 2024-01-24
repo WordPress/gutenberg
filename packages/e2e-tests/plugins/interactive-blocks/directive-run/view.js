@@ -59,7 +59,7 @@ const { state } = store( 'directive-run', {
 		},
 		*navigate() {
 			const { actions } = yield import(
-				"@wordpress/interactivity/router"
+				"@wordpress/interactivity-router"
 			);
 			return actions.navigate( window.location, {
 				force: true,

@@ -104,8 +104,11 @@ function register_block_core_query() {
 		array(
 			'@wordpress/interactivity',
 			array(
-				'id'     => '@wordpress/interactivity/router',
-				'import' => 'dynamic',
+				'@wordpress/interactivity',
+				array(
+					'id'   => '@wordpress/interactivity-router',
+					'type' => 'dynamic',
+				),
 			),
 		),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
