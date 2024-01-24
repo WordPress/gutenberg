@@ -144,7 +144,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function register_script_modules() {
-			gutenberg_register_module(
+			wp_register_script_module(
 				'@wordpress/interactivity',
 				gutenberg_url( '/build/interactivity/index.min.js' ),
 				array(),
