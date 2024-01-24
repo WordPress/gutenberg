@@ -24,7 +24,6 @@ export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
-		mediaField: 'featured-image',
 	},
 };
 
@@ -40,7 +39,7 @@ const DEFAULT_PAGE_BASE = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'date', 'featured-image' ],
+	hiddenFields: [ 'date', 'featured-image', 'author' ],
 	layout: {
 		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
 	},

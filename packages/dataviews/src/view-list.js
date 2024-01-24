@@ -86,11 +86,15 @@ export default function ViewList( {
 								onClick={ () => onSelectionChange( [ item ] ) }
 							>
 								<HStack spacing={ 3 } justify="start">
-									<div className="dataviews-view-list__media-wrapper">
-										{ mediaField?.render( { item } ) || (
-											<div className="dataviews-view-list__media-placeholder"></div>
-										) }
-									</div>
+									{ mediaField && (
+										<div className="dataviews-view-list__media-wrapper">
+											{ mediaField?.render( {
+												item,
+											} ) || (
+												<div className="dataviews-view-list__media-placeholder"></div>
+											) }
+										</div>
+									) }
 									<VStack spacing={ 1 }>
 										<span className="dataviews-view-list__primary-field">
 											{ primaryField?.render( { item } ) }

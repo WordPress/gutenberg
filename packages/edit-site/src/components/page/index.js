@@ -20,6 +20,7 @@ export default function Page( {
 	actions,
 	children,
 	className,
+	backPath,
 	hideTitleFromUI = false,
 } ) {
 	const classes = classnames( 'edit-site-page', className );
@@ -29,6 +30,7 @@ export default function Page( {
 			<div className="edit-site-page-content">
 				{ ! hideTitleFromUI && title && (
 					<Header
+						backPath={ backPath }
 						title={ title }
 						subTitle={ subTitle }
 						actions={ actions }

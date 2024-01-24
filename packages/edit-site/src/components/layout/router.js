@@ -12,6 +12,7 @@ import Editor from '../editor';
 import DataviewsPatterns from '../page-patterns/dataviews-patterns';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
+import PageSingle from '../page-pages/page-single';
 import PageTemplateParts from '../page-template-parts';
 import PageTemplates from '../page-templates';
 
@@ -50,6 +51,12 @@ export default function useLayoutAreas() {
 		return {
 			areas: {
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
+				content: window.__experimentalAdminViews ? (
+					<PageSingle />
+				) : undefined,
+			},
+			widths: {
+				content: 380,
 			},
 		};
 	}

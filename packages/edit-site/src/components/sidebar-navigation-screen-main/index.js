@@ -21,6 +21,7 @@ import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import TemplatePartHint from './template-part-hint';
+import { useLink } from '../routes/link';
 
 export default function SidebarNavigationScreenMain() {
 	const { location } = useNavigator();
@@ -34,6 +35,10 @@ export default function SidebarNavigationScreenMain() {
 			setEditorCanvasContainerView( undefined );
 		}
 	}, [ setEditorCanvasContainerView, location?.path ] );
+
+	const pageLinkInfo = useLink( {
+		path: location?.path === '/page' ? '/' : '/page',
+	} );
 
 	return (
 		<SidebarNavigationScreen
@@ -59,14 +64,16 @@ export default function SidebarNavigationScreenMain() {
 						>
 							{ __( 'Styles' ) }
 						</SidebarNavigationItemGlobalStyles>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/page"
-							withChevron
+						<SidebarNavigationItem
+							{ ...pageLinkInfo }
 							icon={ page }
+							aria-current={
+								location.path === '/page' ? 'true' : undefined
+							}
 						>
 							{ __( 'Pages' ) }
-						</NavigatorButton>
+						</SidebarNavigationItem>
+
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/wp_template"

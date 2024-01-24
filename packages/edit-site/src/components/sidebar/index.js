@@ -31,8 +31,6 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
-import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
-import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -67,13 +65,13 @@ function SidebarScreens() {
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
 				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreenPagesDataViews />
+					<SidebarNavigationScreenMain />
 				) : (
 					<SidebarNavigationScreenPages />
 				) }
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
-				<SidebarNavigationScreenPage />
+				<SidebarNavigationScreenMain />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
 				{ window?.__experimentalAdminViews ? (

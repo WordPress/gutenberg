@@ -304,7 +304,7 @@ function ResizableFrame( {
 			<motion.div
 				className="edit-site-resizable-frame__inner-content"
 				animate={ {
-					borderRadius: isFullWidth ? 0 : 8,
+					borderRadius: isFullWidth ? 0 : 5,
 				} }
 				transition={ FRAME_TRANSITION }
 				style={ innerContentStyle }

@@ -24,3 +24,12 @@
 		width: 100%;
 	}
 }
+
+.page-main-content {
+	padding: $grid-unit-40;
+}
+
+.page-main-content__featured img {
+	width: 100%;
+	border-radius: $radius-block-ui;
+}

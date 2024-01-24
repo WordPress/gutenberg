@@ -296,7 +296,7 @@
 	margin: 0;
 	margin-top: $header-height;
 	@include break-medium() {
-		border-radius: 8px;
+		border-radius: 5px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
 }
