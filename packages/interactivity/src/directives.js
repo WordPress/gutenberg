@@ -250,8 +250,15 @@ export default () => {
 						attribute !== 'list' &&
 						attribute !== 'form' &&
 						/*
-						 * Default value in browsers is `-1` and an empty string is
-						 * cast to `0` instead.
+						 * The value for `tabindex` follows the parsing rules for an
+						 * integer. If that fails, or if the attribute isn't present, then
+						 * the browsers should "follow platform conventions to determine if
+						 * the element should be considered as a focusable area",
+						 * practically meaning that most elements get a default of `-1` (not
+						 * focusable), but several also get a default of `0` (focusable in
+						 * order after all elements with a positive `tabindex` value).
+						 *
+						 * @see https://html.spec.whatwg.org/#tabindex-value
 						 */
 						attribute !== 'tabIndex' &&
 						attribute !== 'download' &&
