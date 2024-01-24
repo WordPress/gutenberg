@@ -117,7 +117,7 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 			}
 
 			// Process the HTML based on the block and the attribute.
-			$modified_block_content = wp_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_value );
+			$modified_block_content = gutenberg_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_value );
 		}
 		return $modified_block_content;
 	}
