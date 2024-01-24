@@ -271,6 +271,14 @@ function InlineLinkUI( {
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
 				settings={ LINK_SETTINGS }
+				suggestionsQuery={ {
+					// always show Pages as initial suggestions
+					initialSuggestionsSearchOptions: {
+						type: 'post',
+						subtype: 'page',
+						perPage: 20,
+					},
+				} }
 			/>
 		</Popover>
 	);
