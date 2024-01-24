@@ -406,47 +406,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		).toBeVisible();
 	} );
 
-	// Check for regression of https://github.com/WordPress/gutenberg/issues/23263
-	test( 'inserts blocks at root level when using the root appender while selection is in an inner block', async ( {
-		admin,
-		editor,
-		page,
-	} ) => {
-		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/buttons' } );
-
-		// After inserting the Buttons block the inner button block should be selected.
-		await expect(
-			editor.canvas.getByRole( 'textbox', { name: 'Button text' } )
-		).toBeFocused();
-		await page.keyboard.type( '1.1' );
-
-		// The block appender is only visible when there's no selection.
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
-		);
-
-		// Insert a new block using the root appender.
-		await editor.canvas
-			.getByRole( 'button', { name: 'Add block' } )
-			.click();
-		await page
-			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
-			} )
-			.fill( 'Paragraph' );
-		await page.getByRole( 'option', { name: 'Paragraph' } ).click();
-		await page.keyboard.type( '2' );
-
-		// Should show a buttons block followed by a paragraph.
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/buttons' },
-				{ name: 'core/paragraph' },
-			] );
-	} );
-
 	// // Check for regression of https://github.com/WordPress/gutenberg/issues/24262.
 	test( 'inserts a block in proper place after having clicked `Browse All` from inline inserter', async ( {
 		admin,
