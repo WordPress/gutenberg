@@ -1,24 +1,16 @@
 /**
  * WordPress dependencies
  */
-import {
-	serialize,
-	pasteHandler,
-	createBlock,
-	findTransform,
-	getBlockTransforms,
-} from '@wordpress/blocks';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
+import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
 
 export default function useClipboardHandler( { selectBlock } ) {
 	const {
@@ -111,33 +103,8 @@ export default function useClipboardHandler( { selectBlock } ) {
 				}
 
 				notifyCopy( event.type, selectedBlockClientIds );
-				let blocks;
-				// Check if we have partial selection.
-				blocks = getBlocksByClientId( selectedBlockClientIds );
-
-				const wrapperBlockName = event.clipboardData.getData(
-					'__unstableWrapperBlockName'
-				);
-
-				if ( wrapperBlockName ) {
-					blocks = createBlock(
-						wrapperBlockName,
-						JSON.parse(
-							event.clipboardData.getData(
-								'__unstableWrapperBlockAttributes'
-							)
-						),
-						blocks
-					);
-				}
-
-				const serialized = serialize( blocks );
-
-				event.clipboardData.setData(
-					'text/plain',
-					toPlainText( serialized )
-				);
-				event.clipboardData.setData( 'text/html', serialized );
+				const blocks = getBlocksByClientId( selectedBlockClientIds );
+				setClipboardBlocks( event, blocks );
 			}
 
 			if ( event.type === 'cut' ) {
@@ -176,35 +143,10 @@ export default function useClipboardHandler( { selectBlock } ) {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 				} = getSettings();
-				const { plainText, html, files } = getPasteEventData( event );
-				let blocks = [];
-
-				if ( files.length ) {
-					const fromTransforms = getBlockTransforms( 'from' );
-					blocks = files
-						.reduce( ( accumulator, file ) => {
-							const transformation = findTransform(
-								fromTransforms,
-								( transform ) =>
-									transform.type === 'files' &&
-									transform.isMatch( [ file ] )
-							);
-							if ( transformation ) {
-								accumulator.push(
-									transformation.transform( [ file ] )
-								);
-							}
-							return accumulator;
-						}, [] )
-						.flat();
-				} else {
-					blocks = pasteHandler( {
-						HTML: html,
-						plainText,
-						mode: 'BLOCKS',
-						canUserUseUnfilteredHTML,
-					} );
-				}
+				const blocks = getPasteBlocks(
+					event,
+					canUserUseUnfilteredHTML
+				);
 
 				if ( selectedBlockClientIds.length === 1 ) {
 					const [ selectedBlockClientId ] = selectedBlockClientIds;
@@ -252,21 +194,4 @@ export default function useClipboardHandler( { selectBlock } ) {
 			node.ownerDocument.removeEventListener( 'paste', handler );
 		};
 	}, [] );
-}
-
-/**
- * Given a string of HTML representing serialized blocks, returns the plain
- * text extracted after stripping the HTML of any tags and fixing line breaks.
- *
- * @param {string} html Serialized blocks.
- * @return {string} The plain-text content with any html removed.
- */
-function toPlainText( html ) {
-	// Manually handle BR tags as line breaks prior to `stripHTML` call
-	html = html.replace( /<br>/g, '\n' );
-
-	const plainText = stripHTML( html ).trim();
-
-	// Merge any consecutive line breaks
-	return plainText.replace( /\n\n+/g, '\n\n' );
 }
