@@ -487,5 +487,18 @@ describe( 'Tooltip', () => {
 				).not.toBeInTheDocument()
 			);
 		} );
+
+		it( 'should not leak Tooltip component classname to the anchor element', () => {
+			render(
+				<Tooltip>
+					<Tooltip>
+						<button>Anchor</button>
+					</Tooltip>
+				</Tooltip>
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Anchor' } )
+			).not.toHaveClass( 'components-tooltip' );
+		} );
 	} );
 } );
