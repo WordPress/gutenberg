@@ -109,6 +109,11 @@ require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
+require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings.php';
+require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
+require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/post-meta.php';
+require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/pattern.php';
+
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
