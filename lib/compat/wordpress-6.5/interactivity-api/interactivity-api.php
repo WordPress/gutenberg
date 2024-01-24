@@ -23,7 +23,7 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 	function wp_interactivity_process_directives_of_interactive_blocks( $parsed_block ) {
 		static $root_interactive_block = null;
 
-		/**
+		/*
 		 *  Checks whether a root interactive block is already annotated for
 		 *  processing, and if it is, it ignores the subsequent ones.
 		 */
@@ -35,7 +35,7 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 				// Annotates the root interactive block for processing.
 				$root_interactive_block = array( $block_name, md5( serialize( $parsed_block ) ) );
 
-				/**
+				/*
 				 * Adds a filter to process the root interactive block once it has
 				 * finished rendering.
 				 */
@@ -52,7 +52,7 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 					return $content;
 				};
 
-				/**
+				/*
 				 * Uses a priority of 20 to ensure that other filters can add additional
 				 * directives before the processing starts.
 				 */
