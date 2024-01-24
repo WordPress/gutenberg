@@ -241,8 +241,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				 */
 				$directives_prefixes = array_intersect(
 					$p->is_tag_closer()
-					? $directive_processor_prefixes_reversed
-					: $directive_processor_prefixes,
+						? $directive_processor_prefixes_reversed
+						: $directive_processor_prefixes,
 					$directives_prefixes
 				);
 
@@ -399,8 +399,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			// Tries to decode the `data-wp-interactive` attribute value.
 			$attribute_value = $p->get_attribute( 'data-wp-interactive' );
 			$decoded_json    = is_string( $attribute_value ) && ! empty( $attribute_value )
-			? json_decode( $attribute_value, true )
-			: null;
+				? json_decode( $attribute_value, true )
+				: null;
 
 			/*
 			 * Pushes the newly defined namespace or the current one if the
@@ -411,8 +411,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			 * contained a valid namespace.
 			 */
 			$namespace_stack[] = isset( $decoded_json['namespace'] )
-			? $decoded_json['namespace']
-			: end( $namespace_stack );
+				? $decoded_json['namespace']
+				: end( $namespace_stack );
 		}
 
 		/**
@@ -438,8 +438,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 
 			// Separates the namespace from the context JSON object.
 			list( $namespace_value, $decoded_json ) = is_string( $attribute_value ) && ! empty( $attribute_value )
-			? $this->extract_directive_value( $attribute_value, $namespace_value )
-			: array( $namespace_value, null );
+				? $this->extract_directive_value( $attribute_value, $namespace_value )
+				: array( $namespace_value, null );
 
 			/*
 			 * If there is a namespace, it adds a new context to the stack merging the
