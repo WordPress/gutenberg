@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.0.0 (2024-01-10)
+
 ### Breaking Changes
 
 -   Drop support for webpack 4.

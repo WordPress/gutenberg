@@ -43,7 +43,10 @@ import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
 	block: { clientId },
+	displacement,
+	isAfterDraggedBlocks,
 	isDragged,
+	isNesting,
 	isSelected,
 	isBranchSelected,
 	selectBlock,
@@ -270,6 +273,11 @@ function ListViewBlock( {
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
 		'is-draggable': canMove,
+		'is-displacement-normal': displacement === 'normal',
+		'is-displacement-up': displacement === 'up',
+		'is-displacement-down': displacement === 'down',
+		'is-after-dragged-blocks': isAfterDraggedBlocks,
+		'is-nesting': isNesting,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -296,6 +304,7 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }

@@ -4,8 +4,7 @@
  *
  * @package gutenberg
  */
-
-if ( function_exists( 'register_block_bindings_source' ) ) {
+if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 	$pattern_source_callback = function ( $source_attrs, $block_instance, $attribute_name ) {
 		if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
 			return null;
@@ -13,7 +12,7 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 		$block_id = $block_instance->attributes['metadata']['id'];
 		return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, $attribute_name ), null );
 	};
-	register_block_bindings_source(
+	wp_block_bindings_register_source(
 		'pattern_attributes',
 		__( 'Pattern Attributes', 'gutenberg' ),
 		$pattern_source_callback

@@ -20,33 +20,26 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 *
 	 * @var string
 	 */
-	public static $root_block = null;
-
-	/**
-	 * Array containing the direct children of interactive blocks.
-	 *
-	 * @var array
-	 */
-	public static $children_of_interactive_block = array();
+	public static $interactive_root_block = null;
 
 	/**
 	 * Sets the current root block.
 	 *
 	 * @param array $block The block to add.
 	 */
-	public static function mark_root_block( $block ) {
+	public static function mark_interactive_root_block( $block ) {
 		if ( null !== $block['blockName'] ) {
-			self::$root_block = $block['blockName'] . md5( serialize( $block ) );
+			self::$interactive_root_block = $block['blockName'] . md5( serialize( $block ) );
 		} else {
-			self::$root_block = md5( serialize( $block ) );
+			self::$interactive_root_block = md5( serialize( $block ) );
 		}
 	}
 
 	/**
 	 * Resets the root block.
 	 */
-	public static function unmark_root_block() {
-		self::$root_block = null;
+	public static function unmark_interactive_root_block() {
+		self::$interactive_root_block = null;
 	}
 
 	/**
@@ -55,16 +48,16 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @param array $block The block to check.
 	 * @return bool True if block is a root block, false otherwise.
 	 */
-	public static function is_marked_as_root_block( $block ) {
-		// If self::$root_block is null, is impossible that any block has been marked as root.
-		if ( is_null( self::$root_block ) ) {
+	public static function is_marked_as_interactive_root_block( $block ) {
+		// If self::$interactive_root_block is null, is impossible that any block has been marked as root.
+		if ( is_null( self::$interactive_root_block ) ) {
 			return false;
 		}
 		// Blocks whose blockName is null are specifically intended to convey - "this is a freeform HTML block."
 		if ( null !== $block['blockName'] ) {
-			return str_contains( self::$root_block, $block['blockName'] ) && $block['blockName'] . md5( serialize( $block ) ) === self::$root_block;
+			return str_contains( self::$interactive_root_block, $block['blockName'] ) && $block['blockName'] . md5( serialize( $block ) ) === self::$interactive_root_block;
 		}
-		return md5( serialize( $block ) ) === self::$root_block;
+		return md5( serialize( $block ) ) === self::$interactive_root_block;
 	}
 
 	/**
@@ -72,28 +65,8 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 *
 	 * @return bool True if there is a root block, false otherwise.
 	 */
-	public static function has_root_block() {
-		return isset( self::$root_block );
-	}
-
-	/**
-	 * Stores a reference to a direct children of an interactive block to be able
-	 * to identify it later.
-	 *
-	 * @param array $block The block to add.
-	 */
-	public static function mark_children_of_interactive_block( $block ) {
-		self::$children_of_interactive_block[] = md5( serialize( $block ) );
-	}
-
-	/**
-	 * Checks if block is marked as children of an interactive block.
-	 *
-	 * @param array $block The block to check.
-	 * @return bool True if block is a children of an interactive block, false otherwise.
-	 */
-	public static function is_marked_as_children_of_interactive_block( $block ) {
-		return in_array( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
+	public static function has_interactive_root_block() {
+		return isset( self::$interactive_root_block );
 	}
 
 	/**

@@ -44,9 +44,9 @@ function DisableBlock( { clientId } ) {
 export default function DisableNonPageContentBlocks() {
 	useBlockEditingMode( 'disabled' );
 	const clientIds = useSelect( ( select ) => {
-		const { __experimentalGetGlobalBlocksByName } =
-			select( blockEditorStore );
-		return __experimentalGetGlobalBlocksByName( PAGE_CONTENT_BLOCK_TYPES );
+		return select( blockEditorStore ).getBlocksByName(
+			PAGE_CONTENT_BLOCK_TYPES
+		);
 	}, [] );
 
 	return clientIds.map( ( clientId ) => {

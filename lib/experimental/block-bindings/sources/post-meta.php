@@ -4,8 +4,7 @@
  *
  * @package gutenberg
  */
-
-if ( function_exists( 'register_block_bindings_source' ) ) {
+if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 	$post_meta_source_callback = function ( $source_attrs ) {
 		// Use the postId attribute if available
 		if ( isset( $source_attrs['postId'] ) ) {
@@ -17,7 +16,7 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 
 		return get_post_meta( $post_id, $source_attrs['value'], true );
 	};
-	register_block_bindings_source(
+	wp_block_bindings_register_source(
 		'post_meta',
 		__( 'Post Meta', 'gutenberg' ),
 		$post_meta_source_callback

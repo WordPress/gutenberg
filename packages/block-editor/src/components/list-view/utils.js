@@ -93,3 +93,119 @@ export function focusListItem( focusClientId, treeGridElementRef ) {
 		} );
 	}
 }
+
+/**
+ * Get values for the block that flag whether the block should be displaced up or down,
+ * whether the block is being nested, and whether the block appears after the dragged
+ * blocks. These values are used to determine the class names to apply to the block.
+ * The list view rows are displaced visually via CSS rules. Displacement rules:
+ * - `normal`: no displacement — used to apply a translateY of `0` so that the block
+ *  appears in its original position, and moves to that position smoothly when dragging
+ *  outside of the list view area.
+ * - `up`: the block should be displaced up, creating room beneath the block for the drop indicator.
+ * - `down`: the block should be displaced down, creating room above the block for the drop indicator.
+ *
+ * @param {Object}                props
+ * @param {Object}                props.blockIndexes           The indexes of all the blocks in the list view, keyed by clientId.
+ * @param {number|null|undefined} props.blockDropTargetIndex   The index of the block that the user is dropping to.
+ * @param {?string}               props.blockDropPosition      The position relative to the block that the user is dropping to.
+ * @param {string}                props.clientId               The client id for the current block.
+ * @param {?number}               props.firstDraggedBlockIndex The index of the first dragged block.
+ * @param {?boolean}              props.isDragged              Whether the current block is being dragged. Dragged blocks skip displacement.
+ * @return {Object} An object containing the `displacement`, `isAfterDraggedBlocks` and `isNesting` values.
+ */
+export function getDragDisplacementValues( {
+	blockIndexes,
+	blockDropTargetIndex,
+	blockDropPosition,
+	clientId,
+	firstDraggedBlockIndex,
+	isDragged,
+} ) {
+	let displacement;
+	let isNesting;
+	let isAfterDraggedBlocks;
+
+	if ( ! isDragged ) {
+		isNesting = false;
+		const thisBlockIndex = blockIndexes[ clientId ];
+		isAfterDraggedBlocks = thisBlockIndex > firstDraggedBlockIndex;
+
+		// Determine where to displace the position of the current block, relative
+		// to the blocks being dragged (in their original position) and the drop target
+		// (the position where a user is currently dragging the blocks to).
+		if (
+			blockDropTargetIndex !== undefined &&
+			blockDropTargetIndex !== null &&
+			firstDraggedBlockIndex !== undefined
+		) {
+			// If the block is being dragged and there is a valid drop target,
+			// determine if the block being rendered should be displaced up or down.
+
+			if ( thisBlockIndex !== undefined ) {
+				if (
+					thisBlockIndex >= firstDraggedBlockIndex &&
+					thisBlockIndex < blockDropTargetIndex
+				) {
+					// If the current block appears after the set of dragged blocks
+					// (in their original position), but is before the drop target,
+					// then the current block should be displaced up.
+					displacement = 'up';
+				} else if (
+					thisBlockIndex < firstDraggedBlockIndex &&
+					thisBlockIndex >= blockDropTargetIndex
+				) {
+					// If the current block appears before the set of dragged blocks
+					// (in their original position), but is after the drop target,
+					// then the current block should be displaced down.
+					displacement = 'down';
+				} else {
+					displacement = 'normal';
+				}
+				isNesting =
+					typeof blockDropTargetIndex === 'number' &&
+					blockDropTargetIndex - 1 === thisBlockIndex &&
+					blockDropPosition === 'inside';
+			}
+		} else if (
+			blockDropTargetIndex === null &&
+			firstDraggedBlockIndex !== undefined
+		) {
+			// A `null` value for `blockDropTargetIndex` indicates that the
+			// drop target is outside of the valid areas within the list view.
+			// In this case, the drag is still active, but as there is no
+			// valid drop target, we should remove the gap indicating where
+			// the block would be inserted.
+			if (
+				thisBlockIndex !== undefined &&
+				thisBlockIndex >= firstDraggedBlockIndex
+			) {
+				displacement = 'up';
+			} else {
+				displacement = 'normal';
+			}
+		} else if (
+			blockDropTargetIndex !== undefined &&
+			blockDropTargetIndex !== null &&
+			firstDraggedBlockIndex === undefined
+		) {
+			// If the blockdrop target is defined, but there are no dragged blocks,
+			// then the block should be displaced relative to the drop target.
+			if ( thisBlockIndex !== undefined ) {
+				if ( thisBlockIndex < blockDropTargetIndex ) {
+					displacement = 'normal';
+				} else {
+					displacement = 'down';
+				}
+			}
+		} else if ( blockDropTargetIndex === null ) {
+			displacement = 'normal';
+		}
+	}
+
+	return {
+		displacement,
+		isNesting,
+		isAfterDraggedBlocks,
+	};
+}

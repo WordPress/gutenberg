@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "6.25.0",
+	"version": "6.26.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,7 @@
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"change-case": "^4.1.2",
-		"clipboard": "^2.0.8",
+		"clipboard": "^2.0.11",
 		"mousetrap": "^1.6.5",
 		"use-memo-one": "^1.1.1"
 	},

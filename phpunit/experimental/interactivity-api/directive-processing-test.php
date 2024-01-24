@@ -121,40 +121,37 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	public function test_interactivity_process_directives_in_root_blocks() {
+	public function test_interactivity_process_directives_in_interactive_root_blocks() {
 		$block_content =
-		'<!-- wp:paragraph -->' .
-			'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
-		'<!-- /wp:paragraph -->' .
-		'<!-- wp:paragraph -->' .
-			'<p>Welcome to WordPress.</p>' .
-		'<!-- /wp:paragraph -->';
+		'<!-- wp:test/context-level-1 /-->' .
+		'<!-- wp:test/context-level-2 /-->' .
+		'<!-- wp:paragraph --><p>Welcome</p><!-- /wp:paragraph -->';
 
-		$parsed_block        = parse_blocks( $block_content )[0];
-		$source_block        = $parsed_block;
-		$rendered_content    = render_block( $parsed_block );
-		$parsed_block_second = parse_blocks( $block_content )[1];
-		$fake_parent_block   = array();
+		$interactive_parsed_block = parse_blocks( $block_content )[0];
 
-		// Test that root block is intially emtpy.
-		$this->assertEmpty( WP_Directive_Processor::$root_block );
+		$rendered_content           = render_block( $interactive_parsed_block );
+		$parsed_block_second        = parse_blocks( $block_content )[1];
+		$non_interactive_root_block = parse_blocks( $block_content )[2];
 
-		// Test that root block is not added if there is a parent block.
-		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, $fake_parent_block );
-		$this->assertEmpty( WP_Directive_Processor::$root_block );
+		// Test that root block is intially empty.
+		$this->assertEmpty( WP_Directive_Processor::$interactive_root_block );
 
-		// Test that root block is added if there is no parent block.
-		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, null );
-		$current_root_block = WP_Directive_Processor::$root_block;
-		$this->assertNotEmpty( $current_root_block );
+		// Test that root block is not added if it is non interactive.
+		gutenberg_interactivity_mark_root_interactive_blocks( $non_interactive_root_block );
+		$this->assertEmpty( WP_Directive_Processor::$interactive_root_block );
 
-		// Test that a root block is not added if there is already a root block defined.
-		gutenberg_interactivity_mark_root_blocks( $parsed_block_second, $source_block, null );
-		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
+		// Test that a non root block is added if it is interactive.
+		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block );
+		$this->assertNotEmpty( WP_Directive_Processor::$interactive_root_block );
+
+		// Test that an interactive block is not added if it has in interactive ancestor.
+		$current_root_block = WP_Directive_Processor::$interactive_root_block;
+		gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block_second );
+		$this->assertSame( $current_root_block, WP_Directive_Processor::$interactive_root_block );
 
 		// Test that root block is removed after processing.
-		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );
-		$this->assertEmpty( WP_Directive_Processor::$root_block );
+		gutenberg_process_directives_in_root_blocks( $rendered_content, $interactive_parsed_block );
+		$this->assertEmpty( WP_Directive_Processor::$interactive_root_block );
 	}
 
 	public function test_directive_processing_of_interactive_block() {
@@ -220,7 +217,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_non_interactive_blocks_are_not_processed() {
-		$post_content    = '<!-- wp:test/context-level-1 --><!-- wp:test/non-interactive-with-directive /--><!-- /wp:test/context-level-1 -->';
+		$post_content    = '<!-- wp:test/non-interactive-with-directive /-->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'non-interactive-with-directive' ) );
@@ -228,13 +225,13 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$this->assertSame( null, $value );
 	}
 
-	public function test_non_interactive_blocks_with_manual_inner_block_rendering_are_not_processed() {
-		$post_content    = '<!-- wp:test/context-level-with-manual-inner-block-rendering --><!-- wp:test/non-interactive-with-directive /--><!-- /wp:test/context-level-with-manual-inner-block-rendering -->';
+	public function test_non_interactive_blocks_with_interactive_ancestor_are_processed() {
+		$post_content    = '<!-- wp:test/context-level-1 --><!-- wp:test/non-interactive-with-directive /--><!-- /wp:test/context-level-1 -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'non-interactive-with-directive' ) );
 		$value = $p->get_attribute( 'value' );
-		$this->assertSame( null, $value );
+		$this->assertSame( 'level-1', $value );
 	}
 
 	public function test_directives_ordering() {
