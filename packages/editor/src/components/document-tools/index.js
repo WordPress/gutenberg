@@ -104,6 +104,10 @@ function DocumentTools( {
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
+		// Some plugins expect and use the `edit-post-header-toolbar` CSS class to
+		// find the toolbar and inject UI elements into it. This is not officially
+		// supported, but we're keeping it in the list of class names for backwards
+		// compatibility.
 		<NavigableToolbar
 			className={ classnames(
 				'editor-document-tools',
