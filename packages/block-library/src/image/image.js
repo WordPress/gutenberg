@@ -124,6 +124,7 @@ export default function Image( {
 		linkTarget,
 		sizeSlug,
 		lightbox,
+		metadata,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -355,7 +356,8 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
-	const lightboxToggleDisabled = linkDestination !== 'none';
+	const lightboxToggleDisabled =
+		linkDestination && linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -410,21 +412,59 @@ export default function Image( {
 		</InspectorControls>
 	);
 
+	const {
+		lockUrlControls = false,
+		lockAltControls = false,
+		lockTitleControls = false,
+	} = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+			const {
+				url: urlBinding,
+				alt: altBinding,
+				title: titleBinding,
+			} = metadata?.bindings || {};
+			return {
+				lockUrlControls:
+					!! urlBinding &&
+					getBlockBindingsSource( urlBinding?.source?.name )
+						?.lockAttributesEditing === true,
+				lockAltControls:
+					!! altBinding &&
+					getBlockBindingsSource( altBinding?.source?.name )
+						?.lockAttributesEditing === true,
+				lockTitleControls:
+					!! titleBinding &&
+					getBlockBindingsSource( titleBinding?.source?.name )
+						?.lockAttributesEditing === true,
+			};
+		},
+		[ isSelected ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! multiImageSelection && ! isEditingImage && (
-					<ImageURLInputUI
-						url={ href || '' }
-						onChangeUrl={ onSetHref }
-						linkDestination={ linkDestination }
-						mediaUrl={ ( image && image.source_url ) || url }
-						mediaLink={ image && image.link }
-						linkTarget={ linkTarget }
-						linkClass={ linkClass }
-						rel={ rel }
-					/>
-				) }
+				{ ! multiImageSelection &&
+					! isEditingImage &&
+					! lockUrlControls && (
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ ( image && image.source_url ) || url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+						/>
+					) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
@@ -440,19 +480,21 @@ export default function Image( {
 					/>
 				) }
 			</BlockControls>
-			{ ! multiImageSelection && ! isEditingImage && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						onSelect={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onError={ onUploadError }
-					/>
-				</BlockControls>
-			) }
+			{ ! multiImageSelection &&
+				! isEditingImage &&
+				! lockUrlControls && (
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ url }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*"
+							onSelect={ onSelectImage }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+						/>
+					</BlockControls>
+				) }
 			{ ! multiImageSelection && externalBlob && (
 				<BlockControls>
 					<ToolbarGroup>
@@ -483,16 +525,27 @@ export default function Image( {
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
+								disabled={ lockAltControls }
 								help={
-									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									lockAltControls ? (
+										<>
 											{ __(
-												'Describe the purpose of the image.'
+												'Connected to a custom field'
 											) }
-										</ExternalLink>
-										<br />
-										{ __( 'Leave empty if decorative.' ) }
-									</>
+										</>
+									) : (
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
 								}
 								__nextHasNoMarginBottom
 							/>
@@ -542,17 +595,22 @@ export default function Image( {
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
+					disabled={ lockTitleControls }
 					help={
-						<>
-							{ __(
-								'Describe the role of this image on the page.'
-							) }
-							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+						lockTitleControls ? (
+							<>{ __( 'Connected to a custom field' ) }</>
+						) : (
+							<>
 								{ __(
-									'(Note: many devices and browsers do not display this text.)'
+									'Describe the role of this image on the page.'
 								) }
-							</ExternalLink>
-						</>
+								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+									{ __(
+										'(Note: many devices and browsers do not display this text.)'
+									) }
+								</ExternalLink>
+							</>
+						)
 					}
 				/>
 			</InspectorControls>
@@ -747,7 +805,8 @@ export default function Image( {
 	}
 
 	if ( ! url && ! temporaryURL ) {
-		return sizeControls;
+		// Add all controls if the image attributes are connected.
+		return metadata?.bindings ? controls : sizeControls;
 	}
 
 	return (

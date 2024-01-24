@@ -27,6 +27,7 @@ import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
+import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
@@ -68,6 +69,7 @@ createBlockSaveFilter( [
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
+export { getShadowClassesAndStyles, useShadowProps } from './use-shadow-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';

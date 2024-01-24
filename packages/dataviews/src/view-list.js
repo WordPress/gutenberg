@@ -92,7 +92,9 @@ export default function ViewList( {
 										) }
 									</div>
 									<VStack spacing={ 1 }>
-										{ primaryField?.render( { item } ) }
+										<span className="dataviews-view-list__primary-field">
+											{ primaryField?.render( { item } ) }
+										</span>
 										<div className="dataviews-view-list__fields">
 											{ visibleFields.map( ( field ) => {
 												return (

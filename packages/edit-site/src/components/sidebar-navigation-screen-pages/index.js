@@ -137,14 +137,6 @@ export default function SidebarNavigationScreenPages() {
 	};
 
 	const pagesLink = useLink( { path: '/pages' } );
-	const manageAllPagesProps = window?.__experimentalAdminViews
-		? { ...pagesLink }
-		: {
-				href: 'edit.php?post_type=page',
-				onClick: () => {
-					document.location = 'edit.php?post_type=page';
-				},
-		  };
 
 	return (
 		<>
@@ -156,7 +148,7 @@ export default function SidebarNavigationScreenPages() {
 			) }
 			<SidebarNavigationScreen
 				title={ __( 'Pages' ) }
-				description={ __( 'Browse and edit pages on your site.' ) }
+				description={ __( 'Browse and manage pages.' ) }
 				actions={
 					<SidebarButton
 						icon={ plus }
@@ -230,7 +222,7 @@ export default function SidebarNavigationScreenPages() {
 						) ) }
 						<SidebarNavigationItem
 							className="edit-site-sidebar-navigation-screen-pages__see-all"
-							{ ...manageAllPagesProps }
+							{ ...pagesLink }
 						>
 							{ __( 'Manage all pages' ) }
 						</SidebarNavigationItem>

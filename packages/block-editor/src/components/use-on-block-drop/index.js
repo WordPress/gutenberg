@@ -4,9 +4,11 @@
 import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
+	createBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
@@ -61,6 +63,8 @@ export function parseDropEvent( event ) {
  * @param {Function} moveBlocks                A function that moves blocks.
  * @param {Function} insertOrReplaceBlocks     A function that inserts or replaces blocks.
  * @param {Function} clearSelectedBlock        A function that clears block selection.
+ * @param {string}   operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
+ * @param {Function} getBlock                  A function that returns a block given its client id.
  * @return {Function} The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -70,7 +74,9 @@ export function onBlockDrop(
 	getClientIdsOfDescendants,
 	moveBlocks,
 	insertOrReplaceBlocks,
-	clearSelectedBlock
+	clearSelectedBlock,
+	operation,
+	getBlock
 ) {
 	return ( event ) => {
 		const {
@@ -110,6 +116,21 @@ export function onBlockDrop(
 					( id ) => id === targetRootClientId
 				)
 			) {
+				return;
+			}
+
+			// If the user is dropping a block over another block, replace both blocks
+			// with a group block containing them
+			if ( operation === 'group' ) {
+				const blocksToInsert = sourceClientIds.map( ( clientId ) =>
+					getBlock( clientId )
+				);
+				insertOrReplaceBlocks(
+					blocksToInsert,
+					true,
+					null,
+					sourceClientIds
+				);
 				return;
 			}
 
@@ -202,7 +223,7 @@ export default function useOnBlockDrop(
 	targetBlockIndex,
 	options = {}
 ) {
-	const { operation = 'insert' } = options;
+	const { operation = 'insert', nearestSide = 'right' } = options;
 	const {
 		canInsertBlockType,
 		getBlockIndex,
@@ -210,7 +231,10 @@ export default function useOnBlockDrop(
 		getBlockOrder,
 		getBlocksByClientId,
 		getSettings,
+		getBlock,
+		isGroupable,
 	} = useSelect( blockEditorStore );
+	const { getBlockType, getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,
@@ -222,12 +246,63 @@ export default function useOnBlockDrop(
 	const registry = useRegistry();
 
 	const insertOrReplaceBlocks = useCallback(
-		( blocks, updateSelection = true, initialPosition = 0 ) => {
+		(
+			blocks,
+			updateSelection = true,
+			initialPosition = 0,
+			clientIdsToReplace = []
+		) => {
+			const clientIds = getBlockOrder( targetRootClientId );
+			const clientId = clientIds[ targetBlockIndex ];
+			const blocksClientIds = blocks.map( ( block ) => block.clientId );
+			const areGroupableBlocks = isGroupable( [
+				...blocksClientIds,
+				clientId,
+			] );
 			if ( operation === 'replace' ) {
-				const clientIds = getBlockOrder( targetRootClientId );
-				const clientId = clientIds[ targetBlockIndex ];
-
 				replaceBlocks( clientId, blocks, undefined, initialPosition );
+			} else if ( operation === 'group' && areGroupableBlocks ) {
+				const targetBlock = getBlock( clientId );
+				if ( nearestSide === 'left' ) {
+					blocks.push( targetBlock );
+				} else {
+					blocks.unshift( targetBlock );
+				}
+
+				const groupInnerBlocks = blocks.map( ( block ) => {
+					return createBlock(
+						block.name,
+						block.attributes,
+						block.innerBlocks
+					);
+				} );
+
+				const areAllImages = blocks.every( ( block ) => {
+					return block.name === 'core/image';
+				} );
+
+				const galleryBlock = !! getBlockType( 'core/gallery' );
+
+				const wrappedBlocks = createBlock(
+					areAllImages && galleryBlock
+						? 'core/gallery'
+						: getGroupingBlockName(),
+					{
+						layout: {
+							type: 'flex',
+							flexWrap: areAllImages ? null : 'nowrap',
+						},
+					},
+					groupInnerBlocks
+				);
+				// Need to make sure both the target block and the block being dragged are replaced
+				// otherwise the dragged block will be duplicated.
+				replaceBlocks(
+					[ clientId, ...clientIdsToReplace ],
+					wrappedBlocks,
+					undefined,
+					initialPosition
+				);
 			} else {
 				insertBlocks(
 					blocks,
@@ -239,12 +314,16 @@ export default function useOnBlockDrop(
 			}
 		},
 		[
-			operation,
 			getBlockOrder,
-			insertBlocks,
-			replaceBlocks,
-			targetBlockIndex,
 			targetRootClientId,
+			targetBlockIndex,
+			operation,
+			replaceBlocks,
+			getBlock,
+			nearestSide,
+			getBlockType,
+			getGroupingBlockName,
+			insertBlocks,
 		]
 	);
 
@@ -297,7 +376,9 @@ export default function useOnBlockDrop(
 		getClientIdsOfDescendants,
 		moveBlocks,
 		insertOrReplaceBlocks,
-		clearSelectedBlock
+		clearSelectedBlock,
+		operation,
+		getBlock
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,

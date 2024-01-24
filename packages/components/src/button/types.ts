@@ -115,7 +115,9 @@ type BaseButtonProps = {
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 	/**
-	 * Whether this is focusable.
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @default false
 	 */
 	__experimentalIsFocusable?: boolean;
 };
@@ -123,7 +125,8 @@ type BaseButtonProps = {
 type _ButtonProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: boolean;
 };
@@ -131,7 +134,8 @@ type _ButtonProps = {
 type AnchorProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: false;
 	/**
