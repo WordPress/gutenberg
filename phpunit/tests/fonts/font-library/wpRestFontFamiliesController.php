@@ -126,12 +126,43 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		);
 	}
 
+	public function test_font_families_no_autosave_routes() {
+		// @core-merge: Enable this test.
+		$this->markTestSkipped( 'This test only works with WP 6.4 and above. Enable it once 6.5 is released.' );
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayNotHasKey(
+			'/wp/v2/font-families/(?P<id>[\d]+)/autosaves',
+			$routes,
+			'Font families autosaves route exists.'
+		);
+		$this->assertArrayNotHasKey(
+			'/wp/v2/font-families/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)',
+			$routes,
+			'Font families autosaves by id route exists.'
+		);
+	}
+
 	/**
-	 * @doesNotPerformAssertions
+	 * @covers WP_REST_Font_Families_Controller::get_context_param
 	 */
 	public function test_context_param() {
-		// Controller does not use get_context_param().
+		// Collection.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
+		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+
+		// Single.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families/' . self::$font_family_id1 );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
+		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
+
 
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::get_items
@@ -145,9 +176,9 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertCount( 2, $data );
 		$this->assertArrayHasKey( '_links', $data[0] );
-		$this->check_font_family_data( $data[0], self::$font_family_id1, $data[0]['_links'] );
+		$this->check_font_family_data( $data[0], self::$font_family_id2, $data[0]['_links'] );
 		$this->assertArrayHasKey( '_links', $data[1] );
-		$this->check_font_family_data( $data[1], self::$font_family_id2, $data[1]['_links'] );
+		$this->check_font_family_data( $data[1], self::$font_family_id1, $data[1]['_links'] );
 	}
 
 	/**
@@ -193,6 +224,32 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->check_font_family_data( $data, self::$font_family_id1, $response->get_links() );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::prepare_item_for_response
+	 */
+	public function test_get_item_embedded_font_faces() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . self::$font_family_id1 );
+		$request->set_param( '_embed', true );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = rest_get_server()->response_to_data( $response, true );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( '_embedded', $data );
+		$this->assertArrayHasKey( 'font_faces', $data['_embedded'] );
+		$this->assertCount( 2, $data['_embedded']['font_faces'] );
+
+		foreach ( $data['_embedded']['font_faces'] as $font_face ) {
+			$this->assertArrayHasKey( 'id', $font_face );
+
+			$font_face_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . self::$font_family_id1 . '/font-faces/' . $font_face['id'] );
+			$font_face_response = rest_get_server()->dispatch( $font_face_request );
+			$font_face_data     = rest_get_server()->response_to_data( $font_face_response, true );
+
+			$this->assertSame( $font_face_data, $font_face );
+		}
 	}
 
 	/**

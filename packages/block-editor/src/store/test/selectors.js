@@ -72,7 +72,7 @@ const {
 	__unstableGetClientIdsTree,
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
-	__experimentalGetGlobalBlocksByName,
+	getBlocksByName,
 	getBlockEditingMode,
 } = selectors;
 
@@ -975,7 +975,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( '__experimentalGetGlobalBlocksByName', () => {
+	describe( 'getBlocksByName', () => {
 		const state = {
 			blocks: {
 				byClientId: new Map(
@@ -1017,31 +1017,25 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should return the clientIds of blocks of a given type', () => {
-			expect(
-				__experimentalGetGlobalBlocksByName( state, 'core/heading' )
-			).toStrictEqual( [ '123' ] );
+			expect( getBlocksByName( state, 'core/heading' ) ).toStrictEqual( [
+				'123',
+			] );
 		} );
 
 		it( 'should return the clientIds of blocks of a given type even if blocks are nested', () => {
-			expect(
-				__experimentalGetGlobalBlocksByName( state, 'core/paragraph' )
-			).toStrictEqual( [ '456', '1415', '1213' ] );
+			expect( getBlocksByName( state, 'core/paragraph' ) ).toStrictEqual(
+				[ '456', '1415', '1213' ]
+			);
 		} );
 
 		it( 'Should return empty array if no blocks match. The empty array should be the same reference', () => {
-			const result = __experimentalGetGlobalBlocksByName(
-				state,
-				'test/missing'
+			const result = getBlocksByName( state, 'test/missing' );
+			expect( getBlocksByName( state, 'test/missing' ) ).toStrictEqual(
+				[]
 			);
-			expect(
-				__experimentalGetGlobalBlocksByName( state, 'test/missing' )
-			).toStrictEqual( [] );
-			expect(
-				__experimentalGetGlobalBlocksByName(
-					state,
-					'test/missing2'
-				) === result
-			).toBe( true );
+			expect( getBlocksByName( state, 'test/missing2' ) === result ).toBe(
+				true
+			);
 		} );
 	} );
 

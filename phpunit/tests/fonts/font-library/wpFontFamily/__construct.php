@@ -30,11 +30,11 @@ class Tests_Fonts_WpFontFamily_Construct extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_should_throw_exception
+	 * @dataProvider data_should_do_it_wrong
 	 *
 	 * @param mixed $font_data Data to test.
 	 */
-	public function test_should_throw_exception( $font_data ) {
+	public function test_should_do_it_wrong( $font_data ) {
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font family data is missing the slug.' );
 
@@ -46,7 +46,7 @@ class Tests_Fonts_WpFontFamily_Construct extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_should_throw_exception() {
+	public function data_should_do_it_wrong() {
 		return array(
 			'no slug'                  => array(
 				array(

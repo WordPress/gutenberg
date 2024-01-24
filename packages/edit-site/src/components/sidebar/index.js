@@ -66,21 +66,18 @@ function SidebarScreens() {
 				<SidebarNavigationScreenGlobalStyles />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
-				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreenPagesDataViews />
-				) : (
-					<SidebarNavigationScreenPages />
-				) }
+				<SidebarNavigationScreenPages />
 			</SidebarScreenWrapper>
+			{ window?.__experimentalAdminViews && (
+				<SidebarScreenWrapper path="/pages">
+					<SidebarNavigationScreenPagesDataViews />
+				</SidebarScreenWrapper>
+			) }
 			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
-				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreenTemplatesBrowse />
-				) : (
-					<SidebarNavigationScreenTemplates />
-				) }
+				<SidebarNavigationScreenTemplates />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/patterns">
 				<SidebarNavigationScreenPatterns />

@@ -182,11 +182,12 @@ function FontLibraryProvider( { children } ) {
 
 	const getAvailableFontsOutline = ( availableFontFamilies ) => {
 		const outline = availableFontFamilies.reduce( ( acc, font ) => {
-			const availableFontFaces = Array.isArray( font?.fontFace )
-				? font?.fontFace.map(
-						( face ) => `${ face.fontStyle + face.fontWeight }`
-				  )
-				: [ 'normal400' ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400
+			const availableFontFaces =
+				font?.fontFace && font.fontFace?.length > 0
+					? font?.fontFace.map(
+							( face ) => `${ face.fontStyle + face.fontWeight }`
+					  )
+					: [ 'normal400' ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400
 
 			acc[ font.slug ] = availableFontFaces;
 			return acc;
@@ -235,26 +236,35 @@ function FontLibraryProvider( { children } ) {
 
 			// Collect font faces that have already been installed (to be activated later)
 			const alreadyInstalledFontFaces =
-				installedFontFamily.fontFace.filter( ( fontFaceToInstall ) =>
-					checkFontFaceInstalled(
-						fontFaceToInstall,
-						fontFamilyToInstall.fontFace
-					)
-				);
+				installedFontFamily.fontFace && fontFamilyToInstall.fontFace
+					? installedFontFamily.fontFace.filter(
+							( fontFaceToInstall ) =>
+								checkFontFaceInstalled(
+									fontFaceToInstall,
+									fontFamilyToInstall.fontFace
+								)
+					  )
+					: [];
 
 			// Filter out Font Faces that have already been installed (so that they are not re-installed)
-			fontFamilyToInstall.fontFace = fontFamilyToInstall.fontFace.filter(
-				( fontFaceToInstall ) =>
-					! checkFontFaceInstalled(
-						fontFaceToInstall,
-						installedFontFamily.fontFace
-					)
-			);
+			if (
+				installedFontFamily.fontFace &&
+				fontFamilyToInstall.fontFace
+			) {
+				fontFamilyToInstall.fontFace =
+					fontFamilyToInstall.fontFace.filter(
+						( fontFaceToInstall ) =>
+							! checkFontFaceInstalled(
+								fontFaceToInstall,
+								installedFontFamily.fontFace
+							)
+					);
+			}
 
 			// Install the fonts (upload the font files to the server and create the post in the database).
 			let sucessfullyInstalledFontFaces = [];
 			let unsucessfullyInstalledFontFaces = [];
-			if ( fontFamilyToInstall.fontFace.length > 0 ) {
+			if ( fontFamilyToInstall?.fontFace?.length > 0 ) {
 				const response = await batchInstallFontFaces(
 					installedFontFamily.id,
 					makeFontFacesFormData( fontFamilyToInstall )
@@ -272,6 +282,7 @@ function FontLibraryProvider( { children } ) {
 
 			// If there were no successes and nothing already installed then we don't need to activate anything and can bounce now.
 			if (
+				fontFamilyToInstall?.fontFace?.length > 0 &&
 				sucessfullyInstalledFontFaces.length === 0 &&
 				alreadyInstalledFontFaces.length === 0
 			) {
@@ -286,10 +297,15 @@ function FontLibraryProvider( { children } ) {
 
 			// Use the sucessfully installed font faces
 			// As well as any font faces that were already installed (those will be activated)
-			fontFamilyToInstall.fontFace = [
-				...sucessfullyInstalledFontFaces,
-				...alreadyInstalledFontFaces,
-			];
+			if (
+				sucessfullyInstalledFontFaces?.length > 0 ||
+				alreadyInstalledFontFaces?.length > 0
+			) {
+				fontFamilyToInstall.fontFace = [
+					...sucessfullyInstalledFontFaces,
+					...alreadyInstalledFontFaces,
+				];
+			}
 
 			// Activate the font family (add the font family to the global styles).
 			activateCustomFontFamilies( [ fontFamilyToInstall ] );
@@ -423,16 +439,16 @@ function FontLibraryProvider( { children } ) {
 		const response = await fetchFontCollections();
 		setFontCollections( response );
 	};
-	const getFontCollection = async ( id ) => {
+	const getFontCollection = async ( slug ) => {
 		try {
 			const hasData = !! collections.find(
-				( collection ) => collection.id === id
-			)?.data;
+				( collection ) => collection.slug === slug
+			)?.font_families;
 			if ( hasData ) return;
-			const response = await fetchFontCollection( id );
+			const response = await fetchFontCollection( slug );
 			const updatedCollections = collections.map( ( collection ) =>
-				collection.id === id
-					? { ...collection, data: { ...response?.data } }
+				collection.slug === slug
+					? { ...collection, ...response }
 					: collection
 			);
 			setFontCollections( updatedCollections );

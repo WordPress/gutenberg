@@ -237,6 +237,11 @@ export default function createReduxStore( key, options ) {
 				const boundSelector = ( ...args ) => {
 					args = normalize( selector, args );
 					const state = store.__unstableOriginalGetState();
+					// Before calling the selector, switch to the correct
+					// registry.
+					if ( selector.isRegistrySelector ) {
+						selector.registry = registry;
+					}
 					return selector( state.root, ...args );
 				};
 

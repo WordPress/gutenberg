@@ -111,11 +111,41 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		);
 	}
 
+	public function test_font_faces_no_autosave_routes() {
+		// @core-merge: Enable this test.
+		$this->markTestSkipped( 'This test only works with WP 6.4 and above. Enable it once 6.5 is released.' );
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayNotHasKey(
+			'/wp/v2/font-families/(?P<font_family_id>[\d]+)/font-faces/(?P<id>[\d]+)/autosaves',
+			$routes,
+			'Font faces autosaves route exists.'
+		);
+		$this->assertArrayNotHasKey(
+			'/wp/v2/font-families/(?P<font_family_id>[\d]+)/font-faces/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)',
+			$routes,
+			'Font faces autosaves by id route exists.'
+		);
+	}
+
 	/**
-	 * @doesNotPerformAssertions
+	 * @covers WP_REST_Font_Faces_Controller::get_context_param
 	 */
 	public function test_context_param() {
-		// Controller does not use get_context_param().
+		// Collection.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
+		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+
+		// Single.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . self::$font_face_id1 );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
+		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
 	/**
@@ -130,9 +160,9 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertCount( 2, $data );
 		$this->assertArrayHasKey( '_links', $data[0] );
-		$this->check_font_face_data( $data[0], self::$font_face_id1, $data[0]['_links'] );
+		$this->check_font_face_data( $data[0], self::$font_face_id2, $data[0]['_links'] );
 		$this->assertArrayHasKey( '_links', $data[1] );
-		$this->check_font_face_data( $data[1], self::$font_face_id2, $data[1]['_links'] );
+		$this->check_font_face_data( $data[1], self::$font_face_id1, $data[1]['_links'] );
 	}
 
 	/**
@@ -468,6 +498,21 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
+	public function test_create_item_missing_parent() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER . '/font-faces' );
+		$request->set_param(
+			'font_face_settings',
+			wp_json_encode( array_merge( self::$default_settings, array( 'fontWeight' => '100' ) ) )
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 */
 	public function test_create_item_with_duplicate_properties() {
 		$settings     = array(
 			'fontFamily' => '"Open Sans"',
@@ -675,10 +720,10 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_delete_item() {
 		wp_set_current_user( self::$admin_id );
-		$font_face_id     = self::create_font_face_post( self::$font_family_id );
-		$request          = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
-		$request['force'] = true;
-		$response         = rest_get_server()->dispatch( $request );
+		$font_face_id = self::create_font_face_post( self::$font_family_id );
+		$request      = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertNull( get_post( $font_face_id ) );
@@ -710,9 +755,36 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_delete_item_invalid_font_face_id() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$request->set_param( 'force', true );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::delete
+	 */
+	public function test_delete_item_missing_parent() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER . '/font-faces/' . self::$font_face_id1 );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 */
+	public function test_delete_item_invalid_parent_id() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$other_font_family_id . '/font-faces/' . self::$font_face_id1 );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_font_face_parent_id_mismatch', $response, 404 );
+
+		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '"';
+		$this->assertSame( $expected_message, $response->as_error()->get_error_messages()[0], 'The message must contain the correct parent ID.' );
 	}
 
 	/**

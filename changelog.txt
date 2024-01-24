@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 17.5.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- (Preferences)(hotfix)(17.5) Hotfix for missing preferences in the `core` scope([58031](https://github.com/WordPress/gutenberg/pull/58031))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad @fullofcaffeine 
+
+
+
+
 = 17.5.0 =
 
 ## Changelog

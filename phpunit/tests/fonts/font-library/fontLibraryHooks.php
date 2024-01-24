@@ -61,7 +61,7 @@ class Tests_Font_Library_Hooks extends WP_UnitTestCase {
 
 		$font_path     = $font_file['file'];
 		$font_filename = basename( $font_path );
-		add_post_meta( $font_face_id, '_wp_font_face_files', $font_filename );
+		add_post_meta( $font_face_id, '_wp_font_face_file', $font_filename );
 
 		return array( $font_face_id, $font_path );
 	}
