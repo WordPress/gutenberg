@@ -1300,7 +1300,7 @@ class LinkUtils {
 		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button.
-		await this.page.getByRole( 'button', { name: 'Link' } ).click();
+		await this.pageUtils.pressKeys( 'primary+k' );
 
 		// Type a URL.
 		await this.page.keyboard.type( 'https://wordpress.org/gutenberg' );
