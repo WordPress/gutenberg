@@ -231,7 +231,7 @@ export default function QueryInspectorControls( props ) {
 			{ ! inherit && showDisplayPanel && (
 				<ToolsPanel
 					className="block-library-query-toolspanel__display"
-					label={ __( 'Display Settings' ) }
+					label={ __( 'Display' ) }
 					resetAll={ () => {
 						setQuery( {
 							offset: 0,
