@@ -77,13 +77,13 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Determine whether to load the view script.
+	 * Determine whether the navigation blocks is interactive.
 	 *
 	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return bool Returns whether or not to load the view script.
 	 */
-	private static function should_load_view_script( $attributes, $inner_blocks ) {
+	private static function is_interactive( $attributes, $inner_blocks ) {
 		$has_submenus       = static::has_submenus( $inner_blocks );
 		$is_responsive_menu = static::is_responsive( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
@@ -124,8 +124,8 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the html for the inner blocks of the navigation block.
 	 */
 	private static function get_inner_blocks_html( $attributes, $inner_blocks ) {
-		$has_submenus            = static::has_submenus( $inner_blocks );
-		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
+		$has_submenus   = static::has_submenus( $inner_blocks );
+		$is_interactive = static::is_interactive( $attributes, $inner_blocks );
 
 		$style                = static::get_styles( $attributes );
 		$class                = static::get_classes( $attributes );
@@ -163,7 +163,7 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Add directives to the submenu if needed.
-		if ( $has_submenus && $should_load_view_script ) {
+		if ( $has_submenus && $is_interactive ) {
 			$tags              = new WP_HTML_Tag_Processor( $inner_blocks_html );
 			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $tags, $attributes );
 		}
@@ -397,9 +397,9 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the container markup.
 	 */
 	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
-		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
-		$colors                  = block_core_navigation_build_css_colors( $attributes );
-		$modal_unique_id         = wp_unique_id( 'modal-' );
+		$is_interactive  = static::is_interactive( $attributes, $inner_blocks );
+		$colors          = block_core_navigation_build_css_colors( $attributes );
+		$modal_unique_id = wp_unique_id( 'modal-' );
 
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
@@ -427,7 +427,7 @@ class WP_Navigation_Block_Renderer {
 		$responsive_container_directives = '';
 		$responsive_dialog_directives    = '';
 		$close_button_directives         = '';
-		if ( $should_load_view_script ) {
+		if ( $is_interactive ) {
 			$open_button_directives                  = '
 				data-wp-on--click="actions.openMenuOnClick"
 				data-wp-on--keydown="actions.handleMenuKeydown"
@@ -490,12 +490,12 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the navigation block markup.
 	 */
 	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks ) {
-		$nav_menu_name           = static::get_unique_navigation_name( $attributes );
-		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
-		$is_responsive_menu      = static::is_responsive( $attributes );
-		$style                   = static::get_styles( $attributes );
-		$class                   = static::get_classes( $attributes );
-		$wrapper_attributes      = get_block_wrapper_attributes(
+		$nav_menu_name      = static::get_unique_navigation_name( $attributes );
+		$is_interactive     = static::is_interactive( $attributes, $inner_blocks );
+		$is_responsive_menu = static::is_responsive( $attributes );
+		$style              = static::get_styles( $attributes );
+		$class              = static::get_classes( $attributes );
+		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				'class'      => $class,
 				'style'      => $style,
@@ -504,7 +504,7 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $should_load_view_script, $attributes );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive, $attributes );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -512,13 +512,14 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Get the nav element directives
+	 * Gets the nav element directives.
 	 *
-	 * @param bool $should_load_view_script Whether or not the view script should be loaded.
+	 * @param bool  $is_interactive Whether the block is interactive.
+	 * @param array $attributes     The block attributes.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $should_load_view_script, $attributes ) {
-		if ( ! $should_load_view_script ) {
+	private static function get_nav_element_directives( $is_interactive, $attributes ) {
+		if ( ! $is_interactive ) {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
@@ -536,8 +537,10 @@ class WP_Navigation_Block_Renderer {
 			data-wp-context=\'' . $nav_element_context . '\'
 		';
 
-		// When the navigation overlayMenu attribute is set to "always"
-		// we don't need to use JavaScript to collapse the menu as we set the class manually.
+		/*
+		* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
+		* is not needed for collapsing the menu because the class is set manually.
+		*/
 		if ( ! static::is_always_overlay( $attributes ) ) {
 			$nav_element_directives .= 'data-wp-init="callbacks.initNav"';
 			$nav_element_directives .= ' '; // space separator
@@ -548,37 +551,15 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Handle view script loading.
+	 * Handle view script module loading.
 	 *
 	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block      $block        The parsed block.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 */
-	private static function handle_view_script_loading( $attributes, $block, $inner_blocks ) {
-		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
-		$is_gutenberg_plugin     = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
-		$view_js_file            = 'wp-block-navigation-view';
-		$script_handles          = $block->block_type->view_script_handles;
-
-		if ( $is_gutenberg_plugin ) {
-			if ( $should_load_view_script ) {
-				gutenberg_enqueue_module( '@wordpress/block-library/navigation-block' );
-			}
-			// Remove the view script because we are using the module.
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-		} else {
-			// If the script already exists, there is no point in removing it from viewScript.
-			if ( ! wp_script_is( $view_js_file ) ) {
-
-				// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-				if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-					$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-				}
-				// If the script is needed, but it was previously removed, add it again.
-				if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-					$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-				}
-			}
+	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
+		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
+			wp_enqueue_script_module( '@wordpress/block-library/navigation-block' );
 		}
 	}
 
@@ -648,7 +629,7 @@ class WP_Navigation_Block_Renderer {
 			return '';
 		}
 
-		static::handle_view_script_loading( $attributes, $block, $inner_blocks );
+		static::handle_view_script_module_loading( $attributes, $block, $inner_blocks );
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
