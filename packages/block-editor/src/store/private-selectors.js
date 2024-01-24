@@ -292,5 +292,5 @@ export function getAllBlockBindingsSources( state ) {
 }
 
 export function getBlockBindingsSource( state, sourceName ) {
-	return state?.blockBindingsSources?.[ sourceName ];
+	return state.blockBindingsSources[ sourceName ];
 }
