@@ -27,7 +27,7 @@ add_action(
 					array(
 						'@wordpress/interactivity',
 						array(
-							'id'   => '@wordpress/interactivity/router',
+							'id'   => '@wordpress/interactivity-router',
 							'type' => 'dynamic',
 						),
 					),

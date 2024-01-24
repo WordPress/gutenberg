@@ -144,7 +144,7 @@ function register_block_core_query() {
 			array(
 				'@wordpress/interactivity',
 				array(
-					'id'   => '@wordpress/interactivity/router',
+					'id'   => '@wordpress/interactivity-router',
 					'type' => 'dynamic',
 				),
 			),

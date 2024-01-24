@@ -17,7 +17,7 @@ function gutenberg_register_interactivity_modules() {
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 	gutenberg_register_module(
-		'@wordpress/interactivity/router',
+		'@wordpress/interactivity-router',
 		gutenberg_url( '/build/interactivity/router.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )

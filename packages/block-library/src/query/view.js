@@ -47,7 +47,7 @@ store( 'core/query', {
 				}, 400 );
 
 				const { actions } = yield import(
-					'@wordpress/interactivity/router'
+					'@wordpress/interactivity-router'
 				);
 				yield actions.navigate( ref.href );
 
@@ -75,7 +75,7 @@ store( 'core/query', {
 				.wpNavigationDisabled;
 			if ( isValidLink( ref ) && ! isDisabled ) {
 				const { actions } = yield import(
-					'@wordpress/interactivity/router'
+					'@wordpress/interactivity-router'
 				);
 				yield actions.prefetch( ref.href );
 			}
@@ -87,7 +87,7 @@ store( 'core/query', {
 			const { ref } = getElement();
 			if ( url && isValidLink( ref ) ) {
 				const { actions } = yield import(
-					'@wordpress/interactivity/router'
+					'@wordpress/interactivity-router'
 				);
 				yield actions.prefetch( ref.href );
 			}
