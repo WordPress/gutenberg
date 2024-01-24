@@ -54,26 +54,32 @@ const Template: StoryFn< typeof LegacyCustomSelect > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Font Size',
+	__experimentalShowSelectedHint: true,
 	options: [
 		{
 			key: 'small',
 			name: 'Small',
 			style: { fontSize: '50%' },
+			__experimentalHint: '50%',
 		},
 		{
 			key: 'normal',
 			name: 'Normal',
 			style: { fontSize: '100%' },
+			className: 'can-apply-custom-class-to-option',
+			__experimentalHint: '100%',
 		},
 		{
 			key: 'large',
 			name: 'Large',
 			style: { fontSize: '200%' },
+			__experimentalHint: '200%',
 		},
 		{
 			key: 'huge',
 			name: 'Huge',
 			style: { fontSize: '300%' },
+			__experimentalHint: '300%',
 		},
 	],
 };

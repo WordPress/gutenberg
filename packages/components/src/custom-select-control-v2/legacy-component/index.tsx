@@ -13,6 +13,7 @@ import deprecated from '@wordpress/deprecated';
 import _CustomSelect from '../custom-select';
 import type { LegacyCustomSelectProps } from '../types';
 import { CustomSelectItem } from '..';
+import { ExperimentalHint, ExperimentalHintItem } from '../styles';
 
 function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	const {
@@ -56,24 +57,31 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	} );
 
 	const children = options.map(
-		( { name, key, __experimentalHint, ...rest } ) => {
+		( { name, key, style, __experimentalHint, ...rest } ) => {
 			const withHint = (
 				<>
 					<span>{ name }</span>
-					<span className="components-custom-select-control__item-hint">
+					<ExperimentalHintItem className="components-custom-select-control__item-hint">
 						{ __experimentalHint }
-					</span>
+					</ExperimentalHintItem>
 				</>
 			);
 
+			const hintStyles = {
+				gridTemplateColumns: __experimentalShowSelectedHint
+					? '1fr auto 30px'
+					: undefined,
+			};
+
 			return (
 				<CustomSelectItem
-					{ ...rest }
 					key={ key }
 					value={ name }
 					children={
 						__experimentalShowSelectedHint ? withHint : name
 					}
+					style={ { ...hintStyles, ...style } }
+					{ ...rest }
 				/>
 			);
 		}
@@ -89,9 +97,29 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		);
 	}
 
+	const renderSelectedValueHint = () => {
+		const { value: currentValue } = store.getState();
+
+		const currentHint = options?.find(
+			( { name } ) => currentValue === name
+		);
+
+		return (
+			<>
+				{ currentValue }
+				<ExperimentalHint className="components-custom-select-control__hint">
+					{ currentHint?.__experimentalHint }
+				</ExperimentalHint>
+			</>
+		);
+	};
+
 	const translatedProps = {
 		'aria-describedby': props.describedBy,
 		children,
+		renderSelectedValue: __experimentalShowSelectedHint
+			? renderSelectedValueHint
+			: undefined,
 		size:
 			__next40pxDefaultSize || size === '__unstable-large'
 				? 'default'
@@ -99,7 +127,17 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		...restProps,
 	};
 
-	return <_CustomSelect { ...translatedProps } store={ store } />;
+	return (
+		<_CustomSelect
+			{ ...translatedProps }
+			store={ store }
+			style={ {
+				gridTemplateColumns: __experimentalShowSelectedHint
+					? 'auto 1fr 30px'
+					: undefined,
+			} }
+		/>
+	);
 }
 
 export default _LegacyCustomSelect;

@@ -26,7 +26,15 @@ export function CustomSelectItem( {
 			{ ...props }
 		>
 			{ children ?? props.value }
-			<Ariakit.SelectItemCheck />
+			<Ariakit.SelectItemCheck
+				// set initial size of check to prevent inline overrides
+				style={ {
+					fontSize: 'initial',
+					height: 'initial',
+					width: 'initial',
+					justifySelf: 'center',
+				} }
+			/>
 		</Styled.CustomSelectItem>
 	);
 }

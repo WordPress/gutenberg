@@ -1,16 +1,26 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-
+import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
 import { COLORS } from '../utils';
 import { space } from '../utils/space';
 import type { CustomSelectProps } from './types';
+
+export const ExperimentalHint = styled.span`
+	color: ${ COLORS.gray[ 600 ] };
+	margin-left: ${ space( 2 ) };
+`;
+
+export const ExperimentalHintItem = styled.span`
+	color: ${ COLORS.gray[ 600 ] };
+	text-align: right;
+	padding-right: ${ space( 1 ) };
+`;
 
 export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
@@ -40,7 +50,9 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
 
 	return {
-		display: 'flex',
+		textAlign: 'left',
+		display: 'grid',
+		gridTemplateColumns: 'auto auto',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		backgroundColor: COLORS.white,
@@ -49,7 +61,8 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 		cursor: 'pointer',
 		width: '100%',
 		[ heightProperty ]: `${ inputHeights[ size ] }px`,
-		padding: isSmallSize ? space( 2 ) : space( 4 ),
+		// fix with sizing
+		// padding: isSmallSize ? space( 2 ) : space( 4 ),
 		fontSize: isSmallSize ? '11px' : '13px',
 		'&[data-focus-visible]': {
 			outlineStyle: 'solid',
@@ -67,9 +80,11 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 `;
 
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
-	display: flex;
-	align-items: center;
+	text-align: left;
+	display: grid;
+	grid-template-columns: auto auto;
 	justify-content: space-between;
+	align-items: center;
 	padding: ${ space( 2 ) };
 	&[data-active-item] {
 		background-color: ${ COLORS.gray[ 300 ] };
