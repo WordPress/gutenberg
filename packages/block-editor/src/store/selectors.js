@@ -318,14 +318,14 @@ export const getGlobalBlockCount = createSelector(
 );
 
 /**
- * Returns all global blocks that match a blockName. Results include nested blocks.
+ * Returns all blocks that match a blockName. Results include nested blocks.
  *
  * @param {Object}  state     Global application state.
  * @param {?string} blockName Optional block name, if not specified, returns an empty array.
  *
  * @return {Array} Array of clientIds of blocks with name equal to blockName.
  */
-export const __experimentalGetGlobalBlocksByName = createSelector(
+export const getBlocksByName = createSelector(
 	( state, blockName ) => {
 		if ( ! blockName ) {
 			return EMPTY_ARRAY;
@@ -342,6 +342,27 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
+
+/**
+ * Returns all global blocks that match a blockName. Results include nested blocks.
+ *
+ * @deprecated
+ *
+ * @param {Object}  state     Global application state.
+ * @param {?string} blockName Optional block name, if not specified, returns an empty array.
+ *
+ * @return {Array} Array of clientIds of blocks with name equal to blockName.
+ */
+export function __experimentalGetGlobalBlocksByName( state, blockName ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__experimentalGetGlobalBlocksByName",
+		{
+			since: '6.5',
+			alternative: `wp.data.select( 'core/block-editor' ).getBlocksByName`,
+		}
+	);
+	return getBlocksByName( state, blockName );
+}
 
 /**
  * Given an array of block client IDs, returns the corresponding array of block
