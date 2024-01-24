@@ -27,17 +27,17 @@
 .font-library-modal__tabpanel-layout {
 
 	main {
-		padding-bottom: 4rem;
+		padding-bottom: $grid-unit-80;
 	}
 
 	footer {
-		border-top: 1px solid #e5e5e5;
-		margin: 0 -32px -32px;
-		padding: 16px 32px;
+		border-top: 1px solid $gray-300;
+		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
+		padding: $grid-unit-20 $grid-unit-40;
 		position: absolute;
-		bottom: 32px;
+		bottom: $grid-unit-40;
 		width: 100%;
-		background-color: #fff;
+		background-color: $white;
 	}
 
 }
@@ -50,10 +50,10 @@
 }
 
 .font-library-modal__font-card {
-	border: 1px solid #e5e5e5;
+	border: 1px solid $gray-200;
 	width: 100%;
 	height: auto;
-	padding: 1rem;
+	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
 
 	.font-library-modal__font-card__name {
@@ -61,30 +61,29 @@
 	}
 
 	.font-library-modal__font-card__count {
-		color: #6e6e6e;
+		color: $gray-700;
 	}
 }
 
 .font-library-modal__library-font-variant {
-	border: 1px solid #e5e5e5;
-	padding: 1rem;
+	border: 1px solid $gray-200;
+	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
 }
 
 .font-library-modal__font-variant {
-	border-bottom: 1px solid #e5e5e5;
-	padding-bottom: 1rem;
+	border-bottom: 1px solid $gray-200;
+	padding-bottom: $grid-unit-20;
 }
 
 .font-library-modal__tabs {
 	[role="tablist"] {
 		position: sticky;
 		top: 0;
-		width: calc(100% + 64px);
-		border-bottom: 1px solid #e6e6e6;
-		background: #fff;
-		margin: 0 -32px;
-		padding: 0 16px;
+		border-bottom: 1px solid $gray-300;
+		background: $white;
+		margin: 0 #{$grid-unit-40 * -1};
+		padding: 0 $grid-unit-20;
 		z-index: 1;
 	}
 }
@@ -93,12 +92,12 @@
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	height: 250px;
+	height: $grid-unit-80 * 4; // 256px
 	width: 100%;
 }
 
 button.font-library-modal__upload-area {
-	background-color: #f0f0f0;
+	background-color: $gray-100;
 }
 
 .font-library-modal__local-fonts {
@@ -106,20 +105,12 @@ button.font-library-modal__upload-area {
 	width: 80%;
 
 	.font-library-modal__upload-area__text {
-		color: #6e6e6e;
+		color: $gray-700;
 	}
 
 	.font-library-modal__upload-area__notice {
 		margin: 0;
 	}
-}
-
-.font-library-modal__font-name {
-	font-weight: bold;
-}
-
-.font-library-modal__font-filename {
-	color: #6e6e6e;
 }
 
 .font-library-modal__font-variant_demo-wrapper {
@@ -153,8 +144,4 @@ button.font-library-modal__upload-area {
 		min-width: 250px;
 		max-width: 350px;
 	}
-}
-
-.font-library-modal__font-collection__notice {
-	margin: 0;
 }
