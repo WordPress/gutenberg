@@ -16,8 +16,11 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 		}
 		switch ( $attribute_override[0] ) {
 			case 0: // remove
-				// This currently skip this attribute instead of removing it until the binding API supports different operations.
-				return null;
+				/**
+				 * TODO: This currently doesn't remove the attribute, but only set it to an empty string.
+				 * It's a temporary solution until the block binding API supports different operations.
+				 */
+				return '';
 			case 1: // replace
 				return $attribute_override[1];
 			default:
