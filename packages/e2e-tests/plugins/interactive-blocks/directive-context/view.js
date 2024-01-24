@@ -50,7 +50,7 @@ const { actions } = store( 'directive-context-navigate', {
 			ctx.newText = 'some new text';
 		},
 		navigate() {
-			return import( '@wordpress/interactivity-router' ).then(
+			return import( '@wordpress/interactivity/router' ).then(
 				( { actions: routerActions } ) =>
 					routerActions.navigate(
 						window.location,
