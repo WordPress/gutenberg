@@ -77,8 +77,6 @@ const createEntrypoints = () => {
 	}, {} );
 };
 
-const classSuffix = 'Gutenberg';
-
 module.exports = [
 	{
 		...baseConfig,
@@ -140,19 +138,14 @@ module.exports = [
 										)
 									);
 
-								// This assumes every file has a unique name.
-								// This should be true if the only extra files we add are classes
-								// and the class files are named correctly.
-								const newFileName =
-									filename === 'index'
-										? dirname
-										: filename +
-										  '-' +
-										  classSuffix.toLowerCase();
-								return join( to, `${ newFileName }.php` );
+								return join(
+									to,
+									`${ dirname }${ sep }${ filename }.php`
+								);
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
+								const classSuffix = 'Gutenberg';
 								content = content.toString();
 
 								// Within content, search and prefix any function calls from the
@@ -183,24 +176,6 @@ module.exports = [
 										'g'
 									),
 									( match ) => `${ match }_${ classSuffix }`
-								);
-
-								// also convert the requires.
-								const regexForRequireStatment = new RegExp(
-									classesToSuffix
-										.map( ( className ) => {
-											return className
-												.replace( 'WP_', 'class-wp-' )
-												.replace( /_/g, '-' )
-												.toLowerCase();
-										} )
-										.join( '|' ),
-									'g'
-								);
-								content = content.replace(
-									regexForRequireStatment,
-									( match ) =>
-										`${ match }-${ classSuffix.toLowerCase() }`
 								);
 
 								// Within content, search for any function definitions. For
