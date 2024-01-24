@@ -11,16 +11,17 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchor,
 	removeFormat,
 	slice,
 	replace,
 	split,
 	concat,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
+	useCachedTruthy,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -29,7 +30,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
-import useLinkInstanceKey from './use-link-instance-key';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -90,12 +90,9 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// LinkControl calls `onChange` immediately upon the toggling a setting.
-		// Before merging the next value with the current link value, check if
-		// the setting was toggled.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			nextValue.url === undefined;
+		const hasLink = linkValue?.url;
+		const isNewLink = ! hasLink;
+
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -178,17 +175,16 @@ function InlineLinkUI( {
 				newValue = concat( valBefore, newValAfter );
 			}
 
-			newValue.start = newValue.end;
-
-			// Hides the Link UI.
-			newValue.activeFormats = [];
 			onChange( newValue );
 		}
 
-		// Focus should only be shifted back to the formatted segment when the
-		// URL is submitted.
-		if ( ! didToggleSetting ) {
-			stopAddingLink();
+		// Focus should only be returned to the rich text on submit if this link is not
+		// being created for the first time. If it is then focus should remain within the
+		// Link UI because it should remain open for the user to modify the link they have
+		// just created.
+		if ( ! isNewLink ) {
+			const returnFocusToRichText = true;
+			stopAddingLink( returnFocusToRichText );
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -210,11 +206,14 @@ function InlineLinkUI( {
 		settings,
 	} );
 
-	// Generate a string based key that is unique to this anchor reference.
-	// This is used to force re-mount the LinkControl component to avoid
-	// potential stale state bugs caused by the component not being remounted
-	// See https://github.com/WordPress/gutenberg/pull/34742.
-	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
+	//  As you change the link by interacting with the Link UI
+	//  the return value of document.getSelection jumps to the field you're editing,
+	//  not the highlighted text. Given that useAnchor uses document.getSelection,
+	//  it will return null, since it can't find the <mark> element within the Link UI.
+	//  This caches the last truthy value of the selection anchor reference.
+	// This ensures the Popover is positioned correctly on initial submission of the link.
+	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
+	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
 	// Focus should only be moved into the Popover when the Link is being created or edited.
 	// When the Link is in "preview" mode focus should remain on the rich text because at
@@ -257,10 +256,10 @@ function InlineLinkUI( {
 			onClose={ stopAddingLink }
 			onFocusOutside={ () => stopAddingLink( false ) }
 			placement="bottom"
+			offset={ 10 }
 			shift
 		>
 			<LinkControl
-				key={ forceRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }

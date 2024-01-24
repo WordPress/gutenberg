@@ -128,25 +128,13 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-custom-fields',
-		__( 'Connections', 'gutenberg' ),
+		__( 'Block Bindings & Custom Fields', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test connecting block attribute values to a custom field value', 'gutenberg' ),
-			'id'    => 'gutenberg-connections',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-pattern-partial-syncing',
-		__( 'Pattern overrides', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test overrides in synced patterns', 'gutenberg' ),
-			'id'    => 'gutenberg-pattern-partial-syncing',
+			'label' => __( 'Test connecting block attributes to different sources like custom fields', 'gutenberg' ),
+			'id'    => 'gutenberg-block-bindings',
 		)
 	);
 

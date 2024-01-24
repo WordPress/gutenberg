@@ -32,9 +32,11 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	__experimentalUseShadowProps as useShadowProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -183,12 +185,14 @@ function ButtonEdit( props ) {
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
 		onKeyDown,
 	} );
+	const blockEditingMode = useBlockEditingMode();
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
@@ -264,6 +268,7 @@ function ButtonEdit( props ) {
 						...borderProps.style,
 						...colorProps.style,
 						...spacingProps.style,
+						...shadowProps.style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {
@@ -277,12 +282,14 @@ function ButtonEdit( props ) {
 				/>
 			</div>
 			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
+				{ blockEditingMode === 'default' && (
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				) }
 				{ ! isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"

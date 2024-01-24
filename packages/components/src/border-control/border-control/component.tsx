@@ -38,6 +38,7 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
+		__next40pxDefaultSize = false,
 		colors,
 		disableCustomColors,
 		disableUnits,
@@ -112,6 +113,7 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) }
 			</HStack>

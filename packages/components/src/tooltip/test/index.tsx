@@ -12,12 +12,11 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import Button from '../../button';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 
 const props = {
-	children: <Button>Tooltip anchor</Button>,
+	children: <button>Tooltip anchor</button>,
 	text: 'tooltip text',
 };
 
@@ -56,8 +55,8 @@ describe( 'Tooltip', () => {
 			render(
 				// @ts-expect-error Tooltip cannot have more than one child element
 				<Tooltip { ...props }>
-					<Button>First button</Button>
-					<Button>Second button</Button>
+					<button>First button</button>
+					<button>Second button</button>
 				</Tooltip>
 			);
 
@@ -102,6 +101,17 @@ describe( 'Tooltip', () => {
 				screen.queryByRole( 'button', { description: 'tooltip text' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'should not leak Tooltip props to the tooltip anchor', () => {
+			render(
+				<Tooltip data-foo>
+					<button>Anchor</button>
+				</Tooltip>
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Anchor' } )
+			).not.toHaveAttribute( 'data-foo' );
+		} );
 	} );
 
 	describe( 'keyboard focus', () => {
@@ -142,9 +152,7 @@ describe( 'Tooltip', () => {
 			render(
 				<>
 					<Tooltip { ...props }>
-						<Button disabled __experimentalIsFocusable>
-							Tooltip anchor
-						</Button>
+						<button aria-disabled="true">Tooltip anchor</button>
 					</Tooltip>
 					<button>Focus me</button>
 				</>
@@ -196,9 +204,7 @@ describe( 'Tooltip', () => {
 			render(
 				<>
 					<Tooltip { ...props }>
-						<Button disabled __experimentalIsFocusable>
-							Tooltip anchor
-						</Button>
+						<button aria-disabled="true">Tooltip anchor</button>
 					</Tooltip>
 					<button>Focus me</button>
 				</>
@@ -310,12 +316,12 @@ describe( 'Tooltip', () => {
 
 			render(
 				<Tooltip { ...props }>
-					<Button
+					<button
 						onMouseEnter={ onMouseEnterMock }
 						onMouseLeave={ onMouseLeaveMock }
 					>
 						Tooltip anchor
-					</Button>
+					</button>
 				</Tooltip>
 			);
 
@@ -434,6 +440,52 @@ describe( 'Tooltip', () => {
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
 			await waitExpectTooltipToHide();
+		} );
+	} );
+
+	describe( 'nested', () => {
+		it( 'should render the outer tooltip and ignore nested tooltips', async () => {
+			render(
+				<Tooltip text="Outer tooltip">
+					<Tooltip text="Middle tooltip">
+						<Tooltip text="Inner tooltip">
+							<button>Tooltip anchor</button>
+						</Tooltip>
+					</Tooltip>
+				</Tooltip>
+			);
+
+			// Hover the anchor. Only the outer tooltip should show.
+			await hover(
+				screen.getByRole( 'button', {
+					name: 'Tooltip anchor',
+				} )
+			);
+
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', { name: 'Outer tooltip' } )
+				).toBeVisible()
+			);
+			expect(
+				screen.queryByRole( 'tooltip', { name: 'Middle tooltip' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'tooltip', { name: 'Inner tooltip' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					description: 'Outer tooltip',
+				} )
+			).toBeVisible();
+
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tooltip', { name: 'Outer tooltip' } )
+				).not.toBeInTheDocument()
+			);
 		} );
 	} );
 } );

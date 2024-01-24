@@ -603,7 +603,7 @@ export default function DimensionsPanel( {
 			{ showMinHeightControl && (
 				<ToolsPanelItem
 					hasValue={ hasMinHeightValue }
-					label={ __( 'Min. height' ) }
+					label={ __( 'Minimum height' ) }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={
 						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
@@ -611,7 +611,7 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<HeightControl
-						label={ __( 'Min. height' ) }
+						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
 					/>

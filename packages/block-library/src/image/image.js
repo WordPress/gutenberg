@@ -355,7 +355,8 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
-	const lightboxToggleDisabled = linkDestination !== 'none';
+	const lightboxToggleDisabled =
+		linkDestination && linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -459,7 +460,7 @@ export default function Image( {
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
-							label={ __( 'Upload external image' ) }
+							label={ __( 'Upload image to media library' ) }
 						/>
 					</ToolbarGroup>
 				</BlockControls>

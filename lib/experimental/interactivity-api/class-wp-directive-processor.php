@@ -20,29 +20,26 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 *
 	 * @var string
 	 */
-	public static $root_block = null;
-
-	/**
-	 * Array containing the direct children of interactive blocks.
-	 *
-	 * @var array
-	 */
-	public static $children_of_interactive_block = array();
+	public static $interactive_root_block = null;
 
 	/**
 	 * Sets the current root block.
 	 *
 	 * @param array $block The block to add.
 	 */
-	public static function mark_root_block( $block ) {
-		self::$root_block = md5( serialize( $block ) );
+	public static function mark_interactive_root_block( $block ) {
+		if ( null !== $block['blockName'] ) {
+			self::$interactive_root_block = $block['blockName'] . md5( serialize( $block ) );
+		} else {
+			self::$interactive_root_block = md5( serialize( $block ) );
+		}
 	}
 
 	/**
 	 * Resets the root block.
 	 */
-	public static function unmark_root_block() {
-		self::$root_block = null;
+	public static function unmark_interactive_root_block() {
+		self::$interactive_root_block = null;
 	}
 
 	/**
@@ -51,8 +48,16 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @param array $block The block to check.
 	 * @return bool True if block is a root block, false otherwise.
 	 */
-	public static function is_marked_as_root_block( $block ) {
-		return md5( serialize( $block ) ) === self::$root_block;
+	public static function is_marked_as_interactive_root_block( $block ) {
+		// If self::$interactive_root_block is null, is impossible that any block has been marked as root.
+		if ( is_null( self::$interactive_root_block ) ) {
+			return false;
+		}
+		// Blocks whose blockName is null are specifically intended to convey - "this is a freeform HTML block."
+		if ( null !== $block['blockName'] ) {
+			return str_contains( self::$interactive_root_block, $block['blockName'] ) && $block['blockName'] . md5( serialize( $block ) ) === self::$interactive_root_block;
+		}
+		return md5( serialize( $block ) ) === self::$interactive_root_block;
 	}
 
 	/**
@@ -60,28 +65,8 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 *
 	 * @return bool True if there is a root block, false otherwise.
 	 */
-	public static function has_root_block() {
-		return isset( self::$root_block );
-	}
-
-	/**
-	 * Stores a reference to a direct children of an interactive block to be able
-	 * to identify it later.
-	 *
-	 * @param array $block The block to add.
-	 */
-	public static function mark_children_of_interactive_block( $block ) {
-		self::$children_of_interactive_block[] = md5( serialize( $block ) );
-	}
-
-	/**
-	 * Checks if block is marked as children of an interactive block.
-	 *
-	 * @param array $block The block to check.
-	 * @return bool True if block is a children of an interactive block, false otherwise.
-	 */
-	public static function is_marked_as_children_of_interactive_block( $block ) {
-		return in_array( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
+	public static function has_interactive_root_block() {
+		return isset( self::$interactive_root_block );
 	}
 
 	/**
@@ -255,5 +240,44 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 */
 	public static function parse_attribute_name( $name ) {
 		return explode( '--', $name, 2 );
+	}
+
+	/**
+	 * Parse and extract the namespace and path from the given value.
+	 *
+	 * If the value contains a JSON instead of a path, the function parses it
+	 * and returns the resulting array.
+	 *
+	 * @param string $value Passed value.
+	 * @param string $ns Namespace fallback.
+	 * @return array The resulting array
+	 */
+	public static function parse_attribute_value( $value, $ns = null ) {
+		$matches = array();
+		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $value, $matches );
+
+		/*
+		 * Overwrite both `$ns` and `$value` variables if `$value` explicitly
+		 * contains a namespace.
+		 */
+		if ( $has_ns ) {
+			list( , $ns, $value ) = $matches;
+		}
+
+		/*
+		 * Try to decode `$value` as a JSON object. If it works, `$value` is
+		 * replaced with the resulting array. The original string is preserved
+		 * otherwise.
+		 *
+		 * Note that `json_decode` returns `null` both for an invalid JSON or
+		 * the `'null'` string (a valid JSON). In the latter case, `$value` is
+		 * replaced with `null`.
+		 */
+		$data = json_decode( $value, true );
+		if ( null !== $data || 'null' === trim( $value ) ) {
+			$value = $data;
+		}
+
+		return array( $ns, $value );
 	}
 }

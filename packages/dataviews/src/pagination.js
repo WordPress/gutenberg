@@ -30,12 +30,8 @@ const Pagination = memo( function Pagination( {
 				<HStack justify="flex-start" expanded={ false } spacing={ 2 }>
 					{ createInterpolateElement(
 						sprintf(
-							// translators: %1$s: Current page number, %2$s: Total number of pages.
-							_x(
-								'Page <CurrenPageControl /> of %2$s',
-								'paging'
-							),
-							view.page,
+							// translators: %s: Total number of pages.
+							_x( 'Page <CurrenPageControl /> of %s', 'paging' ),
 							totalPages
 						),
 						{

@@ -19,7 +19,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 	const attributeSources = Object.keys( syncedAttributes ).map(
 		( attributeName ) =>
-			attributes.connections?.attributes?.[ attributeName ]?.source
+			attributes.metadata?.bindings?.[ attributeName ]?.source?.name
 	);
 	const isConnectedToOtherSources = attributeSources.every(
 		( source ) => source && source !== 'pattern_attributes'
@@ -30,52 +30,58 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		return null;
 	}
 
-	function updateConnections( isChecked ) {
-		let updatedConnections = {
-			...attributes.connections,
-			attributes: { ...attributes.connections?.attributes },
+	function updateBindings( isChecked ) {
+		let updatedBindings = {
+			...attributes?.metadata?.bindings,
 		};
 
 		if ( ! isChecked ) {
 			for ( const attributeName of Object.keys( syncedAttributes ) ) {
 				if (
-					updatedConnections.attributes[ attributeName ]?.source ===
+					updatedBindings[ attributeName ]?.source?.name ===
 					'pattern_attributes'
 				) {
-					delete updatedConnections.attributes[ attributeName ];
+					delete updatedBindings[ attributeName ];
 				}
 			}
-			if ( ! Object.keys( updatedConnections.attributes ).length ) {
-				delete updatedConnections.attributes;
-			}
-			if ( ! Object.keys( updatedConnections ).length ) {
-				updatedConnections = undefined;
+			if ( ! Object.keys( updatedBindings ).length ) {
+				updatedBindings = undefined;
 			}
 			setAttributes( {
-				connections: updatedConnections,
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
 			} );
 			return;
 		}
 
 		for ( const attributeName of Object.keys( syncedAttributes ) ) {
-			if ( ! updatedConnections.attributes[ attributeName ] ) {
-				updatedConnections.attributes[ attributeName ] = {
-					source: 'pattern_attributes',
+			if ( ! updatedBindings[ attributeName ] ) {
+				updatedBindings[ attributeName ] = {
+					source: {
+						name: 'pattern_attributes',
+					},
 				};
 			}
 		}
 
 		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( { connections: updatedConnections } );
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
+			} );
 			return;
 		}
 
 		const id = nanoid( 6 );
 		setAttributes( {
-			connections: updatedConnections,
 			metadata: {
 				...attributes.metadata,
 				id,
+				bindings: updatedBindings,
 			},
 		} );
 	}
@@ -93,7 +99,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 						( source ) => source === 'pattern_attributes'
 					) }
 					onChange={ ( isChecked ) => {
-						updateConnections( isChecked );
+						updateBindings( isChecked );
 					} }
 				/>
 			</BaseControl>

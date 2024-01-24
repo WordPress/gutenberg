@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -33,7 +33,10 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ () => {} } /> );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Box Control' } )
+				screen.getByRole( 'group', { name: 'Box Control' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
 			).toBeVisible();
 		} );
 
@@ -42,14 +45,40 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ () => {} } /> );
 
-			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
-			} );
+			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
 
 			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
+		} );
+
+		it( 'should update input values when interacting with slider', () => {
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const slider = screen.getByRole( 'slider' );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
+			).toHaveValue( '50' );
+		} );
+
+		it( 'should update slider values when interacting with input', async () => {
+			const user = userEvent.setup();
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const input = screen.getByRole( 'textbox', {
+				name: 'All sides',
+			} );
+
+			await user.type( input, '50' );
+			await user.keyboard( '{Enter}' );
+
+			expect( input ).toHaveValue( '50' );
+			expect( screen.getByRole( 'slider' ) ).toHaveValue( '50' );
 		} );
 	} );
 
@@ -60,7 +89,7 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ () => {} } /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
+				name: 'All sides',
 			} );
 
 			await user.type( input, '100' );
@@ -79,7 +108,7 @@ describe( 'BoxControl', () => {
 			render( <Example /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
+				name: 'All sides',
 			} );
 
 			await user.type( input, '100' );
@@ -98,7 +127,7 @@ describe( 'BoxControl', () => {
 			render( <Example /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
+				name: 'All sides',
 			} );
 
 			await user.type( input, '100' );
@@ -118,7 +147,7 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
+				name: 'All sides',
 			} );
 
 			await user.type( input, '100' );
@@ -152,21 +181,49 @@ describe( 'BoxControl', () => {
 			);
 
 			await user.type(
-				screen.getByRole( 'textbox', { name: 'Top' } ),
+				screen.getByRole( 'textbox', { name: 'Top side' } ),
 				'100'
 			);
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Top' } )
+				screen.getByRole( 'textbox', { name: 'Top side' } )
 			).toHaveValue( '100' );
 			expect(
-				screen.getByRole( 'textbox', { name: 'Right' } )
+				screen.getByRole( 'textbox', { name: 'Right side' } )
 			).not.toHaveValue();
 			expect(
-				screen.getByRole( 'textbox', { name: 'Bottom' } )
+				screen.getByRole( 'textbox', { name: 'Bottom side' } )
 			).not.toHaveValue();
 			expect(
-				screen.getByRole( 'textbox', { name: 'Left' } )
+				screen.getByRole( 'textbox', { name: 'Left side' } )
+			).not.toHaveValue();
+		} );
+
+		it( 'should update a single side value when using slider unlinked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const slider = screen.getByRole( 'slider', { name: 'Right side' } );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top side' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right side' } )
+			).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Bottom side' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left side' } )
 			).not.toHaveValue();
 		} );
 
@@ -181,17 +238,68 @@ describe( 'BoxControl', () => {
 
 			await user.type(
 				screen.getByRole( 'textbox', {
-					name: 'Vertical',
+					name: 'Top and bottom sides',
 				} ),
 				'100'
 			);
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Vertical' } )
+				screen.getByRole( 'textbox', { name: 'Top and bottom sides' } )
 			).toHaveValue( '100' );
 			expect(
-				screen.getByRole( 'textbox', { name: 'Horizontal' } )
+				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
 			).not.toHaveValue();
+		} );
+
+		it( 'should update a whole axis using a slider when value is changed when unlinked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example splitOnAxis /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const slider = screen.getByRole( 'slider', {
+				name: 'Left and right sides',
+			} );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top and bottom sides' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
+			).toHaveValue( '50' );
+		} );
+
+		it( 'should show "Mixed" label when sides have different values but are linked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example /> );
+
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unlink sides',
+			} );
+
+			await user.click( unlinkButton );
+
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Right side',
+				} ),
+				'13'
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right side' } )
+			).toHaveValue( '13' );
+
+			await user.click( unlinkButton );
+
+			expect( screen.getByPlaceholderText( 'Mixed' ) ).toHaveValue( '' );
 		} );
 	} );
 
@@ -287,7 +395,7 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ onChangeSpy } /> );
 
 			const valueInput = screen.getByRole( 'textbox', {
-				name: 'Box Control',
+				name: 'All sides',
 			} );
 			const unitSelect = screen.getByRole( 'combobox', {
 				name: 'Select unit',

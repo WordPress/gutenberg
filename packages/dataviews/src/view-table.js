@@ -1,18 +1,19 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
+	CheckboxControl,
 } from '@wordpress/components';
 import {
 	Children,
@@ -306,6 +307,80 @@ function WithSeparators( { children } ) {
 		) );
 }
 
+function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
+	const areAllSelected = selection.length === data.length;
+	return (
+		<CheckboxControl
+			className="dataviews-view-table-selection-checkbox"
+			__nextHasNoMarginBottom
+			checked={ areAllSelected }
+			indeterminate={ ! areAllSelected && selection.length }
+			onChange={ () => {
+				if ( areAllSelected ) {
+					onSelectionChange( [] );
+				} else {
+					onSelectionChange( data );
+				}
+			} }
+			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+		/>
+	);
+}
+
+function SingleSelectionCheckbox( {
+	selection,
+	onSelectionChange,
+	item,
+	data,
+	getItemId,
+	primaryField,
+} ) {
+	const id = getItemId( item );
+	const isSelected = selection.includes( id );
+	let selectionLabel;
+	if ( primaryField?.getValue && item ) {
+		// eslint-disable-next-line @wordpress/valid-sprintf
+		selectionLabel = sprintf(
+			/* translators: %s: item title. */
+			isSelected ? __( 'Deselect item: %s' ) : __( 'Select item: %s' ),
+			primaryField.getValue( { item } )
+		);
+	} else {
+		selectionLabel = isSelected
+			? __( 'Select a new item' )
+			: __( 'Deselect item' );
+	}
+	return (
+		<CheckboxControl
+			className="dataviews-view-table-selection-checkbox"
+			__nextHasNoMarginBottom
+			checked={ isSelected }
+			label={ selectionLabel }
+			onChange={ () => {
+				if ( ! isSelected ) {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId === id || selection.includes( itemId )
+							);
+						} )
+					);
+				} else {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId !== id && selection.includes( itemId )
+							);
+						} )
+					);
+				}
+			} }
+		/>
+	);
+}
+
 function ViewTable( {
 	view,
 	onChangeView,
@@ -315,7 +390,10 @@ function ViewTable( {
 	getItemId,
 	isLoading = false,
 	deferredRendering,
+	selection,
+	onSelectionChange,
 } ) {
+	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
@@ -348,23 +426,42 @@ function ViewTable( {
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
-			! [ view.layout.mediaField, view.layout.primaryField ].includes(
-				field.id
-			)
+			! [ view.layout.mediaField ].includes( field.id )
 	);
 	const usedData = deferredRendering ? asyncData : data;
 	const hasData = !! usedData?.length;
 	const sortValues = { asc: 'ascending', desc: 'descending' };
 
+	const primaryField = fields.find(
+		( field ) => field.id === view.layout.primaryField
+	);
+
 	return (
-		<div>
+		<div className="dataviews-view-table-wrapper">
 			<table
 				className="dataviews-view-table"
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 			>
 				<thead>
-					<tr>
+					<tr className="dataviews-view-table__row">
+						{ hasBulkActions && (
+							<th
+								className="dataviews-view-table__checkbox-column"
+								style={ {
+									width: 20,
+									minWidth: 20,
+								} }
+								data-field-id="selection"
+								scope="col"
+							>
+								<BulkSelectionCheckbox
+									selection={ selection }
+									onSelectionChange={ onSelectionChange }
+									data={ data }
+								/>
+							</th>
+						) }
 						{ visibleFields.map( ( field, index ) => (
 							<th
 								key={ field.id }
@@ -409,7 +506,10 @@ function ViewTable( {
 							</th>
 						) ) }
 						{ !! actions?.length && (
-							<th data-field-id="actions">
+							<th
+								data-field-id="actions"
+								className="dataviews-view-table__actions-column"
+							>
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
@@ -419,8 +519,43 @@ function ViewTable( {
 				</thead>
 				<tbody>
 					{ hasData &&
-						usedData.map( ( item ) => (
-							<tr key={ getItemId( item ) }>
+						usedData.map( ( item, index ) => (
+							<tr
+								key={ getItemId( item ) }
+								className={ classnames(
+									'dataviews-view-table__row',
+									{
+										'is-selected': selection.includes(
+											getItemId( item ) || index
+										),
+									}
+								) }
+							>
+								{ hasBulkActions && (
+									<td
+										className="dataviews-view-table__checkbox-column"
+										style={ {
+											width: 20,
+											minWidth: 20,
+										} }
+									>
+										<span className="dataviews-view-table__cell-content-wrapper">
+											<SingleSelectionCheckbox
+												id={
+													getItemId( item ) || index
+												}
+												item={ item }
+												selection={ selection }
+												onSelectionChange={
+													onSelectionChange
+												}
+												getItemId={ getItemId }
+												data={ data }
+												primaryField={ primaryField }
+											/>
+										</span>
+									</td>
+								) }
 								{ visibleFields.map( ( field ) => (
 									<td
 										key={ field.id }
@@ -432,13 +567,24 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										{ field.render( {
-											item,
-										} ) }
+										<span
+											className={ classnames(
+												'dataviews-view-table__cell-content-wrapper',
+												{
+													'dataviews-view-table__primary-field':
+														primaryField?.id ===
+														field.id,
+												}
+											) }
+										>
+											{ field.render( {
+												item,
+											} ) }
+										</span>
 									</td>
 								) ) }
 								{ !! actions?.length && (
-									<td>
+									<td className="dataviews-view-table__actions-column">
 										<ItemActions
 											item={ item }
 											actions={ actions }
@@ -450,7 +596,7 @@ function ViewTable( {
 				</tbody>
 			</table>
 			<div
-				className={ classNames( {
+				className={ classnames( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
