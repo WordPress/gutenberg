@@ -95,6 +95,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
+		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
 	} = useContext( PrivateBlockContext );
@@ -152,6 +153,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-block-moving-mode': isBlockMovingMode,
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
+				'has-editable-outline': hasEditableOutline,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

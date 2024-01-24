@@ -616,6 +616,10 @@ function BlockListBlockProvider( props ) {
 					),
 				isEditingDisabled:
 					getBlockEditingMode( clientId ) === 'disabled',
+				hasEditableOutline:
+					getBlockEditingMode( clientId ) !== 'disabled' &&
+					getBlockEditingMode( getBlockRootClientId( clientId ) ) ===
+						'disabled',
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
@@ -660,6 +664,7 @@ function BlockListBlockProvider( props ) {
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
+		hasEditableOutline,
 		className,
 		defaultClassName,
 	} = selectedProps;
@@ -695,6 +700,7 @@ function BlockListBlockProvider( props ) {
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
+		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
 		mayDisplayControls,

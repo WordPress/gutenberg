@@ -27,10 +27,6 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const renderingMode = useSelect(
-		( select ) => select( editorStore ).getRenderingMode(),
-		[]
-	);
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
@@ -42,18 +38,17 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
-			if ( renderingMode !== 'template-locked' ) {
-				return;
-			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
+
 			const isNoticeAlreadyShowing = getNotices().some(
 				( notice ) => notice.id === lastNoticeId.current
 			);
 			if ( isNoticeAlreadyShowing ) {
 				return;
 			}
+
 			const { notice } = await createInfoNotice(
 				__( 'Edit your template to edit this block.' ),
 				{
@@ -71,9 +66,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		};
 
 		const handleDblClick = ( event ) => {
-			if ( renderingMode !== 'template-locked' ) {
-				return;
-			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
@@ -90,7 +82,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, renderingMode, contentRef.current ] );
+	}, [ lastNoticeId, contentRef.current ] );
 
 	return (
 		<ConfirmDialog

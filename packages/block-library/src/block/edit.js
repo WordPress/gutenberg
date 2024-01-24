@@ -35,7 +35,9 @@ import { parse, cloneBlock } from '@wordpress/blocks';
  */
 import { unlock } from '../lock-unlock';
 
-const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { useLayoutClasses, useFlashEditableBlocks } = unlock(
+	blockEditorPrivateApis
+);
 const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 function isPartiallySynced( block ) {
@@ -272,7 +274,10 @@ export default function ReusableBlockEdit( {
 	);
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
+	const flashEditableBlocksRef = useFlashEditableBlocks( patternClientId );
+
 	const blockProps = useBlockProps( {
+		ref: flashEditableBlocksRef,
 		className: classnames(
 			'block-library-block__reusable-block-container',
 			layout && layoutClasses,
@@ -281,6 +286,7 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		ref: flashEditableBlocksRef,
 		templateLock: 'all',
 		layout,
 		renderAppender: innerBlocks?.length
