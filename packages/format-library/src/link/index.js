@@ -47,7 +47,13 @@ function Edit( {
 		}
 
 		function handleClick( event ) {
-			if ( event.target.tagName !== 'A' ) {
+			// There is a situation whereby there is an existing link in the rich text
+			// and the user clicks on the leftmost edge of that link and fails to activate
+			// the link format, but the click event still fires on the `<a>` element.
+			// This causes the `addingLink` state to be set to `true` and the link UI
+			// to be rendered in "creating" mode. We need to check isActive to see if
+			// we have an active link format.
+			if ( event.target.tagName !== 'A' || ! isActive ) {
 				return;
 			}
 			setAddingLink( true );
