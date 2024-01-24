@@ -35,10 +35,10 @@ const fetchPage = async ( url, { html } ) => {
 };
 
 // Return an object with VDOM trees of those HTML regions marked with a
-// `navigation-id` directive.
+// `router-region` directive.
 const regionsToVdom = ( dom ) => {
 	const regions = {};
-	const attrName = `data-${ directivePrefix }-navigation-id`;
+	const attrName = `data-${ directivePrefix }-router-region`;
 	dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
 		const id = region.getAttribute( attrName );
 		regions[ id ] = toVdom( region );
@@ -49,7 +49,7 @@ const regionsToVdom = ( dom ) => {
 
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
-	const attrName = `data-${ directivePrefix }-navigation-id`;
+	const attrName = `data-${ directivePrefix }-router-region`;
 	document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
 		const id = region.getAttribute( attrName );
 		const fragment = getRegionRootFragment( region );

@@ -6,7 +6,7 @@ import { store } from '@wordpress/interactivity';
 const html = `
 		<div
 			data-wp-interactive='{ "namespace": "directive-key" }'
-			data-wp-navigation-id="some-id"
+			data-wp-router-region="some-id"
 		>
 			<ul>
 				<li data-wp-key="id-1">1</li>

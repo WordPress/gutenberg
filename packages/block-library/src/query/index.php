@@ -28,7 +28,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
-			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
+			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
 			// Use context to send translated strings.
 			$p->set_attribute(
 				'data-wp-context',

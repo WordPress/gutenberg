@@ -31,13 +31,13 @@ store( 'core/query', {
 		*navigate( event ) {
 			const ctx = getContext();
 			const { ref } = getElement();
-			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
+			const isDisabled = ref.closest( '[data-wp-router-region]' )?.dataset
 				.wpNavigationDisabled;
 
 			if ( isValidLink( ref ) && isValidEvent( event ) && ! isDisabled ) {
 				event.preventDefault();
 
-				const id = ref.closest( '[data-wp-navigation-id]' ).dataset
+				const id = ref.closest( '[data-wp-router-region]' ).dataset
 					.wpNavigationId;
 
 				// Don't announce the navigation immediately, wait 400 ms.
@@ -65,13 +65,13 @@ store( 'core/query', {
 				ctx.url = ref.href;
 
 				// Focus the first anchor of the Query block.
-				const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
+				const firstAnchor = `[data-wp-router-region=${ id }] .wp-block-post-template a[href]`;
 				document.querySelector( firstAnchor )?.focus();
 			}
 		},
 		*prefetch() {
 			const { ref } = getElement();
-			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
+			const isDisabled = ref.closest( '[data-wp-router-region]' )?.dataset
 				.wpNavigationDisabled;
 			if ( isValidLink( ref ) && ! isDisabled ) {
 				const { actions } = yield import(
