@@ -140,6 +140,18 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Invokes the private `print_client_interactivity` method of
+	 * WP_Interactivity_API class.
+	 *
+	 * @return array|null The content of the JSON object printed on the client-side or null if nothings was printed.
+	 */
+	private function print_client_interactivity_data() {
+		$interactivity_data_markup = get_echo( array( $this->interactivity, 'print_client_interactivity_data' ) );
+		preg_match( '/<script type="application\/json" id="wp-interactivity-data">.*?(\{.*\}).*?<\/script>/s', $interactivity_data_markup, $interactivity_data_string );
+		return isset( $interactivity_data_string[1] ) ? json_decode( $interactivity_data_string[1], true ) : null;
+	}
+
+	/**
 	 * Tests that the initial state and config are correctly printed on the
 	 * client-side.
 	 *
@@ -151,9 +163,7 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 		$this->interactivity->config( 'myPlugin', array( 'a' => 1 ) );
 		$this->interactivity->config( 'otherPlugin', array( 'b' => 2 ) );
 
-		$interactivity_data_markup = get_echo( array( $this->interactivity, 'print_client_interactivity_data' ) );
-		preg_match( '/<script type="application\/json" id="wp-interactivity-data">.*?(\{.*\}).*?<\/script>/s', $interactivity_data_markup, $interactivity_data_string );
-		$result = json_decode( $interactivity_data_string[1], true );
+		$result = $this->print_client_interactivity_data();
 
 		$data = array(
 			'myPlugin'    => array( 'a' => 1 ),
@@ -168,6 +178,41 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 			$result
 		);
 	}
+
+	/**
+	 * Tests that the wp-interactivity-data script is not printed if both state
+	 * and config are empty.
+	 *
+	 * @covers ::print_client_interactivity_data
+	 */
+	public function test_state_and_config_dont_print_when_empty() {
+		$result = $this->print_client_interactivity_data();
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * Tests that the config is not printed if it's empty.
+	 *
+	 * @covers ::print_client_interactivity_data
+	 */
+	public function test_config_not_printed_when_empty() {
+		$this->interactivity->state( 'myPlugin', array( 'a' => 1 ) );
+		$result = $this->print_client_interactivity_data();
+		$this->assertEquals( array( 'state' => array( 'myPlugin' => array( 'a' => 1 ) ) ), $result );
+	}
+
+	/**
+	 * Tests that the state is not printed if it's empty.
+	 *
+	 * @covers ::print_client_interactivity_data
+	 */
+	public function test_state_not_printed_when_empty() {
+		$this->interactivity->config( 'myPlugin', array( 'a' => 1 ) );
+		$result = $this->print_client_interactivity_data();
+		$this->assertEquals( array( 'config' => array( 'myPlugin' => array( 'a' => 1 ) ) ), $result );
+	}
+
+
 
 	/**
 	 * Tests that special characters in the initial state and configuration are

@@ -117,13 +117,20 @@ class WP_Interactivity_API {
 	 * @since 6.5.0
 	 */
 	public function print_client_interactivity_data() {
-		if ( ! empty( $this->state_data ) || ! empty( $this->config_data ) ) {
+		$store      = array();
+		$has_state  = ! empty( $this->state_data );
+		$has_config = ! empty( $this->config_data );
+
+		if ( $has_state || $has_config ) {
+			if ( $has_config ) {
+				$store['config'] = $this->config_data;
+			}
+			if ( $has_state ) {
+				$store['state'] = $this->state_data;
+			}
 			wp_print_inline_script_tag(
 				wp_json_encode(
-					array(
-						'config' => (object) $this->config_data,
-						'state'  => (object) $this->state_data,
-					),
+					$store,
 					JSON_HEX_TAG | JSON_HEX_AMP
 				),
 				array(
@@ -237,8 +244,8 @@ class WP_Interactivity_API {
 			 */
 			$directives_prefixes = array_intersect(
 				$p->is_tag_closer()
-					? $directive_processor_prefixes_reversed
-					: $directive_processor_prefixes,
+				? $directive_processor_prefixes_reversed
+				: $directive_processor_prefixes,
 				$directives_prefixes
 			);
 
@@ -371,7 +378,7 @@ class WP_Interactivity_API {
 		 */
 		$decoded_json = json_decode( $directive_value, true );
 		if ( null !== $decoded_json || 'null' === $directive_value ) {
-				$directive_value = $decoded_json;
+			$directive_value = $decoded_json;
 		}
 
 		return array( $default_namespace, $directive_value );
@@ -411,8 +418,8 @@ class WP_Interactivity_API {
 		 * contained a valid namespace.
 		 */
 		$namespace_stack[] = isset( $decoded_json['namespace'] )
-			? $decoded_json['namespace']
-			: end( $namespace_stack );
+		? $decoded_json['namespace']
+		: end( $namespace_stack );
 	}
 
 	/**
