@@ -176,7 +176,7 @@ test.describe( 'Pattern Overrides', () => {
 						ref: patternId,
 						overrides: {
 							[ editableParagraphId ]: {
-								content: 'I would word it this way',
+								content: [ 1, 'I would word it this way' ],
 							},
 						},
 					},
@@ -187,7 +187,7 @@ test.describe( 'Pattern Overrides', () => {
 						ref: patternId,
 						overrides: {
 							[ editableParagraphId ]: {
-								content: 'This one is different',
+								content: [ 1, 'This one is different' ],
 							},
 						},
 					},

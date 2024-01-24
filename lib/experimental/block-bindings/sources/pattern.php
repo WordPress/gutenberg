@@ -9,8 +9,20 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 		if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
 			return null;
 		}
-		$block_id = $block_instance->attributes['metadata']['id'];
-		return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, $attribute_name ), null );
+		$block_id           = $block_instance->attributes['metadata']['id'];
+		$attribute_override = _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, $attribute_name ), null );
+		if ( null === $attribute_override ) {
+			return null;
+		}
+		switch ( $attribute_override[0] ) {
+			case 0: // remove
+				// This currently skip this attribute instead of removing it until the binding API supports different operations.
+				return null;
+			case 1: // replace
+				return $attribute_override[1];
+			default:
+				return null;
+		}
 	};
 	wp_block_bindings_register_source(
 		'pattern_attributes',
