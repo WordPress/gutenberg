@@ -66,7 +66,6 @@ function Edit( {
 
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
-			setAddingLink( false );
 		};
 	}, [ contentRef, isActive ] );
 
