@@ -107,6 +107,9 @@ require __DIR__ . '/compat/wordpress-6.4/kses.php';
 require __DIR__ . '/compat/wordpress-6.5/blocks.php';
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
+require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivity-api.php';
+require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivity-api-directives-processor.php';
+require __DIR__ . '/compat/wordpress-6.5/interactivity-api/interactivity-api.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings.php';
@@ -127,19 +130,6 @@ require __DIR__ . '/experimental/script-modules.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
-
-require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-initial-state.php';
-require __DIR__ . '/experimental/interactivity-api/initial-state.php';
-require __DIR__ . '/experimental/interactivity-api/modules.php';
-require __DIR__ . '/experimental/interactivity-api/class-wp-directive-processor.php';
-require __DIR__ . '/experimental/interactivity-api/class-wp-directive-context.php';
-require __DIR__ . '/experimental/interactivity-api/directive-processing.php';
-require __DIR__ . '/experimental/interactivity-api/directives/wp-bind.php';
-require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
-require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
-require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
-require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
-require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
 
 // Fonts API / Font Face.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
