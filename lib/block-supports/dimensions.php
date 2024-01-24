@@ -132,6 +132,12 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 
 			if ( ! empty( $styles['classnames'] ) ) {
 				foreach ( explode( ' ', $styles['classnames'] ) as $class_name ) {
+					if (
+						str_contains( $class_name, 'aspect-ratio' ) &&
+						! isset( $block_attributes['style']['dimensions']['aspectRatio'] )
+					) {
+						continue;
+					}
 					$tags->add_class( $class_name );
 				}
 			}
