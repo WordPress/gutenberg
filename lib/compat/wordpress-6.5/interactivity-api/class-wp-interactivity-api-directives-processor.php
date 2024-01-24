@@ -13,10 +13,14 @@ if ( class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 /**
  * Class used to iterate over the tags of an HTML string and help process the
  * directive attributes.
+ *
+ * @access private
  */
 class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	/**
 	 * Returns the content between two balanced tags.
+	 *
+	 * @access private
 	 *
 	 * @return string|null The content between the current opening and its matching closing tag or null if it doesn't
 	 *                     find the matching closing tag.
@@ -40,6 +44,8 @@ class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Proce
 
 	/**
 	 * Sets the content between two balanced tags.
+	 *
+	 * @access private
 	 *
 	 * @param string $new_content The string to replace the content between the matching tags.
 	 * @return bool Whether the content was successfully replaced.
@@ -136,6 +142,8 @@ class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Proce
 	 * Checks whether the current tag is void.
 	 *
 	 * @see https://html.spec.whatwg.org/#elements-2
+	 *
+	 * @access private
 	 *
 	 * @return bool Whether the current tag is void or not.
 	 */
