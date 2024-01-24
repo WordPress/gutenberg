@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.16.0 (2024-01-24)
+
 ### Enhancements
 
 -   `ColorPicker`: improve the UX around HSL sliders ([#57555](https://github.com/WordPress/gutenberg/pull/57555)).
