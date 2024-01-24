@@ -305,6 +305,7 @@ const ImageComponent = ( {
 											resizeMethod: 'scale',
 										} ) }
 										resizeMode={ imageResizeMode }
+										testID={ `network-image-${ url }` }
 									/>
 								) }
 								{ ! networkImageLoaded && ! networkURL && (
@@ -334,6 +335,11 @@ const ImageComponent = ( {
 										resizeMethod: 'scale',
 									} ) }
 									resizeMode={ imageResizeMode }
+									testID={ `network-image-${
+										networkURL && networkImageLoaded
+											? networkURL
+											: localURL || url
+									}` }
 								/>
 								<Image
 									source={ { uri: networkURL } }
