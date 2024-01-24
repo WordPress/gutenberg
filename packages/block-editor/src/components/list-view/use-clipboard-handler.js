@@ -12,6 +12,9 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
 
+// This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.js
+// and adds behaviour for the list view, while skipping partial selection. In the future,
+// consider refactoring the two hooks to share more code.
 export default function useClipboardHandler( { selectBlock } ) {
 	const {
 		getBlockOrder,
