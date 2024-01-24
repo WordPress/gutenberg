@@ -102,13 +102,13 @@ function register_block_core_query() {
 		'@wordpress/block-library/query',
 		gutenberg_url( '/build/interactivity/query.min.js' ),
 		array(
-			'@wordpress/interactivity',
 			array(
-				'@wordpress/interactivity',
-				array(
-					'id'     => '@wordpress/interactivity-router',
-					'import' => 'dynamic',
-				),
+				'id'     => '@wordpress/interactivity',
+				'import' => 'static',
+			),
+			array(
+				'id'     => '@wordpress/interactivity-router',
+				'import' => 'dynamic',
 			),
 		),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
