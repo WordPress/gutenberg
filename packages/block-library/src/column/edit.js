@@ -15,6 +15,7 @@ import {
 	useSettings,
 	useInnerBlocksProps,
 	store as blockEditorStore,
+	__experimentalUseShadowProps as useShadowProps,
 } from '@wordpress/block-editor';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -24,11 +25,9 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
-function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
-	setAttributes,
-	clientId,
-} ) {
+function ColumnEdit( { attributes, setAttributes, clientId } ) {
+	const { verticalAlignment, width, templateLock, allowedBlocks } =
+		attributes;
 	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
@@ -66,9 +65,16 @@ function ColumnEdit( {
 	};
 
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
+	const shadowProps = useShadowProps( attributes );
+	const flexBasisStyle = widthWithUnit
+		? { flexBasis: widthWithUnit }
+		: undefined;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		style: {
+			...shadowProps.style,
+			...flexBasisStyle,
+		},
 	} );
 
 	const columnsCount = columnsIds.length;

@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+import {
+	useInnerBlocksProps,
+	useBlockProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { verticalAlignment, width } = attributes;
@@ -15,7 +19,7 @@ export default function save( { attributes } ) {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	let style;
+	let widthStyle;
 
 	if ( width && /\d/.test( width ) ) {
 		// Numbers are handled for backward compatibility as they can be still provided with templates.
@@ -29,8 +33,13 @@ export default function save( { attributes } ) {
 					multiplier +
 				'%';
 		}
-		style = { flexBasis };
+		widthStyle = { flexBasis };
 	}
+
+	const style = {
+		...getShadowClassesAndStyles( attributes ).style,
+		...widthStyle,
+	};
 
 	const blockProps = useBlockProps.save( {
 		className: wrapperClasses,
