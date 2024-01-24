@@ -44,7 +44,9 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -57,6 +59,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 	}
@@ -68,13 +71,61 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$collections = array();
-		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
-			$collections[] = $collection->get_config();
+	public function get_items( $request ) {
+		$collections_all = WP_Font_Library::get_font_collections();
+
+		$page        = $request['page'];
+		$per_page    = $request['per_page'];
+		$total_items = count( $collections_all );
+		$max_pages   = ceil( $total_items / $per_page );
+
+		if ( $page > $max_pages && $total_items > 0 ) {
+			return new WP_Error(
+				'rest_post_invalid_page_number',
+				__( 'The page number requested is larger than the number of pages available.' ),
+				array( 'status' => 400 )
+			);
 		}
 
-		return rest_ensure_response( $collections, 200 );
+		$collections_page = array_slice( $collections_all, ( $page - 1 ) * $per_page, $per_page );
+
+		$items = array();
+		foreach ( $collections_page as $collection ) {
+			$item = $this->prepare_item_for_response( $collection, $request );
+			if ( is_wp_error( $item ) ) {
+				return $item;
+			}
+			$item    = $this->prepare_response_for_collection( $item );
+			$items[] = $item;
+		}
+
+		$response = rest_ensure_response( $items );
+
+		$response->header( 'X-WP-Total', (int) $total_items );
+		$response->header( 'X-WP-TotalPages', (int) $max_pages );
+
+		$request_params = $request->get_query_params();
+		$collection_url = rest_url( $this->namespace . '/' . $this->rest_base );
+		$base           = add_query_arg( urlencode_deep( $request_params ), $collection_url );
+
+		if ( $page > 1 ) {
+			$prev_page = $page - 1;
+
+			if ( $prev_page > $max_pages ) {
+				$prev_page = $max_pages;
+			}
+
+			$prev_link = add_query_arg( 'page', $prev_page, $base );
+			$response->link_header( 'prev', $prev_link );
+		}
+		if ( $max_pages > $page ) {
+			$next_page = $page + 1;
+			$next_link = add_query_arg( 'page', $next_page, $base );
+
+			$response->link_header( 'next', $next_link );
+		}
+
+		return $response;
 	}
 
 	/**
@@ -95,17 +146,128 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			return $collection;
 		}
 
-		$config   = $collection->get_config();
-		$contents = $collection->get_content();
+		$item = $this->prepare_item_for_response( $collection, $request );
 
-		// If there was an error getting the collection data, return the error.
-		if ( is_wp_error( $contents ) ) {
-			$contents->add_data( array( 'status' => 500 ) );
-			return $contents;
+		if ( is_wp_error( $item ) ) {
+			return $item;
 		}
 
-		$collection_data = array_merge( $config, $contents );
-		return rest_ensure_response( $collection_data );
+		return $item;
+	}
+
+	/*
+	* Prepare a single collection output for response
+	*
+	* @since 6.5.0
+	*
+	* @param WP_Font_Collection $collection Collection object.
+	* @param WP_REST_Request    $request    Request object.
+	* @return array|WP_Error
+	*/
+	public function prepare_item_for_response( $collection, $request ) {
+		$fields = $this->get_fields_for_response( $request );
+		$item   = array();
+
+		$config_fields = array( 'slug', 'name', 'description' );
+		foreach ( $config_fields as $field ) {
+			if ( in_array( $field, $fields ) ) {
+				$item[ $field ] = $collection->$field;
+			}
+		}
+
+		$data_fields = array( 'font_families', 'categories' );
+		if ( in_array( 'font_families', $fields ) || in_array( 'categories', $fields ) ) {
+			$content = $collection->get_content();
+
+			// If there was an error getting the collection data, return the error.
+			if ( is_wp_error( $content ) ) {
+				$content->add_data( array( 'status' => 500 ) );
+				return $content;
+			}
+
+			foreach ( $data_fields as $field ) {
+				if ( in_array( $field, $fields ) ) {
+					$item[ $field ] = $content[ $field ];
+				}
+			}
+		}
+
+		return rest_ensure_response( $item );
+	}
+
+	/**
+	 * Retrieves the font collection's schema, conforming to JSON Schema.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'font-collection',
+			'type'       => 'object',
+			'properties' => array(
+				'slug'          => array(
+					'description' => __( 'Unique identifier for the font collection.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'name'          => array(
+					'description' => __( 'The name for the font collection.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'description'   => array(
+					'description' => __( 'The description for the font collection.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'font_families' => array(
+					'description' => __( 'The font families for the font collection.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'categories'    => array(
+					'description' => __( 'The categories for the font collection.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view', 'edit' ),
+				),
+			),
+		);
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Retrieves the search params for the font collections.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$query_params = parent::get_collection_params();
+
+		$query_params['context']['default'] = 'view';
+
+		unset( $query_params['search'] );
+
+		/**
+		 * Filters REST API collection parameters for the font collections controller.
+		 *
+		 * @since 5.5.0
+		 *
+		 * @param array $query_params JSON Schema-formatted collection parameters.
+		 */
+		return apply_filters( 'rest_font_collections_collection_params', $query_params );
 	}
 
 	/**
