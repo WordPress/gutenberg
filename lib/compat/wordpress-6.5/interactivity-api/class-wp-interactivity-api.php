@@ -244,8 +244,8 @@ class WP_Interactivity_API {
 			 */
 			$directives_prefixes = array_intersect(
 				$p->is_tag_closer()
-				? $directive_processor_prefixes_reversed
-				: $directive_processor_prefixes,
+					? $directive_processor_prefixes_reversed
+					: $directive_processor_prefixes,
 				$directives_prefixes
 			);
 
