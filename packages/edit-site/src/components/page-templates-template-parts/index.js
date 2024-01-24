@@ -85,6 +85,10 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
+	sort: {
+		field: 'title',
+		direction: 'asc',
+	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
