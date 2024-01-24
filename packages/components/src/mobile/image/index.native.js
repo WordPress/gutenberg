@@ -85,28 +85,23 @@ const ImageComponent = ( {
 			} );
 
 			if ( url.startsWith( 'file:///' ) ) {
-				if ( ! isCurrent ) {
-					return;
-				}
-
-				if ( url !== localURL ) {
-					setNetworkImageLoaded( false );
-					setNetworkURL( false );
-				}
-
 				setLocalURL( url );
 			} else if ( url.startsWith( 'https://' ) ) {
 				if ( Platform.isIOS ) {
 					setNetworkURL( url );
 				} else if ( Platform.isAndroid ) {
-					const result = RNImage.prefetch( url );
-					if ( result ) {
-						if ( ! isCurrent ) {
-							return;
+					RNImage.prefetch( url ).then(
+						() => {
+							if ( ! isCurrent ) {
+								return;
+							}
+							setNetworkURL( url );
+							setNetworkImageLoaded( true );
+						},
+						() => {
+							// handle error
 						}
-						setNetworkURL( url );
-						setNetworkImageLoaded( true );
-					}
+					);
 				}
 			}
 		}
