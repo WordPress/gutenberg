@@ -150,6 +150,13 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				array(),
 				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 			);
+
+			wp_register_script_module(
+				'@wordpress/interactivity/router',
+				gutenberg_url( '/build/interactivity/router.min.js' ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
 		}
 
 		/**

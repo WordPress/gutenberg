@@ -100,12 +100,12 @@ function register_block_core_query() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/query',
-		'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
+		gutenberg_url( '/build/interactivity/query.min.js' ),
 		array(
 			'@wordpress/interactivity',
 			array(
-				'id'   => '@wordpress/interactivity/router',
-				'type' => 'dynamic',
+				'id'     => '@wordpress/interactivity/router',
+				'import' => 'dynamic',
 			),
 		),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
