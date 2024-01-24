@@ -193,7 +193,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 							);
 						} }
 					>
-						{ __( 'Edit templates' ) }
+						{ __( 'Edit template' ) }
 					</Button>
 				</p>
 			) }

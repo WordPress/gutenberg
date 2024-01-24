@@ -187,8 +187,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-			// Not sure if the missing no dependencies here is deliberate or not so ignoring lint warning for now.
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] );
 
 		// Synchronizes the active post with the state

@@ -17,8 +17,6 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { STORE_NAME } from '../../../store/constants';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
-// import { store as editSiteStore } from '../../../store';
-// import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
 const SettingsHeader = ( { sidebarName } ) => {
 	const postTypeLabel = useSelect(
