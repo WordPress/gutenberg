@@ -336,7 +336,7 @@ function ButtonEdit( props ) {
 			{ isLinkTag &&
 				isSelected &&
 				( isEditingURL || isURLSet ) &&
-				! metadata?.bindings?.url && (
+				! lockUrlControls && (
 					<Popover
 						placement="bottom"
 						onClose={ () => {
