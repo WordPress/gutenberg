@@ -1,8 +1,41 @@
 == Changelog ==
 
-= 17.5.0-rc.1 =
+= 17.5.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- (Preferences)(17.5.1)(fix) Remove non-core-migrated preferences from the deprecation proxy for `get` ([58153](https://github.com/WordPress/gutenberg/pull/58153))
+- (editor)(fix) Append the `edit-post-header-toolbar` class in NavigableToolbar for backward compatibility with plugin GUI injections ([58154](https://github.com/WordPress/gutenberg/pull/58154))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@fullofcaffeine 
 
 
+
+
+= 17.5.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- (Preferences)(hotfix)(17.5) Hotfix for missing preferences in the `core` scope([58031](https://github.com/WordPress/gutenberg/pull/58031))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad @fullofcaffeine 
+
+
+
+
+= 17.5.0 =
 
 ## Changelog
 
@@ -207,7 +240,7 @@
 - Add drag cursor to draggable list items. ([57493](https://github.com/WordPress/gutenberg/pull/57493))
 
 ### Tools
-
+- DependencyExtractionWebpackPlugin: Throw when using scripts from modules. ([57795]
 - Dependency Extraction Webpack Plugin: Use `import` for module externals. ([57577](https://github.com/WordPress/gutenberg/pull/57577))
 - DependencyExtractionWebpackPlugin: Add true shorthand for requestToExternalModule. ([57593](https://github.com/WordPress/gutenberg/pull/57593))
 - DependencyExtractionWebpackPlugin: Use module for @wordpress/interactivity. ([57602](https://github.com/WordPress/gutenberg/pull/57602))
@@ -254,6 +287,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @afercia @andrewhayward @andrewserong @atachibana @c4rl0sbr4v0 @carolinan @chad1008 @ciampo @DAreRodz @dcalhoun @derekblank @desrosj @ellatrix @fai-sal @fluiddot @geriux @getdave @glendaviesnz @gziolo @hbhalodia @HrithikDalal @jameskoster @jeryj @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @Mamaduka @matiasbenedetto @mcsf @michalczaplinski @mirka @muhme @ndiego @ntsekouras @oandregal @ockham @ramonjd @scruffian @sirreal @Soean @t-hamano @talldan @tellthemachines @youknowriad
+
+
 
 
 = 17.3.2 =

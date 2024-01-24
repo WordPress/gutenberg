@@ -15,7 +15,9 @@ import {
 } from '../../utils/constants';
 
 export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'featured-image',
 		primaryField: 'title',
@@ -27,7 +29,7 @@ export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
 };
 
 const DEFAULT_PAGE_BASE = {
-	type: LAYOUT_LIST,
+	type: LAYOUT_TABLE,
 	search: '',
 	filters: [],
 	page: 1,

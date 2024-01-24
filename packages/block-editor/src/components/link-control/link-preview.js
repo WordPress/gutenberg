@@ -10,12 +10,15 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
-	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
 	Tooltip,
 } from '@wordpress/components';
+import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit, copy } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -41,7 +44,7 @@ export default function LinkPreview( {
 	const hasRichData = richData && Object.keys( richData ).length;
 
 	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
+		( value && filterURLForDisplay( safeDecodeURI( value.url ), 24 ) ) ||
 		'';
 
 	// url can be undefined if the href attribute is unset
@@ -60,6 +63,14 @@ export default function LinkPreview( {
 	} else {
 		icon = <Icon icon={ globe } />;
 	}
+
+	const { createNotice } = useDispatch( noticesStore );
+	const ref = useCopyToClipboard( value.url, () => {
+		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	} );
 
 	return (
 		<div
@@ -88,21 +99,21 @@ export default function LinkPreview( {
 					<span className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
-								<Tooltip
-									text={ value.url }
-									placement="bottom-start"
-								>
+								<Tooltip text={ value.url }>
 									<ExternalLink
 										className="block-editor-link-control__search-item-title"
 										href={ value.url }
 									>
-										{ displayTitle }
+										<Truncate numberOfLines={ 1 }>
+											{ displayTitle }
+										</Truncate>
 									</ExternalLink>
 								</Tooltip>
-
 								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
-										{ displayURL }
+										<Truncate numberOfLines={ 1 }>
+											{ displayURL }
+										</Truncate>
 									</span>
 								) }
 							</>
@@ -119,7 +130,7 @@ export default function LinkPreview( {
 					label={ __( 'Edit' ) }
 					className="block-editor-link-control__search-item-action"
 					onClick={ onEditClick }
-					iconSize={ 24 }
+					size="compact"
 				/>
 				{ hasUnlinkControl && (
 					<Button
@@ -127,54 +138,19 @@ export default function LinkPreview( {
 						label={ __( 'Unlink' ) }
 						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
 						onClick={ onRemove }
-						iconSize={ 24 }
+						size="compact"
 					/>
 				) }
+				<Button
+					icon={ copy }
+					label={ __( 'Copy URL' ) }
+					className="block-editor-link-control__search-item-action block-editor-link-control__copy"
+					ref={ ref }
+					disabled={ isEmptyURL }
+					size="compact"
+				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
-
-			{ !! (
-				( hasRichData &&
-					( richData?.image || richData?.description ) ) ||
-				isFetching
-			) && (
-				<div className="block-editor-link-control__search-item-bottom">
-					{ ( richData?.image || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.image }
-							className={ classnames(
-								'block-editor-link-control__search-item-image',
-								{
-									'is-placeholder': ! richData?.image,
-								}
-							) }
-						>
-							{ richData?.image && (
-								<img src={ richData?.image } alt="" />
-							) }
-						</div>
-					) }
-
-					{ ( richData?.description || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.description }
-							className={ classnames(
-								'block-editor-link-control__search-item-description',
-								{
-									'is-placeholder': ! richData?.description,
-								}
-							) }
-						>
-							{ richData?.description && (
-								<Text truncate numberOfLines="2">
-									{ richData.description }
-								</Text>
-							) }
-						</div>
-					) }
-				</div>
-			) }
-
 			{ additionalControls && additionalControls() }
 		</div>
 	);

@@ -27,7 +27,7 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
+		"{src,build,build-module}/{index.js,store/index.js,hooks/**,bindings/**}"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",

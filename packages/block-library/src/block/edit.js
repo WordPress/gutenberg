@@ -18,8 +18,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InnerBlocks,
 	useBlockProps,
 	Warning,
@@ -27,7 +27,8 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { getBlockSupport, parse, cloneBlock } from '@wordpress/blocks';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { parse, cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -35,20 +36,23 @@ import { getBlockSupport, parse, cloneBlock } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
-		!! block.attributes.connections?.attributes &&
-		Object.values( block.attributes.connections.attributes ).some(
-			( connection ) => connection.source === 'pattern_attributes'
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source.name === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.connections.attributes )
+	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , connection ] ) => connection.source === 'pattern_attributes'
+			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }
@@ -84,6 +88,26 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
+/**
+ * Enum for patch operations.
+ * We use integers here to minimize the size of the serialized data.
+ * This has to be deserialized accordingly on the server side.
+ * See block-bindings/sources/pattern.php
+ */
+const PATCH_OPERATIONS = {
+	/** @type {0} */
+	Remove: 0,
+	/** @type {1} */
+	Replace: 1,
+	// Other operations are reserved for future use. (e.g. Add)
+};
+
+/**
+ * @typedef {[typeof PATCH_OPERATIONS.Remove]} RemovePatch
+ * @typedef {[typeof PATCH_OPERATIONS.Replace, unknown]} ReplacePatch
+ * @typedef {RemovePatch | ReplacePatch} OverridePatch
+ */
+
 function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	return blocks.map( ( block ) => {
 		const innerBlocks = applyInitialOverrides(
@@ -100,9 +124,15 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			defaultValues[ blockId ] ??= {};
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			if ( overrides[ blockId ] ) {
-				newAttributes[ attributeKey ] =
-					overrides[ blockId ][ attributeKey ];
+			/** @type {OverridePatch} */
+			const overrideAttribute = overrides[ blockId ]?.[ attributeKey ];
+			if ( ! overrideAttribute ) {
+				continue;
+			}
+			if ( overrideAttribute[ 0 ] === PATCH_OPERATIONS.Remove ) {
+				delete newAttributes[ attributeKey ];
+			} else if ( overrideAttribute[ 0 ] === PATCH_OPERATIONS.Replace ) {
+				newAttributes[ attributeKey ] = overrideAttribute[ 1 ];
 			}
 		}
 		return {
@@ -114,13 +144,14 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 }
 
 function getOverridesFromBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, Record<string, unknown>>} */
+	/** @type {Record<string, Record<string, OverridePatch>>} */
 	const overrides = {};
 	for ( const block of blocks ) {
 		Object.assign(
 			overrides,
 			getOverridesFromBlocks( block.innerBlocks, defaultValues )
 		);
+		/** @type {string} */
 		const blockId = block.attributes.metadata?.id;
 		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
 		const attributes = getPartiallySyncedAttributes( block );
@@ -130,8 +161,23 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				defaultValues[ blockId ][ attributeKey ]
 			) {
 				overrides[ blockId ] ??= {};
-				overrides[ blockId ][ attributeKey ] =
-					block.attributes[ attributeKey ];
+				/**
+				 * Create a patch operation for the binding attribute.
+				 * We use a tuple here to minimize the size of the serialized data.
+				 * The first item is the operation type, the second item is the value if any.
+				 */
+				if ( block.attributes[ attributeKey ] === undefined ) {
+					/** @type {RemovePatch} */
+					overrides[ blockId ][ attributeKey ] = [
+						PATCH_OPERATIONS.Remove,
+					];
+				} else {
+					/** @type {ReplacePatch} */
+					overrides[ blockId ][ attributeKey ] = [
+						PATCH_OPERATIONS.Replace,
+						block.attributes[ attributeKey ],
+					];
+				}
 			}
 		}
 	}
@@ -144,6 +190,13 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 		setBlockEditMode( setEditMode, block.innerBlocks, mode );
+	} );
+}
+
+function getHasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isPartiallySynced( block ) ) return true;
+		return getHasOverridableBlocks( block.innerBlocks );
 	} );
 }
 
@@ -208,15 +261,23 @@ export default function ReusableBlockEdit( {
 		[ innerBlocks, setBlockEditingMode ]
 	);
 
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
-		const initialBlocks =
+	const hasOverridableBlocks = useMemo(
+		() => getHasOverridableBlocks( innerBlocks ),
+		[ innerBlocks ]
+	);
+
+	const initialBlocks = useMemo(
+		() =>
 			// Clone the blocks to generate new client IDs.
 			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
 			( editedRecord.content && typeof editedRecord.content !== 'function'
 				? parse( editedRecord.content )
-				: [] );
+				: [] ),
+		[ editedRecord.blocks, editedRecord.content ]
+	);
 
+	// Apply the initial overrides from the pattern block to the inner blocks.
+	useEffect( () => {
 		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
@@ -237,7 +298,7 @@ export default function ReusableBlockEdit( {
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		editedRecord,
+		initialBlocks,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
@@ -293,6 +354,12 @@ export default function ReusableBlockEdit( {
 		editOriginalProps.onClick( event );
 	};
 
+	const resetOverrides = () => {
+		if ( overrides ) {
+			replaceInnerBlocks( patternClientId, initialBlocks );
+		}
+	};
+
 	let children = null;
 
 	if ( hasAlreadyRendered ) {
@@ -333,6 +400,21 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
+
+			{ hasOverridableBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetOverrides }
+							disabled={ ! overrides }
+							__experimentalIsFocusable
+						>
+							{ __( 'Reset to original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (

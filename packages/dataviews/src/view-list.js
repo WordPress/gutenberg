@@ -20,6 +20,7 @@ export default function ViewList( {
 	view,
 	fields,
 	data,
+	isLoading,
 	getItemId,
 	onSelectionChange,
 	onDetailsChange,
@@ -49,6 +50,22 @@ export default function ViewList( {
 		}
 	};
 
+	const hasData = usedData?.length;
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ classNames( {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! hasData && ! isLoading,
+				} ) }
+			>
+				{ ! hasData && (
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				) }
+			</div>
+		);
+	}
+
 	return (
 		<ul className="dataviews-view-list">
 			{ usedData.map( ( item ) => {
@@ -75,7 +92,9 @@ export default function ViewList( {
 										) }
 									</div>
 									<VStack spacing={ 1 }>
-										{ primaryField?.render( { item } ) }
+										<span className="dataviews-view-list__primary-field">
+											{ primaryField?.render( { item } ) }
+										</span>
 										<div className="dataviews-view-list__fields">
 											{ visibleFields.map( ( field ) => {
 												return (

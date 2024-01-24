@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store,
-	getContext,
-	getElement,
-	navigate,
-	prefetch,
-} from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -37,14 +31,11 @@ store( 'core/query', {
 		*navigate( event ) {
 			const ctx = getContext();
 			const { ref } = getElement();
-			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
-				.wpNavigationDisabled;
+			const { queryRef } = ctx;
+			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 
 			if ( isValidLink( ref ) && isValidEvent( event ) && ! isDisabled ) {
 				event.preventDefault();
-
-				const id = ref.closest( '[data-wp-navigation-id]' ).dataset
-					.wpNavigationId;
 
 				// Don't announce the navigation immediately, wait 400 ms.
 				const timeout = setTimeout( () => {
@@ -52,7 +43,10 @@ store( 'core/query', {
 					ctx.animation = 'start';
 				}, 400 );
 
-				yield navigate( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.navigate( ref.href );
 
 				// Dismiss loading message if it hasn't been added yet.
 				clearTimeout( timeout );
@@ -68,16 +62,19 @@ store( 'core/query', {
 				ctx.url = ref.href;
 
 				// Focus the first anchor of the Query block.
-				const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
-				document.querySelector( firstAnchor )?.focus();
+				const firstAnchor = `.wp-block-post-template a[href]`;
+				queryRef.querySelector( firstAnchor )?.focus();
 			}
 		},
 		*prefetch() {
+			const { queryRef } = getContext();
 			const { ref } = getElement();
-			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
-				.wpNavigationDisabled;
+			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 			if ( isValidLink( ref ) && ! isDisabled ) {
-				yield prefetch( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.prefetch( ref.href );
 			}
 		},
 	},
@@ -86,8 +83,16 @@ store( 'core/query', {
 			const { url } = getContext();
 			const { ref } = getElement();
 			if ( url && isValidLink( ref ) ) {
-				yield prefetch( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.prefetch( ref.href );
 			}
+		},
+		setQueryRef() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.queryRef = ref;
 		},
 	},
 } );

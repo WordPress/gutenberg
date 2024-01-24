@@ -83,6 +83,7 @@ function DocumentTools() {
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<ToolbarItem
 				ref={ inserterButton }
@@ -104,8 +105,8 @@ function DocumentTools() {
 			/>
 			{ isMediumViewport && (
 				<>
-					<UndoButton />
-					<RedoButton />
+					<ToolbarItem as={ UndoButton } />
+					<ToolbarItem as={ RedoButton } />
 					<ToolbarItem
 						as={ Button }
 						className="edit-widgets-header-toolbar__list-view-toggle"
