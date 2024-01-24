@@ -300,35 +300,30 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-// Indicate which blocks are editable within a locked context.
-// 1. User must be hovering an editor with renderingMode = 'template-lock'; or...
-.is-template-locked:hover,
-// ...a container block.
-.block-editor-block-list__block:hover {
-	// 2. Look for locked blocks; or...
-	.block-editor-block-list__block.is-editing-disabled,
-	// ...container blocks that have locked children.
-	&:has(> .block-editor-block-list__block.is-editing-disabled) {
-		// 3. Highlight any unlocked children of that locked block.
-		& > .block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
-			&::after {
-				content: "";
-				border-style: dotted;
-				position: absolute;
-				pointer-events: none;
-				top: $border-width;
-				left: $border-width;
-				right: $border-width;
-				bottom: $border-width;
-				border: 1px dotted var(--wp-admin-theme-color);
-				border-radius: $radius-block-ui - $border-width;
-			}
+@keyframes block-editor-has-editable-outline__fade-out-animation {
+	from {
+		border-color: rgba(var(--wp-admin-theme-color--rgb), 1);
+	}
+	to {
+		border-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+	}
+}
 
-			&.is-hovered::after {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
-				border: none;
-			}
-		}
+.block-editor-block-list__block.has-editable-outline {
+	&::after {
+		content: "";
+		position: absolute;
+		pointer-events: none;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border: 1px dotted rgba(var(--wp-admin-theme-color--rgb), 1);
+		border-radius: $radius-block-ui;
+		animation: block-editor-has-editable-outline__fade-out-animation 0.3s ease-out;
+		animation-delay: 3s;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
 	}
 }
 
