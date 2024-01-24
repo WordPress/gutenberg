@@ -26,6 +26,7 @@ import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
+import PerPageControl from './per-page-control';
 import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
@@ -47,6 +48,8 @@ export default function QueryInspectorControls( props ) {
 		orderBy,
 		author: authorIds,
 		postType,
+		perPage,
+		offset,
 		sticky,
 		inherit,
 		taxQuery,
@@ -101,6 +104,8 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
+	const showPostCountControl =
+		! inherit && isControlAllowed( allowedControls, 'postCount' );
 	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
@@ -162,6 +167,13 @@ export default function QueryInspectorControls( props ) {
 							help={ __(
 								'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
 							) }
+						/>
+					) }
+					{ showPostCountControl && (
+						<PerPageControl
+							perPage={ perPage }
+							offset={ offset }
+							onChange={ setQuery }
 						/>
 					) }
 					{ showColumnsControl && (
