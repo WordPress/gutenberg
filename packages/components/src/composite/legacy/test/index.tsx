@@ -18,14 +18,24 @@ import {
 // page down. Without this, nothing has a height, and so paging up
 // and down doesn't behave as expected in tests.
 
-jest.spyOn( HTMLElement.prototype, 'clientHeight', 'get' ).mockImplementation(
-	function getClientHeight( this: HTMLElement ) {
-		if ( this.tagName === 'BODY' ) {
-			return window.outerHeight;
-		}
-		return 50;
-	}
-);
+let clientHeightSpy: jest.SpiedGetter<
+	typeof HTMLElement.prototype.clientHeight
+>;
+
+beforeAll( () => {
+	clientHeightSpy = jest
+		.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
+		.mockImplementation( function getClientHeight( this: HTMLElement ) {
+			if ( this.tagName === 'BODY' ) {
+				return window.outerHeight;
+			}
+			return 50;
+		} );
+} );
+
+afterAll( () => {
+	clientHeightSpy?.mockRestore();
+} );
 
 type InitialState = Parameters< typeof useCompositeState >[ 0 ];
 type CompositeState = ReturnType< typeof useCompositeState >;
