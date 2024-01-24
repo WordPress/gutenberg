@@ -113,6 +113,17 @@ function Edit( {
 		setOpenedBy( null );
 	}
 
+	// Test for this:
+	// 1. Click on the link button
+	// 2. Click the Options button in the top right of header
+	// 3. Focus should be in the dropdown of the Options button
+	// 4. Press Escape
+	// 5. Focus should be on the Options button
+	function onFocusOutside() {
+		setAddingLink( false );
+		setOpenedBy( null );
+	}
+
 	function onRemoveFormat() {
 		onChange( removeFormat( value, name ) );
 		speak( __( 'Link removed.' ), 'assertive' );
@@ -143,6 +154,7 @@ function Edit( {
 			{ addingLink && (
 				<InlineLinkUI
 					stopAddingLink={ onClose }
+					onFocusOutside={ onFocusOutside }
 					isActive={ isActive }
 					activeAttributes={ activeAttributes }
 					value={ value }
