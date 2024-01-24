@@ -46,7 +46,6 @@ test.describe( 'data-wp-on-document', () => {
 		// Add the element back.
 		await visibilityButton.click();
 		await expect( counter ).toHaveText( '1' );
-		await expect( counter ).toHaveText( '1' );
 
 		// Wait until the effects run again.
 		await expect( isEventAttached ).toHaveText( 'yes' );
