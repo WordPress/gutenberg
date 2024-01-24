@@ -133,10 +133,14 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: [
+		`${ DIMENSIONS_SUPPORT_KEY }.aspectRatio`,
+	], // Skip serialization of aspect ratio in save mode.
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
 };
 
 const skipSerializationPathsSaveChecks = {
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
 };
 
