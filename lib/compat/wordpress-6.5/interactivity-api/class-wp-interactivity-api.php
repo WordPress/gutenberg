@@ -335,9 +335,12 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * Parses and extracts the namespace and reference path from the given
 		 * directive attribute value.
 		 *
-		 * If the value doesn't contain an explicit namespace, it returns the default
-		 * one. If the value contains a JSON object instead of a reference path, the
-		 * function tries to parse it and return the resulting array.
+		 * If the value doesn't contain an explicit namespace, it returns the
+		 * default one. If the value contains a JSON object instead of a reference
+		 * path, the function tries to parse it and return the resulting array. If
+		 * the value contains strings that reprenset booleans ("true" and "false"),
+		 * numbers ("1" and "1.2") or "null", the function also transform them to
+		 * regular booleans, numbers and `null`.
 		 *
 		 * Example:
 		 *

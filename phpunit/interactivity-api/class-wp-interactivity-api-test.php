@@ -262,6 +262,33 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 
 		$result = $extract_directive_value->invoke( $this->interactivity, 'null', 'myPlugin' );
 		$this->assertEquals( array( 'myPlugin', null ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, '100', 'myPlugin' );
+		$this->assertEquals( array( 'myPlugin', 100 ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, '1.2', 'myPlugin' );
+		$this->assertEquals( array( 'myPlugin', 1.2 ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, '1.2.3', 'myPlugin' );
+		$this->assertEquals( array( 'myPlugin', '1.2.3' ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::true', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', true ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::false', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', false ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::null', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', null ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::100', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', 100 ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::1.2', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', 1.2 ), $result );
+
+		$result = $extract_directive_value->invoke( $this->interactivity, 'otherPlugin::1.2.3', 'myPlugin' );
+		$this->assertEquals( array( 'otherPlugin', '1.2.3' ), $result );
 	}
 
 	/**
@@ -276,6 +303,7 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 		$result = $extract_directive_value->invoke( $this->interactivity, '', 'myPlugin' );
 		$this->assertEquals( array( 'myPlugin', null ), $result );
 
+		// This is a boolean attribute.
 		$result = $extract_directive_value->invoke( $this->interactivity, true, 'myPlugin' );
 		$this->assertEquals( array( 'myPlugin', null ), $result );
 
