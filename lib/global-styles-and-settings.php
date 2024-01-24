@@ -182,11 +182,6 @@ function gutenberg_add_global_styles_for_blocks() {
 	foreach ( $block_nodes as $metadata ) {
 		$block_css = $tree->get_styles_for_block( $metadata );
 
-		if ( ! wp_should_load_separate_core_block_assets() ) {
-			wp_add_inline_style( 'global-styles', $block_css );
-			continue;
-		}
-
 		$stylesheet_handle = 'global-styles';
 		/*
 		 * When `wp_should_load_separate_core_block_assets()` is true, block styles are
