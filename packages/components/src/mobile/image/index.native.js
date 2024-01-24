@@ -323,8 +323,7 @@ const ImageComponent = ( {
 										uri:
 											networkURL && networkImageLoaded
 												? networkURL
-												: ( localURL && localURL ) ||
-												  url,
+												: localURL || url,
 									} }
 									{ ...( ! focalPoint && {
 										resizeMethod: 'scale',
