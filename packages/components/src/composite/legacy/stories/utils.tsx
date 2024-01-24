@@ -6,9 +6,9 @@ import type { StoryContext } from '@storybook/react';
 /**
  * Internal dependencies
  */
-import type { InitialStateProps } from '..';
+import type { LegacyStateOptions } from '..';
 
-export function UseCompositeStatePlaceholder( props: InitialStateProps ) {
+export function UseCompositeStatePlaceholder( props: LegacyStateOptions ) {
 	return (
 		<dl>
 			{ Object.entries( props ).map( ( [ name, value ] ) => (

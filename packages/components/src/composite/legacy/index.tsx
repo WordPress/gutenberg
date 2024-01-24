@@ -22,7 +22,7 @@ import { useInstanceId } from '@wordpress/compose';
 
 type Orientation = 'horizontal' | 'vertical';
 
-export interface InitialStateProps {
+export interface LegacyStateOptions {
 	/**
 	 * ID that will serve as a base for all the items IDs.
 	 */
@@ -77,7 +77,7 @@ type Component = React.FunctionComponent< any >;
 type CompositeStore = ReturnType< typeof Current.useCompositeStore >;
 type CompositeStoreState = { store: CompositeStore };
 export type CompositeState = CompositeStoreState &
-	Required< Pick< InitialStateProps, 'baseId' > >;
+	Required< Pick< LegacyStateOptions, 'baseId' > >;
 
 // Legacy composite components can either provide state through a
 // single `state` prop, or via individual props, usually through
@@ -173,7 +173,7 @@ export const CompositeItem = proxyComposite( Current.CompositeItem, {
 } );
 
 export function useCompositeState(
-	initialState: InitialStateProps = {}
+	legacyStateOptions: LegacyStateOptions = {}
 ): CompositeState {
 	showDeprecationMessage( 'UseCompositeState', 'useCompositeStore' );
 
@@ -187,7 +187,7 @@ export function useCompositeState(
 		shift: focusShift = false,
 		// eslint-disable-next-line camelcase
 		unstable_virtual: virtualFocus,
-	} = initialState;
+	} = legacyStateOptions;
 
 	return {
 		baseId: useInstanceId( Composite, 'composite', baseId ),
