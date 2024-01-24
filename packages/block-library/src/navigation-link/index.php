@@ -338,7 +338,10 @@ function block_core_navigation_link_register_variation( $variation ) {
 		return;
 	}
 
-	$navigation_block_type->variations[] = $variation;
+	$navigation_block_type->variations = array_merge(
+		$navigation_block_type->variations,
+		array( $variation )
+	);
 }
 
 /**
@@ -355,15 +358,16 @@ function block_core_navigation_link_unregister_variation( $name ) {
 	if ( ! $navigation_block_type || empty( $navigation_block_type->variations ) ) {
 		return;
 	}
+	$variations = $navigation_block_type->variations;
 	// Search for the variation and remove it from the array.
-	foreach ( $navigation_block_type->variations as $i => $variation ) {
+	foreach ( $variations as $i => $variation ) {
 		if ( $variation['name'] === $name ) {
-			unset( $navigation_block_type->variations[ $i ] );
+			unset( $variations[ $i ] );
 			break;
 		}
 	}
 	// Reindex array after removing one variation.
-	$navigation_block_type->variations = array_values( $navigation_block_type->variations );
+	$navigation_block_type->variations = array_values( $variations );
 }
 
 /**

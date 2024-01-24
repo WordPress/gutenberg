@@ -20,6 +20,7 @@ import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,
 	isPointContainedByRect,
+	isPointWithinTopAndBottomBoundariesOfRect,
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 
@@ -72,6 +73,8 @@ export function getDropTargetPosition(
 	let nearestIndex = 0;
 	let insertPosition = 'before';
 	let minDistance = Infinity;
+	let targetBlockIndex = null;
+	let nearestSide = 'right';
 
 	const {
 		dropZoneElement,
@@ -136,7 +139,12 @@ export function getDropTargetPosition(
 	}
 
 	blocksData.forEach(
-		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
+		( {
+			isUnmodifiedDefaultBlock,
+			getBoundingClientRect,
+			blockIndex,
+			blockOrientation,
+		} ) => {
 			const rect = getBoundingClientRect();
 
 			let [ distance, edge ] = getDistanceToNearestEdge(
@@ -144,12 +152,35 @@ export function getDropTargetPosition(
 				rect,
 				allowedEdges
 			);
+			// If the the point is close to a side, prioritize that side.
+			const [ sideDistance, sideEdge ] = getDistanceToNearestEdge(
+				position,
+				rect,
+				[ 'left', 'right' ]
+			);
+
+			const isPointInsideRect = isPointContainedByRect( position, rect );
+
 			// Prioritize the element if the point is inside of an unmodified default block.
-			if (
-				isUnmodifiedDefaultBlock &&
-				isPointContainedByRect( position, rect )
-			) {
+			if ( isUnmodifiedDefaultBlock && isPointInsideRect ) {
 				distance = 0;
+			} else if (
+				orientation === 'vertical' &&
+				blockOrientation !== 'horizontal' &&
+				( ( isPointInsideRect && sideDistance < THRESHOLD_DISTANCE ) ||
+					( ! isPointInsideRect &&
+						isPointWithinTopAndBottomBoundariesOfRect(
+							position,
+							rect
+						) ) )
+			) {
+				/**
+				 * This condition should only apply when the layout is vertical (otherwise there's
+				 * no need to create a Row) and dropzones should only activate when the block is
+				 * either within and close to the sides of the target block or on its outer sides.
+				 */
+				targetBlockIndex = blockIndex;
+				nearestSide = sideEdge;
 			}
 
 			if ( distance < minDistance ) {
@@ -175,6 +206,10 @@ export function getDropTargetPosition(
 	const isAdjacentBlockUnmodifiedDefaultBlock =
 		!! blocksData[ adjacentIndex ]?.isUnmodifiedDefaultBlock;
 
+	// If the target index is set then group with the block at that index.
+	if ( targetBlockIndex !== null ) {
+		return [ targetBlockIndex, 'group', nearestSide ];
+	}
 	// If both blocks are not unmodified default blocks then just insert between them.
 	if (
 		! isNearestBlockUnmodifiedDefaultBlock &&
@@ -284,6 +319,7 @@ export default function useBlockDropZone( {
 		dropTarget.index,
 		{
 			operation: dropTarget.operation,
+			nearestSide: dropTarget.nearestSide,
 		}
 	);
 	const throttled = useThrottle(
@@ -333,28 +369,32 @@ export default function useBlockDropZone( {
 								.getElementById( `block-${ clientId }` )
 								.getBoundingClientRect(),
 						blockIndex: getBlockIndex( clientId ),
+						blockOrientation:
+							getBlockListSettings( clientId )?.orientation,
 					};
 				} );
 
-				const [ targetIndex, operation ] = getDropTargetPosition(
-					blocksData,
-					{ x: event.clientX, y: event.clientY },
-					getBlockListSettings( targetRootClientId )?.orientation,
-					{
-						dropZoneElement,
-						parentBlockClientId,
-						parentBlockOrientation: parentBlockClientId
-							? getBlockListSettings( parentBlockClientId )
-									?.orientation
-							: undefined,
-						rootBlockIndex: getBlockIndex( targetRootClientId ),
-					}
-				);
+				const [ targetIndex, operation, nearestSide ] =
+					getDropTargetPosition(
+						blocksData,
+						{ x: event.clientX, y: event.clientY },
+						getBlockListSettings( targetRootClientId )?.orientation,
+						{
+							dropZoneElement,
+							parentBlockClientId,
+							parentBlockOrientation: parentBlockClientId
+								? getBlockListSettings( parentBlockClientId )
+										?.orientation
+								: undefined,
+							rootBlockIndex: getBlockIndex( targetRootClientId ),
+						}
+					);
 
 				registry.batch( () => {
 					setDropTarget( {
 						index: targetIndex,
 						operation,
+						nearestSide,
 					} );
 
 					const insertionPointClientId = [
@@ -366,6 +406,7 @@ export default function useBlockDropZone( {
 
 					showInsertionPoint( insertionPointClientId, targetIndex, {
 						operation,
+						nearestSide,
 					} );
 				} );
 			},

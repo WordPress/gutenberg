@@ -1599,13 +1599,19 @@ export function blocksMode( state = {}, action ) {
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index, __unstableWithInserter, operation } =
-				action;
+			const {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+				nearestSide,
+			} = action;
 			const nextState = {
 				rootClientId,
 				index,
 				__unstableWithInserter,
 				operation,
+				nearestSide,
 			};
 
 			// Bail out updates if the states are the same.
@@ -2027,6 +2033,14 @@ function blockBindingsSources( state = {}, action ) {
 				lockAttributesEditing: action.lockAttributesEditing,
 			},
 		};
+  }
+ 	return state;
+}
+
+function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
 	}
 
 	return state;
@@ -2063,6 +2077,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	blockBindingsSources,
+	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

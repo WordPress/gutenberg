@@ -30,17 +30,28 @@ test.describe( 'data-wp-on-document', () => {
 		page,
 	} ) => {
 		const counter = page.getByTestId( 'counter' );
+		const isEventAttached = page.getByTestId( 'isEventAttached' );
 		const visibilityButton = page.getByTestId( 'visibility' );
+
 		await expect( counter ).toHaveText( '0' );
+		await expect( isEventAttached ).toHaveText( 'yes' );
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '1' );
+
 		// Remove the element.
 		await visibilityButton.click();
 		// This keyboard press should not increase the counter.
 		await page.keyboard.press( 'ArrowDown' );
+
 		// Add the element back.
 		await visibilityButton.click();
 		await expect( counter ).toHaveText( '1' );
+		await expect( counter ).toHaveText( '1' );
+
+		// Wait until the effects run again.
+		await expect( isEventAttached ).toHaveText( 'yes' );
+
+		// Check that the event listener is attached again.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '2' );
 	} );

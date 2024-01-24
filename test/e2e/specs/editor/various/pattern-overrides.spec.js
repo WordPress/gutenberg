@@ -8,7 +8,7 @@ test.describe( 'Pattern Overrides', () => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
 			requestUtils.setGutenbergExperiments( [
-				'gutenberg-pattern-partial-syncing',
+				'gutenberg-block-bindings',
 			] ),
 			requestUtils.deleteAllBlocks(),
 		] );
@@ -215,5 +215,52 @@ test.describe( 'Pattern Overrides', () => {
 				'This one can’t',
 			] );
 		} );
+	} );
+
+	test( 'retains override values when converting a pattern block to regular blocks', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphId = 'paragraph-id';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":{"name":"pattern_attributes"}}}}} -->
+<p>Editable</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Make an edit to the pattern.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.focus();
+		await page.keyboard.type( 'edited ' );
+
+		// Convert back to regular blocks.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.showBlockToolbar();
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		// Check that the overrides remain.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'edited Editable',
+					metadata: undefined,
+				},
+			},
+		] );
 	} );
 } );

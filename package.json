@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.5.0",
+	"version": "17.5.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -178,7 +178,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.21.10",
-		"caniuse-lite": "1.0.30001538",
+		"caniuse-lite": "1.0.30001579",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"commander": "9.2.0",

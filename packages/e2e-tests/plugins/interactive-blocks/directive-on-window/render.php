@@ -8,10 +8,18 @@
 gutenberg_enqueue_module( 'directive-on-window-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-on-window" }' data-wp-context='{"isVisible":true}'>
-	<button data-wp-on--click="actions.visibilityHandler" data-testid="visibility">Switch visibility</button>
-	<div data-wp-show-mock="context.isVisible">
-		<div data-wp-on-window--resize="callbacks.resizeHandler">
+<div data-wp-interactive='{ "namespace": "directive-on-window" }'>
+	<button
+		data-wp-on--click="actions.visibilityHandler"
+		data-testid="visibility">
+		Switch visibility
+	</button>
+	<div data-wp-text="state.isEventAttached" data-testid="isEventAttached">no</div>
+	<div data-wp-show-mock="state.isVisible">
+		<div
+			data-wp-on-window--resize="callbacks.resizeHandler"
+			data-wp-init="callbacks.init"
+		>
 			<p data-wp-text="state.counter" data-testid="counter">0</p>
 		</div>
 	</div>
