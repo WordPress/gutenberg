@@ -73,6 +73,7 @@
 		"position": {
 			"sticky": true
 		},
+		"role": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

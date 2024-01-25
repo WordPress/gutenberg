@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add new block support for the `role` attribute. ([#47868](https://github.com/WordPress/gutenberg/pull/47868/))
+
 -   Add new properties `settings.typography.fluid` and `settings.typography.fontSizes[n].fluidSize` to theme.json to enable fluid typography ([#39529](https://github.com/WordPress/gutenberg/pull/39529)).
 
 
