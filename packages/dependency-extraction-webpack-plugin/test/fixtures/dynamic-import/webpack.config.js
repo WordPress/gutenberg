@@ -7,9 +7,7 @@ module.exports = {
 	plugins: [
 		new DependencyExtractionWebpackPlugin( {
 			requestToExternalModule( request ) {
-				if ( request.startsWith( '@wordpress/' ) ) {
-					return request;
-				}
+				return request.startsWith( '@wordpress/' );
 			},
 		} ),
 	],

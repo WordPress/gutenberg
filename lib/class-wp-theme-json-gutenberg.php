@@ -155,7 +155,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'              => array( 'typography', 'fontSizes' ),
-			'prevent_override'  => false,
+			'prevent_override'  => array( 'typography', 'defaultFontSizes' ),
 			'use_default_names' => true,
 			'value_func'        => 'gutenberg_get_typography_font_size_value',
 			'css_vars'          => '--wp--preset--font-size--$slug',
@@ -211,6 +211,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
+		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
 		'border-radius'                     => array( 'border', 'radius' ),
@@ -382,7 +383,8 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'                        => null,
 		'dimensions'                    => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'layout'                        => array(
 			'contentSize'                   => null,
@@ -412,19 +414,20 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'typography'                    => array(
-			'fluid'          => null,
-			'customFontSize' => null,
-			'dropCap'        => null,
-			'fontFamilies'   => null,
-			'fontSizes'      => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textColumns'    => null,
-			'textDecoration' => null,
-			'textTransform'  => null,
-			'writingMode'    => null,
+			'fluid'            => null,
+			'customFontSize'   => null,
+			'defaultFontSizes' => null,
+			'dropCap'          => null,
+			'fontFamilies'     => null,
+			'fontSizes'        => null,
+			'fontStyle'        => null,
+			'fontWeight'       => null,
+			'letterSpacing'    => null,
+			'lineHeight'       => null,
+			'textColumns'      => null,
+			'textDecoration'   => null,
+			'textTransform'    => null,
+			'writingMode'      => null,
 		),
 	);
 
@@ -486,7 +489,8 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'dimensions' => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'filter'     => array(
 			'duotone' => null,
@@ -661,6 +665,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'heading' ),
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
+		array( 'dimensions', 'aspectRatio' ),
 		array( 'dimensions', 'minHeight' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
@@ -1010,7 +1015,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				if ( $duotone_support ) {
 					$root_selector    = wp_get_block_css_selector( $block_type );
-					$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+					$duotone_selector = static::scope_selector( $root_selector, $duotone_support );
 				}
 			}
 
@@ -1022,8 +1027,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
-					// The style variation classname is duplicated in the selector to ensure that it overrides core block styles.
-					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'] . '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
@@ -1186,7 +1190,7 @@ class WP_Theme_JSON_Gutenberg {
 				$setting_nodes[ $root_settings_key ]['selector'] = $options['root_selector'];
 			}
 			if ( false !== $root_style_key ) {
-				$setting_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
+				$style_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
 			}
 		}
 
@@ -2092,6 +2096,15 @@ class WP_Theme_JSON_Gutenberg {
 				 * and therefore the original $value will be returned.
 				 */
 				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+			}
+
+			if ( 'aspect-ratio' === $css_property ) {
+				// For aspect ratio to work, other dimensions rules must be unset.
+				// This ensures that a fixed height does not override the aspect ratio.
+				$declarations[] = array(
+					'name'  => 'min-height',
+					'value' => 'unset',
+				);
 			}
 
 			$declarations[] = array(

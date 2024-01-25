@@ -24,7 +24,6 @@ export function initializeEditor( id, postType, postId ) {
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
 		fullscreenMode: true,
-		hiddenBlockTypes: [],
 		inactivePanels: [],
 		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
@@ -32,6 +31,7 @@ export function initializeEditor( id, postType, postId ) {
 		welcomeGuide: true,
 	} );
 	dispatch( preferencesStore ).setDefaults( 'core', {
+		hiddenBlockTypes: [],
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 	} );
