@@ -36,7 +36,7 @@
 		padding: 16px 32px;
 		position: absolute;
 		bottom: 32px;
-		width: 100%;
+		width: calc(100% - var(--modal-scrollbar-width));
 		background-color: #fff;
 	}
 

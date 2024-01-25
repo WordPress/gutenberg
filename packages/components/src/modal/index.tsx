@@ -195,6 +195,68 @@ function UnforwardedModal(
 		};
 	}, [ isContentScrollable, childrenContainerRef ] );
 
+	useLayoutEffect( () => {
+		// Function to calculate the scrollbar width of the modal content.
+		// This calculates the difference between the offsetWidth (full width including scrollbar)
+		// and the clientWidth (width excluding scrollbar).
+		const updateScrollbarWidth = () => {
+			const scrollbarWidth = contentRef.current
+				? contentRef.current.offsetWidth -
+				  contentRef.current.clientWidth
+				: 0;
+
+			// Select or create a style tag to hold the custom CSS variable.
+			let styleTag = document.getElementById(
+				'modal-scrollbar-width-style'
+			) as HTMLStyleElement;
+			if ( ! styleTag ) {
+				// If the style tag doesn't exist, create it and append to the document head.
+				styleTag = document.createElement( 'style' );
+				styleTag.id = 'modal-scrollbar-width-style';
+				document.head.appendChild( styleTag );
+			}
+
+			// Set the CSS variable --modal-scrollbar-width on the :root selector.
+			// This variable holds the calculated width of the scrollbar.
+			styleTag.textContent = `
+				:root {
+					--modal-scrollbar-width: ${ scrollbarWidth }px;
+				}
+			`;
+		};
+
+		// Create a ResizeObserver to monitor changes in the size of the modal content.
+		// This is necessary to recalculate the scrollbar width when the modal's size changes.
+		const resizeObserver = new ResizeObserver( () => {
+			updateScrollbarWidth();
+		} );
+
+		const currentContentRef = contentRef.current;
+
+		// Start observing the modal content's size.
+		if ( currentContentRef ) {
+			resizeObserver.observe( currentContentRef );
+		}
+
+		// Perform an initial update of the scrollbar width.
+		updateScrollbarWidth();
+
+		// Define a cleanup function to be executed when the component unmounts.
+		// This removes the ResizeObserver and the dynamically created style tag
+		// to prevent memory leaks and remove unused styles from the document.
+		return () => {
+			if ( currentContentRef ) {
+				resizeObserver.unobserve( currentContentRef );
+			}
+			const styleTag = document.getElementById(
+				'modal-scrollbar-width-style'
+			) as HTMLStyleElement;
+			if ( styleTag ) {
+				document.head.removeChild( styleTag );
+			}
+		};
+	}, [] ); // Empty dependency array to ensure this effect runs only once on mount.
+
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
 			// Ignore keydowns from IMEs
