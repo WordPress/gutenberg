@@ -64,7 +64,6 @@ const UI = {
 	borderFocus: THEME.accent,
 	borderDisabled: THEME.gray[ 400 ],
 	textDisabled: THEME.gray[ 600 ],
-	textDark: white, // TODO: Make this Theme-ready
 
 	// Matches @wordpress/base-styles
 	darkGrayPlaceholder: rgba( GRAY[ 900 ], 0.62 ), // TODO: Make this work with CSS vars
