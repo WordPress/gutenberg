@@ -156,7 +156,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	}
 
 	/*
-	* Prepare a single collection output for response
+	* Prepare a single collection output for response.
 	*
 	* @since 6.5.0
 	*
