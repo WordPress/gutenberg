@@ -32,6 +32,7 @@ function ButtonTrigger( { action, onClick } ) {
 			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
+			data-action-type={ action.id }
 		/>
 	);
 }
@@ -56,7 +57,10 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	const { RenderModal, hideModalHeader } = action;
 	return (
 		<>
-			<ActionTrigger { ...actionTriggerProps } />
+			<ActionTrigger
+				{ ...actionTriggerProps }
+				data-action-type={ action.id }
+			/>
 			{ isModalOpen && (
 				<Modal
 					title={ action.modalHeader || action.label }
@@ -97,6 +101,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 						key={ action.id }
 						action={ action }
 						onClick={ () => action.callback( [ item ] ) }
+						data-action-type={ action.id }
 					/>
 				);
 			} ) }
@@ -150,6 +155,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 								action={ action }
 								item={ item }
 								ActionTrigger={ ButtonTrigger }
+								data-action-type={ action.id }
 							/>
 						);
 					}
@@ -158,6 +164,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 							key={ action.id }
 							action={ action }
 							onClick={ () => action.callback( [ item ] ) }
+							data-action-type={ action.id }
 						/>
 					);
 				} ) }
@@ -168,6 +175,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
 						disabled={ ! secondaryActions.length }
+						data-action-type="menu"
 					/>
 				}
 				placement="bottom-end"
@@ -192,6 +200,7 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					disabled={
 						! primaryActions.length && ! secondaryActions.length
 					}
+					data-action-type="menu"
 				/>
 			}
 			placement="bottom-end"
