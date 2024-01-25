@@ -640,18 +640,22 @@ test.describe( 'Links', () => {
 			name: 'core/paragraph',
 		} );
 		await page.keyboard.type( 'This is WordPress' );
+
 		// Select "WordPress".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'w.org' );
 
-		await page.keyboard.press( 'Enter' );
 		// Close the link control to return the caret to the canvas
 		const linkPopover = LinkUtils.getLinkPopover();
+
+		await page.keyboard.type( 'w.org' );
+
+		// Submit the link
+		await page.keyboard.press( 'Enter' );
+
+		// Close the Link Popover.
 		await pageUtils.pressKeys( 'Escape' );
-		// Deselect the link text by moving the caret to the end of the line
-		// and the link popover should not be displayed.
-		await pageUtils.pressKeys( 'End' );
+
 		await expect( linkPopover ).toBeHidden();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -663,43 +667,28 @@ test.describe( 'Links', () => {
 			},
 		] );
 
-		// Move caret back into the link.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Edit link.
+		// Edit the link again.
 		await pageUtils.pressKeys( 'primary+k' );
-		await pageUtils.pressKeys( 'Tab' );
-		await pageUtils.pressKeys( 'Enter' );
 
-		// getByPlaceholder required in order to handle Link Control component
+		// Expect Link UI to be visible again
+		await expect( linkPopover ).toBeVisible();
+
+		// Click on the `Edit` button.
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Change the URL.
+		// Note: getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await linkPopover.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
-		// Update the link.
+		// Save the link.
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
-		// Navigate back to the link editing state inputs to verify appears as changed.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-		// Navigate back to the popover.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
+		// Link UI should be closed.
+		await expect( linkPopover ).toBeHidden();
 
-		// Navigate back to inputs to verify appears as changed.
-		await pageUtils.pressKeys( 'primary+k' );
-		await pageUtils.pressKeys( 'Tab' );
-		await pageUtils.pressKeys( 'Enter' );
-
-		expect(
-			await page
-				.getByRole( 'combobox', {
-					name: 'Link',
-				} )
-				.inputValue()
-		).toContain( 'wordpress.org' );
-
+		// The link should have been updated.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
