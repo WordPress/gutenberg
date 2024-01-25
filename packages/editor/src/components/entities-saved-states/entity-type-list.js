@@ -5,11 +5,18 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import EntityRecordItem from './entity-record-item';
+import { unlock } from '../../lock-unlock';
+
+const { getGlobalStylesChanges, GlobalStylesContext } = unlock(
+	blockEditorPrivateApis
+);
 
 function getEntityDescription( entity, count ) {
 	switch ( entity ) {
@@ -27,6 +34,44 @@ function getEntityDescription( entity, count ) {
 	}
 }
 
+function GlobalStylesDescription( { record } ) {
+	const { user: currentEditorGlobalStyles } =
+		useContext( GlobalStylesContext );
+	const savedRecord = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
+				record.kind,
+				record.name,
+				record.key
+			),
+		[ record.kind, record.name, record.key ]
+	);
+
+	const globalStylesChanges = getGlobalStylesChanges(
+		currentEditorGlobalStyles,
+		savedRecord,
+		{
+			maxResults: 10,
+		}
+	);
+	return globalStylesChanges.length ? (
+		<>
+			<h3 className="entities-saved-states__description-heading">
+				{ __( 'Changes made to:' ) }
+			</h3>
+			<PanelRow>{ globalStylesChanges.join( ', ' ) }</PanelRow>
+		</>
+	) : null;
+}
+
+function EntityDescription( { record, count } ) {
+	if ( 'globalStyles' === record?.name ) {
+		return <GlobalStylesDescription record={ record } />;
+	}
+	const description = getEntityDescription( record?.name, count );
+	return description ? <PanelRow>{ description }</PanelRow> : null;
+}
+
 export default function EntityTypeList( {
 	list,
 	unselectedEntities,
@@ -42,19 +87,16 @@ export default function EntityTypeList( {
 			),
 		[ firstRecord.kind, firstRecord.name ]
 	);
-	const { name } = firstRecord;
 
 	let entityLabel = entityConfig.label;
-	if ( name === 'wp_template_part' ) {
+	if ( firstRecord?.name === 'wp_template_part' ) {
 		entityLabel =
 			1 === count ? __( 'Template Part' ) : __( 'Template Parts' );
 	}
-	// Set description based on type of entity.
-	const description = getEntityDescription( name, count );
 
 	return (
 		<PanelBody title={ entityLabel } initialOpen={ true }>
-			{ description && <PanelRow>{ description }</PanelRow> }
+			<EntityDescription record={ firstRecord } count={ count } />
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem

@@ -10,7 +10,9 @@ module.exports = {
 				return `chunk--${ chunkData.chunk.name }--[name].asset.php`;
 			},
 			requestToExternalModule( request ) {
-				return request.startsWith( '@wordpress/' );
+				return (
+					request.startsWith( '@wordpress/' ) || request === 'lodash'
+				);
 			},
 		} ),
 	],

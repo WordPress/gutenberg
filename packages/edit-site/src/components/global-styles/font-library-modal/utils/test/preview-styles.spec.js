@@ -123,13 +123,13 @@ describe( 'getFamilyPreviewStyle', () => {
 describe( 'formatFontFamily', () => {
 	it( 'should transform "Baloo 2, system-ui" correctly', () => {
 		expect( formatFontFamily( 'Baloo 2, system-ui' ) ).toBe(
-			"'Baloo 2', system-ui"
+			'"Baloo 2", system-ui'
 		);
 	} );
 
 	it( 'should ignore extra spaces', () => {
 		expect( formatFontFamily( '  Baloo 2   , system-ui' ) ).toBe(
-			"'Baloo 2', system-ui"
+			'"Baloo 2", system-ui'
 		);
 	} );
 
@@ -144,18 +144,18 @@ describe( 'formatFontFamily', () => {
 	} );
 
 	it( 'should wrap single font name with spaces in quotes', () => {
-		expect( formatFontFamily( 'Baloo 2' ) ).toBe( "'Baloo 2'" );
+		expect( formatFontFamily( 'Baloo 2' ) ).toBe( '"Baloo 2"' );
 	} );
 
 	it( 'should wrap multiple font names with spaces in quotes', () => {
 		expect( formatFontFamily( 'Baloo Bhai 2, Baloo 2' ) ).toBe(
-			"'Baloo Bhai 2', 'Baloo 2'"
+			'"Baloo Bhai 2", "Baloo 2"'
 		);
 	} );
 
 	it( 'should wrap only those font names with spaces which are not already quoted', () => {
 		expect( formatFontFamily( 'Baloo Bhai 2, Arial' ) ).toBe(
-			"'Baloo Bhai 2', Arial"
+			'"Baloo Bhai 2", Arial'
 		);
 	} );
 } );

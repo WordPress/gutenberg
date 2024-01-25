@@ -117,6 +117,22 @@ describe.each( [
 			expect( container ).toMatchSnapshot();
 		} );
 	} );
+	it( 'should render with the correct option initially selected when `value` is defined', () => {
+		render(
+			<Component value="jack" label="Test Toggle Group Control">
+				{ options }
+			</Component>
+		);
+		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+	} );
+	it( 'should render without a selected option when `value` is `undefined`', () => {
+		render(
+			<Component label="Test Toggle Group Control">{ options }</Component>
+		);
+		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'J' } ) ).not.toBeChecked();
+	} );
 	it( 'should call onChange with proper value', async () => {
 		const mockOnChange = jest.fn();
 
@@ -193,7 +209,7 @@ describe.each( [
 	} );
 
 	if ( mode === 'controlled' ) {
-		it( 'should reset values correctly', async () => {
+		it( 'should reset values correctly when default value is undefined', async () => {
 			render(
 				<Component label="Test Toggle Group Control">
 					{ options }
@@ -208,10 +224,28 @@ describe.each( [
 			expect( jackOption ).not.toBeChecked();
 			expect( rigasOption ).toBeChecked();
 
-			await press.ArrowRight();
+			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( rigasOption ).not.toBeChecked();
-			expect( jackOption ).toBeChecked();
+			expect( jackOption ).not.toBeChecked();
+		} );
+
+		it( 'should reset values correctly when default value is defined', async () => {
+			render(
+				<Component label="Test Toggle Group Control" value="rigas">
+					{ options }
+				</Component>
+			);
+
+			const rigasOption = screen.getByRole( 'radio', {
+				name: 'R',
+			} );
+			const jackOption = screen.getByRole( 'radio', {
+				name: 'J',
+			} );
+
+			expect( rigasOption ).toBeChecked();
+			expect( jackOption ).not.toBeChecked();
 
 			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
@@ -219,45 +253,48 @@ describe.each( [
 			expect( jackOption ).not.toBeChecked();
 		} );
 
-		it( 'should update correctly when triggered by external updates', async () => {
-			render(
-				<Component
-					value="rigas"
-					label="Test Toggle Group Control"
-					extraButtonOptions={ [
-						{ name: 'Rigas', value: 'rigas' },
-						{ name: 'Jack', value: 'jack' },
-					] }
-				>
-					{ options }
-				</Component>
-			);
+		describe.each( [
+			[ 'undefined', undefined ],
+			[ 'defined', 'rigas' ],
+		] )(
+			'should update correctly when triggered by external updates',
+			( defaultValueType, defaultValue ) => {
+				it( `when default value is ${ defaultValueType }`, async () => {
+					render(
+						<Component
+							value={ defaultValue }
+							label="Test Toggle Group Control"
+							extraButtonOptions={ [
+								{ name: 'Rigas', value: 'rigas' },
+								{ name: 'Jack', value: 'jack' },
+							] }
+						>
+							{ options }
+						</Component>
+					);
 
-			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'J' } )
-			).not.toBeChecked();
+					await click(
+						screen.getByRole( 'button', { name: 'Jack' } )
+					);
+					expect(
+						screen.getByRole( 'radio', { name: 'J' } )
+					).toBeChecked();
+					expect(
+						screen.getByRole( 'radio', { name: 'R' } )
+					).not.toBeChecked();
 
-			await click( screen.getByRole( 'button', { name: 'Jack' } ) );
-			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'R' } )
-			).not.toBeChecked();
-
-			await click( screen.getByRole( 'button', { name: 'Rigas' } ) );
-			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'J' } )
-			).not.toBeChecked();
-
-			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
-			expect(
-				screen.getByRole( 'radio', { name: 'R' } )
-			).not.toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'J' } )
-			).not.toBeChecked();
-		} );
+					await click(
+						screen.getByRole( 'button', { name: 'Rigas' } )
+					);
+					expect(
+						screen.getByRole( 'radio', { name: 'R' } )
+					).toBeChecked();
+					expect(
+						screen.getByRole( 'radio', { name: 'J' } )
+					).not.toBeChecked();
+				} );
+			}
+		);
 	}
 
 	describe( 'isDeselectable', () => {
