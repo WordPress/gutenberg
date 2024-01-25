@@ -69,7 +69,7 @@
 
 ## 7.19.0 (2023-06-07)
 
-### Enhancement
+### Enhancements
 
 -   Enable the `bugfixes` option in `@babel/preset-env` to remove unneeded transpilation ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).
 
@@ -83,7 +83,7 @@
 
 ## 7.14.0 (2023-03-29)
 
-### Enhancement
+### Enhancements
 
 -   Exclude IE-only `setImmediate`/`clearImmediate` from list of polyfills.
 

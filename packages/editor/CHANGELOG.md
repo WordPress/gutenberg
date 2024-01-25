@@ -143,7 +143,7 @@
 
 ## 12.2.0 (2022-02-10)
 
-### Enhancement
+### Enhancements
 
 -   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.
 
@@ -191,7 +191,7 @@
 
 ## 9.21.0 (2020-09-03)
 
-### Enhancement
+### Enhancements
 
 -   The `UnsavedChangesWarning` component is now using `__experimentalGetDirtyEntityRecords` to determine if there were changes.
 

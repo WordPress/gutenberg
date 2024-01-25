@@ -113,7 +113,7 @@
 
 ## 1.2.0 (2022-04-21)
 
-### Enhancement
+### Enhancements
 
 -   Add additional configuration for CSS styles to better align with [CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/) ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
 

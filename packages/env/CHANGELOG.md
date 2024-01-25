@@ -50,7 +50,7 @@
 
 ## 8.11.0 (2023-11-02)
 
-### Enhancement
+### Enhancements
 
 -   `wp-env` now works offline after the environment has been created. Note that many `wp-env` configuration changes involve internet connectivity and may not work in offline mode. [#53547](https://github.com/WordPress/gutenberg/pull/53547)
 
@@ -105,7 +105,7 @@
 -   Add a series of `WP_ENV_LIFECYCLE_SCRIPT_` environment variables for the various lifecycle scripts.
 -   Rework `run` command to resolve bugs with non-quoted commands. As a consequence it is no longer possible to pass your entire command to `wp-env` wrapped in double-quotes. While `npx wp-env run cli wp help` will still work, `npx wp-env run cli "wp help"` will not. If you are currently escaping any quotes you will need to review those commands and ensure they are compatible with this update.
 
-### Enhancement
+### Enhancements
 
 -   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
 -   Validate whether or not config options exist to prevent accidentally including ones that don't.
@@ -134,7 +134,7 @@
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
 -   Fix Xdebug while using PHP 7.2x.
 
-### Enhancement
+### Enhancements
 
 -   `wp-env run ...` now uses docker-compose exec instead of docker-compose run. As a result, it is much faster, since commands are executed against existing services, rather than creating them from scratch each time.
 -   Increase the maximum upload size to 1GB.
@@ -163,7 +163,7 @@
 
 -   PHP 7.3 and 7.4 must use PHPUnit 9.
 
-### Enhancement
+### Enhancements
 
 -   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2.
 
@@ -185,7 +185,7 @@
 
 ## 5.2.0 (2022-08-16)
 
-### Enhancement
+### Enhancements
 
 -   Query parameters can now be used in .zip source URLs.
 
@@ -197,7 +197,7 @@
 
 ## 5.1.0 (2022-08-10)
 
-### Enhancement
+### Enhancements
 
 -   Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
 
@@ -212,7 +212,7 @@
 -   Removed the `WP_PHPUNIT__TESTS_CONFIG` environment variable from the `phpunit` container. **This removes automatic support for the `wp-phpunit/wp-phpunit` Composer package. To continue using the package, set the following two environment variables in your `phpunit.xml` file or similar: `WP_TESTS_DIR=""` and `WP_PHPUNIT__TESTS_CONFIG="/wordpress-phpunit/wp-tests-config.php"`.**
 -   Removed the generated `/var/www/html/phpunit-wp-config.php` file from the environment.
 
-### Enhancement
+### Enhancements
 
 -   Read WordPress' version and include the corresponding PHPUnit test files in the environment.
 -   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
@@ -223,20 +223,20 @@
 
 ## 4.8.0 (2022-06-01)
 
-### Enhancement
+### Enhancements
 
 -   Removed the need for quotation marks when passing options to `wp-env run`.
 -   Setting a `config` key to `null` will prevent adding the constant to `wp-config.php` even if a default value is defined by `wp-env`.
 
 ## 4.7.0 (2022-05-18)
 
-### Enhancement
+### Enhancements
 
 -   Added SSH protocol support for git sources
 
 ## 4.2.0 (2022-01-27)
 
-### Enhancement
+### Enhancements
 
 -   Added command `wp-env install-path` to list the directory used for the environment.
 -   The help entry is now shown when no subcommand is passed to `wp-env`.
@@ -276,7 +276,7 @@
 
 -   `wp-env start` is now the only command which writes to the docker configuration files. Previously, running any command would also parse the config and then write it to the correct location. Now, other commands still parse the config, but they will not overwrite the confugiration which was set by wp-env start. This allows parameters to be passed to wp-env start which can affect the configuration.
 
-### Enhancement
+### Enhancements
 
 -   Update nodegit dependency to 0.27.0, the earlier version does not have pre-built binaries for Node 14.15.0 LTS. Upgrading provides support without requiring building nodegit locally.
 -   Allow WP_HOME wp-config value to be set to a custom port other than the default for the docker instance.

@@ -131,7 +131,7 @@
 
 ## 7.6.0 (2022-05-18)
 
-### Enhancement
+### Enhancements
 
 -   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
 
@@ -147,7 +147,7 @@
 
 -   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
 
-### Enhancement
+### Enhancements
 
 -   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
 
@@ -223,7 +223,7 @@
 
 ## 2.27.0 (2020-12-17)
 
-### Enhancement
+### Enhancements
 
 -   File Block: Copy url button is moved to Block toolbar.
 -   Code and Preformatted Blocks: delete on backspace from an empty block.
@@ -235,13 +235,13 @@
     ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
 -   Fix Image Block, reset image dimensions when replace URL. bug mentioned in ([#26333](https://github.com/WordPress/gutenberg/issues/26333)).
 
-### Enhancement
+### Enhancements
 
 -   File Block: Copy url button is moved to Block toolbar.
 
 ## 2.23.0 (2020-09-03)
 
-### Enhancement
+### Enhancements
 
 -   Site title is now a link.
 

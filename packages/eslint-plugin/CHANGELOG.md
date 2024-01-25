@@ -81,7 +81,7 @@
     -   Drops `jsdoc/tag-lines` rule's `noEndLines: true` in favor of `applyToEndTag: false`.
     -   Disables the newly introduced `jsdoc/no-defaults` rule.
 
-### Enhancement
+### Enhancements
 
 -   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
 
@@ -99,7 +99,7 @@
 
 ## 14.6.0 (2023-05-10)
 
-### Enhancement
+### Enhancements
 
 -   Validate dependencies in `useSelect` and `useSuspenseSelect` hooks. ([#49900](https://github.com/WordPress/gutenberg/pull/49900)).
 
@@ -123,7 +123,7 @@
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
 
-### Enhancement
+### Enhancements
 
 -   Bump `eslint-plugin-jest` version to 27.2.1.
 
@@ -199,7 +199,7 @@
 -   The bundled `globals` dependency has been updated from requiring `^12.0.0` to requiring `^13.12.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The `gutenberg-phase` rule has been deprecated and replaced by the `is-gutenberg-plugin` rule. ([#38202](https://github.com/WordPress/gutenberg/pull/38202))
 
-### Enhancement
+### Enhancements
 
 -   Omit verification for WordPress dependencies in the import statements since they get externalized when used with WordPress ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
 
@@ -216,7 +216,7 @@
 
 ## 9.2.0 (2021-10-12)
 
-### Enhancement
+### Enhancements
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).
 
@@ -238,7 +238,7 @@
 
 ## 9.1.0 (2021-07-21)
 
-### Enhancement
+### Enhancements
 
 -   Adds JSDoc alignment check ([#25300](https://github.com/WordPress/gutenberg/pull/25300)).
 

@@ -126,7 +126,7 @@
 
 ## 3.1.0 (2021-05-20)
 
-### Enhancement
+### Enhancements
 
 -   Adjusted count logic to recognize also numbers as words ([#27288](https://github.com/WordPress/gutenberg/pull/27288)).
 

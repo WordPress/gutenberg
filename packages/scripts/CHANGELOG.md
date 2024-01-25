@@ -103,7 +103,7 @@
 
 ## 26.11.0 (2023-08-16)
 
-### Enhancement
+### Enhancements
 
 -   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636).
 -   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
@@ -284,7 +284,7 @@
 
 ## 22.2.0 (2022-03-11)
 
-### Enhancement
+### Enhancements
 
 -   The bundled `@wordpress/eslint-plugin` package got updated to the new major version, but the breaking changes included don't affect this package ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
 

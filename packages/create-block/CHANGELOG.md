@@ -66,13 +66,13 @@
 
 ## 4.23.0 (2023-08-10)
 
-### Enhancement
+### Enhancements
 
 -   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
 
 ## 4.22.0 (2023-07-20)
 
-### Enhancement
+### Enhancements
 
 -   Add support for the `viewScript` property ([#52612](https://github.com/WordPress/gutenberg/pull/52612)).
 
@@ -110,7 +110,7 @@
 
 ## 4.5.0 (2022-11-02)
 
-### Enhancement
+### Enhancements
 
 -   Update templates to use the `render` field in `block.json` introduced in WordPress 6.1 ([#44185](https://github.com/WordPress/gutenberg/pull/44185)).
 
@@ -137,13 +137,13 @@
 
 ## 3.6.0 (2022-07-13)
 
-### Enhancement
+### Enhancements
 
 -   Added prompt to continue when minimum system requirements not met ([#42151](https://github.com/WordPress/gutenberg/pull/42151)).
 
 ## 3.3.0 (2022-06-01)
 
-### Enhancement
+### Enhancements
 
 -   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
 
@@ -198,7 +198,7 @@
 -   Add support for handling block templates with the `blockTemplatesPath` field in the external template configuration ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Add a new field `folderName` for setting the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 
-### Enhancement
+### Enhancements
 
 -   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
 -   Update link to block registration reference ([#37674](https://github.com/WordPress/gutenberg/pull/37674))
@@ -228,21 +228,21 @@
 
 ## 2.4.0 (2021-07-21)
 
-### Enhancement
+### Enhancements
 
 -   Plugin scaffolded with the `esnext` template requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).
 -   Block scaffolded with the `esnext` template is now registered from `block.json` with the `register_block_type` helper ([#33252](https://github.com/WordPress/gutenberg/pull/33252)).
 
 ## 2.3.0 (2021-04-29)
 
-### Enhancement
+### Enhancements
 
 -   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
 -   Updated `.editorconfig` template files to work with automatic file formatting ([#30794](https://github.com/WordPress/gutenberg/pull/30794)).
 
 ## 2.2.0 (2021-04-06)
 
-### Enhancement
+### Enhancements
 
 -   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
 
@@ -256,7 +256,7 @@
 
 -   Add a way to provide a default value in the template for `attributes` and `supports` Block API fields ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
 
-### Enhancement
+### Enhancements
 
 -   Block scaffolded with `esnext` template is now registered from `block.json` with the `register_block_type_from_metadata` helper ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
 
