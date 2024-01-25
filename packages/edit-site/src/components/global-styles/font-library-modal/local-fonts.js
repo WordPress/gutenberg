@@ -27,8 +27,9 @@ import { unlock } from '../../../lock-unlock';
 
 const { ProgressBar } = unlock( componentsPrivateApis );
 
-function LocalFonts() {
-	const { installFont } = useContext( FontLibraryContext );
+function LocalFonts( { onUpload } ) {
+	const { installFont, handleSetLibraryFontSelected } =
+		useContext( FontLibraryContext );
 	const [ notice, setNotice ] = useState( null );
 	const [ isUploading, setIsUploading ] = useState( false );
 	const supportedFormats =
@@ -170,6 +171,10 @@ function LocalFonts() {
 				type: 'success',
 				message: __( 'Fonts were installed successfully.' ),
 			} );
+			handleSetLibraryFontSelected( fontFamilies[ 0 ] );
+			if ( onUpload ) {
+				onUpload();
+			}
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',

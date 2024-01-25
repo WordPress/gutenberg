@@ -6,7 +6,7 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import { useState, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,6 +44,7 @@ function FontLibraryModal( {
 	initialTabId = 'installed-fonts',
 } ) {
 	const { collections } = useContext( FontLibraryContext );
+	const [ selectedTab, setSelectedTab ] = useState( initialTabId );
 
 	const tabs = [
 		...DEFAULT_TABS,
@@ -58,7 +59,7 @@ function FontLibraryModal( {
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs initialTabId={ initialTabId }>
+				<Tabs selectedTabId={ selectedTab } onSelect={ setSelectedTab }>
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>
@@ -70,7 +71,13 @@ function FontLibraryModal( {
 						let contents;
 						switch ( id ) {
 							case 'upload-fonts':
-								contents = <UploadFonts />;
+								contents = (
+									<UploadFonts
+										onUpload={ () =>
+											setSelectedTab( 'installed-fonts' )
+										}
+									/>
+								);
 								break;
 							case 'installed-fonts':
 								contents = <InstalledFonts />;
