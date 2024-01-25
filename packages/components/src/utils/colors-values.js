@@ -1,8 +1,6 @@
 /**
  * Internal dependencies
  */
-import { rgba } from './colors';
-
 const white = '#fff';
 
 // Matches the grays in @wordpress/base-styles
@@ -66,8 +64,8 @@ const UI = {
 	textDisabled: THEME.gray[ 600 ],
 
 	// Matches @wordpress/base-styles
-	darkGrayPlaceholder: rgba( GRAY[ 900 ], 0.62 ), // TODO: Make this work with CSS vars
-	lightGrayPlaceholder: rgba( white, 0.65 ), // TODO: Make this work with CSS vars
+	darkGrayPlaceholder: `color-mix(in srgb, ${ THEME.foreground }, transparent 38%)`,
+	lightGrayPlaceholder: `color-mix(in srgb, ${ THEME.background }, transparent 35%)`,
 };
 
 export const COLORS = Object.freeze( {
