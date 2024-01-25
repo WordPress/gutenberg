@@ -442,6 +442,7 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
     dimensions: {
+        aspectRatio: true // Enable aspect ratio control.
         minHeight: true // Enable min height control.
     }
 }
@@ -449,12 +450,13 @@ supports: {
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+- `style`: attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
     style: {
         dimensions: {
+            aspectRatio: "16/9",
             minHeight: "50vh"
         }
     }

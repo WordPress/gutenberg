@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
+import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -47,31 +47,11 @@ class Editor extends Component {
 		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
-	getEditorSettings( settings, hiddenBlockTypes, blockTypes ) {
+	getEditorSettings( settings ) {
 		settings = {
 			...settings,
 			isRTL: I18nManager.isRTL,
 		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( hiddenBlockTypes.length > 0 ) {
-			if ( settings.allowedBlockTypes === undefined ) {
-				// If no specific flags for allowedBlockTypes are set, assume `true`
-				// meaning allow all block types.
-				settings.allowedBlockTypes = true;
-			}
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? blockTypes.map( ( { name } ) => name )
-					: settings.allowedBlockTypes || [];
-
-			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(
-				( type ) => ! hiddenBlockTypes.includes( type )
-			);
-		}
 
 		return settings;
 	}
@@ -127,8 +107,6 @@ class Editor extends Component {
 		const {
 			settings,
 			initialEdits,
-			hiddenBlockTypes,
-			blockTypes,
 			post,
 			postId,
 			postType,
@@ -137,11 +115,7 @@ class Editor extends Component {
 			...props
 		} = this.props;
 
-		const editorSettings = this.getEditorSettings(
-			settings,
-			hiddenBlockTypes,
-			blockTypes
-		);
+		const editorSettings = this.getEditorSettings( settings );
 
 		const normalizedPost = post || {
 			id: postId,
@@ -180,13 +154,10 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditorMode, getHiddenBlockTypes } = select( editPostStore );
-		const { getBlockTypes } = select( blocksStore );
+		const { getEditorMode } = select( editPostStore );
 
 		return {
 			mode: getEditorMode(),
-			hiddenBlockTypes: getHiddenBlockTypes(),
-			blockTypes: getBlockTypes(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -16,6 +16,7 @@ import './generated-class-name';
 import style from './style';
 import './settings';
 import color from './color';
+import dimensions from './dimensions';
 import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
@@ -25,10 +26,10 @@ import layout from './layout';
 import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
 import './metadata';
-import customFields from './custom-fields';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
 import './role';
+import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
@@ -40,7 +41,6 @@ createBlockEditFilter(
 		position,
 		layout,
 		contentLockUI,
-		window.__experimentalConnections ? customFields : null,
 		blockHooks,
 		blockRenaming,
 	].filter( Boolean )
@@ -49,6 +49,7 @@ createBlockListBlockFilter( [
 	align,
 	style,
 	color,
+	dimensions,
 	duotone,
 	fontFamily,
 	fontSize,
@@ -71,6 +72,7 @@ createBlockSaveFilter( [
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
+export { getShadowClassesAndStyles, useShadowProps } from './use-shadow-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';

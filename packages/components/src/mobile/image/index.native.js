@@ -9,7 +9,7 @@ import FastImage from 'react-native-fast-image';
  */
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
-import { image as icon } from '@wordpress/icons';
+import { image, offline } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState, Platform } from '@wordpress/element';
 
@@ -22,12 +22,11 @@ import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
 
 const ICON_TYPE = {
+	OFFLINE: 'offline',
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
-
-export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 const ImageComponent = ( {
 	align,
@@ -39,6 +38,7 @@ const ImageComponent = ( {
 	isSelected,
 	shouldUseFastImage,
 	isUploadFailed,
+	isUploadPaused,
 	isUploadInProgress,
 	mediaPickerOptions,
 	onImageDataLoad,
@@ -101,19 +101,23 @@ const ImageComponent = ( {
 	};
 
 	const getIcon = ( iconType ) => {
+		let icon;
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return (
-					<Icon
-						icon={ retryIcon || SvgIconRetry }
-						{ ...styles.iconRetry }
-					/>
-				);
+				icon = retryIcon || SvgIconRetry;
+				iconStyle = iconRetryStyles;
+				break;
+			case ICON_TYPE.OFFLINE:
+				icon = offline;
+				iconStyle = iconOfflineStyles;
+				break;
 			case ICON_TYPE.PLACEHOLDER:
+				icon = image;
 				iconStyle = iconPlaceholderStyles;
 				break;
 			case ICON_TYPE.UPLOAD:
+				icon = image;
 				iconStyle = iconUploadStyles;
 				break;
 		}
@@ -128,6 +132,31 @@ const ImageComponent = ( {
 	const iconUploadStyles = usePreferredColorSchemeStyle(
 		styles.iconUpload,
 		styles.iconUploadDark
+	);
+
+	const iconOfflineStyles = usePreferredColorSchemeStyle(
+		styles.iconOffline,
+		styles.iconOfflineDark
+	);
+
+	const retryIconStyles = usePreferredColorSchemeStyle(
+		styles.retryIcon,
+		styles.retryIconDark
+	);
+
+	const iconRetryStyles = usePreferredColorSchemeStyle(
+		styles.iconRetry,
+		styles.iconRetryDark
+	);
+
+	const retryContainerStyles = usePreferredColorSchemeStyle(
+		styles.retryContainer,
+		styles.retryContainerDark
+	);
+
+	const uploadFailedTextStyles = usePreferredColorSchemeStyle(
+		styles.uploadFailedText,
+		styles.uploadFailedTextDark
 	);
 
 	const placeholderStyles = [
@@ -216,9 +245,11 @@ const ImageComponent = ( {
 			>
 				{ isSelected &&
 					highlightSelected &&
-					! ( isUploadInProgress || isUploadFailed ) && (
-						<View style={ imageSelectedStyles } />
-					) }
+					! (
+						isUploadInProgress ||
+						isUploadFailed ||
+						isUploadPaused
+					) && <View style={ imageSelectedStyles } /> }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -239,22 +270,24 @@ const ImageComponent = ( {
 					</View>
 				) }
 
-				{ isUploadFailed && retryMessage && (
+				{ ( isUploadFailed || isUploadPaused ) && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
-							styles.retryContainer,
+							retryContainerStyles,
 						] }
 					>
 						<View
 							style={ [
-								styles.retryIcon,
+								retryIconStyles,
 								retryIcon && styles.customRetryIcon,
 							] }
 						>
-							{ getIcon( ICON_TYPE.RETRY ) }
+							{ isUploadPaused
+								? getIcon( ICON_TYPE.OFFLINE )
+								: getIcon( ICON_TYPE.RETRY ) }
 						</View>
-						<Text style={ styles.uploadFailedText }>
+						<Text style={ uploadFailedTextStyles }>
 							{ retryMessage }
 						</Text>
 					</View>
@@ -265,7 +298,11 @@ const ImageComponent = ( {
 				<ImageEditingButton
 					onSelectMediaUploadOption={ onSelectMediaUploadOption }
 					openMediaOptions={ openMediaOptions }
-					url={ ! isUploadFailed && imageData && url }
+					url={
+						! ( isUploadFailed || isUploadPaused ) &&
+						imageData &&
+						url
+					}
 					pickerOptions={ mediaPickerOptions }
 				/>
 			) }

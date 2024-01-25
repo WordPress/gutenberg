@@ -90,10 +90,8 @@ const OfflineStatus = () => {
 			) }
 			style={ containerStyle }
 		>
-			<View style={ containerStyle }>
-				<Icon fill={ iconStyle.fill } icon={ offlineIcon } />
-				<Text style={ textStyle }>{ __( 'Working Offline' ) }</Text>
-			</View>
+			<Icon fill={ iconStyle.fill } icon={ offlineIcon } />
+			<Text style={ textStyle }>{ __( 'Working Offline' ) } </Text>
 		</View>
 	) : null;
 };
