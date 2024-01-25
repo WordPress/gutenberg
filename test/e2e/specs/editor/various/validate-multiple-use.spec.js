@@ -4,14 +4,6 @@
 
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function showBlockMenuItems( { editor, page } ) {
-	await editor.showBlockToolbar();
-	await page
-		.getByRole( 'toolbar', { name: 'Block tools' } )
-		.getByRole( 'button', { name: 'Options' } )
-		.click();
-}
-
 test.describe( 'Validate multiple use', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -19,7 +11,7 @@ test.describe( 'Validate multiple use', () => {
 
 	test( 'should display correct amount of warning message', async ( {
 		editor,
-		page,
+		pageUtils,
 	} ) => {
 		// Insert a block with `multiple` feature enabled, such as `core/more`
 		await editor.insertBlock( {
@@ -27,12 +19,12 @@ test.describe( 'Validate multiple use', () => {
 		} );
 
 		// Group the block
-		await showBlockMenuItems( { editor, page } );
-		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await editor.clickBlockOptionsMenuItem( 'Group' );
 
 		// Duplicate the block
-		await showBlockMenuItems( { editor, page } );
-		await page.getByRole( 'menuitem', { name: 'Duplicate' } ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await editor.clickBlockOptionsMenuItem( 'Duplicate' );
 
 		// Check if warnings is visible
 		await expect(
