@@ -32,7 +32,7 @@ class Tests_Fonts_WpFontCollection_GetConfig extends WP_UnitTestCase {
 		file_put_contents( $mock_file, '{"this is mock data":true}' );
 
 		return array(
-			'with a file' => array(
+			'with a file'        => array(
 				'config'        => array(
 					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
@@ -45,7 +45,7 @@ class Tests_Fonts_WpFontCollection_GetConfig extends WP_UnitTestCase {
 					'description' => 'My collection description',
 				),
 			),
-			'with a url'  => array(
+			'with a url'         => array(
 				'config'        => array(
 					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
@@ -58,12 +58,12 @@ class Tests_Fonts_WpFontCollection_GetConfig extends WP_UnitTestCase {
 					'description' => 'My collection description',
 				),
 			),
-			'with data'   => array(
+			'with font_families' => array(
 				'config'        => array(
-					'slug'        => 'my-collection',
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-					'data'        => array( 'this is mock data' => true ),
+					'slug'          => 'my-collection',
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( array() ),
 				),
 				'expected_data' => array(
 					'slug'        => 'my-collection',

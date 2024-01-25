@@ -59,6 +59,10 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
+.dataviews-view-table-wrapper {
+	overflow-x: auto;
+}
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -81,7 +85,8 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		min-width: 160px;
+		white-space: nowrap;
+
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
@@ -200,6 +205,48 @@
 	.dataviews-view-table-header {
 		padding-left: $grid-unit-05;
 	}
+
+	.dataviews-view-table__actions-column {
+		width: 1%;
+	}
+}
+
+.dataviews-view-list__primary-field,
+.dataviews-view-grid__primary-field,
+.dataviews-view-table__primary-field {
+	font-size: $default-font-size;
+	font-weight: 500;
+	color: $gray-900;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	display: block;
+	width: 100%;
+
+	a {
+		text-decoration: none;
+		color: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+
+		&:hover {
+			color: $gray-900;
+		}
+	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		color: inherit;
+		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+	}
 }
 
 .dataviews-view-grid {
@@ -216,22 +263,17 @@
 	}
 
 	.dataviews-view-grid__card {
-		.dataviews-view-grid__primary-field {
-			.dataviews-view-grid__title-field {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: block;
-				font-size: $default-font-size;
-				width: 100%;
-			}
+		border-radius: $radius-block-ui * 2;
+		border: 1px solid $gray-200;
+		height: 100%;
+		justify-content: flex-start;
 
-			.dataviews-view-grid__title-field a,
-			button.dataviews-view-grid__title-field {
-				font-weight: 500;
-				color: $gray-900;
-				text-decoration: none;
-			}
+		.dataviews-view-grid__title-actions {
+			padding: 0 $grid-unit-05;
+		}
+
+		.dataviews-view-grid__primary-field {
+			min-height: $grid-unit-50;
 		}
 	}
 
@@ -239,11 +281,11 @@
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-		border-radius: $radius-block-ui * 2;
-		overflow: hidden;
+		border-bottom: 1px solid $gray-200;
+		background-color: $gray-100;
+		border-radius: 3px 3px 0 0;
 
-		> * {
+		img {
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
@@ -251,7 +293,7 @@
 	}
 
 	.dataviews-view-grid__primary-field {
-		min-height: $grid-unit-30;
+		padding: $grid-unit-10;
 	}
 
 	.dataviews-view-grid__fields {
@@ -259,12 +301,14 @@
 		font-size: 12px;
 		line-height: 16px;
 
+		&:not(:empty) {
+			padding: $grid-unit-15;
+			padding-top: 0;
+		}
+
 		.dataviews-view-grid__field {
-			.dataviews-view-grid__field-header {
-				color: $gray-700;
-			}
 			.dataviews-view-grid__field-value {
-				color: $gray-900;
+				color: $gray-700;
 			}
 		}
 	}
@@ -296,6 +340,7 @@
 		&:not(.is-selected):hover {
 			color: var(--wp-admin-theme-color);
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
@@ -308,6 +353,7 @@
 			background-color: var(--wp-admin-theme-color);
 			color: $white;
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
 				color: $white;
@@ -350,6 +396,7 @@
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
+		background-color: $gray-100;
 
 		img {
 			width: 100%;
@@ -386,6 +433,10 @@
 
 			&:last-child {
 				margin-right: 0;
+			}
+
+			&:empty {
+				display: none;
 			}
 		}
 	}

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.34.0 (2024-01-24)
+
+## 4.33.0 (2024-01-10)
+
 ### New Feature
 
 -   Add support for the `viewModule` property ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
