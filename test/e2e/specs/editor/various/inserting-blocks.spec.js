@@ -430,6 +430,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.mouse.move(
 			boundingBox.x + boundingBox.width / 2,
 			boundingBox.y - 10,
+			// An arbitrary number of `steps` imitates cursor movement in the test environment,
+			// activating the in-between inserter.
 			{ steps: 10 }
 		);
 
