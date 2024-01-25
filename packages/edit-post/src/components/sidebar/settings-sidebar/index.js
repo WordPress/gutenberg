@@ -48,7 +48,7 @@ export const sidebars = {
 const SidebarContent = ( {
 	sidebarName,
 	keyboardShortcut,
-	isTemplateMode,
+	isEditingTemplate,
 } ) => {
 	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
@@ -77,7 +77,7 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ ! isTemplateMode && (
+					{ ! isEditingTemplate && (
 						<>
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
@@ -90,7 +90,7 @@ const SidebarContent = ( {
 							<MetaBoxes location="side" />
 						</>
 					) }
-					{ isTemplateMode && <TemplateSummary /> }
+					{ isEditingTemplate && <TemplateSummary /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
@@ -105,7 +105,7 @@ const SettingsSidebar = () => {
 		sidebarName,
 		isSettingsSidebarActive,
 		keyboardShortcut,
-		isTemplateMode,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
@@ -132,8 +132,8 @@ const SettingsSidebar = () => {
 			sidebarName: sidebar,
 			isSettingsSidebarActive: isSettingsSidebar,
 			keyboardShortcut: shortcut,
-			isTemplateMode:
-				select( editorStore ).getRenderingMode() === 'template-only',
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 
@@ -161,7 +161,7 @@ const SettingsSidebar = () => {
 			<SidebarContent
 				sidebarName={ sidebarName }
 				keyboardShortcut={ keyboardShortcut }
-				isTemplateMode={ isTemplateMode }
+				isEditingTemplate={ isEditingTemplate }
 			/>
 		</Tabs>
 	);

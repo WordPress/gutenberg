@@ -7,16 +7,16 @@ import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 
 export default function WelcomeGuideMenuItem() {
-	const isTemplateMode = useSelect(
+	const isEditingTemplate = useSelect(
 		( select ) =>
-			select( editorStore ).getRenderingMode() === 'template-only',
+			select( editorStore ).getCurrentPostType() === 'wp_template',
 		[]
 	);
 
 	return (
 		<PreferenceToggleMenuItem
 			scope="core/edit-post"
-			name={ isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide' }
+			name={ isEditingTemplate ? 'welcomeGuideTemplate' : 'welcomeGuide' }
 			label={ __( 'Welcome Guide' ) }
 		/>
 	);
