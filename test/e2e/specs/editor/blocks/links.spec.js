@@ -796,9 +796,7 @@ test.describe( 'Links', () => {
 	} );
 
 	test( 'can toggle link settings and save', async ( {
-		page,
 		editor,
-		pageUtils,
 		LinkUtils,
 	} ) => {
 		await editor.insertBlock( {
@@ -809,31 +807,35 @@ test.describe( 'Links', () => {
 			},
 		} );
 
-		// Move caret into the link.
-		await pageUtils.pressKeys( 'ArrowRight' );
+		// Click on "Gutenberg" link in the canvas
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
 
-		// Switch Link UI to "edit" mode.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		// Get the Link Popover using the LinkUtils helper
+		const linkPopover = LinkUtils.getLinkPopover();
+
+		// Switch to Edit the link
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Open Advanced Settings
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
 			.click();
 
 		// expect settings for `Open in new tab` and `No follow`
-		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeChecked();
-		await expect( page.getByLabel( 'nofollow' ) ).not.toBeChecked();
+		await expect(
+			linkPopover.getByLabel( 'Open in new tab' )
+		).not.toBeChecked();
+		await expect( linkPopover.getByLabel( 'nofollow' ) ).not.toBeChecked();
 
 		// Toggle both of the settings
-		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'nofollow' ).click();
-
-		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByLabel( 'Open in new tab' ).click();
+		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
@@ -848,17 +850,20 @@ test.describe( 'Links', () => {
 			},
 		] );
 
-		// Move caret back into the link.
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
+		// Click on "Gutenberg" link in the canvas again
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
 
 		// Edit the link
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Toggle both the settings to be off.
 		// Note: no need to toggle settings again because the open setting should be persisted.
-		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'nofollow' ).click();
+		await linkPopover.getByLabel( 'Open in new tab' ).click();
+		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
