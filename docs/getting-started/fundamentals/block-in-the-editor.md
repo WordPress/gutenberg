@@ -3,6 +3,7 @@
 The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component defined in the `edit` property of the settings object used to [register the block on the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side). 
 
 The `props` object received by the block's `Edit` React component includes:
+
 - [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) - attributes object
 - [`setAttributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#setattributes) - method to update the attributes object
 - [`isSelected`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#isselected) - boolean that communicates whether the block is currently selected
@@ -14,18 +15,21 @@ The WordPress Gutenberg project uses <a href="https://wordpress.github.io/gutenb
 </div>
 
 Custom settings controls for the block in the Block Toolbar or the Settings Sidebar can also be defined through this `Edit` React component via built-in components such as:
+
 - [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) 
 - [`BlockControls`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/block-controls) 
 
 ## Built-in components
 
 The package [`@wordpress/components`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-components/) includes a library of generic WordPress components to create common UI elements for the Block Editor and the WordPress dashboard. Some of the  most commonly used components from this package are:
+
 - [`TextControl`](https://wordpress.github.io/gutenberg/?path=/docs/components-textcontrol--docs) 
 - [`Panel`](https://wordpress.github.io/gutenberg/?path=/docs/components-panel--docs)
 - [`ToggleControl`](https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--docs)
 - [`ExternalLink`](https://wordpress.github.io/gutenberg/?path=/docs/components-externallink--docs)
 
 The package [`@wordpress/block-editor`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/) includes a library of components and hooks for the Block Editor, including those to define custom settings controls for the block in the Editor. Some of the components most commonly used from this package are:
+
 - [`RichText`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md)
 - [`BlockControls`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/block-controls)
 - [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md)
@@ -37,12 +41,11 @@ The package <a href="https://developer.wordpress.org/block-editor/reference-guid
 </div>
 
 A good workflow when using a component for the Block Editor is:
+
 - Import the component from a WordPress package
 - Add the corresponding code for the component to your project in JSX format
 - Most built-in components will be used to set [block attributes](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#using-attributes-to-store-block-data), so define any necessary attributes in `block.json` and create event handlers to update those attributes with `setAttributes` in your component
 - If needed, adapt the code to be serialized and stored in the database
-
-
 
 ## Block Controls: Block Toolbar and Settings Sidebar
 
@@ -94,7 +97,6 @@ _See the [full block example](https://github.com/WordPress/block-development-exa
 
 
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
-
 
 ### Settings Sidebar
 

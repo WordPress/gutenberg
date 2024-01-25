@@ -7,12 +7,13 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
+import { settings } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { VIEW_LAYOUTS, LAYOUT_TABLE, SORTING_DIRECTIONS } from './constants';
+import { VIEW_LAYOUTS, SORTING_DIRECTIONS } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -260,24 +261,17 @@ const ViewActions = memo( function ViewActions( {
 			trigger={
 				<Button
 					size="compact"
-					icon={
-						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-							?.icon ||
-						VIEW_LAYOUTS.find( ( v ) => v.type === LAYOUT_TABLE )
-							.icon
-					}
+					icon={ settings }
 					label={ __( 'View options' ) }
 				/>
 			}
 		>
 			<DropdownMenuGroup>
-				{ window?.__experimentalAdminViews && (
-					<ViewTypeMenu
-						view={ view }
-						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
-					/>
-				) }
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }

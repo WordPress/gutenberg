@@ -25,6 +25,7 @@ import {
 const noop = () => {};
 
 export default function AllInputControl( {
+	__next40pxDefaultSize,
 	onChange = noop,
 	onFocus = noop,
 	values,
@@ -74,6 +75,7 @@ export default function AllInputControl( {
 		<HStack>
 			<StyledUnitControl
 				{ ...props }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				className="component-box-control__unit-control"
 				disableUnits={ isMixed }
 				id={ inputId }
@@ -89,6 +91,7 @@ export default function AllInputControl( {
 
 			<FlexedRangeControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				aria-controls={ inputId }
 				label={ LABELS.all }
 				hideLabelFromVision
