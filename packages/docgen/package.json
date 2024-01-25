@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/docgen",
-	"version": "1.58.0",
+	"version": "1.59.0",
 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

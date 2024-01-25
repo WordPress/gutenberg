@@ -197,6 +197,43 @@ describe( 'Button', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		it( 'should not trash the rendered HTML elements when toggling between showing and not showing a tooltip', async () => {
+			const user = userEvent.setup();
+
+			const { rerender } = render(
+				<Button label="Button label">Test button</Button>
+			);
+
+			const button = screen.getByRole( 'button', {
+				name: 'Button label',
+			} );
+
+			expect( button ).toBeVisible();
+
+			await user.tab();
+
+			expect( button ).toHaveFocus();
+
+			// Re-render the button, but this time change the settings so that it
+			// shows a tooltip.
+			rerender(
+				<Button label="Button label" showTooltip>
+					Test button
+				</Button>
+			);
+
+			// The same button element that we referenced before should still be
+			// in the document and have focus.
+			expect( button ).toHaveFocus();
+
+			// Re-render the button, but stop showing a tooltip.
+			rerender( <Button label="Button label">Test button</Button> );
+
+			// The same button element that we referenced before should still be
+			// in the document and have focus.
+			expect( button ).toHaveFocus();
+		} );
+
 		it( 'should add a disabled prop to the button', () => {
 			render( <Button disabled /> );
 

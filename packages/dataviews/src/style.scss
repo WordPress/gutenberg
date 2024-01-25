@@ -87,10 +87,6 @@
 		padding: $grid-unit-15;
 		white-space: nowrap;
 
-		@include break-huge() {
-			min-width: 200px;
-		}
-
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
@@ -285,9 +281,9 @@
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		overflow: hidden;
 		border-bottom: 1px solid $gray-200;
 		background-color: $gray-100;
+		border-radius: 3px 3px 0 0;
 
 		img {
 			object-fit: cover;

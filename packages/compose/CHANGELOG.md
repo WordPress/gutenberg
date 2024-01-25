@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.27.0 (2024-01-24)
+
 ### Deprecations
 
 -   The `pure` HoC has been deprecated. Use `memo` or `PureComponent` instead ([#57173](https://github.com/WordPress/gutenberg/pull/57173)).

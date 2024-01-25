@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-each-view' );
+wp_enqueue_script_module( 'directive-each-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-each" }'>
@@ -209,7 +209,7 @@ gutenberg_enqueue_module( 'directive-each-view' );
 
 <div
 	data-wp-interactive='{ "namespace": "directive-each" }'
-	data-wp-navigation-id="navigation-updated list"
+	data-wp-router-region="navigation-updated list"
 	data-wp-context='{ "list": [ "beta", "gamma", "delta" ] }'
 	data-testid="navigation-updated list"
 >

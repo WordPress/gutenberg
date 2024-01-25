@@ -160,7 +160,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 			}
 
 			// Some URLs in list views are different
-			if ( path === '/page' && postId ) {
+			if ( path === '/pages' && postId ) {
 				return resolveTemplateForPostTypeAndId( 'page', postId );
 			}
 
@@ -196,7 +196,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		}
 
 		// Some URLs in list views are different
-		if ( path === '/page' && postId ) {
+		if ( path === '/pages' && postId ) {
 			return { postType: 'page', postId };
 		}
 
