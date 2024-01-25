@@ -57,13 +57,7 @@ module.exports = {
 							configFile: false,
 							presets: [
 								'@babel/preset-typescript',
-								[
-									'@babel/preset-react',
-									{
-										runtime: 'automatic',
-										importSource: 'preact',
-									},
-								],
+								'@babel/preset-react',
 							],
 						},
 					},
