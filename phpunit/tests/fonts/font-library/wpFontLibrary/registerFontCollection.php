@@ -29,9 +29,9 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 			'description' => 'My Collection Description',
 			'src'         => 'my-collection-data.json',
 		);
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Font Collection config slug is required as a non-empty string.' );
-		WP_Font_Library::register_font_collection( $config );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
+		$collection = WP_Font_Library::register_font_collection( $config );
+		$this->assertWPError( $collection, 'A WP_Error should be returned.' );
 	}
 
 	public function test_should_return_error_if_name_is_missing() {
@@ -40,16 +40,16 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 			'description' => 'My Collection Description',
 			'src'         => 'my-collection-data.json',
 		);
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Font Collection config name is required as a non-empty string.' );
-		WP_Font_Library::register_font_collection( $config );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
+		$collection = WP_Font_Library::register_font_collection( $config );
+		$this->assertWPError( $collection, 'A WP_Error should be returned.' );
 	}
 
 	public function test_should_return_error_if_config_is_empty() {
 		$config = array();
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Font Collection config options is required as a non-empty array.' );
-		WP_Font_Library::register_font_collection( $config );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
+		$collection = WP_Font_Library::register_font_collection( $config );
+		$this->assertWPError( $collection, 'A WP_Error should be returned.' );
 	}
 
 	public function test_should_return_error_if_slug_is_repeated() {

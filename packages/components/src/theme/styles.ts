@@ -30,4 +30,6 @@ export const colorVariables = ( { colors }: ThemeOutputValues ) => {
 	];
 };
 
-export const Wrapper = styled.div``;
+export const Wrapper = styled.div`
+	color: var( --wp-components-color-foreground, currentColor );
+`;

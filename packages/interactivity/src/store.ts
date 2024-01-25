@@ -36,12 +36,12 @@ const deepMerge = ( target: any, source: any ) => {
 
 const parseInitialState = () => {
 	const storeTag = document.querySelector(
-		`script[type="application/json"]#wp-interactivity-initial-state`
+		`script[type="application/json"]#wp-interactivity-data`
 	);
 	if ( ! storeTag?.textContent ) return {};
 	try {
-		const initialState = JSON.parse( storeTag.textContent );
-		if ( isObject( initialState ) ) return initialState;
+		const { state } = JSON.parse( storeTag.textContent );
+		if ( isObject( state ) ) return state;
 		throw Error( 'Parsed state is not an object' );
 	} catch ( e ) {
 		// eslint-disable-next-line no-console

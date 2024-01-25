@@ -172,7 +172,7 @@ export default function PostLockedModal() {
 			shouldCloseOnClickOutside={ false }
 			shouldCloseOnEsc={ false }
 			isDismissible={ false }
-			className="editor-post-locked-modal"
+			size="medium"
 		>
 			<HStack alignment="top" spacing={ 6 }>
 				{ !! userAvatar && (

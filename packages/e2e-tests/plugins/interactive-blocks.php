@@ -21,26 +21,35 @@ add_action(
 
 				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
-				gutenberg_register_module(
+				wp_register_script_module(
 					$name . '-view',
 					$view_file,
-					array( '@wordpress/interactivity' ),
-					filemtime( $view_file ),
-					true
+					array(
+						'@wordpress/interactivity',
+						array(
+							'id'     => '@wordpress/interactivity-router',
+							'import' => 'dynamic',
+						),
+					),
+					filemtime( $view_file )
 				);
 
 				register_block_type_from_metadata( $block_folder );
 			}
 		}
 
-		// Temporary fix to disable SSR of directives during E2E testing. This
-		// is required at this moment, as SSR for directives is not stabilized
-		// yet and we need to ensure hydration works, even when the rendered
-		// HTML is not correct or malformed.
-		if ( 'true' === $_GET['disable_directives_ssr'] ) {
+		/*
+		 * Disable the server directive processing during E2E testing. This is
+		 * required to ensure that client hydration works even when the rendered
+		 * HTML contains unbalanced tags and it couldn't be processed in the server.
+		 */
+		if ( 'true' === $_GET['disable_server_directive_processing'] ) {
+			// Ensure the interactivity API is loaded.
+			wp_interactivity();
+			// But remove the server directive processing.
 			remove_filter(
 				'render_block_data',
-				'gutenberg_interactivity_mark_root_interactive_blocks'
+				'wp_interactivity_process_directives_of_interactive_blocks'
 			);
 		}
 	}
