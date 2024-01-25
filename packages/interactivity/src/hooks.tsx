@@ -1,7 +1,14 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement } from 'preact';
+import {
+	h as createElement,
+	options,
+	createContext,
+	cloneElement,
+} from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
 
@@ -59,7 +66,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	attributes: h.JSX.HTMLAttributes;
+	attributes: createElement.JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -372,7 +379,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type as any, props ),
+				element: createElement( vnode.type as any, props ),
 				top: true,
 			};
 			vnode.type = Directives;
