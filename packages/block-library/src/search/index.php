@@ -199,7 +199,7 @@ function register_block_core_search() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/search-block',
-		gutenberg_url( '/build/interactivity/search.min.js' ),
+		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/search.min.js' ) : '/wp-includes/blocks/search/view.min.js',
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);

@@ -325,7 +325,7 @@ function register_block_core_image() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/image',
-		gutenberg_url( '/build/interactivity/image.min.js' ),
+		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/image.min.js' ) : '/wp-includes/blocks/image/view.min.js',
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
