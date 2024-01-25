@@ -18,7 +18,6 @@ async function login( this: RequestUtils, user: User = this.user ) {
 		);
 	}
 
-	// Log in and get the bearer token.
 	const response = await this.request.post(
 		'https://wordpress.com/wp-login.php?action=login-endpoint',
 		{
