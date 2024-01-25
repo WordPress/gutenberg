@@ -237,7 +237,7 @@ export async function downloadFontFaceAssets( src ) {
 
 	const files = await Promise.all(
 		src.map( async ( url ) => {
-			return await fetch( new Request( url ) )
+			return fetch( new Request( url ) )
 				.then( ( response ) => {
 					if ( ! response.ok ) {
 						throw new Error(
