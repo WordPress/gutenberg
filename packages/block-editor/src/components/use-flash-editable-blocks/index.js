@@ -33,6 +33,12 @@ export default function useFlashEditableBlocks( rootClientId = '' ) {
 		};
 
 		const handleClick = ( event ) => {
+			const shouldFlash =
+				event.target === element ||
+				event.target.classList.contains( 'is-root-container' );
+			if ( ! shouldFlash ) {
+				return;
+			}
 			if ( event.defaultPrevented ) {
 				return;
 			}
