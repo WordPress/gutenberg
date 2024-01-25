@@ -7,18 +7,44 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import {
+	useSelect,
+	withRegistry,
+	createRegistry,
+	RegistryProvider,
+} from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { ExperimentalBlockEditorProvider } from '../provider';
+import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 import AutoHeightBlockPreview from './auto';
 import EditorStyles from '../editor-styles';
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore, storeConfig } from '../../store';
+import { __experimentalUpdateSettings } from '../../store/private-actions';
+import { resetBlocks } from '../../store/actions';
 import { BlockListItems } from '../block-list';
+
+const PreviewProvider = withRegistry( ( props ) => {
+	const { children, value, settings, registry } = props;
+	// Previews are meant to be static, so create a store and immediately
+	// dispatch the settings and blocks so it doesn't call subscribers.
+	const subRegistry = useMemo( () => {
+		const newRegistry = createRegistry( {}, registry );
+		const store = newRegistry.registerStore(
+			blockEditorStoreName,
+			storeConfig
+		);
+		store.dispatch( __experimentalUpdateSettings( settings ) );
+		store.dispatch( resetBlocks( value ) );
+		return newRegistry;
+	}, [ registry, value, settings ] );
+	return (
+		<RegistryProvider value={ subRegistry }>{ children }</RegistryProvider>
+	);
+} );
 
 export function BlockPreview( {
 	blocks,
@@ -49,13 +75,9 @@ export function BlockPreview( {
 		} );
 	}
 
-	const originalSettings = useSelect(
+	const settings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
-	);
-	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
-		[ originalSettings ]
 	);
 	const renderedBlocks = useMemo(
 		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
@@ -67,16 +89,13 @@ export function BlockPreview( {
 	}
 
 	return (
-		<ExperimentalBlockEditorProvider
-			value={ renderedBlocks }
-			settings={ settings }
-		>
+		<PreviewProvider value={ renderedBlocks } settings={ settings }>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
 			/>
-		</ExperimentalBlockEditorProvider>
+		</PreviewProvider>
 	);
 }
 
@@ -129,13 +148,10 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 	);
 
 	const children = (
-		<ExperimentalBlockEditorProvider
-			value={ renderedBlocks }
-			settings={ settings }
-		>
+		<PreviewProvider value={ renderedBlocks } settings={ settings }>
 			<EditorStyles />
 			<BlockListItems renderAppender={ false } layout={ layout } />
-		</ExperimentalBlockEditorProvider>
+		</PreviewProvider>
 	);
 
 	return {
