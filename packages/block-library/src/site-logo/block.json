@@ -38,7 +38,6 @@
 			"radius": true,
 			"width": true,
 			"style": true,
-			"__experimentalSelector": "img, .components-placeholder__illustration, .components-placeholder::before, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
@@ -60,6 +59,9 @@
 				"padding": false
 			}
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder, .wp-block-site-logo .wp-block-image__crop-area"
 	},
 	"styles": [
 		{
