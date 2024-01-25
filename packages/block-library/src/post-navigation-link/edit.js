@@ -10,6 +10,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
+	SelectControl,
 	PanelBody,
 } from '@wordpress/components';
 import {
@@ -20,9 +21,20 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function PostNavigationLinkEdit( {
-	attributes: { type, label, showTitle, textAlign, linkLabel, arrow },
+	context: { postType },
+	attributes: {
+		type,
+		label,
+		showTitle,
+		textAlign,
+		linkLabel,
+		arrow,
+		taxonomy,
+	},
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
@@ -47,6 +59,35 @@ export default function PostNavigationLinkEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	const taxonomies = useSelect(
+		( select ) => {
+			const { getTaxonomies } = select( coreStore );
+			const filteredTaxonomies = getTaxonomies( {
+				type: postType,
+				per_page: -1,
+			} );
+			return filteredTaxonomies;
+		},
+		[ postType ]
+	);
+	const getTaxonomyOptions = () => {
+		const selectOption = {
+			label: __( 'Unfiltered' ),
+			value: '',
+		};
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
+			.map( ( item ) => {
+				return {
+					value: item.slug,
+					label: item.name,
+				};
+			} );
+
+		return [ selectOption, ...taxonomyOptions ];
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -113,6 +154,21 @@ export default function PostNavigationLinkEdit( {
 						/>
 					</ToggleGroupControl>
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<SelectControl
+					label={ __( 'Filter by taxonomy' ) }
+					value={ taxonomy }
+					options={ getTaxonomyOptions() }
+					onChange={ ( value ) =>
+						setAttributes( {
+							taxonomy: value,
+						} )
+					}
+					help={ __(
+						'Only link to posts that have the same taxonomy terms as the current post. For example the same tags or categories.'
+					) }
+				/>
 			</InspectorControls>
 			<BlockControls>
 				<AlignmentToolbar

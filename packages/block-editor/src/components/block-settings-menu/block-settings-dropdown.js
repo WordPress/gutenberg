@@ -41,9 +41,7 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemBlocksLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
-	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
+	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
@@ -201,9 +199,6 @@ export function BlockSettingsDropdown( {
 		hasSelectedBlocks,
 		getSelectedBlockClientIds,
 	] );
-
-	const removeBlockLabel =
-		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
 
 	// This can occur when the selected block (the parent)
 	// displays child blocks within a List View.
@@ -411,7 +406,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ removeBlockLabel }
+										{ __( 'Delete' ) }
 									</MenuItem>
 								</MenuGroup>
 							) }

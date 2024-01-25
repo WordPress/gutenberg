@@ -50,11 +50,12 @@ export function BlockRemovalWarningModal( { rules } ) {
 		<Modal
 			title={ __( 'Be careful!' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
+			size="medium"
 		>
 			<p>
 				{ _n(
-					'Post or page content will not be displayed if you delete this block.',
-					'Post or page content will not be displayed if you delete these blocks.',
+					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
+					'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.',
 					blockNamesForPrompt.length
 				) }
 			</p>

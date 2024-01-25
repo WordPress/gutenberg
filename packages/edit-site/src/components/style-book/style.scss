@@ -17,13 +17,13 @@
 	}
 }
 
-.edit-site-style-book__tab-panel {
-	.components-tab-panel__tabs {
+.edit-site-style-book__tabs {
+	[role="tablist"] {
 		background: $white;
 		color: $gray-900;
 	}
 
-	.components-tab-panel__tab-content {
+	[role="tabpanel"] {
 		bottom: 0;
 		left: 0;
 		overflow: auto;

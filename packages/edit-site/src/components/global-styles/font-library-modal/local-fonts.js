@@ -23,13 +23,12 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 import { unlock } from '../../../lock-unlock';
 
 const { ProgressBar } = unlock( componentsPrivateApis );
 
 function LocalFonts() {
-	const { installFonts } = useContext( FontLibraryContext );
+	const { installFont } = useContext( FontLibraryContext );
 	const [ notice, setNotice ] = useState( null );
 	const [ isUploading, setIsUploading ] = useState( false );
 	const supportedFormats =
@@ -153,9 +152,31 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		const response = await installFonts( fontFamilies );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
+
+		if ( fontFamilies.length > 1 ) {
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Variants from only one font family can be uploaded at a time.'
+				),
+			} );
+			setIsUploading( false );
+			return;
+		}
+
+		try {
+			await installFont( fontFamilies[ 0 ] );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error.message,
+			} );
+		}
+
 		setIsUploading( false );
 	};
 

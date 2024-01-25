@@ -64,6 +64,15 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		);
 	} );
 
+	it( 'should return `null` when maximum and minimum viewport width are equal', () => {
+		const fluidTypographyValues = getComputedFluidTypographyValue( {
+			fontSize: '30px',
+			minimumViewportWidth: '500px',
+			maximumViewportWidth: '500px',
+		} );
+		expect( fluidTypographyValues ).toBeNull();
+	} );
+
 	it( 'should return a fluid font size when given a scale factor', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize: '30px',

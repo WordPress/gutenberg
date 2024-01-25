@@ -77,24 +77,27 @@ export function CreatePatternModalContents( {
 	const categoryMap = useMemo( () => {
 		// Merge the user and core pattern categories and remove any duplicates.
 		const uniqueCategories = new Map();
-		[ ...userPatternCategories, ...corePatternCategories ].forEach(
-			( category ) => {
-				if (
-					! uniqueCategories.has( category.label ) &&
-					// There are two core categories with `Post` label so explicitly remove the one with
-					// the `query` slug to avoid any confusion.
-					category.name !== 'query'
-				) {
-					// We need to store the name separately as this is used as the slug in the
-					// taxonomy and may vary from the label.
-					uniqueCategories.set( category.label, {
-						label: category.label,
-						value: category.label,
-						name: category.name,
-					} );
-				}
+		userPatternCategories.forEach( ( category ) => {
+			uniqueCategories.set( category.label.toLowerCase(), {
+				label: category.label,
+				name: category.name,
+				id: category.id,
+			} );
+		} );
+
+		corePatternCategories.forEach( ( category ) => {
+			if (
+				! uniqueCategories.has( category.label.toLowerCase() ) &&
+				// There are two core categories with `Post` label so explicitly remove the one with
+				// the `query` slug to avoid any confusion.
+				category.name !== 'query'
+			) {
+				uniqueCategories.set( category.label.toLowerCase(), {
+					label: category.label,
+					name: category.name,
+				} );
 			}
-		);
+		} );
 		return uniqueCategories;
 	}, [ userPatternCategories, corePatternCategories ] );
 
@@ -140,9 +143,13 @@ export function CreatePatternModalContents( {
 	 */
 	async function findOrCreateTerm( term ) {
 		try {
-			// We need to match any existing term to the correct slug to prevent duplicates, eg.
-			// the core `Headers` category uses the singular `header` as the slug.
-			const existingTerm = categoryMap.get( term );
+			const existingTerm = categoryMap.get( term.toLowerCase() );
+			if ( existingTerm && existingTerm.id ) {
+				return existingTerm.id;
+			}
+			// If we have an existing core category we need to match the new user category to the
+			// correct slug rather than autogenerating it to prevent duplicates, eg. the core `Headers`
+			// category uses the singular `header` as the slug.
 			const termData = existingTerm
 				? { name: existingTerm.label, slug: existingTerm.name }
 				: { name: term };
