@@ -51,11 +51,11 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_should_do_ti_wrong
+	 * @dataProvider data_should_do_it_wrong
 	 *
 	 * @param mixed  $config Config of the font collection.
 	 */
-	public function test_should_do_ti_wrong( $config ) {
+	public function test_should_do_it_wrong( $config ) {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
 		new WP_Font_Collection( $config );
 	}
@@ -65,7 +65,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_should_do_ti_wrong() {
+	public function data_should_do_it_wrong() {
 		return array(
 			'no id'                           => array(
 				array(
