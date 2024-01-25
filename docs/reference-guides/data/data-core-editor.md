@@ -1382,6 +1382,7 @@ _Parameters_
 -   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
 -   _value.rootClientId_ `string`: The root client ID to insert at.
 -   _value.insertionIndex_ `number`: The index to insert at.
+-   _value.initialTab_ `string`: The id of the tab to display first when the block editor inserter is opened. A category corresponds to one of the tab ids defined in packages/block-editor/src/components/inserter/tabs.js.
 
 _Returns_
 

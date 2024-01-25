@@ -45,6 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
+		initialInserterTab,
 	},
 	ref
 ) {
@@ -56,8 +57,9 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState( null );
-
+	const [ selectedTab, setSelectedTab ] = useState(
+		initialInserterTab || null
+	);
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
 			rootClientId,
@@ -259,6 +261,7 @@ function InserterMenu(
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
 						tabsContents={ inserterTabsContents }
+						initialTabId={ initialInserterTab }
 					/>
 				) }
 				{ ! delayedFilterValue && ! showAsTabs && (

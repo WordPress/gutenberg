@@ -33,6 +33,7 @@ function InserterTabs( {
 	showMedia = false,
 	onSelect,
 	tabsContents,
+	initialTabId,
 } ) {
 	const tabs = [
 		blocksTab,
@@ -40,9 +41,13 @@ function InserterTabs( {
 		showMedia && mediaTab,
 	].filter( Boolean );
 
+	initialTabId = !! tabs.find( ( { name } ) => initialTabId === name )
+		? initialTabId
+		: 'blocks';
+
 	return (
 		<div className="block-editor-inserter__tabs">
-			<Tabs onSelect={ onSelect }>
+			<Tabs initialTabId={ initialTabId } onSelect={ onSelect }>
 				<Tabs.TabList>
 					{ tabs.map( ( tab ) => (
 						<Tabs.Tab key={ tab.name } tabId={ tab.name }>

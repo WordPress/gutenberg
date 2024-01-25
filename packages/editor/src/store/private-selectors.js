@@ -25,7 +25,11 @@ const EMPTY_INSERTION_POINT = {
 export const getInsertionPoint = createRegistrySelector(
 	( select ) => ( state ) => {
 		if ( typeof state.blockInserterPanel === 'object' ) {
-			return state.blockInserterPanel;
+			return {
+				rootClientId: state.blockInserterPanel?.rootClientId,
+				insertionIndex: state.blockInserterPanel?.insertionIndex,
+				filterValue: state.blockInserterPanel?.filterValue,
+			};
 		}
 
 		if ( getRenderingMode( state ) === 'template-locked' ) {
@@ -44,6 +48,21 @@ export const getInsertionPoint = createRegistrySelector(
 
 		return EMPTY_INSERTION_POINT;
 	}
+);
+
+/**
+ * Get the initial tab id for the inserter.
+ * A category corresponds to one of the tab ids defined in packages/block-editor/src/components/inserter/tabs.js.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The initial tab category to open when the inserter is opened.
+ */
+export const getInserterInitialTab = createRegistrySelector(
+	() => ( state ) =>
+		typeof state.blockInserterPanel === 'object'
+			? state.blockInserterPanel?.initialTab
+			: null
 );
 
 export function getListViewToggleRef( state ) {

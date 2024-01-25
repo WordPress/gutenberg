@@ -697,6 +697,8 @@ export function removeEditorPanel( panelName ) {
  *                                              use an object.
  * @param {string}         value.rootClientId   The root client ID to insert at.
  * @param {number}         value.insertionIndex The index to insert at.
+ * @param {string}         value.initialTab     The id of the tab to display first when the block editor inserter is opened.
+ *                                              A category corresponds to one of the tab ids defined in packages/block-editor/src/components/inserter/tabs.js.
  *
  * @return {Object} Action object.
  */
