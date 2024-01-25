@@ -167,6 +167,8 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 			add_action( $position, array( $this, 'print_import_map' ) );
 			add_action( $position, array( $this, 'print_enqueued_script_modules' ) );
 			add_action( $position, array( $this, 'print_script_module_preloads' ) );
+			// Prints the script that loads the import map polyfill in the footer.
+			add_action( 'wp_footer', array( $this, 'print_import_map_polyfill' ), 11 );
 		}
 
 		/**
@@ -226,6 +228,27 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 			}
 		}
 
+		/**
+		 * Prints the necessary script to load import map polyfill for browsers that
+		 * do not support import maps.
+		 *
+		 * TODO: Replace the polyfill with a simpler version that only provides
+		 * support for import maps and load it only when the browser doesn't support
+		 * import maps (https://github.com/guybedford/es-module-shims/issues/371).
+		 *
+		 * @since 6.5.0
+		 */
+		public function print_import_map_polyfill() {
+			$import_map = $this->get_import_map();
+			if ( ! empty( $import_map['imports'] ) ) {
+				wp_print_script_tag(
+					array(
+						'src'   => defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/importmap-polyfill.min.js' ),
+						'defer' => true,
+					)
+				);
+			}
+		}
 		/**
 		 * Returns the import map array.
 		 *
