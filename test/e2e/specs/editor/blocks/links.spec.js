@@ -228,8 +228,8 @@ test.describe( 'Links', () => {
 		await LinkUtils.createLink();
 
 		// Click on the Edit button.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
-		await page.getByLabel( 'Edit', { exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Edit', exact: true } ).click();
+
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
@@ -250,13 +250,8 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can remove existing links`, async ( {
-		editor,
-		LinkUtils,
-		pageUtils,
-	} ) => {
+	test( `can remove existing links`, async ( { editor, LinkUtils } ) => {
 		await LinkUtils.createLink();
-		await pageUtils.pressKeys( 'primary+k' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
 
@@ -338,6 +333,7 @@ test.describe( 'Links', () => {
 		pageUtils,
 	} ) => {
 		await LinkUtils.createLink();
+		await pageUtils.pressKeys( 'Escape' );
 		// Make a collapsed selection inside the link.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
@@ -957,6 +953,7 @@ test.describe( 'Links', () => {
 			LinkUtils,
 		} ) => {
 			await LinkUtils.createLink();
+			await pageUtils.pressKeys( 'Escape' );
 
 			// Make a collapsed selection inside the link. This is used
 			// as a stress test to ensure we can find the link text from a
