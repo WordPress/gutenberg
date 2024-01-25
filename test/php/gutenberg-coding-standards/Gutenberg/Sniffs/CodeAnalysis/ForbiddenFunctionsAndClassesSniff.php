@@ -66,9 +66,8 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * Detects whether a given string token represents a function call or class usage.
 	 * It then delegates further processing based on the type of usage detected.
 	 *
-	 * @param File $phpcsFile The file being scanned.
-	 * @param int  $stackPtr  The position of the current token
-	 *                        in the stack passed in $tokens.
+	 * @param File $phpcs_file The file being scanned.
+	 * @param int  $stack_pointer  The position of the current token in the token stack.
 	 */
 	private function process_string_token( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->forbidden_functions ) && empty( $this->forbidden_classes ) ) {
@@ -170,7 +169,8 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 *
 	 * Example of a guarded function (works similarly for classes):
 	 * if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-	 * // gutenberg_prefixed_i_am_allowed_to_be_called_since_i_am_guarded_function();
+	 *     // gutenberg_prefixed_i_am_allowed_to_be_called_since_i_am_guarded_function();
+	 * }
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
