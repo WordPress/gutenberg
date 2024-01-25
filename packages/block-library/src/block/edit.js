@@ -408,7 +408,7 @@ export default function ReusableBlockEdit( {
 							disabled={ ! overrides }
 							__experimentalIsFocusable
 						>
-							{ __( 'Reset to original' ) }
+							{ __( 'Reset' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
