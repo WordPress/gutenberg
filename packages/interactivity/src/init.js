@@ -21,15 +21,25 @@ export const getRegionRootFragment = ( region ) => {
 	return regionRootFragments.get( region );
 };
 
+function yieldToMain() {
+	return new Promise( ( resolve ) => {
+		// TODO: Use scheduler.yield() when available.
+		setTimeout( resolve, 0 );
+	} );
+}
+
 // Initialize the router with the initial DOM.
 export const init = async () => {
-	document
-		.querySelectorAll( `[data-${ directivePrefix }-interactive]` )
-		.forEach( ( node ) => {
-			if ( ! hydratedIslands.has( node ) ) {
-				const fragment = getRegionRootFragment( node );
-				const vdom = toVdom( node );
-				hydrate( vdom, fragment );
-			}
-		} );
+	const nodes = document.querySelectorAll(
+		`[data-${ directivePrefix }-interactive]`
+	);
+
+	for ( const node of nodes ) {
+		if ( ! hydratedIslands.has( node ) ) {
+			await yieldToMain();
+			const fragment = getRegionRootFragment( node );
+			const vdom = toVdom( node );
+			hydrate( vdom, fragment );
+		}
+	}
 };
