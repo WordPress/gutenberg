@@ -78,7 +78,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		$tokens = $phpcs_file->getTokens();
 
 		$next_token = $phpcs_file->findPrevious( T_WHITESPACE, ( $stack_pointer + 1 ), null, true, null, true );
-		if ( false !== $next_token && ( $tokens[ $next_token ]['code'] === T_DOUBLE_COLON ) ) {
+		if ( false !== $next_token && ( T_DOUBLE_COLON === $tokens[ $next_token ]['code'] ) ) {
 			// Static class method or a class constant.
 			$this->check_class_usage( $phpcs_file, $stack_pointer );
 
@@ -86,14 +86,14 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		}
 
 		$previous_token = $phpcs_file->findPrevious( T_WHITESPACE, $stack_pointer - 1, null, true, null, true );
-		if ( false !== $previous_token && ( $tokens[ $previous_token ]['code'] === T_NEW ) ) {
+		if ( false !== $previous_token && ( T_NEW === $tokens[ $previous_token ]['code'] ) ) {
 			// Static method or a constant usage.
 			$this->check_class_usage( $phpcs_file, $stack_pointer );
 
 			return;
 		}
 
-		if ( false !== $next_token && ( $tokens[ $next_token ]['code'] === T_OPEN_PARENTHESIS ) ) {
+		if ( false !== $next_token && ( T_OPEN_PARENTHESIS === $tokens[ $next_token ]['code'] ) ) {
 			// Function.
 			$this->check_function_usage( $phpcs_file, $stack_pointer );
 		}
@@ -188,11 +188,11 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		// It has to start from the matched condition closest to the passed token.
 		$conditions = array_reverse( $tokens[ $stack_pointer ]['conditions'], true );
 
-		// if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		// Matches the "if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN" string.
 		$regexp = '/if\s*\(\s*defined\(\s*(\'|")IS_GUTENBERG_PLUGIN(\'|")\s*\)\s*&&\s*IS_GUTENBERG_PLUGIN/';
 
 		foreach ( $conditions as $wrapping_if_token => $condition ) {
-			if ( $condition !== T_IF ) {
+			if ( T_IF !== $condition ) {
 				continue;
 			}
 
