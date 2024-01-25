@@ -80,10 +80,7 @@ export const PaletteItem = styled( View )`
 	&:focus-visible {
 		border-color: transparent;
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-			var(
-				--wp-components-color-accent,
-				var( --wp-admin-theme-color, ${ COLORS.theme.accent } )
-			);
+			${ COLORS.theme.accent };
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: 0;
