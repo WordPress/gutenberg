@@ -122,7 +122,7 @@
 
 ## 6.0.0 (2022-01-27)
 
-### Breaking changes
+### Breaking Changes
 
 `OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` (for consistency with how GET requests are resolved). They used to be resolved as `Plain Old JavaScript Objects`.
 
@@ -215,6 +215,6 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

@@ -157,7 +157,7 @@
 
 ## 11.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -190,13 +190,13 @@
 
 ## 8.0.0 (2021-03-17)
 
-### Breaking Change
+### Breaking Changes
 
 -   Reverted `cloneBlock` back to its original logic that doesn't sanitize block's attributes. [#28379](https://github.com/WordPress/gutenberg/pull/29111)
 
 ## 7.0.0 (2021-02-01)
 
-### Breaking Change
+### Breaking Changes
 
 -   `cloneBlock` now sanitizes the attributes to match the same logic `createBlock` has. [#28379](https://github.com/WordPress/gutenberg/pull/28379)
 

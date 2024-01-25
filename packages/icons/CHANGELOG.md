@@ -190,13 +190,13 @@
 
 ## 6.0.0 (2021-10-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Removed the `minus` icon, which was only used once in the block editor, in favor of the new `reset` icon which offers a more refined vector.
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -219,7 +219,7 @@
 
 ## 2.0.0 (2020-05-14)
 
-### Breaking change
+### Breaking Changes
 
 -   `star` icon removed as it is duplicative of `star-filled`. ([#21825](https://github.com/WordPress/gutenberg/pull/21825))
 

@@ -42,7 +42,7 @@
 
 ## 3.0.0 (2023-10-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).
 
@@ -103,7 +103,7 @@
 
 ## 2.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 

@@ -69,7 +69,7 @@
 
 ## 4.0.0 (2023-04-26)
 
-### Breaking Change
+### Breaking Changes
 
 -   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
 
@@ -152,7 +152,7 @@
 
 ## 2.0.0 (2020-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/notice).
 

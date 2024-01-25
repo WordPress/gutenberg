@@ -203,7 +203,7 @@
 
 ## 24.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 -   The bundled `@wordpress/eslint-plugin` package got updated to the new major version and the default linting for Jest unit tests is now handled in the default config in this package ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
@@ -891,7 +891,7 @@
 
 ## 2.0.0 (2018-07-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 

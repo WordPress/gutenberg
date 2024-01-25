@@ -133,7 +133,7 @@
 
 ## 3.0.0 (2023-11-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Implement the new `store()` API as specified in the [proposal](https://github.com/WordPress/gutenberg/discussions/53586). ([#55459](https://github.com/WordPress/gutenberg/pull/55459))
 
@@ -190,7 +190,7 @@
 
 ## 2.0.0 (2023-08-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove the `wp-show` directive until we figure out its final implementation. ([#53240](https://github.com/WordPress/gutenberg/pull/53240))
 

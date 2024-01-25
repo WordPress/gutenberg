@@ -179,7 +179,7 @@
 
 ## 10.0.0 (2022-09-13)
 
-### Breaking change
+### Breaking Changes
 
 -   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
 
@@ -205,7 +205,7 @@
 
 ## 9.0.0 (2022-05-04)
 
-### Breaking change
+### Breaking Changes
 
 -   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
 -   `ListView` no longer accepts the `__experimentalFeatures`, `__experimentalPersistentListViewFeatures`, `__experimentalHideContainerBlockActions`, and `showNestedBlocks` props. Passing additional undocumented props through to `ListView` is also now disallowed. ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
@@ -243,13 +243,13 @@
 -   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). When List View is open Block focus time is 4 times faster in large posts.
 -   Render fixed number of items in List View [#35706](https://github.com/WordPress/gutenberg/pull/35230). Opening List View is 13 times faster in large posts.
 
-### Breaking change
+### Breaking Changes
 
 -   List View no longer supports the `showOnlyCurrentHierarchy` flag [#35706](https://github.com/WordPress/gutenberg/pull/35706). To display a subset of blocks, use the `blocks` parameter instead.
 
 ## 7.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 

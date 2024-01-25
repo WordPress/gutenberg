@@ -40,7 +40,7 @@
 
 ## 9.0.0 (2023-12-13)
 
-### Breaking Change
+### Breaking Changes
 
 -   Update Docker usage to `docker compose` V2 following [deprecation](https://docs.docker.com/compose/migrate/) of `docker-compose` V1.
 
@@ -95,7 +95,7 @@
 
 ## 8.0.0 (2023-05-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove `afterSetup` option from `.wp-env.json` and the `WP_ENV_AFTER_SETUP` environment variable in favor of more granular lifecycle scripts.
 
@@ -116,7 +116,7 @@
 
 ## 7.0.0 (2023-05-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
 -   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively. Note that with `composer`, you will need to use the `--env-cwd` option to navigate to your plugin's directory as it is no longer the default working directory.
@@ -141,7 +141,7 @@
 
 ## 6.0.0 (2023-04-26)
 
-### Breaking Change
+### Breaking Changes
 
 -   Use test environment's `WP_SITEURL` instead of `WP_TESTS_DOMAIN` as the WordPress URL.
 -   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
@@ -262,7 +262,7 @@
 
 ## 4.0.0 (2021-03-17)
 
-### Breaking Change
+### Breaking Changes
 
 -   Migrate from `nodegit` to `simple-git`. This change now requires you to have a `git` binary installed locally to utilize the git sources feature of wp-env.json.
 

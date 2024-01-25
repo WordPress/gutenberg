@@ -104,7 +104,7 @@
 
 ## 4.0.0 (2021-01-21)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -114,13 +114,13 @@
 
 ## 3.0.0 (2020-04-15)
 
-### Breaking Change
+### Breaking Changes
 
 -   Add `types` to the order of preferred properties. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
 ## 2.0.0 (2019-06-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Added `type` and `react-native` to the order of preferred properties.
 

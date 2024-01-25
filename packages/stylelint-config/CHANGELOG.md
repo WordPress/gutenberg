@@ -94,19 +94,19 @@
 
 ## 21.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ## 20.0.0 (2022-01-27)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increased minimum peer dependency of `stylelint` to `14.2.0` ([#38091](https://github.com/WordPress/gutenberg/pull/38091)). See [official migration guide to v14](https://github.com/stylelint/stylelint/blob/14.0.0/docs/migration-guide/to-14.md) for details.
 
 ## 19.0.0 (2021-01-21)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 -   Increased minimum peer dependency of `stylelint` to `13.7.0`.
@@ -117,7 +117,7 @@
 
 ## 18.0.0 (2021-01-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 

@@ -143,7 +143,7 @@
 
 ## 6.0.0 (2022-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
 
@@ -155,7 +155,7 @@
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -245,7 +245,7 @@
 
 ## 3.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
 -   `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.

@@ -577,7 +577,7 @@
 
 ## 25.7.0 (2023-08-31)
 
-### Breaking changes
+### Breaking Changes
 
 -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
 
@@ -1960,7 +1960,7 @@
 
 ## 17.0.0 (2021-09-09)
 
-### Breaking Change
+### Breaking Changes
 
 -   Removed a min-width from the `DropdownMenu` component, allowing the menu to accommodate thin contents like vertical tools menus ([#33995](https://github.com/WordPress/gutenberg/pull/33995)).
 
@@ -1976,7 +1976,7 @@
 
 ## 16.0.0 (2021-08-23)
 
-### Breaking Change
+### Breaking Changes
 
 -   Updated the visual styles of the RangeControl component ([#33824](https://github.com/WordPress/gutenberg/pull/33824)).
 
@@ -1990,7 +1990,7 @@
 
 ## 15.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -2037,7 +2037,7 @@
 
 ## 13.0.0 (2021-03-17)
 
-### Breaking Change
+### Breaking Changes
 
 -   `onChange` prop of `FocalPointPicker` is called at the end of drag operations. Previously, it was called repetitively while dragging.
 
@@ -2056,7 +2056,7 @@
 
 -   ComboboxControl: Deburr option labels before filter
 
-### Breaking Change
+### Breaking Changes
 
 -   Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
 
@@ -2073,7 +2073,7 @@
 
 ## 10.0.0 (2020-07-07)
 
-### Breaking Change
+### Breaking Changes
 
 -   `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
 -   `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
@@ -2174,7 +2174,7 @@
 
 -   Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
 
-### Breaking Change
+### Breaking Changes
 
 -   `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
 
@@ -2256,7 +2256,7 @@
 
 ## 7.0.0 (2018-11-20)
 
-### Breaking Change
+### Breaking Changes
 
 -   `Dropdown.refresh()` has been removed. The contained `Popover` is now automatically refreshed.
 
@@ -2274,7 +2274,7 @@
 
 ## 6.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `PanelColor` component has been removed.
 
@@ -2303,7 +2303,7 @@
 
 ## 5.0.0 (2018-10-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   `AccessibleSVG` component has been removed. Please use `SVG` instead.
 
@@ -2342,7 +2342,7 @@
 
 ## 4.0.0 (2018-09-30)
 
-### Breaking Change
+### Breaking Changes
 
 -   `Draggable` as a DOM node drag handler has been removed. Please, use `Draggable` as a wrap component for your DOM node drag handler.
 
@@ -2352,7 +2352,7 @@
 
 ## 3.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   `withAPIData` has been removed. Please use the Core Data module or `@wordpress/api-fetch` directly instead.
 -   `Draggable` as a DOM node drag handler has been deprecated. Please, use `Draggable` as a wrap component for your DOM node drag handler.
