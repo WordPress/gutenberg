@@ -323,9 +323,13 @@ function register_block_core_image() {
 		)
 	);
 
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$module_url = gutenberg_url( '/build/interactivity/image.min.js' );
+	}
+
 	wp_register_script_module(
 		'@wordpress/block-library/image',
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/image.min.js' ) : includes_url( 'blocks/image/view.min.js' ),
+		$module_url ?? includes_url( 'blocks/image/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
