@@ -168,7 +168,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 			add_action( $position, array( $this, 'print_enqueued_script_modules' ) );
 			add_action( $position, array( $this, 'print_script_module_preloads' ) );
 			// Prints the script that loads the import map polyfill in the footer.
-			add_action( 'wp_footer', array( $this, 'print_import_map_polyfill' ), 11 );
+			add_action( 'wp_head', array( $this, 'print_import_map_polyfill' ), 11 );
 		}
 
 		/**
@@ -232,22 +232,24 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		 * Prints the necessary script to load import map polyfill for browsers that
 		 * do not support import maps.
 		 *
-		 * TODO: Replace the polyfill with a simpler version that only provides
-		 * support for import maps and load it only when the browser doesn't support
-		 * import maps (https://github.com/guybedford/es-module-shims/issues/406).
-		 *
 		 * @since 6.5.0
 		 */
 		public function print_import_map_polyfill() {
-			$import_map = $this->get_import_map();
-			if ( ! empty( $import_map['imports'] ) ) {
-				wp_print_script_tag(
-					array(
-						'src'   => defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/importmap-polyfill.min.js' ),
-						'defer' => true,
-					)
-				);
-			}
+			$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
+			$src  = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/importmap-polyfill.min.js' ),
+
+			echo (
+			// Test presence of feature...
+			'<script>( ' . $test . ' ) || ' .
+			/*
+			 * ...appending polyfill on any failures. Cautious viewers may balk
+			 * at the `document.write`. Its caveat of synchronous mid-stream
+			 * blocking write is exactly the behavior we need though.
+			 */
+			'document.write( \'<script src="' .
+			$src .
+			'"></scr\' + \'ipt>\' );</script>'
+			);
 		}
 		/**
 		 * Returns the import map array.
