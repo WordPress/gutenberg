@@ -6,7 +6,7 @@ The new editor is highly flexible, like most of WordPress. You can build custom 
 
 The editor is about blocks, and the main extensibility API is the Block API. It allows you to create your own static blocks, [Dynamic Blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) ( rendered on the server ) and also blocks capable of saving data to Post Meta for more structured content.
 
-If you want to learn more about block creation, see the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for the best place to start.
+If you want to learn more about block creation, see the [Create a Block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) for the best place to start.
 
 ## Extending blocks
 

@@ -126,30 +126,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	add_settings_field(
-		'gutenberg-custom-fields',
-		__( 'Connections', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test Connections', 'gutenberg' ),
-			'id'    => 'gutenberg-connections',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-pattern-partial-syncing',
-		__( 'Synced patterns partial syncing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test partial syncing of patterns', 'gutenberg' ),
-			'id'    => 'gutenberg-pattern-partial-syncing',
-		)
-	);
-
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

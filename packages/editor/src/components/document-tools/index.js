@@ -19,6 +19,7 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -36,7 +37,6 @@ const preventDefault = ( event ) => {
 
 function DocumentTools( {
 	className,
-	showIconLabels,
 	disableBlockTools = false,
 	children,
 	// This is a temporary prop until the list view is fully unified between post and site editors.
@@ -51,8 +51,10 @@ function DocumentTools( {
 		listViewShortcut,
 		listViewToggleRef,
 		hasFixedToolbar,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
+		const { get } = select( preferencesStore );
 		const { isListViewOpened, getListViewToggleRef } = unlock(
 			select( editorStore )
 		);
@@ -66,6 +68,7 @@ function DocumentTools( {
 			),
 			listViewToggleRef: getListViewToggleRef(),
 			hasFixedToolbar: getSettings().hasFixedToolbar,
+			showIconLabels: get( 'core', 'showIconLabels' ),
 		};
 	}, [] );
 
@@ -101,8 +104,16 @@ function DocumentTools( {
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
+		// Some plugins expect and use the `edit-post-header-toolbar` CSS class to
+		// find the toolbar and inject UI elements into it. This is not officially
+		// supported, but we're keeping it in the list of class names for backwards
+		// compatibility.
 		<NavigableToolbar
-			className={ classnames( 'editor-document-tools', className ) }
+			className={ classnames(
+				'editor-document-tools',
+				'edit-post-header-toolbar',
+				className
+			) }
 			aria-label={ toolbarAriaLabel }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 			variant="unstyled"

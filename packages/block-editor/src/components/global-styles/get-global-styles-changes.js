@@ -16,6 +16,12 @@ const translationMap = {
 	link: __( 'Link' ),
 	button: __( 'Button' ),
 	heading: __( 'Heading' ),
+	h1: __( 'H1' ),
+	h2: __( 'H2' ),
+	h3: __( 'H3' ),
+	h4: __( 'H4' ),
+	h5: __( 'H5' ),
+	h6: __( 'H6' ),
 	'settings.color': __( 'Color settings' ),
 	'settings.typography': __( 'Typography settings' ),
 	'styles.color': __( 'Colors' ),
@@ -54,10 +60,11 @@ function getTranslation( key ) {
 	}
 
 	if ( keyArray?.[ 0 ] === 'elements' ) {
+		const elementName = translationMap[ keyArray[ 1 ] ] || keyArray[ 1 ];
 		return sprintf(
 			// translators: %s: element name, e.g., heading button, link, caption.
 			__( '%s element' ),
-			translationMap[ keyArray[ 1 ] ]
+			elementName
 		);
 	}
 

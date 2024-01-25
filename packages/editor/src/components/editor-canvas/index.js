@@ -12,7 +12,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
-	__experimentalRecursionProvider as RecursionProvider,
+	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
@@ -91,6 +91,7 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -127,7 +128,7 @@ function EditorCanvas( {
 
 		return {
 			renderingMode: _renderingMode,
-			postContentAttributes: getEditorSettings().postContentAttributes,
+			postContentAttributes: editorSettings.postContentAttributes,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -137,6 +138,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
+			hasHistory: !! editorSettings.goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -299,6 +301,9 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
+				className: classnames( 'editor-canvas__iframe', {
+					'has-history': hasHistory,
+				} ),
 				...iframeProps,
 				style: {
 					...iframeProps?.style,
@@ -359,7 +364,8 @@ function EditorCanvas( {
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+							: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+						renderingMode !== 'all' && 'is-' + renderingMode
 					) }
 					layout={ blockListLayout }
 					dropZoneElement={

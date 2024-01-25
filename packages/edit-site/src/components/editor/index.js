@@ -42,8 +42,6 @@ import {
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
-import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
-import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
@@ -59,8 +57,11 @@ import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
-const { ExperimentalEditorProvider: EditorProvider } =
-	unlock( editorPrivateApis );
+const {
+	ExperimentalEditorProvider: EditorProvider,
+	InserterSidebar,
+	ListViewSidebar,
+} = unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -109,6 +110,7 @@ export default function Editor( { isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
@@ -139,14 +141,8 @@ export default function Editor( { isLoading } ) {
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
-				'showIconLabels'
-			),
-			showBlockBreadcrumbs: select( preferencesStore ).get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			showIconLabels: get( 'core', 'showIconLabels' ),
 		};
 	}, [] );
 

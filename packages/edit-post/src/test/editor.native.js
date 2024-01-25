@@ -11,6 +11,7 @@ import {
 	screen,
 	setupCoreBlocks,
 } from 'test/helpers';
+import { BackHandler } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -128,5 +129,21 @@ describe( 'Editor', () => {
 
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'unselects current block when tapping on the hardware back button', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Spacer' );
+
+		// Act
+		act( () => {
+			BackHandler.mockPressBack();
+		} );
+
+		// Assert
+		const openBlockSettingsButton =
+			screen.queryAllByLabelText( 'Open Settings' );
+		expect( openBlockSettingsButton.length ).toBe( 0 );
 	} );
 } );

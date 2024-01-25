@@ -63,8 +63,6 @@ export function ExperimentalBlockCanvas( {
 				ref={ resetTypingRef }
 				contentRef={ contentRef }
 				style={ {
-					width: '100%',
-					height: '100%',
 					...iframeProps?.style,
 				} }
 				name="editor-canvas"
