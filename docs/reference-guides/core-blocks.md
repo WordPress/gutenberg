@@ -42,7 +42,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/block
 -	**Category:** reusable
 -	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
--	**Attributes:** overrides, ref
+-	**Attributes:** content, ref
 
 ## Button
 

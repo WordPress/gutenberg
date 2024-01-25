@@ -46,7 +46,7 @@ function render_block_core_block( $attributes ) {
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 	$content = $wp_embed->autoembed( $content );
 
-	$has_pattern_overrides = isset( $attributes['overrides'] );
+	$has_pattern_overrides = isset( $attributes['content'] );
 
 	/**
 	 * We set the `pattern/overrides` context through the `render_block_context`
@@ -55,7 +55,7 @@ function render_block_core_block( $attributes ) {
 	 */
 	if ( $has_pattern_overrides ) {
 		$filter_block_context = static function ( $context ) use ( $attributes ) {
-			$context['pattern/overrides'] = $attributes['overrides'];
+			$context['pattern/overrides'] = $attributes['content'];
 			return $context;
 		};
 		add_filter( 'render_block_context', $filter_block_context, 1 );

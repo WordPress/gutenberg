@@ -108,11 +108,11 @@ const PATCH_OPERATIONS = {
  * @typedef {RemovePatch | ReplacePatch} OverridePatch
  */
 
-function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
+function applyInitialOverrides( blocks, content = {}, defaultValues ) {
 	return blocks.map( ( block ) => {
 		const innerBlocks = applyInitialOverrides(
 			block.innerBlocks,
-			overrides,
+			content,
 			defaultValues
 		);
 		const blockId = block.attributes.metadata?.id;
@@ -125,7 +125,7 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
 			/** @type {OverridePatch} */
-			const overrideAttribute = overrides[ blockId ]?.[ attributeKey ];
+			const overrideAttribute = content[ blockId ]?.[ attributeKey ];
 			if ( ! overrideAttribute ) {
 				continue;
 			}
@@ -145,10 +145,10 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 
 function getOverridesFromBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, Record<string, OverridePatch>>} */
-	const overrides = {};
+	const content = {};
 	for ( const block of blocks ) {
 		Object.assign(
-			overrides,
+			content,
 			getOverridesFromBlocks( block.innerBlocks, defaultValues )
 		);
 		/** @type {string} */
@@ -160,7 +160,7 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				block.attributes[ attributeKey ] !==
 				defaultValues[ blockId ][ attributeKey ]
 			) {
-				overrides[ blockId ] ??= {};
+				content[ blockId ] ??= {};
 				/**
 				 * Create a patch operation for the binding attribute.
 				 * We use a tuple here to minimize the size of the serialized data.
@@ -168,12 +168,12 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				 */
 				if ( block.attributes[ attributeKey ] === undefined ) {
 					/** @type {RemovePatch} */
-					overrides[ blockId ][ attributeKey ] = [
+					content[ blockId ][ attributeKey ] = [
 						PATCH_OPERATIONS.Remove,
 					];
 				} else {
 					/** @type {ReplacePatch} */
-					overrides[ blockId ][ attributeKey ] = [
+					content[ blockId ][ attributeKey ] = [
 						PATCH_OPERATIONS.Replace,
 						block.attributes[ attributeKey ],
 					];
@@ -181,7 +181,7 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 			}
 		}
 	}
-	return Object.keys( overrides ).length > 0 ? overrides : undefined;
+	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
@@ -202,7 +202,7 @@ function getHasOverridableBlocks( blocks ) {
 
 export default function ReusableBlockEdit( {
 	name,
-	attributes: { ref, overrides },
+	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 	setAttributes,
@@ -215,7 +215,7 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialOverrides = useRef( overrides );
+	const initialOverrides = useRef( content );
 	const defaultValuesRef = useRef( {} );
 
 	const {
@@ -338,7 +338,7 @@ export default function ReusableBlockEdit( {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
 					setAttributes( {
-						overrides: getOverridesFromBlocks(
+						content: getOverridesFromBlocks(
 							blocks,
 							defaultValuesRef.current
 						),
@@ -354,7 +354,7 @@ export default function ReusableBlockEdit( {
 	};
 
 	const resetOverrides = () => {
-		if ( overrides ) {
+		if ( content ) {
 			replaceInnerBlocks( patternClientId, initialBlocks );
 		}
 	};
@@ -405,7 +405,7 @@ export default function ReusableBlockEdit( {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ resetOverrides }
-							disabled={ ! overrides }
+							disabled={ ! content }
 							__experimentalIsFocusable
 						>
 							{ __( 'Reset' ) }
