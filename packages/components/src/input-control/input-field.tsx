@@ -19,7 +19,7 @@ import { forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';

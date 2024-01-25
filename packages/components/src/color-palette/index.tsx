@@ -32,7 +32,7 @@ import type {
 	PaletteObject,
 	SinglePaletteProps,
 } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { DropdownProps } from '../dropdown/types';
 import {
 	extractColorNameFromCurrentValue,
@@ -48,7 +48,7 @@ function SinglePalette( {
 	colors,
 	onChange,
 	value,
-	...otherProps
+	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
 		return colors.map( ( { color, name }, index ) => {
@@ -95,7 +95,7 @@ function SinglePalette( {
 		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ colorOptions }
-			{ ...otherProps }
+			{ ...additionalProps }
 		/>
 	);
 }
@@ -147,6 +147,10 @@ export function CustomColorPickerDropdown( {
 	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
+			// Disabling resize as it would otherwise cause the popover to show
+			// scrollbars while dragging the color picker's handle close to the
+			// popover edge.
+			resize: false,
 			...( isRenderedInSidebar
 				? {
 						// When in the sidebar: open to the left (stacking),
@@ -178,6 +182,8 @@ function UnforwardedColorPalette(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
+		asButtons,
+		loop,
 		clearable = true,
 		colors = [],
 		disableCustomColors = false,
@@ -188,7 +194,7 @@ function UnforwardedColorPalette(
 		headingLevel = 2,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
-		...otherProps
+		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
@@ -248,17 +254,36 @@ function UnforwardedColorPalette(
 		</CircularOptionPicker.ButtonAction>
 	);
 
-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
-	if ( ariaLabel ) {
-		ariaProps = { 'aria-label': ariaLabel };
-	} else if ( ariaLabelledby ) {
-		ariaProps = { 'aria-labelledby': ariaLabelledby };
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
+
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
 	} else {
-		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
+		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
 	}
 
 	return (
-		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
+		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
@@ -278,6 +303,7 @@ function UnforwardedColorPalette(
 								style={ {
 									background: value,
 								} }
+								type="button"
 							/>
 							<VStack
 								className="components-color-palette__custom-color-text-wrapper"
@@ -286,7 +312,7 @@ function UnforwardedColorPalette(
 								<Truncate className="components-color-palette__custom-color-name">
 									{ value
 										? buttonLabelName
-										: 'No color selected' }
+										: __( 'No color selected' ) }
 								</Truncate>
 								{ /*
 								This `Truncate` is always rendered, even if
@@ -310,7 +336,7 @@ function UnforwardedColorPalette(
 				/>
 			) }
 			<CircularOptionPicker
-				{ ...ariaProps }
+				{ ...metaProps }
 				actions={ actions }
 				options={
 					hasMultipleColorOrigins ? (

@@ -1,26 +1,15 @@
+/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * External dependencies
- */
-const path = require( 'path' );
+import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
  */
-const {
-	getTypingEventDurations,
-	getClickEventDurations,
-	getHoverEventDurations,
-	getSelectionEventDurations,
-	getLoadingDurations,
-	loadBlocksFromHtml,
-	load1000Paragraphs,
-	sum,
-} = require( '../utils' );
+import { PerfUtils } from '../fixtures';
+import { sum } from '../utils.js';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
@@ -33,15 +22,27 @@ const results = {
 	firstContentfulPaint: [],
 	firstBlock: [],
 	type: [],
+	typeWithoutInspector: [],
+	typeWithTopToolbar: [],
 	typeContainer: [],
 	focus: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
 	inserterSearch: [],
+	loadPatterns: [],
 };
 
 test.describe( 'Post Editor Performance', () => {
+	test.use( {
+		perfUtils: async ( { page }, use ) => {
+			await use( new PerfUtils( { page } ) );
+		},
+		metrics: async ( { page }, use ) => {
+			await use( new Metrics( { page } ) );
+		},
+	} );
+
 	test.afterAll( async ( {}, testInfo ) => {
 		await testInfo.attach( 'results', {
 			body: JSON.stringify( results, null, 2 ),
@@ -49,356 +50,647 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.createNewPost();
-		// Disable auto-save to avoid impacting the metrics.
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				autosaveInterval: 100000000000,
-				localAutosaveInterval: 100000000000,
-			} );
+	test.describe( 'Loading', () => {
+		let draftId = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			draftId = await perfUtils.saveDraft();
 		} );
-	} );
 
-	test( 'Loading', async ( { browser, page } ) => {
-		// Turn the large post HTML into blocks and insert.
-		await loadBlocksFromHtml(
-			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
-
-		// Save the draft.
-		await page
-			.getByRole( 'button', { name: 'Save draft' } )
-			.click( { timeout: 60_000 } );
-		await expect(
-			page.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
-
-		// Get the URL that we will be testing against.
-		const draftURL = page.url();
-
-		// Start the measurements.
 		const samples = 10;
 		const throwaway = 1;
-		const rounds = throwaway + samples;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Open a fresh page in a new context to prevent caching.
-			const testPage = await browser.newPage();
+		const iterations = samples + throwaway;
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
+				admin,
+				perfUtils,
+				metrics,
+			} ) => {
+				// Open the test draft.
+				await admin.editPost( draftId );
+				const canvas = await perfUtils.getCanvas();
 
-			// Go to the test page URL.
-			await testPage.goto( draftURL );
+				// Wait for the first block.
+				await canvas.locator( '.wp-block' ).first().waitFor();
 
-			// Get canvas (handles both legacy and iframed canvas).
-			const canvas = await Promise.any( [
-				( async () => {
-					const legacyCanvasLocator = testPage.locator(
-						'.wp-block-post-content'
+				// Get the durations.
+				const loadingDurations = await metrics.getLoadingDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					Object.entries( loadingDurations ).forEach(
+						( [ metric, duration ] ) => {
+							if ( metric === 'timeSinceResponseEnd' ) {
+								results.firstBlock.push( duration );
+							} else {
+								results[ metric ].push( duration );
+							}
+						}
 					);
-					await legacyCanvasLocator.waitFor( { timeout: 120_000 } );
-					return legacyCanvasLocator;
-				} )(),
-				( async () => {
-					const iframedCanvasLocator = testPage.frameLocator(
-						'[name=editor-canvas]'
-					);
-					await iframedCanvasLocator
-						.locator( 'body' )
-						.waitFor( { timeout: 120_000 } );
-					return iframedCanvasLocator;
-				} )(),
-			] );
-
-			await canvas.locator( '.wp-block' ).first().waitFor( {
-				timeout: 120_000,
+				}
 			} );
-
-			// Save the results.
-			if ( i >= throwaway ) {
-				const loadingDurations = await getLoadingDurations( testPage );
-				Object.entries( loadingDurations ).forEach(
-					( [ metric, duration ] ) => {
-						results[ metric ].push( duration );
-					}
-				);
-			}
-
-			await testPage.close();
 		}
 	} );
 
-	test( 'Typing', async ( { browser, page, editor } ) => {
-		// Load the large post fixture.
-		await loadBlocksFromHtml(
-			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
-
-		// Append an empty paragraph.
-		await editor.insertBlock( { name: 'core/paragraph' } );
+	async function type( target, metrics, key ) {
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const samples = 10;
+		const throwaway = 1;
+		const iterations = samples + throwaway;
 
 		// Start tracing.
-		await browser.startTracing( page, {
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
-
-		// The first character typed triggers a longer time (isTyping change).
-		// It can impact the stability of the metric, so we exclude it. It
-		// probably deserves a dedicated metric itself, though.
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
+		await metrics.startTracing();
 
 		// Type the testing sequence into the empty paragraph.
-		await page.keyboard.type( 'x'.repeat( rounds ), {
+		await target.type( 'x'.repeat( iterations ), {
 			delay: BROWSER_IDLE_WAIT,
+			// The extended timeout is needed because the typing is very slow
+			// and the `delay` value itself does not extend it.
+			timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
 		} );
 
-		// Stop tracing and save results.
-		const traceBuffer = await browser.stopTracing();
-		const traceResults = JSON.parse( traceBuffer.toString() );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
+		// Stop tracing.
+		await metrics.stopTracing();
 
-		for ( let i = throwaway; i < rounds; i++ ) {
-			results.type.push(
+		// Get the durations.
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			metrics.getTypingEventDurations();
+
+		// Save the results.
+		for ( let i = throwaway; i < iterations; i++ ) {
+			results[ key ].push(
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
-	} );
+	}
 
-	test( 'Typing within containers', async ( { browser, page, editor } ) => {
-		await loadBlocksFromHtml(
-			page,
-			path.join(
-				process.env.ASSETS_PATH,
-				'small-post-with-containers.html'
-			)
-		);
+	test.describe( 'Typing', () => {
+		let draftId = null;
 
-		// Select the block where we type in
-		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
-			.first()
-			.click();
-
-		await browser.startTracing( page, {
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		const samples = 10;
-		// The first character typed triggers a longer time (isTyping change).
-		// It can impact the stability of the metric, so we exclude it. It
-		// probably deserves a dedicated metric itself, though.
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		await page.keyboard.type( 'x'.repeat( rounds ), {
-			delay: BROWSER_IDLE_WAIT,
-		} );
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
 
-		const traceBuffer = await browser.stopTracing();
-		const traceResults = JSON.parse( traceBuffer.toString() );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
-
-		for ( let i = throwaway; i < rounds; i++ ) {
-			results.typeContainer.push(
-				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-			);
-		}
-	} );
-
-	test( 'Selecting blocks', async ( { browser, page, editor } ) => {
-		await load1000Paragraphs( page );
-		const paragraphs = editor.canvas.locator( '.wp-block' );
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
 			} );
 
-			await paragraphs.nth( i ).click();
+			await type( paragraph, metrics, 'type' );
+		} );
+	} );
 
-			const traceBuffer = await browser.stopTracing();
+	test.describe( 'Typing (without inspector)', () => {
+		let draftId = null;
 
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const allDurations = getSelectionEventDurations( traceResults );
-				results.focus.push(
-					allDurations.reduce( ( acc, eventDurations ) => {
-						return acc + sum( eventDurations );
-					}, 0 )
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( {
+			admin,
+			perfUtils,
+			metrics,
+			page,
+			editor,
+		} ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const toggleButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Settings' } );
+			await toggleButton.click();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			await type( paragraph, metrics, 'typeWithoutInspector' );
+
+			// Open the inspector again.
+			await editor.openDocumentSettingsSidebar();
+		} );
+	} );
+
+	test.describe( 'Typing (with top toolbar)', () => {
+		let draftId = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( {
+			admin,
+			perfUtils,
+			metrics,
+			editor,
+		} ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			// Enable fixed toolbar.
+			await editor.setIsFixedToolbar( true );
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			await type( paragraph, metrics, 'typeWithTopToolbar' );
+
+			// Disabled fixed toolbar. Default state.
+			await editor.setIsFixedToolbar( false );
+		} );
+	} );
+
+	test.describe( 'Typing within containers', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForSmallPostWithContainers();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			// Select the block where we type in.
+			const firstParagraph = canvas
+				.getByRole( 'document', {
+					name: /Paragraph block|Block: Paragraph/,
+				} )
+				.first();
+			await firstParagraph.click();
+
+			await type( firstParagraph, metrics, 'typeContainer' );
+		} );
+	} );
+
+	test.describe( 'Selecting blocks', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraphs = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Click the next paragraph.
+				await paragraphs.nth( i ).click();
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const allDurations = metrics.getSelectionEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.focus.push(
+						allDurations.reduce( ( acc, eventDurations ) => {
+							return acc + sum( eventDurations );
+						}, 0 )
+					);
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Opening persistent List View', () => {
+		let draftId = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+
+			const listViewToggle = page.getByRole( 'button', {
+				name: 'Document Overview',
+			} );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Open List View.
+				await listViewToggle.click();
+				await perfUtils.expectExpandedState( listViewToggle, 'true' );
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.listViewOpen.push( mouseClickEvents[ 0 ] );
+				}
+
+				// Close List View
+				await listViewToggle.click();
+				await perfUtils.expectExpandedState( listViewToggle, 'false' );
+			}
+		} );
+	} );
+
+	test.describe( 'Opening Inserter', () => {
+		let draftId = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
+			// Go to the test page.
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Open Inserter.
+				await globalInserterToggle.click();
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
+					'true'
+				);
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.inserterOpen.push( mouseClickEvents[ 0 ] );
+				}
+
+				// Close Inserter.
+				await globalInserterToggle.click();
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
+					'false'
 				);
 			}
-		}
+		} );
 	} );
 
-	test( 'Opening persistent list view', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const listViewToggle = page.getByRole( 'button', {
-			name: 'Document Overview',
+	test.describe( 'Searching Inserter', () => {
+		let draftId = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
-
-			// Open List View
-			await listViewToggle.click();
-
-			const traceBuffer = await browser.stopTracing();
-
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const [ mouseClickEvents ] =
-					getClickEventDurations( traceResults );
-				results.listViewOpen.push( mouseClickEvents[ 0 ] );
-			}
-
-			// Close List View
-			await listViewToggle.click();
-		}
-	} );
-
-	test( 'Opening the inserter', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const globalInserterToggle = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
-		} );
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
+			// Go to the test page.
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
 			} );
 
 			// Open Inserter.
 			await globalInserterToggle.click();
+			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
 
-			const traceBuffer = await browser.stopTracing();
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const [ mouseClickEvents ] =
-					getClickEventDurations( traceResults );
-				results.inserterOpen.push( mouseClickEvents[ 0 ] );
-			}
+				// Start tracing.
+				await metrics.startTracing();
 
-			// Close Inserter.
-			await globalInserterToggle.click();
-		}
-	} );
+				// Type to trigger search.
+				await page.keyboard.type( 'p' );
 
-	test( 'Searching the inserter', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const globalInserterToggle = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
-		} );
+				// Stop tracing.
+				await metrics.stopTracing();
 
-		// Open Inserter.
-		await globalInserterToggle.click();
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
-
-			await page.keyboard.type( 'p' );
-
-			const traceBuffer = await browser.stopTracing();
-
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
+				// Get the durations.
 				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-					getTypingEventDurations( traceResults );
-				results.inserterSearch.push(
-					keyDownEvents[ 0 ] + keyPressEvents[ 0 ] + keyUpEvents[ 0 ]
-				);
-			}
+					metrics.getTypingEventDurations();
 
-			await page.keyboard.press( 'Backspace' );
-		}
-
-		// Close Inserter.
-		await globalInserterToggle.click();
-	} );
-
-	test( 'Hovering Inserter Items', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const globalInserterToggle = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
-		} );
-		const paragraphBlockItem = page.locator(
-			'.block-editor-inserter__menu .editor-block-list-item-paragraph'
-		);
-		const headingBlockItem = page.locator(
-			'.block-editor-inserter__menu .editor-block-list-item-heading'
-		);
-
-		// Open Inserter.
-		await globalInserterToggle.click();
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
-
-			// Hover Items.
-			await paragraphBlockItem.hover();
-			await headingBlockItem.hover();
-
-			const traceBuffer = await browser.stopTracing();
-
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const [ mouseOverEvents, mouseOutEvents ] =
-					getHoverEventDurations( traceResults );
-				for ( let k = 0; k < mouseOverEvents.length; k++ ) {
-					results.inserterHover.push(
-						mouseOverEvents[ k ] + mouseOutEvents[ k ]
+				// Save the results.
+				if ( i > throwaway ) {
+					results.inserterSearch.push(
+						keyDownEvents[ 0 ] +
+							keyPressEvents[ 0 ] +
+							keyUpEvents[ 0 ]
 					);
 				}
-			}
-		}
 
-		// Close Inserter.
-		await globalInserterToggle.click();
+				await page.keyboard.press( 'Backspace' );
+			}
+		} );
+	} );
+
+	test.describe( 'Hovering Inserter items', () => {
+		let draftId = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
+			// Go to the test page.
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+			const paragraphBlockItem = page.locator(
+				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
+			);
+			const headingBlockItem = page.locator(
+				'.block-editor-inserter__menu .editor-block-list-item-heading'
+			);
+
+			// Open Inserter.
+			await globalInserterToggle.click();
+			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Hover Inserter items.
+				await paragraphBlockItem.hover();
+				await headingBlockItem.hover();
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseOverEvents, mouseOutEvents ] =
+					metrics.getHoverEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					for ( let k = 0; k < mouseOverEvents.length; k++ ) {
+						results.inserterHover.push(
+							mouseOverEvents[ k ] + mouseOutEvents[ k ]
+						);
+					}
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Loading Patterns', () => {
+		test( 'Run the test', async ( { page, admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.disableAutosave();
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+
+			const testPatterns = [
+				{
+					name: 'core/query-standard-posts',
+					title: 'Standard',
+					content:
+						'<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-query">\n\t\t\t\t\t<!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:post-title {"isLink":true} /-->\n\t\t\t\t\t<!-- wp:post-featured-image {"isLink":true,"align":"wide"} /-->\n\t\t\t\t\t<!-- wp:post-excerpt /-->\n\t\t\t\t\t<!-- wp:separator -->\n\t\t\t\t\t<hr class="wp-block-separator"/>\n\t\t\t\t\t<!-- /wp:separator -->\n\t\t\t\t\t<!-- wp:post-date /-->\n\t\t\t\t\t<!-- /wp:post-template -->\n\t\t\t\t\t</div>\n\t\t\t\t\t<!-- /wp:query -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-medium-posts',
+					title: 'Image at left',
+					content:
+						'<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-query">\n\t\t\t\t\t<!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:columns {"align":"wide"} -->\n\t\t\t\t\t<div class="wp-block-columns alignwide"><!-- wp:column {"width":"66.66%"} -->\n\t\t\t\t\t<div class="wp-block-column" style="flex-basis:66.66%"><!-- wp:post-featured-image {"isLink":true} /--></div>\n\t\t\t\t\t<!-- /wp:column -->\n\t\t\t\t\t<!-- wp:column {"width":"33.33%"} -->\n\t\t\t\t\t<div class="wp-block-column" style="flex-basis:33.33%"><!-- wp:post-title {"isLink":true} /-->\n\t\t\t\t\t<!-- wp:post-excerpt /--></div>\n\t\t\t\t\t<!-- /wp:column --></div>\n\t\t\t\t\t<!-- /wp:columns -->\n\t\t\t\t\t<!-- /wp:post-template -->\n\t\t\t\t\t</div>\n\t\t\t\t\t<!-- /wp:query -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-small-posts',
+					title: 'Small image and title',
+					content:
+						'<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-query">\n\t\t\t\t\t<!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:columns {"verticalAlignment":"center"} -->\n\t\t\t\t\t<div class="wp-block-columns are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"25%"} -->\n\t\t\t\t\t<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:25%"><!-- wp:post-featured-image {"isLink":true} /--></div>\n\t\t\t\t\t<!-- /wp:column -->\n\t\t\t\t\t<!-- wp:column {"verticalAlignment":"center","width":"75%"} -->\n\t\t\t\t\t<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:75%"><!-- wp:post-title {"isLink":true} /--></div>\n\t\t\t\t\t<!-- /wp:column --></div>\n\t\t\t\t\t<!-- /wp:columns -->\n\t\t\t\t\t<!-- /wp:post-template -->\n\t\t\t\t\t</div>\n\t\t\t\t\t<!-- /wp:query -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-grid-posts',
+					title: 'Grid',
+					content:
+						'<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->\n\t\t\t\t\t<div class="wp-block-query">\n\t\t\t\t\t<!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->\n\t\t\t\t\t<!-- wp:post-excerpt /-->\n\t\t\t\t\t<!-- wp:post-date /--></div>\n\t\t\t\t\t<!-- /wp:group -->\n\t\t\t\t\t<!-- /wp:post-template -->\n\t\t\t\t\t</div>\n\t\t\t\t\t<!-- /wp:query -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-large-title-posts',
+					title: 'Large title',
+					content:
+						'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}},"color":{"text":"#ffffff","background":"#000000"}}} -->\n\t\t\t\t\t<div class="wp-block-group alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff;padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px"><!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-query"><!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:separator {"customColor":"#ffffff","align":"wide","className":"is-style-wide"} -->\n\t\t\t\t\t<hr class="wp-block-separator alignwide has-text-color has-background is-style-wide" style="background-color:#ffffff;color:#ffffff"/>\n\t\t\t\t\t<!-- /wp:separator -->\n\n\t\t\t\t\t<!-- wp:columns {"verticalAlignment":"center","align":"wide"} -->\n\t\t\t\t\t<div class="wp-block-columns alignwide are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"20%"} -->\n\t\t\t\t\t<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:20%"><!-- wp:post-date {"style":{"color":{"text":"#ffffff"}},"fontSize":"extra-small"} /--></div>\n\t\t\t\t\t<!-- /wp:column -->\n\n\t\t\t\t\t<!-- wp:column {"verticalAlignment":"center","width":"80%"} -->\n\t\t\t\t\t<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:80%"><!-- wp:post-title {"isLink":true,"style":{"typography":{"fontSize":"72px","lineHeight":"1.1"},"color":{"text":"#ffffff","link":"#ffffff"}}} /--></div>\n\t\t\t\t\t<!-- /wp:column --></div>\n\t\t\t\t\t<!-- /wp:columns -->\n\t\t\t\t\t<!-- /wp:post-template --></div>\n\t\t\t\t\t<!-- /wp:query --></div>\n\t\t\t\t\t<!-- /wp:group -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-offset-posts',
+					title: 'Offset',
+					content:
+						'<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->\n\t\t\t\t\t<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->\n\t\t\t\t\t<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->\n\t\t\t\t\t<div class="wp-block-query"><!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:post-featured-image /-->\n\t\t\t\t\t<!-- wp:post-title /-->\n\t\t\t\t\t<!-- wp:post-date /-->\n\t\t\t\t\t<!-- wp:spacer {"height":200} -->\n\t\t\t\t\t<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>\n\t\t\t\t\t<!-- /wp:spacer -->\n\t\t\t\t\t<!-- /wp:post-template --></div>\n\t\t\t\t\t<!-- /wp:query --></div>\n\t\t\t\t\t<!-- /wp:column -->\n\t\t\t\t\t<!-- wp:column {"width":"50%"} -->\n\t\t\t\t\t<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->\n\t\t\t\t\t<div class="wp-block-query"><!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:spacer {"height":200} -->\n\t\t\t\t\t<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>\n\t\t\t\t\t<!-- /wp:spacer -->\n\t\t\t\t\t<!-- wp:post-featured-image /-->\n\t\t\t\t\t<!-- wp:post-title /-->\n\t\t\t\t\t<!-- wp:post-date /-->\n\t\t\t\t\t<!-- /wp:post-template --></div>\n\t\t\t\t\t<!-- /wp:query --></div>\n\t\t\t\t\t<!-- /wp:column --></div>\n\t\t\t\t\t<!-- /wp:columns --></div>\n\t\t\t\t\t<!-- /wp:group -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/social-links-shared-background-color',
+					title: 'Social links with a shared background color',
+					content:
+						'<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->\n\t\t\t\t\t\t<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"chain"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>\n\t\t\t\t\t\t<!-- /wp:social-links -->',
+					viewportWidth: 500,
+					categories: [ 'test' ],
+					blockTypes: [ 'core/social-links' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-large-title-posts-2',
+					title: 'Large title 2',
+					content:
+						'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}},"color":{"text":"#ffffff","background":"#000000"}}} -->\n\t\t\t\t\t<div class="wp-block-group alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff;padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px"><!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-query"><!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:separator {"customColor":"#ffffff","align":"wide","className":"is-style-wide"} -->\n\t\t\t\t\t<hr class="wp-block-separator alignwide has-text-color has-background is-style-wide" style="background-color:#ffffff;color:#ffffff"/>\n\t\t\t\t\t<!-- /wp:separator -->\n\n\t\t\t\t\t<!-- wp:columns {"verticalAlignment":"center","align":"wide"} -->\n\t\t\t\t\t<div class="wp-block-columns alignwide are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"20%"} -->\n\t\t\t\t\t<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:20%"><!-- wp:post-date {"style":{"color":{"text":"#ffffff"}},"fontSize":"extra-small"} /--></div>\n\t\t\t\t\t<!-- /wp:column -->\n\n\t\t\t\t\t<!-- wp:column {"verticalAlignment":"center","width":"80%"} -->\n\t\t\t\t\t<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:80%"><!-- wp:post-title {"isLink":true,"style":{"typography":{"fontSize":"72px","lineHeight":"1.1"},"color":{"text":"#ffffff","link":"#ffffff"}}} /--></div>\n\t\t\t\t\t<!-- /wp:column --></div>\n\t\t\t\t\t<!-- /wp:columns -->\n\t\t\t\t\t<!-- /wp:post-template --></div>\n\t\t\t\t\t<!-- /wp:query --></div>\n\t\t\t\t\t<!-- /wp:group -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/query-offset-posts-2',
+					title: 'Offset 2',
+					content:
+						'<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->\n\t\t\t\t\t<div class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->\n\t\t\t\t\t<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->\n\t\t\t\t\t<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->\n\t\t\t\t\t<div class="wp-block-query"><!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:post-featured-image /-->\n\t\t\t\t\t<!-- wp:post-title /-->\n\t\t\t\t\t<!-- wp:post-date /-->\n\t\t\t\t\t<!-- wp:spacer {"height":200} -->\n\t\t\t\t\t<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>\n\t\t\t\t\t<!-- /wp:spacer -->\n\t\t\t\t\t<!-- /wp:post-template --></div>\n\t\t\t\t\t<!-- /wp:query --></div>\n\t\t\t\t\t<!-- /wp:column -->\n\t\t\t\t\t<!-- wp:column {"width":"50%"} -->\n\t\t\t\t\t<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->\n\t\t\t\t\t<div class="wp-block-query"><!-- wp:post-template -->\n\t\t\t\t\t<!-- wp:spacer {"height":200} -->\n\t\t\t\t\t<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>\n\t\t\t\t\t<!-- /wp:spacer -->\n\t\t\t\t\t<!-- wp:post-featured-image /-->\n\t\t\t\t\t<!-- wp:post-title /-->\n\t\t\t\t\t<!-- wp:post-date /-->\n\t\t\t\t\t<!-- /wp:post-template --></div>\n\t\t\t\t\t<!-- /wp:query --></div>\n\t\t\t\t\t<!-- /wp:column --></div>\n\t\t\t\t\t<!-- /wp:columns --></div>\n\t\t\t\t\t<!-- /wp:group -->',
+					categories: [ 'test' ],
+					blockTypes: [ 'core/query' ],
+					source: 'core',
+				},
+				{
+					name: 'core/social-links-shared-background-color-2',
+					title: 'Social links with a shared background color 2',
+					content:
+						'<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->\n\t\t\t\t\t\t<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"chain"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>\n\t\t\t\t\t\t<!-- /wp:social-links -->',
+					viewportWidth: 500,
+					categories: [ 'test' ],
+					blockTypes: [ 'core/social-links' ],
+					source: 'core',
+				},
+			];
+
+			await page.evaluate( ( _testPatterns ) => {
+				const settings = window.wp.data
+					.select( 'core/editor' )
+					.getEditorSettings();
+				window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+					...settings,
+					__experimentalAdditionalBlockPatternCategories: [
+						...settings.__experimentalAdditionalBlockPatternCategories,
+						{ name: 'test', label: 'Test' },
+					],
+					__experimentalAdditionalBlockPatterns: [
+						...settings.__experimentalAdditionalBlockPatterns,
+						..._testPatterns,
+					],
+				} );
+			}, testPatterns );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				await globalInserterToggle.click();
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
+					'true'
+				);
+				await page.getByRole( 'tab', { name: 'Patterns' } ).click();
+
+				const startTime = performance.now();
+
+				await page.getByRole( 'button', { name: 'Test' } ).click();
+
+				await Promise.all(
+					testPatterns.map( async ( pattern ) => {
+						const canvas = await perfUtils.getCanvas(
+							page
+								.getByRole( 'option', {
+									name: pattern.title,
+									exact: true,
+								} )
+								.getByTitle( 'Editor canvas' )
+						);
+
+						// Wait for the first block.
+						await canvas.locator( '.wp-block' ).first().waitFor();
+					} )
+				);
+
+				const endTime = performance.now();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.loadPatterns.push( endTime - startTime );
+				}
+
+				// Close Inserter.
+				await globalInserterToggle.click();
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
+					'false'
+				);
+			}
+		} );
 	} );
 } );
+
+/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */

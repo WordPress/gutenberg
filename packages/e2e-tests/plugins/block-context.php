@@ -47,14 +47,14 @@ function gutenberg_test_register_context_blocks() {
 				'postId',
 				'postType',
 			),
-			'render_callback'       => static function( $attributes, $content, $block ) {
+			'render_callback'       => static function ( $attributes, $content, $block ) {
 				$ordered_context = array(
 					$block->context['gutenberg/recordId'],
 					$block->context['postId'],
 					$block->context['postType'],
 				);
 
-				return implode( ',', $ordered_context );
+				return '<p>' . implode( ',', $ordered_context ) . '</p>';
 			},
 			'editor_script_handles' => array( 'gutenberg-test-block-context' ),
 		)

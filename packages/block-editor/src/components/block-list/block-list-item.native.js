@@ -35,7 +35,7 @@ import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
  * @param {string}   props.rootClientId                 The root client ID.
  * @param {Function} props.shouldShowInnerBlockAppender Whether to show the inner block appender.
  *
- * @return {WPComponent} The rendered block list item content.
+ * @return {Component} The rendered block list item content.
  */
 function BlockListItemContent( {
 	blockWidth,
@@ -180,7 +180,7 @@ function BlockListItemContent( {
  * @param {string}   props.rootClientId                 The root client ID.
  * @param {Function} props.shouldShowInnerBlockAppender Whether to show the inner block appender.
  *
- * @return {WPComponent|null} The rendered block list item or null if the block width is not provided.
+ * @return {Component|null} The rendered block list item or null if the block width is not provided.
  */
 function BlockListItem( props ) {
 	const { isGridItem, numOfColumns, tileCount, tileIndex, ...restProps } =

@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { TabPanel } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,6 +14,9 @@ import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
 import InspectorControls from '../inspector-controls';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 export default function InspectorControlsTabs( {
 	blockName,
@@ -26,34 +32,39 @@ export default function InspectorControlsTabs( {
 	const initialTabName = ! useIsListViewTabDisabled( blockName )
 		? TAB_LIST_VIEW.name
 		: undefined;
+
 	return (
-		<TabPanel
-			className="block-editor-block-inspector__tabs"
-			tabs={ tabs }
-			initialTabName={ initialTabName }
-			key={ clientId }
-		>
-			{ ( tab ) => {
-				if ( tab.name === TAB_SETTINGS.name ) {
-					return (
-						<SettingsTab showAdvancedControls={ !! blockName } />
-					);
-				}
-
-				if ( tab.name === TAB_STYLES.name ) {
-					return (
-						<StylesTab
-							blockName={ blockName }
-							clientId={ clientId }
-							hasBlockStyles={ hasBlockStyles }
+		<div className="block-editor-block-inspector__tabs">
+			<Tabs initialTabId={ initialTabName } key={ clientId }>
+				<Tabs.TabList>
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab
+							key={ tab.name }
+							tabId={ tab.name }
+							render={
+								<Button
+									icon={ tab.icon }
+									label={ tab.title }
+									className={ tab.className }
+								/>
+							}
 						/>
-					);
-				}
-
-				if ( tab.name === TAB_LIST_VIEW.name ) {
-					return <InspectorControls.Slot group="list" />;
-				}
-			} }
-		</TabPanel>
+					) ) }
+				</Tabs.TabList>
+				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
+					<SettingsTab showAdvancedControls={ !! blockName } />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
+					<StylesTab
+						blockName={ blockName }
+						clientId={ clientId }
+						hasBlockStyles={ hasBlockStyles }
+					/>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
+					<InspectorControls.Slot group="list" />
+				</Tabs.TabPanel>
+			</Tabs>
+		</div>
 	);
 }

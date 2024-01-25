@@ -100,7 +100,7 @@ END;
 		register_block_type(
 			'test/in-the-loop-logger',
 			array(
-				'render_callback' => static function() use ( &$in_the_loop_logs ) {
+				'render_callback' => static function () use ( &$in_the_loop_logs ) {
 					$in_the_loop_logs[] = in_the_loop();
 					return '';
 				},

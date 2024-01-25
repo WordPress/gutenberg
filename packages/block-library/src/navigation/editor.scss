@@ -429,7 +429,7 @@ $color-control-label-height: 20px;
 // These needs extra specificity in the editor.
 .wp-block-navigation__responsive-container:not(.is-menu-open) {
 	.components-button.wp-block-navigation__responsive-container-close {
-		@include break-small {
+		.is-collapsed & {
 			display: none;
 		}
 	}

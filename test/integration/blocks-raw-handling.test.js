@@ -291,11 +291,9 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<h1>FOO</h1>',
 			plainText: 'FOO\n',
 			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
+		} );
 
-		expect( filtered ).toBe( '<h1 class="wp-block-heading">FOO</h1>' );
+		expect( filtered ).toBe( 'FOO' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -371,6 +369,34 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should convert pre', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre>1\n2</pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-preformatted">1\n2</pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert code', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre><code>1\n2</code></pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-code"><code>1\n2</code></pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
@@ -385,6 +411,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',
+			'ms-word-list',
 			'ms-word-styled',
 			'ms-word-online',
 			'evernote',

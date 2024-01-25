@@ -5,13 +5,12 @@ import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
-import { kebabCase } from './utils/object';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
-import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
-import { cleanEmptyObject } from './hooks/utils';
+import { useCanBlockToolbarBeFocused } from './utils/use-can-block-toolbar-be-focused';
+import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
@@ -24,6 +23,7 @@ import {
 } from './components/inserter/reusable-block-rename-hint';
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
+import { getDuotoneFilter } from './components/duotone/utils';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -33,14 +33,15 @@ lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockCanvas,
 	ExperimentalBlockEditorProvider,
+	getDuotoneFilter,
 	getRichTextValues,
-	kebabCase,
 	PrivateInserter,
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
-	useShouldContextualToolbarShow,
+	useCanBlockToolbarBeFocused,
 	cleanEmptyObject,
+	useStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockRemovalWarningModal,

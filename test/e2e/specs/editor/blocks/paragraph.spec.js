@@ -28,9 +28,11 @@ test.describe( 'Paragraph', () => {
 		} );
 		await page.keyboard.type( '1' );
 
-		const firstBlockTagName = await editor.canvas.evaluate( () => {
-			return document.querySelector( '[data-block]' ).tagName;
-		} );
+		const firstBlockTagName = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => {
+				return document.querySelector( '[data-block]' ).tagName;
+			} );
 
 		// The outer element should be a paragraph. Blocks should never have any
 		// additional div wrappers so the markup remains simple and easy to
@@ -61,14 +63,7 @@ test.describe( 'Paragraph', () => {
 			editor,
 			pageUtils,
 			draggingUtils,
-			page,
 		} ) => {
-			await page.evaluate( () => {
-				window.wp.blocks.registerBlockType( 'test/v2', {
-					apiVersion: '2',
-					title: 'test',
-				} );
-			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
 			const testImageName = '10x10_e2e_test_image_z9T8jK.png';
@@ -78,20 +73,17 @@ test.describe( 'Paragraph', () => {
 				testImageName
 			);
 
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			await dragOver(
 				editor.canvas.locator( '[data-type="core/paragraph"]' )
 			);
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
-			await drop(
-				editor.canvas.locator( '[data-type="core/paragraph"]' )
-			);
+			await drop();
 
 			const imageBlock = editor.canvas.locator(
 				'role=document[name="Block: Image"i]'
@@ -113,7 +105,7 @@ test.describe( 'Paragraph', () => {
 				attributes: { content: 'My Heading' },
 			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await editor.canvas.focus( 'text=My Heading' );
+			await editor.canvas.locator( 'text=My Heading' ).focus();
 			await editor.showBlockToolbar();
 
 			const dragHandle = page.locator(
@@ -129,7 +121,7 @@ test.describe( 'Paragraph', () => {
 			await draggingUtils.dragOver( boundingBox.x, boundingBox.y );
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await page.mouse.up();
 
@@ -157,7 +149,7 @@ test.describe( 'Paragraph', () => {
 			await draggingUtils.dragOver( boundingBox.x, boundingBox.y );
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await page.mouse.up();
 
@@ -244,8 +236,9 @@ test.describe( 'Paragraph', () => {
 
 				{
 					// Dragging on the top half of the heading block.
+					// Make sure to target the top dropzone by dragging > 30px inside the block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + 1
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
@@ -260,11 +253,12 @@ test.describe( 'Paragraph', () => {
 
 				{
 					// Dragging on the bottom half of the heading block.
+					// Make sure to target the bottom dropzone by dragging > 30px inside the block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + headingBox.height - 1
 					);
-					await expect( draggingUtils.dropZone ).not.toBeVisible();
+					await expect( draggingUtils.dropZone ).toBeHidden();
 					await expect(
 						draggingUtils.insertionIndicator
 					).toBeVisible();
@@ -275,6 +269,26 @@ test.describe( 'Paragraph', () => {
 								.then( ( { y, height } ) => y + height )
 						)
 						.toBeGreaterThan( headingBox.y + headingBox.height );
+				}
+
+				{
+					// Dragging on the right edge of the heading block.
+					// Targets the right hand dropzone.
+					await draggingUtils.dragOver(
+						headingBox.x + headingBox.width - 1,
+						headingBox.y + headingBox.height - 1
+					);
+					await expect( draggingUtils.dropZone ).toBeHidden();
+					await expect(
+						draggingUtils.insertionIndicator
+					).toBeVisible();
+					await expect
+						.poll( () =>
+							draggingUtils.insertionIndicator
+								.boundingBox()
+								.then( ( { x, width } ) => x + width )
+						)
+						.toBe( headingBox.x + headingBox.width );
 				}
 			} );
 
@@ -307,10 +321,10 @@ test.describe( 'Paragraph', () => {
 				{
 					// Dragging on the top half of the heading block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + 1
 					);
-					await expect( draggingUtils.dropZone ).not.toBeVisible();
+					await expect( draggingUtils.dropZone ).toBeHidden();
 					await expect(
 						draggingUtils.insertionIndicator
 					).toBeVisible();
@@ -326,7 +340,7 @@ test.describe( 'Paragraph', () => {
 				{
 					// Dragging on the bottom half of the heading block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + headingBox.height - 1
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();

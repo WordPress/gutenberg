@@ -9,7 +9,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
  */
 import { View } from '../../view';
 import { useControlledValue } from '../../utils';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';
 import { useComputeControlledOrUncontrolledValue } from './utils';
 import type {
@@ -62,7 +62,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				isBlock: ! isAdaptiveWidth,
 				isDeselectable: true,
 				size,
-			} as ToggleGroupControlContextProps ),
+			} ) as ToggleGroupControlContextProps,
 		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
 	);
 

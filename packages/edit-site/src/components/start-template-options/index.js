@@ -3,7 +3,7 @@
  */
 import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	__experimentalBlockPatternsList as BlockPatternsList,
 	store as blockEditorStore,
@@ -12,28 +12,31 @@ import { useSelect } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { parse } from '@wordpress/blocks';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
-	const [ templateContent, setTemplateContent ] = useState( '' );
-
-	useEffect( () => {
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/templates/lookup', {
+	return useSelect(
+		( select ) => {
+			const { getEntityRecord, getDefaultTemplateId } =
+				select( coreStore );
+			const templateId = getDefaultTemplateId( {
 				slug,
 				is_custom: isCustom,
 				ignore_empty: true,
-			} ),
-		} ).then( ( { content } ) => setTemplateContent( content.raw ) );
-	}, [ isCustom, slug ] );
-	return templateContent;
+			} );
+			return templateId
+				? getEntityRecord( 'postType', TEMPLATE_POST_TYPE, templateId )
+						?.content?.raw
+				: undefined;
+		},
+		[ slug, isCustom ]
+	);
 }
 
 function useStartPatterns( fallbackContent ) {
@@ -49,6 +52,37 @@ function useStartPatterns( fallbackContent ) {
 			patterns: getSettings().__experimentalBlockPatterns,
 		};
 	}, [] );
+
+	const currentThemeStylesheet = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme().stylesheet
+	);
+
+	// Duplicated from packages/block-library/src/pattern/edit.js.
+	function injectThemeAttributeInBlockTemplateContent( block ) {
+		if (
+			block.innerBlocks.find(
+				( innerBlock ) => innerBlock.name === 'core/template-part'
+			)
+		) {
+			block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+				if (
+					innerBlock.name === 'core/template-part' &&
+					innerBlock.attributes.theme === undefined
+				) {
+					innerBlock.attributes.theme = currentThemeStylesheet;
+				}
+				return innerBlock;
+			} );
+		}
+
+		if (
+			block.name === 'core/template-part' &&
+			block.attributes.theme === undefined
+		) {
+			block.attributes.theme = currentThemeStylesheet;
+		}
+		return block;
+	}
 
 	return useMemo( () => {
 		// filter patterns that are supposed to be used in the current template being edited.
@@ -68,7 +102,12 @@ function useStartPatterns( fallbackContent ) {
 					);
 				} )
 				.map( ( pattern ) => {
-					return { ...pattern, blocks: parse( pattern.content ) };
+					return {
+						...pattern,
+						blocks: parse( pattern.content ).map( ( block ) =>
+							injectThemeAttributeInBlockTemplateContent( block )
+						),
+					};
 				} ),
 		];
 	}, [ fallbackContent, slug, patterns ] );
@@ -162,7 +201,7 @@ export default function StartTemplateOptions() {
 				shouldOpenModal:
 					! hasEdits &&
 					'' === templateRecord.content &&
-					'wp_template' === _postType &&
+					TEMPLATE_POST_TYPE === _postType &&
 					! select( preferencesStore ).get(
 						'core/edit-site',
 						'welcomeGuide'

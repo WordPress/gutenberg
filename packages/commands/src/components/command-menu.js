@@ -183,6 +183,9 @@ function CommandInput( { isOpen, search, setSearch } ) {
 	);
 }
 
+/**
+ * @ignore
+ */
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );

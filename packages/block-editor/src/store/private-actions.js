@@ -3,6 +3,11 @@
  */
 import { Platform } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { undoIgnoreBlocks } from './undo-ignore';
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -92,7 +97,7 @@ export function showBlockInterface() {
  */
 export const privateRemoveBlocks =
 	( clientIds, selectPrevious = true, forceRemove = false ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( ! clientIds || ! clientIds.length ) {
 			return;
 		}
@@ -154,11 +159,14 @@ export const privateRemoveBlocks =
 			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
 		}
 
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		dispatch( ensureDefaultBlock() );
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch( ensureDefaultBlock() );
+		} );
 	};
 
 /**
@@ -257,5 +265,108 @@ export function setBlockRemovalRules( rules = false ) {
 	return {
 		type: 'SET_BLOCK_REMOVAL_RULES',
 		rules,
+	};
+}
+
+/**
+ * Sets the client ID of the block settings menu that is currently open.
+ *
+ * @param {?string} clientId The block client ID.
+ * @return {Object} Action object.
+ */
+export function setOpenedBlockSettingsMenu( clientId ) {
+	return {
+		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+		clientId,
+	};
+}
+
+export function setStyleOverride( id, style ) {
+	return {
+		type: 'SET_STYLE_OVERRIDE',
+		id,
+		style,
+	};
+}
+
+export function deleteStyleOverride( id ) {
+	return {
+		type: 'DELETE_STYLE_OVERRIDE',
+		id,
+	};
+}
+
+/**
+ * A higher-order action that mark every change inside a callback as "non-persistent"
+ * and ignore pushing to the undo history stack. It's primarily used for synchronized
+ * derived updates from the block editor without affecting the undo history.
+ *
+ * @param {() => void} callback The synchronous callback to derive updates.
+ */
+export function syncDerivedUpdates( callback ) {
+	return ( { dispatch, select, registry } ) => {
+		registry.batch( () => {
+			// Mark every change in the `callback` as non-persistent.
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: false,
+			} );
+			callback();
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: undefined,
+			} );
+
+			// Ignore pushing undo stack for the updated blocks.
+			const updatedBlocks = select.getBlocks();
+			undoIgnoreBlocks.add( updatedBlocks );
+		} );
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param {Object} lastFocus The last focused element.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setLastFocus( lastFocus = null ) {
+	return {
+		type: 'LAST_FOCUS',
+		lastFocus,
+	};
+}
+
+/**
+ * Action that stops temporarily editing as blocks.
+ *
+ * @param {string} clientId The block's clientId.
+ */
+export function stopEditingAsBlocks( clientId ) {
+	return ( { select, dispatch } ) => {
+		const focusModeToRevert =
+			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateSettings( { focusMode: focusModeToRevert } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks();
+	};
+}
+
+export function registerBlockBindingsSource( source ) {
+	return {
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		useSource: source.useSource,
+		lockAttributesEditing: source.lockAttributesEditing,
 	};
 }

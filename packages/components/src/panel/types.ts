@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { ButtonAsButtonProps } from '../button/types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export type PanelProps = {
 	/**

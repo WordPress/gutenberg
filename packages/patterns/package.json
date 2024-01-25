@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "1.2.0",
+	"version": "1.11.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=16.0.0",
-		"npm": ">=8 <9"
+		"node": ">=16.0.0"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -32,6 +31,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -39,11 +39,13 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"nanoid": "^3.3.4"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

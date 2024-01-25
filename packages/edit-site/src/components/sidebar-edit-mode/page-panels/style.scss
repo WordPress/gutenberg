@@ -1,12 +1,7 @@
-.edit-site-page-panels__edit-template-preview {
-	border: 1px solid $gray-200;
-	height: 200px;
-	max-height: 200px;
-	overflow: hidden;
-}
 
-.edit-site-page-panels__edit-template-button {
-	justify-content: center;
+
+.edit-site-page-panels__swap-template__confirm-modal__actions {
+	margin-top: $grid-unit-30;
 }
 
 .edit-site-change-status__content {
@@ -34,17 +29,13 @@
 	}
 }
 
-.edit-site-summary-field {
-	.components-dropdown {
-		flex-grow: 1;
-	}
+.edit-site-summary-field__trigger {
+	max-width: 100%;
 
-	.edit-site-summary-field__trigger {
-		width: 100%;
-	}
-
-	.edit-site-summary-field__label {
-		width: 30%;
-	}
+	// Truncate
+	display: block;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
-

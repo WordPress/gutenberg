@@ -8,6 +8,7 @@ import { capitalCase, pascalCase } from 'change-case';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -120,6 +121,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -204,8 +206,13 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // Should be different than name.
+		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -222,6 +229,15 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
+	},
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
 	},
 ];
 
@@ -259,6 +275,29 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 
 	return newEdits;
 };
+
+const serialisableBlocksCache = new WeakMap();
+
+function makeBlockAttributesSerializable( attributes ) {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks ) {
+	return blocks.map( ( block ) => {
+		const { innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
 
 /**
  * Returns the list of post type entities.
@@ -302,12 +341,23 @@ async function loadPostTypeEntities() {
 				},
 				applyChangesToDoc: ( doc, changes ) => {
 					const document = doc.getMap( 'document' );
+
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							document.get( key ) !== value &&
-							typeof value !== 'function'
-						) {
-							document.set( key, value );
+						if ( typeof value !== 'function' ) {
+							if ( key === 'blocks' ) {
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+
+								value = serialisableBlocksCache.get( value );
+							}
+
+							if ( document.get( key ) !== value ) {
+								document.set( key, value );
+							}
 						}
 					} );
 				},
@@ -317,6 +367,14 @@ async function loadPostTypeEntities() {
 			},
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }
@@ -400,7 +458,12 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
-			registerSyncConfigs( configs );
+			if ( window.__experimentalEnableSync ) {
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					registerSyncConfigs( configs );
+				}
+			}
+
 			return configs;
 		}
 
@@ -412,7 +475,12 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
-		registerSyncConfigs( configs );
+		if ( window.__experimentalEnableSync ) {
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				registerSyncConfigs( configs );
+			}
+		}
+
 		dispatch( addEntities( configs ) );
 
 		return configs;

@@ -18,17 +18,33 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                xcode: ['13.3.1']
-                device: ['iPhone 13']
+                xcode: ['14.2']
+                device: ['iPhone 14']
                 native-test-name: [gutenberg-editor-rendering]
 
         steps:
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
+            - name: Switch Xcode version to ${{ matrix.xcode }}
+              run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
+
+            - name: Launch simulator
+              run: (open -a Simulator && xcrun simctl boot '${{ matrix.device }}') &
+
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
+
+            - name: Restore tests setup cache
+              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              with:
+                  path: |
+                      ~/.appium
+                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
+
+            - name: Prepare tests setup
+              run: npm run native test:e2e:setup
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
@@ -54,17 +70,11 @@ jobs:
             - name: Bundle iOS
               run: npm run native test:e2e:bundle:ios
 
-            - name: Switch Xcode version to ${{ matrix.xcode }}
-              run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
-
             - name: Build (if needed)
               run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
 
             - name: Build Web Driver Agent (if needed)
               run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
-
-            - name: Launch simulator
-              run: open -a Simulator && xcrun simctl boot '${{ matrix.device }}'
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
@@ -74,13 +84,13 @@ jobs:
                   rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
                   rm -rf packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/assets
 
-            - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               if: always()
               with:
                   name: ios-screen-recordings
                   path: packages/react-native-editor/ios-screen-recordings
 
-            - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               if: always()
               with:
                   name: appium-logs

@@ -13,7 +13,7 @@ import type { HslaColor } from 'react-colorful';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { useDeprecatedProps } from './use-deprecated-props';
 
 export type ColorType = 'rgb' | 'hsl' | 'hex';
@@ -59,6 +59,9 @@ export interface PickerProps {
 	color: Colord;
 	enableAlpha: boolean;
 	onChange: ( nextColor: Colord ) => void;
+	containerEl: HTMLElement | null;
+	onDragStart?: ( event: MouseEvent ) => void;
+	onDragEnd?: ( event: MouseEvent ) => void;
 }
 
 export interface ColorInputProps {

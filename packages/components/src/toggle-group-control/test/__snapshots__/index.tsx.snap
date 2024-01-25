@@ -47,9 +47,9 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -57,7 +57,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -116,7 +116,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -198,7 +199,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
 }
@@ -238,7 +240,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-8"
+        id="toggle-group-control-as-radio-group-10"
         role="radiogroup"
       >
         <div
@@ -249,12 +251,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             aria-label="Uppercase"
             class="emotion-12 components-toggle-group-control-option-base"
             data-active-item=""
-            data-command=""
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-8-20"
+            id="toggle-group-control-as-radio-group-10-24"
             role="radio"
+            type="button"
+            value="uppercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -286,12 +289,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             aria-checked="false"
             aria-label="Lowercase"
             class="emotion-18 components-toggle-group-control-option-base"
-            data-command=""
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-8-21"
+            id="toggle-group-control-as-radio-group-10-25"
             role="radio"
+            type="button"
+            value="lowercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -370,9 +374,9 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -380,7 +384,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -484,7 +488,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-7"
+        id="toggle-group-control-as-radio-group-9"
         role="radiogroup"
       >
         <div
@@ -494,12 +498,13 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             aria-checked="false"
             aria-label="R"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-7-18"
+            id="toggle-group-control-as-radio-group-9-22"
             role="radio"
+            type="button"
+            value="rigas"
           >
             <div
               class="emotion-13 emotion-14"
@@ -515,12 +520,13 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             aria-checked="false"
             aria-label="J"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-7-19"
+            id="toggle-group-control-as-radio-group-9-23"
             role="radio"
+            type="button"
+            value="jack"
           >
             <div
               class="emotion-13 emotion-14"
@@ -588,9 +594,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -598,7 +604,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -657,7 +663,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -739,7 +746,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
 }
@@ -790,12 +798,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             aria-label="Uppercase"
             class="emotion-12 components-toggle-group-control-option-base"
             data-active-item=""
-            data-command=""
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-1-2"
             role="radio"
+            type="button"
+            value="uppercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -827,12 +836,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             aria-checked="false"
             aria-label="Lowercase"
             class="emotion-18 components-toggle-group-control-option-base"
-            data-command=""
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-1-3"
             role="radio"
+            type="button"
+            value="lowercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -905,9 +915,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -915,7 +925,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -1029,12 +1039,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
             aria-checked="false"
             aria-label="R"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-0-0"
             role="radio"
+            type="button"
+            value="rigas"
           >
             <div
               class="emotion-13 emotion-14"
@@ -1050,12 +1061,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
             aria-checked="false"
             aria-label="J"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-0-1"
             role="radio"
+            type="button"
+            value="jack"
           >
             <div
               class="emotion-13 emotion-14"

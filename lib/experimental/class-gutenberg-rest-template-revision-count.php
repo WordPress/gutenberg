@@ -13,7 +13,7 @@
  * When merging into core, prepare_revision_links() should be merged with
  * WP_REST_Templates_Controller::prepare_links().
  */
-class Gutenberg_REST_Template_Revision_Count extends Gutenberg_REST_Templates_Controller_6_3 {
+class Gutenberg_REST_Template_Revision_Count extends WP_REST_Templates_Controller {
 	/**
 	 * Add revisions to the response.
 	 *

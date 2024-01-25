@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 9.41.0 (2024-01-24)
+
+## 9.40.0 (2024-01-10)
+
+## 9.39.0 (2023-12-13)
+
+## 9.38.0 (2023-11-29)
+
+## 9.37.0 (2023-11-16)
+
+### New features
+
+- Add new `funnel` icon.
+
+## 9.36.0 (2023-11-02)
+
+## 9.35.0 (2023-10-18)
+
+## 9.34.0 (2023-10-05)
+
+## 9.33.0 (2023-09-20)
+
+### Enhancement
+
+-   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
 ## 9.32.0 (2023-08-31)
 
 ### Bug Fix

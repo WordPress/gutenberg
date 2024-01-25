@@ -17,6 +17,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			item_scheduled: 'scheduled',
 			item_updated: 'updated',
 			view_item: 'view',
+			item_trashed: 'trash',
 		},
 		viewable: false,
 	};
@@ -74,7 +75,11 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				},
 			],
 		],
-		[ 'when post will be trashed', [ 'publish', 'trash', true ], [] ],
+		[
+			'when post will be trashed',
+			[ 'publish', 'trash', true ],
+			[ 'trash', defaultExpectedAction ],
+		],
 	].forEach(
 		( [
 			description,

@@ -9,12 +9,42 @@
 	@include break-small {
 		overflow: visible;
 	}
+
+	.selected-block-tools-wrapper {
+		overflow-x: hidden;
+
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+		}
+
+		// Modified group borders.
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				margin-top: $grid-unit + $grid-unit-05;
+				margin-bottom: $grid-unit + $grid-unit-05;
+				background-color: $gray-300;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
+	}
 }
 
 .edit-widgets-header__navigable-toolbar-wrapper {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 2;
 	padding-left: $grid-unit-20;
 }
 
@@ -36,7 +66,7 @@
 }
 
 .edit-widgets-header-toolbar {
-	border: none;
+	gap: $grid-unit-10;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles

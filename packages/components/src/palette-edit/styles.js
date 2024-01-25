@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import Button from '../button';
 import { Heading } from '../heading';
 import { HStack } from '../h-stack';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { COLORS, CONFIG } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';

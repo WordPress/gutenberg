@@ -86,287 +86,6 @@
 }
 
 /**
- * Block Toolbar when contextual.
- */
-
-// Base left position for the toolbar when fixed.
-@include editor-left(".block-editor-block-contextual-toolbar.is-fixed");
-
-.block-editor-block-contextual-toolbar {
-	// Block UI appearance.
-	display: inline-flex;
-	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-900;
-	}
-
-	&.is-fixed {
-		position: sticky;
-		top: 0;
-		z-index: z-index(".block-editor-block-popover");
-		display: block;
-		width: 100%;
-		overflow: hidden;
-
-		.block-editor-block-toolbar {
-			overflow: auto;
-			overflow-y: hidden;
-		}
-
-		border: none;
-		border-bottom: $border-width solid $gray-200;
-		border-radius: 0;
-
-		.block-editor-block-toolbar .components-toolbar-group,
-		.block-editor-block-toolbar .components-toolbar {
-			border-right-color: $gray-200;
-		}
-	}
-
-	// Add a scrim to the right of the collapsed button.
-	&.is-collapsed::after {
-		content: "";
-		position: absolute;
-		left: 100%;
-		width: $grid-unit-60;
-		height: 100%;
-		background: linear-gradient(to right, $white, transparent);
-	}
-
-	// on desktop and tablet viewports the toolbar is fixed
-	// on top of interface header
-	$toolbar-margin: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
-	@include break-medium() {
-		&.is-fixed {
-			// leave room for block inserter, undo and redo, list view
-			margin-left: $toolbar-margin;
-			// position on top of interface header
-			position: fixed;
-			top: $admin-bar-height;
-			// Don't fill up when empty
-			min-height: initial;
-			// remove the border
-			border-bottom: none;
-			// has to be flex for collapse button to fit
-			display: flex;
-
-			// Mimic the height of the parent, vertically align center, and provide a max-height.
-			height: $header-height;
-			align-items: center;
-
-			&.is-collapsed {
-				width: initial;
-			}
-
-			&:empty {
-				width: initial;
-			}
-
-			.is-fullscreen-mode & {
-				// leave room for block inserter, undo and redo, list view
-				// and some margin left
-				margin-left: $grid-unit-80 * 4 - 2 * $grid-unit;
-
-				top: 0;
-
-				&.is-collapsed {
-					width: initial;
-				}
-
-				&:empty {
-					width: initial;
-				}
-			}
-
-			& > .block-editor-block-toolbar {
-				flex-grow: initial;
-				width: initial;
-
-				// Add a border as separator in the block toolbar.
-				&::before {
-					content: "";
-					width: $border-width;
-					height: 3 * $grid-unit;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-right: 0;
-					background-color: $gray-300;
-					position: relative;
-					left: math.div(-$grid-unit-05, 2);
-					top: -1px;
-				}
-			}
-
-			& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
-				border: none;
-
-				.show-icon-labels & {
-					.components-button.has-icon {
-						// Hide the button icons when labels are set to display...
-						svg {
-							display: none;
-						}
-						// ... and display labels.
-						&::after {
-							content: attr(aria-label);
-							font-size: $helptext-font-size;
-						}
-					}
-				}
-
-				// Add a border as separator in the block toolbar.
-				&::before {
-					content: "";
-					width: $border-width;
-					height: 3 * $grid-unit;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-right: $grid-unit-10;
-					background-color: $gray-300;
-					position: relative;
-					left: 0;
-					top: -1px;
-				}
-			}
-
-			& > .block-editor-block-toolbar__group-expand-fixed-toolbar {
-				border: none;
-
-				.show-icon-labels & {
-					width: $grid-unit-80 * 4;
-					.components-button.has-icon {
-						// Hide the button icons when labels are set to display...
-						svg {
-							display: none;
-						}
-						// ... and display labels.
-						&::after {
-							content: attr(aria-label);
-							font-size: $helptext-font-size;
-						}
-					}
-				}
-
-				// Add a border as separator in the block toolbar.
-				&::before {
-					content: "";
-					width: $border-width;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-bottom: $grid-unit + $grid-unit-05;
-					background-color: $gray-300;
-					position: relative;
-					left: -8px;
-					height: 3 * $grid-unit;
-					top: -1px;
-				}
-			}
-
-			.show-icon-labels & {
-
-				margin-left: $grid-unit-80 + 2 * $grid-unit; // inserter and margin
-
-				.is-fullscreen-mode & {
-					margin-left: $grid-unit * 18; // site hub, inserter and margin
-				}
-
-				.block-editor-block-parent-selector .block-editor-block-parent-selector__button::after {
-					left: 0;
-				}
-
-				.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-					border-left: none;
-					&::before {
-						content: "";
-						width: $border-width;
-						margin-top: $grid-unit + $grid-unit-05;
-						margin-bottom: $grid-unit + $grid-unit-05;
-						background-color: $gray-300;
-						position: relative;
-					}
-				}
-			}
-
-			.blocks-widgets-container & {
-				margin-left: $grid-unit-80 * 2.4;
-
-				&.is-collapsed {
-					margin-left: $grid-unit-80 * 4.2;
-				}
-			}
-		}
-
-		&.is-fixed .block-editor-block-parent-selector {
-
-			.block-editor-block-parent-selector__button {
-				position: relative;
-				top: -1px;
-				border: 0;
-				padding-right: 6px;
-				padding-left: 6px;
-
-				&::after {
-					content: "\00B7";
-					font-size: 16px;
-					line-height: $grid-unit-40 + $grid-unit-10;
-					position: absolute;
-					left: $grid-unit-40 + $grid-unit-15 + 2px;
-					bottom: $grid-unit-05;
-				}
-			}
-		}
-
-		&:not(.is-fixed) .block-editor-block-parent-selector {
-			position: absolute;
-			top: -$border-width;
-			left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-
-			.show-icon-labels & {
-				position: relative;
-				left: auto;
-				top: auto;
-				margin-top: -$border-width;
-				margin-left: -$border-width;
-				margin-bottom: -$border-width;
-			}
-		}
-	}
-
-	// on tablet viewports the toolbar is fixed
-	// on top of interface header and covers the whole header
-	// except for the inserter on the left
-	@include break-medium() {
-		&.is-fixed {
-			width: calc(100% - #{$toolbar-margin});
-
-			.show-icon-labels & {
-				width: calc(100% + 40px - #{$toolbar-margin}); //there are no undo, redo and list view buttons
-			}
-
-		}
-	}
-
-	// on desktop viewports the toolbar is fixed
-	// on top of interface header and leaves room
-	// for the block inserter the publish button
-	@include break-large() {
-		&.is-fixed {
-			width: auto;
-			.show-icon-labels & {
-				width: auto; //there are no undo, redo and list view buttons
-			}
-		}
-		.is-fullscreen-mode &.is-fixed {
-			// in full screen mode we need to account for
-			// the combined with of the tools at the right of the header and the margin left
-			// of the toolbar which includes four buttons
-			width: calc(100% - 280px - #{4 * $grid-unit-80});
-		}
-	}
-}
-
-/**
  * Block Label for Navigation/Selection Mode
  */
 
@@ -458,12 +177,37 @@
 }
 
 .components-popover.block-editor-block-list__block-popover {
+
 	// Position the block toolbar.
 	.block-editor-block-list__block-selection-button,
 	.block-editor-block-contextual-toolbar {
 		pointer-events: all;
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
+	}
+
+	.block-editor-block-contextual-toolbar {
+		border: $border-width solid $gray-900;
+		border-radius: $radius-block-ui;
+		overflow: visible; // allow the parent selector to be visible
+		position: static;
+		width: auto;
+
+		&.has-parent {
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+			.show-icon-labels & {
+				margin-left: 0;
+			}
+		}
+	}
+
+	.block-editor-block-toolbar {
+		overflow: visible;
+	}
+
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-900;
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
@@ -476,6 +220,42 @@
 		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
 		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
 		animation: hide-during-dragging 1ms linear forwards;
+	}
+
+	.block-editor-block-parent-selector {
+		position: absolute;
+		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+		&::before {
+			content: "";
+		}
+
+		.block-editor-block-parent-selector__button {
+			border: 1px solid $gray-900;
+			padding-right: 6px;
+			padding-left: 6px;
+			background-color: $white;
+
+			.show-icon-labels & {
+				padding-right: $grid-unit-15;
+				padding-left: $grid-unit-15;
+			}
+		}
+	}
+
+	// Show Icon Label Styles
+	.show-icon-labels & {
+
+		.block-editor-block-parent-selector {
+			position: relative;
+			left: auto;
+			margin-left: -$border-width;
+		}
+
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+			border-left: 1px solid $gray-900;
+		}
 	}
 }
 

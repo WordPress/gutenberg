@@ -116,9 +116,7 @@ _Usage_
 ```ts
 type Props = { foo: string };
 const Component = ( props: Props ) => <div>{ props.foo }</div>;
-const ConditionalComponent = ifCondition(
-	( props: Props ) => props.foo.length !== 0
-)( Component );
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
 <ConditionalComponent foo="" />; // => null
 <ConditionalComponent foo="bar" />; // => <div>bar</div>;
 ```
@@ -142,6 +140,8 @@ _Related_
 -   <https://docs-lodash.com/v4/flow/>
 
 ### pure
+
+> **Deprecated** Use `memo` or `PureComponent` instead.
 
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
 
@@ -250,6 +250,18 @@ _Parameters_
 _Returns_
 
 -   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
+
+### useDebouncedInput
+
+Helper hook for input fields that need to debounce the value before using it.
+
+_Parameters_
+
+-   _defaultValue_ `any`: The default value to use.
+
+_Returns_
+
+-   `[string, Function, string]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
@@ -483,6 +495,18 @@ const App = () => {
 	);
 };
 ```
+
+### useStateWithHistory
+
+useState with undo/redo history.
+
+_Parameters_
+
+-   _initialValue_ `T`: Initial value.
+
+_Returns_
+
+-   Value, setValue, hasUndo, hasRedo, undo, redo.
 
 ### useThrottle
 

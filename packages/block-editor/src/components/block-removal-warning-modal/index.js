@@ -8,7 +8,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -48,22 +48,16 @@ export function BlockRemovalWarningModal( { rules } ) {
 
 	return (
 		<Modal
-			title={ __( 'Are you sure?' ) }
+			title={ __( 'Be careful!' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
+			size="medium"
 		>
-			{ blockNamesForPrompt.length === 1 ? (
-				<p>{ rules[ blockNamesForPrompt[ 0 ] ] }</p>
-			) : (
-				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
-					{ blockNamesForPrompt.map( ( name ) => (
-						<li key={ name }>{ rules[ name ] }</li>
-					) ) }
-				</ul>
-			) }
 			<p>
-				{ blockNamesForPrompt.length > 1
-					? __( 'Removing these blocks is not advised.' )
-					: __( 'Removing this block is not advised.' ) }
+				{ _n(
+					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
+					'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.',
+					blockNamesForPrompt.length
+				) }
 			</p>
 			<HStack justify="right">
 				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>

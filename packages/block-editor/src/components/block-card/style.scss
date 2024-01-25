@@ -1,24 +1,28 @@
 .block-editor-block-card {
-	display: flex;
 	align-items: flex-start;
+	color: $gray-900;
+	display: flex;
+	padding: $grid-unit-20;
 }
 
 .block-editor-block-card__content {
 	flex-grow: 1;
-	margin-bottom: $grid-unit-05;
 }
 
 .block-editor-block-card__title {
 	font-weight: 500;
 
 	&.block-editor-block-card__title {
+		font-size: $default-font-size;
 		line-height: $button-size-small;
-		margin: 0 0 $grid-unit-05;
+		margin: 0;
 	}
 }
 
 .block-editor-block-card__description {
+	display: block;
 	font-size: $default-font-size;
+	margin-top: $grid-unit-05;
 }
 
 .block-editor-block-card .block-editor-block-icon {

@@ -22,12 +22,37 @@ import {
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
+	getRevisions,
+	getRevision,
 } from '../selectors';
 // getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],
 ] )( '%p', ( selector ) => {
+	describe( 'normalizing Post ID passed as recordKey', () => {
+		it( 'normalizes any Post ID recordKey argument to a Number via `__unstableNormalizeArgs` method', async () => {
+			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+				'postType',
+				'some_post',
+				'123',
+			] );
+			expect( normalized ).toEqual( [ 'postType', 'some_post', 123 ] );
+		} );
+
+		it( 'does not normalize recordKey argument unless it is a Post ID', async () => {
+			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+				'postType',
+				'some_post',
+				'i-am-a-slug-with-a-number-123',
+			] );
+			expect( normalized ).toEqual( [
+				'postType',
+				'some_post',
+				'i-am-a-slug-with-a-number-123',
+			] );
+		} );
+	} );
 	it( 'should return undefined for unknown entity kind, name', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -135,6 +160,43 @@ describe.each( [
 			} )
 		).toEqual( { content: 'chicken' } );
 	} );
+
+	it( 'should work well for nested fields properties', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									default: {
+										post: {
+											foo: undefined,
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										post: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getEntityRecord( state, 'root', 'postType', 'post', {
+				_fields: [ 'foo.bar' ],
+			} )
+		).toEqual( {
+			foo: {
+				bar: undefined,
+			},
+		} );
+	} );
 } );
 
 describe( 'hasEntityRecords', () => {
@@ -189,7 +251,7 @@ describe( 'hasEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'': [ 'post', 'page' ],
+										'': { itemIds: [ 'post', 'page' ] },
 									},
 								},
 							},
@@ -324,7 +386,7 @@ describe( 'getEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'': [ 'post', 'page' ],
+										'': { itemIds: [ 'post', 'page' ] },
 									},
 								},
 							},
@@ -362,7 +424,9 @@ describe( 'getEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'_fields=id%2Ccontent': [ 1 ],
+										'_fields=id%2Ccontent': {
+											itemIds: [ 1 ],
+										},
 									},
 								},
 							},
@@ -832,5 +896,99 @@ describe( 'getCurrentUser', () => {
 		};
 
 		expect( getCurrentUser( state ) ).toEqual( currentUser );
+	} );
+} );
+
+describe( 'getRevisions', () => {
+	it( 'should return revisions', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							revisions: {
+								1: {
+									items: {
+										default: {
+											10: {
+												id: 10,
+												content: 'chicken',
+												author: 'bob',
+												parent: 1,
+											},
+										},
+									},
+									itemIsComplete: {
+										default: {
+											10: true,
+										},
+									},
+									queries: {
+										default: {
+											'': { itemIds: [ 10 ] },
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getRevisions( state, 'postType', 'post', 1 ) ).toEqual( [
+			{
+				id: 10,
+				content: 'chicken',
+				author: 'bob',
+				parent: 1,
+			},
+		] );
+	} );
+} );
+
+describe( 'getRevision', () => {
+	it( 'should return a specific revision', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							revisions: {
+								1: {
+									items: {
+										default: {
+											10: {
+												id: 10,
+												content: 'chicken',
+												author: 'bob',
+												parent: 1,
+											},
+										},
+									},
+									itemIsComplete: {
+										default: {
+											10: true,
+										},
+									},
+									queries: {
+										default: {
+											'': [ 10 ],
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getRevision( state, 'postType', 'post', 1, 10 ) ).toEqual( {
+			id: 10,
+			content: 'chicken',
+			author: 'bob',
+			parent: 1,
+		} );
 	} );
 } );

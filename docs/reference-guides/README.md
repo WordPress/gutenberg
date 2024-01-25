@@ -18,7 +18,7 @@
 
 ## [Hooks Reference](/docs/reference-guides/filters/README.md)
 
--   [Block Hooks](/docs/reference-guides/filters/block-filters.md)
+-   [Block Filters](/docs/reference-guides/filters/block-filters.md)
 -   [Editor Hooks](/docs/reference-guides/filters/editor-filters.md)
 -   [i18n Hooks](/docs/reference-guides/filters/i18n-filters.md)
 -   [Parser Hooks](/docs/reference-guides/filters/parser-filters.md)

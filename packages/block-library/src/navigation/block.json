@@ -91,6 +91,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"ariaLabel": true,
 		"html": false,
 		"inserter": true,
 		"typography": {
@@ -132,9 +133,9 @@
 				}
 			}
 		},
-		"interactivity": true
+		"interactivity": true,
+		"renaming": false
 	},
-	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

@@ -53,11 +53,40 @@ test.describe( 'List View', () => {
 			name: 'Paragraph',
 			exact: true,
 		} );
+		const imageBlockItem = listView.getByRole( 'gridcell', {
+			name: 'Image',
+			exact: true,
+		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
 			name: 'Heading',
 			exact: true,
 		} );
-		await paragraphBlockItem.dragTo( headingBlockItem, { x: 0, y: 0 } );
+
+		await paragraphBlockItem.hover();
+		await page.mouse.down();
+
+		// To work around a drag and drop bug in Safari, the list view applies
+		// `pointer-events: none` to the list view while dragging, so that
+		// `onDragLeave` is not fired when dragging within the list view.
+		// Without the `force: true` option, the `hover` action will fail
+		// as playwright will complain that pointer-events are intercepted.
+		// https://bugs.webkit.org/show_bug.cgi?id=66547
+		// See: https://github.com/WordPress/gutenberg/pull/56625
+
+		// Hover over each block to mimic moving up the list view.
+		// Also, hover twice to ensure a dragover event is dispatched.
+		// See: https://playwright.dev/docs/input#dragging-manually
+		await imageBlockItem.hover( { force: true } );
+		await imageBlockItem.hover( { force: true } );
+		await headingBlockItem.hover( { force: true } );
+		await headingBlockItem.hover( { force: true } );
+
+		// Disable reason: Need to wait until the throttle timeout of 250ms has passed.
+		/* eslint-disable playwright/no-wait-for-timeout */
+		await editor.page.waitForTimeout( 300 );
+		/* eslint-enable playwright/no-wait-for-timeout */
+
+		await page.mouse.up();
 
 		// Ensure the block was dropped correctly.
 		await expect
@@ -261,13 +290,6 @@ test.describe( 'List View', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -275,7 +297,7 @@ test.describe( 'List View', () => {
 		} );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 		).toBeFocused();
 
@@ -322,16 +344,13 @@ test.describe( 'List View', () => {
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
 
-		// Focus should now be on the paragraph block since that is
-		// where we opened the list view sidebar. This is not a perfect
-		// solution, but current functionality prevents a better way at
-		// the moment.
+		// Focus should now be on the list view toggle button.
 		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Paragraph block' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// List View should be closed.
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -352,7 +371,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -377,7 +396,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 	} );
 
 	test( 'should place focus on the currently selected block in the canvas', async ( {
@@ -431,7 +450,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should duplicate, delete, and deselect blocks using keyboard', async ( {
+	test( 'should cut, copy, paste, select, duplicate, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -474,6 +493,116 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
+		// Move up to columns block, expand, and then move to the first column block.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'The last inserted block should be selected, while the first column block should be focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column', selected: false, focused: true },
+						{ name: 'core/column' },
+					],
+				},
+				{ name: 'core/file', selected: true, focused: false },
+			] );
+
+		// Select all sibling column blocks at current level.
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'All column blocks should be selected, with the first one focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: false, focused: false },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column', selected: true, focused: true },
+						{ name: 'core/column', selected: true, focused: false },
+					],
+					selected: false,
+				},
+				{ name: 'core/file', selected: false, focused: false },
+			] );
+
+		// Select next parent (the columns block).
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'The columns block should be selected and focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: false, focused: false },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column' },
+						{ name: 'core/column' },
+					],
+					selected: true,
+					focused: true,
+				},
+				{ name: 'core/file', selected: false, focused: false },
+			] );
+
+		// Select all siblings at root level.
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'All blocks should be selected.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: true, focused: false },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column' },
+						{ name: 'core/column' },
+					],
+					selected: true,
+					focused: true,
+				},
+				{ name: 'core/file', selected: true, focused: false },
+			] );
+
+		// Deselect blocks via Escape key.
+		await page.keyboard.press( 'Escape' );
+		// Collapse the columns block.
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'All blocks should be deselected, with focus on the Columns block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: false, focused: false },
+				{
+					name: 'core/columns',
+					selected: false,
+					focused: true,
+				},
+				{ name: 'core/file', selected: false, focused: false },
+			] );
+
+		// Move focus and selection to the file block to set up for testing duplication.
+		await listView
+			.getByRole( 'gridcell', { name: 'File', exact: true } )
+			.dblclick();
+
+		// Test duplication behaviour.
 		await pageUtils.pressKeys( 'primaryShift+d' );
 
 		await expect
@@ -679,6 +808,100 @@ test.describe( 'List View', () => {
 				{ name: 'core/heading', selected: false, focused: false },
 				{ name: 'core/file', selected: false, focused: true },
 			] );
+
+		// Copy and paste blocks. To begin, add another Group block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{ name: 'core/paragraph' },
+				{ name: 'core/pullquote' },
+			],
+		} );
+
+		// Click the newly inserted Group block List View item to ensure it is focused.
+		await listView
+			.getByRole( 'link', {
+				name: 'Group',
+				expanded: false,
+			} )
+			.click();
+
+		// Move down to group block, expand, and then move to the paragraph block.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Should be able to copy focused block and paste in the list view via keyboard shortcuts'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: false, focused: false },
+				{
+					name: 'core/group',
+					selected: true,
+					innerBlocks: [
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: true,
+						},
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: false,
+						},
+					],
+				},
+			] );
+
+		// Cut and paste blocks.
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+x' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Should be able to cut a block in the list view, with the preceding block being selected'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: true, focused: true },
+			] );
+
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Should be able to paste previously cut block in the list view via keyboard shortcuts'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{
+					name: 'core/group',
+					selected: true,
+					focused: true,
+					innerBlocks: [
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: false,
+						},
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: false,
+						},
+					],
+				},
+			] );
 	} );
 
 	test( 'block settings dropdown menu', async ( {
@@ -720,7 +943,7 @@ test.describe( 'List View', () => {
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Options for Heading' } )
-			.getByRole( 'menuitem', { name: 'Delete blocks' } )
+			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
 			.poll(
@@ -784,6 +1007,10 @@ test.describe( 'List View', () => {
 		).toBeHidden();
 
 		await optionsForFileToggle.click();
+		await expect(
+			optionsForFileMenu,
+			'Pressing Space should also open the menu dropdown'
+		).toBeVisible();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(

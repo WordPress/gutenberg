@@ -5,6 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,12 +24,13 @@ export default function WelcomeGuideTemplate() {
 			'core/edit-site',
 			'welcomeGuide'
 		);
-		const { isPage, hasPageContentFocus } = select( editSiteStore );
+		const { isPage } = select( editSiteStore );
+		const { getRenderingMode } = select( editorStore );
 		return (
 			isTemplateActive &&
 			! isEditorActive &&
 			isPage() &&
-			! hasPageContentFocus()
+			getRenderingMode() === 'template-only'
 		);
 	}, [] );
 

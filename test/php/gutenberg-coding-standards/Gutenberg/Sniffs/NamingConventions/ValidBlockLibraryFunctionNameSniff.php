@@ -114,22 +114,22 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$parent_directory_name = basename( dirname( $phpcsFile->getFilename() ) );
 
 		$allowed_function_prefixes = array();
-		$is_function_name_valid    = false;
 		foreach ( $this->prefixes as $prefix ) {
 			$prefix                      = rtrim( $prefix, '_' );
 			$allowed_function_prefix     = $prefix . '_' . self::sanitize_directory_name( $parent_directory_name );
 			$allowed_function_prefixes[] = $allowed_function_prefix;
 			// Validate the name's correctness and ensure it does not end with an underscore.
-			$regexp                 = sprintf( '/^%s(|_.+)$/', preg_quote( $allowed_function_prefix, '/' ) );
-			$is_function_name_valid |= ( 1 === preg_match( $regexp, $function_name ) );
+			$regexp = sprintf( '/^%s(|_.+)$/', preg_quote( $allowed_function_prefix, '/' ) );
+
+			if ( 1 === preg_match( $regexp, $function_name ) ) {
+				// The function has a valid prefix; bypassing further checks.
+				return;
+			}
 		}
 
-		if ( $is_function_name_valid ) {
-			return;
-		}
-
-		$error_message = "The function name `{$function_name}()` is invalid because PHP function names in this file should start with one of the following prefixes: `"
-		                 . implode( '`, `', $allowed_function_prefixes ) . '`.';
+		$error_message = "The function name '{$function_name}()' is invalid."
+		. ' In this file, PHP function names must either match one of the allowed prefixes exactly or begin with one of them, followed by an underscore.'
+		. " The allowed prefixes are: '" . implode( "', '", $allowed_function_prefixes ) . "'.";
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
@@ -146,7 +146,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * Sanitize a directory name by converting it to lowercase and replacing non-letter
 	 * and non-digit characters with underscores.
 	 *
-	 * @param string $directory_name
+	 * @param string $directory_name Directory name.
 	 *
 	 * @return string
 	 */

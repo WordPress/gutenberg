@@ -45,6 +45,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
+/**
+ * Internal dependencies
+ */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useExistingTemplates,
@@ -56,7 +61,6 @@ import {
 } from './utils';
 import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
-import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -160,7 +164,6 @@ export default function NewTemplate( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate } = unlock( useDispatch( editSiteStore ) );
 
 	const { homeUrl } = useSelect( ( select ) => {
 		const {
@@ -190,7 +193,7 @@ export default function NewTemplate( {
 			const { title, description, slug } = template;
 			const newTemplate = await saveEntityRecord(
 				'postType',
-				'wp_template',
+				TEMPLATE_POST_TYPE,
 				{
 					description,
 					// Slugs need to be strings, so this is for template `404`
@@ -202,9 +205,6 @@ export default function NewTemplate( {
 				},
 				{ throwOnError: true }
 			);
-
-			// Set template before navigating away to avoid initial stale value.
-			setTemplate( newTemplate.id, newTemplate.slug );
 
 			// Navigate to the created template editor.
 			history.push( {

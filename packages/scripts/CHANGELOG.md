@@ -2,9 +2,54 @@
 
 ## Unreleased
 
-### Enhancement
+## 27.1.0 (2024-01-24)
+
+## 27.0.0 (2024-01-10)
+
+### New Features
+
+-   Add experimental support for `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).
+
+### Breaking Changes
+
+-   Drop support for Node.js versions < 18.
+
+## 26.19.0 (2023-12-13)
+
+### Bug Fix
+
+-   Fix CSS imports not minified ([#56516](https://github.com/WordPress/gutenberg/pull/56516)).
+
+## 26.18.0 (2023-11-29)
+
+### Internal
+
+-   The bundled `jest-dev-server` dependency has been updated from `^6.0.2` to `^9.0.1` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+## 26.17.0 (2023-11-16)
+
+## 26.16.0 (2023-11-02)
+
+## 26.15.0 (2023-10-18)
+
+## 26.14.0 (2023-10-05)
+
+### Internal
+
+-   The bundled `@pmmmwh/react-refresh-webpack-plugin` dependency has been updated from requiring `^0.5.2` to requiring `^0.5.11` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `browserslist` dependency has been updated from requiring `^4.21.9` to requiring `^4.21.10` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `react-refresh` dependency has been updated from requiring `^0.10.0` to requiring `^0.14.0` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack` dependency has been updated from requiring `^5.47.1` to requiring `^5.88.2` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^4.4.2` to requiring `^4.9.1` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-cli` dependency has been updated from requiring `^4.9.1` to requiring `^5.1.4` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-dev-server` dependency has been updated from requiring `^4.4.0` to requiring `^4.15.1` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+
+## 26.13.0 (2023-09-20)
+
+### Enhancements
 
 -   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
+-   The bundled `wp-prettier` dependency has been upgraded from `2.8.5` to `3.0.3` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
 
 ### Bug Fix
 

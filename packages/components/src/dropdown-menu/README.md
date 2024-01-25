@@ -4,11 +4,6 @@ The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuI
 
 ![An expanded DropdownMenu, containing a list of MenuItems.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuExample.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-
 ## Anatomy
 
 ![Anatomy of a DropdownMenu.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuAnatomy.png)

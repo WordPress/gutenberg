@@ -17,3 +17,6 @@ export {
 	CompositeItem,
 	useCompositeState,
 } from 'reakit';
+
+/* eslint-disable-next-line no-restricted-imports */
+export type { CompositeStateReturn as CompositeState } from 'reakit';

@@ -10,6 +10,8 @@ import { directivePrefix as p } from './constants';
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
+const namespaces = [];
+const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -25,6 +27,12 @@ const directiveParser = new RegExp(
 	'i' // Case insensitive.
 );
 
+// Regular expression for reference parsing. It can contain a namespace before
+// the reference, separated by `::`, like `some-namespace::state.somePath`.
+// Namespaces can contain any alphanumeric characters, hyphens, underscores or
+// forward slashes. References don't have any restrictions.
+const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
+
 export const hydratedIslands = new WeakSet();
 
 // Recursive function that transforms a DOM tree into vDOM.
@@ -35,7 +43,7 @@ export function toVdom( root ) {
 	);
 
 	function walk( node ) {
-		const { attributes, nodeType } = node;
+		const { attributes, nodeType, localName } = node;
 
 		if ( nodeType === 3 ) return [ node.data ];
 		if ( nodeType === 4 ) {
@@ -51,8 +59,7 @@ export function toVdom( root ) {
 
 		const props = {};
 		const children = [];
-		const directives = {};
-		let hasDirectives = false;
+		const directives = [];
 		let ignore = false;
 		let island = false;
 
@@ -64,17 +71,19 @@ export function toVdom( root ) {
 			) {
 				if ( n === ignoreAttr ) {
 					ignore = true;
-				} else if ( n === islandAttr ) {
-					island = true;
 				} else {
-					hasDirectives = true;
-					let val = attributes[ i ].value;
+					let [ ns, value ] = nsPathRegExp
+						.exec( attributes[ i ].value )
+						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
 					try {
-						val = JSON.parse( val );
+						value = JSON.parse( value );
 					} catch ( e ) {}
-					const [ , prefix, suffix ] = directiveParser.exec( n );
-					directives[ prefix ] = directives[ prefix ] || {};
-					directives[ prefix ][ suffix || 'default' ] = val;
+					if ( n === islandAttr ) {
+						island = true;
+						namespaces.push( value?.namespace ?? null );
+					} else {
+						directives.push( [ n, ns, value ] );
+					}
 				}
 			} else if ( n === 'ref' ) {
 				continue;
@@ -84,7 +93,7 @@ export function toVdom( root ) {
 
 		if ( ignore && ! island )
 			return [
-				h( node.localName, {
+				h( localName, {
 					...props,
 					innerHTML: node.innerHTML,
 					__directives: { ignore: true },
@@ -92,19 +101,43 @@ export function toVdom( root ) {
 			];
 		if ( island ) hydratedIslands.add( node );
 
-		if ( hasDirectives ) props.__directives = directives;
-
-		let child = treeWalker.firstChild();
-		if ( child ) {
-			while ( child ) {
-				const [ vnode, nextChild ] = walk( child );
-				if ( vnode ) children.push( vnode );
-				child = nextChild || treeWalker.nextSibling();
-			}
-			treeWalker.parentNode();
+		if ( directives.length ) {
+			props.__directives = directives.reduce(
+				( obj, [ name, ns, value ] ) => {
+					const [ , prefix, suffix = 'default' ] =
+						directiveParser.exec( name );
+					if ( ! obj[ prefix ] ) obj[ prefix ] = [];
+					obj[ prefix ].push( {
+						namespace: ns ?? currentNamespace(),
+						value,
+						suffix,
+					} );
+					return obj;
+				},
+				{}
+			);
 		}
 
-		return [ h( node.localName, props, children ) ];
+		if ( localName === 'template' ) {
+			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
+				toVdom( childNode )
+			);
+		} else {
+			let child = treeWalker.firstChild();
+			if ( child ) {
+				while ( child ) {
+					const [ vnode, nextChild ] = walk( child );
+					if ( vnode ) children.push( vnode );
+					child = nextChild || treeWalker.nextSibling();
+				}
+				treeWalker.parentNode();
+			}
+		}
+
+		// Restore previous namespace.
+		if ( island ) namespaces.pop();
+
+		return [ h( localName, props, children ) ];
 	}
 
 	return walk( treeWalker.currentNode );

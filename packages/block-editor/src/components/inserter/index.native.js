@@ -225,7 +225,7 @@ export class Inserter extends Component {
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
 	 *
-	 * @return {WPElement} Dropdown toggle element.
+	 * @return {Element} Dropdown toggle element.
 	 */
 	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
@@ -305,7 +305,7 @@ export class Inserter extends Component {
 	 *                                   closed.
 	 * @param {boolean}  options.isOpen  Whether dropdown is currently open.
 	 *
-	 * @return {WPElement} Dropdown content element.
+	 * @return {Element} Dropdown content element.
 	 */
 	renderContent( { onClose, isOpen } ) {
 		const { clientId, isAppender } = this.props;

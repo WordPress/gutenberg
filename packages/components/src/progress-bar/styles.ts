@@ -27,11 +27,17 @@ export const Track = styled.div`
 	width: 100%;
 	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
-	background-color: var(
-		--wp-components-color-gray-300,
-		${ COLORS.gray[ 300 ] }
+	/* Text color at 10% opacity */
+	background-color: color-mix(
+		in srgb,
+		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
+		transparent 90%
 	);
 	border-radius: ${ CONFIG.radiusBlockUi };
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 `;
 
 export const Indicator = styled.div< {
@@ -43,7 +49,16 @@ export const Indicator = styled.div< {
 	top: 0;
 	height: 100%;
 	border-radius: ${ CONFIG.radiusBlockUi };
-	background-color: ${ COLORS.theme.accent };
+	/* Text color at 90% opacity */
+	background-color: color-mix(
+		in srgb,
+		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
+		transparent 10%
+	);
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
 
 	${ ( { isIndeterminate, value } ) =>
 		isIndeterminate

@@ -10,6 +10,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { blockMeta, post, archive } from '@wordpress/icons';
 
 /**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
+/**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
  * @property {string}        name The entity's name.
@@ -48,9 +53,13 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 export const useExistingTemplates = () => {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-			} ),
+			select( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+				}
+			),
 		[]
 	);
 };

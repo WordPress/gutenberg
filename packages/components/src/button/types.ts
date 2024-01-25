@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 
 export type ButtonProps =
 	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
@@ -33,10 +33,6 @@ type BaseButtonProps = {
 	 * An accessible description for the button.
 	 */
 	describedBy?: string;
-	/**
-	 * Whether the button is focused.
-	 */
-	focus?: boolean;
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
@@ -119,7 +115,9 @@ type BaseButtonProps = {
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 	/**
-	 * Whether this is focusable.
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @default false
 	 */
 	__experimentalIsFocusable?: boolean;
 };
@@ -127,7 +125,8 @@ type BaseButtonProps = {
 type _ButtonProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: boolean;
 };
@@ -135,7 +134,8 @@ type _ButtonProps = {
 type AnchorProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: false;
 	/**

@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
@@ -81,7 +81,6 @@ export const ColorfulWrapper = styled.div`
 		align-items: center;
 		width: 216px;
 		height: auto;
-		overflow: hidden;
 	}
 
 	.react-colorful__saturation {

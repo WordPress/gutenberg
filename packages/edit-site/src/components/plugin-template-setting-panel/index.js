@@ -28,6 +28,6 @@ PluginTemplateSettingPanel.Slot = Slot;
  *	);
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default PluginTemplateSettingPanel;

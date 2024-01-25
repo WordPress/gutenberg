@@ -5,7 +5,6 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
@@ -129,7 +128,7 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
 export {
 	default as CopyHandler,
-	useClipboardHandler as __unstableUseClipboardHandler,
+	__unstableUseClipboardHandler,
 } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
@@ -153,8 +152,10 @@ export { default as WritingFlow } from './writing-flow';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export {
-	RecursionProvider as __experimentalRecursionProvider,
-	useHasRecursion as __experimentalUseHasRecursion,
+	RecursionProvider,
+	DeprecatedExperimentalRecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion,
+	DeprecatedExperimentalUseHasRecursion as __experimentalUseHasRecursion,
 } from './recursion-provider';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
@@ -166,7 +167,7 @@ export { useBlockEditingMode } from './block-editing-mode';
  */
 
 export { default as BlockEditorProvider } from './provider';
-export { default as useSetting } from './use-setting';
+export { useSettings, useSetting } from './use-settings';
 export { useBlockCommands } from './use-block-commands';
 
 /*

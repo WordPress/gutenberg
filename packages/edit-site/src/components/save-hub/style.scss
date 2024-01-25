@@ -18,4 +18,11 @@
 	&[aria-disabled="true"]:hover {
 		color: inherit;
 	}
+
+	&:not(.is-primary) {
+		&.is-busy,
+		&.is-busy[aria-disabled="true"]:hover {
+			color: $gray-900;
+		}
+	}
 }

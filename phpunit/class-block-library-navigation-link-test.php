@@ -246,7 +246,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 						$urls_after_render[ $idx ]
 					) !== false
 				);
-		};
+		}
 	}
 
 	public function test_returns_empty_when_custom_post_type_draft() {

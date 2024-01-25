@@ -65,14 +65,10 @@ const {
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
-	__experimentalGetAllowedPatterns,
-	__experimentalGetParsedPattern,
-	getPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
-	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
-	__experimentalGetGlobalBlocksByName,
+	getBlocksByName,
 	getBlockEditingMode,
 } = selectors;
 
@@ -526,130 +522,131 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getClientIdsOfDescendants', () => {
+		const state = {
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						'uuid-2': {
+							clientId: 'uuid-2',
+							name: 'core/image',
+						},
+						'uuid-4': {
+							clientId: 'uuid-4',
+							name: 'core/paragraph',
+						},
+						'uuid-6': {
+							clientId: 'uuid-6',
+							name: 'core/paragraph',
+						},
+						'uuid-8': {
+							clientId: 'uuid-8',
+							name: 'core/block',
+						},
+						'uuid-10': {
+							clientId: 'uuid-10',
+							name: 'core/columns',
+						},
+						'uuid-12': {
+							clientId: 'uuid-12',
+							name: 'core/column',
+						},
+						'uuid-14': {
+							clientId: 'uuid-14',
+							name: 'core/column',
+						},
+						'uuid-16': {
+							clientId: 'uuid-16',
+							name: 'core/quote',
+						},
+						'uuid-18': {
+							clientId: 'uuid-18',
+							name: 'core/block',
+						},
+						'uuid-20': {
+							clientId: 'uuid-20',
+							name: 'core/gallery',
+						},
+						'uuid-22': {
+							clientId: 'uuid-22',
+							name: 'core/block',
+						},
+						'uuid-24': {
+							clientId: 'uuid-24',
+							name: 'core/columns',
+						},
+						'uuid-26': {
+							clientId: 'uuid-26',
+							name: 'core/column',
+						},
+						'uuid-28': {
+							clientId: 'uuid-28',
+							name: 'core/column',
+						},
+						'uuid-30': {
+							clientId: 'uuid-30',
+							name: 'core/paragraph',
+						},
+					} )
+				),
+				attributes: new Map(
+					Object.entries( {
+						'uuid-2': {},
+						'uuid-4': {},
+						'uuid-6': {},
+						'uuid-8': {},
+						'uuid-10': {},
+						'uuid-12': {},
+						'uuid-14': {},
+						'uuid-16': {},
+						'uuid-18': {},
+						'uuid-20': {},
+						'uuid-22': {},
+						'uuid-24': {},
+						'uuid-26': {},
+						'uuid-28': {},
+						'uuid-30': {},
+					} )
+				),
+				order: new Map(
+					Object.entries( {
+						'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+						'uuid-2': [],
+						'uuid-4': [],
+						'uuid-6': [],
+						'uuid-8': [],
+						'uuid-10': [ 'uuid-12', 'uuid-14' ],
+						'uuid-12': [ 'uuid-16' ],
+						'uuid-14': [ 'uuid-18' ],
+						'uuid-16': [],
+						'uuid-18': [ 'uuid-24' ],
+						'uuid-20': [],
+						'uuid-22': [],
+						'uuid-24': [ 'uuid-26', 'uuid-28' ],
+						'uuid-26': [],
+						'uuid-28': [ 'uuid-30' ],
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						'uuid-6': '',
+						'uuid-8': '',
+						'uuid-10': '',
+						'uuid-22': '',
+						'uuid-12': 'uuid-10',
+						'uuid-14': 'uuid-10',
+						'uuid-16': 'uuid-12',
+						'uuid-18': 'uuid-14',
+						'uuid-24': 'uuid-18',
+						'uuid-26': 'uuid-24',
+						'uuid-28': 'uuid-24',
+						'uuid-30': 'uuid-28',
+					} )
+				),
+				controlledInnerBlocks: {},
+			},
+		};
+
 		it( 'should return the ids of any descendants in sequential order, given an array of clientIds', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map(
-						Object.entries( {
-							'uuid-2': {
-								clientId: 'uuid-2',
-								name: 'core/image',
-							},
-							'uuid-4': {
-								clientId: 'uuid-4',
-								name: 'core/paragraph',
-							},
-							'uuid-6': {
-								clientId: 'uuid-6',
-								name: 'core/paragraph',
-							},
-							'uuid-8': {
-								clientId: 'uuid-8',
-								name: 'core/block',
-							},
-							'uuid-10': {
-								clientId: 'uuid-10',
-								name: 'core/columns',
-							},
-							'uuid-12': {
-								clientId: 'uuid-12',
-								name: 'core/column',
-							},
-							'uuid-14': {
-								clientId: 'uuid-14',
-								name: 'core/column',
-							},
-							'uuid-16': {
-								clientId: 'uuid-16',
-								name: 'core/quote',
-							},
-							'uuid-18': {
-								clientId: 'uuid-18',
-								name: 'core/block',
-							},
-							'uuid-20': {
-								clientId: 'uuid-20',
-								name: 'core/gallery',
-							},
-							'uuid-22': {
-								clientId: 'uuid-22',
-								name: 'core/block',
-							},
-							'uuid-24': {
-								clientId: 'uuid-24',
-								name: 'core/columns',
-							},
-							'uuid-26': {
-								clientId: 'uuid-26',
-								name: 'core/column',
-							},
-							'uuid-28': {
-								clientId: 'uuid-28',
-								name: 'core/column',
-							},
-							'uuid-30': {
-								clientId: 'uuid-30',
-								name: 'core/paragraph',
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							'uuid-2': {},
-							'uuid-4': {},
-							'uuid-6': {},
-							'uuid-8': {},
-							'uuid-10': {},
-							'uuid-12': {},
-							'uuid-14': {},
-							'uuid-16': {},
-							'uuid-18': {},
-							'uuid-20': {},
-							'uuid-22': {},
-							'uuid-24': {},
-							'uuid-26': {},
-							'uuid-28': {},
-							'uuid-30': {},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
-							'uuid-2': [],
-							'uuid-4': [],
-							'uuid-6': [],
-							'uuid-8': [],
-							'uuid-10': [ 'uuid-12', 'uuid-14' ],
-							'uuid-12': [ 'uuid-16' ],
-							'uuid-14': [ 'uuid-18' ],
-							'uuid-16': [],
-							'uuid-18': [ 'uuid-24' ],
-							'uuid-20': [],
-							'uuid-22': [],
-							'uuid-24': [ 'uuid-26', 'uuid-28' ],
-							'uuid-26': [],
-							'uuid-28': [ 'uuid-30' ],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							'uuid-6': '',
-							'uuid-8': '',
-							'uuid-10': '',
-							'uuid-22': '',
-							'uuid-12': 'uuid-10',
-							'uuid-14': 'uuid-10',
-							'uuid-16': 'uuid-12',
-							'uuid-18': 'uuid-14',
-							'uuid-24': 'uuid-18',
-							'uuid-26': 'uuid-24',
-							'uuid-28': 'uuid-24',
-							'uuid-30': 'uuid-28',
-						} )
-					),
-					controlledInnerBlocks: {},
-				},
-			};
 			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual(
 				[
 					'uuid-12',
@@ -661,6 +658,12 @@ describe( 'selectors', () => {
 					'uuid-28',
 					'uuid-30',
 				]
+			);
+		} );
+
+		it( 'should return same value when called with same state and argument', () => {
+			expect( getClientIdsOfDescendants( state, 'uuid-10' ) ).toBe(
+				getClientIdsOfDescendants( state, 'uuid-10' )
 			);
 		} );
 	} );
@@ -968,7 +971,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( '__experimentalGetGlobalBlocksByName', () => {
+	describe( 'getBlocksByName', () => {
 		const state = {
 			blocks: {
 				byClientId: new Map(
@@ -1010,31 +1013,25 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should return the clientIds of blocks of a given type', () => {
-			expect(
-				__experimentalGetGlobalBlocksByName( state, 'core/heading' )
-			).toStrictEqual( [ '123' ] );
+			expect( getBlocksByName( state, 'core/heading' ) ).toStrictEqual( [
+				'123',
+			] );
 		} );
 
 		it( 'should return the clientIds of blocks of a given type even if blocks are nested', () => {
-			expect(
-				__experimentalGetGlobalBlocksByName( state, 'core/paragraph' )
-			).toStrictEqual( [ '456', '1415', '1213' ] );
+			expect( getBlocksByName( state, 'core/paragraph' ) ).toStrictEqual(
+				[ '456', '1415', '1213' ]
+			);
 		} );
 
 		it( 'Should return empty array if no blocks match. The empty array should be the same reference', () => {
-			const result = __experimentalGetGlobalBlocksByName(
-				state,
-				'test/missing'
+			const result = getBlocksByName( state, 'test/missing' );
+			expect( getBlocksByName( state, 'test/missing' ) ).toStrictEqual(
+				[]
 			);
-			expect(
-				__experimentalGetGlobalBlocksByName( state, 'test/missing' )
-			).toStrictEqual( [] );
-			expect(
-				__experimentalGetGlobalBlocksByName(
-					state,
-					'test/missing2'
-				) === result
-			).toBe( true );
+			expect( getBlocksByName( state, 'test/missing2' ) === result ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -4195,382 +4192,6 @@ describe( 'selectors', () => {
 					'core/navigation-link',
 				] )
 			).toEqual( 'client-id-03' );
-		} );
-	} );
-
-	describe( '__experimentalGetAllowedPatterns', () => {
-		const state = {
-			blocks: {
-				byClientId: new Map(
-					Object.entries( {
-						block1: { name: 'core/test-block-a' },
-						block2: { name: 'core/test-block-b' },
-					} )
-				),
-				attributes: new Map(
-					Object.entries( {
-						block1: {},
-						block2: {},
-					} )
-				),
-				parents: new Map(
-					Object.entries( {
-						block1: '',
-						block2: '',
-					} )
-				),
-			},
-			blockListSettings: {
-				block1: {
-					allowedBlocks: [ 'core/test-block-b' ],
-				},
-				block2: {
-					allowedBlocks: [],
-				},
-			},
-			settings: {
-				__experimentalBlockPatterns: [
-					{
-						name: 'pattern-a',
-						title: 'pattern with a',
-						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
-					},
-					{
-						name: 'pattern-b',
-						title: 'pattern with b',
-						content:
-							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-					{
-						name: 'pattern-c',
-						title: 'pattern hidden from UI',
-						inserter: false,
-						content:
-							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-					},
-				],
-			},
-			blockEditingModes: new Map(),
-		};
-
-		it( 'should return all patterns for root level', () => {
-			expect(
-				__experimentalGetAllowedPatterns( state, null )
-			).toHaveLength( 2 );
-		} );
-
-		it( 'should return patterns that consists of blocks allowed for the specified client ID', () => {
-			expect(
-				__experimentalGetAllowedPatterns( state, 'block1' )
-			).toHaveLength( 1 );
-
-			expect(
-				__experimentalGetAllowedPatterns( state, 'block2' )
-			).toHaveLength( 0 );
-		} );
-		it( 'should return empty array if only patterns hidden from UI exist', () => {
-			expect(
-				__experimentalGetAllowedPatterns( {
-					blocks: { byClientId: new Map() },
-					blockListSettings: {},
-					settings: {
-						__experimentalBlockPatterns: [
-							{
-								name: 'pattern-c',
-								title: 'pattern hidden from UI',
-								inserter: false,
-								content:
-									'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-							},
-						],
-					},
-				} )
-			).toHaveLength( 0 );
-		} );
-	} );
-	describe( '__experimentalGetParsedPattern', () => {
-		const state = {
-			settings: {
-				__experimentalBlockPatterns: [
-					{
-						name: 'pattern-a',
-						title: 'pattern with a',
-						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
-					},
-					{
-						name: 'pattern-hidden-from-ui',
-						title: 'pattern hidden from UI',
-						inserter: false,
-						content:
-							'<!-- wp:test-block-a --><!-- /wp:test-block-a --><!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-				],
-			},
-		};
-		it( 'should return proper results when pattern does not exist', () => {
-			expect(
-				__experimentalGetParsedPattern( state, 'not there' )
-			).toBeNull();
-		} );
-		it( 'should return existing pattern properly parsed', () => {
-			const { name, blocks } = __experimentalGetParsedPattern(
-				state,
-				'pattern-a'
-			);
-			expect( name ).toEqual( 'pattern-a' );
-			expect( blocks ).toHaveLength( 1 );
-			expect( blocks[ 0 ] ).toEqual(
-				expect.objectContaining( {
-					name: 'core/test-block-a',
-				} )
-			);
-		} );
-		it( 'should return hidden from UI pattern when requested', () => {
-			const { name, blocks, inserter } = __experimentalGetParsedPattern(
-				state,
-				'pattern-hidden-from-ui'
-			);
-			expect( name ).toEqual( 'pattern-hidden-from-ui' );
-			expect( inserter ).toBeFalsy();
-			expect( blocks ).toHaveLength( 2 );
-			expect( blocks[ 0 ] ).toEqual(
-				expect.objectContaining( {
-					name: 'core/test-block-a',
-				} )
-			);
-		} );
-	} );
-	describe( 'getPatternsByBlockTypes', () => {
-		const state = {
-			blocks: {
-				byClientId: new Map(
-					Object.entries( {
-						block1: { name: 'core/test-block-a' },
-					} )
-				),
-				parents: new Map(),
-			},
-			blockListSettings: {
-				block1: {
-					allowedBlocks: [ 'core/test-block-b' ],
-				},
-			},
-			settings: {
-				__experimentalBlockPatterns: [
-					{
-						name: 'pattern-a',
-						blockTypes: [ 'test/block-a' ],
-						title: 'pattern a',
-						content:
-							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-					},
-					{
-						name: 'pattern-b',
-						blockTypes: [ 'test/block-b' ],
-						title: 'pattern b',
-						content:
-							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-					{
-						title: 'pattern c',
-						blockTypes: [ 'test/block-a' ],
-						content:
-							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-				],
-			},
-			blockEditingModes: new Map(),
-		};
-		it( 'should return empty array if no block name is provided', () => {
-			expect( getPatternsByBlockTypes( state ) ).toEqual( [] );
-		} );
-		it( 'should return empty array if no match is found', () => {
-			const patterns = getPatternsByBlockTypes(
-				state,
-				'test/block-not-exists'
-			);
-			expect( patterns ).toEqual( [] );
-		} );
-		it( 'should return the same empty array in both empty array cases', () => {
-			const patterns1 = getPatternsByBlockTypes( state );
-			const patterns2 = getPatternsByBlockTypes(
-				state,
-				'test/block-not-exists'
-			);
-			expect( patterns1 ).toBe( patterns2 );
-		} );
-		it( 'should return proper results when there are matched block patterns', () => {
-			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );
-			expect( patterns ).toHaveLength( 2 );
-			expect( patterns ).toEqual(
-				expect.arrayContaining( [
-					expect.objectContaining( { title: 'pattern a' } ),
-					expect.objectContaining( { title: 'pattern c' } ),
-				] )
-			);
-		} );
-		it( 'should return proper result with matched patterns and allowed blocks from rootClientId', () => {
-			const patterns = getPatternsByBlockTypes(
-				state,
-				'test/block-a',
-				'block1'
-			);
-			expect( patterns ).toHaveLength( 1 );
-			expect( patterns[ 0 ] ).toEqual(
-				expect.objectContaining( { title: 'pattern c' } )
-			);
-		} );
-	} );
-	describe( '__experimentalGetPatternTransformItems', () => {
-		const state = {
-			blocks: {
-				byClientId: new Map(
-					Object.entries( {
-						block1: { name: 'core/test-block-a' },
-						block2: { name: 'core/test-block-b' },
-					} )
-				),
-				parents: new Map(),
-				controlledInnerBlocks: { 'block2-clientId': true },
-			},
-			blockListSettings: {
-				block1: {
-					allowedBlocks: [ 'core/test-block-b' ],
-				},
-			},
-			settings: {
-				__experimentalBlockPatterns: [
-					{
-						name: 'pattern-a',
-						blockTypes: [ 'test/block-a' ],
-						title: 'pattern a',
-						content:
-							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-					},
-					{
-						name: 'pattern-b',
-						blockTypes: [ 'test/block-b' ],
-						title: 'pattern b',
-						content:
-							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-					{
-						name: 'pattern-c',
-						title: 'pattern c',
-						blockTypes: [ 'test/block-a' ],
-						content:
-							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-					{
-						name: 'pattern-mix',
-						title: 'pattern mix',
-						blockTypes: [
-							'core/test-block-a',
-							'core/test-block-b',
-						],
-						content:
-							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
-				],
-			},
-			blockEditingModes: new Map(),
-		};
-		describe( 'should return empty array', () => {
-			it( 'when no blocks are selected', () => {
-				expect(
-					__experimentalGetPatternTransformItems( state )
-				).toEqual( [] );
-			} );
-			it( 'when a selected block has inner blocks', () => {
-				const blocks = [
-					{ name: 'core/test-block-a', innerBlocks: [] },
-					{
-						name: 'core/test-block-b',
-						innerBlocks: [ { name: 'some inner block' } ],
-					},
-				];
-				expect(
-					__experimentalGetPatternTransformItems( state, blocks )
-				).toEqual( [] );
-			} );
-			it( 'when a selected block has controlled inner blocks', () => {
-				const blocks = [
-					{ name: 'core/test-block-a', innerBlocks: [] },
-					{
-						name: 'core/test-block-b',
-						clientId: 'block2-clientId',
-						innerBlocks: [],
-					},
-				];
-				expect(
-					__experimentalGetPatternTransformItems( state, blocks )
-				).toEqual( [] );
-			} );
-			it( 'when no patterns are available based on the selected blocks', () => {
-				const blocks = [
-					{ name: 'block-with-no-patterns', innerBlocks: [] },
-				];
-				expect(
-					__experimentalGetPatternTransformItems( state, blocks )
-				).toEqual( [] );
-			} );
-		} );
-		describe( 'should return proper results', () => {
-			it( 'when a single block is selected', () => {
-				const blocks = [
-					{ name: 'core/test-block-b', innerBlocks: [] },
-				];
-				const patterns = __experimentalGetPatternTransformItems(
-					state,
-					blocks
-				);
-				expect( patterns ).toHaveLength( 1 );
-				expect( patterns[ 0 ] ).toEqual(
-					expect.objectContaining( {
-						name: 'pattern-mix',
-					} )
-				);
-			} );
-			it( 'when different multiple blocks are selected', () => {
-				const blocks = [
-					{ name: 'core/test-block-b', innerBlocks: [] },
-					{ name: 'test/block-b', innerBlocks: [] },
-					{ name: 'some other block', innerBlocks: [] },
-				];
-				const patterns = __experimentalGetPatternTransformItems(
-					state,
-					blocks
-				);
-				expect( patterns ).toHaveLength( 2 );
-				expect( patterns ).toEqual(
-					expect.arrayContaining( [
-						expect.objectContaining( {
-							name: 'pattern-mix',
-						} ),
-						expect.objectContaining( {
-							name: 'pattern-b',
-						} ),
-					] )
-				);
-			} );
-			it( 'when multiple blocks are selected containing multiple times the same block', () => {
-				const blocks = [
-					{ name: 'core/test-block-b', innerBlocks: [] },
-					{ name: 'some other block', innerBlocks: [] },
-					{ name: 'core/test-block-a', innerBlocks: [] },
-					{ name: 'core/test-block-b', innerBlocks: [] },
-				];
-				const patterns = __experimentalGetPatternTransformItems(
-					state,
-					blocks
-				);
-				expect( patterns ).toHaveLength( 1 );
-				expect( patterns[ 0 ] ).toEqual(
-					expect.objectContaining( {
-						name: 'pattern-mix',
-					} )
-				);
-			} );
 		} );
 	} );
 

@@ -21,17 +21,16 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript
+        name: JavaScript (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
         strategy:
             fail-fast: false
             matrix:
-                node: ['16']
+                node: ['20', '21']
 
         steps:
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -40,7 +39,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Npm build
+            - name: npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
@@ -111,7 +110,7 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -126,7 +125,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@72ae4ccbe57f82bbe08411e84e2130bd4ba1c10f # v2.25.5
+              uses: shivammathur/setup-php@e6f75134d35752277f093989e72e140eaa222f35 # v2.28.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -221,12 +220,12 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@72ae4ccbe57f82bbe08411e84e2130bd4ba1c10f # v2.25.5
+              uses: shivammathur/setup-php@e6f75134d35752277f093989e72e140eaa222f35 # v2.28.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -290,7 +289,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 

@@ -20,6 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
+import EnhancedPaginationModal from './enhanced-pagination-modal';
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -103,14 +104,23 @@ export default function QueryContent( {
 			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
 		),
 	};
+
 	return (
 		<>
-			<QueryInspectorControls
+			<EnhancedPaginationModal
 				attributes={ attributes }
-				setQuery={ updateQuery }
-				setDisplayLayout={ updateDisplayLayout }
 				setAttributes={ setAttributes }
+				clientId={ clientId }
 			/>
+			<InspectorControls>
+				<QueryInspectorControls
+					attributes={ attributes }
+					setQuery={ updateQuery }
+					setDisplayLayout={ updateDisplayLayout }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</InspectorControls>
 			<BlockControls>
 				<QueryToolbar
 					name={ name }
@@ -123,6 +133,7 @@ export default function QueryContent( {
 			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },

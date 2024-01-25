@@ -8,4 +8,8 @@ h6 {
 	&.has-text-align-left[style*="writing-mode"]:where([style*="vertical-lr"]) {
 		rotate: 180deg;
 	}
+	&.has-text-align-right[style*="writing-mode"]:where([style*="vertical-rl"]),
+	&.has-text-align-left[style*="writing-mode"]:where([style*="vertical-lr"]) {
+		rotate: 180deg;
+	}
 }

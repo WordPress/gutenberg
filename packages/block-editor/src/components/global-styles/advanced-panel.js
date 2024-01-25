@@ -30,7 +30,7 @@ export default function AdvancedPanel( {
 		} );
 		if ( cssError ) {
 			const [ transformed ] = transformStyles(
-				[ { css: value } ],
+				[ { css: newValue } ],
 				'.editor-styles-wrapper'
 			);
 			if ( transformed ) {

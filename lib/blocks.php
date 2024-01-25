@@ -22,6 +22,8 @@ function gutenberg_reregister_core_block_types() {
 				'column',
 				'columns',
 				'details',
+				'form-input',
+				'form-submit-button',
 				'group',
 				'html',
 				'list',
@@ -66,6 +68,9 @@ function gutenberg_reregister_core_block_types() {
 				'comments.php'                     => 'core/comments',
 				'footnotes.php'                    => 'core/footnotes',
 				'file.php'                         => 'core/file',
+				'form.php'                         => 'core/form',
+				'form-input.php'                   => 'core/form-input',
+				'form-submission-notification.php' => 'core/form-submission-notification',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
@@ -274,7 +279,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		if ( ! $stylesheet_removed ) {
 			add_action(
 				'wp_enqueue_scripts',
-				static function() {
+				static function () {
 					wp_dequeue_style( 'wp-block-library-theme' );
 				}
 			);
@@ -431,4 +436,95 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 	return $value;
 }
+
 add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
+
+
+
+/**
+ * Strips all HTML from the content of footnotes, and sanitizes the ID.
+ *
+ * This function expects slashed data on the footnotes content.
+ *
+ * @access private
+ *
+ * @param string $footnotes JSON encoded string of an array containing the content and ID of each footnote.
+ * @return string Filtered content without any HTML on the footnote content and with the sanitized id.
+ */
+function _gutenberg_filter_post_meta_footnotes( $footnotes ) {
+	$footnotes_decoded = json_decode( $footnotes, true );
+	if ( ! is_array( $footnotes_decoded ) ) {
+		return '';
+	}
+	$footnotes_sanitized = array();
+	foreach ( $footnotes_decoded as $footnote ) {
+		if ( ! empty( $footnote['content'] ) && ! empty( $footnote['id'] ) ) {
+			$footnotes_sanitized[] = array(
+				'id'      => sanitize_key( $footnote['id'] ),
+				'content' => wp_unslash( wp_filter_post_kses( wp_slash( $footnote['content'] ) ) ),
+			);
+		}
+	}
+	return wp_json_encode( $footnotes_sanitized );
+}
+
+/**
+ * Adds the filters to filter footnotes meta field.
+ *
+ * @access private
+ */
+function _gutenberg_footnotes_kses_init_filters() {
+	add_filter( 'sanitize_post_meta_footnotes', '_gutenberg_filter_post_meta_footnotes' );
+}
+
+/**
+ * Removes the filters that filter footnotes meta field.
+ *
+ * @access private
+ */
+function _gutenberg_footnotes_remove_filters() {
+	remove_filter( 'sanitize_post_meta_footnotes', '_gutenberg_filter_post_meta_footnotes' );
+}
+
+/**
+ * Registers the filter of footnotes meta field if the user does not have unfiltered_html capability.
+ *
+ * @access private
+ */
+function _gutenberg_footnotes_kses_init() {
+	if ( function_exists( '_wp_filter_post_meta_footnotes' ) ) {
+		return;
+	}
+	_gutenberg_footnotes_remove_filters();
+	if ( ! current_user_can( 'unfiltered_html' ) ) {
+		_gutenberg_footnotes_kses_init_filters();
+	}
+}
+
+/**
+ * Initializes footnotes meta field filters when imported data should be filtered.
+ *
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable kses, independently of the user capabilities.
+ * So in that case we call _gutenberg_footnotes_kses_init_filters;
+ *
+ * @access private
+ *
+ * @param string $arg Input argument of the filter.
+ * @return string Input argument of the filter.
+ */
+function _gutenberg_footnotes_force_filtered_html_on_import_filter( $arg ) {
+	if ( function_exists( '_wp_filter_post_meta_footnotes' ) ) {
+		return;
+	}
+	// force_filtered_html_on_import is true we need to init the global styles kses filters.
+	if ( $arg ) {
+		_gutenberg_footnotes_kses_init_filters();
+	}
+	return $arg;
+}
+
+add_action( 'init', '_gutenberg_footnotes_kses_init' );
+add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
+add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );

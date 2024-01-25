@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -14,6 +13,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { combineReducers } from './combine-reducers';
 import { builtinControls } from '../controls';
 import { lock } from '../lock-unlock';
 import promise from '../promise-middleware';
@@ -22,6 +22,8 @@ import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+
+export { combineReducers };
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
 /** @typedef {import('../types').ListenerFunction} ListenerFunction */
@@ -32,7 +34,7 @@ import * as metadataActions from './metadata/actions';
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
  * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template {Record<string,import('../types').ActionCreator>} Actions
  * @template Selectors
  */
 
@@ -134,7 +136,7 @@ function createBindingCache( bind ) {
  * ```
  *
  * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template {Record<string,import('../types').ActionCreator>} Actions
  * @template Selectors
  * @param {string}                                    key     Unique namespace identifier.
  * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
@@ -233,11 +235,24 @@ export default function createReduxStore( key, options ) {
 					selector.registry = registry;
 				}
 				const boundSelector = ( ...args ) => {
+					args = normalize( selector, args );
 					const state = store.__unstableOriginalGetState();
+					// Before calling the selector, switch to the correct
+					// registry.
+					if ( selector.isRegistrySelector ) {
+						selector.registry = registry;
+					}
 					return selector( state.root, ...args );
 				};
 
+				// Expose normalization method on the bound selector
+				// in order that it can be called when fullfilling
+				// the resolver.
+				boundSelector.__unstableNormalizeArgs =
+					selector.__unstableNormalizeArgs;
+
 				const resolver = resolvers[ selectorName ];
+
 				if ( ! resolver ) {
 					boundSelector.hasResolver = false;
 					return boundSelector;
@@ -252,10 +267,24 @@ export default function createReduxStore( key, options ) {
 				);
 			}
 
-			function bindMetadataSelector( selector ) {
+			function bindMetadataSelector( metaDataSelector ) {
 				const boundSelector = ( ...args ) => {
 					const state = store.__unstableOriginalGetState();
-					return selector( state.metadata, ...args );
+
+					const originalSelectorName = args && args[ 0 ];
+					const originalSelectorArgs = args && args[ 1 ];
+					const targetSelector =
+						options?.selectors?.[ originalSelectorName ];
+
+					// Normalize the arguments passed to the target selector.
+					if ( originalSelectorName && targetSelector ) {
+						args[ 1 ] = normalize(
+							targetSelector,
+							originalSelectorArgs
+						);
+					}
+
+					return metaDataSelector( state.metadata, ...args );
 				};
 				boundSelector.hasResolver = false;
 				return boundSelector;
@@ -602,9 +631,29 @@ function mapSelectorWithResolver(
 	}
 
 	const selectorResolver = ( ...args ) => {
+		args = normalize( selector, args );
 		fulfillSelector( args );
 		return selector( ...args );
 	};
 	selectorResolver.hasResolver = true;
 	return selectorResolver;
+}
+
+/**
+ * Applies selector's normalization function to the given arguments
+ * if it exists.
+ *
+ * @param {Object} selector The selector potentially with a normalization method property.
+ * @param {Array}  args     selector arguments to normalize.
+ * @return {Array} Potentially normalized arguments.
+ */
+function normalize( selector, args ) {
+	if (
+		selector.__unstableNormalizeArgs &&
+		typeof selector.__unstableNormalizeArgs === 'function' &&
+		args?.length
+	) {
+		return selector.__unstableNormalizeArgs( args );
+	}
+	return args;
 }

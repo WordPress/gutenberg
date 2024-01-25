@@ -40,7 +40,7 @@ test.describe( 'Hybrid theme', () => {
 			page.getByRole( 'region', { name: 'Editor content' } )
 		).toBeVisible();
 
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 
 		await expect(
 			editor.canvas.getByRole( 'document', {

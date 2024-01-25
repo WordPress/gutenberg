@@ -33,11 +33,26 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 				__nextHasNoMarginBottom
 				label={ __( 'Numbering style' ) }
 				options={ [
-					{ value: '1', label: __( 'Numbers' ) },
-					{ value: 'A', label: __( 'Uppercase letters' ) },
-					{ value: 'a', label: __( 'Lowercase letters' ) },
-					{ value: 'I', label: __( 'Uppercase Roman numerals' ) },
-					{ value: 'i', label: __( 'Lowercase Roman numerals' ) },
+					{
+						label: __( 'Numbers' ),
+						value: 'decimal',
+					},
+					{
+						label: __( 'Uppercase letters' ),
+						value: 'upper-alpha',
+					},
+					{
+						label: __( 'Lowercase letters' ),
+						value: 'lower-alpha',
+					},
+					{
+						label: __( 'Uppercase Roman numerals' ),
+						value: 'upper-roman',
+					},
+					{
+						label: __( 'Lowercase Roman numerals' ),
+						value: 'lower-roman',
+					},
 				] }
 				value={ type }
 				onChange={ ( newValue ) => setAttributes( { type: newValue } ) }

@@ -1,20 +1,32 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
+import { focus } from '@wordpress/dom';
 import {
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Button,
+	__experimentalUnitControl as UnitControl,
+	__experimentalVStack as VStack,
 	DropZone,
 	FlexItem,
+	MenuItem,
+	VisuallyHidden,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Platform, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { Platform, useCallback, useRef } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 
@@ -23,9 +35,7 @@ import { getFilename } from '@wordpress/url';
  */
 import InspectorControls from '../components/inspector-controls';
 import MediaReplaceFlow from '../components/media-replace-flow';
-import MediaUpload from '../components/media-upload';
-import MediaUploadCheck from '../components/media-upload/check';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -36,15 +46,26 @@ export const IMAGE_BACKGROUND_TYPE = 'image';
  * Checks if there is a current value in the background image block support
  * attributes.
  *
- * @param {Object} props Block props.
+ * @param {Object} style Style attribute.
  * @return {boolean}     Whether or not the block has a background image value set.
  */
-export function hasBackgroundImageValue( props ) {
+export function hasBackgroundImageValue( style ) {
 	const hasValue =
-		!! props.attributes.style?.background?.backgroundImage?.id ||
-		!! props.attributes.style?.background?.backgroundImage?.url;
+		!! style?.background?.backgroundImage?.id ||
+		!! style?.background?.backgroundImage?.url;
 
 	return hasValue;
+}
+
+/**
+ * Checks if there is a current value in the background size block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether or not the block has a background size value set.
+ */
+export function hasBackgroundSizeValue( style ) {
+	return style?.background?.backgroundSize !== undefined;
 }
 
 /**
@@ -67,7 +88,11 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! support?.backgroundImage;
+		return (
+			!! support?.backgroundImage ||
+			!! support?.backgroundSize ||
+			!! support?.backgroundRepeat
+		);
 	}
 
 	return !! support?.[ feature ];
@@ -77,13 +102,10 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
  * Resets the background image block support attributes. This can be used when disabling
  * the background image controls for a block via a `ToolsPanel`.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
  */
-export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
-	const { style = {} } = attributes;
-
+export function resetBackgroundImage( style = {}, setAttributes ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
@@ -95,12 +117,60 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 	} );
 }
 
-function InspectorImagePreview( { label, url: imgUrl } ) {
+/**
+ * Resets the background size block support attributes. This can be used when disabling
+ * the background size controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
+ */
+function resetBackgroundSize( style = {}, setAttributes ) {
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			background: {
+				...style?.background,
+				backgroundRepeat: undefined,
+				backgroundSize: undefined,
+			},
+		} ),
+	} );
+}
+
+/**
+ * Generates a CSS class name if an background image is set.
+ *
+ * @param {Object} style A block's style attribute.
+ *
+ * @return {string} CSS class name.
+ */
+export function getBackgroundImageClasses( style ) {
+	return hasBackgroundImageValue( style ) ? 'has-background' : '';
+}
+
+function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	const imgLabel = label || getFilename( imgUrl );
 	return (
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
-				<img src={ imgUrl } alt="" />
+				<span
+					className={ classnames(
+						'block-editor-hooks__background__inspector-image-indicator-wrapper',
+						{
+							'has-image': imgUrl,
+						}
+					) }
+					aria-hidden
+				>
+					{ imgUrl && (
+						<span
+							className="block-editor-hooks__background__inspector-image-indicator"
+							style={ {
+								backgroundImage: `url(${ imgUrl })`,
+							} }
+						/>
+					) }
+				</span>
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
@@ -108,23 +178,41 @@ function InspectorImagePreview( { label, url: imgUrl } ) {
 					>
 						{ imgLabel }
 					</Truncate>
+					<VisuallyHidden as="span">
+						{ filename
+							? sprintf(
+									/* translators: %s: file name */
+									__( 'Selected image: %s' ),
+									filename
+							  )
+							: __( 'No image selected' ) }
+					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
 		</ItemGroup>
 	);
 }
 
-function BackgroundImagePanelItem( props ) {
-	const { attributes, clientId, setAttributes } = props;
+function BackgroundImagePanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
+	const { style, mediaUpload } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
 
-	const { id, title, url } =
-		attributes.style?.background?.backgroundImage || {};
+			return {
+				style: getBlockAttributes( clientId )?.style,
+				mediaUpload: getSettings().mediaUpload,
+			};
+		},
+		[ clientId ]
+	);
+	const { id, title, url } = style?.background?.backgroundImage || {};
 
-	const { mediaUpload } = useSelect( ( select ) => {
-		return {
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		};
-	} );
+	const replaceContainerRef = useRef();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
@@ -134,9 +222,9 @@ function BackgroundImagePanelItem( props ) {
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
 			const newStyle = {
-				...attributes.style,
+				...style,
 				background: {
-					...attributes.style?.background,
+					...style?.background,
 					backgroundImage: undefined,
 				},
 			};
@@ -168,9 +256,9 @@ function BackgroundImagePanelItem( props ) {
 		}
 
 		const newStyle = {
-			...attributes.style,
+			...style,
 			background: {
-				...attributes.style?.background,
+				...style?.background,
 				backgroundImage: {
 					url: media.url,
 					id: media.id,
@@ -211,70 +299,257 @@ function BackgroundImagePanelItem( props ) {
 		};
 	}, [] );
 
+	const hasValue = hasBackgroundImageValue( style );
+
 	return (
 		<ToolsPanelItem
 			className="single-column"
-			hasValue={ () => hasBackgroundImageValue( props ) }
+			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
-			onDeselect={ () => resetBackgroundImage( props ) }
-			isShownByDefault={ true }
+			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
+			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
-			<div className="block-editor-hooks__background__inspector-media-replace-container">
-				{ !! url && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-						accept="image/*"
-						onSelect={ onSelectMedia }
-						name={
-							<InspectorImagePreview
-								label={ title }
-								url={ url }
-							/>
-						}
-						variant="secondary"
-					/>
-				) }
-				{ ! url && (
-					<MediaUploadCheck>
-						<MediaUpload
-							onSelect={ onSelectMedia }
-							allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-							render={ ( { open } ) => (
-								<div className="block-editor-hooks__background__inspector-upload-container">
-									<Button
-										onClick={ open }
-										variant="secondary"
-									>
-										{ __( 'Add background image' ) }
-									</Button>
-									<DropZone onFilesDrop={ onFilesDrop } />
-								</div>
-							) }
+			<div
+				className="block-editor-hooks__background__inspector-media-replace-container"
+				ref={ replaceContainerRef }
+			>
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
+					accept="image/*"
+					onSelect={ onSelectMedia }
+					name={
+						<InspectorImagePreview
+							label={ __( 'Background image' ) }
+							filename={ title }
+							url={ url }
 						/>
-					</MediaUploadCheck>
-				) }
+					}
+					variant="secondary"
+				>
+					{ hasValue && (
+						<MenuItem
+							onClick={ () => {
+								const [ toggleButton ] = focus.tabbable.find(
+									replaceContainerRef.current
+								);
+								// Focus the toggle button and close the dropdown menu.
+								// This ensures similar behaviour as to selecting an image, where the dropdown is
+								// closed and focus is redirected to the dropdown toggle button.
+								toggleButton?.focus();
+								toggleButton?.click();
+								resetBackgroundImage( style, setAttributes );
+							} }
+						>
+							{ __( 'Reset ' ) }
+						</MenuItem>
+					) }
+				</MediaReplaceFlow>
+				<DropZone
+					onFilesDrop={ onFilesDrop }
+					label={ __( 'Drop to upload' ) }
+				/>
 			</div>
 		</ToolsPanelItem>
 	);
 }
 
-export function BackgroundImagePanel( props ) {
-	const isBackgroundImageSupported =
-		useSetting( 'background.backgroundImage' ) &&
-		hasBackgroundSupport( props.name, 'backgroundImage' );
+function backgroundSizeHelpText( value ) {
+	if ( value === 'cover' || value === undefined ) {
+		return __( 'Stretch image to cover the block.' );
+	}
+	if ( value === 'contain' ) {
+		return __( 'Resize image to fit without cropping.' );
+	}
+	return __( 'Set a fixed width.' );
+}
 
-	if ( ! isBackgroundImageSupported ) {
+function BackgroundSizePanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
+	const style = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+		[ clientId ]
+	);
+
+	const sizeValue = style?.background?.backgroundSize;
+	const repeatValue = style?.background?.backgroundRepeat;
+
+	// An `undefined` value is treated as `cover` by the toggle group control.
+	// An empty string is treated as `auto` by the toggle group control. This
+	// allows a user to select "Size" and then enter a custom value, with an
+	// empty value being treated as `auto`.
+	const currentValueForToggle =
+		( sizeValue !== undefined &&
+			sizeValue !== 'cover' &&
+			sizeValue !== 'contain' ) ||
+		sizeValue === ''
+			? 'auto'
+			: sizeValue || 'cover';
+
+	// If the current value is `cover` and the repeat value is `undefined`, then
+	// the toggle should be unchecked as the default state. Otherwise, the toggle
+	// should reflect the current repeat value.
+	const repeatCheckedValue =
+		repeatValue === 'no-repeat' ||
+		( currentValueForToggle === 'cover' && repeatValue === undefined )
+			? false
+			: true;
+
+	const hasValue = hasBackgroundSizeValue( style );
+
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			style: {
+				...previousValue.style,
+				background: {
+					...previousValue.style?.background,
+					backgroundRepeat: undefined,
+					backgroundSize: undefined,
+				},
+			},
+		};
+	}, [] );
+
+	const updateBackgroundSize = ( next ) => {
+		// When switching to 'contain' toggle the repeat off.
+		let nextRepeat = repeatValue;
+
+		if ( next === 'contain' ) {
+			nextRepeat = 'no-repeat';
+		}
+
+		if (
+			( currentValueForToggle === 'cover' ||
+				currentValueForToggle === 'contain' ) &&
+			next === 'auto'
+		) {
+			nextRepeat = undefined;
+		}
+
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundRepeat: nextRepeat,
+					backgroundSize: next,
+				},
+			} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundRepeat:
+						repeatCheckedValue === true ? 'no-repeat' : undefined,
+				},
+			} ),
+		} );
+	};
+
+	return (
+		<VStack
+			as={ ToolsPanelItem }
+			spacing={ 2 }
+			className="single-column"
+			hasValue={ () => hasValue }
+			label={ __( 'Size' ) }
+			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
+			isShownByDefault={ isShownByDefault }
+			resetAllFilter={ resetAllFilter }
+			panelId={ clientId }
+		>
+			<ToggleGroupControl
+				__nextHasNoMarginBottom
+				size={ '__unstable-large' }
+				label={ __( 'Size' ) }
+				value={ currentValueForToggle }
+				onChange={ updateBackgroundSize }
+				isBlock={ true }
+				help={ backgroundSizeHelpText( sizeValue ) }
+			>
+				<ToggleGroupControlOption
+					key={ 'cover' }
+					value={ 'cover' }
+					label={ __( 'Cover' ) }
+				/>
+				<ToggleGroupControlOption
+					key={ 'contain' }
+					value={ 'contain' }
+					label={ __( 'Contain' ) }
+				/>
+				<ToggleGroupControlOption
+					key={ 'fixed' }
+					value={ 'auto' }
+					label={ __( 'Fixed' ) }
+				/>
+			</ToggleGroupControl>
+			{ sizeValue !== undefined &&
+			sizeValue !== 'cover' &&
+			sizeValue !== 'contain' ? (
+				<UnitControl
+					size={ '__unstable-large' }
+					onChange={ updateBackgroundSize }
+					value={ sizeValue }
+				/>
+			) : null }
+			{ currentValueForToggle !== 'cover' && (
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Repeat image' ) }
+					checked={ repeatCheckedValue }
+					onChange={ toggleIsRepeated }
+				/>
+			) }
+		</VStack>
+	);
+}
+
+export function BackgroundImagePanel( props ) {
+	const [ backgroundImage, backgroundSize ] = useSettings(
+		'background.backgroundImage',
+		'background.backgroundSize'
+	);
+
+	if (
+		! backgroundImage ||
+		! hasBackgroundSupport( props.name, 'backgroundImage' )
+	) {
 		return null;
 	}
 
+	const showBackgroundSize = !! (
+		backgroundSize && hasBackgroundSupport( props.name, 'backgroundSize' )
+	);
+
+	const defaultControls = getBlockSupport( props.name, [
+		BACKGROUND_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
 	return (
 		<InspectorControls group="background">
-			{ isBackgroundImageSupported && (
-				<BackgroundImagePanelItem { ...props } />
+			<BackgroundImagePanelItem
+				isShownByDefault={ defaultControls?.backgroundImage }
+				{ ...props }
+			/>
+			{ showBackgroundSize && (
+				<BackgroundSizePanelItem
+					isShownByDefault={ defaultControls?.backgroundSize }
+					{ ...props }
+				/>
 			) }
 		</InspectorControls>
 	);

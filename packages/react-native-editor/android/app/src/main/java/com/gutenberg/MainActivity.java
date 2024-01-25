@@ -113,6 +113,8 @@ public class MainActivity extends ReactActivity {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        linearLayout.setFocusable(false);
+        linearLayout.setFocusableInTouchMode(true);
 
         // Create a Toolbar instance
         Toolbar toolbar = new Toolbar(this);
@@ -166,14 +168,27 @@ public class MainActivity extends ReactActivity {
         Bundle bundle = new Bundle();
 
         // Parse initial props from launch arguments
+        String initialTitle = null;
         String initialData = null;
+        String rawStyles = null;
+        String rawFeatures = null;
         Bundle extrasBundle = getIntent().getExtras();
+
         if(extrasBundle != null) {
             String initialProps = extrasBundle.getString(EXTRAS_INITIAL_PROPS, "{}");
             try {
                 JSONObject jsonObject = new JSONObject(initialProps);
+                if (jsonObject.has(GutenbergProps.PROP_INITIAL_TITLE)) {
+                    initialTitle = jsonObject.getString(GutenbergProps.PROP_INITIAL_TITLE);
+                }
                 if (jsonObject.has(GutenbergProps.PROP_INITIAL_DATA)) {
                     initialData = jsonObject.getString(GutenbergProps.PROP_INITIAL_DATA);
+                }
+                if (jsonObject.has(GutenbergProps.PROP_STYLES)) {
+                    rawStyles = jsonObject.getString(GutenbergProps.PROP_STYLES);
+                }
+                if (jsonObject.has(GutenbergProps.PROP_FEATURES)) {
+                    rawFeatures = jsonObject.getString(GutenbergProps.PROP_FEATURES);
                 }
             } catch (final JSONException e) {
                 Log.e("MainActivity", "Json parsing error: " + e.getMessage());
@@ -200,8 +215,17 @@ public class MainActivity extends ReactActivity {
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, true);
         bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
 
+        if(initialTitle != null) {
+            bundle.putString(GutenbergProps.PROP_INITIAL_TITLE, initialTitle);
+        }
         if(initialData != null) {
             bundle.putString(GutenbergProps.PROP_INITIAL_DATA, initialData);
+        }
+        if(rawStyles != null) {
+            bundle.putString(GutenbergProps.PROP_STYLES, rawStyles);
+        }
+        if(rawFeatures != null) {
+            bundle.putString(GutenbergProps.PROP_FEATURES, rawFeatures);
         }
 
         return bundle;

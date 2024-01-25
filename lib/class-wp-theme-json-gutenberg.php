@@ -155,7 +155,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'              => array( 'typography', 'fontSizes' ),
-			'prevent_override'  => false,
+			'prevent_override'  => array( 'typography', 'defaultFontSizes' ),
 			'use_default_names' => true,
 			'value_func'        => 'gutenberg_get_typography_font_size_value',
 			'css_vars'          => '--wp--preset--font-size--$slug',
@@ -211,6 +211,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
+		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
 		'border-radius'                     => array( 'border', 'radius' ),
@@ -331,7 +332,6 @@ class WP_Theme_JSON_Gutenberg {
 		'templateParts',
 		'title',
 		'version',
-		'behaviors',
 	);
 
 	/**
@@ -347,6 +347,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `position.fixed` and `position.sticky`.
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @since 6.4.0 Added `layout.allowEditing`.
+	 * @since 6.4.0 Added `lightbox`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -354,6 +355,7 @@ class WP_Theme_JSON_Gutenberg {
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
 			'backgroundImage' => null,
+			'backgroundSize'  => null,
 		),
 		'border'                        => array(
 			'color'  => null,
@@ -380,11 +382,17 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'                        => null,
 		'dimensions'                    => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'layout'                        => array(
-			'contentSize'  => null,
-			'wideSize'     => null,
+			'contentSize'                   => null,
+			'wideSize'                      => null,
+			'allowEditing'                  => null,
+			'allowCustomContentAndWideSize' => null,
+		),
+		'lightbox'                      => array(
+			'enabled'      => null,
 			'allowEditing' => null,
 		),
 		'position'                      => array(
@@ -405,21 +413,48 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'typography'                    => array(
-			'fluid'          => null,
-			'customFontSize' => null,
-			'dropCap'        => null,
-			'fontFamilies'   => null,
-			'fontSizes'      => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textColumns'    => null,
-			'textDecoration' => null,
-			'textTransform'  => null,
-			'writingMode'    => null,
+			'fluid'            => null,
+			'customFontSize'   => null,
+			'defaultFontSizes' => null,
+			'dropCap'          => null,
+			'fontFamilies'     => null,
+			'fontSizes'        => null,
+			'fontStyle'        => null,
+			'fontWeight'       => null,
+			'letterSpacing'    => null,
+			'lineHeight'       => null,
+			'textColumns'      => null,
+			'textDecoration'   => null,
+			'textTransform'    => null,
+			'writingMode'      => null,
 		),
-		'behaviors'                     => null,
+	);
+
+	const FONT_FAMILY_SCHEMA = array(
+		array(
+			'fontFamily' => null,
+			'name'       => null,
+			'slug'       => null,
+			'preview'    => null,
+			'fontFace'   => array(
+				array(
+					'ascentOverride'        => null,
+					'descentOverride'       => null,
+					'fontDisplay'           => null,
+					'fontFamily'            => null,
+					'fontFeatureSettings'   => null,
+					'fontStyle'             => null,
+					'fontStretch'           => null,
+					'fontVariationSettings' => null,
+					'fontWeight'            => null,
+					'lineGapOverride'       => null,
+					'sizeAdjust'            => null,
+					'src'                   => null,
+					'unicodeRange'          => null,
+					'preview'               => null,
+				),
+			),
+		),
 	);
 
 	/**
@@ -453,7 +488,8 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'dimensions' => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'filter'     => array(
 			'duotone' => null,
@@ -547,6 +583,52 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Return the input schema at the root and per origin.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $schema The base schema.
+	 * @return array The schema at the root and per origin.
+	 *
+	 * Example:
+	 * schema_in_root_and_per_origin(
+	 *   array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *   )
+	 * )
+	 *
+	 * Returns:
+	 * array(
+	 *  'fontFamily' => null,
+	 *  'slug' => null,
+	 *  'default' => array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *  ),
+	 *  'blocks' => array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *  ),
+	 *  'theme' => array(
+	 *     'fontFamily' => null,
+	 *     'slug' => null,
+	 *  ),
+	 *  'custom' => array(
+	 *     'fontFamily' => null,
+	 *     'slug' => null,
+	 *  ),
+	 * )
+	 */
+	protected static function schema_in_root_and_per_origin( $schema ) {
+		$schema_in_root_and_per_origin = $schema;
+		foreach ( static::VALID_ORIGINS as $origin ) {
+			$schema_in_root_and_per_origin[ $origin ] = $schema;
+		}
+		return $schema_in_root_and_per_origin;
+	}
+
+	/**
 	 * Returns a class name by an element name.
 	 *
 	 * @since 6.1.0
@@ -573,6 +655,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
 		array( 'background', 'backgroundImage' ),
+		array( 'background', 'backgroundSize' ),
 		array( 'border', 'color' ),
 		array( 'border', 'radius' ),
 		array( 'border', 'style' ),
@@ -581,6 +664,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'heading' ),
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
+		array( 'dimensions', 'aspectRatio' ),
 		array( 'dimensions', 'minHeight' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
@@ -787,11 +871,12 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
 		}
 
-		$schema['styles']             = static::VALID_STYLES;
-		$schema['styles']['blocks']   = $schema_styles_blocks;
-		$schema['styles']['elements'] = $schema_styles_elements;
-		$schema['settings']           = static::VALID_SETTINGS;
-		$schema['settings']['blocks'] = $schema_settings_blocks;
+		$schema['styles']                                 = static::VALID_STYLES;
+		$schema['styles']['blocks']                       = $schema_styles_blocks;
+		$schema['styles']['elements']                     = $schema_styles_elements;
+		$schema['settings']                               = static::VALID_SETTINGS;
+		$schema['settings']['blocks']                     = $schema_settings_blocks;
+		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -925,11 +1010,11 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Keep backwards compatibility for support.color.__experimentalDuotone.
 			if ( null === $duotone_selector ) {
-				$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
+				$duotone_support = $block_type->supports['color']['__experimentalDuotone'] ?? null;
 
 				if ( $duotone_support ) {
 					$root_selector    = wp_get_block_css_selector( $block_type );
-					$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+					$duotone_selector = static::scope_selector( $root_selector, $duotone_support );
 				}
 			}
 
@@ -941,8 +1026,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
-					// The style variation classname is duplicated in the selector to ensure that it overrides core block styles.
-					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'] . '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
@@ -963,18 +1047,39 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The modified $tree.
 	 */
 	protected static function remove_keys_not_in_schema( $tree, $schema ) {
-		$tree = array_intersect_key( $tree, $schema );
+		if ( ! is_array( $tree ) ) {
+			return $tree;
+		}
 
-		foreach ( $schema as $key => $data ) {
-			if ( ! isset( $tree[ $key ] ) ) {
+		foreach ( $tree as $key => $value ) {
+			// Remove keys not in the schema or with null/empty values.
+			if ( ! array_key_exists( $key, $schema ) ) {
+				unset( $tree[ $key ] );
 				continue;
 			}
 
-			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
-				$tree[ $key ] = static::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
+			// Check if the value is an array and requires further processing.
+			if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+				// Determine if it is an associative or indexed array.
+				$schema_is_assoc = self::is_assoc( $value );
 
-				if ( empty( $tree[ $key ] ) ) {
-					unset( $tree[ $key ] );
+				if ( $schema_is_assoc ) {
+					// If associative, process as a single object.
+					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+
+					if ( empty( $tree[ $key ] ) ) {
+						unset( $tree[ $key ] );
+					}
+				} else {
+					// If indexed, process each item in the array.
+					foreach ( $value as $item_key => $item_value ) {
+						if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
+							$tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
+						} else {
+							// If the schema does not define a further structure, keep the value as is.
+							$tree[ $key ][ $item_key ] = $item_value;
+						}
+					}
 				}
 			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
 				unset( $tree[ $key ] );
@@ -982,6 +1087,20 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $tree;
+	}
+
+	/**
+	 * Checks if the given array is associative.
+	 *
+	 * @since 6.5.0
+	 * @param array $data The array to check.
+	 * @return bool True if the array is associative, false otherwise.
+	 */
+	protected static function is_assoc( $data ) {
+		if ( array() === $data ) {
+			return false;
+		}
+		return array_keys( $data ) !== range( 0, count( $data ) - 1 );
 	}
 
 	/**
@@ -1062,6 +1181,7 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $style_nodes as &$node ) {
 				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
 			}
+			unset( $node );
 		}
 
 		if ( ! empty( $options['root_selector'] ) ) {
@@ -1069,7 +1189,7 @@ class WP_Theme_JSON_Gutenberg {
 				$setting_nodes[ $root_settings_key ]['selector'] = $options['root_selector'];
 			}
 			if ( false !== $root_style_key ) {
-				$setting_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
+				$style_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
 			}
 		}
 
@@ -1142,9 +1262,23 @@ class WP_Theme_JSON_Gutenberg {
 		// Split CSS nested rules.
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
-			$processed_css .= ( ! str_contains( $part, '{' ) )
-				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
-				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
+			$is_root_css = ( ! str_contains( $part, '{' ) );
+			if ( $is_root_css ) {
+				// If the part doesn't contain braces, it applies to the root level.
+				$processed_css .= trim( $selector ) . '{' . trim( $part ) . '}';
+			} else {
+				// If the part contains braces, it's a nested CSS rule.
+				$part = explode( '{', str_replace( '}', '', $part ) );
+				if ( count( $part ) !== 2 ) {
+					continue;
+				}
+				$nested_selector = $part[0];
+				$css_value       = $part[1];
+				$part_selector   = str_starts_with( $nested_selector, ' ' )
+					? static::scope_selector( $selector, $nested_selector )
+					: static::append_to_selector( $selector, $nested_selector );
+				$processed_css  .= $part_selector . '{' . trim( $css_value ) . '}';
+			}
 		}
 		return $processed_css;
 	}
@@ -1158,12 +1292,12 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_custom_css() {
 		// Add the global styles root CSS.
-		$stylesheet = _wp_array_get( $this->theme_json, array( 'styles', 'css' ), '' );
+		$stylesheet = $this->theme_json['styles']['css'] ?? '';
 
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
-				$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
+				$custom_block_css = $this->theme_json['styles']['blocks'][ $name ]['css'] ?? null;
 				if ( $custom_block_css ) {
 					$selector    = static::$blocks_metadata[ $name ]['selector'];
 					$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
@@ -1281,7 +1415,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$selector                 = isset( $block_metadata['selector'] ) ? $block_metadata['selector'] : '';
-		$has_block_gap_support    = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+		$has_block_gap_support    = isset( $this->theme_json['settings']['spacing']['blockGap'] );
 		$has_fallback_gap_support = ! $has_block_gap_support; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$layout_definitions       = gutenberg_get_layout_definitions();
@@ -1295,7 +1429,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! $has_block_gap_support ) {
 				$block_gap_value = static::ROOT_BLOCK_SELECTOR === $selector ? '0.5em' : null;
 				if ( ! empty( $block_type ) ) {
-					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), null );
+					$block_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? null;
 				}
 			} else {
 				$block_gap_value = static::get_property_value( $node, array( 'spacing', 'blockGap' ) );
@@ -1321,8 +1455,8 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					$class_name    = _wp_array_get( $layout_definition, array( 'className' ), false );
-					$spacing_rules = _wp_array_get( $layout_definition, array( 'spacingStyles' ), array() );
+					$class_name    = $layout_definition['className'] ?? false;
+					$spacing_rules = $layout_definition['spacingStyles'] ?? array();
 
 					if (
 						! empty( $class_name ) &&
@@ -1378,8 +1512,8 @@ class WP_Theme_JSON_Gutenberg {
 		) {
 			$valid_display_modes = array( 'block', 'flex', 'grid' );
 			foreach ( $layout_definitions as $layout_definition ) {
-				$class_name       = _wp_array_get( $layout_definition, array( 'className' ), false );
-				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
+				$class_name       = $layout_definition['className'] ?? false;
+				$base_style_rules = $layout_definition['baseStyles'] ?? array();
 
 				if (
 					! empty( $class_name ) &&
@@ -1811,7 +1945,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function compute_theme_vars( $settings ) {
 		$declarations  = array();
-		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
+		$custom_values = $settings['custom'] ?? array();
 		$css_vars      = static::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -1961,6 +2095,15 @@ class WP_Theme_JSON_Gutenberg {
 				 * and therefore the original $value will be returned.
 				 */
 				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+			}
+
+			if ( 'aspect-ratio' === $css_property ) {
+				// For aspect ratio to work, other dimensions rules must be unset.
+				// This ensures that a fixed height does not override the aspect ratio.
+				$declarations[] = array(
+					'name'  => 'min-height',
+					'value' => 'unset',
+				);
 			}
 
 			$declarations[] = array(
@@ -2323,7 +2466,7 @@ class WP_Theme_JSON_Gutenberg {
 		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
-		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$settings         = $this->theme_json['settings'] ?? null;
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -2345,7 +2488,7 @@ class WP_Theme_JSON_Gutenberg {
 					// Prepend the variation selector to the current selector.
 					$split_selectors    = explode( ',', $shortened_selector );
 					$updated_selectors  = array_map(
-						static function( $split_selector ) use ( $clean_style_variation_selector ) {
+						static function ( $split_selector ) use ( $clean_style_variation_selector ) {
 							return $clean_style_variation_selector . $split_selector;
 						},
 						$split_selectors
@@ -2384,7 +2527,7 @@ class WP_Theme_JSON_Gutenberg {
 		$pseudo_matches = array_values(
 			array_filter(
 				$element_pseudo_allowed,
-				static function( $pseudo_selector ) use ( $selector ) {
+				static function ( $pseudo_selector ) use ( $selector ) {
 					return str_contains( $selector, $pseudo_selector );
 				}
 			)
@@ -2476,7 +2619,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_root_layout_rules( $selector, $block_metadata ) {
 		$css              = '';
-		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$settings         = $this->theme_json['settings'] ?? array();
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
 		/*
@@ -2510,11 +2653,11 @@ class WP_Theme_JSON_Gutenberg {
 			// Right and left padding are applied to the first container with `.has-global-padding` class.
 			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			// Nested containers with `.has-global-padding` class do not get padding.
-			$css .= '.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }';
+			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }';
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
 			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
 			// The above rule is negated for alignfull children of nested containers.
-			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
+			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }';
 			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
 			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
@@ -2525,8 +2668,8 @@ class WP_Theme_JSON_Gutenberg {
 		$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
-		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+		$block_gap_value       = $this->theme_json['styles']['spacing']['blockGap'] ?? '0.5em';
+		$has_block_gap_support = isset( $this->theme_json['settings']['spacing']['blockGap'] );
 		if ( $has_block_gap_support ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
 			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
@@ -3357,7 +3500,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return null|void
 	 */
 	public function set_spacing_sizes() {
-		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
+		$spacing_scale = $this->theme_json['settings']['spacing']['spacingScale'] ?? array();
 
 		// Gutenberg didn't have the 1st isset check.
 		if ( ! isset( $spacing_scale['steps'] )
@@ -3415,7 +3558,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( $below_midpoint_count < $steps_mid_point - 2 ) {
-				$x_small_count++;
+				++$x_small_count;
 			}
 
 			$slug -= 10;
@@ -3452,7 +3595,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( $above_midpoint_count > 1 ) {
-				$x_large_count++;
+				++$x_large_count;
 			}
 
 			$slug += 10;
@@ -3543,7 +3686,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$settings = $this->theme_json['settings'] ?? null;
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
 			// Skip if this is the block's root selector or the block doesn't
@@ -3728,10 +3871,10 @@ class WP_Theme_JSON_Gutenberg {
 		$theme_vars  = static::compute_theme_vars( $settings );
 		$vars        = array_reduce(
 			array_merge( $preset_vars, $theme_vars ),
-			function( $carry, $item ) {
+			function ( $carry, $item ) {
 				$name                    = $item['name'];
 				$carry[ "var({$name})" ] = $item['value'];
-				return  $carry;
+				return $carry;
 			},
 			array()
 		);
@@ -3739,5 +3882,4 @@ class WP_Theme_JSON_Gutenberg {
 		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
 		return $theme_json;
 	}
-
 }

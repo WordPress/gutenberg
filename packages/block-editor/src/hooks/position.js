@@ -12,24 +12,17 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
+import { useMemo, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
@@ -197,8 +190,10 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPositionDisabled( { name: blockName } = {} ) {
-	const allowFixed = useSetting( 'position.fixed' );
-	const allowSticky = useSetting( 'position.sticky' );
+	const [ allowFixed, allowSticky ] = useSettings(
+		'position.fixed',
+		'position.sticky'
+	);
 	const isDisabled = ! allowFixed && ! allowSticky;
 
 	return ! hasPositionSupport( blockName ) || isDisabled;
@@ -209,16 +204,14 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @param {Object} props
  *
- * @return {WPElement} Position panel.
+ * @return {Element} Position panel.
  */
-export function PositionPanel( props ) {
-	const {
-		attributes: { style = {} },
-		clientId,
-		name: blockName,
-		setAttributes,
-	} = props;
-
+export function PositionPanelPure( {
+	style = {},
+	clientId,
+	name: blockName,
+	setAttributes,
+} ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
@@ -296,7 +289,7 @@ export function PositionPanel( props ) {
 					>
 						<CustomSelectControl
 							__nextUnconstrainedWidth
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							className="block-editor-hooks__position-selection__select-control"
 							label={ __( 'Position' ) }
 							hideLabelFromVision
@@ -320,95 +313,52 @@ export function PositionPanel( props ) {
 	} );
 }
 
-/**
- * Override the default edit UI to include position controls.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withInspectorControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const positionSupport = hasBlockSupport(
-			blockName,
-			POSITION_SUPPORT_KEY
-		);
-		const showPositionControls =
-			positionSupport && ! useIsPositionDisabled( props );
-
-		return [
-			showPositionControls && (
-				<PositionPanel key="position" { ...props } />
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withInspectorControls'
-);
-
-/**
- * Override the default block element to add the position styles.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withPositionStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const hasPositionBlockSupport = hasBlockSupport(
-			name,
-			POSITION_SUPPORT_KEY
-		);
-		const allowPositionStyles =
-			hasPositionBlockSupport && ! useIsPositionDisabled( props );
-
-		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
-
-		// Higher specificity to override defaults in editor UI.
-		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
-
-		// Get CSS string for the current position values.
-		let css;
-		if ( allowPositionStyles ) {
-			css =
-				getPositionCSS( {
-					selector: positionSelector,
-					style: attributes?.style,
-				} ) || '';
+export default {
+	edit: function Edit( props ) {
+		const isPositionDisabled = useIsPositionDisabled( props );
+		if ( isPositionDisabled ) {
+			return null;
 		}
-
-		// Attach a `wp-container-` id-based class name.
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-			[ `is-position-${ attributes?.style?.position?.type }` ]:
-				allowPositionStyles &&
-				!! css &&
-				!! attributes?.style?.position?.type,
-		} );
-
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
+		return <PositionPanelPure { ...props } />;
 	},
-	'withPositionStyles'
-);
+	useBlockProps,
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+	},
+};
 
-addFilter(
-	'editor.BlockListBlock',
-	'core/editor/position/with-position-styles',
-	withPositionStyles
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/position/with-inspector-controls',
-	withInspectorControls
-);
+function useBlockProps( { name, style } ) {
+	const hasPositionBlockSupport = hasBlockSupport(
+		name,
+		POSITION_SUPPORT_KEY
+	);
+	const isPositionDisabled = useIsPositionDisabled( { name } );
+	const allowPositionStyles = hasPositionBlockSupport && ! isPositionDisabled;
+
+	const id = useInstanceId( useBlockProps );
+
+	// Higher specificity to override defaults in editor UI.
+	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
+
+	// Get CSS string for the current position values.
+	let css;
+	if ( allowPositionStyles ) {
+		css =
+			getPositionCSS( {
+				selector: positionSelector,
+				style,
+			} ) || '';
+	}
+
+	// Attach a `wp-container-` id-based class name.
+	const className = classnames( {
+		[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		[ `is-position-${ style?.position?.type }` ]:
+			allowPositionStyles && !! css && !! style?.position?.type,
+	} );
+
+	useStyleOverride( { css } );
+
+	return { className };
+}

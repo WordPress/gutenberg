@@ -28,6 +28,8 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/icons',
 	'@wordpress/interface',
 	'@wordpress/undo-manager',
+	'@wordpress/sync',
+	'@wordpress/dataviews',
 ];
 
 // PHP files in packages that have to be copied during build.
@@ -127,10 +129,10 @@ const vendorsCopyConfig = Object.entries( vendors ).flatMap(
 module.exports = {
 	...baseConfig,
 	name: 'packages',
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		return {
-			...memo,
-			[ packageName ]: {
+	entry: Object.fromEntries(
+		gutenbergPackages.map( ( packageName ) => [
+			packageName,
+			{
 				import: `./packages/${ packageName }`,
 				library: {
 					name: [ 'wp', camelCaseDash( packageName ) ],
@@ -140,12 +142,23 @@ module.exports = {
 						: undefined,
 				},
 			},
-		};
-	}, {} ),
+		] )
+	),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
 		path: join( __dirname, '..', '..' ),
+		devtoolModuleFilenameTemplate: ( info ) => {
+			if ( info.resourcePath.includes( '/@wordpress/' ) ) {
+				const resourcePath =
+					info.resourcePath.split( '/@wordpress/' )[ 1 ];
+				return `../../packages/${ resourcePath }`;
+			}
+			return `webpack://${ info.namespace }/${ info.resourcePath }`;
+		},
+	},
+	performance: {
+		hints: false, // disable warnings about package sizes
 	},
 	plugins: [
 		...plugins,

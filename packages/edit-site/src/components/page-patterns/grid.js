@@ -9,7 +9,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 	}
 
 	return (
-		<ul role="listbox" className="edit-site-patterns__grid" { ...props }>
+		<ul className="edit-site-patterns__grid" { ...props }>
 			{ items.map( ( item ) => (
 				<GridItem
 					key={ item.name }

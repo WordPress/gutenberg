@@ -114,6 +114,10 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		if ( node.closest( '[inert]' ) ) {
+			return;
+		}
+
 		// Skip if there's only one child that is content editable (and thus a
 		// better candidate).
 		if (

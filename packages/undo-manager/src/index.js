@@ -153,19 +153,29 @@ export function createUndoManager() {
 				dropPendingRedos();
 				appendStagedRecordToLatestHistoryRecord();
 			}
+			const undoRecord = history[ history.length - 1 + offset ];
+			if ( ! undoRecord ) {
+				return;
+			}
 			offset -= 1;
+			return undoRecord;
 		},
 
 		redo() {
+			const redoRecord = history[ history.length + offset ];
+			if ( ! redoRecord ) {
+				return;
+			}
 			offset += 1;
+			return redoRecord;
 		},
 
-		getUndoRecord() {
-			return history[ history.length - 1 + offset ];
+		hasUndo() {
+			return !! history[ history.length - 1 + offset ];
 		},
 
-		getRedoRecord() {
-			return history[ history.length + offset ];
+		hasRedo() {
+			return !! history[ history.length + offset ];
 		},
 	};
 }

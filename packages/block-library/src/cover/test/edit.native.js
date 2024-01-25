@@ -11,6 +11,8 @@ import {
 	within,
 	getBlock,
 	openBlockSettings,
+	setupMediaPicker,
+	setupPicker,
 } from 'test/helpers';
 
 /**
@@ -68,10 +70,23 @@ const COLOR_GRAY = '#abb8c3';
 const GRADIENT_GREEN =
 	'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)';
 
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'Take a Video',
+	'WordPress Media Library',
+];
+
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
-		<BlockEdit isSelected name={ cover.name } clientId={ 0 } { ...props } />
+		<BlockEdit
+			isSelected
+			mayDisplayControls
+			name={ cover.name }
+			clientId={ 0 }
+			{ ...props }
+		/>
 		<BottomSheetSettings isVisible />
 	</SlotFillProvider>
 );
@@ -127,6 +142,35 @@ describe( 'when no media is attached', () => {
 	} );
 } );
 
+describe( 'when no media is attached and overlay color is set', () => {
+	it( 'adds image', async () => {
+		const media = {
+			type: 'image',
+			id: 2000,
+			url: 'https://test.files.wordpress.com/local-image-1.mp4',
+		};
+		const { mediaPickerCallback } = setupMediaPicker();
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
+		} );
+		const { getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		fireEvent.press( getByText( 'Add image or video' ) );
+		selectOption( 'WordPress Media Library' );
+		await mediaPickerCallback( media );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+} );
+
 describe( 'when an image is attached', () => {
 	it( 'edits the image', async () => {
 		const screen = render(
@@ -169,9 +213,8 @@ describe( 'when an image is attached', () => {
 			/>
 		);
 		fireEvent.press( screen.getByLabelText( 'Edit image' ) );
-		const [ clearMediaButton ] = await screen.findAllByText(
-			'Clear Media'
-		);
+		const [ clearMediaButton ] =
+			await screen.findAllByText( 'Clear Media' );
 		fireEvent.press( clearMediaButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -191,9 +234,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const fixedBackgroundButton = await screen.findByText(
-			'Fixed background'
-		);
+		const fixedBackgroundButton =
+			await screen.findByText( 'Fixed background' );
 		fireEvent.press( fixedBackgroundButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -210,9 +252,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent(
 			screen.getByTestId( 'Slider Y-Axis Position', { hidden: true } ),
@@ -239,9 +280,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -268,9 +308,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -360,9 +399,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -399,9 +437,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -455,9 +492,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -511,9 +547,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.

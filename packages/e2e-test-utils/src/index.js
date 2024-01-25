@@ -51,7 +51,6 @@ export {
 	searchForBlockDirectoryBlock,
 	insertBlock,
 	insertPattern,
-	insertReusableBlock,
 	insertBlockDirectoryBlock,
 } from './inserter';
 export { installPlugin } from './install-plugin';

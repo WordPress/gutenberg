@@ -6,11 +6,6 @@ The rendered an [Icon](https://github.com/WordPress/gutenberg/tree/HEAD/packages
 
 ![Image block icons in various places](https://make.wordpress.org/core/files/2020/08/image-block-icons-in-various-places.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

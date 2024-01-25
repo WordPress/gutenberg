@@ -176,6 +176,7 @@ export class PostPublishButton extends Component {
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
 			variant: 'primary',
+			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
 		};
 

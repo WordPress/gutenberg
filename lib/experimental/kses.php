@@ -60,7 +60,6 @@ function gutenberg_override_core_kses_init_filters() {
 		remove_filter( 'content_filtered_save_pre', 'wp_filter_global_styles_post', 9 );
 		add_filter( 'content_filtered_save_pre', 'gutenberg_filter_global_styles_post', 9 );
 	}
-
 }
 // The 'kses_init_filters' is usually initialized with default priority. Use higher priority to override.
 add_action( 'init', 'gutenberg_override_core_kses_init_filters', 20 );

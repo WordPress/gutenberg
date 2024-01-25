@@ -28,14 +28,9 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-	$styles = '';
-	if ( isset( $attributes['style']['typography']['writingMode'] ) ) {
-		$styles = "writing-mode: {$attributes['style']['typography']['writingMode']};";
-	}
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $classes,
-			'style' => $styles,
 		)
 	);
 	// Set default values.
@@ -43,6 +38,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
 	$label  = '';
 
+	// Only use hardcoded values here, otherwise we need to add escaping where these values are used.
 	$arrow_map = array(
 		'none'    => '',
 		'arrow'   => array(
@@ -93,7 +89,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	}
 
 	// Display arrows.
-	if ( isset( $attributes['arrow'] ) && ! empty( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] ) {
+	if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
 		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
 
 		if ( 'next' === $navigation_type ) {
@@ -103,10 +99,21 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		}
 	}
 
-	// The dynamic portion of the function name, `$navigation_type`,
-	// refers to the type of adjacency, 'next' or 'previous'.
+	/**
+	 * The dynamic portion of the function name, `$navigation_type`,
+	 * Refers to the type of adjacency, 'next' or 'previous'.
+	 *
+	 * @See https://developer.wordpress.org/reference/functions/get_previous_post_link/
+	 * @See https://developer.wordpress.org/reference/functions/get_next_post_link/
+	 */
 	$get_link_function = "get_{$navigation_type}_post_link";
-	$content           = $get_link_function( $format, $link );
+
+	if ( ! empty( $attributes['taxonomy'] ) ) {
+		$content = $get_link_function( $format, $link, true, '', $attributes['taxonomy'] );
+	} else {
+		$content = $get_link_function( $format, $link );
+	}
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,

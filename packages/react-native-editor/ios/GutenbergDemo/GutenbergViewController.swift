@@ -345,6 +345,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             }
         }
     }
+
+    func gutenbergDidRequestConnectionStatus() -> Bool {
+        return true
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -368,6 +372,17 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
+    class EditorSettings: GutenbergEditorSettings {
+        var isFSETheme: Bool = true
+        var galleryWithImageBlocks: Bool = true
+        var quoteBlockV2: Bool = true
+        var listBlockV2: Bool = true
+        var rawStyles: String? = nil
+        var rawFeatures: String? = nil
+        var colors: [[String: String]]? = nil
+        var gradients: [[String: String]]? = nil
+    }
+    
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
@@ -384,7 +399,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergInitialTitle() -> String? {
-        return nil
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        return initialProps["initialTitle"]
     }
 
     func gutenbergHostAppNamespace() -> String {
@@ -419,7 +437,14 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergEditorSettings() -> GutenbergEditorSettings? {
-        return nil
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        let settings = EditorSettings()
+        settings.rawStyles = initialProps["rawStyles"]
+        settings.rawFeatures = initialProps["rawFeatures"]
+
+        return settings
     }
 
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {

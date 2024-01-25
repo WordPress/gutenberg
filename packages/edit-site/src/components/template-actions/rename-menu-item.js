@@ -16,6 +16,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
 export default function RenameMenuItem( { template, onClose } ) {
 	const title = decodeEntities( template.title.rendered );
 	const [ editedTitle, setEditedTitle ] = useState( title );
@@ -28,7 +33,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( template.type === 'wp_template' && ! template.is_custom ) {
+	if ( template.type === TEMPLATE_POST_TYPE && ! template.is_custom ) {
 		return null;
 	}
 
@@ -57,7 +62,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			);
 
 			createSuccessNotice(
-				template.type === 'wp_template'
+				template.type === TEMPLATE_POST_TYPE
 					? __( 'Template renamed.' )
 					: __( 'Template part renamed.' ),
 				{
@@ -66,7 +71,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			);
 		} catch ( error ) {
 			const fallbackErrorMessage =
-				template.type === 'wp_template'
+				template.type === TEMPLATE_POST_TYPE
 					? __( 'An error occurred while renaming the template.' )
 					: __(
 							'An error occurred while renaming the template part.'
@@ -102,6 +107,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Name' ) }
 								value={ editedTitle }
 								onChange={ setEditedTitle }
@@ -110,6 +116,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -118,7 +125,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Save' ) }
 								</Button>
 							</HStack>

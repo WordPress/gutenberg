@@ -6,10 +6,12 @@ import { __experimentalUseNavigator as useNavigator } from '@wordpress/component
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+
 /**
  * Internal dependencies
  */
 import { postType } from '.';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 function useDeleteNavigationMenu() {
 	const { goTo } = useNavigator();
@@ -82,7 +84,7 @@ function useSaveNavigationMenu() {
 		// Prepare for revert in case of error.
 		const originalRecord = getEditedEntityRecord(
 			'postType',
-			'wp_navigation',
+			NAVIGATION_POST_TYPE,
 			postId
 		);
 

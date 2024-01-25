@@ -37,8 +37,8 @@ When returned by your block's `edit` implementation, renders a toolbar of icon b
 Example:
 
 ```js
-( function ( editor, element ) {
-	var el = element.createElement,
+( function ( editor, React ) {
+	var el = React.createElement,
 		BlockControls = editor.BlockControls,
 		AlignmentToolbar = editor.AlignmentToolbar;
 
@@ -64,7 +64,7 @@ Example:
 			),
 		];
 	}
-} )( window.wp.editor, window.wp.element );
+} )( window.wp.editor, window.React );
 ```
 
 Note in this example that we render `AlignmentToolbar` as a child of the `BlockControls` element. This is another pre-configured component you can use to simplify block text alignment.
@@ -95,8 +95,8 @@ The following properties (non-exhaustive list) are made available:
 Example:
 
 ```js
-( function ( editor, element ) {
-	var el = element.createElement,
+( function ( editor, React ) {
+	var el = React.createElement,
 		RichText = editor.RichText;
 
 	function edit( props ) {
@@ -111,7 +111,7 @@ Example:
 	}
 
 	// blocks.registerBlockType( ..., { edit: edit, ... } );
-} )( window.wp.editor, window.wp.element );
+} )( window.wp.editor, window.React );
 ```
 
 ## Contributing to this package

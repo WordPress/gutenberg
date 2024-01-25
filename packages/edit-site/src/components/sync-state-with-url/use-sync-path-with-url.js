@@ -9,6 +9,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -18,9 +23,9 @@ export function getPathFromURL( urlParams ) {
 	// Compute the navigator path based on the URL params.
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {
-			case 'wp_block':
-			case 'wp_template':
-			case 'wp_template_part':
+			case PATTERN_TYPES.user:
+			case TEMPLATE_POST_TYPE:
+			case TEMPLATE_PART_POST_TYPE:
 			case 'page':
 				path = `/${ encodeURIComponent(
 					urlParams.postType
@@ -77,6 +82,7 @@ export default function useSyncPathWithURL() {
 					postType: navigatorParams?.postType,
 					postId: navigatorParams?.postId,
 					path: undefined,
+					layout: undefined,
 				} );
 			} else if (
 				navigatorLocation.path.startsWith( '/page/' ) &&
@@ -86,6 +92,7 @@ export default function useSyncPathWithURL() {
 					postType: 'page',
 					postId: navigatorParams?.postId,
 					path: undefined,
+					layout: undefined,
 				} );
 			} else if ( navigatorLocation.path === '/patterns' ) {
 				updateUrlParams( {
@@ -94,12 +101,42 @@ export default function useSyncPathWithURL() {
 					canvas: undefined,
 					path: navigatorLocation.path,
 				} );
+			} else if (
+				navigatorLocation.path === '/wp_template/all' &&
+				! window?.__experimentalAdminViews
+			) {
+				// When the experiment is disabled, we only support table layout.
+				// Clear it out from the URL, so layouts other than table cannot be accessed.
+				updateUrlParams( {
+					postType: undefined,
+					categoryType: undefined,
+					categoryId: undefined,
+					path: navigatorLocation.path,
+					layout: undefined,
+				} );
+			} else if (
+				// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
+				// The "type" property should be kept as well.
+				( navigatorLocation.path === '/pages' &&
+					window?.__experimentalAdminViews ) ||
+				( navigatorLocation.path === '/wp_template/all' &&
+					window?.__experimentalAdminViews ) ||
+				( navigatorLocation.path === '/wp_template_part/all' &&
+					window?.__experimentalAdminViews )
+			) {
+				updateUrlParams( {
+					postType: undefined,
+					categoryType: undefined,
+					categoryId: undefined,
+					path: navigatorLocation.path,
+				} );
 			} else {
 				updateUrlParams( {
 					postType: undefined,
 					postId: undefined,
 					categoryType: undefined,
 					categoryId: undefined,
+					layout: undefined,
 					path:
 						navigatorLocation.path === '/'
 							? undefined

@@ -17,8 +17,9 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,12 +27,9 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
 
-const {
-	cleanEmptyObject,
-	GlobalStylesContext,
-	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
-	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
-} = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, GlobalStylesContext } = unlock(
+	blockEditorPrivateApis
+);
 
 // Block Gap is a special case and isn't defined within the blocks
 // style properties config. We'll add it here to allow it to be pushed
@@ -286,10 +284,6 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const hasBehaviorsPanel = useHasBehaviorsPanel( attributes, name, {
-		blockSupportOnly: true,
-	} );
-
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
@@ -299,13 +293,8 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
-
-	const userHasEditedBehaviors =
-		attributes.hasOwnProperty( 'behaviors' ) && hasBehaviorsPanel;
-
 	const pushChanges = useCallback( () => {
-		if ( changes.length === 0 && ! userHasEditedBehaviors ) {
+		if ( changes.length === 0 ) {
 			return;
 		}
 
@@ -364,46 +353,15 @@ function PushChangesToGlobalStylesControl( {
 				}
 			);
 		}
-
-		if ( userHasEditedBehaviors ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { behaviors: undefined } );
-			setBehavior( attributes.behaviors );
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: Title of the block e.g. 'Heading'.
-					__( '%s behaviors applied.' ),
-					getBlockType( name ).title
-				),
-				{
-					type: 'snackbar',
-					actions: [
-						{
-							label: __( 'Undo' ),
-							onClick() {
-								__unstableMarkNextChangeAsNotPersistent();
-								setBehavior( inheritedBehaviors );
-								setUserConfig( () => userConfig, {
-									undoIgnore: true,
-								} );
-							},
-						},
-					],
-				}
-			);
-		}
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		attributes,
 		changes,
 		createSuccessNotice,
-		inheritedBehaviors,
 		name,
 		setAttributes,
-		setBehavior,
 		setUserConfig,
 		userConfig,
-		userHasEditedBehaviors,
 	] );
 
 	return (
@@ -412,7 +370,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Apply this block’s typography, spacing, dimensions, color styles, and behaviors to all %s blocks.'
+					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
 				),
 				getBlockType( name ).title
 			) }
@@ -422,7 +380,7 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={ changes.length === 0 && ! userHasEditedBehaviors }
+				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
 				{ __( 'Apply globally' ) }
@@ -431,24 +389,36 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const blockEditingMode = useBlockEditingMode();
-		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
-			hasBlockSupport( props.name, feature )
-		);
+function PushChangesToGlobalStyles( props ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+		hasBlockSupport( props.name, feature )
+	);
+	const isDisplayed =
+		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && supportsStyles && (
-					<InspectorAdvancedControls>
-						<PushChangesToGlobalStylesControl { ...props } />
-					</InspectorAdvancedControls>
-				) }
-			</>
-		);
+	if ( ! isDisplayed ) {
+		return null;
 	}
+
+	return (
+		<InspectorAdvancedControls>
+			<PushChangesToGlobalStylesControl { ...props } />
+		</InspectorAdvancedControls>
+	);
+}
+
+const withPushChangesToGlobalStyles = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => (
+		<>
+			<BlockEdit { ...props } />
+			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
+		</>
+	)
 );
 
 addFilter(

@@ -283,6 +283,8 @@ public protocol GutenbergBridgeDelegate: AnyObject {
     func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
     
     func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
+
+    func gutenbergDidRequestConnectionStatus() -> Bool
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

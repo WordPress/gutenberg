@@ -208,4 +208,7 @@ module.exports = {
 		marginLeft: 16,
 		minWidth: 32,
 	},
+	'unsupported-block-details__icon': {
+		color: 'gray',
+	},
 };

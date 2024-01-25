@@ -4,12 +4,6 @@ Use Notices to communicate prominent messages to the user.
 
 ![Notice component](https://make.wordpress.org/design/files/2019/03/Notice-Screenshot-alt.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 A Notice displays a succinct message. It can also offer the user options, like viewing a published post or updating a setting, and requires a user action to be dismissed.

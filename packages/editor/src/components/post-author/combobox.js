@@ -96,6 +96,7 @@ function PostAuthorCombobox() {
 	return (
 		<ComboboxControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ authorId }

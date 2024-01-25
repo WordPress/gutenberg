@@ -33,7 +33,7 @@ export interface StoreDescriptor< Config extends AnyConfig > {
 export interface ReduxStoreConfig<
 	State,
 	ActionCreators extends MapOf< ActionCreator >,
-	Selectors
+	Selectors,
 > {
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
@@ -182,7 +182,7 @@ export type ActionCreatorsOf< Config extends AnyConfig > =
 // return type of each action creator to account for internal registry details --
 // for example, dispatched actions are wrapped with a Promise.
 export type PromisifiedActionCreators<
-	ActionCreators extends MapOf< ActionCreator >
+	ActionCreators extends MapOf< ActionCreator >,
 > = {
 	[ Action in keyof ActionCreators ]: PromisifyActionCreator<
 		ActionCreators[ Action ]

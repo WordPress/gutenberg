@@ -13,12 +13,12 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	Disabled,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
@@ -40,7 +40,7 @@ const MAX_TAGS = 100;
 const MIN_FONT_SIZE = 0.1;
 const MAX_FONT_SIZE = 100;
 
-function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
+function TagCloudEdit( { attributes, setAttributes } ) {
 	const {
 		taxonomy,
 		showTagCounts,
@@ -49,14 +49,14 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		largestFontSize,
 	} = attributes;
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem' ],
 	} );
+	const taxonomies = useSelect(
+		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		[]
+	);
 
 	const getTaxonomyOptions = () => {
 		const selectOption = {
@@ -178,8 +178,4 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 	);
 }
 
-export default withSelect( ( select ) => {
-	return {
-		taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
-	};
-} )( TagCloudEdit );
+export default TagCloudEdit;

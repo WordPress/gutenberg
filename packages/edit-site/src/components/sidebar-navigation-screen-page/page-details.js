@@ -21,6 +21,7 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
@@ -45,7 +46,9 @@ function getPageDetails( page ) {
 			label: __( 'Slug' ),
 			value: (
 				<Truncate numberOfLines={ 1 }>
-					{ safeDecodeURIComponent( page.slug ) }
+					{ safeDecodeURIComponent(
+						page.slug || page.generated_slug
+					) }
 				</Truncate>
 			),
 		},
@@ -102,26 +105,13 @@ export default function PageDetails( { id } ) {
 	const { record } = useEntityRecord( 'postType', 'page', id );
 	const { parentTitle, templateTitle, isPostsPage } = useSelect(
 		( select ) => {
-			const { getEditedPostContext } = unlock( select( editSiteStore ) );
-			const postContext = getEditedPostContext();
-			const templates = select( coreStore ).getEntityRecords(
+			const { getEditedPostId } = unlock( select( editSiteStore ) );
+			const template = select( coreStore ).getEntityRecord(
 				'postType',
-				'wp_template',
-				{ per_page: -1 }
+				TEMPLATE_POST_TYPE,
+				getEditedPostId()
 			);
-			// Template title.
-			const templateSlug =
-				// Checks that the post type matches the current theme's post type, otherwise
-				// the templateSlug returns 'home'.
-				postContext?.postType === 'page'
-					? postContext?.templateSlug
-					: null;
-			const _templateTitle =
-				templates && templateSlug
-					? templates.find(
-							( template ) => template.slug === templateSlug
-					  )?.title?.rendered
-					: null;
+			const _templateTitle = template?.title?.rendered;
 
 			// Parent page title.
 			const _parentTitle = record?.parent

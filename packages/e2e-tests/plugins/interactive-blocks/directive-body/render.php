@@ -5,9 +5,11 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+wp_enqueue_script_module( 'directive-body-view' );
 ?>
+
 <div
-	data-wp-interactive
+	data-wp-interactive='{ "namespace":"directive-body" }'
 	data-wp-context='{"text":"text-1"}'
 >
 	<div data-testid="container">

@@ -27,6 +27,28 @@ const RANGE_CONTROL_MAX_VALUES = {
 	vh: 100,
 	em: 38,
 	rem: 38,
+	svw: 100,
+	lvw: 100,
+	dvw: 100,
+	svh: 100,
+	lvh: 100,
+	dvh: 100,
+	vi: 100,
+	svi: 100,
+	lvi: 100,
+	dvi: 100,
+	vb: 100,
+	svb: 100,
+	lvb: 100,
+	dvb: 100,
+	vmin: 100,
+	svmin: 100,
+	lvmin: 100,
+	dvmin: 100,
+	vmax: 100,
+	svmax: 100,
+	lvmax: 100,
+	dvmax: 100,
 };
 
 export default {
@@ -131,10 +153,36 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			// Convert to pixel value assuming a root size of 16px.
 			newValue = Math.round( quantity * 16 ) + newUnit;
 		} else if (
-			[ 'vh', 'vw', '%' ].includes( newUnit ) &&
+			[
+				'vh',
+				'vw',
+				'%',
+				'svw',
+				'lvw',
+				'dvw',
+				'svh',
+				'lvh',
+				'dvh',
+				'vi',
+				'svi',
+				'lvi',
+				'dvi',
+				'vb',
+				'svb',
+				'lvb',
+				'dvb',
+				'vmin',
+				'svmin',
+				'lvmin',
+				'dvmin',
+				'vmax',
+				'svmax',
+				'lvmax',
+				'dvmax',
+			].includes( newUnit ) &&
 			quantity > 100
 		) {
-			// When converting to `vh`, `vw`, or `%` units, cap the new value at 100.
+			// When converting to `%` or viewport-relative units, cap the new value at 100.
 			newValue = 100 + newUnit;
 		}
 

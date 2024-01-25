@@ -37,7 +37,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 
 	// Check if the pagination is for Query that inherits the global context.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
-		$filter_link_attributes = static function() use ( $wrapper_attributes ) {
+		$filter_link_attributes = static function () use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
 		add_filter( 'next_posts_link_attributes', $filter_link_attributes );
@@ -63,7 +63,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		wp_reset_postdata(); // Restore original Post Data.
 	}
 
-	if ( $enhanced_pagination ) {
+	if ( $enhanced_pagination && isset( $content ) ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag(
 			array(
@@ -72,8 +72,9 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 			)
 		) ) {
 			$p->set_attribute( 'data-wp-key', 'query-pagination-next' );
-			$p->set_attribute( 'data-wp-on--click', 'actions.core.query.navigate' );
-			$p->set_attribute( 'data-wp-on--mouseenter', 'actions.core.query.prefetch' );
+			$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+			$p->set_attribute( 'data-wp-on--mouseenter', 'core/query::actions.prefetch' );
+			$p->set_attribute( 'data-wp-watch', 'core/query::callbacks.prefetch' );
 			$content = $p->get_updated_html();
 		}
 	}

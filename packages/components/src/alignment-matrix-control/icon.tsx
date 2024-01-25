@@ -13,7 +13,7 @@ import {
 	Point,
 } from './styles/alignment-matrix-control-icon-styles';
 import type { AlignmentMatrixControlIconProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 const BASE_SIZE = 24;
 

@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 
 export function useHasBorderPanel( settings ) {
 	const controls = [
@@ -62,6 +62,7 @@ function BorderToolsPanel( {
 			label={ __( 'Border' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -84,8 +85,10 @@ export default function BorderPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
 	const colors = useColorsPerOrigin( settings );
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const decodeValue = useCallback(
+		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
+		[ settings ]
+	);
 	const encodeColorValue = ( colorValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
@@ -97,25 +100,13 @@ export default function BorderPanel( {
 			? 'var:preset|color|' + colorObject.slug
 			: colorValue;
 	};
-	const decodeColorValue = useCallback(
-		( colorValue ) => {
-			const allColors = colors.flatMap(
-				( { colors: originColors } ) => originColors
-			);
-			const colorObject = allColors.find(
-				( { slug } ) => colorValue === 'var:preset|color|' + slug
-			);
-			return colorObject ? colorObject.color : colorValue;
-		},
-		[ colors ]
-	);
 	const border = useMemo( () => {
 		if ( hasSplitBorders( inheritedValue?.border ) ) {
 			const borderValue = { ...inheritedValue?.border };
 			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
 				borderValue[ side ] = {
 					...borderValue[ side ],
-					color: decodeColorValue( borderValue[ side ]?.color ),
+					color: decodeValue( borderValue[ side ]?.color ),
 				};
 			} );
 			return borderValue;
@@ -123,10 +114,10 @@ export default function BorderPanel( {
 		return {
 			...inheritedValue?.border,
 			color: inheritedValue?.border?.color
-				? decodeColorValue( inheritedValue?.border?.color )
+				? decodeValue( inheritedValue?.border?.color )
 				: undefined,
 		};
-	}, [ inheritedValue?.border, decodeColorValue ] );
+	}, [ inheritedValue?.border, decodeValue ] );
 	const setBorder = ( newBorder ) =>
 		onChange( { ...value, border: newBorder } );
 	const showBorderColor = useHasBorderColorControl( settings );

@@ -19,8 +19,8 @@ import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
@@ -142,6 +142,7 @@ const BorderControlDropdown = (
 		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
+		isStyleSettable,
 		onReset,
 		onColorChange,
 		onStyleChange,
@@ -149,6 +150,7 @@ const BorderControlDropdown = (
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
+		size,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -178,6 +180,7 @@ const BorderControlDropdown = (
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip={ true }
+			__next40pxDefaultSize={ size === '__unstable-large' ? true : false }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
@@ -198,7 +201,7 @@ const BorderControlDropdown = (
 						<HStack>
 							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
 							<Button
-								isSmall
+								size="small"
 								label={ __( 'Close border color' ) }
 								icon={ closeSmall }
 								onClick={ onClose }
@@ -216,7 +219,7 @@ const BorderControlDropdown = (
 						clearable={ false }
 						enableAlpha={ enableAlpha }
 					/>
-					{ enableStyle && (
+					{ enableStyle && isStyleSettable && (
 						<BorderControlStylePicker
 							label={ __( 'Style' ) }
 							value={ style }
@@ -235,7 +238,7 @@ const BorderControlDropdown = (
 							onClose();
 						} }
 					>
-						{ __( 'Reset to default' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</DropdownContentWrapper>
 			) }

@@ -9,11 +9,27 @@
 		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
 		width: calc(100% + #{ $grid-unit-15 });
 	}
+
+	// Without setting `pointer-events: none`, when dragging over list view items,
+	// Safari calls onDropZoneLeave causing flickering in the position of the drop indicator.
+	// https://bugs.webkit.org/show_bug.cgi?id=66547
+	// See: https://github.com/WordPress/gutenberg/pull/56625
+	&.is-dragging tbody {
+		pointer-events: none;
+	}
 }
 
 .block-editor-list-view-leaf {
 	// Use position relative for row animation.
 	position: relative;
+	// Set the initial translate position to ensure the UI in Safari doesn't jump
+	// when rows later receive the is-displacement-up or is-displacement-down class.
+	transform: translateY(0);
+
+	&.is-draggable,
+	&.is-draggable .block-editor-list-view-block-contents {
+		cursor: grab;
+	}
 
 	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
@@ -123,6 +139,66 @@
 		border-radius: 0;
 	}
 
+	// List view items will be displaced up or down relative to their original position
+	// when a user is dragging a block within the list view. This creates a space for a
+	// visual indicator of where the block will be placed when dropped. The `normal` state
+	// is used to allow rows to smoothly transition back into their original position,
+	// without attaching the transition to the list view leaf itself. This prevents rows
+	// from animating too much once the user has dropped the block.
+	&.is-displacement-normal {
+		transition: transform 0.2s;
+		transform: translateY(0);
+		@include reduce-motion("transition");
+	}
+
+	&.is-displacement-up {
+		transition: transform 0.2s;
+		transform: translateY(-36px);
+		@include reduce-motion("transition");
+	}
+
+	&.is-displacement-down {
+		transition: transform 0.2s;
+		transform: translateY(36px);
+		@include reduce-motion("transition");
+	}
+
+	// Collapse multi-selections down into a single row space while dragging. The following
+	// rules ensure that during a multi-selection, the space for additional blocks is factored in
+	// when displacing up and down. The result is that there should only ever be a single row's
+	// worth of space for the visual indicator of where a block will be placed when dropped.
+	&.is-after-dragged-blocks {
+		transition: transform 0.2s;
+		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
+	}
+
+	&.is-after-dragged-blocks.is-displacement-up {
+		transition: transform 0.2s;
+		transform: translateY(calc(-36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
+	}
+
+	&.is-after-dragged-blocks.is-displacement-down {
+		transition: transform 0.2s;
+		transform: translateY(calc(36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
+	}
+
+	// To ensure displaced rows behave correctly, ensure that blocks that are currently being dragged
+	// are visually hidden. The below rules are used in favor of `display: none` to ensure that
+	// there is no flicker when a user begins to drag a block.
+	&.is-dragging {
+		opacity: 0;
+		// The row's left position is set to 0 to ensure that the animation
+		// when dropping a block animates from the correct position.
+		left: 0;
+		// Ensure the dragged element does not otherwise affect dropping to
+		// other positions.
+		pointer-events: none;
+		z-index: -9999;
+	}
+
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
@@ -154,6 +230,7 @@
 		}
 	}
 
+	&.is-nesting .block-editor-list-view-block-contents,
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
 
@@ -168,11 +245,6 @@
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			z-index: 2;
 			pointer-events: none;
-
-			// Hide focus styles while a user is dragging blocks/files etc.
-			.is-dragging-components-draggable & {
-				box-shadow: none;
-			}
 		}
 	}
 
@@ -181,14 +253,10 @@
 		right: 0;
 	}
 
+	&.is-nesting .block-editor-list-view__menu,
 	.block-editor-list-view-block__menu:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		z-index: 1;
-
-		// Hide focus styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			box-shadow: none;
-		}
 	}
 
 	&.is-visible .block-editor-list-view-block-contents {
@@ -335,8 +403,7 @@
 		background: rgba($black, 0.3);
 	}
 
-	.block-editor-list-view-block-select-button__lock,
-	.block-editor-list-view-block-select-button__sticky {
+	.block-editor-list-view-block-select-button__lock {
 		line-height: 0;
 	}
 
@@ -366,6 +433,14 @@
 	}
 }
 
+// First level of indentation is aria-level 2, max indent is 8.
+// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
+$block-navigation-max-indent: 8;
+
+.block-editor-list-view-draggable-chip {
+	opacity: 0.8;
+}
+
 .block-editor-list-view-block__contents-cell,
 .block-editor-list-view-appender__cell {
 	.block-editor-list-view-block__contents-container,
@@ -379,11 +454,9 @@
 	height: $icon-size;
 	margin-left: $grid-unit-05;
 	width: $icon-size;
+	cursor: pointer;
 }
 
-// First level of indentation is aria-level 2, max indent is 8.
-// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
-$block-navigation-max-indent: 8;
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
 	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
 }
@@ -435,6 +508,27 @@ $block-navigation-max-indent: 8;
 		background: var(--wp-admin-theme-color);
 		height: 4px;
 		border-radius: 4px;
+	}
+}
+
+.block-editor-list-view-drop-indicator--preview {
+	pointer-events: none;
+
+	// If the drop indicator's popover ever extends to the edge of the screen,
+	// avoid any scrollbars by hiding the overflow.
+	.components-popover__content {
+		overflow: hidden !important;
+	}
+
+	.block-editor-list-view-drop-indicator__line {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		height: 36px;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.block-editor-list-view-drop-indicator__line--darker {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.09);
 	}
 }
 

@@ -29,7 +29,7 @@ export async function trashAllComments() {
 	// Submit the form to send all mine/pendings/approved/spam comments to the trash.
 	await page.click( '#doaction' );
 	await page.waitForXPath(
-		'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
+		'//*[contains(@class, "notice")]/p[contains(text(), "moved to the Trash.")]'
 	);
 	await switchUserToTest();
 }

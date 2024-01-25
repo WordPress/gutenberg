@@ -1,4 +1,8 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
 
 /**
  * WordPress dependencies
@@ -6,7 +10,6 @@
 import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 import type { IconType } from '@wordpress/components';
-import type { WPComponent } from '@wordpress/element';
 
 /**
  * Defined behavior of a plugin type.
@@ -27,7 +30,7 @@ export interface WPPlugin {
 	/**
 	 * A component containing the UI elements to be rendered.
 	 */
-	render: WPComponent;
+	render: ComponentType;
 
 	/**
 	 * The optional scope to be used when rendering inside a plugin area.
@@ -53,12 +56,12 @@ const plugins = {} as Record< string, WPPlugin >;
  * @example
  * ```js
  * // Using ES5 syntax
- * var el = wp.element.createElement;
+ * var el = React.createElement;
  * var Fragment = wp.element.Fragment;
  * var PluginSidebar = wp.editPost.PluginSidebar;
  * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
  * var registerPlugin = wp.plugins.registerPlugin;
- * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+ * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function Component() {
  * 	return el(

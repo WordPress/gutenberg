@@ -39,6 +39,10 @@ import {
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
+	OPTION_TAKE_VIDEO,
+	OPTION_TAKE_PHOTO,
+	OPTION_INSERT_FROM_URL,
+	OPTION_WORDPRESS_MEDIA_LIBRARY,
 } from './constants';
 import styles from './style.scss';
 
@@ -93,7 +97,7 @@ export class MediaUpload extends Component {
 		const cameraImageSource = {
 			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
-			label: __( 'Take a Photo' ),
+			label: OPTION_TAKE_PHOTO,
 			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE ],
 			icon: capturePhoto,
@@ -102,7 +106,7 @@ export class MediaUpload extends Component {
 		const cameraVideoSource = {
 			id: mediaSources.deviceCamera,
 			value: mediaSources.deviceCamera,
-			label: __( 'Take a Video' ),
+			label: OPTION_TAKE_VIDEO,
 			requiresModal: true,
 			types: [ MEDIA_TYPE_VIDEO ],
 			icon: captureVideo,
@@ -120,7 +124,7 @@ export class MediaUpload extends Component {
 		const siteLibrarySource = {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
-			label: __( 'WordPress Media Library' ),
+			label: OPTION_WORDPRESS_MEDIA_LIBRARY,
 			requiresModal: true,
 			types: [
 				MEDIA_TYPE_IMAGE,
@@ -135,7 +139,7 @@ export class MediaUpload extends Component {
 		const urlSource = {
 			id: URL_MEDIA_SOURCE,
 			value: URL_MEDIA_SOURCE,
-			label: __( 'Insert from URL' ),
+			label: OPTION_INSERT_FROM_URL,
 			types: [ MEDIA_TYPE_AUDIO, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: globe,
 		};
@@ -329,7 +333,7 @@ function URLInput( props ) {
 					autoCorrect={ false }
 					autoComplete={ Platform.isIOS ? 'url' : 'off' }
 					keyboardType="url"
-					label={ __( 'Insert from URL' ) }
+					label={ OPTION_INSERT_FROM_URL }
 					onChange={ props.onChange }
 					placeholder={ __( 'Type a URL' ) }
 					value={ props.value }

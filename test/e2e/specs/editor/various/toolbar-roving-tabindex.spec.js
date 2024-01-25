@@ -14,6 +14,10 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'First block' );
+
+		// Ensure the fixed toolbar option is off.
+		// See: https://github.com/WordPress/gutenberg/pull/54785.
+		await editor.setIsFixedToolbar( false );
 	} );
 
 	test( 'ensures base block toolbars use roving tabindex', async ( {
@@ -26,14 +30,14 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Paragraph' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
 			'Paragraph'
 		);
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 
@@ -53,11 +57,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// ensures list block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'List' );
-		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'List text',
-			'Select List'
-		);
-		await page.click( `role=button[name="Select List"i]` );
+		await ToolbarRovingTabindexUtils.focusBlockToolbar();
+		await page.click( `role=button[name="Select parent block: List"i]` );
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: List',
@@ -75,7 +76,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
-		await editor.canvas.click( `role=button[name="Create Table"i]` );
+		await editor.canvas
+			.locator( `role=button[name="Create Table"i]` )
+			.click();
 		await pageUtils.pressKeys( 'Tab' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Body cell text',
@@ -195,7 +198,7 @@ class ToolbarRovingTabindexUtils {
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
-		await this.expectLabelToHaveFocus( 'Select Group' );
+		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}

@@ -66,7 +66,7 @@ Determines the amount of padding within the component.
 
 ### Inherited props
 
-`Card` also inherits all of the [`Surface` props](/packages/components/src/ui/surface/README.md#props).
+`Card` also inherits all of the [`Surface` props](/packages/components/src/surface/README.md#props).
 
 ## Sub-Components
 
@@ -99,7 +99,7 @@ const Example = () => (
 		<CardMedia>
 			<img src="..." />
 		</CardMedia>
-		<CardHeader>...</CardHeader>
+		<CardFooter>...</CardFooter>
 	</Card>
 );
 ```

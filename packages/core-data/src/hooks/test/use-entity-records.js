@@ -51,6 +51,8 @@ describe( 'useEntityRecords', () => {
 			hasResolved: false,
 			isResolving: false,
 			status: 'IDLE',
+			totalItems: null,
+			totalPages: null,
 		} );
 
 		// Fetch request should have been issued
@@ -65,6 +67,8 @@ describe( 'useEntityRecords', () => {
 			hasResolved: true,
 			isResolving: false,
 			status: 'SUCCESS',
+			totalItems: null,
+			totalPages: null,
 		} );
 	} );
 } );

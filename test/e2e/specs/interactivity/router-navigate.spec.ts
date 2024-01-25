@@ -106,24 +106,58 @@ test.describe( 'Router navigate', () => {
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Main' );
 
-		{
-			const resolver = resolvers.pop();
-			if ( resolver ) resolver();
-		}
+		resolvers.pop()!();
 
 		await expect( navigations ).toHaveText( '1' );
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Link 1' );
 		await expect( page ).toHaveURL( href );
 
-		{
-			const resolver = resolvers.pop();
-			if ( resolver ) resolver();
-		}
+		resolvers.pop()!();
 
 		await expect( navigations ).toHaveText( '0' );
 		await expect( status ).toHaveText( 'idle' );
 		await expect( title ).toHaveText( 'Link 1' );
 		await expect( page ).toHaveURL( href );
+	} );
+
+	test( 'should reload the next page when the timeout ends', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const link1 = utils.getLink( 'router navigate - link 1' );
+
+		const title = page.getByTestId( 'title' );
+		const toggleTimeout = page.getByTestId( 'toggle timeout' );
+
+		let resolver: Function;
+
+		await page.route( link1, async ( route ) => {
+			// Only capture the first request.
+			if ( ! resolver ) {
+				await new Promise( ( r ) => ( resolver = r ) );
+				await route.abort();
+			} else {
+				await route.continue();
+			}
+		} );
+
+		await expect( toggleTimeout ).toHaveText( 'Timeout 10000' );
+
+		// Set timeout to 0.
+		await toggleTimeout.click();
+		await expect( toggleTimeout ).toHaveText( 'Timeout 0' );
+
+		// Navigation should timeout almost instantly.
+		await page.getByTestId( 'link 1' ).click();
+
+		await expect( page ).toHaveURL( link1 );
+		await expect( title ).toHaveText( 'Link 1' );
+
+		// If timeout is 10000, that means the page has been reloaded.
+		await expect( toggleTimeout ).toHaveText( 'Timeout 10000' );
+
+		// Make the fetch abort, just in case.
+		resolver!();
 	} );
 } );

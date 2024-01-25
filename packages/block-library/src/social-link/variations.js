@@ -19,6 +19,7 @@ import {
 	GoodreadsIcon,
 	GoogleIcon,
 	GitHubIcon,
+	GravatarIcon,
 	InstagramIcon,
 	LastfmIcon,
 	LinkedInIcon,
@@ -44,6 +45,7 @@ import {
 	VkIcon,
 	WhatsAppIcon,
 	WordPressIcon,
+	XIcon,
 	YelpIcon,
 	YouTubeIcon,
 } from './icons';
@@ -158,6 +160,12 @@ const variations = [
 		attributes: { service: 'github' },
 		title: 'GitHub',
 		icon: GitHubIcon,
+	},
+	{
+		name: 'gravatar',
+		attributes: { service: 'gravatar' },
+		title: 'Gravatar',
+		icon: GravatarIcon,
 	},
 	{
 		name: 'instagram',
@@ -303,6 +311,13 @@ const variations = [
 		attributes: { service: 'whatsapp' },
 		title: 'WhatsApp',
 		icon: WhatsAppIcon,
+	},
+	{
+		name: 'x',
+		attributes: { service: 'x' },
+		keywords: [ 'twitter' ],
+		title: 'X',
+		icon: XIcon,
 	},
 	{
 		name: 'yelp',

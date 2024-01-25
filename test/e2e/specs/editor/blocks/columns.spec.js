@@ -143,7 +143,7 @@ test.describe( 'Columns', () => {
 		} );
 
 		await editor.selectBlocks(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		);
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
@@ -200,7 +200,7 @@ test.describe( 'Columns', () => {
 
 		await editor.selectBlocks(
 			editor.canvas.locator(
-				'role=document[name="Paragraph block"i] >> text="1"'
+				'role=document[name="Block: Paragraph"i] >> text="1"'
 			)
 		);
 		await page.keyboard.press( 'ArrowRight' );

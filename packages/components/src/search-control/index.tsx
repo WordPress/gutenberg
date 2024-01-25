@@ -16,13 +16,14 @@ import { forwardRef, useRef } from '@wordpress/element';
  */
 import Button from '../button';
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
 
 function UnforwardedSearchControl(
 	{
 		__nextHasNoMarginBottom,
+		__next40pxDefaultSize = false,
 		className,
 		onChange,
 		onKeyDown,
@@ -32,6 +33,7 @@ function UnforwardedSearchControl(
 		hideLabelFromVision = true,
 		help,
 		onClose,
+		size = 'default',
 		...restProps
 	}: WordPressComponentProps< SearchControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
@@ -44,9 +46,11 @@ function UnforwardedSearchControl(
 		if ( onClose ) {
 			return (
 				<Button
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					icon={ closeSmall }
 					label={ __( 'Close search' ) }
 					onClick={ onClose }
+					size={ size }
 				/>
 			);
 		}
@@ -54,12 +58,14 @@ function UnforwardedSearchControl(
 		if ( !! value ) {
 			return (
 				<Button
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					icon={ closeSmall }
 					label={ __( 'Reset search' ) }
 					onClick={ () => {
 						onChange( '' );
 						searchRef.current?.focus();
 					} }
+					size={ size }
 				/>
 			);
 		}
@@ -74,7 +80,10 @@ function UnforwardedSearchControl(
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
-			className={ classnames( className, 'components-search-control' ) }
+			className={ classnames( className, 'components-search-control', {
+				'is-next-40px-default-size': __next40pxDefaultSize,
+				'is-size-compact': size === 'compact',
+			} ) }
 		>
 			<div className="components-search-control__input-wrapper">
 				<input

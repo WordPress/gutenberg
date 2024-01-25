@@ -3,9 +3,13 @@
  */
 import {
 	BlockList,
+	BlockToolbar,
 	BlockTools,
-	privateApis as blockEditorPrivateApis,
+	BlockSelectionClearer,
+	WritingFlow,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -15,11 +19,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { unlock } from '../../lock-unlock';
-
-const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
-	blockEditorPrivateApis
-);
 
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
@@ -32,6 +31,7 @@ export default function WidgetAreasBlockEditorContent( {
 			),
 		[]
 	);
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const styles = useMemo( () => {
 		return hasThemeStyles ? blockEditorSettings.styles : [];
@@ -40,15 +40,18 @@ export default function WidgetAreasBlockEditorContent( {
 	return (
 		<div className="edit-widgets-block-editor">
 			<Notices />
+			{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
 			<BlockTools>
 				<KeyboardShortcuts />
-				<BlockCanvas
-					shouldIframe={ false }
+				<EditorStyles
 					styles={ styles }
-					height="100%"
-				>
-					<BlockList className="edit-widgets-main-block-list" />
-				</BlockCanvas>
+					scope=".editor-styles-wrapper"
+				/>
+				<BlockSelectionClearer>
+					<WritingFlow>
+						<BlockList className="edit-widgets-main-block-list" />
+					</WritingFlow>
+				</BlockSelectionClearer>
 			</BlockTools>
 		</div>
 	);

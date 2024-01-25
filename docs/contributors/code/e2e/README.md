@@ -4,7 +4,7 @@ This living document serves to prescribe instructions and best practices for wri
 
 <div class="callout callout-info">
 
-See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the [migration guide](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/migration.md) if you're migrating tests from Jest + Puppeteer.
+See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the <a href="https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/migration.md">migration guide</a> if you're migrating tests from Jest + Puppeteer.
 </div>
 
 

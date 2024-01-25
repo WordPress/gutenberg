@@ -10,7 +10,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { InspectorControls, useSetting } from '@wordpress/block-editor';
+import { InspectorControls, useSettings } from '@wordpress/block-editor';
 
 const SCALE_OPTIONS = (
 	<>
@@ -53,9 +53,9 @@ const DimensionControls = ( {
 	setAttributes,
 	imageSizeOptions = [],
 } ) => {
-	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || defaultUnits,
+		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );

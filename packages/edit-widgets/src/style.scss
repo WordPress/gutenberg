@@ -56,7 +56,7 @@ body.js.widgets-php {
 
 // Don't display admin notices on the Widgets screen.
 // Needs !important because plugins may add inline styles to notices.
-.widgets-php .notice {
+.js .widgets-php .notice {
 	display: none !important;
 }
 

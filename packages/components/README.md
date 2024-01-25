@@ -29,16 +29,11 @@ Many components include CSS to add styles, which you will need to load in order 
 
 In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
 
-### Popovers and Tooltips
-
-_If you're using [`Popover`](/packages/components/src/popover/README.md) or [`Tooltip`](/packages/components/src/tooltip/README.md) components outside of the editor, make sure they are rendered within a `SlotFillProvider` and with a `Popover.Slot` somewhere up the element tree._
+### Popovers
 
 By default, the `Popover` component will render within an extra element appended to the body of the document.
 
 If you want to precisely contol where the popovers render, you will need to use the `Popover.Slot` component.
-
-A `Popover` is also used as the underlying mechanism to display `Tooltip` components.
-So the same considerations should be applied to them.
 
 The following example illustrates how you can wrap a component using a
 `Popover` and have those popovers render to a single location in the DOM.
@@ -58,7 +53,7 @@ const Example = () => {
 	<SlotFillProvider>
 		<MyComponentWithPopover />
 		<Popover.Slot />
-	</SlotFillProvider>
+	</SlotFillProvider>;
 };
 ```
 

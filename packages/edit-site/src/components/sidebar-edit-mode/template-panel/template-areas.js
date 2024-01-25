@@ -73,7 +73,7 @@ export default function TemplateAreas() {
 
 			<ul className="edit-site-template-card__template-areas-list">
 				{ templateParts.map( ( { templatePart, block } ) => (
-					<li key={ templatePart.slug }>
+					<li key={ block.clientId }>
 						<TemplateAreaItem
 							area={ templatePart.area }
 							clientId={ block.clientId }

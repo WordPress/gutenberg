@@ -18,7 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PARTS } from './utils';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function RenameMenuItem( { item, onClose } ) {
 	const [ title, setTitle ] = useState( () => item.title );
@@ -29,7 +29,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( item.type === TEMPLATE_PARTS && ! item.isCustom ) {
+	if ( item.type === TEMPLATE_PART_POST_TYPE && ! item.isCustom ) {
 		return null;
 	}
 
@@ -50,7 +50,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 			} );
 
 			createSuccessNotice(
-				item.type === TEMPLATE_PARTS
+				item.type === TEMPLATE_PART_POST_TYPE
 					? __( 'Template part renamed.' )
 					: __( 'Pattern renamed.' ),
 				{
@@ -59,11 +59,11 @@ export default function RenameMenuItem( { item, onClose } ) {
 			);
 		} catch ( error ) {
 			const fallbackErrorMessage =
-				item.type === TEMPLATE_PARTS
+				item.type === TEMPLATE_PART_POST_TYPE
 					? __(
-							'An error occurred while reverting the template part.'
+							'An error occurred while renaming the template part.'
 					  )
-					: __( 'An error occurred while reverting the pattern.' );
+					: __( 'An error occurred while renaming the pattern.' );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
@@ -96,6 +96,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Name' ) }
 								value={ title }
 								onChange={ setTitle }
@@ -104,6 +105,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -113,7 +115,11 @@ export default function RenameMenuItem( { item, onClose } ) {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Save' ) }
 								</Button>
 							</HStack>

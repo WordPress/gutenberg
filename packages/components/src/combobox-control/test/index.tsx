@@ -56,7 +56,6 @@ const getOption = ( name: string ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
 const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
-const setupUser = () => userEvent.setup();
 
 const ControlledComboboxControl = ( {
 	value: valueProp,
@@ -112,7 +111,7 @@ describe.each( [
 	} );
 
 	it( 'should render with the correct options', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		render(
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
@@ -133,7 +132,7 @@ describe.each( [
 	} );
 
 	it( 'should select the correct option via click events', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetOption = timezones[ 2 ];
 		const onChangeSpy = jest.fn();
 		render(
@@ -157,7 +156,7 @@ describe.each( [
 	} );
 
 	it( 'should select the correct option via keypress events', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetIndex = 4;
 		const targetOption = timezones[ targetIndex ];
 		const onChangeSpy = jest.fn();
@@ -187,7 +186,7 @@ describe.each( [
 	} );
 
 	it( 'should select the correct option from a search', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
 		const onChangeSpy = jest.fn();
 		render(
@@ -214,7 +213,7 @@ describe.each( [
 	} );
 
 	it( 'should render aria-live announcement upon selection', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetOption = timezones[ 9 ];
 		const onChangeSpy = jest.fn();
 		render(
@@ -242,7 +241,7 @@ describe.each( [
 	} );
 
 	it( 'should process multiple entries in a single session', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const unmatchedString = 'Mordor';
 		const targetOption = timezones[ 6 ];
 		const onChangeSpy = jest.fn();

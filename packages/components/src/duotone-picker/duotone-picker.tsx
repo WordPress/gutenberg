@@ -55,6 +55,8 @@ import type { DuotonePickerProps } from './types';
  * ```
  */
 function DuotonePicker( {
+	asButtons,
+	loop,
 	clearable = true,
 	unsetable = true,
 	colorPalette,
@@ -65,6 +67,7 @@ function DuotonePicker( {
 	onChange,
 	'aria-label': ariaLabel,
 	'aria-labelledby': ariaLabelledby,
+	...otherProps
 }: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
@@ -72,13 +75,15 @@ function DuotonePicker( {
 	);
 
 	const isUnset = value === 'unset';
+	const unsetOptionLabel = __( 'Unset' );
 
 	const unsetOption = (
 		<CircularOptionPicker.Option
 			key="unset"
 			value="unset"
 			isSelected={ isUnset }
-			tooltipText={ __( 'Unset' ) }
+			tooltipText={ unsetOptionLabel }
+			aria-label={ unsetOptionLabel }
 			className="components-duotone-picker__color-indicator"
 			onClick={ () => {
 				onChange( isUnset ? undefined : 'unset' );
@@ -86,7 +91,7 @@ function DuotonePicker( {
 		/>
 	);
 
-	const options = duotonePalette.map( ( { colors, slug, name } ) => {
+	const duotoneOptions = duotonePalette.map( ( { colors, slug, name } ) => {
 		const style = {
 			background: getGradientFromCSSColors( colors, '135deg' ),
 			color: 'transparent',
@@ -122,19 +127,43 @@ function DuotonePicker( {
 		);
 	} );
 
-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
-	if ( ariaLabel ) {
-		ariaProps = { 'aria-label': ariaLabel };
-	} else if ( ariaLabelledby ) {
-		ariaProps = { 'aria-labelledby': ariaLabelledby };
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
+
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
 	} else {
-		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
+		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
 	}
+
+	const options = unsetable
+		? [ unsetOption, ...duotoneOptions ]
+		: duotoneOptions;
 
 	return (
 		<CircularOptionPicker
-			{ ...ariaProps }
-			options={ unsetable ? [ unsetOption, ...options ] : options }
+			{ ...otherProps }
+			{ ...metaProps }
+			options={ options }
 			actions={
 				!! clearable && (
 					<CircularOptionPicker.ButtonAction
@@ -145,7 +174,7 @@ function DuotonePicker( {
 				)
 			}
 		>
-			<Spacer paddingTop={ 4 }>
+			<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
 				<VStack spacing={ 3 }>
 					{ ! disableCustomColors && ! disableCustomDuotone && (
 						<CustomDuotoneBar

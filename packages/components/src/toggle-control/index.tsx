@@ -15,11 +15,11 @@ import { useInstanceId } from '@wordpress/compose';
 import { FlexBlock } from '../flex';
 import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { ToggleControlProps } from './types';
 import { HStack } from '../h-stack';
 import { useCx } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 
 /**
  * ToggleControl is used to generate a toggle user interface.

@@ -10,11 +10,14 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { SVG } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../utils/transform-styles';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -65,33 +68,42 @@ function useDarkThemeBodyClassName( styles, scope ) {
 }
 
 export default function EditorStyles( { styles, scope } ) {
-	const stylesArray = useMemo(
-		() => Object.values( styles ?? [] ),
-		[ styles ]
+	const overrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
 	);
-	const transformedStyles = useMemo(
-		() =>
+	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
+		const _styles = Object.values( styles ?? [] );
+
+		for ( const [ id, override ] of overrides ) {
+			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
+			const overrideWithId = { ...override, id };
+			if ( index === -1 ) {
+				_styles.push( overrideWithId );
+			} else {
+				_styles[ index ] = overrideWithId;
+			}
+		}
+
+		return [
 			transformStyles(
-				stylesArray.filter( ( style ) => style?.css ),
+				_styles.filter( ( style ) => style?.css ),
 				scope
 			),
-		[ stylesArray, scope ]
-	);
-
-	const transformedSvgs = useMemo(
-		() =>
-			stylesArray
+			_styles
 				.filter( ( style ) => style.__unstableType === 'svgs' )
 				.map( ( style ) => style.assets )
 				.join( '' ),
-		[ stylesArray ]
-	);
+		];
+	}, [ styles, overrides, scope ] );
 
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ useDarkThemeBodyClassName( stylesArray, scope ) } />
+			<style
+				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
+			/>
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }

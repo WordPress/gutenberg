@@ -3,8 +3,16 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { trash, backup, help, styles, external, brush } from '@wordpress/icons';
+import { __, isRTL } from '@wordpress/i18n';
+import {
+	rotateLeft,
+	rotateRight,
+	backup,
+	help,
+	styles,
+	external,
+	brush,
+} from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -148,8 +156,8 @@ function useGlobalStylesResetCommands() {
 		return [
 			{
 				name: 'core/edit-site/reset-global-styles',
-				label: __( 'Reset styles to defaults' ),
-				icon: trash,
+				label: __( 'Reset styles' ),
+				icon: isRTL() ? rotateRight : rotateLeft,
 				callback: ( { close } ) => {
 					close();
 					onReset();
@@ -182,8 +190,7 @@ function useGlobalStylesOpenCssCommands() {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
@@ -237,11 +244,16 @@ function useGlobalStylesOpenRevisionsCommands() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
-	const hasRevisions = useSelect(
-		( select ) =>
-			select( coreStore ).getCurrentThemeGlobalStylesRevisions()?.length,
-		[]
-	);
+	const hasRevisions = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return !! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
+	}, [] );
+
 	const commands = useMemo( () => {
 		if ( ! hasRevisions ) {
 			return [];

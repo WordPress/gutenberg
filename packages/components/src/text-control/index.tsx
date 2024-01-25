@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -13,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { TextControlProps } from './types';
 
 function UnforwardedTextControl(
@@ -22,6 +23,7 @@ function UnforwardedTextControl(
 ) {
 	const {
 		__nextHasNoMarginBottom,
+		__next40pxDefaultSize = false,
 		label,
 		hideLabelFromVision,
 		value,
@@ -46,7 +48,9 @@ function UnforwardedTextControl(
 			className={ className }
 		>
 			<input
-				className="components-text-control__input"
+				className={ classnames( 'components-text-control__input', {
+					'is-next-40px-default-size': __next40pxDefaultSize,
+				} ) }
 				type={ type }
 				id={ id }
 				value={ value }

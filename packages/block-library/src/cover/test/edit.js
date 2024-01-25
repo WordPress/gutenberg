@@ -53,7 +53,7 @@ async function createAndSelectBlock() {
 	);
 	await userEvent.click(
 		screen.getByRole( 'button', {
-			name: 'Select Cover',
+			name: 'Select parent block: Cover',
 		} )
 	);
 }
@@ -64,9 +64,9 @@ describe( 'Cover block', () => {
 			await setup();
 
 			expect(
-				screen.getByRole( 'group', {
-					name: 'To edit this block, you need permission to upload media.',
-				} )
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
+					'To edit this block, you need permission to upload media.'
+				)
 			).toBeInTheDocument();
 		} );
 
@@ -260,7 +260,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 			expect(
-				within( screen.queryByLabelText( 'Block: Cover' ) ).queryByRole(
+				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
 					'img'
 				)
 			).not.toBeInTheDocument();

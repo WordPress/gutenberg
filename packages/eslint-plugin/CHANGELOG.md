@@ -2,14 +2,37 @@
 
 ## Unreleased
 
+## 17.7.0 (2024-01-24)
+
+## 17.6.0 (2024-01-10)
+
+## 17.5.0 (2023-12-13)
+
+## 17.4.0 (2023-11-29)
+
+## 17.3.0 (2023-11-16)
+
+## 17.2.0 (2023-11-02)
+
+## 17.1.0 (2023-10-18)
+
+## 17.0.0 (2023-10-05)
+
+### Breaking Changes
+
+-   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).
+
+## 16.0.0 (2023-09-20)
+
 ### Breaking Changes
 
 -   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#53975](https://github.com/WordPress/gutenberg/pull/53975)):
     -   Removes the deprecated `@typescript-eslint/no-duplicate-imports` rule in favor of `import/no-duplicates`.
 
-### Enhancement
+### Enhancements
 
 -   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+-   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.3.0` to requiring `^5.0.0` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
 
 ## 15.1.0 (2023-08-31)
 

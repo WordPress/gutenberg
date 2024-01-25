@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import type { ReactElement } from 'react';
+
+/**
  * WordPress dependencies
  */
-import type { WPElement } from '@wordpress/element';
 import type { RichTextValue } from '@wordpress/rich-text';
 
 /**
@@ -20,7 +24,7 @@ export type ReplaceOption = { action: 'replace'; value: RichTextValue };
 
 export type OptionCompletion = React.ReactNode | InsertOption | ReplaceOption;
 
-type OptionLabel = string | WPElement | Array< string | WPElement >;
+type OptionLabel = string | ReactElement | Array< string | ReactElement >;
 export type KeyedOption = {
 	key: string;
 	value: any;

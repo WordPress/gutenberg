@@ -14,8 +14,8 @@ import { BorderControl } from '../../border-control';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControl } from './hook';
 
 import type { BorderBoxControlProps } from '../types';
@@ -89,7 +89,6 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
-
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel

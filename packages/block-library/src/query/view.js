@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate, prefetch } from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -11,72 +11,88 @@ const isValidLink = ( ref ) =>
 	ref.origin === window.location.origin;
 
 const isValidEvent = ( event ) =>
-	event.button === 0 && // left clicks only
-	! event.metaKey && // open in new tab (mac)
-	! event.ctrlKey && // open in new tab (windows)
-	! event.altKey && // download
+	event.button === 0 && // Left clicks only.
+	! event.metaKey && // Open in new tab (Mac).
+	! event.ctrlKey && // Open in new tab (Windows).
+	! event.altKey && // Download.
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
-store( {
-	selectors: {
-		core: {
-			query: {
-				startAnimation: ( { context } ) =>
-					context.core.query.animation === 'start',
-				finishAnimation: ( { context } ) =>
-					context.core.query.animation === 'finish',
-			},
+store( 'core/query', {
+	state: {
+		get startAnimation() {
+			return getContext().animation === 'start';
+		},
+		get finishAnimation() {
+			return getContext().animation === 'finish';
 		},
 	},
 	actions: {
-		core: {
-			query: {
-				navigate: async ( { event, ref, context, state } ) => {
-					if ( isValidLink( ref ) && isValidEvent( event ) ) {
-						event.preventDefault();
+		*navigate( event ) {
+			const ctx = getContext();
+			const { ref } = getElement();
+			const { queryRef } = ctx;
+			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 
-						const id = ref.closest( '[data-wp-navigation-id]' )
-							.dataset.wpNavigationId;
+			if ( isValidLink( ref ) && isValidEvent( event ) && ! isDisabled ) {
+				event.preventDefault();
 
-						// Don't announce the navigation immediately, wait 300 ms.
-						const timeout = setTimeout( () => {
-							context.core.query.message =
-								state.core.query.loadingText;
-							context.core.query.animation = 'start';
-						}, 300 );
+				// Don't announce the navigation immediately, wait 400 ms.
+				const timeout = setTimeout( () => {
+					ctx.message = ctx.loadingText;
+					ctx.animation = 'start';
+				}, 400 );
 
-						await navigate( ref.href );
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.navigate( ref.href );
 
-						// Dismiss loading message if it hasn't been added yet.
-						clearTimeout( timeout );
+				// Dismiss loading message if it hasn't been added yet.
+				clearTimeout( timeout );
 
-						// Announce that the page has been loaded. If the message is the
-						// same, we use a no-break space similar to the @wordpress/a11y
-						// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
-						context.core.query.message =
-							state.core.query.loadedText +
-							( context.core.query.message ===
-							state.core.query.loadedText
-								? '\u00A0'
-								: '' );
+				// Announce that the page has been loaded. If the message is the
+				// same, we use a no-break space similar to the @wordpress/a11y
+				// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
+				ctx.message =
+					ctx.loadedText +
+					( ctx.message === ctx.loadedText ? '\u00A0' : '' );
 
-						context.core.query.animation = 'finish';
+				ctx.animation = 'finish';
+				ctx.url = ref.href;
 
-						// Focus the first anchor of the Query block.
-						document
-							.querySelector(
-								`[data-wp-navigation-id=${ id }] a[href]`
-							)
-							?.focus();
-					}
-				},
-				prefetch: async ( { ref } ) => {
-					if ( isValidLink( ref ) ) {
-						await prefetch( ref.href );
-					}
-				},
-			},
+				// Focus the first anchor of the Query block.
+				const firstAnchor = `.wp-block-post-template a[href]`;
+				queryRef.querySelector( firstAnchor )?.focus();
+			}
+		},
+		*prefetch() {
+			const { queryRef } = getContext();
+			const { ref } = getElement();
+			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
+			if ( isValidLink( ref ) && ! isDisabled ) {
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.prefetch( ref.href );
+			}
+		},
+	},
+	callbacks: {
+		*prefetch() {
+			const { url } = getContext();
+			const { ref } = getElement();
+			if ( url && isValidLink( ref ) ) {
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.prefetch( ref.href );
+			}
+		},
+		setQueryRef() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.queryRef = ref;
 		},
 	},
 } );

@@ -20,7 +20,7 @@ import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,6 +31,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
 const POPOVER_PROPS = {
@@ -40,19 +41,52 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemBlocksLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
-	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
+	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
+function ParentSelectorMenuItem( { parentClientId, parentBlockType } ) {
+	const isSmallViewport = useViewportMatch( 'medium', '<' );
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	// Allows highlighting the parent block outline when focusing or hovering
+	// the parent block selector within the child.
+	const menuItemRef = useRef();
+	const gesturesProps = useShowHoveredOrFocusedGestures( {
+		ref: menuItemRef,
+		highlightParent: true,
+	} );
+
+	if ( ! isSmallViewport ) {
+		return null;
+	}
+
+	return (
+		<MenuItem
+			{ ...gesturesProps }
+			ref={ menuItemRef }
+			icon={ <BlockIcon icon={ parentBlockType.icon } /> }
+			onClick={ () => selectBlock( parentClientId ) }
+		>
+			{ sprintf(
+				/* translators: %s: Name of the block's parent. */
+				__( 'Select parent block (%s)' ),
+				parentBlockType.title
+			) }
+		</MenuItem>
+	);
+}
+
 export function BlockSettingsDropdown( {
+	block,
 	clientIds,
 	__experimentalSelectBlock,
 	children,
 	__unstableDisplayLocation,
 	...props
 } ) {
+	// Get the client id of the current block for this menu, if one is set.
+	const currentClientId = block?.clientId;
 	const blockClientIds = Array.isArray( clientIds )
 		? clientIds
 		: [ clientIds ];
@@ -102,6 +136,16 @@ export function BlockSettingsDropdown( {
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
 
+	const openedBlockSettingsMenu = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getOpenedBlockSettingsMenu(),
+		[]
+	);
+
+	const { setOpenedBlockSettingsMenu } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
@@ -118,8 +162,6 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 	const isMatch = __unstableUseShortcutEventMatch();
-
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
 	const updateSelectionAfterDuplicate = useCallback(
@@ -158,21 +200,36 @@ export function BlockSettingsDropdown( {
 		getSelectedBlockClientIds,
 	] );
 
-	const removeBlockLabel =
-		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
-
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const selectParentButtonRef = useRef();
-	const showParentOutlineGestures = useShowHoveredOrFocusedGestures( {
-		ref: selectParentButtonRef,
-		highlightParent: true,
-	} );
-
 	// This can occur when the selected block (the parent)
 	// displays child blocks within a List View.
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
+
+	// When a currentClientId is in use, treat the menu as a controlled component.
+	// This ensures that only one block settings menu is open at a time.
+	// This is a temporary solution to work around an issue with `onFocusOutside`
+	// where it does not allow a dropdown to be closed if focus was never within
+	// the dropdown to begin with. Examples include a user either CMD+Clicking or
+	// right clicking into an inactive window.
+	// See: https://github.com/WordPress/gutenberg/pull/54083
+	const open = ! currentClientId
+		? undefined
+		: openedBlockSettingsMenu === currentClientId || false;
+
+	const onToggle = useCallback(
+		( localOpen ) => {
+			if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
+				setOpenedBlockSettingsMenu( currentClientId );
+			} else if (
+				! localOpen &&
+				openedBlockSettingsMenu &&
+				openedBlockSettingsMenu === currentClientId
+			) {
+				setOpenedBlockSettingsMenu( undefined );
+			}
+		},
+		[ currentClientId, openedBlockSettingsMenu, setOpenedBlockSettingsMenu ]
+	);
 
 	return (
 		<BlockActions
@@ -199,6 +256,8 @@ export function BlockSettingsDropdown( {
 					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
+					open={ open }
+					onToggle={ onToggle }
 					noIcons
 					menuProps={ {
 						/**
@@ -230,6 +289,7 @@ export function BlockSettingsDropdown( {
 								canInsertDefaultBlock
 							) {
 								event.preventDefault();
+								setOpenedBlockSettingsMenu( undefined );
 								onInsertAfter();
 							} else if (
 								isMatch(
@@ -239,6 +299,7 @@ export function BlockSettingsDropdown( {
 								canInsertDefaultBlock
 							) {
 								event.preventDefault();
+								setOpenedBlockSettingsMenu( undefined );
 								onInsertBefore();
 							}
 						},
@@ -253,30 +314,12 @@ export function BlockSettingsDropdown( {
 								/>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
+										<ParentSelectorMenuItem
+											parentClientId={
+												firstParentClientId
 											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
+											parentBlockType={ parentBlockType }
+										/>
 									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
@@ -363,7 +406,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ removeBlockLabel }
+										{ __( 'Delete' ) }
 									</MenuItem>
 								</MenuGroup>
 							) }

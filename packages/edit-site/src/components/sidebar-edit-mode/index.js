@@ -8,6 +8,7 @@ import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,7 +34,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditorSidebarOpened,
 		hasBlockSelection,
 		supportsGlobalStyles,
-		hasPageContentFocus,
+		isEditingPage,
 	} = useSelect( ( select ) => {
 		const _sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
@@ -48,7 +49,9 @@ export function SidebarComplementaryAreaFills() {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
+			isEditingPage:
+				select( editSiteStore ).isPage() &&
+				select( editorStore ).getRenderingMode() !== 'template-only',
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -60,13 +63,18 @@ export function SidebarComplementaryAreaFills() {
 			return;
 		}
 		if ( hasBlockSelection ) {
-			if ( ! hasPageContentFocus ) {
+			if ( ! isEditingPage ) {
 				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 			}
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened, hasPageContentFocus ] );
+	}, [
+		hasBlockSelection,
+		isEditorSidebarOpened,
+		isEditingPage,
+		enableComplementaryArea,
+	] );
 
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
@@ -85,11 +93,7 @@ export function SidebarComplementaryAreaFills() {
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<>
-						{ hasPageContentFocus ? (
-							<PagePanels />
-						) : (
-							<TemplatePanel />
-						) }
+						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
 						<PluginTemplateSettingPanel.Slot />
 					</>
 				) }

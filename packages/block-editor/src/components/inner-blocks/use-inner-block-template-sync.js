@@ -23,6 +23,7 @@ import { store as blockEditorStore } from '../../store';
  * then we replace the inner blocks with the correct value after synchronizing it with the template.
  *
  * @param {string}  clientId                       The block client ID.
+ * @param {Array}   innerBlocks
  * @param {Object}  template                       The template to match.
  * @param {string}  templateLock                   The template lock state for the inner blocks. For
  *                                                 example, if the template lock is set to "all",
@@ -36,10 +37,14 @@ import { store as blockEditorStore } from '../../store';
  */
 export default function useInnerBlockTemplateSync(
 	clientId,
+	innerBlocks,
 	template,
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
+
 	const {
 		getBlocks,
 		getSelectedBlocksInitialCaretPosition,
@@ -47,13 +52,6 @@ export default function useInnerBlockTemplateSync(
 	} = useSelect( blockEditorStore );
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-
-	const { innerBlocks } = useSelect(
-		( select ) => ( {
-			innerBlocks: select( blockEditorStore ).getBlocks( clientId ),
-		} ),
-		[ clientId ]
-	);
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
 	const existingTemplate = useRef( null );

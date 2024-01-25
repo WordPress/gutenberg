@@ -52,13 +52,14 @@ const restrictedImports = [
 			'Please use Reakit API through `@wordpress/components` instead.',
 	},
 	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
 		name: 'redux',
 		importNames: [ 'combineReducers' ],
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
-	},
-	{
-		name: 'puppeteer-testing-library',
-		message: '`puppeteer-testing-library` is still experimental.',
 	},
 	{
 		name: '@emotion/css',
@@ -326,6 +327,7 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
 				'@typescript-eslint/await-thenable': 'error',
 				'@typescript-eslint/no-floating-promises': 'error',
 				'@typescript-eslint/no-misused-promises': 'error',

@@ -7,29 +7,6 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
-		"behaviorsBlocksPropertiesComplete": {
-			"type": "object",
-			"properties": {
-				"lightbox": {
-					"description": "Settings related to the lightbox behavior.",
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"description": "Allow users to enable the lightbox behavior.",
-							"type": "boolean",
-							"default": false
-						},
-						"animation": {
-							"description": "Set lightbox animation. Possible values: `fade`, `zoom`, `''` (empty string).",
-							"type": "string",
-							"enum": [ "fade", "zoom", "" ]
-						}
-					},
-					"additionalProperties": false
-				}
-			},
-			"additionalProperties": false
-		},
 		"refComplete": {
 			"type": "object",
 			"properties": {
@@ -43,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -223,7 +200,7 @@
 							}
 						},
 						"link": {
-							"description": "Allow users to set link colors.",
+							"description": "Allow users to set link colors in a block.",
 							"type": "boolean",
 							"default": false
 						},
@@ -251,7 +228,17 @@
 							}
 						},
 						"text": {
-							"description": "Allow users to set text colors.",
+							"description": "Allow users to set text colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"heading": {
+							"description": "Allow users to set heading colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"button": {
+							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
 							"default": true
 						}
@@ -284,6 +271,11 @@
 					"description": "Settings related to dimensions.",
 					"type": "object",
 					"properties": {
+						"aspectRatio": {
+							"description": "Allow users to set an aspect ratio.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
@@ -313,6 +305,31 @@
 							"description": "Disable the layout UI controls.",
 							"type": "boolean",
 							"default": true
+						},
+						"allowCustomContentAndWideSize": {
+							"description": "Enable or disable the custom content and wide size controls.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesLightbox": {
+			"type": "object",
+			"properties": {
+				"lightbox": {
+					"description": "Settings related to the lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether the lightbox is enabled or not.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
+							"type": "boolean"
 						}
 					},
 					"additionalProperties": false
@@ -367,7 +384,8 @@
 							"items": {
 								"type": "string"
 							},
-							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ],
+							"minItems": 1
 						},
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
@@ -428,9 +446,31 @@
 										"px",
 										"em",
 										"rem",
-										"vh",
+										"%",
 										"vw",
-										"%"
+										"svw",
+										"lvw",
+										"dvw",
+										"vh",
+										"svh",
+										"lvh",
+										"dvh",
+										"vi",
+										"svi",
+										"lvi",
+										"dvi",
+										"vb",
+										"svb",
+										"lvb",
+										"dvb",
+										"vmin",
+										"svmin",
+										"lvmin",
+										"dvmin",
+										"vmax",
+										"svmax",
+										"lvmax",
+										"dvmax"
 									],
 									"default": "rem"
 								}
@@ -449,6 +489,11 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
+						"defaultFontSizes": {
+							"description": "Allow users to choose font sizes from the default font size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
@@ -574,124 +619,136 @@
 							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"description": "Name of the font family preset, translatable.",
-										"type": "string"
-									},
-									"slug": {
-										"description": "Kebab-case unique identifier for the font family preset.",
-										"type": "string"
-									},
-									"fontFamily": {
-										"description": "CSS font-family value.",
-										"type": "string"
-									},
-									"fontFace": {
-										"description": "Array of font-face declarations.",
-										"type": "array",
-										"items": {
-											"type": "object",
-											"properties": {
-												"fontFamily": {
-													"description": "CSS font-family value.",
-													"type": "string",
-													"default": ""
-												},
-												"fontStyle": {
-													"description": "CSS font-style value.",
-													"type": "string",
-													"default": "normal"
-												},
-												"fontWeight": {
-													"description": "List of available font weights, separated by a space.",
-													"default": "400",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "integer"
-														}
-													]
-												},
-												"fontDisplay": {
-													"description": "CSS font-display value.",
-													"type": "string",
-													"default": "fallback",
-													"enum": [
-														"auto",
-														"block",
-														"fallback",
-														"swap",
-														"optional"
-													]
-												},
-												"src": {
-													"description": "Paths or URLs to the font files.",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "array",
-															"items": {
-																"type": "string"
-															}
-														}
-													],
-													"default": []
-												},
-												"fontStretch": {
-													"description": "CSS font-stretch value.",
-													"type": "string"
-												},
-												"ascentOverride": {
-													"description": "CSS ascent-override value.",
-													"type": "string"
-												},
-												"descentOverride": {
-													"description": "CSS descent-override value.",
-													"type": "string"
-												},
-												"fontVariant": {
-													"description": "CSS font-variant value.",
-													"type": "string"
-												},
-												"fontFeatureSettings": {
-													"description": "CSS font-feature-settings value.",
-													"type": "string"
-												},
-												"fontVariationSettings": {
-													"description": "CSS font-variation-settings value.",
-													"type": "string"
-												},
-												"lineGapOverride": {
-													"description": "CSS line-gap-override value.",
-													"type": "string"
-												},
-												"sizeAdjust": {
-													"description": "CSS size-adjust value.",
-													"type": "string"
-												},
-												"unicodeRange": {
-													"description": "CSS unicode-range value.",
-													"type": "string"
-												}
-											},
-											"required": [ "fontFamily", "src" ],
-											"additionalProperties": false
-										}
-									}
-								},
-								"additionalProperties": false
+								"$ref": "#/definitions/fontFamily"
 							}
 						}
 					},
 					"additionalProperties": false
 				}
 			}
+		},
+		"fontFamily": {
+			"type": "object",
+			"description": "Font family preset",
+			"properties": {
+				"name": {
+					"description": "Name of the font family preset, translatable.",
+					"type": "string"
+				},
+				"slug": {
+					"description": "Kebab-case unique identifier for the font family preset.",
+					"type": "string"
+				},
+				"fontFamily": {
+					"description": "CSS font-family value.",
+					"type": "string"
+				},
+				"preview": {
+					"description": "URL to a preview image of the font family.",
+					"type": "string"
+				},
+				"fontFace": {
+					"description": "Array of font-face declarations.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"fontFamily": {
+								"description": "CSS font-family value.",
+								"type": "string",
+								"default": ""
+							},
+							"fontStyle": {
+								"description": "CSS font-style value.",
+								"type": "string",
+								"default": "normal"
+							},
+							"fontWeight": {
+								"description": "List of available font weights, separated by a space.",
+								"default": "400",
+								"oneOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "integer"
+									}
+								]
+							},
+							"fontDisplay": {
+								"description": "CSS font-display value.",
+								"type": "string",
+								"default": "fallback",
+								"enum": [
+									"auto",
+									"block",
+									"fallback",
+									"swap",
+									"optional"
+								]
+							},
+							"src": {
+								"description": "Paths or URLs to the font files.",
+								"oneOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									}
+								],
+								"default": []
+							},
+							"fontStretch": {
+								"description": "CSS font-stretch value.",
+								"type": "string"
+							},
+							"ascentOverride": {
+								"description": "CSS ascent-override value.",
+								"type": "string"
+							},
+							"descentOverride": {
+								"description": "CSS descent-override value.",
+								"type": "string"
+							},
+							"fontVariant": {
+								"description": "CSS font-variant value.",
+								"type": "string"
+							},
+							"fontFeatureSettings": {
+								"description": "CSS font-feature-settings value.",
+								"type": "string"
+							},
+							"fontVariationSettings": {
+								"description": "CSS font-variation-settings value.",
+								"type": "string"
+							},
+							"lineGapOverride": {
+								"description": "CSS line-gap-override value.",
+								"type": "string"
+							},
+							"sizeAdjust": {
+								"description": "CSS size-adjust value.",
+								"type": "string"
+							},
+							"unicodeRange": {
+								"description": "CSS unicode-range value.",
+								"type": "string"
+							},
+							"preview": {
+								"description": "URL to a preview image of the font face.",
+								"type": "string"
+							}
+						},
+						"required": [ "fontFamily", "src" ],
+						"additionalProperties": false
+					}
+				}
+			},
+			"additionalProperties": false
 		},
 		"settingsPropertiesCustom": {
 			"type": "object",
@@ -702,33 +759,16 @@
 				}
 			}
 		},
-		"settingsPropertiesBehaviors": {
-			"type": "object",
-			"properties": {
-				"behaviors": {
-					"description": "Settings related to behaviors.",
-					"type": "object",
-					"properties": {
-						"lightbox": {
-							"description": "Allow users to enable/disable lightbox.",
-							"type": "boolean",
-							"default": false
-						}
-					},
-					"additionalProperties": false
-				}
-			}
-		},
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
 				{ "$ref": "#/definitions/settingsPropertiesBackground" },
-				{ "$ref": "#/definitions/settingsPropertiesBehaviors" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
@@ -745,11 +785,11 @@
 					"properties": {
 						"appearanceTools": {},
 						"background": {},
-						"behaviors": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
 						"layout": {},
+						"lightbox": {},
 						"position": {},
 						"shadow": {},
 						"spacing": {},
@@ -1384,6 +1424,17 @@
 					"description": "Dimensions styles",
 					"type": "object",
 					"properties": {
+						"aspectRatio": {
+							"description": "Sets the `aspect-ratio` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
 						"minHeight": {
 							"description": "Sets the `min-height` CSS property.",
 							"oneOf": [
@@ -2203,21 +2254,6 @@
 			"type": "string",
 			"description": "Description of the global styles variation."
 		},
-		"behaviors": {
-			"description": "A list of blocks that have behaviors. This setting controls the display of the Behaviors UI in the block editor.",
-			"type": "object",
-			"properties": {
-				"blocks": {
-					"type": "object",
-					"properties": {
-						"core/image": {
-							"$ref": "#/definitions/behaviorsBlocksPropertiesComplete"
-						}
-					},
-					"additionalProperties": false
-				}
-			}
-		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
@@ -2234,6 +2270,7 @@
 						"background": {},
 						"color": {},
 						"layout": {},
+						"lightbox": {},
 						"spacing": {},
 						"typography": {},
 						"border": {},

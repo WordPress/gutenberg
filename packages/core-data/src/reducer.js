@@ -238,14 +238,13 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
@@ -351,6 +350,38 @@ function entity( entityConfig ) {
 								error: action.error,
 							},
 						};
+				}
+
+				return state;
+			},
+
+			revisions: ( state = {}, action ) => {
+				// Use the same queriedDataReducer shape for revisions.
+				if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+					const recordKey = action.recordKey;
+					delete action.recordKey;
+					const newState = queriedDataReducer( state[ recordKey ], {
+						...action,
+						type: 'RECEIVE_ITEMS',
+					} );
+					return {
+						...state,
+						[ recordKey ]: newState,
+					};
+				}
+
+				if ( action.type === 'REMOVE_ITEMS' ) {
+					return Object.fromEntries(
+						Object.entries( state ).filter(
+							( [ id ] ) =>
+								! action.itemIds.some( ( itemId ) => {
+									if ( Number.isInteger( itemId ) ) {
+										return itemId === +id;
+									}
+									return itemId === id;
+								} )
+						)
+					);
 				}
 
 				return state;
@@ -535,6 +566,14 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function userPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_PATTERN_CATEGORIES':
+			return action.patternCategories;
+	}
+	return state;
+}
+
 export function navigationFallbackId( state = null, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
@@ -564,6 +603,26 @@ export function themeGlobalStyleRevisions( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the template lookup per query.
+ *
+ * @param {Record<string, string>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, string>} Updated state.
+ */
+export function defaultTemplates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_DEFAULT_TEMPLATE':
+			return {
+				...state,
+				[ JSON.stringify( action.query ) ]: action.templateId,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -582,5 +641,7 @@ export default combineReducers( {
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	userPatternCategories,
 	navigationFallbackId,
+	defaultTemplates,
 } );

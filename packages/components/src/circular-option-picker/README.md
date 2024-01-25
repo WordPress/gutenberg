@@ -9,8 +9,8 @@ This component is not exported, and therefore can only be used internally to the
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { CircularOptionPicker } from '../circular-option-picker';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ currentColor, setCurrentColor ] = useState();
@@ -79,6 +79,20 @@ Usually a `CircularOptionPicker.Option` component.
 The child elements.
 
 - Required: No
+
+### `asButtons`: `boolean`
+
+Whether the control should present as a set of buttons, each with its own tab stop.
+
+- Required: No
+- Default: `false`
+
+### `loop`: `boolean`
+
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+
+- Required: No
+- Default: `true`
 
 ## Subcomponents
 

@@ -70,4 +70,42 @@ describe( 'Preformatted', () => {
 		<!-- /wp:preformatted -->"
 	` );
 	} );
+
+	it( 'should split on triple Enter', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+
+		// Act
+		await addBlock( screen, 'Preformatted' );
+		const preformattedTextInput = await screen.findByPlaceholderText(
+			'Write preformatted text…'
+		);
+		typeInRichText( preformattedTextInput, 'Hello' );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:preformatted -->
+		<pre class="wp-block-preformatted">Hello</pre>
+		<!-- /wp:preformatted -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
 } );

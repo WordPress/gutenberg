@@ -6,47 +6,54 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
 /**
  * Internal dependencies
  */
+import {
+	Composite as CompositeV2,
+	CompositeGroup as CompositeGroupV2,
+	CompositeItem as CompositeItemV2,
+	CompositeRow as CompositeRowV2,
+	useCompositeStore as useCompositeStoreV2,
+} from './composite/v2';
 import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { default as ProgressBar } from './progress-bar';
 import { createPrivateSlotFill } from './slot-fill';
 import {
 	DropdownMenu as DropdownMenuV2,
-	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
 	DropdownMenuGroup as DropdownMenuGroupV2,
 	DropdownMenuItem as DropdownMenuItemV2,
-	DropdownMenuLabel as DropdownMenuLabelV2,
-	DropdownMenuRadioGroup as DropdownMenuRadioGroupV2,
+	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
 	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
 	DropdownMenuSeparator as DropdownMenuSeparatorV2,
-	DropdownSubMenu as DropdownSubMenuV2,
-	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
+	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
+	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
 } from './dropdown-menu-v2';
-import { ComponentsContext } from './ui/context/context-system-provider';
+import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
-
-export const { lock, unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
-		'@wordpress/components'
-	);
+import Tabs from './tabs';
+import { kebabCase } from './utils/strings';
+import { lock } from './lock-unlock';
 
 export const privateApis = {};
 lock( privateApis, {
+	CompositeV2,
+	CompositeGroupV2,
+	CompositeItemV2,
+	CompositeRowV2,
+	useCompositeStoreV2,
 	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
 	ComponentsContext,
+	ProgressBar,
+	Tabs,
+	Theme,
 	DropdownMenuV2,
-	DropdownMenuCheckboxItemV2,
 	DropdownMenuGroupV2,
 	DropdownMenuItemV2,
-	DropdownMenuLabelV2,
-	DropdownMenuRadioGroupV2,
+	DropdownMenuCheckboxItemV2,
 	DropdownMenuRadioItemV2,
 	DropdownMenuSeparatorV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
-	ProgressBar,
-	Theme,
+	DropdownMenuItemLabelV2,
+	DropdownMenuItemHelpTextV2,
+	kebabCase,
 } );

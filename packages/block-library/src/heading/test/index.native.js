@@ -17,6 +17,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 beforeAll( () => {
 	// Register all core blocks
@@ -133,5 +134,44 @@ describe( 'Heading block', () => {
 				'bottom-sheet-cell-selected-icon'
 			)
 		).toBeVisible();
+	} );
+
+	it( 'should merge with an empty Paragraph block and keep being the Heading block', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		await addBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading', { rowIndex: 2 } );
+		fireEvent.press( headingBlock );
+
+		const headingTextInput =
+			within( headingBlock ).getByPlaceholderText( 'Heading' );
+		typeInRichText(
+			headingTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( headingTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "16.6.0",
+	"version": "17.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -15,14 +15,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=16.0.0",
-		"npm": ">=8 <9"
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
-		"@types/gradient-parser": "0.1.2",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
@@ -42,6 +41,7 @@
 		"@wordpress/customize-widgets": "file:packages/customize-widgets",
 		"@wordpress/data": "file:packages/data",
 		"@wordpress/data-controls": "file:packages/data-controls",
+		"@wordpress/dataviews": "file:packages/dataviews",
 		"@wordpress/date": "file:packages/date",
 		"@wordpress/deprecated": "file:packages/deprecated",
 		"@wordpress/dom": "file:packages/dom",
@@ -92,11 +92,13 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
+		"es-module-shims": "^1.8.2",
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
+		"@ariakit/test": "^0.3.7",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -108,8 +110,8 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
-		"@playwright/test": "1.32.0",
-		"@pmmmwh/react-refresh-webpack-plugin": "0.5.2",
+		"@playwright/test": "1.39.0",
+		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
 		"@storybook/addon-a11y": "7.2.2",
 		"@storybook/addon-actions": "7.2.2",
 		"@storybook/addon-controls": "7.2.2",
@@ -126,7 +128,6 @@
 		"@testing-library/user-event": "14.4.3",
 		"@types/eslint": "7.28.0",
 		"@types/estree": "0.0.50",
-		"@types/highlight-words-core": "1.2.1",
 		"@types/istanbul-lib-report": "3.0.0",
 		"@types/mime": "2.0.3",
 		"@types/npm-package-arg": "6.1.1",
@@ -168,7 +169,7 @@
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"ajv": "8.7.1",
 		"ajv-draft-04": "1.0.0",
-		"appium": "1.22.3",
+		"appium": "2.0.0",
 		"babel-jest": "29.6.2",
 		"babel-loader": "8.2.3",
 		"babel-plugin-inline-json-import": "0.3.2",
@@ -176,14 +177,14 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
-		"browserslist": "4.21.9",
-		"caniuse-lite": "1.0.30001513",
+		"browserslist": "4.22.2",
+		"caniuse-lite": "1.0.30001579",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"commander": "9.2.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "10.2.0",
-		"core-js-builder": "3.31.0",
+		"core-js-builder": "3.35.1",
 		"cross-env": "3.2.4",
 		"css-loader": "6.2.0",
 		"cssnano": "6.0.1",
@@ -195,9 +196,10 @@
 		"eslint-plugin-import": "2.25.2",
 		"eslint-plugin-jest": "27.2.3",
 		"eslint-plugin-jest-dom": "5.0.2",
+		"eslint-plugin-prettier": "5.0.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"eslint-plugin-storybook": "0.6.13",
-		"eslint-plugin-testing-library": "5.7.2",
+		"eslint-plugin-testing-library": "6.0.2",
 		"execa": "4.0.2",
 		"fast-glob": "3.2.7",
 		"filenamify": "4.2.0",
@@ -222,16 +224,16 @@
 		"node-fetch": "2.6.1",
 		"node-watch": "0.7.0",
 		"npm-run-all": "4.1.5",
-		"patch-package": "6.2.2",
+		"patch-package": "8.0.0",
 		"postcss": "8.4.16",
 		"postcss-loader": "6.2.1",
-		"prettier": "npm:wp-prettier@2.8.5",
+		"prettier": "npm:wp-prettier@3.0.3",
 		"progress": "2.0.3",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
 		"react-native": "0.71.11",
 		"react-native-url-polyfill": "1.1.2",
-		"react-refresh": "0.10.0",
+		"react-refresh": "0.14.0",
 		"react-test-renderer": "18.2.0",
 		"reassure": "0.7.1",
 		"redux": "4.1.2",
@@ -252,10 +254,10 @@
 		"terser-webpack-plugin": "5.3.9",
 		"typescript": "5.1.6",
 		"uglify-js": "3.13.7",
-		"uuid": "8.3.0",
-		"wd": "1.12.1",
-		"webpack": "5.76.0",
-		"webpack-bundle-analyzer": "4.4.2",
+		"uuid": "9.0.1",
+		"webdriverio": "8.16.20",
+		"webpack": "5.88.2",
+		"webpack-bundle-analyzer": "4.9.1",
 		"worker-farm": "1.7.0"
 	},
 	"overrides": {
@@ -320,6 +322,7 @@
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
+		"test:native:watch": "npm run test:native -- --watch",
 		"test:native:clean": "jest --clearCache --config test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
 		"test:native:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config test/native/jest.config.js",
 		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
@@ -356,8 +359,7 @@
 			"wp-scripts lint-style"
 		],
 		"package-lock.json": [
-			"npm run lint:lockfile",
-			"node ./bin/check-latest-npm.js"
+			"npm run lint:lockfile"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"

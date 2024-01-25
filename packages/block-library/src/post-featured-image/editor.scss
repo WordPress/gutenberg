@@ -96,6 +96,25 @@
 		height: 100%;
 		width: 100%;
 	}
+
+	// When the Post Featured Image block is linked,
+	// it's wrapped with a disabled <a /> tag.
+	// Restore cursor style so it doesn't appear 'clickable'.
+	> a {
+		cursor: default;
+	}
+
+	// When the Post Featured Image block is linked,
+	// and wrapped with a disabled <a /> tag
+	// ensure that the placeholder items are visible when selected.
+	&.is-selected .components-placeholder.has-illustration {
+		.components-button,
+		.components-placeholder__instructions,
+		.components-placeholder__label {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
 }
 
 div[data-type="core/post-featured-image"] {

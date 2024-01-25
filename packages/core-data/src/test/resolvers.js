@@ -172,7 +172,10 @@ describe( 'getEntityRecords', () => {
 			'root',
 			'postType',
 			Object.values( POST_TYPES ),
-			{}
+			{},
+			false,
+			undefined,
+			undefined
 		);
 	} );
 

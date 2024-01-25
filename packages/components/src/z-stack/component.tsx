@@ -11,11 +11,11 @@ import { isValidElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValidChildren } from '../ui/utils/get-valid-children';
-import { contextConnect, useContextSystem } from '../ui/context';
+import { getValidChildren } from '../utils/get-valid-children';
+import { contextConnect, useContextSystem } from '../context';
 import { ZStackView, ZStackChildView } from './styles';
 import type { ZStackProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnconnectedZStack(
 	props: WordPressComponentProps< ZStackProps, 'div' >,
