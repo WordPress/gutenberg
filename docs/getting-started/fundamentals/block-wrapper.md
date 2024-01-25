@@ -24,6 +24,7 @@ For the [`edit` React component and the `save` function](https://developer.wordp
 The [`useBlockProps()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops) hook available on the [`@wordpress/block-editor`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor) allows passing the required attributes for the Block Editor to the `edit` block's outer wrapper.
 
 Among other things, the `useBlockProps()` hook takes care of including in this wrapper:
+
 - An `id` for the block's markup
 - Some accessibility and `data-` attributes
 - Classes and inline styles reflecting custom settings, which include by default:
