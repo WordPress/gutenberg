@@ -17,23 +17,23 @@ class Tests_Fonts_WpFontCollection_IsConfigValid extends WP_UnitTestCase {
 	 *
 	 * @param array $config Font collection config options.
 	 */
-	public function test_is_config_valid( $config ) {
-		$this->assertTrue( WP_Font_Collection::is_config_valid( $config ) );
+	public function test_is_config_valid( $slug, $config ) {
+		$this->assertTrue( WP_Font_Collection::is_config_valid( $slug, $config ) );
 	}
 
 	public function data_is_config_valid() {
 		return array(
 			'with src'           => array(
+				'slug'   => 'my-collection',
 				'config' => array(
-					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
 			),
 			'with font families' => array(
+				'slug'   => 'my-collection',
 				'config' => array(
-					'slug'          => 'my-collection',
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
 					'font_families' => array( 'mock' ),
@@ -48,54 +48,65 @@ class Tests_Fonts_WpFontCollection_IsConfigValid extends WP_UnitTestCase {
 	 *
 	 * @param mixed  $config Config of the font collection.
 	 */
-	public function test_is_config_valid_should_call_doing_it_wrong( $config ) {
+	public function test_is_config_valid_should_call_doing_it_wrong( $slug, $config ) {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid', 'Should call _doing_it_wrong if the config is not valid.' );
-		$this->assertFalse( WP_Font_Collection::is_config_valid( $config ), 'Should return false if the config is not valid.' );
+		$this->assertFalse( WP_Font_Collection::is_config_valid( $slug, $config ), 'Should return false if the config is not valid.' );
 	}
 
 	public function data_is_config_valid_should_call_doing_it_wrong() {
 		return array(
-			'with missing slug'               => array(
+			'with empty slug'                    => array(
+				'slug'   => '',
 				'config' => array(
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
 			),
-			'with missing name'               => array(
+			'with invalig slug data type'        => array(
+				'slug'   => 100,
 				'config' => array(
-					'slug'        => 'my-collection',
+					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
 			),
-			'with missing src'                => array(
+			'with missing name'                  => array(
+				'slug'   => 'my-collection',
 				'config' => array(
-					'slug'        => 'my-collection',
+					'description' => 'My collection description',
+					'src'         => 'my-collection-data.json',
+				),
+			),
+			'with missing src'                   => array(
+				'slug'   => 'my-collection',
+				'config' => array(
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
 			),
-			'with both src and font_families' => array(
+			'with both src and font_families'    => array(
+				'slug'   => 'my-collection',
 				'config' => array(
-					'slug'          => 'my-collection',
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
 					'src'           => 'my-collection-data.json',
 					'font_families' => array( 'mock' ),
 				),
 			),
-			'without src or font_families'    => array(
+			'without src or font_families'       => array(
+				'slug'   => 'my-collection',
 				'config' => array(
-					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
 			),
-			'with empty config'               => array(
+			'with empty config'                  => array(
+				'slug'   => 'my-collection',
 				'config' => array(),
 			),
-			'without an array'                => array(
+			'with a config of a wrong data type' => array(
+				'slug'   => 'my-collection',
 				'config' => 'not an array',
 			),
 		);

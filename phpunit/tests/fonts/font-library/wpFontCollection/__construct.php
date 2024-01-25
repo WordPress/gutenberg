@@ -26,12 +26,11 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$src->setAccessible( true );
 
 		$config     = array(
-			'slug'        => 'my-collection',
 			'name'        => 'My Collection',
 			'description' => 'My collection description',
 			'src'         => 'my-collection-data.json',
 		);
-		$collection = new WP_Font_Collection( $config );
+		$collection = new WP_Font_Collection( 'my-collection', $config );
 
 		$actual_slug = $slug->getValue( $collection );
 		$this->assertSame( 'my-collection', $actual_slug, 'Provided slug and initialized slug should match.' );
@@ -55,9 +54,9 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	 *
 	 * @param mixed  $config Config of the font collection.
 	 */
-	public function test_should_do_it_wrong( $config ) {
+	public function test_should_do_it_wrong( $slug, $config ) {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
-		new WP_Font_Collection( $config );
+		new WP_Font_Collection( $slug, $config );
 	}
 
 	/**
@@ -67,37 +66,100 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	 */
 	public function data_should_do_it_wrong() {
 		return array(
-			'no id'                           => array(
-				array(
+			'with empty slug'                       => array(
+				'slug'   => '',
+				'config' => array(
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
 			),
 
-			'no config'                       => array(
-				'',
+			'with wrong slug data type'             => array(
+				'slug'   => true,
+				'config' => array(
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'src'         => 'my-collection-data.json',
+				),
 			),
 
-			'empty array'                     => array(
-				array(),
+			'with config as empty array'            => array(
+				'slug'   => 'my-collection',
+				'config' => array(),
 			),
 
-			'boolean instead of config array' => array(
-				false,
+			'with wrong config data type'           => array(
+				'slug'   => 'my-collection',
+				'config' => true,
 			),
 
-			'null instead of config array'    => array(
-				null,
+			'with config missing name'              => array(
+				'slug'   => 'my-collection',
+				'config' => array(
+					'description' => 'My collection description',
+					'src'         => 'my-collection-data.json',
+				),
 			),
 
-			'missing src'                     => array(
-				array(
-					'slug'        => 'my-collection',
+			'with config missing src'               => array(
+				'slug'   => 'my-collection',
+				'config' => array(
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
 			),
+
+			'with both src and font families'       => array(
+				'slug'   => 'my-collection',
+				'config' => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'src'           => 'my-collection-data.json',
+					'font_families' => array( 'mock' ),
+				),
+			),
+
+			'with empty families'                   => array(
+				'slug'   => 'my-collection',
+				'config' => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array(),
+				),
+			),
+
+			'with font families wrong data type'    => array(
+				'slug'   => 'my-collection',
+				'config' => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => 'I am not an array',
+				),
+			),
+
+			'with empty categories'                 => array(
+				'slug'   => 'my-collection',
+				'config' => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'src'           => 'my-collection-data.json',
+					'font_families' => array( 'mock' ),
+					'categories'    => array(),
+				),
+			),
+
+			'with empty categories wrong data type' => array(
+				'slug'   => 'my-collection',
+				'config' => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'src'           => 'my-collection-data.json',
+					'font_families' => array( 'mock' ),
+					'categories'    => 'I am not an array',
+				),
+			),
+
 		);
 	}
 }

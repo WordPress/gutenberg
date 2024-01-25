@@ -49,11 +49,12 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_should_get_content
 	 *
-	 * @param array $config Font collection config options.
-	 * @param array $expected_data Expected output data.
+	 * @param string $slug Font collection slug.
+	 * @param array  $config Font collection config options.
+	 * @param array  $expected_data Expected output data.
 	 */
-	public function test_should_get_content( $config, $expected_data ) {
-		$collection = new WP_Font_Collection( $config );
+	public function test_should_get_content( $slug, $config, $expected_data ) {
+		$collection = new WP_Font_Collection( $slug, $config );
 		$this->assertSame( $expected_data, $collection->get_content() );
 	}
 
@@ -68,8 +69,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 
 		return array(
 			'with a file'                           => array(
+				'slug'          => 'my-collection',
 				'config'        => array(
-					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => $mock_file,
@@ -80,8 +81,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 				),
 			),
 			'with a url'                            => array(
+				'slug'          => 'my-collection-with-url',
 				'config'        => array(
-					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 					'src'         => 'https://localhost/fonts/mock-font-collection.json',
@@ -92,8 +93,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 				),
 			),
 			'with font_families and categories'     => array(
+				'slug'          => 'my-collection',
 				'config'        => array(
-					'slug'          => 'my-collection',
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
 					'font_families' => array( 'mock' ),
@@ -105,8 +106,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 				),
 			),
 			'with font_families without categories' => array(
+				'slug'          => 'my-collection',
 				'config'        => array(
-					'slug'          => 'my-collection',
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
 					'font_families' => array( 'mock' ),

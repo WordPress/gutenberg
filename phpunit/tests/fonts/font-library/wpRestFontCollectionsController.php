@@ -31,9 +31,9 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		file_put_contents( $mock_file, '{"font_families": [ "mock" ], "categories": [ "mock" ] }' );
 
 		wp_register_font_collection(
+			'mock-col-slug',
 			array(
 				'name' => 'My Collection',
-				'slug' => 'mock-col-slug',
 				'src'  => $mock_file,
 			)
 		);
