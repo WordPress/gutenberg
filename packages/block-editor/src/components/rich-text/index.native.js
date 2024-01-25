@@ -24,7 +24,6 @@ import {
 	create,
 	split,
 	toHTMLString,
-	slice,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
@@ -46,6 +45,8 @@ import EmbedHandlerPicker from './embed-handler-picker';
 import { Content } from './content';
 import RichText from './native';
 import { withDeprecations } from './with-deprecations';
+import { findSelection } from './use-input-rules';
+import { START_OF_SELECTED_AREA } from '../../utils/selection';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -486,7 +487,7 @@ export function RichTextWrapper(
 	);
 
 	const inputRule = useCallback(
-		( value, valueToFormat ) => {
+		( value ) => {
 			if ( ! onReplace ) {
 				return;
 			}
@@ -517,15 +518,17 @@ export function RichTextWrapper(
 				return;
 			}
 
-			const content = valueToFormat(
-				slice( value, startPosition, text.length )
-			);
+			const content = toHTMLString( {
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
+			} );
 			const block = transformation.transform( content );
 
+			const currentSelection = findSelection( [ block ] );
 			onReplace( [ block ] );
+			selectionChange( ...currentSelection );
 			__unstableMarkAutomaticChange();
 		},
-		[ onReplace, __unstableMarkAutomaticChange ]
+		[ onReplace, start, selectionChange, __unstableMarkAutomaticChange ]
 	);
 
 	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
