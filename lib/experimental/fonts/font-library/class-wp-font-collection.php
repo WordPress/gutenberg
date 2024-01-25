@@ -80,8 +80,8 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @param string $slug  The font collection's unique slug.
 	 * @param array $config Font collection config options. {
-	 *      @type string $slug        The font collection's unique slug.
 	 *      @type string $name        The font collection's name.
 	 *      @type string $description The font collection's description.
 	 *      @type string $src         The font collection's source.
@@ -89,10 +89,10 @@ class WP_Font_Collection {
 	 *      @type array  $categories The font collection's categories.
 	 *  }
 	 */
-	public function __construct( $config ) {
-		$this->is_config_valid( $config );
+	public function __construct( $slug, $config ) {
+		$this->is_config_valid( $slug, $config );
 
-		$this->slug          = isset( $config['slug'] ) ? $config['slug'] : '';
+		$this->slug          = isset( $slug ) ? $slug : '';
 		$this->name          = isset( $config['name'] ) ? $config['name'] : '';
 		$this->description   = isset( $config['description'] ) ? $config['description'] : '';
 		$this->src           = isset( $config['src'] ) ? $config['src'] : '';
@@ -105,8 +105,8 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @param string $slug Font collection slug.
 	 * @param array $config Font collection config options. {
-	 *      @type string $slug        The font collection's unique slug.
 	 *      @type string $name        The font collection's name.
 	 *      @type string $description The font collection's description.
 	 *      @type string $src         The font collection's source.
@@ -115,30 +115,42 @@ class WP_Font_Collection {
 	 *  }
 	 * @return bool True if the font collection config is valid and false otherwise.
 	 */
-	public static function is_config_valid( $config ) {
+	public static function is_config_valid( $slug, $config ) {
+		if ( empty( $slug ) || ! is_string( $slug ) ) {
+			_doing_it_wrong( __METHOD__, __( 'Font Collection slug is required as a non-empty string.', 'gutenberg' ), '6.5.0' );
+			return false;
+		}
+
 		if ( empty( $config ) || ! is_array( $config ) ) {
 			_doing_it_wrong( __METHOD__, __( 'Font Collection config options are required as a non-empty array.', 'gutenberg' ), '6.5.0' );
 			return false;
 		}
 
-		$required_keys = array( 'slug', 'name' );
-		foreach ( $required_keys as $key ) {
-			if ( empty( $config[ $key ] ) ) {
-				_doing_it_wrong(
-					__METHOD__,
-					// translators: %s: Font collection config key.
-					sprintf( __( 'Font Collection config %s is required as a non-empty string.', 'gutenberg' ), $key ),
-					'6.5.0'
-				);
-				return false;
-			}
+		if ( empty( $config['name'] ) || ! is_string( $config['name'] ) ) {
+			_doing_it_wrong( __METHOD__, __( 'Font Collection name is required as a non-empty string.', 'gutenberg' ), '6.5.0' );
+			return false;
 		}
 
 		if (
-			( empty( $config['src'] ) && empty( $config['font_families'] ) ) ||
-			( ! empty( $config['src'] ) && ! empty( $config['font_families'] ) )
+			( isset( $config['src'] ) && isset( $config['font_families'] ) ) ||
+			( ! isset( $config['src'] ) && ! isset( $config['font_families'] ) )
 		) {
 			_doing_it_wrong( __METHOD__, __( 'Font Collection config "src" option OR "font_families" option are required.', 'gutenberg' ), '6.5.0' );
+			return false;
+		}
+
+		if ( isset( $config['src'] ) && ! is_string( $config['src'] ) ) {
+			_doing_it_wrong( __METHOD__, __( 'Font Collection config "src" option is required as a non-empty string.', 'gutenberg' ), '6.5.0' );
+			return false;
+		}
+
+		if ( isset( $config['font_families'] ) && ( empty( $config['font_families'] ) || ! is_array( $config['font_families'] ) ) ) {
+			_doing_it_wrong( __METHOD__, __( 'Font Collection config "font_families" option is required as a non-empty array.', 'gutenberg' ), '6.5.0' );
+			return false;
+		}
+
+		if ( isset( $config['categories'] ) && ( empty( $config['categories'] ) || ! is_array( $config['categories'] ) ) ) {
+			_doing_it_wrong( __METHOD__, __( 'Font Collection config "categories" option is required as a non-empty array.', 'gutenberg' ), '6.5.0' );
 			return false;
 		}
 

@@ -57,23 +57,24 @@ class WP_Font_Library {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @param string $slug  Font collection slug.
 	 * @param array $config Font collection config options.
 	 *                      See {@see wp_register_font_collection()} for the supported fields.
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered successfully and a WP_Error otherwise.
 	 */
-	public static function register_font_collection( $config ) {
-		if ( ! WP_Font_Collection::is_config_valid( $config ) ) {
+	public static function register_font_collection( $slug, $config ) {
+		if ( ! WP_Font_Collection::is_config_valid( $slug, $config ) ) {
 			$error_message = __( 'Font collection config is invalid.', 'gutenberg' );
 			return new WP_Error( 'font_collection_registration_error', $error_message );
 		}
 
-		$new_collection = new WP_Font_Collection( $config );
+		$new_collection = new WP_Font_Collection( $slug, $config );
 
-		if ( self::is_collection_registered( $new_collection->get_config()['slug'] ) ) {
+		if ( self::is_collection_registered( $slug ) ) {
 			$error_message = sprintf(
 				/* translators: %s: Font collection slug. */
 				__( 'Font collection with slug: "%s" is already registered.', 'gutenberg' ),
-				$config['slug']
+				$slug
 			);
 			_doing_it_wrong(
 				__METHOD__,
@@ -82,7 +83,7 @@ class WP_Font_Library {
 			);
 			return new WP_Error( 'font_collection_registration_error', $error_message );
 		}
-		self::$collections[ $new_collection->get_config()['slug'] ] = $new_collection;
+		self::$collections[ $slug ] = $new_collection;
 		return $new_collection;
 	}
 

@@ -103,18 +103,22 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @param string   $slug   The font collection's unique slug.
 	 * @param string[] $config {
 	 *     Font collection associative array of configuration options.
 	 *
-	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $src            The font collection's data as a JSON file path.
-	 *     @type array  $data           The font collection's data as a PHP array.
+	 *     @type string name           The font collection's name.
+	 *     @type string description    The font collection's description.
+	 *     @type string src            The font collection's data as a JSON file path.
+	 *     @type array font_families   The font collection's font families.
+	 *     @type array categories      The font collection's caegories.
+	 *
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
 	 */
-	function wp_register_font_collection( $config ) {
-		return WP_Font_Library::register_font_collection( $config );
+	function wp_register_font_collection( $slug, $config ) {
+		return WP_Font_Library::register_font_collection( $slug, $config );
 	}
 }
 
@@ -124,22 +128,21 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string $collection_id The font collection ID.
+	 * @param string $slug The font collection ID.
 	 */
-	function wp_unregister_font_collection( $collection_id ) {
-		WP_Font_Library::unregister_font_collection( $collection_id );
+	function wp_unregister_font_collection( $slug ) {
+		WP_Font_Library::unregister_font_collection( $slug );
 	}
 
 }
 
 $default_font_collection = array(
-	'slug'        => 'default-font-collection',
 	'name'        => 'Google Fonts',
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
 );
 
-wp_register_font_collection( $default_font_collection );
+wp_register_font_collection( 'default-font-collection', $default_font_collection );
 
 // @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {
