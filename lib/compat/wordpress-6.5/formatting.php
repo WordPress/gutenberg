@@ -9,9 +9,11 @@
 
 /**
  * Given a numeric value, returns a rounded a valid CSS <number> as a string.
+ * Negative zero values, e.g., `-0.0`, will return "0".
  * See https://developer.mozilla.org/en-US/docs/Web/CSS/number
  * Normalizes LM_NUMERIC locales with non-dot decimal point, e.g., "1,234.56" to "1234.56".
- * Negative zero values, e.g., `-0.0`, will return "0"
+ * The above is relevant to PHP < 8, whose float to string casting is locale-dependent.
+ * See https://php.watch/versions/8.0/float-to-string-locale-independent
  *
  * Usage:
  * Call just before constructing the final output of your CSS rules, and after any number-based calculation.
