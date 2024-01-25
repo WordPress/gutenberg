@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0 (2024-01-24)
+
 ### Enhancements
 
 -   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
@@ -12,12 +14,14 @@
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([#57805](https://github.com/WordPress/gutenberg/pull/57805))
 -   Add `wp-data-on-window` and `wp-data-on-document` directives. ([#57931](https://github.com/WordPress/gutenberg/pull/57931))
+-   Add the `data-wp-each` directive to render lists of items using a template. ([57859](https://github.com/WordPress/gutenberg/pull/57859))
 
 ### Breaking Changes
 
 -   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
 -   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
 -   Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
+-   Convert `navigate` and `prefetch` function to actions of the new `core/router` store, available when importing the `@wordpress/interactivity-router` module. ([#57924](https://github.com/WordPress/gutenberg/pull/57924))
 
 ### Bug Fix
 

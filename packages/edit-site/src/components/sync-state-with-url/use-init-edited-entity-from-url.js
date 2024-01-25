@@ -160,7 +160,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 			}
 
 			// Some URLs in list views are different
-			if ( path === '/page' && postId ) {
+			if ( path === '/pages' && postId ) {
 				return resolveTemplateForPostTypeAndId( 'page', postId );
 			}
 
@@ -196,7 +196,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		}
 
 		// Some URLs in list views are different
-		if ( path === '/page' && postId ) {
+		if ( path === '/pages' && postId ) {
 			return { postType: 'page', postId };
 		}
 
@@ -207,12 +207,12 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		return {};
 	}, [ homepageId, postType, postId, path ] );
 
-	if (
-		( path === '/wp_template/all' ||
-			( path === '/wp_template' && window?.__experimentalAdminViews ) ) &&
-		postId
-	) {
+	if ( path === '/wp_template/all' && postId ) {
 		return { isReady: true, postType: 'wp_template', postId, context };
+	}
+
+	if ( path === '/wp_template_part/all' && postId ) {
+		return { isReady: true, postType: 'wp_template_part', postId, context };
 	}
 
 	if ( postTypesWithoutParentTemplate.includes( postType ) ) {

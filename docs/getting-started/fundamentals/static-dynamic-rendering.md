@@ -63,6 +63,7 @@ The markup stored for a block can be modified before it gets rendered on the fro
 </div>
 
 Some examples of core blocks with static rendering are:
+
 - [`separator`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator/save.js) function) 
 - [`spacer`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js) function).
 - [`button`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/button/save.js) function).
@@ -82,10 +83,12 @@ There are some common use cases for dynamic blocks:
 ### How to define dynamic rendering for a block
 
 A block can define dynamic rendering in two main ways:
+
 1. Via the `render_callback` argument that can be passed to the [`register_block_type()` function](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-php-server-side).
-1. Via a separate PHP file (usually named `render.php`) which path can be defined at the [`render` property of the `block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#files-for-the-blocks-behavior-output-or-style).
+2. Via a separate PHP file (usually named `render.php`) which path can be defined at the [`render` property of the `block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#files-for-the-blocks-behavior-output-or-style).
 
 Both of these ways to define the block's dynamic rendering receive the following data:
+
  - `$attributes` - The array of attributes for this block.
  - `$content` - Rendered block output (markup of the block as stored in the database).
  - `$block` - The instance of the [WP_Block](https://developer.wordpress.org/reference/classes/wp_block/) class that represents the block being rendered ([metadata of the block](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)).
@@ -94,7 +97,6 @@ Both of these ways to define the block's dynamic rendering receive the following
 <br/>
 
 For example, the [`site-title`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-title) core block with the following function registered as [`render_callback`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/site-title/index.php)...
-
 
 ```php
 function render_block_core_site_title( $attributes ) {
@@ -159,6 +161,7 @@ For dynamic blocks, the `save` callback function can return just `null`, which t
 Blocks with dynamic rendering can also save an HTML representation of the block as a backup. If you provide a server-side rendering callback, the HTML representing the block in the database will be replaced with the output of your callback, but will be rendered if your block is deactivated (the plugin that registers the block is uninstalled) or your render callback is removed.
 
 In some cases, the block saves an HTML representation of the block and uses a dynamic rendering to fine-tune this markup if some conditions are met. Some examples of core blocks using this approach are:
+
 - The [`cover`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block saves a [full HTML representation of the block in the database](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js). This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74) when requested to do some PHP magic that dynamically [injects the featured image if the "use featured image" setting is enabled](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16).
 - The [`image`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image) block also saves [its HTML representation in the database](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image/save.js) and processes it via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L363) when requested to [add some attributes to the markup](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L18) if some conditions are met.
 

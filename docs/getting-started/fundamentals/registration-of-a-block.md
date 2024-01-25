@@ -69,6 +69,7 @@ The content of <code>block.json</code> (or any other <code>.json</code> file) ca
 </div>
 
 The client-side block settings object passed as a second parameter includes two especially relevant properties:
+
 - `edit`: The React component that gets used in the editor for our block.
 - `save`: The function that returns the static HTML markup that gets saved to the Database. 
 

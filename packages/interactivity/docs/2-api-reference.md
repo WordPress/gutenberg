@@ -26,6 +26,7 @@ DOM elements are connected to data stored in the state and context through direc
     - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-run`](#wp-run) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-key`](#wp-key) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
+    - [`wp-each`](#wp-each) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
   - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
 - [The store](#the-store)
   - [Elements of the store](#elements-of-the-store)
@@ -619,6 +620,78 @@ But it can also be used on other elements:
 ```
 
 When the list is re-rendered, the Interactivity API will match elements by their keys to determine if an item was added/removed/reordered. Elements without keys might be recreated unnecessarily.
+
+
+#### `wp-each`
+
+The `wp-each` directive is intended to render a list of elements. The directive can be used in `<template>` tags, being the value a path to an array stored in the global state or the context. The content inside the `<template>` tag is the template used to render each of the items.
+
+Each item is included in the context under the `item` name by default, so directives inside the template can access the current item.
+
+For example, let's consider the following HTML.
+
+```html
+<ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
+  <template data-wp-each="context.list" >
+    <li data-wp-text="context.item"></li>
+  </template>
+</ul>
+```
+
+It would generate the following output:
+
+```html
+<ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
+  <li data-wp-text="context.item">hello</li>
+  <li data-wp-text="context.item">hola</li>
+  <li data-wp-text="context.item">olá</li>
+</ul>
+```
+
+The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, we change the default prop `item` to `greeting`.
+
+```html
+<ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
+  <template data-wp-each--greeting="context.list" >
+    <li data-wp-text="context.greeting"></li>
+  </template>
+</ul>
+```
+
+By default, it uses each element as the key for the rendered nodes, but you can also specify a path to retrieve the key if necessary, e.g., when the list contains objects.
+
+For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-wp-key` inside the template content. This is because `data-wp-each` creates
+a context provider wrapper around each rendered item, and those wrappers are the ones that need the `key` property.
+
+```html
+<ul data-wp-context='{
+  "list": [
+    { "id": "en", "value": "hello" },
+    { "id": "es", "value": "hola" },
+    { "id": "pt", "value": "olá" }
+  ]
+}'>
+  <template
+    data-wp-each--greeting="context.list"
+    data-wp-each-key="context.greeting.id"
+  >
+    <li data-wp-text="context.greeting.value"></li>
+  </template>
+</ul>
+```
+
+For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
+
+```html
+<ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
+  <template data-wp-each--greeting="context.list" >
+    <li data-wp-text="context.greeting"></li>
+  </template>
+  <li data-wp-each-child>hello</li>
+  <li data-wp-each-child>hola</li>
+  <li data-wp-each-child>olá</li>
+</ul>
+```
 
 ### Values of directives are references to store properties
 

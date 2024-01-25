@@ -66,6 +66,7 @@
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>packages/block-library/src/navigation/index.php</exclude-pattern>
 	</rule>
 
 	<!-- Ignore empty files in tests/gutenberg-test-themes -->
