@@ -170,7 +170,7 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'core/block',
 					attributes: {
 						ref: patternId,
-						overrides: {
+						content: {
 							[ editableParagraphId ]: {
 								content: [ 1, 'I would word it this way' ],
 							},
@@ -181,7 +181,7 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'core/block',
 					attributes: {
 						ref: patternId,
-						overrides: {
+						content: {
 							[ editableParagraphId ]: {
 								content: [ 1, 'This one is different' ],
 							},
@@ -305,7 +305,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'core/block',
 				attributes: {
 					ref: id,
-					overrides: {
+					content: {
 						[ buttonId ]: {
 							linkTarget: [ 0 ],
 						},
