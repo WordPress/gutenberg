@@ -30,7 +30,7 @@ import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
-import { downloadFontFaceAsset } from './utils';
+import { downloadFontFaceAssets } from './utils';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -161,7 +161,7 @@ function FontCollection( { slug } ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
 						if ( fontFace.src ) {
-							fontFace.file = await downloadFontFaceAsset(
+							fontFace.file = await downloadFontFaceAssets(
 								fontFace.src
 							);
 						}
