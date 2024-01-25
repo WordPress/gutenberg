@@ -11,7 +11,6 @@ import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
-	Tooltip,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -65,7 +64,7 @@ export default function LinkPreview( {
 
 	const { createNotice } = useDispatch( noticesStore );
 	const ref = useCopyToClipboard( value.url, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+		createNotice( 'info', __( 'Link copied to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
@@ -98,16 +97,14 @@ export default function LinkPreview( {
 					<span className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
-								<Tooltip text={ value.url }>
-									<ExternalLink
-										className="block-editor-link-control__search-item-title"
-										href={ value.url }
-									>
-										<Truncate numberOfLines={ 1 }>
-											{ displayTitle }
-										</Truncate>
-									</ExternalLink>
-								</Tooltip>
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ value.url }
+								>
+									<Truncate numberOfLines={ 1 }>
+										{ displayTitle }
+									</Truncate>
+								</ExternalLink>
 								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
 										<Truncate numberOfLines={ 1 }>
@@ -123,11 +120,9 @@ export default function LinkPreview( {
 						) }
 					</span>
 				</span>
-
 				<Button
 					icon={ edit }
 					label={ __( 'Edit link' ) }
-					className="block-editor-link-control__search-item-action"
 					onClick={ onEditClick }
 					size="compact"
 				/>
@@ -135,7 +130,6 @@ export default function LinkPreview( {
 					<Button
 						icon={ linkOff }
 						label={ __( 'Remove link' ) }
-						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
 						onClick={ onRemove }
 						size="compact"
 					/>
@@ -143,7 +137,6 @@ export default function LinkPreview( {
 				<Button
 					icon={ copySmall }
 					label={ __( 'Copy link' ) }
-					className="block-editor-link-control__search-item-action block-editor-link-control__copy"
 					ref={ ref }
 					disabled={ isEmptyURL }
 					size="compact"
