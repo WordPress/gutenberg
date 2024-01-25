@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.4.0",
+	"version": "17.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -98,7 +98,7 @@
 	"devDependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
-		"@ariakit/test": "^0.3.5",
+		"@ariakit/test": "^0.3.7",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -177,14 +177,14 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
-		"browserslist": "4.21.10",
-		"caniuse-lite": "1.0.30001538",
+		"browserslist": "4.22.2",
+		"caniuse-lite": "1.0.30001579",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"commander": "9.2.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "10.2.0",
-		"core-js-builder": "3.31.0",
+		"core-js-builder": "3.35.1",
 		"cross-env": "3.2.4",
 		"css-loader": "6.2.0",
 		"cssnano": "6.0.1",
@@ -224,7 +224,7 @@
 		"node-fetch": "2.6.1",
 		"node-watch": "0.7.0",
 		"npm-run-all": "4.1.5",
-		"patch-package": "6.2.2",
+		"patch-package": "8.0.0",
 		"postcss": "8.4.16",
 		"postcss-loader": "6.2.1",
 		"prettier": "npm:wp-prettier@3.0.3",
@@ -359,8 +359,7 @@
 			"wp-scripts lint-style"
 		],
 		"package-lock.json": [
-			"npm run lint:lockfile",
-			"node ./bin/check-latest-npm.js"
+			"npm run lint:lockfile"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"

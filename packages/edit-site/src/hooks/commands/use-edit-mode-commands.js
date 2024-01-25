@@ -216,6 +216,8 @@ function useEditUICommands() {
 		showBlockBreadcrumbs,
 		isListViewOpen,
 		isDistractionFree,
+		isTopToolbar,
+		isFocusMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorMode } = select( editSiteStore );
@@ -228,7 +230,9 @@ function useEditUICommands() {
 			),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: get( editSiteStore.name, 'distractionFree' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
+			isFocusMode: get( 'core', 'focusMode' ),
+			isTopToolbar: get( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -271,16 +275,33 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',
-		label: __( 'Toggle spotlight mode' ),
+		label: __( 'Toggle spotlight' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
+			createInfoNotice(
+				isFocusMode ? __( 'Spotlight off.' ) : __( 'Spotlight on.' ),
+				{
+					id: 'core/edit-site/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	commands.push( {
 		name: 'core/toggle-distraction-free',
-		label: __( 'Toggle distraction free' ),
+		label: isDistractionFree
+			? __( 'Exit Distraction Free' )
+			: __( 'Enter Distraction Free ' ),
 		callback: ( { close } ) => {
 			toggleDistractionFree();
 			close();
@@ -291,11 +312,28 @@ function useEditUICommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
 			close();
+			createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar off.' )
+					: __( 'Top toolbar on.' ),
+				{
+					id: 'core/edit-site/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
@@ -350,11 +388,20 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
+		label: isListViewOpen
+			? __( 'Close List View' )
+			: __( 'Open List View' ),
 		icon: listView,
 		callback: ( { close } ) => {
 			setIsListViewOpened( ! isListViewOpen );
 			close();
+			createInfoNotice(
+				isListViewOpen ? __( 'List View off.' ) : __( 'List View on.' ),
+				{
+					id: 'core/edit-site/toggle-list-view/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 

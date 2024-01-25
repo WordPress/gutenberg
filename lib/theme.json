@@ -236,6 +236,7 @@
 		},
 		"typography": {
 			"customFontSize": true,
+			"defaultFontSizes": true,
 			"dropCap": true,
 			"fontSizes": [
 				{

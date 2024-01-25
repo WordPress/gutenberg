@@ -7,9 +7,12 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
+	fetchBlockPatterns,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { useViewportMatch } from '@wordpress/compose';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,7 +31,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalPreferredStyleVariations',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
-	'allowedBlockTypes',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
@@ -46,14 +48,11 @@ const BLOCK_EDITOR_SETTINGS = [
 	'enableCustomSpacing',
 	'enableCustomUnits',
 	'enableOpenverseMediaCategory',
-	'focusMode',
-	'distractionFree',
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'hasFixedToolbar',
+	'getPostLinkProps',
 	'hasInlineToolbar',
-	'isDistractionFree',
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
@@ -75,7 +74,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsBlockBasedTheme',
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
-	'__experimentalGetPostLinkProps',
 ];
 
 /**
@@ -88,19 +86,23 @@ const BLOCK_EDITOR_SETTINGS = [
  * @return {Object} Block Editor Settings.
  */
 function useBlockEditorSettings( settings, postType, postId ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
+		blockTypes,
+		focusMode,
+		hasFixedToolbar,
+		isDistractionFree,
 		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
+		hiddenBlockTypes,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
-		restBlockPatterns,
 		restBlockPatternCategories,
-		getPostLinkProps,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -110,13 +112,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
-				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
-			const { getPostLinkProps: postLinkProps } =
-				select( editorStore ).getEditorSettings();
 			const { get } = select( preferencesStore );
-
+			const { getBlockTypes } = select( blocksStore );
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
@@ -126,11 +125,17 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					'core',
 					'allowRightClickOverrides'
 				),
+				blockTypes: getBlockTypes(),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				focusMode: get( 'core', 'focusMode' ),
+				hasFixedToolbar:
+					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
+				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
+				isDistractionFree: get( 'core', 'distractionFree' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
@@ -142,12 +147,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
-				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
-				getPostLinkProps: postLinkProps,
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const settingsBlockPatterns =
@@ -159,22 +162,16 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 	const blockPatterns = useMemo(
 		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
+			[ ...( settingsBlockPatterns || [] ) ].filter(
+				( { postTypes } ) => {
 					return (
 						! postTypes ||
 						( Array.isArray( postTypes ) &&
 							postTypes.includes( postType ) )
 					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, postType ]
+				}
+			),
+		[ settingsBlockPatterns, postType ]
 	);
 
 	const blockPatternCategories = useMemo(
@@ -214,6 +211,27 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const allowedBlockTypes = useMemo( () => {
+		// Omit hidden block types if exists and non-empty.
+		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
+			// Defer to passed setting for `allowedBlockTypes` if provided as
+			// anything other than `true` (where `true` is equivalent to allow
+			// all block types).
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? blockTypes.map( ( { name } ) => name )
+					: settings.allowedBlockTypes || [];
+
+			return defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
+			);
+		}
+
+		return settings.allowedBlockTypes;
+	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
+
+	const forceDisableFocusMode = settings.focusMode === false;
+
 	return useMemo(
 		() => ( {
 			...Object.fromEntries(
@@ -221,11 +239,26 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowedBlockTypes,
 			allowRightClickOverrides,
+			focusMode: focusMode && ! forceDisableFocusMode,
+			hasFixedToolbar,
+			isDistractionFree,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
+			__experimentalFetchBlockPatterns: async () => {
+				return ( await fetchBlockPatterns() ).filter(
+					( { postTypes } ) => {
+						return (
+							! postTypes ||
+							( Array.isArray( postTypes ) &&
+								postTypes.includes( postType ) )
+						);
+					}
+				);
+			},
+			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -253,10 +286,14 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-			__experimentalGetPostLinkProps: getPostLinkProps,
 		} ),
 		[
+			allowedBlockTypes,
 			allowRightClickOverrides,
+			focusMode,
+			forceDisableFocusMode,
+			hasFixedToolbar,
+			isDistractionFree,
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
@@ -272,7 +309,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageForPosts,
 			postType,
 			setIsInserterOpened,
-			getPostLinkProps,
 		]
 	);
 }

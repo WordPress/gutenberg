@@ -6,8 +6,9 @@ import { paramCase as kebabCase } from 'change-case';
 /**
  * WordPress dependencies
  */
+import { getQueryArgs } from '@wordpress/url';
 import { downloadBlob } from '@wordpress/blob';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	TextControl,
@@ -21,23 +22,35 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import { PATTERN_TYPES, TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
+import {
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_DEFAULT_CATEGORY,
+} from '../../utils/constants';
+import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+
+const { useHistory } = unlock( routerPrivateApis );
+const { CreatePatternModalContents, useDuplicatePatternProps } =
+	unlock( patternsPrivateApis );
 
 export const exportJSONaction = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
-	callback: ( item ) => {
+	callback: ( [ item ] ) => {
 		const json = {
 			__file: item.type,
 			title: item.title || item.name,
-			content: item.patternBlock.content.raw,
-			syncStatus: item.patternBlock.wp_pattern_sync_status,
+			content: item.patternPost.content.raw,
+			syncStatus: item.patternPost.wp_pattern_sync_status,
 		};
 		return downloadBlob(
 			`${ kebabCase( item.title || item.name ) }.json`,
@@ -58,7 +71,8 @@ export const renameAction = {
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const [ title, setTitle ] = useState( () => item.title );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
@@ -147,7 +161,8 @@ export const deleteAction = {
 		return canDeleteOrReset( item ) && ! hasThemeFile;
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { __experimentalDeleteReusableBlock } =
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
@@ -211,7 +226,8 @@ export const resetAction = {
 		return canDeleteOrReset( item ) && hasThemeFile;
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { removeTemplate } = useDispatch( editSiteStore );
 		return (
 			<VStack spacing="5">
@@ -232,6 +248,87 @@ export const resetAction = {
 					</Button>
 				</HStack>
 			</VStack>
+		);
+	},
+};
+
+export const duplicatePatternAction = {
+	id: 'duplicate-pattern',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate pattern', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
+			window.location.href
+		);
+		const isThemePattern = item.type === PATTERN_TYPES.theme;
+		const history = useHistory();
+		function onPatternSuccess( { pattern } ) {
+			history.push( {
+				categoryType: PATTERN_TYPES.theme,
+				categoryId,
+				postType: PATTERN_TYPES.user,
+				postId: pattern.id,
+			} );
+			closeModal();
+		}
+		const duplicatedProps = useDuplicatePatternProps( {
+			pattern: isThemePattern ? item : item.patternPost,
+			onSuccess: onPatternSuccess,
+		} );
+		return (
+			<CreatePatternModalContents
+				onClose={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+				{ ...duplicatedProps }
+			/>
+		);
+	},
+};
+
+export const duplicateTemplatePartAction = {
+	id: 'duplicate-template-part',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate template part', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const { createSuccessNotice } = useDispatch( noticesStore );
+		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
+			window.location.href
+		);
+		const history = useHistory();
+		async function onTemplatePartSuccess( templatePart ) {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					item.title
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
+			history.push( {
+				postType: TEMPLATE_PART_POST_TYPE,
+				postId: templatePart?.id,
+				categoryType: TEMPLATE_PART_POST_TYPE,
+				categoryId,
+			} );
+			closeModal();
+		}
+		return (
+			<CreateTemplatePartModalContents
+				blocks={ item.blocks }
+				defaultArea={ item.templatePart.area }
+				defaultTitle={ sprintf(
+					/* translators: %s: Existing template part title */
+					__( '%s (Copy)' ),
+					item.title
+				) }
+				onCreate={ onTemplatePartSuccess }
+				onError={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+			/>
 		);
 	},
 };

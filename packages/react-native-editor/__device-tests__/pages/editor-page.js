@@ -15,6 +15,8 @@ const {
 	clickIfClickable,
 	launchApp,
 	tapStatusBariOS,
+	longPressElement,
+	longPressMiddleOfElement,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
@@ -45,8 +47,18 @@ class EditorPage {
 		}
 	}
 
-	async initializeEditor( { initialData, rawStyles, rawFeatures } = {} ) {
-		await launchApp( this.driver, { initialData, rawStyles, rawFeatures } );
+	async initializeEditor( {
+		initialTitle,
+		initialData,
+		rawStyles,
+		rawFeatures,
+	} = {} ) {
+		await launchApp( this.driver, {
+			initialTitle,
+			initialData,
+			rawStyles,
+			rawFeatures,
+		} );
 
 		// Stores initial values from the editor for different helpers.
 		const addButton = await this.driver.$$( `~${ ADD_BLOCK_ID }` );
@@ -72,9 +84,13 @@ class EditorPage {
 	// Text blocks functions
 	// E.g. Paragraph, Heading blocks
 	// ===============================
-	async getTextBlockAtPosition( blockName, position = 1 ) {
+	async getTextBlockAtPosition(
+		blockName,
+		position = 1,
+		skipWrapperClick = false
+	) {
 		// iOS needs a click to get the text element
-		if ( ! isAndroid() ) {
+		if ( ! isAndroid() && ! skipWrapperClick ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
 
 			await clickIfClickable( this.driver, textBlockLocator );
@@ -89,6 +105,47 @@ class EditorPage {
 
 	async typeTextToTextBlock( block, text, clear ) {
 		await typeString( this.driver, block, text, clear );
+	}
+
+	async pasteClipboardToTextBlock( element, { timeout = 1000 } = {} ) {
+		if ( this.driver.isAndroid ) {
+			await longPressMiddleOfElement( this.driver, element );
+		} else {
+			await longPressElement( this.driver, element );
+		}
+
+		if ( this.driver.isAndroid ) {
+			// Long pressing seemingly results in drag-and-drop blurring the input, so
+			// we tap again to re-focus the input.
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( { origin: element } )
+				.down()
+				.up()
+				.perform();
+
+			const location = await element.getLocation();
+			const approximatePasteMenuLocation = {
+				x: location.x + 30,
+				y: location.y - 120,
+			};
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( approximatePasteMenuLocation )
+				.down()
+				.up()
+				.perform();
+		} else {
+			const pasteMenuItem = await this.driver.$(
+				'//XCUIElementTypeMenuItem[@name="Paste"]'
+			);
+			await pasteMenuItem.waitForDisplayed( { timeout } );
+			await pasteMenuItem.click();
+		}
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
@@ -171,14 +228,25 @@ class EditorPage {
 	}
 
 	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
-		const emptyAreaBelowLastBlock =
-			await this.driver.elementByAccessibilityId( 'Add paragraph block' );
+		const element = isAndroid()
+			? '~Add paragraph block'
+			: '(//XCUIElementTypeOther[@name="Add paragraph block"])';
+		const emptyAreaBelowLastBlock = await this.driver.$( element );
 		await emptyAreaBelowLastBlock.click();
 	}
 
-	async getTitleElement( options = { autoscroll: false } ) {
+	async getDefaultBlockAppenderElement() {
+		const appenderElement = isAndroid()
+			? `//android.widget.EditText[@text='Start writing…']`
+			: '(//XCUIElementTypeOther[contains(@name, "Start writing…")])[2]';
+		return this.driver.$( appenderElement );
+	}
+
+	async getTitleElement( options = { autoscroll: false, isEmpty: false } ) {
 		const titleElement = isAndroid()
-			? 'Post title. Welcome to Gutenberg!'
+			? `Post title. ${
+					options.isEmpty ? 'Empty' : 'Welcome to Gutenberg!'
+			  }`
 			: 'post-title';
 
 		if ( options.autoscroll ) {
@@ -198,6 +266,18 @@ class EditorPage {
 			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
+	}
+
+	async getEmptyTitleTextInputElement() {
+		const titleWrapperElement = await this.getTitleElement( {
+			isEmpty: true,
+		} );
+		await titleWrapperElement.click();
+
+		const titleElement = isAndroid()
+			? '//android.widget.EditText[@content-desc="Post title. Empty"]'
+			: '~Add title';
+		return this.driver.$( titleElement );
 	}
 
 	// iOS loads the block list more eagerly compared to Android.
@@ -370,10 +450,14 @@ class EditorPage {
 		await settingsButton.click();
 	}
 
-	async removeBlock() {
-		const blockActionsButtonElement = isAndroid()
+	getBlockActionsMenuElement() {
+		return isAndroid()
 			? '//android.widget.Button[contains(@content-desc, "Open Block Actions Menu")]'
 			: '//XCUIElementTypeButton[@name="Open Block Actions Menu"]';
+	}
+
+	async removeBlock() {
+		const blockActionsButtonElement = this.getBlockActionsMenuElement();
 		const blockActionsMenu = await this.swipeToolbarToElement(
 			blockActionsButtonElement
 		);
@@ -391,6 +475,12 @@ class EditorPage {
 		return await swipeDown( this.driver );
 	}
 
+	async isBlockActionsMenuButtonDisplayed() {
+		const menuButtonElement = this.getBlockActionsMenuElement();
+		const elementsFound = await this.driver.$$( menuButtonElement );
+		return elementsFound.length !== 0;
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================
@@ -406,8 +496,6 @@ class EditorPage {
 				swipeRight: true,
 			} );
 			await addButton[ 0 ].click();
-			// Wait for Bottom sheet animation to finish
-			await this.driver.pause( 3000 );
 		}
 
 		// Click on block of choice.
@@ -425,10 +513,9 @@ class EditorPage {
 		const inserterElement = isAndroid()
 			? 'Blocks menu'
 			: 'InserterUI-Blocks';
-		return await this.waitForElementToBeDisplayedById(
-			inserterElement,
-			4000
-		);
+		await this.driver
+			.$( `~${ inserterElement }` )
+			.waitForDisplayed( { timeout: 4000 } );
 	}
 
 	static async isElementOutOfBounds( element, { width, height } = {} ) {
@@ -787,13 +874,25 @@ class EditorPage {
 		await clickIfClickable( this.driver, mediaLibraryLocator );
 	}
 
+	async getImageBlockCaptionButton() {
+		const captionElement = isAndroid()
+			? '//android.widget.Button[starts-with(@content-desc, "Image caption")]'
+			: '//XCUIElementTypeButton[starts-with(@name, "Image caption.")]';
+		return this.driver.$( captionElement );
+	}
+
+	async getImageBlockCaptionInput( imageBlockCaptionButton ) {
+		const captionInputElement = isAndroid()
+			? '//android.widget.EditText'
+			: '//XCUIElementTypeTextView';
+		return imageBlockCaptionButton.$( captionInputElement );
+	}
+
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
-		const imageBlockCaptionButton = await this.driver.$(
-			'//XCUIElementTypeButton[starts-with(@name, "Image caption.")]'
-		);
+		const imageBlockCaptionButton = await this.getImageBlockCaptionButton();
 		await imageBlockCaptionButton.click();
-		const imageBlockCaptionField = await imageBlockCaptionButton.$(
-			'//XCUIElementTypeTextView'
+		const imageBlockCaptionField = await this.getImageBlockCaptionInput(
+			imageBlockCaptionButton
 		);
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
@@ -812,6 +911,16 @@ class EditorPage {
 			.down( { button: 0 } )
 			.up( { button: 0 } )
 			.perform();
+	}
+
+	async isImageBlockSelected() {
+		// Since there isn't an easy way to see if a block is selected,
+		// it will check if the edit image button is visible
+		const editImageElement = isAndroid()
+			? '(//android.widget.Button[@content-desc="Edit image"])'
+			: '(//XCUIElementTypeButton[@name="Edit image"])';
+
+		return await this.driver.$( editImageElement ).isDisplayed();
 	}
 
 	// =============================

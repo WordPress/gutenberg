@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'tovdom-islands-view' );
+wp_enqueue_script_module( 'tovdom-islands-view' );
 ?>
 
 <div>

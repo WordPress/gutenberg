@@ -10,6 +10,8 @@ This block template can be used by running the following command:
 npx  @wordpress/create-block --template @wordpress/create-block-interactive-template
 ```
 
+It requires Gutenberg 17.5 or higher.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

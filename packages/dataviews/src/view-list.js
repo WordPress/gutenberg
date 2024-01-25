@@ -10,15 +10,20 @@ import { useAsyncList } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Button,
 } from '@wordpress/components';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { info } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 export default function ViewList( {
 	view,
 	fields,
 	data,
+	isLoading,
 	getItemId,
 	onSelectionChange,
+	onDetailsChange,
 	selection,
 	deferredRendering,
 } ) {
@@ -45,40 +50,57 @@ export default function ViewList( {
 		}
 	};
 
+	const hasData = usedData?.length;
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ classNames( {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! hasData && ! isLoading,
+				} ) }
+			>
+				{ ! hasData && (
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				) }
+			</div>
+		);
+	}
+
 	return (
-		<ul className="dataviews-list-view">
+		<ul className="dataviews-view-list">
 			{ usedData.map( ( item ) => {
 				return (
-					<li key={ getItemId( item ) }>
-						<div
-							role="button"
-							tabIndex={ 0 }
-							aria-pressed={ selection.includes( item.id ) }
-							onKeyDown={ onEnter( item ) }
-							className={ classNames(
-								'dataviews-list-view__item',
-								{
-									'dataviews-list-view__item-selected':
-										selection.includes( item.id ),
-								}
-							) }
-							onClick={ () => onSelectionChange( [ item ] ) }
-						>
-							<HStack spacing={ 3 } alignment="flex-start">
-								<div className="dataviews-list-view__media-wrapper">
-									{ mediaField?.render( { item } ) || (
-										<div className="dataviews-list-view__media-placeholder"></div>
-									) }
-								</div>
-								<HStack>
+					<li
+						key={ getItemId( item ) }
+						className={ classNames( {
+							'is-selected': selection.includes( item.id ),
+						} ) }
+					>
+						<HStack className="dataviews-view-list__item-wrapper">
+							<div
+								role="button"
+								tabIndex={ 0 }
+								aria-pressed={ selection.includes( item.id ) }
+								onKeyDown={ onEnter( item ) }
+								className="dataviews-view-list__item"
+								onClick={ () => onSelectionChange( [ item ] ) }
+							>
+								<HStack spacing={ 3 } justify="start">
+									<div className="dataviews-view-list__media-wrapper">
+										{ mediaField?.render( { item } ) || (
+											<div className="dataviews-view-list__media-placeholder"></div>
+										) }
+									</div>
 									<VStack spacing={ 1 }>
-										{ primaryField?.render( { item } ) }
-										<div className="dataviews-list-view__fields">
+										<span className="dataviews-view-list__primary-field">
+											{ primaryField?.render( { item } ) }
+										</span>
+										<div className="dataviews-view-list__fields">
 											{ visibleFields.map( ( field ) => {
 												return (
 													<span
 														key={ field.id }
-														className="dataviews-list-view__field"
+														className="dataviews-view-list__field"
 													>
 														{ field.render( {
 															item,
@@ -89,8 +111,19 @@ export default function ViewList( {
 										</div>
 									</VStack>
 								</HStack>
-							</HStack>
-						</div>
+							</div>
+							{ onDetailsChange && (
+								<Button
+									className="dataviews-view-list__details-button"
+									onClick={ () =>
+										onDetailsChange( [ item ] )
+									}
+									icon={ info }
+									label={ __( 'View details' ) }
+									size="compact"
+								/>
+							) }
+						</HStack>
 					</li>
 				);
 			} ) }
