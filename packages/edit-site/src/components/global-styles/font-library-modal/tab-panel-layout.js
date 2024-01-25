@@ -26,18 +26,6 @@ function TabPanelLayout( {
 			<Spacer margin={ 4 } />
 			<VStack spacing={ 4 } justify="space-between">
 				<VStack spacing={ 2 }>
-					{ notice && (
-						<FlexBlock>
-							<Spacer margin={ 4 } />
-							<Notice
-								status={ notice.type }
-								onRemove={ notice.onRemove }
-							>
-								{ notice.message }
-							</Notice>
-						</FlexBlock>
-					) }
-					<Spacer margin={ 4 } />
 					<HStack justify="flex-start">
 						{ !! handleBack && (
 							<Button
@@ -58,6 +46,18 @@ function TabPanelLayout( {
 						) }
 					</HStack>
 					{ description && <Text>{ description }</Text> }
+					{ notice && (
+						<FlexBlock>
+							<Spacer margin={ 1 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ notice.onRemove }
+							>
+								{ notice.message }
+							</Notice>
+							<Spacer margin={ 1 } />
+						</FlexBlock>
+					) }
 				</VStack>
 				<div className="font-library-modal__tabpanel-layout__main">
 					{ children }
