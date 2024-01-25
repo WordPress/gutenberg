@@ -82,37 +82,25 @@ function render_block_core_site_logo( $attributes ) {
  * @return array The border-related classnames and styles for the block.
  */
 function block_core_site_logo_get_border_attributes( $attributes ) {
-
-	$border_styles = array();
 	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	// Border radius.
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-
-	// Border style.
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-
-	// Border width.
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
+	$border_styles = array(
+		'radius' => $attributes['style']['border']['radius'] ?? null,
+		'style'  => $attributes['style']['border']['style'] ?? null,
+		'width'  => $attributes['style']['border']['width'] ?? null,
+	);
 
 	// Border color.
 	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
 	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
+	$border_styles['color'] = $preset_color ?? $custom_color;
 
 	// Individual border styles e.g. top, left etc.
 	foreach ( $sides as $side ) {
 		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
-			'color' => isset( $border['color'] ) ? $border['color'] : null,
-			'style' => isset( $border['style'] ) ? $border['style'] : null,
-			'width' => isset( $border['width'] ) ? $border['width'] : null,
+			'color' => $border['color'] ?? null,
+			'style' => $border['style'] ?? null,
+			'width' => $border['width'] ?? null,
 		);
 	}
 
