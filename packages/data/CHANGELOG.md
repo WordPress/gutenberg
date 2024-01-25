@@ -46,7 +46,7 @@
 
 ## 9.13.1 (2023-10-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
 
@@ -68,7 +68,7 @@
 
 ## 9.9.0 (2023-08-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Update the type definitions for dispatched actions by accounting for Promisified return values and thunks. Previously, a dispatched action's return type was the same as the return type of the original action creator, which did not account for how dispatch works internally. (Plain actions get wrapped in a Promise, and thunk actions ultimately resolve to the innermost function's return type).
 -   Update the type definition for dispatch() to handle string store descriptors correctly.
@@ -135,7 +135,7 @@
 
 – Add TypeScript types to the built package (via "types": "build-types" in the package.json)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -177,13 +177,13 @@
 
 ## 6.2.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `memize` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 6.2.0 (2022-01-27)
 
-### Bug Fix
+### Bug Fixes
 
 -   Corrected expect type of action creators and selectors in Redux store configuration type
 -   Move `redux` to regular dependencies and update it to version `^4.1.2`.
@@ -260,7 +260,7 @@
 
 ## 4.5.0 (2019-05-21)
 
-### Bug Fix
+### Bug Fixes
 
 -   Restore functionality of action-generators returning a Promise. Clarify intent and behaviour for `dispatch` behaviour. Dispatch actions now always
     return a promise ([#14830](https://github.com/WordPress/gutenberg/pull/14830)
@@ -277,7 +277,7 @@
 -   Introduce new `invalidateResolutionForStore` dispatch action for signalling to invalidate the resolution cache for an entire given store.
 -   Introduce new `invalidateResolutionForStoreSelector` dispatch action for signalling to invalidate the resolution cache for a store selector (and all variations of arguments on that selector).
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolves issue in the persistence plugin where passing `persist` as an array of reducer keys would wrongly replace state values for the unpersisted reducer keys.
 -   Restores a behavior in the persistence plugin where a default state provided as an object will be deeply merged as a base for the persisted value. This allows for a developer to include additional new keys in a persisted value default in future iterations of their store.
@@ -306,7 +306,7 @@
 -   `registry.registerActions` has been removed. Use `registry.registerStore` instead.
 -   `registry.registerResolvers` has been removed. Use `registry.registerStore` instead.
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolve an issue where `withSelect`'s `mapSelectToProps` would not be rerun if the wrapped component had incurred a store change during its mount lifecycle.
 

@@ -56,7 +56,7 @@
 
 ## 9.32.0 (2023-08-31)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).
 
@@ -229,7 +229,7 @@
 
 ## 1.3.1 (2020-04-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   Hide TypeScript type declarations ([#21613](https://github.com/WordPress/gutenberg/pull/21613))
     after they were found to conflict with DefinitelyTyped provided declarations.

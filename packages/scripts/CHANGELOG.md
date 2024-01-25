@@ -60,7 +60,7 @@
 
 ## 26.19.0 (2023-12-13)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix CSS imports not minified ([#56516](https://github.com/WordPress/gutenberg/pull/56516)).
 
@@ -95,7 +95,7 @@
 -   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
 -   The bundled `wp-prettier` dependency has been upgraded from `2.8.5` to `3.0.3` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Correctly resolve entry points when the directory is symlinked ([#54212](https://github.com/WordPress/gutenberg/pull/54212)).
 
@@ -109,7 +109,7 @@
 -   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
 -   The bundled `cssnano` dependency has been updated from requiring ^5.07 to requiring ^6.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))
 
@@ -158,7 +158,7 @@
 
 ## 25.5.1 (2023-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix `render.php` isn't copied in Windows OS ([#48735](https://github.com/WordPress/gutenberg/pull/48735)).
 
@@ -208,25 +208,25 @@
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 -   The bundled `@wordpress/eslint-plugin` package got updated to the new major version and the default linting for Jest unit tests is now handled in the default config in this package ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 23.7.2 (2022-08-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
 
 ## 23.7.1 (2022-08-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
 
 ## 23.6.0 (2022-07-27)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the incorrect exit error code when status missing in `webpack` call for `build` and `start` commands ([#42396](https://github.com/WordPress/gutenberg/pull/42396)).
 
@@ -238,7 +238,7 @@
 
 ## 23.2.0 (2022-06-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix incorrect handling in `plugin-zip` for root-level files and some specific platform conditions ([#41439](https://github.com/WordPress/gutenberg/pull/41439)).
 
@@ -310,7 +310,7 @@
 
 ## 21.0.1 (2022-02-11)
 
-### Bug Fix
+### Bug Fixes
 
 -   Return a default entry object in the `build` command when no entry files discovered in the project ([#38737](https://github.com/WordPress/gutenberg/pull/38737)).
 
@@ -320,20 +320,20 @@
 
 -   The bundled `puppeteer-core` dependency has been updated from requiring `^11.0.0` to requiring `^13.2.0` ([#37078](https://github.com/WordPress/gutenberg/pull/37078)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the handling for entry points when running `build` command ([#38584](https://github.com/WordPress/gutenberg/pull/38584)).
 
 ## 20.0.2 (2022-01-31)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the `build` command that does not generate assets on Windows OS ([#38348](https://github.com/WordPress/gutenberg/pull/38348)).
 -   Adds fallback to `src/index.js` when no valid scripts discovered in metadata files when running the `build` command ([#38367](https://github.com/WordPress/gutenberg/pull/38367)).
 
 ## 20.0.1 (2022-01-28)
 
-### Bug Fix
+### Bug Fixes
 
 -   Ensure that React Fast Refresh is not wired when it isn't explicitly enabled with `--hot` CLI argument when running the `start` command.
 
@@ -469,7 +469,7 @@
 
 ## 16.1.0 (2021-05-20)
 
-### Bug Fix
+### Bug Fixes
 
 -   The default Babel configuration has changed to respect a local Browserslist configuration.
 
@@ -493,7 +493,7 @@
 
 ## 15.0.1 (2021-04-30)
 
-### Bug Fix
+### Bug Fixes
 
 -   Add `postcss` as a dependency to ensure that the correct version gets installed.
 
@@ -558,7 +558,7 @@
 -   Make it possible to transpile `.jsx` files with `build` and `start` commands ([#28002](https://github.com/WordPress/gutenberg/pull/28002)).
 -   Add support for static assets (fonts and images) for `build` and `start` commands ([#28043](https://github.com/WordPress/gutenberg/pull/28043)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Ensure that `check-engines` uses the same default version of Node.js and npm as this package ([#28143](https://github.com/WordPress/gutenberg/pull/28143)).
 -   Prevent translation function names from being mangled to ensure stings are extracted ([#28231](https://github.com/WordPress/gutenberg/pull/28231)).
@@ -569,7 +569,7 @@
 
 ## 12.6.1 (2021-01-05)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix multiple build (`build` command) runtimes conflicting when using globals ([#27985](https://github.com/WordPress/gutenberg/pull/27985)).
 
@@ -672,7 +672,7 @@
 -   Add debugging support for `test-unit-js` script ([#21631](https://github.com/WordPress/gutenberg/pull/21631)). Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) using the `--inspect-brk` option.
 -   Add debugging support for `test-e2e` script ([#21861](https://github.com/WordPress/gutenberg/pull/21861)). Tests can be debugged by using the `--inspect-brk` option and a new `--puppeteer-devtools` option (or `PUPPETEER_DEVTOOLS="true"` environment variable).
 
-### Bug fix
+### Bug Fixes
 
 -   The bundled `npm-package-json-lint` dependency has been updated from requiring `^4.0.3` to requiring `^5.0.0` ([#21597](https://github.com/WordPress/gutenberg/pull/21597)). [Breaking changes](https://npmpackagejsonlint.org/docs/en/v4-to-v5) don't break anything in this package. It fixes the abrupt shutdown when `"description"` field in `package.json` is empty.
 -   Update `check-licenses` script to parse JSON dependency tree recursively so sub-dependencies of packages passed in `--ignore` flag are ignored as well.
@@ -787,7 +787,7 @@
 -   The bundled `eslint` dependency has been updated from requiring `^5.16.0` to requiring `^6.1.0`.
 -   The bundled `@wordpress/eslint-plugin` dependency has been updated to the next major version `^3.0.0` due to new ESLint rules enabled for all test files.
 
-### Bug Fix
+### Bug Fixes
 
 -   Use the SCSS shared `stylelint-config-wordpress` config so that both CSS and SCSS rules are used ([#17060](https://github.com/WordPress/gutenberg/pull/17060))
 
@@ -797,7 +797,7 @@
 
 -   The `build` and `start` commands supports simplified syntax for multiple entry points: `wp-scripts build entry-one.js entry-two.js` ([15982](https://github.com/WordPress/gutenberg/pull/15982)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Added missing [babel-jest](https://www.npmjs.com/package/babel-jest) dependency ([#16259](https://github.com/WordPress/gutenberg/pull/16259)).
 
@@ -844,7 +844,7 @@
 -   Added support for `start` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
 -   Updated `npm-package-json-lint` dependency [#14200](https://github.com/WordPress/gutenberg/pull/14200)
 
-### Bug Fix
+### Bug Fixes
 
 -   Avoid inheriting from ESLint configurations in ancestor directories when using the default configuration ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
 
@@ -881,7 +881,7 @@
 
 ## 2.2.1 (2018-09-05)
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
 

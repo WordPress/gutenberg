@@ -147,7 +147,7 @@
 
 -   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/autop`, `@wordpress/blob` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 

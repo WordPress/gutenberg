@@ -80,7 +80,7 @@
 
 -   Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
-### Bug Fix
+### Bug Fixes
 
 -   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
 
@@ -108,13 +108,13 @@
 
 ## 11.5.0 (2023-03-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
 
 ## 11.4.0 (2023-02-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
 
@@ -122,7 +122,7 @@
 
 ## 11.2.0 (2023-01-11)
 
-### Bug Fix
+### Bug Fixes
 
 -   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
 -   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
@@ -143,7 +143,7 @@
 -   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 -   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
 
-### Bug Fix
+### Bug Fixes
 
 -   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
 -   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
@@ -157,13 +157,13 @@
 
 ## 10.4.0 (2022-11-02)
 
-### Bug Fix
+### Bug Fixes
 
 -   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))
 
 ## 10.3.0 (2022-10-19)
 
-### Bug Fix
+### Bug Fixes
 
 -   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))
 -   `getTypographyClassesAndStyles()`: Ensure that font sizes are transformed into fluid values if fluid typography is activated ([#44852](https://github.com/WordPress/gutenberg/pull/44852))
@@ -195,7 +195,7 @@
 
 ## 9.3.0 (2022-06-15)
 
-### Bug fix
+### Bug Fixes
 
 -   Fix focus trap on certain `input` elements when navigating within a block with the left/right arrow keys ([#41538](https://github.com/WordPress/gutenberg/pull/41538)).
 
@@ -226,7 +226,7 @@
 
 ## 8.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 

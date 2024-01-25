@@ -112,13 +112,13 @@
 
 -   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the issue with the block wrapper in the editor ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
 
 ## 2.1.0 (2022-04-21)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix some CSS Coding Standards violations in file templates ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
 

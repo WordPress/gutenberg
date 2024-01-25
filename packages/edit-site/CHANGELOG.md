@@ -87,7 +87,7 @@
 
 ## 5.3.0 (2023-02-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
 -   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
@@ -106,7 +106,7 @@
 
 -   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Don't show block inserter when the canvas is view mode ([#46763](https://github.com/WordPress/gutenberg/pull/46763)).
 
@@ -154,7 +154,7 @@
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/primitives`, `file-saver` and `jszip` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 

@@ -134,7 +134,7 @@
 
 ## 5.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/dom`, `@wordpress/is-shallow-equal` and `classnames` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -215,7 +215,7 @@
 
 ## 2.0.3 (2018-11-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix Format Type Assignment During Parsing.
 -   Fix applying formats on multiline values without wrapper tags.

@@ -169,7 +169,7 @@
 
 ## 1.0.2 (2018-05-08)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix: Resolve error when input strings contains only whitespace ([#123](https://github.com/WordPress/packages/pull/123))
 

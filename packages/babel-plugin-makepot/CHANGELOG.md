@@ -98,7 +98,7 @@
 
 ## 5.1.0 (2022-09-13)
 
-### Bug Fix
+### Bug Fixes
 
 -   Makepot: Fix translations object handling ([#43797](https://github.com/WordPress/gutenberg/pull/43797)).
 
@@ -116,7 +116,7 @@
 
 ## 2.2.0 (2019-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed Babel plugin for POT file generation to properly handle plural numbers specified in the passed header. ([#13577](https://github.com/WordPress/gutenberg/pull/13577))
 -   Fix extracted translator comments to be written as prefixed by `#.` ([#9440](https://github.com/WordPress/gutenberg/pull/9440))

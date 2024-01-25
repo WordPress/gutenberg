@@ -56,7 +56,7 @@
 
 ## 8.10.0 (2023-10-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Corrected `PATH` to include the host user's Composer bin directory.
 -   Replaced `yoast/phpunit-polyfills` with `phpunit/phpunit` to install the required PHPUnit version, avoiding the need for project-specific polyfills.
@@ -79,7 +79,7 @@
 
 ## 8.1.1 (2023-06-17)
 
-### Bug fix
+### Bug Fixes
 
 -   Address issue where a missing file in the underlying Docker image caused `wp-env` to crash. [#51513](https://github.com/WordPress/gutenberg/pull/51513)
 
@@ -89,7 +89,7 @@
 
 -   Execute the local package's `wp-env` instead of the globally installed version if one is available.
 
-### Bug fix
+### Bug Fixes
 
 -   Run `useradd` with `-l` option to prevent excessive Docker image sizes.
 
@@ -110,7 +110,7 @@
 -   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
 -   Validate whether or not config options exist to prevent accidentally including ones that don't.
 
-### Bug fix
+### Bug Fixes
 
 -   Support Windows without requiring the use of WSL.
 
@@ -129,7 +129,7 @@
 -   Execute the `afterSetup` command on `npx wp-env clean`.
 -   Globally install `composer` and the correct version of `phpunit` in all of the Docker containers.
 
-### Bug fix
+### Bug Fixes
 
 -   Ensure `wordpress`, `tests-wordpress`, `cli`, and `tests-cli` always build the correct Docker image.
 -   Fix Xdebug while using PHP 7.2x.
@@ -159,7 +159,7 @@
 
 ## 5.11.0 (2023-02-01)
 
-### Bug fix
+### Bug Fixes
 
 -   PHP 7.3 and 7.4 must use PHPUnit 9.
 
@@ -191,7 +191,7 @@
 
 ## 5.1.1 (2022-08-16)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix a crash when "core" was set to `null` in a `.wp-env.json` file. We now use the latest stable WordPress version in that case. This also restores the previous behavior of `"core": null` in `.wp-env.override.json`, which was to use the latest stable WordPress version.
 
@@ -201,7 +201,7 @@
 
 -   Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
 
-### Bug Fix
+### Bug Fixes
 
 -   Downloading a default WordPress version also resolves a bug where the wrong WordPress test files were used if no core source was specified in wp-env.json. The current trunk test files were downloaded rather than the stable version. Now, the test files will match the default stable version.
 
@@ -217,7 +217,7 @@
 -   Read WordPress' version and include the corresponding PHPUnit test files in the environment.
 -   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
 
-### Bug Fix
+### Bug Fixes
 
 -   Restrict `WP_TESTS_DOMAIN` constant to just hostname rather than an entire URL (e.g. it now excludes scheme, port, etc.) ([#41039](https://github.com/WordPress/gutenberg/pull/41039)).
 
@@ -241,19 +241,19 @@
 -   Added command `wp-env install-path` to list the directory used for the environment.
 -   The help entry is now shown when no subcommand is passed to `wp-env`.
 
-### Bug Fix
+### Bug Fixes
 
 -   Updated `yargs` to fix [CVE-2021-3807](https://nvd.nist.gov/vuln/detail/CVE-2021-3807).
 
 ## 4.1.3 (2021-11-07)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix Xdebug installation code to ensure it would fail gracefully
 
 ## 4.0.3 (2021-04-29)
 
-### Bug Fix
+### Bug Fixes
 
 -   `wp-env destroy` will now work in environments which don't include the `grep` or `awk` commands, such as Windows PowerShell.
 -   Fix several permissions issues related to wp-config.php and wp-content files.

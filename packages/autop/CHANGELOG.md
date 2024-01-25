@@ -147,13 +147,13 @@
 
 ## 2.3.0 (2019-05-21)
 
-### Bug Fix
+### Bug Fixes
 
 -   `removep` will correctly preserve multi-line paragraph tags where attributes are present.
 
 ## 2.1.0 (2019-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   `autop` correctly matches whitespace preceding and following block-level elements.
 

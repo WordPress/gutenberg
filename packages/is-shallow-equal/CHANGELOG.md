@@ -181,13 +181,13 @@
 
 ## 1.0.2 (2018-05-08)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix: Use implicit `index.js` for main entry ([#124](https://github.com/WordPress/packages/pull/124))
 
 ## 1.0.1 (2018-05-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix: Passing a null-ish value as one of the arguments now correctly falls back to a strict equality comparison. ([#116](https://github.com/WordPress/packages/pull/116))
 

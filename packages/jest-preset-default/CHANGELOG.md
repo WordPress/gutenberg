@@ -107,19 +107,19 @@
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 8.5.2 (2022-08-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
 
 ## 8.5.1 (2022-08-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
 
@@ -136,13 +136,13 @@
 
 ## 7.1.2 (2021-10-22)
 
-### Bug Fix
+### Bug Fixes
 
 -   Provide more complete mocks of browser timing functions. ([#35368](https://github.com/WordPress/gutenberg/pull/35368))
 
 ## 7.1.1 (2021-09-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   Restore the default setting for the `verbose` option. In effect, each test won't get reported during the run ([#34327](https://github.com/WordPress/gutenberg/pull/34327)).
 

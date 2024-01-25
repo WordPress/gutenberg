@@ -100,7 +100,7 @@
 
 ## 4.16.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -149,7 +149,7 @@
 
 ## 3.7.0 (2020-02-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Change the `isGenerator` check for better compatibility with generator helper libraries ([#19666](https://github.com/WordPress/gutenberg/pull/19666)).
 
@@ -166,7 +166,7 @@
 
 ## 3.0.2 (2018-10-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
 

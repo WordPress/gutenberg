@@ -157,7 +157,7 @@
 
 ## 1.3.1 (2020-04-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   Hide TypeScript type declarations ([#21613](https://github.com/WordPress/gutenberg/pull/21613))
     after they were found to conflict with DefinitelyTyped provided declarations.

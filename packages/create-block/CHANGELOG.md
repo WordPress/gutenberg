@@ -149,7 +149,7 @@
 
 ## 3.2.0 (2022-05-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the `.editorconfig` file include to work correctly with YAML files ([#40994](https://github.com/WordPress/gutenberg/pull/40994)).
 
@@ -267,7 +267,7 @@
 
 ## 2.0.1 (2021-02-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   Extract the package name from the value passed as an external template ([#28383](https://github.com/WordPress/gutenberg/pull/28383)).
 
@@ -294,19 +294,19 @@
 -   Adds the `npmDependencies` field to the template configuration. It allows listing remote npm dependencies that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 -   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Print the block class name in the `save` method in scaffolded templates ([#27988](https://github.com/WordPress/gutenberg/pull/27988)).
 
 ## 1.0.2 (2020-12-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
 
 ## 1.0.1 (2020-12-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix support for external templates hosted on npm.
 
@@ -334,7 +334,7 @@
 
 -   Generate `block.json` file with all metadata necessary for Block Directory ([#23399](https://github.com/WordPress/gutenberg/pull/23399)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the error in the scaffolding process caused by the missing `scripts` section in `package.json` file ([#23443](https://github.com/WordPress/gutenberg/pull/23443)).
 
@@ -346,13 +346,13 @@
 
 ## 0.14.2 (2020-06-16)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix errors reported by CSS linter in ESNext template by using hex colors in CSS files ([#23188](https://github.com/WordPress/gutenberg/pull/23188)).
 
 ## 0.14.1 (2020-06-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix an error reported by JavaScript linter by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
 
@@ -432,7 +432,7 @@
 
 ## 0.4.3 (2020-01-08)
 
-### Bug Fix
+### Bug Fixes
 
 -   Print available commands only for ESNext template.
 
@@ -448,7 +448,7 @@
 
 ## 0.3.2 (2019-12-16)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the paths pointing to the JS build file listed in PHP file in the ESNext template.
 

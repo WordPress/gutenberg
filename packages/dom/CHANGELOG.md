@@ -163,7 +163,7 @@
 
 ## 2.1.0 (2019-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   Update `isHorizontalEdge` to account for empty text nodes.
 -   `tabbables.find` considers at most a single radio input for a given name. The checked input is given priority, falling back to the first in the tabindex-sorted set if there is no checked input.

@@ -162,7 +162,7 @@
 
 ## 12.2.0 (2022-05-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the `recommended` preset when Prettier is not installed ([#40634](https://github.com/WordPress/gutenberg/pull/40634)).
 
@@ -178,7 +178,7 @@
 
 -   The integration with [Prettier](https://prettier.io) is now optional and gets activated when the `prettier` package is installed in the project ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
 
@@ -203,7 +203,7 @@
 
 -   Omit verification for WordPress dependencies in the import statements since they get externalized when used with WordPress ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix Babel config resolution when a custom ESLint config present ([#37406](https://github.com/WordPress/gutenberg/pull/37406)). Warning: it won't recognize the `babel.config.json` file present in the project until the upstream bug in `cosmiconfig` is fixed.
 
@@ -220,19 +220,19 @@
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Use Jest related rules only when the `jest` package is installed ([#33120](https://github.com/WordPress/gutenberg/pull/33120)).
 
 ## 9.1.2 (2021-09-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   The recommended configuration will now respect `type` imports in TypeScript files ([#34055](https://github.com/WordPress/gutenberg/pull/34055)).
 
 ## 9.1.1 (2021-08-23)
 
-### Bug Fix
+### Bug Fixes
 
 -   Include `.jsx` extension when linting import statements in case TypeScript not present ([#33746](https://github.com/WordPress/gutenberg/pull/33746)).
 
@@ -244,7 +244,7 @@
 
 ## 9.0.1 (2021-03-19)
 
-### Bug Fix
+### Bug Fixes
 
 -   Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
 
@@ -261,7 +261,7 @@
 
 ## 8.0.1 (2021-01-28)
 
-### Bug Fix
+### Bug Fixes
 
 -   Add missing `eslint-plugin-import` npm dependency ([#28545](https://github.com/WordPress/gutenberg/pull/28545)).
 
@@ -406,7 +406,7 @@
 
 ## 3.4.1 (2020-02-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed `plugin:prettier/recommended` from `recommended` ruleset as it introduces breaking changes.
 
@@ -455,7 +455,7 @@
 
 ## 2.3.0 (2019-06-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
 -   Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).

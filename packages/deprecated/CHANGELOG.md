@@ -143,7 +143,7 @@
 
 ## 2.6.0 (2019-08-29)
 
-### Bug Fix
+### Bug Fixes
 
 -   When there is no `options.version` param provided `deprecated` method warns with more relaxed tone.
 

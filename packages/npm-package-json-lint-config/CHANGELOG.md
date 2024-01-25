@@ -98,7 +98,7 @@
 
 ## 4.2.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -132,7 +132,7 @@
 
 ## 1.1.3 (2018-09-05)
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
 
