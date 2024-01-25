@@ -7,6 +7,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -14,6 +15,7 @@ import _CustomSelect from '../custom-select';
 import type { LegacyCustomSelectProps } from '../types';
 import { CustomSelectItem } from '..';
 import { ExperimentalHint, ExperimentalHintItem } from '../styles';
+import { ContextSystemProvider } from '../../context';
 
 function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	const {
@@ -22,7 +24,6 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		__nextUnconstrainedWidth,
 		options,
 		onChange,
-		// TO-DO 'default' should be the 'compact' size
 		size = 'default',
 		value: valueProp,
 		...restProps
@@ -114,6 +115,11 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		);
 	};
 
+	const customSelectButtonContext = useMemo(
+		() => ( { CustomSelectButton: { _overrides: { size } } } ),
+		[ size ]
+	);
+
 	const translatedProps = {
 		'aria-describedby': props.describedBy,
 		children,
@@ -121,22 +127,17 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 			? renderSelectedValueHint
 			: undefined,
 		size:
-			__next40pxDefaultSize || size === '__unstable-large'
+			( __next40pxDefaultSize && size === 'default' ) ||
+			size === '__unstable-large'
 				? 'default'
 				: size,
 		...restProps,
 	};
 
 	return (
-		<_CustomSelect
-			{ ...translatedProps }
-			store={ store }
-			style={ {
-				gridTemplateColumns: __experimentalShowSelectedHint
-					? 'auto 1fr 30px'
-					: undefined,
-			} }
-		/>
+		<ContextSystemProvider value={ customSelectButtonContext }>
+			<_CustomSelect { ...translatedProps } store={ store } />
+		</ContextSystemProvider>
 	);
 }
 

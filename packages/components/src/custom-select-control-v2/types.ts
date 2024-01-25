@@ -18,26 +18,12 @@ export type CustomSelectStore = {
 
 export type CustomSelectContext = CustomSelectStore | undefined;
 
-export type CustomSelectProps = {
-	/**
-	 * The child elements. This should be composed of CustomSelectItem components.
-	 */
-	children: React.ReactNode;
+export type CustomSelectButtonProps = {
 	/**
 	 * An optional default value for the control. If left `undefined`, the first
 	 * non-disabled item will be used.
 	 */
-	defaultValue: string | string[];
-	/**
-	 * Used to visually hide the label. It will always be visible to screen readers.
-	 *
-	 * @default false
-	 */
-	hideLabelFromVision?: boolean;
-	/**
-	 * Label for the control.
-	 */
-	label: string;
+	defaultValue?: string | string[];
 	/**
 	 * A function that receives the new value of the input.
 	 */
@@ -53,17 +39,31 @@ export type CustomSelectProps = {
 	 *
 	 * @default default
 	 */
-	size?: 'compact' | 'default' | 'small';
+	size?: 'compact' | 'default';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: string | string[];
 };
 
-export type DefaultCustomSelectProps = Omit<
-	CustomSelectProps,
-	'defaultValue'
->;
+export type _CustomSelectProps = {
+	/**
+	 * The child elements. This should be composed of CustomSelectItem components.
+	 */
+	children: React.ReactNode;
+	/**
+	 * Used to visually hide the label. It will always be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
+	/**
+	 * Label for the control.
+	 */
+	label: string;
+};
+
+export type CustomSelectProps = _CustomSelectProps & CustomSelectButtonProps;
 
 /**
  * The legacy object structure for the options array.

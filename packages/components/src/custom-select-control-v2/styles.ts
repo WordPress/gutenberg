@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 /**
  * Internal dependencies
@@ -30,12 +31,6 @@ export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	margin-bottom: ${ space( 2 ) };
 `;
 
-const inputHeights = {
-	compact: 32,
-	default: 40,
-	small: 24,
-};
-
 export const CustomSelectButton = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
@@ -46,31 +41,54 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 	size: NonNullable< CustomSelectProps[ 'size' ] >;
 	hasCustomRenderProp: boolean;
 } ) => {
-	const isSmallSize = size === 'small' && ! hasCustomRenderProp;
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
 
-	return {
-		textAlign: 'left',
-		display: 'grid',
-		gridTemplateColumns: 'auto auto',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		backgroundColor: COLORS.white,
-		border: `1px solid ${ COLORS.gray[ 600 ] }`,
-		borderRadius: space( 0.5 ),
-		cursor: 'pointer',
-		width: '100%',
-		[ heightProperty ]: `${ inputHeights[ size ] }px`,
-		// fix with sizing
-		// padding: isSmallSize ? space( 2 ) : space( 4 ),
-		fontSize: isSmallSize ? '11px' : '13px',
-		'&[data-focus-visible]': {
-			outlineStyle: 'solid',
-		},
-		'&[aria-expanded="true"]': {
-			outlineStyle: `1.5px solid ${ COLORS.theme.accent }`,
-		},
+	const getSize = () => {
+		const sizes = {
+			compact: {
+				[ heightProperty ]: 32,
+				paddingLeft: space( 2 ),
+				paddingRight: space( 2 ),
+			},
+			default: {
+				[ heightProperty ]: 40,
+				paddingLeft: space( 4 ),
+				paddingRight: space( 4 ),
+			},
+			small: {
+				[ heightProperty ]: 24,
+				paddingLeft: space( 2 ),
+				paddingRight: space( 2 ),
+				fontSize: 11,
+			},
+			'__unstable-large': {
+				[ heightProperty ]: 40,
+				paddingLeft: space( 4 ),
+				paddingRight: space( 4 ),
+			},
+		};
+
+		return sizes[ size ] || sizes.default;
 	};
+
+	return css`
+		text-align: left;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-content: center;
+		background-color: ${ COLORS.white };
+		border: 1px solid ${ COLORS.gray[ 600 ] };
+		border-radius: ${ space( 0.5 ) };
+		cursor: pointer;
+		width: 100%;
+		&[data-focus-visible] {
+			outline-style: solid;
+		}
+		&[aria-expanded='true'] {
+			outline-style: 1.5px solid ${ COLORS.theme.accent };
+		}
+		${ getSize() }
+	`;
 } );
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`

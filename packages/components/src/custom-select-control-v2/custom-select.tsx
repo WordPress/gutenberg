@@ -15,17 +15,22 @@ import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '..';
 import * as Styled from './styles';
 import type {
-	DefaultCustomSelectProps,
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
+	CustomSelectButtonProps,
+	_CustomSelectProps,
 } from './types';
-import type { WordPressComponentProps } from '../context';
+import {
+	contextConnectWithoutRef,
+	useContextSystem,
+	type WordPressComponentProps,
+} from '../context';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
 
 function defaultRenderSelectedValue(
-	value: DefaultCustomSelectProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'value' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
@@ -45,28 +50,58 @@ function defaultRenderSelectedValue(
 	return value;
 }
 
-export function _CustomSelect( {
-	children,
-	defaultValue,
-	hideLabelFromVision = false,
-	label,
-	onChange,
-	size = 'default',
-	value,
-	renderSelectedValue,
-	store,
-	...props
-}: WordPressComponentProps<
-	DefaultCustomSelectProps & CustomSelectStore,
-	'button',
-	false
-> ) {
+const UnconnectedCustomSelectButton = (
+	props: WordPressComponentProps<
+		CustomSelectButtonProps & CustomSelectStore,
+		'button',
+		false
+	>
+) => {
+	const {
+		defaultValue,
+		renderSelectedValue,
+		onChange,
+		size = 'default',
+		store,
+		value,
+		...restProps
+	} = useContextSystem( props, 'CustomSelectButton' );
+
 	const { value: currentValue } = store.useState();
 
 	const computedRenderSelectedValue = useMemo(
 		() => renderSelectedValue ?? defaultRenderSelectedValue,
 		[ renderSelectedValue ]
 	);
+
+	return (
+		<Styled.CustomSelectButton
+			{ ...restProps }
+			size={ size }
+			hasCustomRenderProp={ !! renderSelectedValue }
+			store={ store }
+		>
+			{ computedRenderSelectedValue( currentValue ) }
+			<Ariakit.SelectArrow />
+		</Styled.CustomSelectButton>
+	);
+};
+
+const CustomSelectButton = Object.assign(
+	contextConnectWithoutRef(
+		UnconnectedCustomSelectButton,
+		'CustomSelectButton'
+	)
+);
+
+function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
+	const {
+		children,
+		hideLabelFromVision = false,
+		label,
+		store,
+		...restProps
+	} = props;
 
 	return (
 		<>
@@ -77,15 +112,7 @@ export function _CustomSelect( {
 					{ label }
 				</Styled.CustomSelectLabel>
 			) }
-			<Styled.CustomSelectButton
-				{ ...props }
-				size={ size }
-				hasCustomRenderProp={ !! renderSelectedValue }
-				store={ store }
-			>
-				{ computedRenderSelectedValue( currentValue ) }
-				<Ariakit.SelectArrow />
-			</Styled.CustomSelectButton>
+			<CustomSelectButton { ...restProps } store={ store } />
 			<Styled.CustomSelectPopover
 				gutter={ 12 }
 				store={ store }
