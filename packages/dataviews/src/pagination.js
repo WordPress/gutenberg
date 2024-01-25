@@ -29,7 +29,7 @@ const Pagination = memo( function Pagination( {
 			>
 				<HStack justify="flex-start" expanded={ false } spacing={ 1 }>
 					<SelectControl
-						aria-label={ __( 'Current page' ) }
+						label={ __( 'Current page' ) }
 						value={ view.page }
 						className="dataviews-pagination__page-selector"
 						options={ Array.from( Array( totalPages ) ).map(
@@ -44,8 +44,9 @@ const Pagination = memo( function Pagination( {
 								page: +newValue,
 							} );
 						} }
-						size={ 'compact' }
+						size="compact"
 						__nextHasNoMarginBottom
+						hideLabelFromVision
 					/>
 					<span>
 						{ sprintf(
