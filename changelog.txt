@@ -1,5 +1,39 @@
 == Changelog ==
 
+= 17.6.0-rc.2 =
+
+## Changelog
+
+### Enhancements
+
+#### Font Library
+- Font Library: Refactor stylesheet using CSS variables ([#58237]https://github.com/WordPress/gutenberg/pull/58237)
+
+### Bug Fixes
+
+#### Interactivity API
+
+- Prevent usage of `gutenberg_url` in block-library([#58242]https://github.com/WordPress/gutenberg/pull/58242)
+
+#### Font Library
+- Removed <header> <main> and <footer> elements from Font Library Modal ([#58221]https://github.com/WordPress/gutenberg/pull/58221)
+
+
+### Experiments
+
+#### Design Tools
+- Dimensions: Add Aspect Ratio block support. ([#56897](https://github.com/WordPress/gutenberg/pull/56897))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @t-hamano @luisherranz @pbking 
+
+
 = 17.6.0-rc.1 =
 
 
