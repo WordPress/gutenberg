@@ -168,7 +168,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 			add_action( $position, array( $this, 'print_enqueued_script_modules' ) );
 			add_action( $position, array( $this, 'print_script_module_preloads' ) );
 			// Prints the script that loads the import map polyfill in the footer.
-			add_action( 'wp_head', array( $this, 'print_import_map_polyfill' ), 11 );
+			add_action( 'wp_footer', array( $this, 'print_import_map_polyfill' ), 11 );
 		}
 
 		/**
