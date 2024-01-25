@@ -22,6 +22,7 @@ const MAX_MONTHS_TO_QUERY = 4;
 // The following paths will be ignored when generating the issue content.
 const IGNORED_PATHS = [
 	'lib/load.php', // plugin specific code.
+	'lib/client-assets.php', // plugin specific code.
 	'lib/experiments-page.php', // experiments are plugin specific.
 	'packages/e2e-tests/plugins', // PHP files related to e2e tests only.
 	'packages/block-library', // this is handled automatically.
