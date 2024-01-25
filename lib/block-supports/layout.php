@@ -820,7 +820,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 
 		$class_attribute = $processor->get_attribute( 'class' );
-		if ( is_string( $class_attribute ) && false !== strpos( $class_attribute, $inner_block_wrapper_classes ) ) {
+		if ( is_string( $class_attribute ) && str_contains( $class_attribute, $inner_block_wrapper_classes ) ) {
 			break;
 		}
 	} while ( $processor->next_tag() );
