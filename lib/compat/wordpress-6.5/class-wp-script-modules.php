@@ -236,7 +236,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		 */
 		public function print_import_map_polyfill() {
 			$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
-			$src  = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/importmap-polyfill.min.js' ),
+			$src  = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/importmap-polyfill.min.js' );
 
 			echo (
 			// Test presence of feature...
