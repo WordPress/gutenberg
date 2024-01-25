@@ -141,6 +141,8 @@ _Related_
 
 ### pure
 
+> **Deprecated** Use `memo` or `PureComponent` instead.
+
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
 
 ### throttle

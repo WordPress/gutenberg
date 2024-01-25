@@ -80,6 +80,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"randomOrder": {
+			"type": "boolean",
+			"default": false
+		},
 		"fixedHeight": {
 			"type": "boolean",
 			"default": true

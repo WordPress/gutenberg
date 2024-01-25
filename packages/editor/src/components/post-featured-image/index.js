@@ -98,17 +98,15 @@ function PostFeaturedImage( {
 } ) {
 	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
-	const mediaUpload = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().mediaUpload;
-	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
 	);
 
 	function onDropFiles( filesList ) {
-		mediaUpload( {
-			allowedTypes: [ 'image' ],
+		getSettings().mediaUpload( {
+			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {

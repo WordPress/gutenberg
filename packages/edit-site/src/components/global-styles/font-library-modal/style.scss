@@ -24,7 +24,7 @@
 	}
 }
 
-.font-library-modal__tab-layout {
+.font-library-modal__tabpanel-layout {
 
 	main {
 		padding-bottom: 4rem;
@@ -51,6 +51,7 @@
 
 .font-library-modal__font-card {
 	border: 1px solid #e5e5e5;
+	width: 100%;
 	height: auto;
 	padding: 1rem;
 	margin-top: -1px; /* To collapse the margin with the previous element */
@@ -75,7 +76,7 @@
 	padding-bottom: 1rem;
 }
 
-.font-library-modal__tab-panel {
+.font-library-modal__tabs {
 	[role="tablist"] {
 		position: sticky;
 		top: 0;
@@ -94,6 +95,9 @@
 	justify-content: center;
 	height: 250px;
 	width: 100%;
+}
+
+button.font-library-modal__upload-area {
 	background-color: #f0f0f0;
 }
 

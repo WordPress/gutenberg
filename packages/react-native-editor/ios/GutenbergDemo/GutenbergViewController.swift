@@ -399,7 +399,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergInitialTitle() -> String? {
-        return nil
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        return initialProps["initialTitle"]
     }
 
     func gutenbergHostAppNamespace() -> String {

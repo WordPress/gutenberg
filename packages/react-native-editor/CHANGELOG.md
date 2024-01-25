@@ -10,6 +10,20 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.111.1
+-   [**] Video block: Fix logic for displaying empty state based on source presence [#58015]
+-   [**] Fix crash when RichText values are not defined [#58088]
+
+## 1.111.0
+-   [**] Image block media uploads display a custom error message when there is no internet connection [#56937]
+-   [*] Fix missing custom color indicator for custom gradients [#57605]
+-   [**] Display a notice when a network connection unavailable [#56934]
+
+## 1.110.1
+-   [**] Fix crash when RichText values are not defined [#58088]
+
+## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
 -   [*] Fix crash when blockType wrapperProps are not defined [#56846]
@@ -18,6 +32,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix regressions with wrapper props and font size customization [#56985]
 -   [***] Avoid keyboard dismiss when interacting with text blocks [#57070]
 -   [**] Auto-scroll upon block insertion [#57273]
+-   [*] Unselect blocks using the hardware back button (Android) [#57279]
 
 ## 1.109.3
 -   [**] Fix duplicate/unresponsive options in font size settings. [#56985]

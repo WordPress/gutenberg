@@ -31,7 +31,7 @@ namespace() {
 	awk -F: '
 		{ print module($1), $2 }
 		function module(path) {
-			n = split(path, parts, "/")
+			split(path, parts, "/")
 			if (parts[1] == "lib") return "lib"
 			return parts[1] "/" parts[2]
 		}'

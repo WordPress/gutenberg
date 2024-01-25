@@ -17,6 +17,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { store as editPostStore } from '.';
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -28,7 +29,7 @@ export const openGeneralSidebar =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( isDistractionFree ) {
 			dispatch.toggleDistractionFree();
 		}
@@ -194,9 +195,7 @@ export const toggleFeature =
 export const switchEditorMode =
 	( mode ) =>
 	( { dispatch, registry } ) => {
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'editorMode', mode );
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		// Unselect blocks when we switch to the code editor.
 		if ( mode !== 'visual' ) {
@@ -205,9 +204,7 @@ export const switchEditorMode =
 
 		if (
 			mode === 'text' &&
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'distractionFree' )
+			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
 		) {
 			dispatch.toggleDistractionFree();
 		}
@@ -291,21 +288,7 @@ export const updatePreferredStyleVariations =
 export const showBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const newBlockNames = existingBlockNames.filter(
-			( type ) =>
-				! (
-					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
-				).includes( type )
-		);
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', newBlockNames );
+		unlock( registry.dispatch( editorStore ) ).showBlockTypes( blockNames );
 	};
 
 /**
@@ -316,21 +299,7 @@ export const showBlockTypes =
 export const hideBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const mergedBlockNames = new Set( [
-			...existingBlockNames,
-			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
-		] );
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', [
-				...mergedBlockNames,
-			] );
+		unlock( registry.dispatch( editorStore ) ).hideBlockTypes( blockNames );
 	};
 
 /**
@@ -580,12 +549,12 @@ export const toggleDistractionFree =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-post', 'fixedToolbar', true );
+					.set( 'core', 'fixedToolbar', true );
 				registry.dispatch( editorStore ).setIsInserterOpened( false );
 				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
@@ -594,11 +563,7 @@ export const toggleDistractionFree =
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
-				.set(
-					'core/edit-post',
-					'distractionFree',
-					! isDistractionFree
-				);
+				.set( 'core', 'distractionFree', ! isDistractionFree );
 			registry
 				.dispatch( noticesStore )
 				.createInfoNotice(
@@ -608,6 +573,16 @@ export const toggleDistractionFree =
 					{
 						id: 'core/edit-post/distraction-free-mode/notice',
 						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry
+										.dispatch( preferencesStore )
+										.toggle( 'core', 'distractionFree' );
+								},
+							},
+						],
 					}
 				);
 		} );

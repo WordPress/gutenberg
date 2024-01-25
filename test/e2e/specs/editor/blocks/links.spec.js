@@ -445,6 +445,9 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'Enter' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		// Close the link control to return the caret to the canvas
+		await pageUtils.pressKeys( 'Escape' );
 
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
@@ -612,6 +615,13 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'w.org' );
 
 		await page.keyboard.press( 'Enter' );
+		// Close the link control to return the caret to the canvas
+		const linkPopover = LinkUtils.getLinkPopover();
+		await pageUtils.pressKeys( 'Escape' );
+		// Deselect the link text by moving the caret to the end of the line
+		// and the link popover should not be displayed.
+		await pageUtils.pressKeys( 'End' );
+		await expect( linkPopover ).toBeHidden();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -634,17 +644,12 @@ test.describe( 'Links', () => {
 		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
-		const linkPopover = LinkUtils.getLinkPopover();
-
 		// Update the link.
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
-		// Navigate back to the popover.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Navigate back to inputs to verify appears as changed.
-		await pageUtils.pressKeys( 'primary+k' );
+		// Navigate back to the link editing state inputs to verify appears as changed.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
 
 		expect(
 			await page
@@ -683,20 +688,21 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Escape' );
 
 		// Move to edge of text "Gutenberg".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await pageUtils.pressKeys( 'ArrowLeft' );
 
 		// Select "Gutenberg".
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowRight' );
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
-
+		await page.keyboard.press( 'Escape' );
+		await pageUtils.pressKeys( 'End' );
 		// Move back into the link.
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+k' );
@@ -1054,6 +1060,9 @@ test.describe( 'Links', () => {
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
+			await pageUtils.pressKeys( 'Escape' );
+			await pageUtils.pressKeys( 'ArrowRight' );
+
 			// Reactivate the link.
 			await pageUtils.pressKeys( 'ArrowLeft' );
 			await pageUtils.pressKeys( 'ArrowLeft' );
@@ -1117,11 +1126,10 @@ test.describe( 'Links', () => {
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
+			await pageUtils.pressKeys( 'Escape' );
 
 			// Move cursor next to the **end** of `linkTextOne`
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: linkedTextTwo.length,
-			} );
+			await pageUtils.pressKeys( 'ArrowLeft' );
 
 			// Select `linkTextOne`
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
@@ -1134,6 +1142,8 @@ test.describe( 'Links', () => {
 
 			// Update the link.
 			await pageUtils.pressKeys( 'Enter' );
+			await pageUtils.pressKeys( 'Escape' );
+			await pageUtils.pressKeys( 'ArrowRight' );
 
 			// Move cursor within `linkTextOne`
 			await pageUtils.pressKeys( 'ArrowLeft', {
@@ -1146,8 +1156,8 @@ test.describe( 'Links', () => {
 			await expect( linkPopover ).toBeVisible();
 
 			// Expand selection so that it overlaps with `linkTextTwo`
-			await pageUtils.pressKeys( 'ArrowRight', {
-				times: 3,
+			await pageUtils.pressKeys( 'Shift+ArrowRight', {
+				times: 6,
 			} );
 
 			// Link UI should be inactive.
@@ -1228,10 +1238,10 @@ class LinkUtils {
 		await this.page.evaluate( ( _isFixed ) => {
 			const { select, dispatch } = window.wp.data;
 			const isCurrentlyFixed =
-				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+				select( 'core/preferences' ).get( 'fixedToolbar' );
 
 			if ( isCurrentlyFixed !== _isFixed ) {
-				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+				dispatch( 'core/preferences' ).toggle( 'fixedToolbar' );
 			}
 		}, isFixed );
 	}
@@ -1254,6 +1264,8 @@ class LinkUtils {
 
 		// Click on the Submit button.
 		await this.pageUtils.pressKeys( 'Enter' );
+		await this.pageUtils.pressKeys( 'Escape' );
+		await this.pageUtils.pressKeys( 'End' );
 
 		// Reselect the link.
 		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );

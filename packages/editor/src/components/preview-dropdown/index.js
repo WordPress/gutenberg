@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { check, desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -20,25 +21,21 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 
-export default function PreviewDropdown( {
-	showIconLabels,
-	forceIsAutosaveable,
-	disabled,
-} ) {
-	const { deviceType, homeUrl, isTemplate, isViewable } = useSelect(
-		( select ) => {
+export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
+	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
+		useSelect( ( select ) => {
 			const { getDeviceType, getCurrentPostType } = select( editorStore );
 			const { getUnstableBase, getPostType } = select( coreStore );
+			const { get } = select( preferencesStore );
 			const _currentPostType = getCurrentPostType();
 			return {
 				deviceType: getDeviceType(),
 				homeUrl: getUnstableBase()?.home,
 				isTemplate: _currentPostType === 'wp_template',
 				isViewable: getPostType( _currentPostType )?.viewable ?? false,
+				showIconLabels: get( 'core', 'showIconLabels' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) return null;

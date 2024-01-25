@@ -8,7 +8,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 
-import { default as DEFAULT_VIEWS } from './default-views';
+import { DEFAULT_VIEWS } from './default-views';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 import DataViewItem from './dataview-item';
@@ -47,11 +47,13 @@ export default function DataViewsSidebarContent() {
 					);
 				} ) }
 			</ItemGroup>
-			<CustomDataViewsList
-				activeView={ activeView }
-				type={ type }
-				isCustom="true"
-			/>
+			{ window?.__experimentalAdminViews && (
+				<CustomDataViewsList
+					activeView={ activeView }
+					type={ type }
+					isCustom="true"
+				/>
+			) }
 		</>
 	);
 }

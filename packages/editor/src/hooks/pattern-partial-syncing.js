@@ -5,7 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
-import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -31,43 +30,41 @@ const {
  */
 const withPartialSyncingControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const blockEditingMode = useBlockEditingMode();
-		const hasCustomFieldsSupport = hasBlockSupport(
-			props.name,
-			'__experimentalConnections',
-			false
-		);
-		const isEditingPattern = useSelect(
-			( select ) =>
-				select( editorStore ).getCurrentPostType() ===
-				PATTERN_TYPES.user,
-			[]
-		);
-
-		const shouldShowPartialSyncingControls =
-			hasCustomFieldsSupport &&
-			props.isSelected &&
-			isEditingPattern &&
-			blockEditingMode === 'default' &&
-			Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-				props.name
-			);
+		const isSupportedBlock = Object.keys(
+			PARTIAL_SYNCING_SUPPORTED_BLOCKS
+		).includes( props.name );
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ shouldShowPartialSyncingControls && (
-					<PartialSyncingControls { ...props } />
+				{ props.isSelected && isSupportedBlock && (
+					<ControlsWithStoreSubscription { ...props } />
 				) }
 			</>
 		);
 	}
 );
 
-if ( window.__experimentalPatternPartialSyncing ) {
-	addFilter(
-		'editor.BlockEdit',
-		'core/editor/with-partial-syncing-controls',
-		withPartialSyncingControls
+// Split into a separate component to avoid a store subscription
+// on every block.
+function ControlsWithStoreSubscription( props ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isEditingPattern = useSelect(
+		( select ) =>
+			select( editorStore ).getCurrentPostType() === PATTERN_TYPES.user,
+		[]
+	);
+
+	return (
+		isEditingPattern &&
+		blockEditingMode === 'default' && (
+			<PartialSyncingControls { ...props } />
+		)
 	);
 }
+
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/with-partial-syncing-controls',
+	withPartialSyncingControls
+);

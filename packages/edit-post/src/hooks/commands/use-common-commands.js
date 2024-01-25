@@ -9,7 +9,7 @@ import {
 	drawerRight,
 	blockDefault,
 	keyboard,
-	desktop,
+	fullscreen,
 	listView,
 	external,
 	formatListBullets,
@@ -39,12 +39,17 @@ export default function useCommonCommands() {
 		editorMode,
 		activeSidebar,
 		isListViewOpen,
+		isFullscreen,
 		isPublishSidebarEnabled,
 		showBlockBreadcrumbs,
 		isDistractionFree,
+		isTopToolbar,
+		isFocusMode,
 	} = useSelect( ( select ) => {
-		const { getEditorMode, isFeatureActive } = select( editPostStore );
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editPostStore );
 		const { isListViewOpened } = select( editorStore );
+
 		return {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editPostStore.name
@@ -53,11 +58,11 @@ export default function useCommonCommands() {
 			isListViewOpen: isListViewOpened(),
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
-			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
-			isDistractionFree: select( preferencesStore ).get(
-				editPostStore.name,
-				'distractionFree'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
+			isFocusMode: get( 'core', 'focusMode' ),
+			isTopToolbar: get( 'core', 'fixedToolbar' ),
+			isFullscreen: get( 'core/edit-post', 'fullscreenMode' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
@@ -96,7 +101,9 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/toggle-distraction-free',
-		label: __( 'Toggle distraction free' ),
+		label: isDistractionFree
+			? __( 'Exit Distraction Free' )
+			: __( 'Enter Distraction Free ' ),
 		callback: ( { close } ) => {
 			toggleDistractionFree();
 			close();
@@ -105,30 +112,71 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/toggle-spotlight-mode',
-		label: __( 'Toggle spotlight mode' ),
+		label: __( 'Toggle spotlight' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
+			createInfoNotice(
+				isFocusMode ? __( 'Spotlight off.' ) : __( 'Spotlight on.' ),
+				{
+					id: 'core/edit-post/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-fullscreen-mode',
-		label: __( 'Toggle fullscreen mode' ),
-		icon: desktop,
+		label: isFullscreen
+			? __( 'Exit fullscreen' )
+			: __( 'Enter fullscreen' ),
+		icon: fullscreen,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fullscreenMode' );
 			close();
+			createInfoNotice(
+				isFullscreen ? __( 'Fullscreen off.' ) : __( 'Fullscreen on.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core/edit-post', 'fullscreenMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
+		label: isListViewOpen
+			? __( 'Close List View' )
+			: __( 'Open List View' ),
 		icon: listView,
 		callback: ( { close } ) => {
 			setIsListViewOpened( ! isListViewOpen );
 			close();
+			createInfoNotice(
+				isListViewOpen ? __( 'List View off.' ) : __( 'List View on.' ),
+				{
+					id: 'core/edit-post/toggle-list-view/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
@@ -136,17 +184,37 @@ export default function useCommonCommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
 			close();
+			createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar off.' )
+					: __( 'Top toolbar on.' ),
+				{
+					id: 'core/edit-post/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-code-editor',
-		label: __( 'Toggle code editor' ),
+		label:
+			editorMode === 'visual'
+				? __( 'Open code editor' )
+				: __( 'Exit code editor' ),
 		icon: code,
 		callback: ( { close } ) => {
 			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
@@ -177,7 +245,7 @@ export default function useCommonCommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
@@ -194,16 +262,16 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-publish-sidebar',
 		label: isPublishSidebarEnabled
-			? __( 'Disable pre-publish checklist' )
-			: __( 'Enable pre-publish checklist' ),
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
 			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
-					? __( 'Pre-publish checklist off.' )
-					: __( 'Pre-publish checklist on.' ),
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
 				{
 					id: 'core/edit-post/publish-sidebar/notice',
 					type: 'snackbar',

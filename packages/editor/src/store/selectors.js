@@ -1152,7 +1152,7 @@ export const isEditorPanelEnabled = createRegistrySelector(
 		// For backward compatibility, we check edit-post
 		// even though now this is in "editor" package.
 		const inactivePanels = select( preferencesStore ).get(
-			'core/edit-post',
+			'core',
 			'inactivePanels'
 		);
 		return (
@@ -1176,7 +1176,7 @@ export const isEditorPanelOpened = createRegistrySelector(
 		// For backward compatibility, we check edit-post
 		// even though now this is in "editor" package.
 		const openPanels = select( preferencesStore ).get(
-			'core/edit-post',
+			'core',
 			'openPanels'
 		);
 		return !! openPanels?.includes( panelName );

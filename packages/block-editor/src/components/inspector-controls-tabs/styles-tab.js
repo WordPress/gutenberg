@@ -46,6 +46,7 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ __( 'Border' ) } />
+			<InspectorControls.Slot group="effects" label={ __( 'Effects' ) } />
 			<InspectorControls.Slot group="styles" />
 		</>
 	);
