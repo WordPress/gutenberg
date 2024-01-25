@@ -567,7 +567,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
-			wp_enqueue_script_module( '@wordpress/block-library/navigation-block' );
+			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
 		}
 	}
 

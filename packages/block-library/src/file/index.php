@@ -38,7 +38,7 @@ function render_block_core_file( $attributes, $content ) {
 
 	// If it's interactive, enqueue the script module and add the directives.
 	if ( ! empty( $attributes['displayPreview'] ) ) {
-		wp_enqueue_script_module( '@wordpress/block-library/file-block' );
+		wp_enqueue_script_module( '@wordpress/block-library/file' );
 
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
