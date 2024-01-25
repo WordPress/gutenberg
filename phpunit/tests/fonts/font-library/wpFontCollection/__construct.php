@@ -13,32 +13,50 @@
 class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 
 	public function test_should_initialize_data() {
-		$property = new ReflectionProperty( WP_Font_Collection::class, 'config' );
-		$property->setAccessible( true );
+		$slug = new ReflectionProperty( WP_Font_Collection::class, 'slug' );
+		$slug->setAccessible( true );
 
-		$config          = array(
+		$name = new ReflectionProperty( WP_Font_Collection::class, 'name' );
+		$name->setAccessible( true );
+
+		$description = new ReflectionProperty( WP_Font_Collection::class, 'description' );
+		$description->setAccessible( true );
+
+		$src = new ReflectionProperty( WP_Font_Collection::class, 'src' );
+		$src->setAccessible( true );
+
+		$config     = array(
 			'slug'        => 'my-collection',
 			'name'        => 'My Collection',
 			'description' => 'My collection description',
 			'src'         => 'my-collection-data.json',
 		);
-		$font_collection = new WP_Font_Collection( $config );
+		$collection = new WP_Font_Collection( $config );
 
-		$actual = $property->getValue( $font_collection );
-		$property->setAccessible( false );
+		$actual_slug = $slug->getValue( $collection );
+		$this->assertSame( 'my-collection', $actual_slug, 'Provided slug and initialized slug should match.' );
+		$slug->setAccessible( false );
 
-		$this->assertSame( $config, $actual );
+		$actual_name = $name->getValue( $collection );
+		$this->assertSame( 'My Collection', $actual_name, 'Provided name and initialized name should match.' );
+		$name->setAccessible( false );
+
+		$actual_description = $description->getValue( $collection );
+		$this->assertSame( 'My collection description', $actual_description, 'Provided description and initialized description should match.' );
+		$description->setAccessible( false );
+
+		$actual_src = $src->getValue( $collection );
+		$this->assertSame( 'my-collection-data.json', $actual_src, 'Provided src and initialized src should match.' );
+		$src->setAccessible( false );
 	}
 
 	/**
-	 * @dataProvider data_should_throw_exception
+	 * @dataProvider data_should_do_ti_wrong
 	 *
 	 * @param mixed  $config Config of the font collection.
-	 * @param string $expected_exception_message Expected exception message.
 	 */
-	public function test_should_throw_exception( $config, $expected_exception_message ) {
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( $expected_exception_message );
+	public function test_should_do_ti_wrong( $config ) {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
 		new WP_Font_Collection( $config );
 	}
 
@@ -47,7 +65,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_should_throw_exception() {
+	public function data_should_do_ti_wrong() {
 		return array(
 			'no id'                           => array(
 				array(
@@ -55,27 +73,22 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
-				'Font Collection config slug is required as a non-empty string.',
 			),
 
 			'no config'                       => array(
 				'',
-				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'empty array'                     => array(
 				array(),
-				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'boolean instead of config array' => array(
 				false,
-				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'null instead of config array'    => array(
 				null,
-				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'missing src'                     => array(
@@ -84,9 +97,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
-				'Font Collection config "src" option OR "data" option is required.',
 			),
-
 		);
 	}
 }

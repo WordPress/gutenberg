@@ -9,7 +9,7 @@
 	object-fit: cover;
 	background: #333;
 
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
+	.edit-site-layout.is-full-canvas & {
 		border-radius: 0;
 	}
 }

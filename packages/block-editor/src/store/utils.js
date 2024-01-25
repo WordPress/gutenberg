@@ -1,53 +1,3 @@
-/**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
- * Internal dependencies
- */
-import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-
-export const getUserPatterns = createSelector(
-	( state ) => {
-		const userPatterns = state.settings.__experimentalReusableBlocks ?? [];
-		const userPatternCategories =
-			state.settings.__experimentalUserPatternCategories ?? [];
-		return userPatterns.map( ( userPattern ) => {
-			return {
-				name: `core/block/${ userPattern.id }`,
-				id: userPattern.id,
-				type: INSERTER_PATTERN_TYPES.user,
-				title: userPattern.title.raw,
-				categories: userPattern.wp_pattern_category.map( ( catId ) => {
-					const category = userPatternCategories.find(
-						( { id } ) => id === catId
-					);
-					return category ? category.slug : catId;
-				} ),
-				content: userPattern.content.raw,
-				syncStatus: userPattern.wp_pattern_sync_status,
-			};
-		} );
-	},
-	( state ) => [
-		state.settings.__experimentalReusableBlocks,
-		state.settings.__experimentalUserPatternCategories,
-	]
-);
-
-export const getAllPatterns = createSelector(
-	( state ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		const userPatterns = getUserPatterns( state );
-		return [ ...userPatterns, ...patterns ];
-	},
-	( state ) => [
-		state.settings.__experimentalBlockPatterns,
-		getUserPatterns( state ),
-	]
-);
-
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
 		return list;
@@ -88,4 +38,14 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	}
 
 	return true;
+};
+
+export const getAllPatternsDependants = ( state ) => {
+	return [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalUserPatternCategories,
+		state.settings.__experimentalReusableBlocks,
+		state.settings.__experimentalFetchBlockPatterns,
+		state.blockPatterns,
+	];
 };

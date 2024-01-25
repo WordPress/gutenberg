@@ -59,6 +59,10 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
+.dataviews-view-table-wrapper {
+	overflow-x: auto;
+}
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -81,7 +85,12 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		min-width: 160px;
+		white-space: nowrap;
+
+		@include break-huge() {
+			min-width: 200px;
+		}
+
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
@@ -200,6 +209,10 @@
 	.dataviews-view-table-header {
 		padding-left: $grid-unit-05;
 	}
+
+	.dataviews-view-table__actions-column {
+		width: 1%;
+	}
 }
 
 .dataviews-view-list__primary-field,
@@ -272,11 +285,11 @@
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		overflow: hidden;
 		border-bottom: 1px solid $gray-200;
 		background-color: $gray-100;
+		border-radius: 3px 3px 0 0;
 
-		> * {
+		img {
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
@@ -387,6 +400,7 @@
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
+		background-color: $gray-100;
 
 		img {
 			width: 100%;

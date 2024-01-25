@@ -4,7 +4,6 @@
 import {
 	store,
 	directive,
-	navigate,
 	useInit,
 	useWatch,
 	cloneElement,
@@ -28,7 +27,7 @@ directive(
 const html = `
 <div
 	data-wp-interactive='{ "namespace": "directive-run" }'
-	data-wp-navigation-id='test-directive-run'
+	data-wp-router-region='test-directive-run'
 >
 	<div data-testid="hydrated" data-wp-text="state.isHydrated"></div>
 	<div data-testid="mounted" data-wp-text="state.isMounted"></div>
@@ -58,8 +57,11 @@ const { state } = store( 'directive-run', {
 		increment() {
 			state.clickCount = state.clickCount + 1;
 		},
-		navigate() {
-			navigate( window.location, {
+		*navigate() {
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );
