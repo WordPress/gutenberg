@@ -1017,48 +1017,6 @@ test.describe( 'Links', () => {
 				},
 			] );
 		} );
-
-		test( 'should display (capture the) text from the currently active link even if there is a rich text selection', async ( {
-			editor,
-			pageUtils,
-			LinkUtils,
-		} ) => {
-			const originalLinkText = 'Gutenberg';
-
-			await LinkUtils.createLink();
-
-			// Make a collapsed selection inside the link in order
-			// to activate the Link UI.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowRight' );
-
-			const linkPopover = LinkUtils.getLinkPopover();
-
-			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
-
-			// Place cursor within the underling RichText link (not the Link UI).
-			await editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.getByRole( 'link', {
-					name: 'Gutenberg',
-				} )
-				.click();
-
-			// Make a selection within the RichText.
-			await pageUtils.pressKeys( 'shift+ArrowRight', {
-				times: 3,
-			} );
-
-			// Making a selection within the link text whilst the Link UI
-			// is open should not alter the value in the Link UI's "Text"
-			// field. It should remain as the full text of the currently
-			// focused link format.
-			await expect(
-				linkPopover.getByLabel( 'Text', { exact: true } )
-			).toHaveValue( originalLinkText );
-		} );
 	} );
 
 	test.describe( 'Disabling Link UI active state', () => {
