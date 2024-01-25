@@ -309,7 +309,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.block-editor-block-list__block.has-editable-outline {
+.is-root-container:not([inert]) .block-editor-block-list__block.has-editable-outline {
 	&::after {
 		content: "";
 		position: absolute;
