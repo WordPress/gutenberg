@@ -50,7 +50,7 @@
 
 ## 6.19.0 (2023-09-20)
 
-### Features
+### New Features
 
 -   `useStateWithHistory`: Add a new hook to manage state with undo/redo support.
 
