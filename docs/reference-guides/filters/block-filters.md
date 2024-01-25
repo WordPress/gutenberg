@@ -19,11 +19,11 @@ _Example_:
 ```php
 <?php
 
-function filter_metadata_registration( $metadata ) {
+function wpdocs_filter_metadata_registration( $metadata ) {
 	$metadata['apiVersion'] = 1;
 	return $metadata;
 };
-add_filter( 'block_type_metadata', 'filter_metadata_registration' );
+add_filter( 'block_type_metadata', 'wpdocs_filter_metadata_registration' );
 
 register_block_type( __DIR__ );
 ```
@@ -40,11 +40,11 @@ The filter takes two params:
 _Example:_
 
 ```php
-function filter_metadata_registration( $settings, $metadata ) {
+function wpdocs_filter_metadata_registration( $settings, $metadata ) {
 	$settings['api_version'] = $metadata['apiVersion'] + 1;
 	return $settings;
 };
-add_filter( 'block_type_metadata_settings', 'filter_metadata_registration', 10, 2 );
+add_filter( 'block_type_metadata_settings', 'wpdocs_filter_metadata_registration', 10, 2 );
 
 register_block_type( __DIR__ );
 ```
@@ -189,7 +189,7 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				<InspectorControls>
 					<PanelBody>My custom control</PanelBody>
 				</InspectorControls>
@@ -352,14 +352,14 @@ On the server, you can filter the list of blocks shown in the inserter using the
 <?php
 // my-plugin.php
 
-function filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
+function wpdocs_filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		return array( 'core/paragraph', 'core/heading' );
 	}
 	return $allowed_block_types;
 }
 
-add_filter( 'allowed_block_types_all', 'filter_allowed_block_types_when_post_provided', 10, 2 );
+add_filter( 'allowed_block_types_all', 'wpdocs_filter_allowed_block_types_when_post_provided', 10, 2 );
 ```
 
 ## Managing block categories
@@ -374,7 +374,7 @@ It is possible to filter the list of default block categories using the `block_c
 <?php
 // my-plugin.php
 
-function filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
+function wpdocs_filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		array_push(
 			$block_categories,
@@ -388,7 +388,7 @@ function filter_block_categories_when_post_provided( $block_categories, $editor_
 	return $block_categories;
 }
 
-add_filter( 'block_categories_all', 'filter_block_categories_when_post_provided', 10, 2 );
+add_filter( 'block_categories_all', 'wpdocs_filter_block_categories_when_post_provided', 10, 2 );
 ```
 
 ### `wp.blocks.updateCategory`

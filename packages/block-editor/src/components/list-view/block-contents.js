@@ -74,7 +74,11 @@ const ListViewBlockContents = forwardRef(
 						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
-				<BlockDraggable clientIds={ draggableClientIds }>
+				<BlockDraggable
+					appendToOwnerDocument
+					clientIds={ draggableClientIds }
+					cloneClassname={ 'block-editor-list-view-draggable-chip' }
+				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
 							ref={ ref }

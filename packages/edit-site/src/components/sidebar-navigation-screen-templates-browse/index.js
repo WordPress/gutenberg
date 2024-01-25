@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -16,6 +17,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import DataviewsTemplatesSidebarContent from './content';
 
 const config = {
 	[ TEMPLATE_POST_TYPE ]: {
@@ -40,7 +42,7 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 		params: { postType },
 	} = useNavigator();
 	const {
-		params: { didAccessPatternsPage },
+		params: { didAccessPatternsPage, activeView = 'all' },
 	} = useLocation();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
@@ -56,6 +58,13 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 			title={ config[ postType ].title }
 			description={ config[ postType ].description }
 			backPath={ config[ postType ].backPath }
+			content={
+				<DataviewsTemplatesSidebarContent
+					activeView={ activeView }
+					postType={ postType }
+					config={ config }
+				/>
+			}
 		/>
 	);
 }
