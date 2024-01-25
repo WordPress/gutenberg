@@ -234,7 +234,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		 *
 		 * TODO: Replace the polyfill with a simpler version that only provides
 		 * support for import maps and load it only when the browser doesn't support
-		 * import maps (https://github.com/guybedford/es-module-shims/issues/371).
+		 * import maps (https://github.com/guybedford/es-module-shims/issues/406).
 		 *
 		 * @since 6.5.0
 		 */
