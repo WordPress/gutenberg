@@ -26,11 +26,11 @@
 
 .font-library-modal__tabpanel-layout {
 
-	main {
+	.font-library-modal__tabpanel-layout__main {
 		padding-bottom: $grid-unit-80;
 	}
 
-	footer {
+	.font-library-modal__tabpanel-layout__footer {
 		border-top: 1px solid $gray-300;
 		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
 		padding: $grid-unit-20 $grid-unit-40;
