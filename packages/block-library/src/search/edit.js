@@ -59,8 +59,6 @@ import {
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
 
-const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
-
 export default function SearchEdit( {
 	className,
 	attributes,
@@ -79,7 +77,6 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		buttonBehavior,
 		isSearchFieldHidden,
 		style,
 	} = attributes;
@@ -186,9 +183,6 @@ export default function SearchEdit( {
 				: undefined,
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
-				: undefined,
-			hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior
-				? 'wp-block-search__button-behavior-expand'
 				: undefined,
 			hasOnlyButton && isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
@@ -325,7 +319,7 @@ export default function SearchEdit( {
 				: borderProps.style ),
 		};
 		const handleButtonClick = () => {
-			if ( hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior ) {
+			if ( hasOnlyButton ) {
 				setAttributes( {
 					isSearchFieldHidden: ! isSearchFieldHidden,
 				} );

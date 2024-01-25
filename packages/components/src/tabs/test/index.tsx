@@ -1260,7 +1260,9 @@ describe( 'Tabs', () => {
 
 				// Tab key should focus the currently selected tab, which is Beta.
 				await press.Tab();
-				expect( await getSelectedTab() ).toHaveFocus();
+				await waitFor( async () =>
+					expect( await getSelectedTab() ).toHaveFocus()
+				);
 
 				rerender(
 					<ControlledTabs

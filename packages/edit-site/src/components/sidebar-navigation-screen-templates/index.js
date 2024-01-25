@@ -4,6 +4,7 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -30,20 +31,11 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 
 export default function SidebarNavigationScreenTemplates() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
 		TEMPLATE_POST_TYPE,
-		{
-			per_page: -1,
-		}
+		{ per_page: -1 }
 	);
-
-	const sortedTemplates = templates ? [ ...templates ] : [];
-	sortedTemplates.sort( ( a, b ) =>
-		a.title.rendered.localeCompare( b.title.rendered )
-	);
-
 	const browseAllLink = useLink( { path: '/wp_template/all' } );
 	const canCreate = ! isMobileViewport;
 	return (
@@ -66,24 +58,7 @@ export default function SidebarNavigationScreenTemplates() {
 				<>
 					{ isLoading && __( 'Loading templates…' ) }
 					{ ! isLoading && (
-						<ItemGroup>
-							{ ! templates?.length && (
-								<Item>{ __( 'No templates found' ) }</Item>
-							) }
-							{ sortedTemplates.map( ( template ) => (
-								<TemplateItem
-									postType={ TEMPLATE_POST_TYPE }
-									postId={ template.id }
-									key={ template.id }
-									withChevron
-								>
-									{ decodeEntities(
-										template.title?.rendered ||
-											template.slug
-									) }
-								</TemplateItem>
-							) ) }
-						</ItemGroup>
+						<SidebarTemplatesList templates={ templates } />
 					) }
 				</>
 			}
@@ -95,5 +70,87 @@ export default function SidebarNavigationScreenTemplates() {
 				)
 			}
 		/>
+	);
+}
+
+function TemplatesGroup( { title, templates } ) {
+	return (
+		<ItemGroup>
+			{ !! title && (
+				<Item className="edit-site-sidebar-navigation-screen-templates__templates-group-title">
+					{ title }
+				</Item>
+			) }
+			{ templates.map( ( template ) => (
+				<TemplateItem
+					postType={ TEMPLATE_POST_TYPE }
+					postId={ template.id }
+					key={ template.id }
+					withChevron
+				>
+					{ decodeEntities(
+						template.title?.rendered || template.slug
+					) }
+				</TemplateItem>
+			) ) }
+		</ItemGroup>
+	);
+}
+function SidebarTemplatesList( { templates } ) {
+	if ( ! templates?.length ) {
+		return (
+			<ItemGroup>
+				<Item>{ __( 'No templates found' ) }</Item>
+			</ItemGroup>
+		);
+	}
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
+	const { hierarchyTemplates, customTemplates, ...plugins } =
+		sortedTemplates.reduce(
+			( accumulator, template ) => {
+				const {
+					original_source: originalSource,
+					author_text: authorText,
+				} = template;
+				if ( originalSource === 'plugin' ) {
+					if ( ! accumulator[ authorText ] ) {
+						accumulator[ authorText ] = [];
+					}
+					accumulator[ authorText ].push( template );
+				} else if ( template.is_custom ) {
+					accumulator.customTemplates.push( template );
+				} else {
+					accumulator.hierarchyTemplates.push( template );
+				}
+				return accumulator;
+			},
+			{ hierarchyTemplates: [], customTemplates: [] }
+		);
+	return (
+		<VStack spacing={ 3 }>
+			{ !! hierarchyTemplates.length && (
+				<TemplatesGroup templates={ hierarchyTemplates } />
+			) }
+			{ !! customTemplates.length && (
+				<TemplatesGroup
+					title={ __( 'Custom' ) }
+					templates={ customTemplates }
+				/>
+			) }
+			{ Object.entries( plugins ).map(
+				( [ plugin, pluginTemplates ] ) => {
+					return (
+						<TemplatesGroup
+							key={ plugin }
+							title={ plugin }
+							templates={ pluginTemplates }
+						/>
+					);
+				}
+			) }
+		</VStack>
 	);
 }

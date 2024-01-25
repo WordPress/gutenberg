@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { press } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -71,8 +71,6 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is not set', () => {
 		it( 'should loop', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
@@ -80,19 +78,17 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await user.tab();
+			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 		} );
 	} );
 
 	describe( 'when `loop` is true', () => {
 		it( 'should loop', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
@@ -101,19 +97,17 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await user.tab();
+			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 		} );
 	} );
 
 	describe( 'when `loop` is false', () => {
 		it( 'should not loop', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
@@ -122,11 +116,11 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await user.tab();
+			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
 		} );
 	} );

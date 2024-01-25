@@ -40,7 +40,6 @@ import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -161,7 +160,6 @@ function Layout() {
 		isDistractionFree,
 		showBlockBreadcrumbs,
 		showMetaBoxes,
-		showMostUsedBlocks,
 		documentLabel,
 		hasHistory,
 	} = useSelect( ( select ) => {
@@ -192,13 +190,8 @@ function Layout() {
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
-			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
-				'showBlockBreadcrumbs'
-			),
-			showMostUsedBlocks:
-				select( editPostStore ).isFeatureActive( 'mostUsedBlocks' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
@@ -267,9 +260,7 @@ function Layout() {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			return (
-				<InserterSidebar showMostUsedBlocks={ showMostUsedBlocks } />
-			);
+			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;

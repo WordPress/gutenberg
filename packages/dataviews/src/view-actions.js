@@ -7,18 +7,19 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
+import { settings } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { VIEW_LAYOUTS, LAYOUT_TABLE, SORTING_DIRECTIONS } from './constants';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
+import { VIEW_LAYOUTS, SORTING_DIRECTIONS } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -50,7 +51,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 		>
 			{ _availableViews.map( ( availableView ) => {
 				return (
-					<DropdownMenuRadioItemCustom
+					<DropdownMenuRadioItem
 						key={ availableView.type }
 						value={ availableView.type }
 						name="view-actions-available-view"
@@ -66,7 +67,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						<DropdownMenuItemLabel>
 							{ availableView.label }
 						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItemCustom>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
 		</DropdownMenu>
@@ -90,21 +91,23 @@ function PageSizeMenu( { view, onChangeView } ) {
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
-					<DropdownMenuRadioItemCustom
+					<DropdownMenuRadioItem
 						key={ size }
 						value={ size }
 						name="view-actions-page-size"
 						checked={ view.perPage === size }
-						onChange={ ( e ) => {
+						onChange={ () => {
 							onChangeView( {
 								...view,
-								perPage: e.target.value,
+								// `e.target.value` holds the same value as `size` but as a string,
+								// so we use `size` directly to avoid parsing to int.
+								perPage: size,
 								page: 1,
 							} );
 						} }
 					>
 						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
-					</DropdownMenuRadioItemCustom>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
 		</DropdownMenu>
@@ -210,18 +213,25 @@ function SortMenu( { fields, view, onChangeView } ) {
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
 
+								const value = `${ field.id }-${ direction }`;
+
 								return (
-									<DropdownMenuRadioItemCustom
-										key={ direction }
-										value={ direction }
-										name={ `view-actions-sorting-${ field.id }` }
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-actions-sorting"
+										value={ value }
 										checked={ isChecked }
-										onChange={ ( e ) => {
+										onChange={ () => {
 											onChangeView( {
 												...view,
 												sort: {
 													field: field.id,
-													direction: e.target.value,
+													direction,
 												},
 											} );
 										} }
@@ -229,7 +239,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 										<DropdownMenuItemLabel>
 											{ info.label }
 										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItemCustom>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }
@@ -251,24 +261,17 @@ const ViewActions = memo( function ViewActions( {
 			trigger={
 				<Button
 					size="compact"
-					icon={
-						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-							?.icon ||
-						VIEW_LAYOUTS.find( ( v ) => v.type === LAYOUT_TABLE )
-							.icon
-					}
+					icon={ settings }
 					label={ __( 'View options' ) }
 				/>
 			}
 		>
 			<DropdownMenuGroup>
-				{ window?.__experimentalAdminViews && (
-					<ViewTypeMenu
-						view={ view }
-						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
-					/>
-				) }
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }

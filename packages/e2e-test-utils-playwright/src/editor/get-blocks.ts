@@ -14,17 +14,21 @@ type Block = {
  *
  * @param this
  * @param options
- * @param options.full Whether to return the full block data or just the name and attributes.
+ * @param options.clientId Limit the results to be only under a partial tree of the specified clientId.
+ * @param options.full     Whether to return the full block data or just the name and attributes.
  *
  * @return  The blocks.
  */
-export async function getBlocks( this: Editor, { full = false } = {} ) {
+export async function getBlocks(
+	this: Editor,
+	{ clientId, full = false }: { clientId?: string; full?: boolean } = {}
+) {
 	await this.page.waitForFunction(
 		() => window?.wp?.blocks && window?.wp?.data
 	);
 
 	return await this.page.evaluate(
-		( [ _full ] ) => {
+		( [ _full, _clientId ] ) => {
 			// Remove other unpredictable properties like clientId from blocks for testing purposes.
 			function recursivelyTransformBlocks( blocks: Block[] ): Block[] {
 				return blocks.map( ( block ) => ( {
@@ -38,7 +42,7 @@ export async function getBlocks( this: Editor, { full = false } = {} ) {
 
 			const blocks = window.wp.data
 				.select( 'core/block-editor' )
-				.getBlocks();
+				.getBlocks( _clientId ) as Block[];
 
 			// The editor might still contain an unmodified empty block even when it's technically "empty".
 			if (
@@ -50,6 +54,6 @@ export async function getBlocks( this: Editor, { full = false } = {} ) {
 
 			return _full ? blocks : recursivelyTransformBlocks( blocks );
 		},
-		[ full ]
+		[ full, clientId ]
 	);
 }

@@ -23,19 +23,15 @@ const Pagination = memo( function Pagination( {
 		totalPages !== 1 && (
 			<HStack
 				expanded={ false }
-				spacing={ 3 }
-				justify="space-between"
+				spacing={ 6 }
+				justify="end"
 				className="dataviews-pagination"
 			>
 				<HStack justify="flex-start" expanded={ false } spacing={ 2 }>
 					{ createInterpolateElement(
 						sprintf(
-							// translators: %1$s: Current page number, %2$s: Total number of pages.
-							_x(
-								'Page <CurrenPageControl /> of %2$s',
-								'paging'
-							),
-							view.page,
+							// translators: %s: Total number of pages.
+							_x( 'Page <CurrenPageControl /> of %s', 'paging' ),
 							totalPages
 						),
 						{
