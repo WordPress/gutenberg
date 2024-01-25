@@ -225,7 +225,7 @@ test.describe( 'Links', () => {
 		pageUtils,
 		LinkUtils,
 	} ) => {
-		await LinkUtils.createAndReselectLink();
+		await LinkUtils.createLink();
 
 		// Click on the Edit button.
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
@@ -255,7 +255,7 @@ test.describe( 'Links', () => {
 		LinkUtils,
 		pageUtils,
 	} ) => {
-		await LinkUtils.createAndReselectLink();
+		await LinkUtils.createLink();
 		await pageUtils.pressKeys( 'primary+k' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
@@ -337,7 +337,7 @@ test.describe( 'Links', () => {
 		LinkUtils,
 		pageUtils,
 	} ) => {
-		await LinkUtils.createAndReselectLink();
+		await LinkUtils.createLink();
 		// Make a collapsed selection inside the link.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
@@ -886,20 +886,16 @@ test.describe( 'Links', () => {
 			editor,
 			LinkUtils,
 		} ) => {
-			await LinkUtils.createAndReselectLink();
+			await LinkUtils.createLink();
 
 			const originalLinkText = 'Gutenberg';
 			const changedLinkText =
 				'    link text that was modified via the Link UI to include spaces     ';
 
-			// Make a collapsed selection inside the link. This is used
-			// as a stress test to ensure we can find the link text from a
-			// collapsed RichTextValue that contains a link format.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowRight' );
+			// Get the LinkPopover using the LinkUtils
+			const linkPopover = LinkUtils.getLinkPopover();
 
-			await editor.showBlockToolbar();
-			await page.getByRole( 'button', { name: 'Edit' } ).click();
+			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 			const textInput = page.getByLabel( 'Text', { exact: true } );
 
@@ -960,7 +956,7 @@ test.describe( 'Links', () => {
 			pageUtils,
 			LinkUtils,
 		} ) => {
-			await LinkUtils.createAndReselectLink();
+			await LinkUtils.createLink();
 
 			// Make a collapsed selection inside the link. This is used
 			// as a stress test to ensure we can find the link text from a
@@ -1032,7 +1028,7 @@ test.describe( 'Links', () => {
 		} ) => {
 			const originalLinkText = 'Gutenberg';
 
-			await LinkUtils.createAndReselectLink();
+			await LinkUtils.createLink();
 
 			// Make a collapsed selection inside the link in order
 			// to activate the Link UI.
@@ -1288,7 +1284,7 @@ class LinkUtils {
 		}, isFixed );
 	}
 
-	async createAndReselectLink() {
+	async createLink() {
 		// Create a block with some text.
 		await this.editor.insertBlock( {
 			name: 'core/paragraph',
@@ -1301,16 +1297,17 @@ class LinkUtils {
 		// Click on the Link button.
 		await this.pageUtils.pressKeys( 'primary+k' );
 
+		// get the link popover
+		const linkPopover = this.getLinkPopover();
+
+		// Expect link popover to be visible
+		await expect( linkPopover ).toBeVisible();
+
 		// Type a URL.
 		await this.page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Click on the Submit button.
+		// Submit the link.
 		await this.pageUtils.pressKeys( 'Enter' );
-		await this.pageUtils.pressKeys( 'Escape' );
-		await this.pageUtils.pressKeys( 'End' );
-
-		// Reselect the link.
-		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 	}
 
 	/**
