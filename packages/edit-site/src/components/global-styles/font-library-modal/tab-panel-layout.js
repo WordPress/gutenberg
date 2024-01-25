@@ -25,44 +25,48 @@ function TabPanelLayout( {
 		<div className="font-library-modal__tabpanel-layout">
 			<Spacer margin={ 4 } />
 			<VStack spacing={ 4 } justify="space-between">
-				<header>
-					<VStack spacing={ 2 }>
-						{ notice && (
-							<FlexBlock>
-								<Spacer margin={ 4 } />
-								<Notice
-									status={ notice.type }
-									onRemove={ notice.onRemove }
-								>
-									{ notice.message }
-								</Notice>
-							</FlexBlock>
+				<VStack spacing={ 2 }>
+					{ notice && (
+						<FlexBlock>
+							<Spacer margin={ 4 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ notice.onRemove }
+							>
+								{ notice.message }
+							</Notice>
+						</FlexBlock>
+					) }
+					<Spacer margin={ 4 } />
+					<HStack justify="flex-start">
+						{ !! handleBack && (
+							<Button
+								variant="tertiary"
+								onClick={ handleBack }
+								icon={ chevronLeft }
+								size="small"
+							/>
 						) }
-						<Spacer margin={ 4 } />
-						<HStack justify="flex-start">
-							{ !! handleBack && (
-								<Button
-									variant="tertiary"
-									onClick={ handleBack }
-									icon={ chevronLeft }
-									size="small"
-								/>
-							) }
-							{ title && (
-								<Heading
-									level={ 2 }
-									size={ 13 }
-									className="edit-site-global-styles-header"
-								>
-									{ title }
-								</Heading>
-							) }
-						</HStack>
-						{ description && <Text>{ description }</Text> }
-					</VStack>
-				</header>
-				<main>{ children }</main>
-				{ footer && <footer>{ footer }</footer> }
+						{ title && (
+							<Heading
+								level={ 2 }
+								size={ 13 }
+								className="edit-site-global-styles-header"
+							>
+								{ title }
+							</Heading>
+						) }
+					</HStack>
+					{ description && <Text>{ description }</Text> }
+				</VStack>
+				<div className="font-library-modal__tabpanel-layout__main">
+					{ children }
+				</div>
+				{ footer && (
+					<div className="font-library-modal__tabpanel-layout__footer">
+						{ footer }
+					</div>
+				) }
 			</VStack>
 		</div>
 	);
