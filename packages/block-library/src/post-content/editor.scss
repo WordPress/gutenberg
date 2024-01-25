@@ -1,0 +1,13 @@
+.wp-block-post-content {
+	.block-list-appender {
+		position: relative;
+	}
+
+	.block-editor-default-block-appender:not(.is-selected):not(.has-child-selected) {
+		display: block;
+	}
+}
+
+.wp-block-post-content__insert-pattern {
+	font-size: $editor-font-size;
+}

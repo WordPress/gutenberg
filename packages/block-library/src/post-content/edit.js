@@ -8,13 +8,15 @@ import {
 	RecursionProvider,
 	useHasRecursion,
 	Warning,
+	InnerBlocks,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useEntityProp,
-	useEntityBlockEditor,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import { Button } from '@wordpress/components';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -45,7 +47,31 @@ function ReadOnlyContent( {
 	);
 }
 
-function EditableContent( { context = {} } ) {
+function InsertPatternButton( { rootClientId } ) {
+	const setIsInserterOpened = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalSetIsInserterOpened,
+		[]
+	);
+	return (
+		<Button
+			className="wp-block-post-content__insert-pattern"
+			variant="link"
+			onClick={ () =>
+				setIsInserterOpened( {
+					initialTab: 'patterns',
+					rootClientId,
+					insertionIndex: 0,
+				} )
+			}
+		>
+			{ __( 'or start with a pattern' ) }
+		</Button>
+	);
+}
+
+function EditableContent( { context = {}, clientId } ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -54,20 +80,20 @@ function EditableContent( { context = {} } ) {
 		{ id: postId }
 	);
 
-	const entityRecord = useSelect(
-		( select ) => {
-			return select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-		},
-		[ postType, postId ]
+	const hasBlocks = !! blocks?.length;
+	const isDefaultBlock =
+		blocks?.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] );
+	const hasContent = hasBlocks && ! isDefaultBlock;
+
+	const Appender = useMemo(
+		() => () => (
+			<>
+				{ ! isDefaultBlock && <InnerBlocks.DefaultBlockAppender /> }
+				<InsertPatternButton rootClientId={ clientId } />
+			</>
+		),
+		[ isDefaultBlock, clientId ]
 	);
-
-	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
-
-	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
 
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
@@ -75,7 +101,7 @@ function EditableContent( { context = {} } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
+			renderAppender: hasContent ? undefined : Appender,
 		}
 	);
 	return <div { ...props } />;
@@ -141,6 +167,7 @@ function RecursionError() {
 export default function PostContentEdit( {
 	context,
 	__unstableLayoutClassNames: layoutClassNames,
+	clientId,
 } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
@@ -155,6 +182,7 @@ export default function PostContentEdit( {
 				<Content
 					context={ context }
 					layoutClassNames={ layoutClassNames }
+					clientId={ clientId }
 				/>
 			) : (
 				<Placeholder layoutClassNames={ layoutClassNames } />
