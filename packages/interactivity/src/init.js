@@ -47,11 +47,11 @@ export const init = async () => {
 				}
 
 				if ( ! hydratedIslands.has( node ) ) {
-					await yieldToMain();
 					const fragment = getRegionRootFragment( node );
 					const vdom = toVdom( node );
 					await yieldToMain();
 					hydrate( vdom, fragment );
+					await yieldToMain();
 				}
 			}
 		},
