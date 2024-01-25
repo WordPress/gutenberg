@@ -206,7 +206,7 @@ function Option< T extends Color | Gradient >( {
 					: sprintf(
 							// translators: %s is a color or gradient name, e.g. "Red".
 							__( 'Edit: %s' ),
-							element.name
+							element.name.trim().length ? element.name : value
 					  )
 			}
 			ref={ setPopoverAnchor }
@@ -234,7 +234,12 @@ function Option< T extends Color | Gradient >( {
 							}
 						/>
 					) : (
-						<NameContainer>{ element.name }</NameContainer>
+						<NameContainer>
+							{ element.name.trim().length
+								? element.name
+								: /* Fall back to non-breaking space to maintain height */
+								  '\u00A0' }
+						</NameContainer>
 					) }
 				</FlexItem>
 				{ isEditing && ! canOnlyChangeValues && (
