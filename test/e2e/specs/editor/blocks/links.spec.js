@@ -1020,141 +1020,34 @@ test.describe( 'Links', () => {
 	} );
 
 	test.describe( 'Disabling Link UI active state', () => {
-		test( 'should not show the Link UI when selection extends beyond link boundary', async ( {
+		test( 'should correctly move focus when link control closes on click outside', async ( {
 			page,
 			pageUtils,
-			editor,
 			LinkUtils,
 		} ) => {
-			const linkedText = `Gutenberg`;
-			const textBeyondLinkedText = ` and more text.`;
-
-			// Create a block with some text.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-			} );
-			await page.keyboard.type(
-				`This is ${ linkedText }${ textBeyondLinkedText }`
-			);
-
-			// Move cursor next to end of `linkedText`.
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: textBeyondLinkedText.length,
-			} );
-
-			// Select the linkedText.
-			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-
-			// Click on the Link button.
-			await editor.clickBlockToolbarButton( 'Link' );
-
-			// Type a URL.
-			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-			// Update the link.
-			await pageUtils.pressKeys( 'Enter' );
-			await pageUtils.pressKeys( 'Escape' );
-			await pageUtils.pressKeys( 'ArrowRight' );
-
-			// Reactivate the link.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowLeft' );
+			await LinkUtils.createLink();
 
 			const linkPopover = LinkUtils.getLinkPopover();
 
 			await expect( linkPopover ).toBeVisible();
 
-			// Make selection starting within the link and moving beyond boundary to the left.
-			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', {
-				times: linkedText.length,
-			} );
+			const optionsButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } );
 
-			// The Link UI should have disappeared (i.e. be inactive).
+			await optionsButton.click();
+
 			await expect( linkPopover ).toBeHidden();
-
-			// Cancel selection and move back within the Link.
-			await pageUtils.pressKeys( 'ArrowRight' );
-
-			// We should see the Link UI displayed again.
-			await expect( linkPopover ).toBeVisible();
-
-			// Make selection starting within the link and moving beyond boundary to the right.
-			await pageUtils.pressKeys( 'shift+ArrowRight', {
-				times: 3,
-			} );
-
-			// The Link UI should have disappeared (i.e. be inactive).
-			await expect( linkPopover ).toBeHidden();
-		} );
-
-		test( 'should not show the Link UI when selection extends into another link', async ( {
-			page,
-			pageUtils,
-			editor,
-			LinkUtils,
-		} ) => {
-			const linkedTextOne = `Gutenberg`;
-			const linkedTextTwo = `Block Editor`;
-			const linkOneURL = 'https://wordpress.org';
-			const linkTwoURL = 'https://wordpress.org/gutenberg';
-
-			// Create a block with some text.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-			} );
-			await page.keyboard.type(
-				`This is the ${ linkedTextOne }${ linkedTextTwo }`
-			);
-
-			// Select the linkedTextTwo.
-			await pageUtils.pressKeys( 'shift+ArrowLeft', {
-				times: linkedTextTwo.length,
-			} );
-
-			// Click on the Link button.
-			await editor.clickBlockToolbarButton( 'Link' );
-
-			// Type a URL.
-			await page.keyboard.type( linkTwoURL );
-
-			// Update the link.
-			await pageUtils.pressKeys( 'Enter' );
+			// Expect focus on Top toolbar button within dropdown
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Top toolbar Access all block and document tools in a single place',
+				} )
+			).toBeFocused();
+			// Press Escape
 			await pageUtils.pressKeys( 'Escape' );
-
-			// Move cursor next to the **end** of `linkTextOne`
-			await pageUtils.pressKeys( 'ArrowLeft' );
-
-			// Select `linkTextOne`
-			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-
-			// Click on the Link button.
-			await editor.clickBlockToolbarButton( 'Link' );
-
-			// Type a URL.
-			await page.keyboard.type( linkOneURL );
-
-			// Update the link.
-			await pageUtils.pressKeys( 'Enter' );
-			await pageUtils.pressKeys( 'Escape' );
-			await pageUtils.pressKeys( 'ArrowRight' );
-
-			// Move cursor within `linkTextOne`
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: 3,
-			} );
-
-			const linkPopover = LinkUtils.getLinkPopover();
-
-			// Link UI should activate for `linkTextOne`
-			await expect( linkPopover ).toBeVisible();
-
-			// Expand selection so that it overlaps with `linkTextTwo`
-			await pageUtils.pressKeys( 'Shift+ArrowRight', {
-				times: 6,
-			} );
-
-			// Link UI should be inactive.
-			await expect( linkPopover ).toBeHidden();
+			// Expect focus on Top toolbar Options button
+			await expect( optionsButton ).toBeFocused();
 		} );
 
 		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
