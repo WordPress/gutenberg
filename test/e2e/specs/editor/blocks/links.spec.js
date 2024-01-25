@@ -718,11 +718,10 @@ test.describe( 'Links', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Move to edge of text "Gutenberg".
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-
+		await pageUtils.pressKeys( 'ArrowLeft' );
 		// Select "Gutenberg".
-		await pageUtils.pressKeys( 'shiftAlt+ArrowRight' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
