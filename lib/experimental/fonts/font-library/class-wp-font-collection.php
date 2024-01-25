@@ -138,7 +138,16 @@ class WP_Font_Collection {
 			( empty( $config['src'] ) && empty( $config['font_families'] ) ) ||
 			( ! empty( $config['src'] ) && ! empty( $config['font_families'] ) )
 		) {
-			_doing_it_wrong( __METHOD__, __( 'Font Collection config "src" option OR "font_families" option are required.', 'gutenberg' ), '6.5.0' );
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %1$s: src, %2$s: font_families */
+					__( 'Font Collection config "%1$s" option OR "%2$s" option are required.', 'gutenberg' ),
+					'src',
+					'font_families'
+				),
+				'6.5.0'
+			);
 			return false;
 		}
 
