@@ -56,9 +56,11 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<BlockInfo.Slot />
-			<PanelBody title={ __( 'Content' ) }>
-				<BlockQuickNavigation clientIds={ contentClientIds } />
-			</PanelBody>
+			{ contentClientIds.length > 0 && (
+				<PanelBody title={ __( 'Content' ) }>
+					<BlockQuickNavigation clientIds={ contentClientIds } />
+				</PanelBody>
+			) }
 		</div>
 	);
 }
