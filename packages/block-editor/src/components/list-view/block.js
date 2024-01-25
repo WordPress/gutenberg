@@ -187,7 +187,7 @@ function ListViewBlock( {
 				selectBlock( undefined, focusClientId, null, null );
 			}
 
-			focusListItem( focusClientId, treeGridElementRef );
+			focusListItem( focusClientId, treeGridElementRef?.current );
 		},
 		[ selectBlock, treeGridElementRef ]
 	);

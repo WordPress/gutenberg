@@ -16,6 +16,7 @@ import './generated-class-name';
 import style from './style';
 import './settings';
 import color from './color';
+import dimensions from './dimensions';
 import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
@@ -47,6 +48,7 @@ createBlockListBlockFilter( [
 	align,
 	style,
 	color,
+	dimensions,
 	duotone,
 	fontFamily,
 	fontSize,

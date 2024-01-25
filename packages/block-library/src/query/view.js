@@ -31,14 +31,11 @@ store( 'core/query', {
 		*navigate( event ) {
 			const ctx = getContext();
 			const { ref } = getElement();
-			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
-				.wpNavigationDisabled;
+			const { queryRef } = ctx;
+			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 
 			if ( isValidLink( ref ) && isValidEvent( event ) && ! isDisabled ) {
 				event.preventDefault();
-
-				const id = ref.closest( '[data-wp-navigation-id]' ).dataset
-					.wpNavigationId;
 
 				// Don't announce the navigation immediately, wait 400 ms.
 				const timeout = setTimeout( () => {
@@ -65,14 +62,14 @@ store( 'core/query', {
 				ctx.url = ref.href;
 
 				// Focus the first anchor of the Query block.
-				const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
-				document.querySelector( firstAnchor )?.focus();
+				const firstAnchor = `.wp-block-post-template a[href]`;
+				queryRef.querySelector( firstAnchor )?.focus();
 			}
 		},
 		*prefetch() {
+			const { queryRef } = getContext();
 			const { ref } = getElement();
-			const isDisabled = ref.closest( '[data-wp-navigation-id]' )?.dataset
-				.wpNavigationDisabled;
+			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 			if ( isValidLink( ref ) && ! isDisabled ) {
 				const { actions } = yield import(
 					'@wordpress/interactivity-router'
@@ -91,6 +88,11 @@ store( 'core/query', {
 				);
 				yield actions.prefetch( ref.href );
 			}
+		},
+		setQueryRef() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.queryRef = ref;
 		},
 	},
 } );

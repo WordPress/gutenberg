@@ -28,7 +28,7 @@ store( 'directive-context', {
 const html = `
 		<div
 			data-wp-interactive='{ "namespace": "directive-context-navigate" }'
-			data-wp-navigation-id="navigation"
+			data-wp-router-region="navigation"
 			data-wp-context='{ "text": "second page" }'
 		>
 			<div data-testid="navigation text" data-wp-text="context.text"></div>

@@ -63,12 +63,12 @@ export function getCommonDepthClientIds(
  *
  * @typedef {import('@wordpress/element').RefObject} RefObject
  *
- * @param {string}                 focusClientId      The client ID of the block to focus.
- * @param {RefObject<HTMLElement>} treeGridElementRef The container element to search within.
+ * @param {string}       focusClientId   The client ID of the block to focus.
+ * @param {?HTMLElement} treeGridElement The container element to search within.
  */
-export function focusListItem( focusClientId, treeGridElementRef ) {
+export function focusListItem( focusClientId, treeGridElement ) {
 	const getFocusElement = () => {
-		const row = treeGridElementRef.current?.querySelector(
+		const row = treeGridElement?.querySelector(
 			`[role=row][data-block="${ focusClientId }"]`
 		);
 		if ( ! row ) return null;

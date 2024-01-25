@@ -29,9 +29,6 @@
 			"type": "string",
 			"default": "none"
 		},
-		"inSameTerm": {
-			"type": "boolean"
-		},
 		"taxonomy": {
 			"type": "string",
 			"default": ""
