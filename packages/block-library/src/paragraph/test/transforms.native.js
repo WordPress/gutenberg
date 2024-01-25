@@ -12,7 +12,7 @@ import {
 const block = 'Paragraph';
 const initialHtml = `
 <!-- wp:paragraph -->
-<p>Example text</p>
+<p class="wp-block-paragraph">Example text</p>
 <!-- /wp:paragraph -->`;
 
 // NOTE: Paragraph block can be transformed to Buttons block in web,

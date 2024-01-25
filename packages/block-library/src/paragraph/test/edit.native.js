@@ -83,7 +83,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <strong>quick</strong> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <strong>quick</strong> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -108,7 +108,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <em>quick</em> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <em>quick</em> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -133,7 +133,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <s>quick</s> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <s>quick</s> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -158,7 +158,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"align":"left"} -->
-		<p class="has-text-align-left">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-text-align-left">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -183,7 +183,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"align":"center"} -->
-		<p class="has-text-align-center">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-text-align-center">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -208,7 +208,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"align":"right"} -->
-		<p class="has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -239,11 +239,11 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"align":"center"} -->
-		<p class="has-text-align-center">A quick brown fox jum</p>
+		<p class="wp-block-paragraph has-text-align-center">A quick brown fox jum</p>
 		<!-- /wp:paragraph -->
 
 		<!-- wp:paragraph {"align":"center"} -->
-		<p class="has-text-align-center">ps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-text-align-center">ps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -281,7 +281,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p><a href="http://wordpress.org">WordPress</a></p>
+		<p class="wp-block-paragraph"><a href="http://wordpress.org">WordPress</a></p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -324,7 +324,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -360,7 +360,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <a href="https://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <a href="https://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -386,7 +386,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>     <em>some text</em>      </p>
+		<p class="wp-block-paragraph">     <em>some text</em>      </p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -428,7 +428,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"textColor":"pale-pink"} -->
-		<p class="has-pale-pink-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-pale-pink-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 		` );
 	} );
@@ -466,7 +466,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"backgroundColor":"luminous-vivid-orange"} -->
-		<p class="has-luminous-vivid-orange-background-color has-background">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-luminous-vivid-orange-background-color has-background">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 		` );
 	} );
@@ -513,7 +513,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"backgroundColor":"luminous-vivid-orange","textColor":"white"} -->
-		<p class="has-white-color has-luminous-vivid-orange-background-color has-text-color has-background">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-white-color has-luminous-vivid-orange-background-color has-text-color has-background">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 		` );
 	} );
@@ -558,7 +558,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 		` );
 	} );
@@ -628,7 +628,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"textColor":"tertiary"} -->
-		<p class="has-tertiary-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph has-tertiary-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 		` );
 	} );
@@ -684,7 +684,7 @@ describe( 'Paragraph block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
+		<p class="wp-block-paragraph">A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
