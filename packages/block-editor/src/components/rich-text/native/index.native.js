@@ -317,12 +317,15 @@ export class RichText extends Component {
 			event.nativeEvent.text
 		);
 
+		const { __unstableInputRule } = this.props;
 		const currentValuePosition = {
 			end: this.isIOS ? this.selectionEnd : this.selectionEnd + 1,
 			start: this.isIOS ? this.selectionStart : this.selectionStart + 1,
 		};
+
 		if (
-			this.props.__unstableInputRule( {
+			__unstableInputRule &&
+			__unstableInputRule( {
 				...currentValuePosition,
 				...this.formatToValue( contentWithoutRootTag ),
 			} )
