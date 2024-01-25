@@ -164,8 +164,7 @@ export function makeFontFacesFormData( font ) {
 		const fontFacesFormData = font.fontFace.map( ( face, faceIndex ) => {
 			const formData = new FormData();
 			if ( face.file ) {
-				// file may be a single file or a collection of files.
-				// make sure it's an array
+				// Normalize to an array, since face.file may be a single file or an array of files.
 				const files = Array.isArray( face.file )
 					? face.file
 					: [ face.file ];
