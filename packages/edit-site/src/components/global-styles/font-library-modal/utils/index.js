@@ -231,8 +231,7 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
  * Downloads a font face asset from a URL to the client and returns a File object.
  */
 export async function downloadFontFaceAssets( src ) {
-	//src could be a single string or a collection of strings.
-	//here, just make sure it's an array
+	// Normalize to an array, since `src` could be a string or array.
 	src = Array.isArray( src ) ? src : [ src ];
 
 	const files = await Promise.all(
