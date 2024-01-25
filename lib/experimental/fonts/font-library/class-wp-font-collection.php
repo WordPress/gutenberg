@@ -142,7 +142,7 @@ class WP_Font_Collection {
 				__METHOD__,
 				sprintf(
 					/* translators: %1$s: src, %2$s: font_families */
-					__( 'Font Collection config "%1$s" option OR "%2$s" option are required.', 'gutenberg' ),
+					__( 'Font Collection config "%1$s" option OR "%2$s" option is required.', 'gutenberg' ),
 					'src',
 					'font_families'
 				),
