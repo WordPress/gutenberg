@@ -33,10 +33,10 @@ final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 	 */
 	public function getErrorList() {
 		return array(
-			3 => 1,
-			5 => 1,
-			7 => 1,
-			9 => 1,
+			3  => 1,
+			5  => 1,
+			7  => 1,
+			9  => 1,
 			11 => 1,
 
 			16 => 1,
@@ -89,7 +89,7 @@ final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 		parent::setCliValues( $filename, $config );
 
 		if ( ! isset( $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] )
-		     || ( ! $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] instanceof Ruleset )
+			|| ( ! $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] instanceof Ruleset )
 		) {
 			throw new \RuntimeException( 'Cannot set ruleset parameters required for this test.' );
 		}
@@ -101,12 +101,12 @@ final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 		$GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] = $current_ruleset;
 
 		if ( ! isset( $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] )
-		     || ( ! $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] instanceof ForbiddenFunctionsAndClassesSniff )
+			|| ( ! $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] instanceof ForbiddenFunctionsAndClassesSniff )
 		) {
 			throw new \RuntimeException( 'Cannot set ruleset parameters required for this test.' );
 		}
 
-		$sniff           = $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ];
+		$sniff                      = $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ];
 		$sniff->forbidden_functions = array(
 			'(G|g)utenberg.*',
 		);
