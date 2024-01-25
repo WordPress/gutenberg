@@ -115,7 +115,7 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			overrides,
 			defaultValues
 		);
-		const blockId = block.attributes.metadata?.id;
+		const blockId = block.attributes.metadata?.name;
 		if ( ! isPartiallySynced( block ) || ! blockId )
 			return { ...block, innerBlocks };
 		const attributes = getPartiallySyncedAttributes( block );
@@ -152,7 +152,7 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 			getOverridesFromBlocks( block.innerBlocks, defaultValues )
 		);
 		/** @type {string} */
-		const blockId = block.attributes.metadata?.id;
+		const blockId = block.attributes.metadata?.name;
 		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
 		const attributes = getPartiallySyncedAttributes( block );
 		for ( const attributeKey of attributes ) {

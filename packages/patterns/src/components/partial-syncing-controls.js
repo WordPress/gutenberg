@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { nanoid } from 'nanoid';
-
-/**
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
@@ -66,7 +61,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 			}
 		}
 
-		if ( typeof attributes.metadata?.id === 'string' ) {
+		if ( typeof attributes.metadata?.name === 'string' ) {
 			setAttributes( {
 				metadata: {
 					...attributes.metadata,
@@ -76,11 +71,9 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 			return;
 		}
 
-		const id = nanoid( 6 );
 		setAttributes( {
 			metadata: {
 				...attributes.metadata,
-				id,
 				bindings: updatedBindings,
 			},
 		} );

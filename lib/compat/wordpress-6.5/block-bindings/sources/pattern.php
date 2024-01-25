@@ -6,10 +6,10 @@
  */
 if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 	$pattern_source_callback = function ( $source_attrs, $block_instance, $attribute_name ) {
-		if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
+		if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'name' ), false ) ) {
 			return null;
 		}
-		$block_id           = $block_instance->attributes['metadata']['id'];
+		$block_id           = $block_instance->attributes['metadata']['name'];
 		$attribute_override = _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, $attribute_name ), null );
 		if ( null === $attribute_override ) {
 			return null;
