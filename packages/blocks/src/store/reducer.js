@@ -92,6 +92,20 @@ function bootstrappedBlockTypes( state = {}, action ) {
 						blockHooks: blockType.blockHooks,
 					};
 				}
+
+				// The `children` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.5.
+				if (
+					serverDefinition.children === undefined &&
+					blockType.children
+				) {
+					newDefinition = {
+						...serverDefinition,
+						...newDefinition,
+						children: blockType.children,
+					};
+				}
 			} else {
 				newDefinition = Object.fromEntries(
 					Object.entries( blockType )

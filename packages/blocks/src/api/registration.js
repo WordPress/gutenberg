@@ -156,6 +156,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'category',
 		'parent',
 		'ancestor',
+		'children',
 		'icon',
 		'description',
 		'keywords',
