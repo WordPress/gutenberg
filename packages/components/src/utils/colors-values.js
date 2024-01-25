@@ -43,7 +43,8 @@ const THEME = {
 	background: `var(--wp-components-color-background, ${ white })`,
 	foreground: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
 	gray: {
-		900: `var(--wp-components-color-gray-900, ${ GRAY[ 900 ] })`,
+		/** @deprecated Use `COLORS.theme.foreground` instead. */
+		900: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
 		800: `var(--wp-components-color-gray-800, ${ GRAY[ 800 ] })`,
 		700: `var(--wp-components-color-gray-700, ${ GRAY[ 700 ] })`,
 		600: `var(--wp-components-color-gray-600, ${ GRAY[ 600 ] })`,
