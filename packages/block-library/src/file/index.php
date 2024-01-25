@@ -38,7 +38,7 @@ function render_block_core_file( $attributes, $content ) {
 
 	// If it's interactive, enqueue the script module and add the directives.
 	if ( ! empty( $attributes['displayPreview'] ) ) {
-		wp_enqueue_script_module( '@wordpress/block-library/file-block' );
+		wp_enqueue_script_module( '@wordpress/block-library/file' );
 
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
@@ -64,8 +64,8 @@ function register_block_core_file() {
 	);
 
 	wp_register_script_module(
-		'@wordpress/block-library/file-block',
-		gutenberg_url( '/build/interactivity/file.min.js' ),
+		'@wordpress/block-library/file',
+		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/file.min.js' ) : includes_url( 'blocks/file/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
