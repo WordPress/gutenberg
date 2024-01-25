@@ -37,7 +37,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Restore tests setup cache
-              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
               with:
                   path: |
                       ~/.appium
@@ -50,7 +50,7 @@ jobs:
               uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2.11.1
 
             - name: AVD cache
-              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
               id: avd-cache
               with:
                   path: |
@@ -81,13 +81,13 @@ jobs:
                   profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+            - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+            - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
               if: always()
               with:
                   name: appium-logs
