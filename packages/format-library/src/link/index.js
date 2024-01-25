@@ -147,7 +147,7 @@ function Edit( {
 			<RichTextToolbarButton
 				name="link"
 				icon={ linkIcon }
-				title={ isActive ? __( 'Edit link' ) : title }
+				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
 					addLink( event.currentTarget );
 				} }
