@@ -20,6 +20,12 @@ export const settings = {
 	icon,
 	example: {},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return attributes.customText;
 		}

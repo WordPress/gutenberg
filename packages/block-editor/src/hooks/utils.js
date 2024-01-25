@@ -195,6 +195,7 @@ export function useBlockSettings( name, parentLayout ) {
 		blockGap,
 		spacingSizes,
 		units,
+		aspectRatio,
 		minHeight,
 		layout,
 		borderColor,
@@ -221,6 +222,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -243,6 +245,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'spacing.blockGap',
 		'spacing.spacingSizes',
 		'spacing.units',
+		'dimensions.aspectRatio',
 		'dimensions.minHeight',
 		'layout',
 		'border.color',
@@ -268,7 +271,8 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.link',
 		'color.text',
 		'color.heading',
-		'color.button'
+		'color.button',
+		'shadow'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -341,10 +345,12 @@ export function useBlockSettings( name, parentLayout ) {
 				width: borderWidth,
 			},
 			dimensions: {
+				aspectRatio,
 				minHeight,
 			},
 			layout,
 			parentLayout,
+			shadow,
 		};
 	}, [
 		backgroundImage,
@@ -368,6 +374,7 @@ export function useBlockSettings( name, parentLayout ) {
 		blockGap,
 		spacingSizes,
 		units,
+		aspectRatio,
 		minHeight,
 		layout,
 		parentLayout,
@@ -395,6 +402,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );

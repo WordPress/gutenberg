@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, navigate } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'directive-each' );
 
@@ -158,7 +158,7 @@ store( 'directive-each', {
 const html = `
 <div
 	data-wp-interactive='{ "namespace": "directive-each" }'
-	data-wp-navigation-id="navigation-updated list"
+	data-wp-router-region="navigation-updated list"
 	data-wp-context='{ "list": [ "alpha", "beta", "gamma", "delta" ] }'
 	data-testid="navigation-updated list"
 >
@@ -178,8 +178,11 @@ const html = `
 
 store( 'directive-each', {
 	actions: {
-		navigate() {
-			return navigate( window.location, {
+		*navigate() {
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );

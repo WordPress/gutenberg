@@ -89,7 +89,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	.block-editor-block-list__block:not([contenteditable]):focus {
+	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 
 		// We're using a pseudo element to overflow placeholder borders
@@ -199,9 +199,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		width: 100%;
 
 		.components-notice {
-			margin-left: 0;
-			margin-right: 0;
-
 			.components-notice__content {
 				font-size: $default-font-size;
 			}

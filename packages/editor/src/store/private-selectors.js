@@ -30,7 +30,7 @@ export const getInsertionPoint = createRegistrySelector(
 
 		if ( getRenderingMode( state ) === 'template-locked' ) {
 			const [ postContentClientId ] =
-				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+				select( blockEditorStore ).getBlocksByName(
 					'core/post-content'
 				);
 			if ( postContentClientId ) {
