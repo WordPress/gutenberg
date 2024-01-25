@@ -341,3 +341,11 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 export function getLastFocus( state ) {
 	return state.lastFocus;
 }
+
+export function getAllBlockBindingsSources( state ) {
+	return state.blockBindingsSources;
+}
+
+export function getBlockBindingsSource( state, sourceName ) {
+	return state.blockBindingsSources[ sourceName ];
+}

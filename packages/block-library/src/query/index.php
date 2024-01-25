@@ -28,7 +28,8 @@ function render_block_core_query( $attributes, $content, $block ) {
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
-			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
+			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
+			$p->set_attribute( 'data-wp-init', 'callbacks.setQueryRef' );
 			// Use context to send translated strings.
 			$p->set_attribute(
 				'data-wp-context',
@@ -100,8 +101,17 @@ function register_block_core_query() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/query',
-		'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
-		array( '@wordpress/interactivity' ),
+		gutenberg_url( '/build/interactivity/query.min.js' ),
+		array(
+			array(
+				'id'     => '@wordpress/interactivity',
+				'import' => 'static',
+			),
+			array(
+				'id'     => '@wordpress/interactivity-router',
+				'import' => 'dynamic',
+			),
+		),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }

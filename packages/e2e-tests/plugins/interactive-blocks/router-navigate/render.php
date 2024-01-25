@@ -12,7 +12,7 @@ wp_enqueue_script_module( 'router-navigate-view' );
 
 <div
 	data-wp-interactive='{ "namespace": "router" }'
-	data-wp-navigation-id="region-1"
+	data-wp-router-region="region-1"
 >
 	<h2 data-testid="title"><?php echo $attributes['title']; ?></h2>
 
