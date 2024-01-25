@@ -704,6 +704,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		// Create a block with some text.
 		await editor.insertBlock( {
@@ -729,23 +730,18 @@ test.describe( 'Links', () => {
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
+
 		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Escape' );
-		await pageUtils.pressKeys( 'End' );
-		// Move back into the link.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'primary+k' );
-		await pageUtils.pressKeys( 'Tab' );
-		await pageUtils.pressKeys( 'Enter' );
+
+		// Press the "Edit" button
+		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Toggle the Advanced settings to be open.
 		// This should set the editor preference to persist this
 		// UI state.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
@@ -754,24 +750,25 @@ test.describe( 'Links', () => {
 		// Move focus out of Link UI and into Paragraph block.
 		await pageUtils.pressKeys( 'Escape' );
 
-		// Move caret back into the "WordPress" link
-		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
+		// Click on the "WordPress" link
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'WordPress',
+			} )
+			.click();
 
-		// Switch Link UI to "edit" mode.
-		await pageUtils.pressKeys( 'primary+k' );
-		await pageUtils.pressKeys( 'Tab' );
-		await pageUtils.pressKeys( 'Enter' );
+		// press the "edit" button
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Check that the Advanced settings are still expanded/open
 		// and I can see the open in new tab checkbox. This verifies
 		// that the editor preference was persisted.
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+		await expect(
+			linkPopover.getByLabel( 'Open in new tab' )
+		).toBeVisible();
 
 		// Toggle the Advanced settings back to being closed.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
@@ -782,12 +779,20 @@ test.describe( 'Links', () => {
 
 		// Move caret back into the "Gutenberg" link and open
 		// the Link UI for that link.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'primary+k' );
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
+
+		// Switch to "Edit" mode.
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Check that the Advanced settings are still closed.
 		// This verifies that the editor preference was persisted.
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeHidden();
+		await expect(
+			linkPopover.getByLabel( 'Open in new tab' )
+		).toBeHidden();
 	} );
 
 	test( 'can toggle link settings and save', async ( {
