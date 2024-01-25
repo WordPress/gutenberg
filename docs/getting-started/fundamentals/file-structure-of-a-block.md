@@ -30,7 +30,8 @@ This file contains the [metadata of the block](https://developer.wordpress.org/b
 
 Among other data it provides properties to define the paths of the files involved in the block's behaviour, output and style. If there's a build process involved, this `block.json` along with the generated files are placed into a destination folder (usually the `build` folder) so the paths provided target to the bundled versions of these files.
 
-The most relevant properties that can be defined in a `block.json` to set the files involved in the block's behaviour, output or style are:
+The most relevant properties that can be defined in a `block.json` to set the files involved in the block's behaviour, output, or style are:
+
 - The [`editorScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-script) property, usually set with the path of a bundled `index.js` file (output build from `src/index.js`).
 - The [`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) property, usually set with the path of a bundled `style-index.css` file (output build from `src/style.(css|scss|sass)`).
 - The [`editorStyle`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style) property, usually set with the path of a bundled `index.css` (output build from `src/editor.(css|scss|sass)`).

@@ -77,8 +77,7 @@ export function useInBetweenInserter() {
 				if (
 					getTemplateLock( rootClientId ) ||
 					getBlockEditingMode( rootClientId ) === 'disabled' ||
-					( getBlockName( rootClientId ) === 'core/block' &&
-						window.__experimentalPatternPartialSyncing )
+					getBlockName( rootClientId ) === 'core/block'
 				) {
 					return;
 				}

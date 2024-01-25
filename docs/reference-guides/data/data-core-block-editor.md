@@ -409,6 +409,19 @@ _Returns_
 
 -   `WPBlock[]`: Block objects.
 
+### getBlocksByName
+
+Returns all blocks that match a blockName. Results include nested blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _blockName_ `?string`: Optional block name, if not specified, returns an empty array.
+
+_Returns_
+
+-   `Array`: Array of clientIds of blocks with name equal to blockName.
+
 ### getBlockSelectionEnd
 
 Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.

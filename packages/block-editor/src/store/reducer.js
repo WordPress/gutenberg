@@ -1599,13 +1599,19 @@ export function blocksMode( state = {}, action ) {
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index, __unstableWithInserter, operation } =
-				action;
+			const {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+				nearestSide,
+			} = action;
 			const nextState = {
 				rootClientId,
 				index,
 				__unstableWithInserter,
 				operation,
+				nearestSide,
 			};
 
 			// Bail out updates if the states are the same.
@@ -2017,6 +2023,29 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				useSource: action.useSource,
+				lockAttributesEditing: action.lockAttributesEditing,
+			},
+		};
+	}
+	return state;
+}
+
+function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -2047,6 +2076,8 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	blockBindingsSources,
+	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {
