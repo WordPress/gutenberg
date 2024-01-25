@@ -29,19 +29,20 @@ const ALERT = {
 	green: '#4ab866',
 };
 
-// Matches the Modern admin scheme in @wordpress/base-styles
-const ADMIN = {
-	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
-	themeDark10:
-		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
-};
-
 // Should match packages/components/src/utils/theme-variables.scss
 const THEME = {
-	accent: ADMIN.theme,
-	accentDarker10: ADMIN.themeDark10,
+	accent: `var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`,
+	accentDarker10: `var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))`,
+	accentDarker20: `var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6))`,
+	/** Used when placing text on the accent color. */
+	accentInverted: `var(--wp-components-color-accent-inverted, ${ white })`,
+
 	background: `var(--wp-components-color-background, ${ white })`,
+
 	foreground: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
+	/** Used when placing text on the foreground color. */
+	foregroundInverted: `var(--wp-components-color-foreground-inverted, ${ white })`,
+
 	gray: {
 		/** @deprecated Use `COLORS.theme.foreground` instead. */
 		900: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
