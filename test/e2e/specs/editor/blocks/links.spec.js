@@ -572,6 +572,11 @@ test.describe( 'Links', () => {
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
+		const linkPopover = LinkUtils.getLinkPopover();
+
+		// Expect link popover to be visible
+		await expect( linkPopover ).toBeVisible();
+
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
@@ -584,35 +589,30 @@ test.describe( 'Links', () => {
 			},
 		] );
 
+		// Submit the link.
 		await page.keyboard.press( 'Enter' );
 
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
+		// Expect the Link UI to still be visible
+		await expect( linkPopover ).toBeVisible();
 
-		// Edit link.
-		await pageUtils.pressKeys( 'primary+K' );
+		// Tab to "Edit" button and enter edit mode again.
 		await pageUtils.pressKeys( 'Tab' );
 		await pageUtils.pressKeys( 'Enter' );
 
 		// Open settings.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
 			.click();
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
-		const checkbox = page.getByLabel( 'Open in new tab' );
+		const checkbox = linkPopover.getByLabel( 'Open in new tab' );
 		await checkbox.click();
 
 		// Toggle should still have focus and be checked.
 		await expect( checkbox ).toBeChecked();
 		await expect( checkbox ).toBeFocused();
-
-		const linkPopover = LinkUtils.getLinkPopover();
 
 		// Tab back to the Submit and apply the link.
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
