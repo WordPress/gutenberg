@@ -61,6 +61,10 @@
 		.components-input-control__container {
 			background: transparent !important;
 		}
+
+		.components-select-control__input {
+			padding-right: $grid-unit-05 * 5 !important;
+		}
 	}
 }
 
