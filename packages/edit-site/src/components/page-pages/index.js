@@ -161,6 +161,10 @@ function FeaturedImage( { item, viewType } ) {
 		canvas: 'edit',
 	} );
 	const hasMedia = !! item.featured_media;
+	const size =
+		viewType === LAYOUT_GRID
+			? [ 'large', 'full', 'medium', 'thumbnail' ]
+			: [ 'thumbnail', 'medium', 'large', 'full' ];
 	return (
 		<span
 			className={ {
@@ -168,24 +172,29 @@ function FeaturedImage( { item, viewType } ) {
 					viewType === LAYOUT_TABLE,
 			} }
 		>
-			<button
-				className="page-pages-preview-field__button"
-				type="button"
-				onClick={ onClick }
-				aria-label={ item.title?.rendered || __( '(no title)' ) }
-			>
-				{ hasMedia && (
-					<Media
-						className="edit-site-page-pages__featured-image"
-						id={ item.featured_media }
-						size={
-							viewType === LAYOUT_GRID
-								? [ 'large', 'full', 'medium', 'thumbnail' ]
-								: [ 'thumbnail', 'medium', 'large', 'full' ]
-						}
-					/>
-				) }
-			</button>
+			{ viewType === LAYOUT_LIST && hasMedia && (
+				<Media
+					className="edit-site-page-pages__featured-image"
+					id={ item.featured_media }
+					size={ size }
+				/>
+			) }
+			{ viewType !== LAYOUT_LIST && (
+				<button
+					className="page-pages-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || __( '(no title)' ) }
+				>
+					{ hasMedia && (
+						<Media
+							className="edit-site-page-pages__featured-image"
+							id={ item.featured_media }
+							size={ size }
+						/>
+					) }
+				</button>
+			) }
 		</span>
 	);
 }
