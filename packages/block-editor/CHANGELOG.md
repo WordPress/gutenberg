@@ -303,7 +303,7 @@
 
 -   Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
 
-### Deprecation
+### Deprecations
 
 -   `dropZoneUIOnly` prop in `MediaPlaceholder` component has been deprecated in favor of `disableMediaButtons` prop.
 

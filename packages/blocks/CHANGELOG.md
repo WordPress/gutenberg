@@ -284,7 +284,7 @@
 
 -   `isValidBlockContent` function has been added ([#10891](https://github.com/WordPress/gutenberg/pull/10891)).
 
-### Deprecation
+### Deprecations
 
 -   `isValidBlock` function has been deprecated ([#10891](https://github.com/WordPress/gutenberg/pull/10891)). Use `isValidBlockContent` instead.
 

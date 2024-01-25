@@ -1747,7 +1747,7 @@
 -   Fix `UnitControl`'s reset of unit when the quantity value is cleared. ([#39531](https://github.com/WordPress/gutenberg/pull/39531/)).
 -   `ResizableBox`: Ensure tooltip text remains on a single line. ([#39623](https://github.com/WordPress/gutenberg/pull/39623)).
 
-### Deprecation
+### Deprecations
 
 -   `unit` prop in `UnitControl` marked as deprecated ([#39503](https://github.com/WordPress/gutenberg/pull/39503)).
 
@@ -1994,7 +1994,7 @@
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
-### Deprecation
+### Deprecations
 
 -   `isScrollable` prop in `CardBody` default value changed from `true` to `false` ([#33490](https://github.com/WordPress/gutenberg/pull/33490))
 
@@ -2008,7 +2008,7 @@
 
 -   Update the border color used in `CardBody`, `CardHeader`, `CardFooter`, and `CardDivider` to a different shade of gray, in order to match the color used in other components ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
 
-### Deprecation
+### Deprecations
 
 -   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
 -   `isElevated` prop in `Card` has been deprecated. Use `elevation` instead ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
@@ -2027,7 +2027,7 @@
 -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 -   The experimental `Text` component has been completely re-written and enhanced with truncation support and separate variant, size, and weight props to allow for greater control. The previous `variant` prop has been completely removed.
 
-### Deprecation
+### Deprecations
 
 -   `isReversed` prop in `Flex` component has been deprecated. Use `direction` instead ([#31297](https://github.com/WordPress/gutenberg/pull/31297)).
 
@@ -2287,7 +2287,7 @@
 -   Adjust a11y roles for MenuItem component, so that aria-checked is used properly, related change in Editor/Components/BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
 -   `Popover` components are now automatically refreshed every 0.5s in order to recalculate their size or position.
 
-### Deprecation
+### Deprecations
 
 -   `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
 
@@ -2328,7 +2328,7 @@
 
 -   `IconButton` correctly respects a passed `aria-label` prop.
 
-### Deprecation
+### Deprecations
 
 -   `PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
 
@@ -2346,7 +2346,7 @@
 
 -   `Draggable` as a DOM node drag handler has been removed. Please, use `Draggable` as a wrap component for your DOM node drag handler.
 
-### Deprecation
+### Deprecations
 
 -   Renamed `AccessibleSVG` component to `SVG`.
 
