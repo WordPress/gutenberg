@@ -75,15 +75,16 @@ function FontCollection( { slug } ) {
 				await getFontCollection( slug );
 				resetFilters();
 			} catch ( e ) {
-				setNotice( {
-					type: 'error',
-					message: e?.message,
-					duration: 0, // Don't auto-hide.
-				} );
+				if ( ! notice ) {
+					setNotice( {
+						type: 'error',
+						message: e?.message,
+					} );
+				}
 			}
 		};
 		fetchFontCollection();
-	}, [ slug, getFontCollection, setNotice ] );
+	}, [ slug, getFontCollection, setNotice, notice ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
