@@ -1076,6 +1076,7 @@ const blockNames = {
 	button: 'Button',
 	preformatted: 'Preformatted',
 	unsupported: 'Unsupported',
+	quote: 'Quote',
 };
 
 module.exports = { setupEditor, blockNames };
