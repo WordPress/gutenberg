@@ -37,7 +37,13 @@ const PreviewProvider = withRegistry( ( props ) => {
 			blockEditorStoreName,
 			storeConfig
 		);
-		store.dispatch( __experimentalUpdateSettings( settings ) );
+		store.dispatch(
+			__experimentalUpdateSettings( {
+				...settings,
+				__internalIsInitialized: true,
+				__unstableIsPreviewMode: true,
+			} )
+		);
 		store.dispatch( resetBlocks( value ) );
 		return newRegistry;
 	}, [ registry, value, settings ] );
