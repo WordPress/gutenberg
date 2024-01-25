@@ -160,7 +160,6 @@ function Layout() {
 		isDistractionFree,
 		showBlockBreadcrumbs,
 		showMetaBoxes,
-		showMostUsedBlocks,
 		documentLabel,
 		hasHistory,
 	} = useSelect( ( select ) => {
@@ -193,8 +192,6 @@ function Layout() {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			showMostUsedBlocks:
-				select( editPostStore ).isFeatureActive( 'mostUsedBlocks' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
@@ -263,9 +260,7 @@ function Layout() {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			return (
-				<InserterSidebar showMostUsedBlocks={ showMostUsedBlocks } />
-			);
+			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;

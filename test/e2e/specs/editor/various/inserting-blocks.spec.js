@@ -451,7 +451,8 @@ class InsertingBlocksUtils {
 		for ( let i = 0; i < 2; i += 1 ) {
 			await this.page.mouse.move(
 				// Hover on the right side of the block to avoid collapsing with the preview.
-				boundingBox.x + boundingBox.width - 1,
+				// But not too far to avoid triggering the grouping block inserter.
+				boundingBox.x + boundingBox.width - 32,
 				// Hover on the bottom of the paragraph block.
 				boundingBox.y + boundingBox.height - 1
 			);

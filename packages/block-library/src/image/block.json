@@ -4,7 +4,12 @@
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
-	"usesContext": [ "allowResize", "imageCrop", "fixedHeight" ],
+	"usesContext": [
+		"allowResize",
+		"imageCrop",
+		"fixedHeight",
+		"pattern/overrides"
+	],
 	"description": "Insert an image to make a visual statement.",
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
@@ -129,6 +134,5 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image",
-	"viewScript": "file:./view.min.js"
+	"style": "wp-block-image"
 }

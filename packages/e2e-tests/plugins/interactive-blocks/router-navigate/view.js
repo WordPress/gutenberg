@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate } from '@wordpress/interactivity';
+import { store } from '@wordpress/interactivity';
 
 const { state } = store( 'router', {
 	state: {
@@ -19,7 +19,10 @@ const { state } = store( 'router', {
 			const force = e.target.dataset.forceNavigation === 'true';
 			const { timeout } = state;
 
-			yield navigate( e.target.href, { force, timeout } );
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			yield actions.navigate( e.target.href, { force, timeout } );
 
 			state.navigations -= 1;
 

@@ -43,7 +43,7 @@ A callback function that handles the application of the height value.
 -   **Type:** `String`
 -   **Default:** `'Height'`
 
-A label for the height control. This is useful when using the height control for a feature that is controlled in the same way as height, but requires a different label. For example, "Min. height".
+A label for the height control. This is useful when using the height control for a feature that is controlled in the same way as height, but requires a different label. For example, "Minimum height".
 
 ## Related components
 

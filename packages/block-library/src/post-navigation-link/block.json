@@ -28,8 +28,13 @@
 		"arrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": ""
 		}
 	},
+	"usesContext": [ "postType" ],
 	"supports": {
 		"reusable": false,
 		"html": false,

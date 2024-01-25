@@ -21,16 +21,21 @@ type ValueProp = ToggleGroupControlProps[ 'value' ];
 export function useComputeControlledOrUncontrolledValue(
 	valueProp: ValueProp
 ): { value: ValueProp; defaultValue: ValueProp } {
+	const isInitialRender = useRef( true );
 	const prevValueProp = usePrevious( valueProp );
 	const prevIsControlled = useRef( false );
+
+	useEffect( () => {
+		if ( isInitialRender.current ) {
+			isInitialRender.current = false;
+		}
+	}, [] );
 
 	// Assume the component is being used in controlled mode on the first re-render
 	// that has a different `valueProp` from the previous render.
 	const isControlled =
 		prevIsControlled.current ||
-		( prevValueProp !== undefined &&
-			valueProp !== undefined &&
-			prevValueProp !== valueProp );
+		( ! isInitialRender.current && prevValueProp !== valueProp );
 	useEffect( () => {
 		prevIsControlled.current = isControlled;
 	}, [ isControlled ] );
