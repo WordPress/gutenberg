@@ -184,13 +184,13 @@
 
 ## 2.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.21.0 (2020-09-03)
 
-### New Feature
+### New Features
 
 -   The `deleteEntityRecord` and `removeItems` actions have been added.
 -   The `isDeletingEntityRecord` and `getLastEntityDeleteError` selectors have been added.
@@ -198,7 +198,7 @@
 
 ## 2.3.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
 -   The `receiveAutosaves` and `receiveCurrentUser` actions have been added.

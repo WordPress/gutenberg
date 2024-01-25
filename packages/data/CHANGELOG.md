@@ -248,7 +248,7 @@
 
 ## 4.6.0 (2019-06-12)
 
-### New Feature
+### New Features
 
 -   Expose `useSelect` hook for usage in functional components. ([#15737](https://github.com/WordPress/gutenberg/pull/15737))
 -   Expose `useDispatch` hook for usage in functional components. ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
@@ -290,7 +290,7 @@
 
 ## 4.1.0 (2018-12-12)
 
-### New Feature
+### New Features
 
 -   `withDispatch`'s `mapDispatchToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
 -   `withSelect`'s `mapSelectToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).

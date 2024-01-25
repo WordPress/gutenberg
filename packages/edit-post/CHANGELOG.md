@@ -196,7 +196,7 @@
 
 ## 3.4.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
 
@@ -235,7 +235,7 @@
 
 ## 3.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   The new `AdminNotices` component will transparently upgrade any `.notice` elements on the page to the equivalent `@wordpress/notices` module notice state.
 

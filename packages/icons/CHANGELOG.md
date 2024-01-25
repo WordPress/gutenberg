@@ -38,7 +38,7 @@
 
 ## 9.37.0 (2023-11-16)
 
-### New features
+### New Features
 
 -   Add new `funnel` icon.
 
@@ -84,7 +84,7 @@
 
 ## 9.22.0 (2023-04-12)
 
-### New features
+### New Features
 
 ## 9.21.0 (2023-03-29)
 
@@ -223,7 +223,7 @@
 
 -   `star` icon removed as it is duplicative of `star-filled`. ([#21825](https://github.com/WordPress/gutenberg/pull/21825))
 
-### New Feature
+### New Features
 
 -   Include TypeScript type declarations ([#21781](https://github.com/WordPress/gutenberg/pull/21781))
 

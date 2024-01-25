@@ -626,7 +626,7 @@
 
 ## 25.5.0 (2023-08-10)
 
-### New Feature
+### New Features
 
 -   Add a new `ProgressBar` component. ([#53030](https://github.com/WordPress/gutenberg/pull/53030)).
 
@@ -999,7 +999,7 @@
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
 
-### New Feature
+### New Features
 
 -   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
 -   `TabPanel`: support disabled prop for tab buttons ([#46471](https://github.com/WordPress/gutenberg/pull/46471)).
@@ -1108,7 +1108,7 @@
 -   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
 -   `Popover`: The `isAlternate` prop has been replaced with a `variant` prop that can be called with the `'toolbar'` string ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
 
-### New Feature
+### New Features
 
 -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
 -   `Popover`: A `variant` prop has been added to style popovers, with `'unstyled'` and `'toolbar'` possible values ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
@@ -1980,7 +1980,7 @@
 
 -   Updated the visual styles of the RangeControl component ([#33824](https://github.com/WordPress/gutenberg/pull/33824)).
 
-### New Feature
+### New Features
 
 -   Add `hideLabelFromVision` prop to `RangeControl` ([#33714](https://github.com/WordPress/gutenberg/pull/33714)).
 
@@ -2004,7 +2004,7 @@
 
 ## 14.2.0 (2021-07-21)
 
-### New Feature
+### New Features
 
 -   Update the border color used in `CardBody`, `CardHeader`, `CardFooter`, and `CardDivider` to a different shade of gray, in order to match the color used in other components ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
 
@@ -2041,7 +2041,7 @@
 
 -   `onChange` prop of `FocalPointPicker` is called at the end of drag operations. Previously, it was called repetitively while dragging.
 
-### New Feature
+### New Features
 
 -   Supports ref forwarding in `withNotices` and `ResizableBox`.
 -   Adds `onDrag` prop of `FocalPointPicker`.
@@ -2062,7 +2062,7 @@
 
 ## 10.1.0 (2020-09-03)
 
-### New Feature
+### New Features
 
 -   Add `ToolbarItem` component.
 -   Support `label` prop on the `Toolbar` component.
@@ -2161,7 +2161,7 @@
 
 ## 8.0.0 (2019-06-12)
 
-### New Feature
+### New Features
 
 -   Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
 -   `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
@@ -2184,7 +2184,7 @@
 
 ## 7.4.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Added a new `HorizontalRule` component.
 -   Added a new `Snackbar` component.
@@ -2238,7 +2238,7 @@
 -   Resolves a conflict where two instance of Slot would produce an inconsistent or duplicated rendering output.
 -   Allow years between 0 and 1970 in DateTime component.
 
-### New Feature
+### New Features
 
 -   `Dropdown` now has a `focusOnMount` prop which is passed directly to the contained `Popover`.
 -   `DatePicker` has new prop `isInvalidDate` exposing react-dates' `isOutsideRange`.
@@ -2282,7 +2282,7 @@
 
 ## 5.1.0 (2018-11-09)
 
-### New Feature
+### New Features
 
 -   Adjust a11y roles for MenuItem component, so that aria-checked is used properly, related change in Editor/Components/BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
 -   `Popover` components are now automatically refreshed every 0.5s in order to recalculate their size or position.
@@ -2307,7 +2307,7 @@
 
 -   `AccessibleSVG` component has been removed. Please use `SVG` instead.
 
-### New Feature
+### New Features
 
 -   The `Notice` component accepts an array of action objects via the `actions` prop. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
 
@@ -2319,7 +2319,7 @@
 
 ## 4.2.0 (2018-10-19)
 
-### New Feature
+### New Features
 
 -   Added a new `ColorPicker` component ([#10564](https://github.com/WordPress/gutenberg/pull/10564)).
 -   `MenuItem` now accepts an `info` prop for including an extended description.
@@ -2336,7 +2336,7 @@
 
 ## 4.1.0 (2018-10-10)
 
-### New Feature
+### New Features
 
 -   Added a new `ResizableBox` component.
 
@@ -2359,6 +2359,6 @@
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 -   `withContext` has been removed. Please use `wp.element.createContext` instead. See: <https://reactjs.org/docs/context.html>.
 
-### New Feature
+### New Features
 
 -   Added a new `AccessibleSVG` component.

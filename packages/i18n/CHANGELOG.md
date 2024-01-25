@@ -171,7 +171,7 @@
 
 ## 3.10.0 (2020-04-01)
 
-### New Feature
+### New Features
 
 -   Add `isRTL` function ([#20298](https://github.com/WordPress/gutenberg/pull/20298))
 
@@ -200,7 +200,7 @@
 
 ## 1.2.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 

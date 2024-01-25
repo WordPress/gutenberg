@@ -107,7 +107,7 @@
 
 ## 7.14.0 (2022-09-13)
 
-### New Feature
+### New Features
 
 -   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
 
@@ -288,7 +288,7 @@
 
 ## 2.3.0 (2019-03-06)
 
-### New Feature
+### New Features
 
 -   Add background color controls for the table block.
 -   Add new `RSS` block ([#7966](https://github.com/WordPress/gutenberg/pull/7966)).

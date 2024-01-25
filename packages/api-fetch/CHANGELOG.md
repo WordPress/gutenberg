@@ -134,7 +134,7 @@
 
 ## 5.2.0 (2021-07-21)
 
-### New feature
+### New Features
 
 -   `AbortError` being thrown by the default fetch handler can now be caught and handled separately in user-land. Add documentation about aborting a request ([#32530](https://github.com/WordPress/gutenberg/pull/32530)).
 
@@ -161,7 +161,7 @@
 
 ## 3.23.0 (2021-04-06)
 
-### New Feature
+### New Features
 
 -   Publish TypeScript definitions.
 
@@ -184,7 +184,7 @@
 
 -   A created nonce middleware will no longer automatically listen for `heartbeat.tick` actions. Assign to the new `nonce` middleware property instead.
 
-### New Feature
+### New Features
 
 -   The function returned by `createNonceMiddleware` includes an assignable `nonce` property corresponding to the active nonce to be used.
 -   Default fetch handler can be overridden with a custom fetch handler
@@ -203,13 +203,13 @@
 
 ## 2.2.0 (2018-10-29)
 
-### New Feature
+### New Features
 
 -   Always request data in the user's locale ([#10862](https://github.com/WordPress/gutenberg/pull/10862)).
 
 ## 2.1.0 (2018-10-22)
 
-### New Feature
+### New Features
 
 -   Support `per_page=-1` paginated requests.
 

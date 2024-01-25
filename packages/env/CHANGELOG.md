@@ -85,7 +85,7 @@
 
 ## 8.1.0 (2023-06-07)
 
-### New feature
+### New Features
 
 -   Execute the local package's `wp-env` instead of the globally installed version if one is available.
 
@@ -99,7 +99,7 @@
 
 -   Remove `afterSetup` option from `.wp-env.json` and the `WP_ENV_AFTER_SETUP` environment variable in favor of more granular lifecycle scripts.
 
-### New feature
+### New Features
 
 -   Add `afterStart`, `afterClean`, and `afterDestroy` lifecycle scripts to a new `lifecycleScripts` key in `.wp-env.json`.
 -   Add a series of `WP_ENV_LIFECYCLE_SCRIPT_` environment variables for the various lifecycle scripts.
@@ -121,7 +121,7 @@
 -   Docker containers now run as the host user. This should resolve problems with permissions arising from different owners between the host, web container, and cli container. If you still encounter permissions issues, try running `npx wp-env destroy` so that the environment can be recreated with the correct permissions.
 -   Remove the `composer` and `phpunit` Docker containers. If you are currently using the `run composer` or `run phpunit` command you can migrate to `run cli composer` or `run tests-cli phpunit` respectively. Note that with `composer`, you will need to use the `--env-cwd` option to navigate to your plugin's directory as it is no longer the default working directory.
 
-### New feature
+### New Features
 
 -   Create an `afterSetup` option in `.wp-env.json` files for setting arbitrary commands to run after setting up WordPress when using `npx wp-env start` and `npx wp-env clean`.
 -   Add a `WP_ENV_AFTER_SETUP` environment variable to override the `afterSetup` option.
@@ -282,7 +282,7 @@
 -   Allow WP_HOME wp-config value to be set to a custom port other than the default for the docker instance.
 -   Append the instance URL to output of `wp-env start`.
 
-### New feature
+### New Features
 
 -   Add support for setting the PHP version used for the WordPress instance. For example, test PHP 8 with `"phpVersion": 8.0` in wp-env.json.
 -   Add Xdebug 3 to the development environment. You can enable Xdebug with `wp-env start --xdebug` (for debug mode) or `wp-env start --xdebug=develop,coverage` for custom modes.
@@ -300,7 +300,7 @@
 -   `wp-env start` no longer stops the WordPress instance if it was already started unless it needs to configure WordPress.
 -   `wp-env start` no longer updates remote sources after first install if the configuration is the same. Use `wp-env start --update` to update sources.
 
-### New Feature
+### New Features
 
 -   You may now specify specific configuration for different environments using `env.tests` or `env.development` in `.wp-env.json`.
 -   `wp-env start` is significantly faster after first install.
@@ -313,7 +313,7 @@
 
 ## 1.4.0 (2020-05-28)
 
-### New Feature
+### New Features
 
 -   Add support for running interactive commands. Examples: `wp-env run cli wp shell` and `wp-env run cli bash`.
 -   View php and WordPress log output with the new `wp-env logs` command.
@@ -323,7 +323,7 @@
 
 ## 1.1.0 (2020-04-01)
 
-### New Feature
+### New Features
 
 -   URLs for ZIP files are now supported as core, plugin, and theme sources.
 -   The `.wp-env.json` coniguration file now accepts a `config` object for setting `wp-config.php` values.
@@ -338,7 +338,7 @@
 -   `wp-env start` no longer accepts a WordPress branch or tag reference as its argument. Instead, create a `.wp-env.json` file and specify a `"core"` field.
 -   `wp-env start` will now download WordPress into a hidden directory located in `~/.wp-env`. You may delete your `{projectName}-wordpress` and `{projectName}-tests-wordpress` directories.
 
-### New Feature
+### New Features
 
 -   A `.wp-env.json` configuration file can now be used to specify the WordPress installation, plugins, and themes to use in the local development environment.
 

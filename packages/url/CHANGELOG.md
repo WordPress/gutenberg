@@ -124,7 +124,7 @@
 
 ## 3.3.0 (2021-11-07)
 
-### New Feature
+### New Features
 
 -   Added new `normalizePath` function ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).
 
@@ -149,13 +149,13 @@
 
 ## 2.21.0 (2021-01-05)
 
-### New Feature
+### New Features
 
 -   Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
 
 ## 2.16.0 (2020-06-15)
 
-### New Feature
+### New Features
 
 -   Added `getPathAndQueryString`.
 
@@ -167,7 +167,7 @@
 
 ## 2.13.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
@@ -224,7 +224,7 @@
 
 ## 2.1.0 (2018-10-16)
 
-### New Feature
+### New Features
 
 -   Added `safeDecodeURI`.
 

@@ -141,7 +141,7 @@
 
 ## 1.8.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#20669](https://github.com/WordPress/gutenberg/pull/20669))
 

@@ -149,7 +149,7 @@
     `@wordpress/is-shallow-equal/arrays` and `@wordpress/is-shallow-equal/objects` were never
     officially supported and have been removed. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
@@ -161,7 +161,7 @@
 
 ## 1.2.0 (2019-03-06)
 
-### New Feature
+### New Features
 
 -   Type-specific variants are now exposed from the module root. In a WordPress context, this has the effect of making them available as `wp.isShallowEqual.isShallowEqualObjects` and `wp.isShallowEqual.isShallowEqualArrays`.
 
@@ -171,7 +171,7 @@
 
 ## 1.1.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -193,6 +193,6 @@
 
 ## 1.0.0 (2018-04-25)
 
-### New Feature
+### New Features
 
 -   Initial release

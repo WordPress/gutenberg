@@ -117,7 +117,7 @@
 
 ## 3.24.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 

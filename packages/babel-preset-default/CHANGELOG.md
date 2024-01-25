@@ -132,7 +132,7 @@
 
 ## 6.2.0 (2021-05-31)
 
-### New Feature
+### New Features
 
 -   New `build/polyfill.js` (minified version – `build/polyfill.min.js`) file is available that polyfills ECMAScript features missing in the [browsers supported](https://make.wordpress.org/core/handbook/best-practices/browser-support/) by the WordPress project. It's a drop-in replacement for the deprecated `@babel/polyfill` package ([#31279](https://github.com/WordPress/gutenberg/pull/31279)).
 
@@ -195,7 +195,7 @@
 
 ## 4.10.0 (2020-02-04)
 
-### New Feature
+### New Features
 
 -   The bundled `@babel/core` dependency has been updated from requiring `^7.4.4` to requiring `^7.8.3`. All other Babel plugins were updated to the latest version. `@babel/preset-env` has now ESMAScript 2020 support enabled by default (see [Highlights](https://babeljs.io/blog/2020/01/11/7.8.0#highlights)).
 
@@ -238,7 +238,7 @@
 
 ## 2.1.0 (2018-09-05)
 
-### New Feature
+### New Features
 
 -   Plugin updated to work with the stable version of Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).
 
@@ -254,7 +254,7 @@
 
 ## 1.3.0 (2018-05-22)
 
-### New Feature
+### New Features
 
 -   Added support for async generator functions ([#126](https://github.com/WordPress/packages/pull/126))
 

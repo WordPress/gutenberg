@@ -244,7 +244,7 @@
 
 ## 23.1.0 (2022-05-18)
 
-### New Feature
+### New Features
 
 -   Enable by default code formatting for JSON files in the `format` command ([#40994](https://github.com/WordPress/gutenberg/pull/40994)). You can opt-out of this behavior by providing a custom file matcher, example: `wp-scripts format src/**/*.js`.
 -   Support tsx files in `viewScript`, `script`, `editorScript` ([#41068](https://github.com/WordPress/gutenberg/pull/41068)).
@@ -272,7 +272,7 @@
 
 ## 22.4.0 (2022-04-08)
 
-### New Feature
+### New Features
 
 -   Add `--webpack-src-dir` CLI flag to allow customizing the source code directory (`src` by default) ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
 
@@ -290,7 +290,7 @@
 
 ## 22.1.0 (2022-03-03)
 
-### New Feature
+### New Features
 
 -   Add `--webpack-copy-php` CLI flag to opt-in to copying php files from `src` and its subfolders to the output directory (`build` by default) ([#39171](https://github.com/WordPress/gutenberg/pull/39171)).
 
@@ -300,7 +300,7 @@
 
 -   The bundled `@svgr/webpack` dependency has been updated from requiring `^5.5.0` to requiring `^6.2.1` ([#38866](https://github.com/WordPress/gutenberg/pull/38866)). See [official migration guide to v6](https://react-svgr.com/docs/migrate/) for details.
 
-### New Feature
+### New Features
 
 -   Automatically copy PHP files located in the `src` folder and its subfolders to the output directory (`build` by default) ([#38715](https://github.com/WordPress/gutenberg/pull/38715)).
 
@@ -628,7 +628,7 @@
 -   The bundled `wp-prettier` dependency has been upgraded from `1.19.1` to `2.0.5`. Refer to the [Prettier 2.0 "2020" blog post](https://prettier.io/blog/2020/03/21/2.0.0.html) for full details about the major changes included in Prettier 2.0.
 -   The bundled `eslint` dependency has been updated from requiring `^6.8.0` to requiring `^7.1.0`.
 
-### New Feature
+### New Features
 
 -   The PostCSS loader now gives preference to a `postcss.config.js` configuration file if present.
 
@@ -639,7 +639,7 @@
 
 ## 10.0.0 (2020-05-28)
 
-### New Feature
+### New Features
 
 -   New `--webpack-no-externals` flag added to `build` and `start` scripts. It disables scripts' assets generation, and omits the list of default externals ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
 -   New `--webpack-bundle-analyzer` flag added to `build` and `start` scripts. It enables visualization for the size of webpack output files with an interactive zoomable treemap ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
@@ -867,7 +867,7 @@
 
 ## 2.4.0 (2018-10-16)
 
-### New Feature
+### New Features
 
 -   Added support for `lint-js` script ([#10504](https://github.com/WordPress/gutenberg/pull/10504))
 
@@ -901,7 +901,7 @@
 
 ## 1.2.0 (2018-05-29)
 
-### New Feature
+### New Features
 
 -   Added support for `lint-pkg-json` script ([#128](https://github.com/WordPress/packages/pull/128))
 

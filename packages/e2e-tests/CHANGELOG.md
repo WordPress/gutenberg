@@ -99,7 +99,7 @@
 
 ## 5.3.0 (2022-10-05)
 
-### New features
+### New Features
 
 -   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).
 
@@ -158,7 +158,7 @@
 
 ## 1.2.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   Added Axe (the Accessibility Engine) API integration with e2e tests suite.
 

@@ -202,13 +202,13 @@
 
 ## 6.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the blocks namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 6.13.0 (2020-04-01)
 
-### New Feature
+### New Features
 
 -   Blocks can now be registered with an `defaultStylePicker` flag in the `supports` setting, allowing the default style picker to be removed.
 
@@ -224,14 +224,14 @@
 
 ## 6.3.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
 -   Added wildcard block transforms which allows for transforming all/any blocks in another block.
 
 ## 6.1.0 (2019-03-06)
 
-### New Feature
+### New Features
 
 -   Blocks' `transforms` will receive `innerBlocks` as the second argument (or an array of each block's respective `innerBlocks` for a multi-transform).
 
@@ -263,7 +263,7 @@
 
 ## 5.3.0 (2018-11-09)
 
-### New feature
+### New Features
 
 -   `getBlockAttributes`, `getBlockTransforms`, `getSaveContent`, `getSaveElement` and `isValidBlockContent` methods can now take also block's name as the first param ([#11490](https://github.com/WordPress/gutenberg/pull/11490)). Passing a block's type object continues to work as before.
 -   `registerBlockStyles` and `unregisterBlockStyles` can be triggered at any moment (before or after block registration).
@@ -280,7 +280,7 @@
 
 ## 5.1.0 (2018-10-30)
 
-### New features
+### New Features
 
 -   `isValidBlockContent` function has been added ([#10891](https://github.com/WordPress/gutenberg/pull/10891)).
 
@@ -296,7 +296,7 @@
 -   `setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
 -   `getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
 
-### New Feature
+### New Features
 
 -   Added a `unregisterBlockStyle()` function to remove a block style variation.
 

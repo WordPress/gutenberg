@@ -149,7 +149,7 @@
 
 ## 1.1.0 (2018-07-12)
 
-### New feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 

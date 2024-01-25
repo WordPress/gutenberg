@@ -142,7 +142,7 @@
 
 ## 4.1.0 (2021-09-09)
 
-### New Feature
+### New Features
 
 -   Add support for editor 'feature' preferences. Adds an `isFeatureActive` selector, a `toggleFeature` action, a `MoreMenuDropdown` component, and a `MoreMenuFeatureToggle` component. ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
 
@@ -183,7 +183,7 @@
 
 ## 0.11.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the interface namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 

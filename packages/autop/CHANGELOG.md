@@ -141,7 +141,7 @@
 
 ## 2.7.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#20669](https://github.com/WordPress/gutenberg/pull/20669))
 
@@ -165,7 +165,7 @@
 
 ## 1.1.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 

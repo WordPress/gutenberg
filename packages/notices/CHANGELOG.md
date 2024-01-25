@@ -58,7 +58,7 @@
 
 ## 4.3.0 (2023-06-07)
 
-### New Feature
+### New Features
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
 -   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
@@ -146,7 +146,7 @@
 
 ## 2.12.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the notices namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
@@ -168,7 +168,7 @@
 
 ## 1.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 

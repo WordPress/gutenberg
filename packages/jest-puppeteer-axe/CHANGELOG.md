@@ -127,7 +127,7 @@
 
 ## 1.1.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Added optional `disabledRules` option to use with `toPassAxeTests` matcher.
 

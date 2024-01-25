@@ -185,7 +185,7 @@
 
 ## 9.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the editor namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
@@ -431,7 +431,7 @@
 
 -   The `PanelColor` component has been removed.
 
-### New Feature
+### New Features
 
 -   In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
 

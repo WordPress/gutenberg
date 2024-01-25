@@ -38,7 +38,7 @@
 
 ## 4.33.0 (2024-01-10)
 
-### New Feature
+### New Features
 
 -   Add support for the `viewModule` property ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
 
@@ -52,7 +52,7 @@
 
 ## 4.28.0 (2023-10-18)
 
-### New Feature
+### New Features
 
 -   Add new `transformer` property to external templates to allow customization of any values being passed from cli or the template.[#55423](https://github.com/WordPress/gutenberg/pull/55423)
 
@@ -116,7 +116,7 @@
 
 ## 4.4.0 (2022-10-19)
 
-### New Feature
+### New Features
 
 -   Add new `customPackageJSON` and `customBlockJSON` keys to allow templates to define custom keys for the resulting `package.json` and `block.json` files respectively.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
 
@@ -130,7 +130,7 @@
 
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
-### New Feature
+### New Features
 
 -   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
 -   Introduce the `--variant` flag to allow selection of a variant as defined in the template ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
@@ -289,7 +289,7 @@
 
 ## 1.1.0 (2021-01-05)
 
-### New Feature
+### New Features
 
 -   Adds the `npmDependencies` field to the template configuration. It allows listing remote npm dependencies that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 -   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
@@ -330,7 +330,7 @@
 
 ## 0.16.0 (2020-06-25)
 
-### New Feature
+### New Features
 
 -   Generate `block.json` file with all metadata necessary for Block Directory ([#23399](https://github.com/WordPress/gutenberg/pull/23399)).
 
@@ -340,7 +340,7 @@
 
 ## 0.15.0-rc.0 (2020-06-24)
 
-### New Feature
+### New Features
 
 -   Add new CLI options: `--no-wp-scripts` and `--wp-scripts` to let users override the settings that template defines for supports for `@wordpress/scripts` package integration ([#23195](https://github.com/WordPress/gutenberg/pull/23195)).
 

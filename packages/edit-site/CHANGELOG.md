@@ -181,6 +181,6 @@
 
 ## 1.0.0 (2020-01-13)
 
-### New Feature
+### New Features
 
 -   Initial version of the package.
