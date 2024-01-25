@@ -24,25 +24,46 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden } = useSelect( ( select ) => {
-		const { getRenderingMode } = unlock( select( editorStore ) );
-		return {
-			isTemplateHidden: getRenderingMode() === 'post-only',
-		};
-	}, [] );
+	const { isTemplateHidden, getPostLinkProps, getEditorSettings, hasGoBack } =
+		useSelect( ( select ) => {
+			const { getRenderingMode, getEditorSettings: _getEditorSettings } =
+				unlock( select( editorStore ) );
+			const editorSettings = _getEditorSettings();
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				getPostLinkProps: editorSettings.getPostLinkProps,
+				getEditorSettings: _getEditorSettings,
+				hasGoBack: editorSettings.hasOwnProperty( 'goBack' ),
+			};
+		}, [] );
+
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
 		id
 	);
-	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
+	const editTemplate = getPostLinkProps
+		? getPostLinkProps( {
+				postId: template.id,
+				postType: 'wp_template',
+		  } )
+		: {};
 
 	if ( ! hasResolved ) {
 		return null;
 	}
-
+	// The site editor does not have a `goBack` setting as it uses its own routing
+	// and assigns its own backlink to focusMode pages.
+	const notificationAction = hasGoBack
+		? [
+				{
+					label: __( 'Go back' ),
+					onClick: () => getEditorSettings().goBack(),
+				},
+		  ]
+		: undefined;
 	return (
 		<DropdownMenu
 			popoverProps={ POPOVER_PROPS }
@@ -58,8 +79,8 @@ export default function BlockThemeControl( { id } ) {
 				<>
 					<MenuGroup>
 						<MenuItem
-							onClick={ () => {
-								setRenderingMode( 'template-only' );
+							onClick={ ( event ) => {
+								editTemplate.onClick( event );
 								onClose();
 								createSuccessNotice(
 									__(
@@ -67,16 +88,7 @@ export default function BlockThemeControl( { id } ) {
 									),
 									{
 										type: 'snackbar',
-										actions: [
-											{
-												label: __( 'Go back' ),
-												onClick: () =>
-													setRenderingMode(
-														getEditorSettings()
-															.defaultRenderingMode
-													),
-											},
-										],
+										actions: notificationAction,
 									}
 								);
 							} }

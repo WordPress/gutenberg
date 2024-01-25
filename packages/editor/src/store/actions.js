@@ -313,8 +313,14 @@ export const trashPost =
 export const autosave =
 	( { local = false, ...options } = {} ) =>
 	async ( { select, dispatch } ) => {
+		const post = select.getCurrentPost();
+
+		// Currently template autosaving is not supported.
+		if ( post.type === 'wp_template' ) {
+			return;
+		}
+
 		if ( local ) {
-			const post = select.getCurrentPost();
 			const isPostNew = select.isEditedPostNew();
 			const title = select.getEditedPostAttribute( 'title' );
 			const content = select.getEditedPostAttribute( 'content' );
@@ -576,11 +582,10 @@ export function updateEditorSettings( settings ) {
  * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
  *
  * -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
- * -   `template-only`: This mode renders the editor with only the template blocks visible.
  * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
  * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
  *
- * @param {string} mode Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+ * @param {string} mode Mode (one of 'post-only', 'template-locked' or 'all').
  */
 export const setRenderingMode =
 	( mode ) =>
