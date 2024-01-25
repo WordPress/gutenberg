@@ -245,6 +245,10 @@ $block-editor-link-control-number-of-actions: 1;
 		border-radius: $radius-block-ui;
 		line-height: 1.1;
 
+		&:focus {
+			box-shadow: none;
+		}
+
 		&:focus-visible {
 			@include block-toolbar-button-style__focus();
 			text-decoration: none;
