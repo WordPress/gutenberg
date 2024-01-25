@@ -47,6 +47,8 @@ function InstalledFonts() {
 	};
 
 	const handleConfirmUninstall = async () => {
+		setNotice( null );
+
 		try {
 			await uninstallFontFamily( libraryFontSelected );
 			setNotice( {

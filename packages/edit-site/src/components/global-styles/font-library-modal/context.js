@@ -144,6 +144,8 @@ function FontLibraryProvider( { children } ) {
 	}, [ modalTabOpen ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
+		setNotice( null );
+
 		// If font is null, reset the selected font
 		if ( ! font ) {
 			setLibraryFontSelected( null );

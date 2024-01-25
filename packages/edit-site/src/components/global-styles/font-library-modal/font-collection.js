@@ -142,6 +142,8 @@ function FontCollection( { slug } ) {
 	};
 
 	const handleInstall = async () => {
+		setNotice( null );
+
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
