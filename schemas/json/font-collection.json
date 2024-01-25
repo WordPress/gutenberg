@@ -7,11 +7,6 @@
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
-		"version": {
-			"description": "Version of font-collection.json schema to use.",
-			"type": "integer",
-			"enum": [ 1 ]
-		},
 		"font_families": {
 			"type": "array",
 			"description": "Array of font families ready to be installed",
@@ -55,5 +50,5 @@
 		}
 	},
 	"additionalProperties": false,
-	"required": [ "$schema", "version", "font_families" ]
+	"required": [ "$schema", "font_families" ]
 }
