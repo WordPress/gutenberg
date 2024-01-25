@@ -2023,6 +2023,29 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				useSource: action.useSource,
+				lockAttributesEditing: action.lockAttributesEditing,
+			},
+		};
+	}
+	return state;
+}
+
+function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -2053,6 +2076,8 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	blockBindingsSources,
+	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

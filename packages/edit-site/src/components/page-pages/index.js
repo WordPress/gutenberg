@@ -44,6 +44,9 @@ import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
+const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
+	? [ LAYOUT_GRID, LAYOUT_TABLE, LAYOUT_LIST ]
+	: [ LAYOUT_GRID, LAYOUT_TABLE ];
 
 function useView( postType ) {
 	const { params } = useLocation();
@@ -295,7 +298,7 @@ export default function PagePages() {
 							__( '(no title)' )
 					);
 				},
-				maxWidth: 400,
+				maxWidth: 300,
 				enableHiding: false,
 			},
 			{
@@ -418,6 +421,7 @@ export default function PagePages() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);

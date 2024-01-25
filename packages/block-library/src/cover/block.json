@@ -114,6 +114,9 @@
 			"__experimentalSkipSerialization": [ "gradients" ],
 			"enableContrastChecker": false
 		},
+		"dimensions": {
+			"aspectRatio": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

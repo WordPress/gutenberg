@@ -13,9 +13,12 @@ import {
 	__experimentalTruncate as Truncate,
 	Tooltip,
 } from '@wordpress/components';
+import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit, copy } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -60,6 +63,14 @@ export default function LinkPreview( {
 	} else {
 		icon = <Icon icon={ globe } />;
 	}
+
+	const { createNotice } = useDispatch( noticesStore );
+	const ref = useCopyToClipboard( value.url, () => {
+		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	} );
 
 	return (
 		<div
@@ -130,6 +141,14 @@ export default function LinkPreview( {
 						size="compact"
 					/>
 				) }
+				<Button
+					icon={ copy }
+					label={ __( 'Copy URL' ) }
+					className="block-editor-link-control__search-item-action block-editor-link-control__copy"
+					ref={ ref }
+					disabled={ isEmptyURL }
+					size="compact"
+				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
 			{ additionalControls && additionalControls() }

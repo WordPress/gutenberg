@@ -47,11 +47,13 @@ export default function DataViewsSidebarContent() {
 					);
 				} ) }
 			</ItemGroup>
-			<CustomDataViewsList
-				activeView={ activeView }
-				type={ type }
-				isCustom="true"
-			/>
+			{ window?.__experimentalAdminViews && (
+				<CustomDataViewsList
+					activeView={ activeView }
+					type={ type }
+					isCustom="true"
+				/>
+			) }
 		</>
 	);
 }
