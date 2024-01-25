@@ -17,6 +17,9 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
  * @return void
  */
 function gutenberg_enqueue_global_styles() {
+	if ( is_admin() ) {
+		return;
+	}
 	$separate_assets  = wp_should_load_separate_core_block_assets();
 	$is_block_theme   = wp_is_block_theme();
 	$is_classic_theme = ! $is_block_theme;
