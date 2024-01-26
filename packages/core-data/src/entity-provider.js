@@ -145,14 +145,19 @@ const parsedBlocksCache = new WeakMap();
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
- * @param {string} kind         The entity kind.
- * @param {string} name         The entity name.
+ * @param {string} kind              The entity kind.
+ * @param {string} name              The entity name.
  * @param {Object} options
- * @param {string} [options.id] An entity ID to use instead of the context-provided one.
+ * @param {string} [options.id]      An entity ID to use instead of the context-provided one.
+ * @param {string} [options.context] The context param to be passed to the REST API.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
+export function useEntityBlockEditor(
+	kind,
+	name,
+	{ id: _id, context = 'edit' } = {}
+) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { getEntityRecord, getEntityRecordEdits } = useSelect( STORE_NAME );
@@ -162,7 +167,9 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				return {};
 			}
 			const { getEditedEntityRecord } = select( STORE_NAME );
-			const editedRecord = getEditedEntityRecord( kind, name, id );
+			const editedRecord = getEditedEntityRecord( kind, name, id, {
+				context,
+			} );
 			return {
 				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
