@@ -235,21 +235,24 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		 * @since 6.5.0
 		 */
 		public function print_import_map_polyfill() {
-			$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
-			$src  = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/wp-polyfill-importmap.min.js' );
+			$import_map = $this->get_import_map();
+			if ( ! empty( $import_map['imports'] ) ) {
+				$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
+				$src  = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/wp-polyfill-importmap.min.js' );
 
-			echo (
-			// Test presence of feature...
-			'<script>( ' . $test . ' ) || ' .
-			/*
-			 * ...appending polyfill on any failures. Cautious viewers may balk
-			 * at the `document.write`. Its caveat of synchronous mid-stream
-			 * blocking write is exactly the behavior we need though.
-			 */
-			'document.write( \'<script src="' .
-			$src .
-			'"></scr\' + \'ipt>\' );</script>'
-			);
+				echo (
+				// Test presence of feature...
+				'<script>( ' . $test . ' ) || ' .
+				/*
+				* ...appending polyfill on any failures. Cautious viewers may balk
+				* at the `document.write`. Its caveat of synchronous mid-stream
+				* blocking write is exactly the behavior we need though.
+				*/
+				'document.write( \'<script src="' .
+				$src .
+				'"></scr\' + \'ipt>\' );</script>'
+				);
+			}
 		}
 		/**
 		 * Returns the import map array.
