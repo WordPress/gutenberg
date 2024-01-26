@@ -58,9 +58,9 @@ const ControlledTemplate: StoryFn< typeof NewCustomSelect > = ( props ) => {
 	return (
 		<CustomSelect
 			{ ...props }
-			onChange={ ( nextValue: string | string[] ) => {
+			onSelectionChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
-				props.onChange?.( nextValue );
+				props.onSelectionChange?.( nextValue );
 			} }
 			value={ value }
 		/>

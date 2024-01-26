@@ -58,12 +58,9 @@ const UnconnectedCustomSelectButton = (
 	>
 ) => {
 	const {
-		defaultValue,
 		renderSelectedValue,
-		onChange,
 		size = 'default',
 		store,
-		value,
 		...restProps
 	} = useContextSystem( props, 'CustomSelectControlButton' );
 

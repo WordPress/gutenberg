@@ -6,7 +6,6 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -21,7 +20,6 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	const {
 		__experimentalShowSelectedHint,
 		__next40pxDefaultSize = false,
-		__nextUnconstrainedWidth,
 		options,
 		onChange,
 		size = 'default',
@@ -80,16 +78,6 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 			);
 		}
 	);
-
-	if ( __nextUnconstrainedWidth ) {
-		deprecated(
-			'Constrained width styles for wp.components.CustomSelectControl',
-			{
-				hint: 'This behaviour is now built-in.',
-				since: '6.4',
-			}
-		);
-	}
 
 	const renderSelectedValueHint = () => {
 		const { value: currentValue } = store.getState();
