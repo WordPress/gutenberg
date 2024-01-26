@@ -80,10 +80,8 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 		 *     "args": { "key": "text_custom_field" }
 		 *   },
 		 *   "url": {
-		 *     "source": {
-		 *       "name": "core/post-meta",
-		 *       "args": { "key": "text_custom_field" }
-		 *     }
+		 *     "source": "core/post-meta",
+		 *     "args": { "key": "url_custom_field" }
 		 *   }
 		 * }
 		 */
