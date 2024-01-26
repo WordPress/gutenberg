@@ -43,6 +43,54 @@ class Non_Gutenberg_Class {
 	}
 }
 
+gutenberg_prefixed_function();
+Gutenberg_prefixed_function();
+
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	gutenberg_prefixed_function();
+	Gutenberg_prefixed_function();
+}
+
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	// Nested conditions.
+	if (true) {
+		gutenberg_prefixed_function();
+		Gutenberg_prefixed_function();
+	}
+}
+
+if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	// Nested conditions.
+	if (true) {
+		gutenberg_prefixed_function();
+		Gutenberg_prefixed_function();
+	}
+}
+
+$object = new Gutenberg_Prefixed_Class();
+Gutenberg_Prefixed_Class::some_function();
+
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	new Gutenberg_Prefixed_Class();
+	Gutenberg_Prefixed_Class::some_function();
+}
+
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	// Nested conditions.
+	if (true) {
+		new Gutenberg_Prefixed_Class();
+		Gutenberg_Prefixed_Class::some_function();
+	}
+}
+
+if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	// Nested conditions.
+	if (true) {
+		new Gutenberg_Prefixed_Class();
+		Gutenberg_Prefixed_Class::some_function();
+	}
+}
+
 // Gutenberg_Class.
 //Gutenberg_Class.
 

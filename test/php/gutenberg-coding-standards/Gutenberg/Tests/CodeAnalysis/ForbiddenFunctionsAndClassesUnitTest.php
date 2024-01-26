@@ -50,6 +50,16 @@ final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 			37 => 1,
 			39 => 1,
 			41 => 1,
+
+			46 => 1,
+			47 => 1,
+			65 => 1,
+			66 => 1,
+
+			70 => 1,
+			71 => 1,
+			89 => 1,
+			90 => 1,
 		);
 	}
 
