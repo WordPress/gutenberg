@@ -21,9 +21,6 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 				'render_callback' => static function () {
 					return '<div class="wp-block-test/plugin-block">Test</div>';
 				},
-				'supports'        => array(
-					'interactivity' => true,
-				),
 			)
 		);
 	}
@@ -222,7 +219,8 @@ HTML;
 
 	/**
 	 * Tests that the `core/query` block adds an extra attribute to disable the
-	 * enhanced pagination in the browser when a plugin block is found inside.
+	 * enhanced pagination in the browser when a plugin that does not define
+	 * clientNavigation is found inside.
 	 */
 	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_there_is_a_non_compatible_block() {
 		global $wp_query, $wp_the_query;
