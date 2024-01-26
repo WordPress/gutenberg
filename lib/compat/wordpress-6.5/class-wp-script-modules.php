@@ -246,7 +246,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 					'wp-polyfill-importmap',
 					gutenberg_url( '/build/modules/importmap-polyfill.min.js' ),
 					array(),
-					get_bloginfo( 'version' ),
+					'1.8.2',
 					true
 				);
 				wp_print_inline_script_tag(
