@@ -220,18 +220,17 @@ describe( 'Popover', () => {
 				const user = await userEvent.setup();
 				const view = render(
 					<Popover data-testid="popover-element" { ...props }>
-						<button data-testid="first-button">Button 1</button>
-						<button data-testid="second-button">Button 2</button>
-						<button data-testid="third-button">Button 3</button>
+						<button>Button 1</button>
+						<button>Button 2</button>
+						<button>Button 3</button>
 					</Popover>
 				);
 
 				const popover = screen.getByTestId( 'popover-element' );
 				await waitFor( () => expect( popover ).toBeVisible() );
 
-				const firstButton = screen.getByTestId( 'first-button' );
-				const secondButton = screen.getByTestId( 'second-button' );
-				const thirdButton = screen.getByTestId( 'third-button' );
+				const [ firstButton, secondButton, thirdButton ] =
+					screen.getAllByRole( 'button' );
 
 				return {
 					...view,
