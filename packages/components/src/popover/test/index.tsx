@@ -242,14 +242,12 @@ describe( 'Popover', () => {
 				};
 			};
 
-			// eslint-disable-next-line jest/no-commented-out-tests
-			/*
-
 			// Note: due to an issue in testing-library/user-event [1], the
 			// tests for constrained tabbing fail.
 			// [1]: https://github.com/testing-library/user-event/issues/1188
-
-			describe( 'constrains tabbing', () => {
+			//
+			// eslint-disable-next-line jest/no-disabled-tests
+			describe.skip( 'constrains tabbing', () => {
 				test( 'by default', async () => {
 					// The default value for `focusOnMount` is 'firstElement',
 					// which means the default value for `constrainTabbing` is
@@ -331,7 +329,6 @@ describe( 'Popover', () => {
 					expect( thirdButton ).toHaveFocus();
 				} );
 			} );
-			*/
 
 			describe( 'does not constrain tabbing', () => {
 				test( 'when `constrainTabbing` is false', async () => {
