@@ -15,8 +15,6 @@ import {
 	switchToBlockType,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
-	isReusableBlock,
-	getBlockDefaultClassName,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
@@ -519,7 +517,6 @@ function BlockListBlockProvider( props ) {
 				isBlockBeingDragged,
 				hasBlockMovingClientId,
 				canInsertBlockType,
-				getBlockRootClientId,
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
@@ -555,6 +552,7 @@ function BlockListBlockProvider( props ) {
 			const typing = isTyping();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
+			const blockEditingMode = getBlockEditingMode( clientId );
 
 			return {
 				mode: getBlockMode( clientId ),
@@ -574,7 +572,7 @@ function BlockListBlockProvider( props ) {
 				themeSupportsLayout: supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
-				blockEditingMode: getBlockEditingMode( clientId ),
+				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
 					( isFirstMultiSelectedBlock( clientId ) &&
@@ -603,7 +601,6 @@ function BlockListBlockProvider( props ) {
 					isMultiSelected &&
 					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
-				isReusable: isReusableBlock( blockType ),
 				isDragging: isBlockBeingDragged( clientId ),
 				hasChildSelected: isAncestorOfSelectedBlock,
 				removeOutline: _isSelected && outlineMode && typing,
@@ -612,15 +609,11 @@ function BlockListBlockProvider( props ) {
 					movingClientId &&
 					canInsertBlockType(
 						getBlockName( movingClientId ),
-						getBlockRootClientId( clientId )
+						rootClientId
 					),
-				isEditingDisabled:
-					getBlockEditingMode( clientId ) === 'disabled',
+				isEditingDisabled: blockEditingMode === 'disabled',
 				className: hasLightBlockWrapper
 					? attributes.className
-					: undefined,
-				defaultClassName: hasLightBlockWrapper
-					? getBlockDefaultClassName( blockName )
 					: undefined,
 			};
 		},
@@ -653,7 +646,6 @@ function BlockListBlockProvider( props ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
-		isReusable,
 		isDragging,
 		hasChildSelected,
 		removeOutline,
@@ -661,7 +653,6 @@ function BlockListBlockProvider( props ) {
 		canInsertMovingBlock,
 		isEditingDisabled,
 		className,
-		defaultClassName,
 	} = selectedProps;
 
 	// Block is sometimes not mounted at the right time, causing it be
@@ -688,7 +679,6 @@ function BlockListBlockProvider( props ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
-		isReusable,
 		isDragging,
 		hasChildSelected,
 		removeOutline,
@@ -696,7 +686,6 @@ function BlockListBlockProvider( props ) {
 		canInsertMovingBlock,
 		isEditingDisabled,
 		isTemporarilyEditingAsBlocks,
-		defaultClassName,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		themeSupportsLayout,
