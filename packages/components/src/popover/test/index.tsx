@@ -354,6 +354,10 @@ describe( 'Popover', () => {
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
 					expect( baseElement ).toHaveFocus();
+					await user.tab();
+					expect( firstButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( baseElement ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is false', async () => {
@@ -373,6 +377,10 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
+					expect( baseElement ).toHaveFocus();
+					await user.tab();
+					expect( firstButton ).toHaveFocus();
+					await user.tab( { shift: true } );
 					expect( baseElement ).toHaveFocus();
 				} );
 
@@ -398,6 +406,10 @@ describe( 'Popover', () => {
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
 					expect( baseElement ).toHaveFocus();
+					await user.tab();
+					expect( firstButton ).toHaveFocus();
+					await user.tab( { shift: true } );
+					expect( baseElement ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is "firstElement" if `constrainTabbing` is false', async () => {
@@ -418,6 +430,10 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
+					expect( baseElement ).toHaveFocus();
+					await user.tab();
+					expect( firstButton ).toHaveFocus();
+					await user.tab( { shift: true } );
 					expect( baseElement ).toHaveFocus();
 				} );
 			} );
