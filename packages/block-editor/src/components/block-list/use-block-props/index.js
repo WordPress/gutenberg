@@ -99,6 +99,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canInsertMovingBlock,
 		isEditingDisabled,
 		isTemporarilyEditingAsBlocks,
+		hasLightBlockWrapper,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -160,7 +161,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			getBlockDefaultClassName( name )
+			hasLightBlockWrapper ? getBlockDefaultClassName( name ) : undefined
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

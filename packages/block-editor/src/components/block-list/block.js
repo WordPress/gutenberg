@@ -615,6 +615,7 @@ function BlockListBlockProvider( props ) {
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
+				hasLightBlockWrapper,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -653,6 +654,7 @@ function BlockListBlockProvider( props ) {
 		canInsertMovingBlock,
 		isEditingDisabled,
 		className,
+		hasLightBlockWrapper,
 	} = selectedProps;
 
 	// Block is sometimes not mounted at the right time, causing it be
@@ -689,6 +691,7 @@ function BlockListBlockProvider( props ) {
 		mayDisplayControls,
 		mayDisplayParentControls,
 		themeSupportsLayout,
+		hasLightBlockWrapper,
 	};
 
 	// Here we separate between the props passed to BlockListBlock and any other
