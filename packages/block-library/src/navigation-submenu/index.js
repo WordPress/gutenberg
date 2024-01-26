@@ -33,6 +33,8 @@ export const settings = {
 		if ( context === 'list-view' && ( customName || label ) ) {
 			return attributes?.metadata?.name || label;
 		}
+
+		return label;
 	},
 	edit,
 	save,
