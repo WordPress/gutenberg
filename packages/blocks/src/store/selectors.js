@@ -555,6 +555,8 @@ export const getChildBlockNames = createSelector(
 	( state ) => [ state.blockTypes ]
 );
 
+const blockSupportCache = new WeakMap();
+
 /**
  * Returns the block support value for a feature, if defined.
  *
@@ -600,11 +602,32 @@ export const getBlockSupport = (
 		return defaultSupports;
 	}
 
-	return getValueFromObjectPath(
-		blockType.supports,
-		feature,
-		defaultSupports
-	);
+	// In practice we never use arrays.
+	if ( Array.isArray( feature ) ) {
+		return getValueFromObjectPath(
+			blockType.supports,
+			feature,
+			defaultSupports
+		);
+	}
+
+	let supportCache = blockSupportCache.get( blockType );
+	let value = supportCache?.[ feature ];
+
+	if ( value !== undefined ) {
+		return value ?? defaultSupports;
+	}
+
+	value = getValueFromObjectPath( blockType.supports, feature, null );
+
+	if ( supportCache ) {
+		supportCache[ feature ] = value;
+	} else {
+		supportCache = { [ feature ]: value };
+		blockSupportCache.set( blockType, supportCache );
+	}
+
+	return value;
 };
 
 /**
