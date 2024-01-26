@@ -62,12 +62,27 @@ function Edit( {
 			setAddingLink( true );
 		}
 
-		editableContentElement.addEventListener( 'click', handleClick );
+		const removeAddingLink = () => {
+			setAddingLink( false );
+		};
+
+		editableContentElement.addEventListener(
+			'mousedown',
+			removeAddingLink
+		);
+		editableContentElement.addEventListener( 'mouseup', handleClick );
 
 		return () => {
-			editableContentElement.removeEventListener( 'click', handleClick );
+			editableContentElement.removeEventListener(
+				'mousedown',
+				removeAddingLink
+			);
+			editableContentElement.removeEventListener(
+				'mouseup',
+				handleClick
+			);
 		};
-	}, [ contentRef, isActive ] );
+	}, [ contentRef, isActive, onFocus, addingLink ] );
 
 	function addLink( target ) {
 		const text = getTextContent( slice( value ) );
