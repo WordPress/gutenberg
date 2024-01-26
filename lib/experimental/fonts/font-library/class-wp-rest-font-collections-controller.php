@@ -43,8 +43,10 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args'                => $this->get_collection_params(),
+					// 'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'permission_callback' => '__return_true',
+					// 'args'                => $this->get_collection_params(),
+					
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -57,7 +59,9 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					// 'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'permission_callback' => '__return_true',
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::READABLE ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -297,6 +301,8 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
+
+		$query_params['context'] = $this->get_context_param( array( 'default' => 'view' ) );
 
 		unset( $query_params['search'] );
 
