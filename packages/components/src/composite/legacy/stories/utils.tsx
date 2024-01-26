@@ -48,7 +48,7 @@ export function transform( code: string, context: StoryContext ) {
 				.replaceAll( /baseId=[^>]+?(\s*>)/g, ( _, close ) => {
 					return `{ ...state }${ close }`;
 				} )
-				// Now we tidy the output by removing any unnecesary
+				// Now we tidy the output by removing any unnecessary
 				// whitespace...
 				.replaceAll( /<Composite\w+[\s\S]*?>/g, ( match ) =>
 					match.replaceAll( /\s+\s/g, ' ' )
@@ -60,7 +60,7 @@ export function transform( code: string, context: StoryContext ) {
 				)
 				// ...and inside JSX definitions.
 				.replaceAll( '} >', '}>' )
-				// Finally we indent eveything to make it more readable.
+				// Finally we indent everything to make it more readable.
 				.replaceAll( /\n/g, '\n  ' ),
 		');',
 	].join( '\n' );

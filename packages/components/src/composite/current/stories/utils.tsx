@@ -42,7 +42,7 @@ export function transform( code: string, context: StoryContext ) {
 				// what that looks like, so instead we drop all of that
 				// in favor of the store generated above.
 				.replaceAll( /store=\{\{[\s\S]*?\}\}/g, 'store={ store }' )
-				// Now we tidy the output by removing any unnecesary
+				// Now we tidy the output by removing any unnecessary
 				// whitespace...
 				.replaceAll( /<Composite\w+[\s\S]*?>/g, ( match ) =>
 					match.replaceAll( /\s+\s/g, ' ' )
@@ -54,7 +54,7 @@ export function transform( code: string, context: StoryContext ) {
 				)
 				// ...and inside JSX definitions.
 				.replaceAll( '} >', '}>' )
-				// Finally we indent eveything to make it more readable.
+				// Finally we indent everything to make it more readable.
 				.replaceAll( /\n/g, '\n  ' ),
 		');',
 	].join( '\n' );

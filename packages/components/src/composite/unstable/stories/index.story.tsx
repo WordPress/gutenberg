@@ -41,8 +41,6 @@ export const TwoDimensionsWithStateProp: StoryFn< typeof Placeholder > = (
 	initialState
 ) => {
 	const state = useCompositeState( initialState );
-	// eslint-disable-next-line no-console
-	console.log( { initialState, state } );
 
 	return (
 		<Composite
