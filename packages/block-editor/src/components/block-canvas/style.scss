@@ -4,10 +4,10 @@ iframe[name="editor-canvas"] {
 	display: block;
 }
 
-iframe[name="editor-canvas"]:not(.has-history) {
+iframe[name="editor-canvas"]:not(.has-editor-padding) {
 	background-color: $white;
 }
 
-iframe[name="editor-canvas"].has-history {
+iframe[name="editor-canvas"].has-editor-padding {
 	padding: $grid-unit-60 $grid-unit-60 0;
 }

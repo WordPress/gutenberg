@@ -298,7 +298,7 @@ export default function PagePages() {
 							__( '(no title)' )
 					);
 				},
-				maxWidth: 400,
+				maxWidth: 300,
 				enableHiding: false,
 			},
 			{

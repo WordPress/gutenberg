@@ -218,14 +218,20 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	if ( invalidBlocks ) {
 		return null;
 	}
+
+	const isSingleBlock = clientIds.length === 1;
+	const blockSwitcherLabel = isSingleBlock
+		? blockTitle
+		: __( 'Multiple blocks selected' );
 	const hideDropdown = ! hasBlockStyles && ! canRemove;
+
 	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>
 				<ToolbarButton
 					disabled
 					className="block-editor-block-switcher__no-switcher-icon"
-					title={ blockTitle }
+					title={ blockSwitcherLabel }
 					icon={
 						<>
 							<BlockIcon icon={ icon } showColors />
@@ -240,10 +246,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			</ToolbarGroup>
 		);
 	}
-	const isSingleBlock = clientIds.length === 1;
-	const blockSwitcherLabel = isSingleBlock
-		? blockTitle
-		: __( 'Multiple blocks selected' );
+
 	const blockSwitcherDescription = isSingleBlock
 		? __( 'Change block type or style' )
 		: sprintf(
