@@ -185,6 +185,10 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+
+			> * {
+				flex-grow: 1;
+			}
 		}
 	}
 	.dataviews-view-table-header-button {
