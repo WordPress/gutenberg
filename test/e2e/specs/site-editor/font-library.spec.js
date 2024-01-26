@@ -77,7 +77,10 @@ test.describe( 'Font Library', () => {
 					name: /manage fonts/i,
 				} )
 				.click();
-			await page.getByRole( 'button', { name: /system font/i } ).click();
+			await page
+				.getByRole( 'button', { name: /system font/i } )
+				.first()
+				.click();
 			await expect(
 				page.getByRole( 'heading', { name: /system font/i } )
 			).toBeVisible();
