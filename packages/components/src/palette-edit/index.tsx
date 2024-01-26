@@ -198,23 +198,22 @@ function Option< T extends Color | Gradient >( {
 	return (
 		<PaletteItem
 			className={ isEditing ? 'is-selected' : undefined }
-			as="div"
+			as={ isEditing ? 'div' : 'button' }
 			onClick={ onStartEditing }
+			aria-label={
+				isEditing
+					? undefined
+					: sprintf(
+							// translators: %s is a color or gradient name, e.g. "Red".
+							__( 'Edit: %s' ),
+							element.name.trim().length ? element.name : value
+					  )
+			}
 			ref={ setPopoverAnchor }
-			{ ...( isEditing
-				? { ...focusOutsideProps }
-				: {
-						style: {
-							cursor: 'pointer',
-						},
-				  } ) }
+			{ ...( isEditing ? { ...focusOutsideProps } : {} ) }
 		>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<IndicatorStyled
-						style={ { background: value, color: 'transparent' } }
-					/>
-				</FlexItem>
+				<IndicatorStyled colorValue={ value } />
 				<FlexItem>
 					{ isEditing && ! canOnlyChangeValues ? (
 						<NameInput
@@ -235,7 +234,12 @@ function Option< T extends Color | Gradient >( {
 							}
 						/>
 					) : (
-						<NameContainer>{ element.name }</NameContainer>
+						<NameContainer>
+							{ element.name.trim().length
+								? element.name
+								: /* Fall back to non-breaking space to maintain height */
+								  '\u00A0' }
+						</NameContainer>
 					) }
 				</FlexItem>
 				{ isEditing && ! canOnlyChangeValues && (

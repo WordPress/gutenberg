@@ -236,8 +236,9 @@ test.describe( 'Paragraph', () => {
 
 				{
 					// Dragging on the top half of the heading block.
+					// Make sure to target the top dropzone by dragging > 30px inside the block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + 1
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();

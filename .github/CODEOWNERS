@@ -132,7 +132,7 @@
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @noahtallen @ObliviousHarmony @t-hamano
+/packages/env                                   @ObliviousHarmony @t-hamano
 
 # PHP
 /lib                                            @spacedmonkey

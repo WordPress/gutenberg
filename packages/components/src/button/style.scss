@@ -164,11 +164,13 @@
 
 		&:hover:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 

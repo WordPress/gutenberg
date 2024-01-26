@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -42,9 +42,9 @@ const LINK_SETTINGS = [
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
-	addingLink,
 	value,
 	onChange,
+	onFocusOutside,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -183,8 +183,7 @@ function InlineLinkUI( {
 		// Link UI because it should remain open for the user to modify the link they have
 		// just created.
 		if ( ! isNewLink ) {
-			const returnFocusToRichText = true;
-			stopAddingLink( returnFocusToRichText );
+			stopAddingLink();
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -213,15 +212,17 @@ function InlineLinkUI( {
 	//  This caches the last truthy value of the selection anchor reference.
 	// This ensures the Popover is positioned correctly on initial submission of the link.
 	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
-	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
-	// Focus should only be moved into the Popover when the Link is being created or edited.
-	// When the Link is in "preview" mode focus should remain on the rich text because at
-	// this point the Link dialog is informational only and thus the user should be able to
-	// continue editing the rich text.
-	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
+	// If the link is not active (i.e. it is a new link) then we need to
+	// override the getBoundingClientRect method on the anchor element
+	// to return the cached value of the selection represented by the text
+	// that the user selected to be linked.
+	// If the link is active (i.e. it is an existing link) then we allow
+	// the default behaviour of the popover anchor to be used. This will get
+	// the anchor based on the `<a>` element in the rich text.
+	if ( ! isActive ) {
+		popoverAnchor.getBoundingClientRect = () => cachedRect;
+	}
 
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
@@ -252,9 +253,8 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
-			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			onFocusOutside={ () => stopAddingLink( false ) }
+			onFocusOutside={ onFocusOutside }
 			placement="bottom"
 			offset={ 10 }
 			shift
@@ -263,7 +263,6 @@ function InlineLinkUI( {
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
-				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
