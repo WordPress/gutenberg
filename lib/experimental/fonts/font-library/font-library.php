@@ -263,7 +263,6 @@ function gutenberg_convert_legacy_font_family_format() {
 			'post_type'              => 'wp_font_family',
 			// Set a maximum, but in reality there will be far less than this.
 			'posts_per_page'         => 999,
-			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 		)
 	);
