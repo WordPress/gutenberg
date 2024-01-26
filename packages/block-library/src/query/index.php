@@ -110,8 +110,6 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	$block_object   = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	$is_interactive = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) && isset( $block_object->supports['interactivity'] ) && $block_object->supports['interactivity'];
 
-	$client_navigation_compatible = isset( $block_object->supports['clientNavigation'] ) && $block_object->supports['clientNavigation'];
-
 	if ( 'core/query' === $block_name && $is_interactive ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
 
@@ -157,7 +155,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
-		( ! $client_navigation_compatible && ! $is_interactive )
+		( ! $is_interactive )
 	) {
 		foreach ( $enhanced_query_stack as $query_id ) {
 			$dirty_enhanced_queries[ $query_id ] = true;

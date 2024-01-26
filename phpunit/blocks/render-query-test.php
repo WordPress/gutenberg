@@ -22,7 +22,7 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 					return '<div class="wp-block-test/plugin-block">Test</div>';
 				},
 				'supports'        => array(
-					'clientNavigation' => true,
+					'interactivity' => true,
 				),
 			)
 		);

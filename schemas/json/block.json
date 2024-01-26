@@ -268,11 +268,6 @@
 					"description": "By default, the class .wp-block-your-block-name is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.",
 					"default": true
 				},
-				"clientNavigation": {
-					"type": "boolean",
-					"description": "Allow blocks to define client navigation compatibility when using the Interactivity API.",
-					"default": false
-				},
 				"color": {
 					"type": "object",
 					"description": "This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.\n\nNote that the background and text keys have a default value of true, so if the color property is present they’ll also be considered enabled",
@@ -360,11 +355,6 @@
 					"type": "boolean",
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
-				},
-				"interactivity": {
-					"type": "boolean",
-					"description": "Indicates if the block is using Interactivity API.",
-					"default": false
 				},
 				"renaming": {
 					"type": "boolean",
@@ -682,6 +672,29 @@
 								"letterSpacing": { "type": "string" },
 								"textDecoration": { "type": "string" },
 								"textTransform": { "type": "string" }
+							}
+						}
+					]
+				},
+				"interactivity": {
+					"description": "Indicates if the block is using Interactivity API features.",
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"clientNavigation": {
+									"type": "boolean",
+									"description": "Indicates if a block is compatible with Interactivity API client side navigation.\n\nSet as false if the block is using vanilla JS or another framework to handle interactions.",
+									"default": false
+								},
+								"interactive": {
+									"type": "boolean",
+									"description": "Indicates if the block has directives and interactions.",
+									"default": false
+								}
 							}
 						}
 					]
