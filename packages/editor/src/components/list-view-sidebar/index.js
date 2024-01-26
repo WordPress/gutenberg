@@ -156,7 +156,11 @@ export default function ListViewSidebar() {
 						<ListView dropZoneElement={ dropZoneElement } />
 					</div>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="outline" focusable={ false }>
+				<Tabs.TabPanel
+					className="editor-list-view-sidebar__list-view-container"
+					tabId="outline"
+					focusable={ false }
+				>
 					<ListViewOutline />
 				</Tabs.TabPanel>
 			</Tabs>
