@@ -4,10 +4,6 @@
 // eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 import type { FocusEventHandler, MouseEventHandler } from 'react';
-/**
- * Internal dependencies
- */
-import type { InputBaseProps } from '../input-control/types';
 
 export type CustomSelectStore = {
 	/**
@@ -39,7 +35,7 @@ export type CustomSelectButtonProps = {
 	 *
 	 * @default default
 	 */
-	size?: 'compact' | 'default';
+	size?: 'compact' | 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
@@ -63,7 +59,8 @@ export type _CustomSelectProps = {
 	label: string;
 };
 
-export type CustomSelectProps = _CustomSelectProps & CustomSelectButtonProps;
+export type CustomSelectProps = _CustomSelectProps &
+	Exclude< CustomSelectButtonProps, { size: 'small' } >;
 
 /**
  * The legacy object structure for the options array.
@@ -85,10 +82,7 @@ type OnChangeObject = {
 	isOpen?: boolean;
 };
 
-export type LegacyCustomSelectProps = Pick<
-	InputBaseProps,
-	'__next40pxDefaultSize' | 'size'
-> & {
+export type LegacyCustomSelectProps = {
 	/**
 	 * Optional classname for the component.
 	 */
@@ -134,6 +128,12 @@ export type LegacyCustomSelectProps = Pick<
 	 */
 	options: Array< Option >;
 	/**
+	 * The size of the control.
+	 *
+	 * @default default
+	 */
+	size?: 'default' | 'small' | '__unstable-large';
+	/**
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: Option;
@@ -150,6 +150,12 @@ export type LegacyCustomSelectProps = Pick<
 	 * @deprecated
 	 */
 	__nextUnconstrainedWidth?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };
 
 export type CustomSelectItemProps = {

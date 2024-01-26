@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
  */
 import { COLORS } from '../utils';
 import { space } from '../utils/space';
-import type { CustomSelectProps } from './types';
+import type { CustomSelectButtonProps } from './types';
 
 export const ExperimentalHint = styled.span`
 	color: ${ COLORS.gray[ 600 ] };
@@ -38,7 +38,7 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 	size,
 	hasCustomRenderProp,
 }: {
-	size: NonNullable< CustomSelectProps[ 'size' ] >;
+	size: NonNullable< CustomSelectButtonProps[ 'size' ] >;
 	hasCustomRenderProp: boolean;
 } ) => {
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
@@ -60,11 +60,6 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 				paddingLeft: space( 2 ),
 				paddingRight: space( 2 ),
 				fontSize: 11,
-			},
-			'__unstable-large': {
-				[ heightProperty ]: 40,
-				paddingLeft: space( 4 ),
-				paddingRight: space( 4 ),
 			},
 		};
 

@@ -115,10 +115,25 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		);
 	};
 
-	const customSelectButtonContext = useMemo(
-		() => ( { CustomSelectButton: { _overrides: { size } } } ),
-		[ size ]
-	);
+	// translate legacy button sizing
+	const contextSystemValue = useMemo( () => {
+		let selectedSize;
+
+		if (
+			( __next40pxDefaultSize && size === 'default' ) ||
+			size === '__unstable-large'
+		) {
+			selectedSize = 'default';
+		} else if ( ! __next40pxDefaultSize && size === 'default' ) {
+			selectedSize = 'compact';
+		} else {
+			selectedSize = size;
+		}
+
+		return {
+			CustomSelectControlButton: { _overrides: { size: selectedSize } },
+		};
+	}, [ __next40pxDefaultSize, size ] );
 
 	const translatedProps = {
 		'aria-describedby': props.describedBy,
@@ -126,16 +141,11 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		renderSelectedValue: __experimentalShowSelectedHint
 			? renderSelectedValueHint
 			: undefined,
-		size:
-			( __next40pxDefaultSize && size === 'default' ) ||
-			size === '__unstable-large'
-				? 'default'
-				: size,
 		...restProps,
 	};
 
 	return (
-		<ContextSystemProvider value={ customSelectButtonContext }>
+		<ContextSystemProvider value={ contextSystemValue }>
 			<_CustomSelect { ...translatedProps } store={ store } />
 		</ContextSystemProvider>
 	);

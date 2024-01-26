@@ -65,7 +65,7 @@ const UnconnectedCustomSelectButton = (
 		store,
 		value,
 		...restProps
-	} = useContextSystem( props, 'CustomSelectButton' );
+	} = useContextSystem( props, 'CustomSelectControlButton' );
 
 	const { value: currentValue } = store.useState();
 
@@ -87,11 +87,9 @@ const UnconnectedCustomSelectButton = (
 	);
 };
 
-const CustomSelectButton = Object.assign(
-	contextConnectWithoutRef(
-		UnconnectedCustomSelectButton,
-		'CustomSelectButton'
-	)
+const CustomSelectButton = contextConnectWithoutRef(
+	UnconnectedCustomSelectButton,
+	'CustomSelectControlButton'
 );
 
 function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
