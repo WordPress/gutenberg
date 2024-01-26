@@ -192,7 +192,29 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			}
 		}
 
-		return rest_ensure_response( $item );
+		$response = rest_ensure_response( $item );
+
+		if ( rest_is_field_included( '_links', $fields ) ) {
+			$links = $this->prepare_links( $collection );
+			$response->add_links( $links );
+		}
+
+		$context        = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$response->data = $this->add_additional_fields_to_object( $response->data, $request );
+		$response->data = $this->filter_response_by_context( $response->data, $context );
+
+		/**
+		 * Filters a font collection returned from the REST API.
+		 *
+		 * Allows modification of the font collection right before it is returned.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_REST_Response $response The response object.
+		 * @param WP_Font_Collection $collection  The Font Collection object.
+		 * @param WP_REST_Request  $request  Request used to generate the response.
+		 */
+		return apply_filters( 'rest_prepare_font_collection', $response, $collection, $request );
 	}
 
 	/**
@@ -244,6 +266,26 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Font_Collection $collection Font collection data
+	 * @return array Links for the given font collection.
+	 */
+	protected function prepare_links( $collection ) {
+		$links = array(
+			'self'       => array(
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $collection->slug ) ),
+			),
+			'collection' => array(
+				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
+			),
+		);
+		return $links;
 	}
 
 	/**
