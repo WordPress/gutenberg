@@ -45,14 +45,15 @@ function isPartiallySynced( block ) {
 		) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source.name === 'pattern_attributes'
+			( binding ) => binding.source.name === 'core/pattern-attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
 	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
+			( [ , binding ] ) =>
+				binding.source.name === 'core/pattern-attributes'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }

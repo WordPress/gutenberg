@@ -76,14 +76,12 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 		 *
 		 * "bindings": {
 		 *   "title": {
-		 *     "source": {
-		 *       "name": "post_meta",
-		 *       "attributes": { "value": "text_custom_field" }
-		 *     }
+		 *     "source": "core/post-meta",
+		 *     "args": { "value": "text_custom_field" }
 		 *   },
 		 *   "url": {
 		 *     "source": {
-		 *       "name": "post_meta",
+		 *       "name": "core/post-meta",
 		 *       "attributes": { "value": "text_custom_field" }
 		 *     }
 		 *   }
