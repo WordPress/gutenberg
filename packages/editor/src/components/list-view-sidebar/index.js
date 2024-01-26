@@ -136,11 +136,20 @@ export default function ListViewSidebar() {
 						label={ __( 'Close' ) }
 						onClick={ closeListView }
 					/>
-					<Tabs.TabList ref={ tabsRef }>
-						<Tabs.Tab tabId="list-view">
+					<Tabs.TabList
+						className="editor-list-view-sidebar__tabs-tablist"
+						ref={ tabsRef }
+					>
+						<Tabs.Tab
+							className="editor-list-view-sidebar__tabs-tab"
+							tabId="list-view"
+						>
 							{ _x( 'List View', 'Post overview' ) }
 						</Tabs.Tab>
-						<Tabs.Tab tabId="outline">
+						<Tabs.Tab
+							className="editor-list-view-sidebar__tabs-tab"
+							tabId="outline"
+						>
 							{ _x( 'Outline', 'Post overview' ) }
 						</Tabs.Tab>
 					</Tabs.TabList>
@@ -148,7 +157,7 @@ export default function ListViewSidebar() {
 
 				<Tabs.TabPanel
 					ref={ listViewContainerRef }
-					className="editor-list-view-sidebar__list-view-container"
+					className="editor-list-view-sidebar__list-view-container editor-list-view-sidebar__tabs-tabpanel"
 					tabId="list-view"
 					focusable={ false }
 				>

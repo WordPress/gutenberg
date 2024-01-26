@@ -18,20 +18,21 @@
 		align-self: center;
 		margin-right: $grid-unit-10;
 	}
+}
 
-	[role="tablist"] {
-		box-sizing: border-box;
-		flex-grow: 1;
+.editor-list-view-sidebar__tabs-tablist {
+	box-sizing: border-box;
+	flex-grow: 1;
 
-		[role="tab"] {
-			width: 50%;
-			margin-bottom: -$border-width;
-		}
-	}
+}
 
-	[role="tabpanel"] {
-		height: calc(100% - #{$grid-unit-60 - $border-width});
-	}
+.editor-list-view-sidebar__tabs-tab {
+	width: 50%;
+	margin-bottom: -$border-width;
+}
+
+.editor-list-view-sidebar__tabs-tabpanel {
+	height: calc(100% - #{$grid-unit-60 - $border-width});
 }
 
 .editor-list-view-sidebar__list-view-panel-content,
