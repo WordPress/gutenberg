@@ -41,7 +41,7 @@ function CollectionFontVariant( {
 					checked={ selected }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
-					aria-labelledby={ checkboxId }
+					label={ displayName }
 				/>
 				<FontFaceDemo
 					fontFace={ face }

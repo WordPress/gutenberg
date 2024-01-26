@@ -51,7 +51,7 @@ function LibraryFontVariant( { face, font } ) {
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
-					aria-labelledby={ checkboxId }
+					label={ displayName }
 				/>
 				<FontFaceDemo
 					fontFace={ face }
