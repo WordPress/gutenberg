@@ -252,7 +252,6 @@ export default function ReusableBlockEdit( {
 		? getPostLinkProps( {
 				postId: ref,
 				postType: 'wp_block',
-				canvas: 'edit',
 		  } )
 		: {};
 

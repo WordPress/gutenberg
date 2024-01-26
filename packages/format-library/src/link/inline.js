@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -42,9 +42,9 @@ const LINK_SETTINGS = [
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
-	addingLink,
 	value,
 	onChange,
+	onFocusOutside,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -183,8 +183,7 @@ function InlineLinkUI( {
 		// Link UI because it should remain open for the user to modify the link they have
 		// just created.
 		if ( ! isNewLink ) {
-			const returnFocusToRichText = true;
-			stopAddingLink( returnFocusToRichText );
+			stopAddingLink();
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -215,14 +214,6 @@ function InlineLinkUI( {
 	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
 	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
-	// Focus should only be moved into the Popover when the Link is being created or edited.
-	// When the Link is in "preview" mode focus should remain on the rich text because at
-	// this point the Link dialog is informational only and thus the user should be able to
-	// continue editing the rich text.
-	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
-
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
 			title: pageTitle,
@@ -252,9 +243,8 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
-			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			onFocusOutside={ () => stopAddingLink( false ) }
+			onFocusOutside={ onFocusOutside }
 			placement="bottom"
 			offset={ 10 }
 			shift
@@ -263,7 +253,6 @@ function InlineLinkUI( {
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
-				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }

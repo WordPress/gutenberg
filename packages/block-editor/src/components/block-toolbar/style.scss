@@ -76,6 +76,10 @@
 	.block-editor-block-toolbar {
 		overflow: auto;
 		overflow-y: hidden;
+		@include custom-scrollbars-on-hover($gray-200, $gray-600);
+
+		// Prevents padding from being applied to the left and right sides of the element.
+		scrollbar-gutter: auto;
 
 		> :last-child,
 		> :last-child .components-toolbar-group,
@@ -109,7 +113,10 @@
 			position: absolute;
 			font-size: 16px;
 			right: 0;
-			bottom: $grid-unit-20;
+			height: $button-size-compact;
+			top: 0;
+			display: inline-flex;
+			align-items: center;
 		}
 	}
 }

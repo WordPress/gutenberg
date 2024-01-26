@@ -25,6 +25,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import Image from './image';
 
 /**
@@ -333,7 +334,26 @@ export function ImageEdit( {
 	} );
 
 	// Much of this description is duplicated from MediaPlaceholder.
-	const isUrlAttributeConnected = !! metadata?.bindings?.url;
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					getBlockBindingsSource(
+						metadata?.bindings?.url?.source?.name
+					)?.lockAttributesEditing === true,
+			};
+		},
+		[ isSelected ]
+	);
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
@@ -342,10 +362,10 @@ export function ImageEdit( {
 						!! borderProps.className && ! isSelected,
 				} ) }
 				withIllustration={ true }
-				icon={ isUrlAttributeConnected ? pluginsIcon : icon }
+				icon={ lockUrlControls ? pluginsIcon : icon }
 				label={ __( 'Image' ) }
 				instructions={
-					! isUrlAttributeConnected &&
+					! lockUrlControls &&
 					__(
 						'Upload an image file, pick one from your media library, or add one with a URL.'
 					)
@@ -361,7 +381,7 @@ export function ImageEdit( {
 					...borderProps.style,
 				} }
 			>
-				{ isUrlAttributeConnected ? (
+				{ lockUrlControls ? (
 					<span
 						className={ 'block-bindings-media-placeholder-message' }
 					>

@@ -251,7 +251,7 @@ class EditorPage {
 
 		if ( options.autoscroll ) {
 			if ( isAndroid() ) {
-				await swipeDown( this.driver );
+				await swipeDown( this.driver, { endYCoefficient: 2 } );
 			} else {
 				await tapStatusBariOS( this.driver );
 			}
@@ -288,7 +288,10 @@ class EditorPage {
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 100, 1 );
+			await swipeUp( this.driver, undefined, {
+				delay: 100,
+				endYCoefficient: 1,
+			} );
 			return this.androidScrollAndReturnElement( accessibilityLabel );
 		}
 		return elements[ elements.length - 1 ];
@@ -301,7 +304,10 @@ class EditorPage {
 		const elements = await this.driver.$$( `~${ id }` );
 
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 100, 1 );
+			await swipeUp( this.driver, undefined, {
+				delay: 100,
+				endYCoefficient: 1,
+			} );
 			return this.scrollAndReturnElementByAccessibilityId( id );
 		}
 		return elements[ elements.length - 1 ];
@@ -666,46 +672,6 @@ class EditorPage {
 		}="Move block down from row ${ position } to row ${ position + 1 }"]`;
 		const moveDownButton = await this.driver.elementByXPath( blockLocator );
 		await moveDownButton.click();
-	}
-
-	// Position of the block to remove
-	// Block will no longer be present if this succeeds.
-	async removeBlockAtPosition( blockName = '', position = 1 ) {
-		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
-			throw Error( `No Block at position ${ position }` );
-		}
-
-		const buttonElementName = isAndroid()
-			? '//*'
-			: '//XCUIElementTypeButton';
-		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
-		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position );
-			let checkList = await this.driver.$$(
-				blockActionsMenuButtonLocator
-			);
-			while ( checkList.length === 0 ) {
-				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
-				checkList = await this.driver.$$(
-					blockActionsMenuButtonLocator
-				);
-			}
-		}
-
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
-		await blockActionsMenuButton.click();
-		const removeActionButtonIdentifier = 'Remove block';
-		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
-		const removeActionButton = await waitForVisible(
-			this.driver,
-			removeActionButtonLocator
-		);
-
-		await removeActionButton.click();
 	}
 
 	// =========================

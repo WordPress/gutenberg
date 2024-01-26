@@ -20,7 +20,7 @@ function LibraryFontVariant( { face, font } ) {
 	const { isFontActivated, toggleActivateFont } =
 		useContext( FontLibraryContext );
 
-	const isIstalled =
+	const isInstalled =
 		font?.fontFace?.length > 0
 			? isFontActivated(
 					font.slug,
@@ -49,15 +49,15 @@ function LibraryFontVariant( { face, font } ) {
 			className="font-library-modal__library-font-variant"
 			htmlFor={ checkboxId }
 		>
-			<Flex justify="space-between" align="center" gap="1rem">
-				<FontFaceDemo fontFace={ face } text={ displayName } />
+			<Flex justify="flex-start" align="center" gap="1rem">
 				<CheckboxControl
-					checked={ isIstalled }
+					checked={ isInstalled }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
 					id={ checkboxId }
 					label={ false }
 				/>
+				<FontFaceDemo fontFace={ face } text={ displayName } />
 			</Flex>
 		</label>
 	);
