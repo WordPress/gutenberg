@@ -2,11 +2,12 @@
  * External dependencies
  */
 import {
+	addBlock,
 	fireEvent,
+	getBlock,
 	getEditorHtml,
 	initializeEditor,
-	addBlock,
-	getBlock,
+	screen,
 	typeInRichText,
 	waitFor,
 	within,
@@ -33,7 +34,7 @@ afterAll( () => {
 
 describe( 'Heading block', () => {
 	it( 'inserts block', async () => {
-		const screen = await initializeEditor();
+		await initializeEditor();
 
 		// Add block
 		await addBlock( screen, 'Heading' );
@@ -48,7 +49,7 @@ describe( 'Heading block', () => {
 
 	it( 'should set a text color', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Heading' );
 
 		// Act
@@ -86,7 +87,7 @@ describe( 'Heading block', () => {
 
 	it( 'should set a background color', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Heading' );
 
 		// Act
@@ -120,7 +121,7 @@ describe( 'Heading block', () => {
 
 	it( 'change level dropdown displays active selection', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Heading' );
 		const headingBlock = getBlock( screen, 'Heading' );
 
@@ -138,7 +139,7 @@ describe( 'Heading block', () => {
 
 	it( 'should merge with an empty Paragraph block and keep being the Heading block', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
 		// Act
