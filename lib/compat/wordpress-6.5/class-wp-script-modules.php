@@ -237,20 +237,28 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		public function print_import_map_polyfill() {
 			$import_map = $this->get_import_map();
 			if ( ! empty( $import_map['imports'] ) ) {
-				$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
-				$src  = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/modules/importmap-polyfill.min.js' ) : includes_url( 'js/dist/vendor/wp-polyfill-importmap.min.js' );
-
-				echo (
-				// Test presence of feature...
-				'<script>( ' . $test . ' ) || ' .
+				global $wp_scripts;
 				/*
-				* ...appending polyfill on any failures. Cautious viewers may balk
-				* at the `document.write`. Its caveat of synchronous mid-stream
-				* blocking write is exactly the behavior we need though.
-				*/
-				'document.write( \'<script id="wp-js-module-importmap" src="' .
-				$src .
-				'"></scr\' + \'ipt>\' );</script>'
+				 * In Core, the polyfill is registered with a different approach.
+				 * See: https://github.com/WordPress/wordpress-develop/blob/4b23ba81ddb067110e41d05550de7f2a4f09dad3/src/wp-includes/script-loader.php#L99
+				 */
+				wp_register_script(
+					'wp-polyfill-importmap',
+					gutenberg_url( '/build/modules/importmap-polyfill.min.js' ),
+					array(),
+					get_bloginfo( 'version' ),
+					true
+				);
+				wp_print_inline_script_tag(
+					wp_get_script_polyfill(
+						$wp_scripts,
+						array(
+							'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")' => 'wp-polyfill-importmap',
+						)
+					),
+					array(
+						'id' => 'wp-polyfill-importmap',
+					)
 				);
 			}
 		}
