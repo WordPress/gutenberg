@@ -427,6 +427,7 @@ function TableRow( {
 	const onKeyDown = ( event ) => {
 		const { key, altKey, ctrlKey, metaKey, shiftKey, target, repeat } =
 			event;
+		const actionType = target.getAttribute( actionTypeAttribute );
 
 		if ( target !== ref.current ) {
 			// We're currently focused on a child of this row
@@ -436,8 +437,6 @@ function TableRow( {
 				// add further functionality to data views, but ideally
 				// interactive child elements would `preventDefault`
 				// to remove conflicts anyway.
-
-				const actionType = target.getAttribute( actionTypeAttribute );
 
 				if ( key === 'Escape' ) {
 					event.preventDefault();
@@ -461,7 +460,7 @@ function TableRow( {
 		// Everything below this deals with selecting the table row
 		if ( ! isSelectable ) return;
 
-		if ( key === ' ' && ! repeat ) {
+		if ( key === ' ' && ! repeat && ! actionType ) {
 			// Toggle the selected state of the row on `space`, and keep
 			// track of the action in case of multi-row selection.
 			currentRowToggleState = ! isSelected;
