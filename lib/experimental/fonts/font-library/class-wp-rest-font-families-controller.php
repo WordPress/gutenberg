@@ -133,7 +133,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		$settings = json_decode( $value, true );
 
 		if ( isset( $settings['fontFamily'] ) ) {
-			$settings['fontFamily'] = WP_Font_Family_Utils::format_font_family( $settings['fontFamily'] );
+			$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
 		}
 
 		// Provide default for preview, if not provided.

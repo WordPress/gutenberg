@@ -289,7 +289,7 @@ function gutenberg_convert_legacy_font_family_format() {
 		foreach ( $font_faces as $font_face ) {
 			$args                 = array();
 			$args['post_type']    = 'wp_font_face';
-			$args['post_title']   = WP_Font_Family_Utils::get_font_face_slug( $font_face );
+			$args['post_title']   = WP_Font_Utils::get_font_face_slug( $font_face );
 			$args['post_name']    = sanitize_title( $args['post_title'] );
 			$args['post_status']  = 'publish';
 			$args['post_parent']  = $font_family->ID;
