@@ -19,12 +19,13 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { image as icon } from '@wordpress/icons';
+import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import Image from './image';
 
 /**
@@ -111,6 +112,7 @@ export function ImageEdit( {
 		aspectRatio,
 		scale,
 		align,
+		metadata,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -332,6 +334,26 @@ export function ImageEdit( {
 	} );
 
 	// Much of this description is duplicated from MediaPlaceholder.
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					getBlockBindingsSource(
+						metadata?.bindings?.url?.source?.name
+					)?.lockAttributesEditing === true,
+			};
+		},
+		[ isSelected ]
+	);
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
@@ -340,11 +362,14 @@ export function ImageEdit( {
 						!! borderProps.className && ! isSelected,
 				} ) }
 				withIllustration={ true }
-				icon={ icon }
+				icon={ lockUrlControls ? pluginsIcon : icon }
 				label={ __( 'Image' ) }
-				instructions={ __(
-					'Upload an image file, pick one from your media library, or add one with a URL.'
-				) }
+				instructions={
+					! lockUrlControls &&
+					__(
+						'Upload an image file, pick one from your media library, or add one with a URL.'
+					)
+				}
 				style={ {
 					aspectRatio:
 						! ( width && height ) && aspectRatio
@@ -356,7 +381,15 @@ export function ImageEdit( {
 					...borderProps.style,
 				} }
 			>
-				{ content }
+				{ lockUrlControls ? (
+					<span
+						className={ 'block-bindings-media-placeholder-message' }
+					>
+						{ __( 'Connected to a custom field' ) }
+					</span>
+				) : (
+					content
+				) }
 			</Placeholder>
 		);
 	};

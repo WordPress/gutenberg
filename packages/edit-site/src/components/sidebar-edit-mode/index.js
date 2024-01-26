@@ -8,7 +8,6 @@ import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -49,9 +48,7 @@ export function SidebarComplementaryAreaFills() {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
-			isEditingPage:
-				select( editSiteStore ).isPage() &&
-				select( editorStore ).getRenderingMode() !== 'template-only',
+			isEditingPage: select( editSiteStore ).isPage(),
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );

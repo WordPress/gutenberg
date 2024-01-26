@@ -58,6 +58,7 @@ const meta: Meta< typeof DropdownMenu > = {
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
+		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },

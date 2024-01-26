@@ -28,6 +28,7 @@
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/interactivity" },
+		{ "path": "packages/interactivity-router" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/keycodes" },
 		{ "path": "packages/lazy-import" },

@@ -42,36 +42,16 @@ function Editor( {
 			( select ) => {
 				const { isFeatureActive, getEditedPostTemplate } =
 					select( editPostStore );
-				const {
-					getEntityRecord,
-					getPostType,
-					getEntityRecords,
-					canUser,
-				} = select( coreStore );
+				const { getEntityRecord, getPostType, canUser } =
+					select( coreStore );
 				const { getEditorSettings } = select( editorStore );
-				const isTemplate = [
-					'wp_template',
-					'wp_template_part',
-				].includes( currentPost.postType );
-				// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-				// to avoid the special case.
-				let postObject;
-				if ( isTemplate ) {
-					const posts = getEntityRecords(
-						'postType',
-						currentPost.postType,
-						{
-							wp_id: currentPost.postId,
-						}
-					);
-					postObject = posts?.[ 0 ];
-				} else {
-					postObject = getEntityRecord(
-						'postType',
-						currentPost.postType,
-						currentPost.postId
-					);
-				}
+
+				const postObject = getEntityRecord(
+					'postType',
+					currentPost.postType,
+					currentPost.postId
+				);
+
 				const supportsTemplateMode =
 					getEditorSettings().supportsTemplateMode;
 				const isViewable =
@@ -84,7 +64,10 @@ function Editor( {
 						'preferredStyleVariations'
 					),
 					template:
-						supportsTemplateMode && isViewable && canEditTemplate
+						supportsTemplateMode &&
+						isViewable &&
+						canEditTemplate &&
+						currentPost.postType !== 'wp_template'
 							? getEditedPostTemplate()
 							: null,
 					post: postObject,
@@ -94,12 +77,15 @@ function Editor( {
 		);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
+	const defaultRenderingMode =
+		currentPost.postType === 'wp_template' ? 'all' : 'post-only';
 
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
 			getPostLinkProps,
 			goBack,
+			defaultRenderingMode,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -114,6 +100,7 @@ function Editor( {
 		updatePreferredStyleVariations,
 		getPostLinkProps,
 		goBack,
+		defaultRenderingMode,
 	] );
 
 	if ( ! post ) {

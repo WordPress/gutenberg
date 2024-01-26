@@ -156,6 +156,8 @@ export const resetScope = () => {
 	scopeStack.pop();
 };
 
+export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
+
 export const setNamespace = ( namespace: string ) => {
 	namespaceStack.push( namespace );
 };
@@ -259,7 +261,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-const getEvaluate: GetEvaluate =
+export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;

@@ -38,22 +38,34 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { useLink } from '../../components/routes/link';
 
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, renderingMode } = useSelect( ( select ) => {
-		const { isPage: _isPage, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const { getRenderingMode } = select( editorStore );
-		return {
-			isPage: _isPage(),
-			canvasMode: getCanvasMode(),
-			renderingMode: getRenderingMode(),
-		};
-	}, [] );
+	const { isPage, canvasMode, templateId, currentPostType } = useSelect(
+		( select ) => {
+			const { isPage: _isPage, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const { getCurrentPostType, getCurrentTemplateId } =
+				select( editorStore );
+			return {
+				isPage: _isPage(),
+				canvasMode: getCanvasMode(),
+				templateId: getCurrentTemplateId(),
+				currentPostType: getCurrentPostType(),
+			};
+		},
+		[]
+	);
+
+	const { onClick: editTemplate } = useLink( {
+		postType: 'wp_template',
+		postId: templateId,
+	} );
+
 	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! isPage || canvasMode !== 'edit' ) {
@@ -62,7 +74,7 @@ function usePageContentFocusCommands() {
 
 	const commands = [];
 
-	if ( renderingMode !== 'template-only' ) {
+	if ( currentPostType !== 'wp_template' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
 			/* translators: %1$s: template title */
@@ -72,7 +84,7 @@ function usePageContentFocusCommands() {
 			),
 			icon: layout,
 			callback: ( { close } ) => {
-				setRenderingMode( 'template-only' );
+				editTemplate();
 				close();
 			},
 		} );
@@ -129,7 +141,7 @@ function useManipulateDocumentCommands() {
 	const isEditingPage = useSelect(
 		( select ) =>
 			select( editSiteStore ).isPage() &&
-			select( editorStore ).getRenderingMode() !== 'template-only',
+			select( editorStore ).getCurrentPostType() !== 'wp_template',
 		[]
 	);
 
@@ -216,6 +228,8 @@ function useEditUICommands() {
 		showBlockBreadcrumbs,
 		isListViewOpen,
 		isDistractionFree,
+		isTopToolbar,
+		isFocusMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorMode } = select( editSiteStore );
@@ -229,6 +243,8 @@ function useEditUICommands() {
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			isFocusMode: get( 'core', 'focusMode' ),
+			isTopToolbar: get( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -271,16 +287,33 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',
-		label: __( 'Toggle spotlight mode' ),
+		label: __( 'Toggle spotlight' ),
 		callback: ( { close } ) => {
 			toggle( 'core', 'focusMode' );
 			close();
+			createInfoNotice(
+				isFocusMode ? __( 'Spotlight off.' ) : __( 'Spotlight on.' ),
+				{
+					id: 'core/edit-site/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	commands.push( {
 		name: 'core/toggle-distraction-free',
-		label: __( 'Toggle distraction free' ),
+		label: isDistractionFree
+			? __( 'Exit Distraction Free' )
+			: __( 'Enter Distraction Free ' ),
 		callback: ( { close } ) => {
 			toggleDistractionFree();
 			close();
@@ -296,6 +329,23 @@ function useEditUICommands() {
 				toggleDistractionFree();
 			}
 			close();
+			createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar off.' )
+					: __( 'Top toolbar on.' ),
+				{
+					id: 'core/edit-site/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
@@ -350,11 +400,20 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
+		label: isListViewOpen
+			? __( 'Close List View' )
+			: __( 'Open List View' ),
 		icon: listView,
 		callback: ( { close } ) => {
 			setIsListViewOpened( ! isListViewOpen );
 			close();
+			createInfoNotice(
+				isListViewOpen ? __( 'List View off.' ) : __( 'List View on.' ),
+				{
+					id: 'core/edit-site/toggle-list-view/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
