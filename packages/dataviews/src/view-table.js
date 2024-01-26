@@ -424,89 +424,82 @@ function TableRow( {
 	const className = classnames( 'dataviews-view-table__row', {
 		'is-selected': isSelected,
 	} );
-	const onKeyDown = isSelectable
-		? ( event ) => {
-				const {
-					key,
-					altKey,
-					ctrlKey,
-					metaKey,
-					shiftKey,
-					target,
-					repeat,
-				} = event;
+	const onKeyDown = ( event ) => {
+		const { key, altKey, ctrlKey, metaKey, shiftKey, target, repeat } =
+			event;
 
-				if ( target !== ref.current ) {
-					// We're currently focused on a child of this row
+		if ( target !== ref.current ) {
+			// We're currently focused on a child of this row
 
-					if ( ! shiftKey ) {
-						// This is rather naive, and may need revisiting as we
-						// add further functionality to data views, but ideally
-						// interactive child elements would `preventDefault`
-						// to remove conflicts anyway.
+			if ( ! shiftKey ) {
+				// This is rather naive, and may need revisiting as we
+				// add further functionality to data views, but ideally
+				// interactive child elements would `preventDefault`
+				// to remove conflicts anyway.
 
-						const actionType =
-							target.getAttribute( actionTypeAttribute );
+				const actionType = target.getAttribute( actionTypeAttribute );
 
-						if ( key === 'Escape' && actionType ) {
-							event.preventDefault();
-							ref.current.focus();
-						} else if ( key === 'ArrowLeft' && actionType ) {
-							event.preventDefault();
-							getPreviousAction( ref.current, target )?.focus();
-						} else if ( key === 'ArrowRight' && actionType ) {
-							event.preventDefault();
-							getNextAction( ref.current, target )?.focus();
-						} else if ( key === 'ArrowUp' ) {
-							event.preventDefault();
-							compositeStore.move( compositeStore.previous() );
-						} else if ( key === 'ArrowDown' ) {
-							event.preventDefault();
-							compositeStore.move( compositeStore.next() );
-						}
-					}
-				} else if ( key === ' ' && ! repeat ) {
-					// Toggle the selected state of the row on `space`, and keep
-					// track of the action in case of multi-row selection.
-					currentRowToggleState = ! isSelected;
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId( _item );
-							return id === itemId
-								? ! isSelected
-								: selection.includes( itemId );
-						} )
-					);
+				if ( key === 'Escape' ) {
 					event.preventDefault();
-				} else if (
-					( key === 'ArrowDown' || key === 'ArrowUp' ) &&
-					shiftKey &&
-					! isSelected
-				) {
-					// Shift+{Up,Down} selects this row, as well as the next one
-					// (handled in `onKeyUp` below)
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId( _item );
-							return (
-								id === itemId || selection.includes( itemId )
-							);
-						} )
-					);
-				} else if (
-					key === 'a' &&
-					! shiftKey &&
-					! altKey &&
-					! ( isAppleOS() ? ctrlKey : metaKey ) &&
-					( isAppleOS() ? metaKey : ctrlKey )
-				) {
-					// {Ctrl,Cmd}+a selects all the rows (provided no other
-					// modifier key was pressed).
-					onSelectionChange( data );
+					ref.current.focus();
+				} else if ( key === 'ArrowLeft' && actionType ) {
 					event.preventDefault();
+					getPreviousAction( ref.current, target )?.focus();
+				} else if ( key === 'ArrowRight' && actionType ) {
+					event.preventDefault();
+					getNextAction( ref.current, target )?.focus();
+				} else if ( key === 'ArrowUp' ) {
+					event.preventDefault();
+					compositeStore.move( compositeStore.previous() );
+				} else if ( key === 'ArrowDown' ) {
+					event.preventDefault();
+					compositeStore.move( compositeStore.next() );
 				}
-		  }
-		: undefined;
+			}
+		}
+
+		// Everything below this deals with selecting the table row
+		if ( ! isSelectable ) return;
+
+		if ( key === ' ' && ! repeat ) {
+			// Toggle the selected state of the row on `space`, and keep
+			// track of the action in case of multi-row selection.
+			currentRowToggleState = ! isSelected;
+			onSelectionChange(
+				data.filter( ( _item ) => {
+					const itemId = getItemId( _item );
+					return id === itemId
+						? ! isSelected
+						: selection.includes( itemId );
+				} )
+			);
+			event.preventDefault();
+		} else if (
+			( key === 'ArrowDown' || key === 'ArrowUp' ) &&
+			shiftKey &&
+			! isSelected
+		) {
+			// Shift+{Up,Down} selects this row, as well as the next one
+			// (handled in `onKeyUp` below)
+			onSelectionChange(
+				data.filter( ( _item ) => {
+					const itemId = getItemId( _item );
+					return id === itemId || selection.includes( itemId );
+				} )
+			);
+		} else if (
+			key === 'a' &&
+			! shiftKey &&
+			! altKey &&
+			! ( isAppleOS() ? ctrlKey : metaKey ) &&
+			( isAppleOS() ? metaKey : ctrlKey )
+		) {
+			// {Ctrl,Cmd}+a selects all the rows (provided no other
+			// modifier key was pressed).
+			onSelectionChange( data );
+			event.preventDefault();
+		}
+	};
 	const onKeyUp = isSelectable
 		? ( event ) => {
 				const { key, shiftKey, target, repeat } = event;
@@ -542,28 +535,26 @@ function TableRow( {
 				}
 		  }
 		: undefined;
-	const onFocus = isSelectable
-		? ( event ) => {
-				const { target, relatedTarget } = event;
-				const originActionType =
-					relatedTarget?.getAttribute( actionTypeAttribute );
+	const onFocus = ( event ) => {
+		const { target, relatedTarget } = event;
+		const originActionType =
+			relatedTarget?.getAttribute( actionTypeAttribute );
 
-				// Bail if the event wasn't triggered on the row itself, or if
-				// the origin isn't an action toggle.
-				if ( target !== ref.current || ! originActionType ) return;
+		// Bail if the event wasn't triggered on the row itself, or if
+		// the origin isn't an action toggle.
+		if ( target !== ref.current || ! originActionType ) return;
 
-				// Bail if the event is happening inside of the current row.
-				if ( ref.current.contains( relatedTarget ) ) return;
+		// Bail if the event is happening inside of the current row.
+		if ( ref.current.contains( relatedTarget ) ) return;
 
-				const correlatedTarget = target.querySelector(
-					`[${ actionTypeAttribute }="${ originActionType }"]`
-				);
+		const correlatedTarget = target.querySelector(
+			`[${ actionTypeAttribute }="${ originActionType }"]`
+		);
 
-				// If there's a matching action in the current row, focus that
-				// instead of the row itself.
-				correlatedTarget?.focus();
-		  }
-		: undefined;
+		// If there's a matching action in the current row, focus that
+		// instead of the row itself.
+		correlatedTarget?.focus();
+	};
 
 	return (
 		<CompositeItem
@@ -574,6 +565,7 @@ function TableRow( {
 			aria-selected={ isSelectable ? isSelected : undefined }
 			render={ <tr /> }
 			className={ className }
+			tabIndex={ -1 }
 			{ ...props }
 		/>
 	);
