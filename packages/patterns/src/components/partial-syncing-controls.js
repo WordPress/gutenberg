@@ -19,7 +19,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 	const attributeSources = Object.keys( syncedAttributes ).map(
 		( attributeName ) =>
-			attributes.metadata?.bindings?.[ attributeName ]?.source?.name
+			attributes.metadata?.bindings?.[ attributeName ]?.source
 	);
 	const isConnectedToOtherSources = attributeSources.every(
 		( source ) => source && source !== 'core/pattern-attributes'
@@ -38,7 +38,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		if ( ! isChecked ) {
 			for ( const attributeName of Object.keys( syncedAttributes ) ) {
 				if (
-					updatedBindings[ attributeName ]?.source?.name ===
+					updatedBindings[ attributeName ]?.source ===
 					'core/pattern-attributes'
 				) {
 					delete updatedBindings[ attributeName ];
@@ -59,9 +59,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		for ( const attributeName of Object.keys( syncedAttributes ) ) {
 			if ( ! updatedBindings[ attributeName ] ) {
 				updatedBindings[ attributeName ] = {
-					source: {
-						name: 'core/pattern-attributes',
-					},
+					source: 'core/pattern-attributes',
 				};
 			}
 		}

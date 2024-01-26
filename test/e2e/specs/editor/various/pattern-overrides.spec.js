@@ -92,7 +92,7 @@ test.describe( 'Pattern Overrides', () => {
 							id: expect.any( String ),
 							bindings: {
 								content: {
-									source: { name: 'core/pattern-attributes' },
+									source: 'core/pattern-attributes',
 								},
 							},
 						},
@@ -222,7 +222,7 @@ test.describe( 'Pattern Overrides', () => {
 		const paragraphId = 'paragraph-id';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":{"name":"core/pattern-attributes"}}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-attributes"}}}} -->
 <p>Editable</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -270,7 +270,7 @@ test.describe( 'Pattern Overrides', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern with overrides',
 			content: `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":{"name":"core/pattern-attributes"}},"url":{"source":{"name":"core/pattern-attributes"}},"linkTarget":{"source":{"name":"core/pattern-attributes"}}}}} -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":"core/pattern-attributes"},"url":{"source":"core/pattern-attributes"},"linkTarget":{"source":"core/pattern-attributes"}}}} -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener">wp.org</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
