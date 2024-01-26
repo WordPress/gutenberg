@@ -125,14 +125,12 @@ export function CheckboxControl(
 					/>
 				) : null }
 			</span>
-			{ label && (
-				<label
-					className="components-checkbox-control__label"
-					htmlFor={ id }
-				>
-					{ label }
-				</label>
-			) }
+			<label
+				className="components-checkbox-control__label"
+				htmlFor={ id }
+			>
+				{ label }
+			</label>
 		</BaseControl>
 	);
 }
