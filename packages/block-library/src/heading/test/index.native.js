@@ -39,7 +39,7 @@ describe( 'Heading block', () => {
 		await addBlock( screen, 'Heading' );
 
 		// Get block
-		const headingBlock = await getBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading' );
 		fireEvent.press( headingBlock );
 		expect( headingBlock ).toBeVisible();
 
@@ -122,7 +122,7 @@ describe( 'Heading block', () => {
 		// Arrange
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Heading' );
-		const headingBlock = await getBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading' );
 
 		// Act
 		fireEvent.press( headingBlock );
