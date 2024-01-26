@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -42,12 +43,20 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
 
+	const canEditTemplate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+	);
+
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
 	const lastNoticeId = useRef( 0 );
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
+			if ( ! canEditTemplate ) {
+				return;
+			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
@@ -104,7 +113,12 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		onNavigateToEntityRecord,
 		templateId,
 		removeNotice,
+		canEditTemplate,
 	] );
+
+	if ( ! canEditTemplate ) {
+		return null;
+	}
 
 	return (
 		<ConfirmDialog
