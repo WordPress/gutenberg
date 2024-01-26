@@ -27,11 +27,7 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
-import {
-	EFFECTS_SUPPORT_KEYS,
-	SHADOW_SUPPORT_KEY,
-	EffectsPanel,
-} from './effects';
+import { EFFECTS_SUPPORT_KEYS, EffectsPanel } from './effects';
 import {
 	shouldSkipSerialization,
 	useStyleOverride,
@@ -103,7 +99,10 @@ function addAttribute( settings ) {
  * @type {Record<string, string[]>}
  */
 const skipSerializationPathsEdit = {
-	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
+	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		'border',
+		'shadow',
+	],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
 	],
@@ -116,7 +115,6 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
-	[ `${ SHADOW_SUPPORT_KEY }` ]: [ SHADOW_SUPPORT_KEY ],
 };
 
 /**
