@@ -136,6 +136,7 @@ describe( 'Heading block', () => {
 			)
 		).toBeVisible();
 	} );
+
 	it( 'changes heading level', async () => {
 		// Arrange
 		await initializeEditor();
