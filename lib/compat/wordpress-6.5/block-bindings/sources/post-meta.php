@@ -14,7 +14,7 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 			$post_id = get_the_ID();
 		}
 
-		return get_post_meta( $post_id, $source_attrs['value'], true );
+		return get_post_meta( $post_id, $source_attrs['key'], true );
 	};
 	wp_block_bindings_register_source(
 		'core/post-meta',

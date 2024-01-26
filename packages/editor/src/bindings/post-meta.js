@@ -15,7 +15,7 @@ export default {
 	useSource( props, sourceAttributes ) {
 		const { getCurrentPostType } = useSelect( editorStore );
 		const { context } = props;
-		const { value: metaKey } = sourceAttributes;
+		const { key: metaKey } = sourceAttributes;
 		const postType = context.postType
 			? context.postType
 			: getCurrentPostType();
