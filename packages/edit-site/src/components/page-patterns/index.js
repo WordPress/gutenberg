@@ -395,7 +395,7 @@ export default function DataviewsPatterns() {
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<Page
 				title={ __( 'Patterns content' ) }
-				className="edit-site-page-patterns-dataviews"
+				className="edit-site-page-patterns"
 				hideTitleFromUI
 			>
 				<PatternsHeader

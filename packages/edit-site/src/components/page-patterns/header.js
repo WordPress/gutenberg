@@ -53,7 +53,7 @@ export default function PatternsHeader( {
 	if ( ! title ) return null;
 
 	return (
-		<VStack className="edit-site-patterns__section-header">
+		<VStack className="edit-site-patterns__header">
 			<HStack justify="space-between">
 				<Heading as="h2" level={ 4 } id={ titleId }>
 					{ title }
