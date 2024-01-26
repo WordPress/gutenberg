@@ -136,6 +136,19 @@ describe( 'Heading block', () => {
 			)
 		).toBeVisible();
 	} );
+	it( 'changes heading level', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Heading' );
+
+		// Act
+		fireEvent.press( getBlock( screen, 'Heading' ) );
+		fireEvent.press( screen.getByLabelText( 'Change level' ) );
+		fireEvent.press( screen.getByLabelText( 'Heading 6' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 
 	it( 'should merge with an empty Paragraph block and keep being the Heading block', async () => {
 		// Arrange
