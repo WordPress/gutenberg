@@ -215,28 +215,28 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				'slug'          => array(
 					'description' => __( 'Unique identifier for the font collection.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'name'          => array(
 					'description' => __( 'The name for the font collection.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'description'   => array(
 					'description' => __( 'The description for the font collection.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'font_families' => array(
 					'description' => __( 'The font families for the font collection.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'categories'    => array(
 					'description' => __( 'The categories for the font collection.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 			),
 		);
