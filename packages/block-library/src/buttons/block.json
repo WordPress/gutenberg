@@ -4,6 +4,7 @@
 	"name": "core/buttons",
 	"title": "Buttons",
 	"category": "design",
+	"children": [ "core/button" ],
 	"description": "Prompt visitors to take action with a group of button-style links.",
 	"keywords": [ "link" ],
 	"textdomain": "default",
