@@ -47,6 +47,7 @@
 		"enhancedPagination": "enhancedPagination"
 	},
 	"supports": {
+		"interactivity": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true
