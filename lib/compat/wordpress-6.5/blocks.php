@@ -97,16 +97,16 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 				continue;
 			}
 			// If no source is provided, or that source is not registered, process next attribute.
-			if ( ! isset( $binding_source['source'] ) || ! isset( $binding_source['source']['name'] ) || ! isset( $block_bindings_sources[ $binding_source['source']['name'] ] ) ) {
+			if ( ! isset( $binding_source['source'] ) || ! is_string( $binding_source['source'] ) || ! isset( $block_bindings_sources[ $binding_source['source'] ] ) ) {
 				continue;
 			}
 
-			$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
+			$source_callback = $block_bindings_sources[ $binding_source['source'] ]['apply'];
 			// Get the value based on the source.
-			if ( ! isset( $binding_source['source']['args'] ) ) {
+			if ( ! isset( $binding_source['args'] ) ) {
 				$source_args = array();
 			} else {
-				$source_args = $binding_source['source']['args'];
+				$source_args = $binding_source['args'];
 			}
 			$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
 			// If the value is null, process next attribute.
