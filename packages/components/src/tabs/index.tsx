@@ -179,13 +179,6 @@ function Tabs( {
 			typeof previousSelectedId === 'string' &&
 			previousSelectedId === activeElement?.id;
 
-		// If the previously selected tab had focus when the selection changed,
-		// move focus to the newly selected tab.
-		if ( previousSelectedTabHadFocus && selectedId !== activeElement.id ) {
-			move( selectedId );
-			return;
-		}
-
 		// If a tab other than the one previously selected had focus when the
 		// selection changed, update the activeId to the currently focused tab.
 		// The activeId controls how arrow key navigation behaves. Keeping them
