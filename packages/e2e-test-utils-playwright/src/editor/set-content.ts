@@ -10,9 +10,7 @@ import type { Editor } from './index';
  * @param html Serialized block HTML.
  */
 async function setContent( this: Editor, html: string ) {
-	await this.page.waitForFunction(
-		() => window?.wp?.blocks && window?.wp?.data
-	);
+	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 
 	await this.page.evaluate( ( _html ) => {
 		const blocks = window.wp.blocks.parse( _html );

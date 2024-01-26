@@ -9,7 +9,7 @@ import type { Editor } from './index';
  * @param this
  */
 export async function switchToLegacyCanvas( this: Editor ) {
-	await this.page.waitForFunction( () => window?.wp?.blocks );
+	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 
 	await this.page.evaluate( () => {
 		window.wp.blocks.registerBlockType( 'test/v2', {

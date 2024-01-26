@@ -20,7 +20,7 @@ export async function setPreferences(
 	context: PreferencesContext,
 	preferences: Record< string, any >
 ) {
-	await this.page.waitForFunction( () => window?.wp?.data );
+	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 
 	await this.page.evaluate(
 		async ( props ) => {

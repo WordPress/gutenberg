@@ -23,9 +23,7 @@ export async function getBlocks(
 	this: Editor,
 	{ clientId, full = false }: { clientId?: string; full?: boolean } = {}
 ) {
-	await this.page.waitForFunction(
-		() => window?.wp?.blocks && window?.wp?.data
-	);
+	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 
 	return await this.page.evaluate(
 		( [ _full, _clientId ] ) => {
