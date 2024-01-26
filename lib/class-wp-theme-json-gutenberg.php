@@ -678,9 +678,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Changed value from 1 to 2.
+	 * @since 6.5.0 Changed value from 2 to 3.
 	 * @var int
 	 */
-	const LATEST_SCHEMA = 2;
+	const LATEST_SCHEMA = 3;
 
 	/**
 	 * Constructor.

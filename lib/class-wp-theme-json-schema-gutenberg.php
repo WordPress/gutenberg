@@ -38,6 +38,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Function that migrates a given theme.json structure to the last version.
 	 *
 	 * @since 5.9.0
+	 * @since 6.5.0 Migrate up to v3.
 	 *
 	 * @param array $theme_json The structure to migrate.
 	 *
@@ -50,8 +51,12 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			);
 		}
 
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = self::migrate_v1_to_v2( $theme_json );
+		// No breaks so all migrations will run in order starting with the current.
+		switch( $theme_json['version'] ) {
+			case 1:
+				$theme_json = self::migrate_v1_to_v2( $theme_json );
+			case 2:
+				$theme_json = self::migrate_v2_to_v3( $theme_json );
 		}
 
 		return $theme_json;
@@ -83,6 +88,36 @@ class WP_Theme_JSON_Schema_Gutenberg {
 
 		// Set the new version.
 		$new['version'] = 2;
+
+		return $new;
+	}
+
+	/**
+	 * Sets settings.typography.defaultFontSizes to false as it drives
+	 * PRESETS_METADATA prevent_override in class-wp-theme-json.php which was
+	 * hardcoded to false in v2 but defaults to true in v3.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $old Data to migrate.
+	 *
+	 * @return array Data with defaultFontSizes set to false.
+	 */
+	private static function migrate_v2_to_v3( $old ) {
+		// Copy everything.
+		$new = $old;
+
+		// Overwrite the things that changed.
+		if ( ! isset( $old['settings'] ) ) {
+			$new['settings'] = array();
+		}
+		if ( ! isset( $old['settings']['typography'] ) ) {
+			$new['settings']['typography'] = array();
+		}
+		$new['settings']['typography']['defaultFontSizes'] = false;
+
+		// Set the new version.
+		$new['version'] = 3;
 
 		return $new;
 	}
