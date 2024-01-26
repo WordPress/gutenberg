@@ -8,7 +8,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
-import { fetchInstallFontFace } from '../resolvers';
+import { fetchInstallFontFace } from '../src/resolvers';
 import { formatFontFamily } from './preview-styles';
 
 /**

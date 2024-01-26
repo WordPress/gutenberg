@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Modal,
 } from '@wordpress/components';
-import FontLibrary from '@wordpress/font-library';
+import FontLibrary from './font-library';
 
 function FontLibraryModal( {
 	onRequestClose,

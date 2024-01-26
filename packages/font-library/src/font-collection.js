@@ -21,15 +21,15 @@ import { search, closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanelLayout from './tab-panel-layout';
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from './src/context';
 import FontsGrid from './fonts-grid';
-import FontCard from './font-card';
-import filterFonts from './utils/filter-fonts';
-import CollectionFontDetails from './collection-font-details';
-import { toggleFont } from './utils/toggleFont';
-import { getFontsOutline } from './utils/fonts-outline';
+import FontCard from './src/font-card';
+import filterFonts from './src/utils/filter-fonts';
+import CollectionFontDetails from './src/collection-font-details';
+import { toggleFont } from './src/utils/toggleFont';
+import { getFontsOutline } from './src/utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
-import { downloadFontFaceAssets } from './utils';
+import { downloadFontFaceAssets } from './src/utils';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
