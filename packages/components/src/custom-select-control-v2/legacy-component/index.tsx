@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
 import _CustomSelect from '../custom-select';
 import type { LegacyCustomSelectProps } from '../types';
 import { CustomSelectItem } from '..';
-import { ExperimentalHint, ExperimentalHintItem } from '../styles';
+import * as Styled from '../styles';
 import { ContextSystemProvider } from '../../context';
 
 function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
@@ -58,21 +58,15 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	} );
 
 	const children = options.map(
-		( { name, key, style, __experimentalHint, ...rest } ) => {
+		( { name, key, __experimentalHint, ...rest } ) => {
 			const withHint = (
-				<>
+				<Styled.WithHintWrapper>
 					<span>{ name }</span>
-					<ExperimentalHintItem className="components-custom-select-control__item-hint">
+					<Styled.ExperimentalHintItem className="components-custom-select-control__item-hint">
 						{ __experimentalHint }
-					</ExperimentalHintItem>
-				</>
+					</Styled.ExperimentalHintItem>
+				</Styled.WithHintWrapper>
 			);
-
-			const hintStyles = {
-				gridTemplateColumns: __experimentalShowSelectedHint
-					? '1fr auto 30px'
-					: undefined,
-			};
 
 			return (
 				<CustomSelectItem
@@ -81,7 +75,6 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 					children={
 						__experimentalShowSelectedHint ? withHint : name
 					}
-					style={ { ...hintStyles, ...style } }
 					{ ...rest }
 				/>
 			);
@@ -108,9 +101,9 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		return (
 			<>
 				{ currentValue }
-				<ExperimentalHint className="components-custom-select-control__hint">
+				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
 					{ currentHint?.__experimentalHint }
-				</ExperimentalHint>
+				</Styled.SelectedExperimentalHintItem>
 			</>
 		);
 	};

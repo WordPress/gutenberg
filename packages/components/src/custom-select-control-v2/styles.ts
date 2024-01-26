@@ -12,7 +12,13 @@ import { COLORS } from '../utils';
 import { space } from '../utils/space';
 import type { CustomSelectButtonProps } from './types';
 
-export const ExperimentalHint = styled.span`
+export const WithHintWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	flex: 1;
+`;
+
+export const SelectedExperimentalHintItem = styled.span`
 	color: ${ COLORS.gray[ 600 ] };
 	margin-left: ${ space( 2 ) };
 `;
@@ -67,10 +73,9 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 	};
 
 	return css`
-		text-align: left;
-		display: grid;
-		grid-template-columns: auto 1fr auto;
-		align-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		background-color: ${ COLORS.white };
 		border: 1px solid ${ COLORS.gray[ 600 ] };
 		border-radius: ${ space( 0.5 ) };
@@ -93,13 +98,16 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 `;
 
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
-	text-align: left;
-	display: grid;
-	grid-template-columns: auto auto;
-	justify-content: space-between;
+	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	padding: ${ space( 2 ) };
 	&[data-active-item] {
 		background-color: ${ COLORS.gray[ 300 ] };
 	}
+`;
+
+export const SelectedItemCheckmark = styled( Ariakit.SelectItemCheck )`
+	justify-self: center;
+	padding: ${ space( 1 ) };
 `;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import * as Ariakit from '@ariakit/react';
-/**
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
@@ -26,13 +21,11 @@ export function CustomSelectItem( {
 			{ ...props }
 		>
 			{ children ?? props.value }
-			<Ariakit.SelectItemCheck
+			<Styled.SelectedItemCheckmark
 				// set initial size of check to prevent inline overrides
+				// due to legacy style options
 				style={ {
 					fontSize: 'initial',
-					height: 'initial',
-					width: 'initial',
-					justifySelf: 'center',
 				} }
 			/>
 		</Styled.CustomSelectItem>

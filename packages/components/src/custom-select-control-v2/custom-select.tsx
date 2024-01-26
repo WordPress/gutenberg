@@ -81,7 +81,7 @@ const UnconnectedCustomSelectButton = (
 			hasCustomRenderProp={ !! renderSelectedValue }
 			store={ store }
 		>
-			{ computedRenderSelectedValue( currentValue ) }
+			<div>{ computedRenderSelectedValue( currentValue ) }</div>
 			<Ariakit.SelectArrow />
 		</Styled.CustomSelectButton>
 	);
