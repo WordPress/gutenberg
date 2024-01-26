@@ -132,14 +132,14 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 
 }
 
-$default_font_collection = array(
-	'slug'        => 'default-font-collection',
+$google_fonts = array(
+	'slug'        => 'google-fonts',
 	'name'        => 'Google Fonts',
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
 );
 
-wp_register_font_collection( $default_font_collection );
+wp_register_font_collection( $google_fonts );
 
 // @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {

@@ -36,12 +36,12 @@ const DEFAULT_CATEGORY = {
 	name: __( 'All' ),
 };
 function FontCollection( { slug } ) {
-	const requiresPermission = slug === 'default-font-collection';
+	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
 		return (
 			window.localStorage.getItem(
-				'wp-font-library-default-font-collection-permission'
+				'wp-font-library-google-fonts-permission'
 			) === 'true'
 		);
 	};
