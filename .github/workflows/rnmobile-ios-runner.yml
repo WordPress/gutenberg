@@ -44,7 +44,7 @@ jobs:
                   key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
 
             - name: Prepare tests setup
-              run: npm run native test:e2e:setup
+              run: TEST_ENV=github npm run native test:e2e:setup
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
@@ -77,7 +77,7 @@ jobs:
               run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
 
             - name: Run iOS Device Tests
-              run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+              run: TEST_ENV=github TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
 
             - name: Prepare build cache
               run: |

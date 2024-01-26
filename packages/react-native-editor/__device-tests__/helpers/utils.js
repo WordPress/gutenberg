@@ -12,7 +12,6 @@ const path = require( 'path' );
  */
 const serverConfigs = require( './serverConfigs' );
 const {
-	iosServer,
 	iosLocal,
 	android,
 	sauceOptions,
@@ -126,38 +125,38 @@ const setupDriver = async () => {
 			desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		}
 	} else {
-		desiredCaps = iosServer( { iPadDevice } );
+		desiredCaps = desiredCaps = iosLocal( {
+			iPadDevice,
+			environment: testEnvironment,
+		} );
 		desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
-		if ( isLocalEnvironment() ) {
-			desiredCaps = iosLocal( { iPadDevice } );
 
-			const iosPlatformVersions = getIOSPlatformVersions( {
-				requiredVersion: desiredCaps.platformVersion,
-			} );
-			if ( iosPlatformVersions.length === 0 ) {
-				throw new Error(
-					`No compatible iOS simulators available! Please verify that you have iOS ${ desiredCaps.platformVersion } simulators installed.`
-				);
-			}
+		const iosPlatformVersions = getIOSPlatformVersions( {
+			requiredVersion: desiredCaps.platformVersion,
+		} );
+		if ( iosPlatformVersions.length === 0 ) {
+			throw new Error(
+				`No compatible iOS simulators available! Please verify that you have iOS ${ desiredCaps.platformVersion } simulators installed.`
+			);
+		}
+		// eslint-disable-next-line no-console
+		console.log(
+			'Available iOS platform versions:',
+			iosPlatformVersions.map( ( { name } ) => name )
+		);
+
+		if ( ! desiredCaps.platformVersion ) {
+			desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
+
 			// eslint-disable-next-line no-console
 			console.log(
-				'Available iOS platform versions:',
-				iosPlatformVersions.map( ( { name } ) => name )
+				`Using iOS ${ desiredCaps.platformVersion } platform version`
 			);
-
-			if ( ! desiredCaps.platformVersion ) {
-				desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
-
-				// eslint-disable-next-line no-console
-				console.log(
-					`Using iOS ${ desiredCaps.platformVersion } platform version`
-				);
-			}
-
-			desiredCaps.app = path.resolve( localIOSAppPath );
-			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
+
+		desiredCaps.app = path.resolve( localIOSAppPath );
+		desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 	}
 
 	const sauceOptionsConfig = ! isLocalEnvironment()
