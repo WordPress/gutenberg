@@ -21,6 +21,7 @@ function log_error() {
 	printf "❌ $1\n"
 }
 
+TEST_ENV=${TEST_ENV:-"local"}
 output=$($APPIUM_CMD driver list --installed --json)
 
 if echo "$output" | grep -q 'uiautomator2'; then
@@ -38,7 +39,7 @@ else
 fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
-IOS_PLATFORM_VERSION=$(jq -r '.ios.local.platformVersion' "$CONFIG_FILE")
+IOS_PLATFORM_VERSION=$(jq -r ".ios.$TEST_ENV.platformVersion" "$CONFIG_FILE")
 
 # Throw an error if the required iOS runtime is not installed
 IOS_RUNTIME_INSTALLED=$(xcrun simctl list runtimes -j | jq -r --arg version "$IOS_PLATFORM_VERSION" '.runtimes | to_entries[] | select(.value.version | contains($version))')
@@ -62,8 +63,8 @@ function detect_or_create_simulator() {
 	fi
 }
 
-IOS_DEVICE_NAME=$(jq -r '.ios.local.deviceName' "$CONFIG_FILE")
-IOS_DEVICE_TABLET_NAME=$(jq -r '.ios.local.deviceTabletName' "$CONFIG_FILE")
+IOS_DEVICE_NAME=$(jq -r ".ios.$TEST_ENV.deviceName" "$CONFIG_FILE")
+IOS_DEVICE_TABLET_NAME=$(jq -r ".ios.$TEST_ENV.deviceTabletName" "$CONFIG_FILE")
 
 # Create the required iOS simulators, if they don't exist
 detect_or_create_simulator "$IOS_DEVICE_NAME"
