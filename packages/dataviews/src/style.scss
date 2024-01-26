@@ -256,6 +256,7 @@
 .dataviews-view-grid {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	grid-template-rows: max-content;
 	padding: 0 $grid-unit-40;
 
 	@include break-xlarge() {
