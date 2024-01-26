@@ -24,6 +24,7 @@ function FontFaceDemo( {
 	fontFace,
 	text,
 	checkboxId,
+	onClick,
 	style = {},
 } ) {
 	const ref = useRef( null );
@@ -49,6 +50,9 @@ function FontFaceDemo( {
 		height: '23px',
 		width: 'auto',
 	};
+	const containerStyle = {
+		cursor: 'pointer',
+	};
 
 	useEffect( () => {
 		const observer = new window.IntersectionObserver( ( [ entry ] ) => {
@@ -71,7 +75,15 @@ function FontFaceDemo( {
 	}, [ fontFace, isIntersecting, loadFontFaceAsset, isPreviewImage ] );
 
 	return (
-		<div ref={ ref } id={ checkboxId }>
+		<div
+			ref={ ref }
+			id={ checkboxId }
+			onClick={ onClick }
+			onKeyDown={ onClick }
+			tabIndex={ -1 }
+			role="button"
+			style={ containerStyle }
+		>
 			{ isPreviewImage ? (
 				<img
 					src={ previewUrl }

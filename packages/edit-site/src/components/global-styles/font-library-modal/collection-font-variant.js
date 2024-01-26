@@ -47,6 +47,7 @@ function CollectionFontVariant( {
 					fontFace={ face }
 					text={ displayName }
 					checkboxId={ checkboxId }
+					onClick={ handleToggleActivation }
 				/>
 			</Flex>
 		</div>
