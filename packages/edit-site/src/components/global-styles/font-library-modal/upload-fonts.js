@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	DropZone,
@@ -30,11 +30,6 @@ const { ProgressBar } = unlock( componentsPrivateApis );
 function UploadFonts() {
 	const { installFont, notice, setNotice } = useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
-	const supportedFormats =
-		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
-			.map( ( extension ) => `.${ extension }` )
-			.join( ', ' ) +
-		` ${ __( 'and' ) } .${ ALLOWED_FILE_EXTENSIONS.slice( -1 ) }`;
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -199,12 +194,8 @@ function UploadFonts() {
 				) }
 				<Spacer margin={ 2 } />
 				<Text className="font-library-modal__upload-area__text">
-					{ sprintf(
-						/* translators: %s: supported font formats: ex: .ttf, .woff and .woff2 */
-						__(
-							'Uploaded fonts appear in your library and can be used in your theme. Supported formats: %s.'
-						),
-						supportedFormats
+					{ __(
+						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .tff, .otf, .woff, and .woff2.'
 					) }
 				</Text>
 			</VStack>
