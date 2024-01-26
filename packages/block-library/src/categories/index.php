@@ -63,7 +63,7 @@ function render_block_core_categories( $attributes ) {
 /**
  * Generates the inline script for a categories dropdown field.
  *
- * @param string $dropdown_id ID of the dropdown field.
+ * @param string $dropdown_id HTML ID of the dropdown field.
  *
  * @return string Returns the dropdown onChange redirection script.
  */
@@ -72,10 +72,11 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	?>
 	<script>
 	( function() {
-		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
+		var dropdown = document.getElementById( <?php echo wp_json_encode( $dropdown_id ); ?> );
+		var categoryUrl = <?php echo wp_json_encode( esc_url_raw( home_url( '?cat=' ) ) ); ?>;
 		function onCatChange() {
 			if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
-				location.href = "<?php echo esc_url( home_url() ); ?>/?cat=" + dropdown.options[ dropdown.selectedIndex ].value;
+				location.href = categoryUrl + dropdown.options[ dropdown.selectedIndex ].value;
 			}
 		}
 		dropdown.onchange = onCatChange;
