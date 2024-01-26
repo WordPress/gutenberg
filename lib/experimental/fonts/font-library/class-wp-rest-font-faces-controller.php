@@ -79,7 +79,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
-						'context' => $this->get_context_param( array( 'default' => 'edit' ) ),
+						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 					),
 				),
 				array(
@@ -427,7 +427,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			$data['font_face_settings'] = $this->get_settings_from_post( $item );
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'edit';
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
 
@@ -471,7 +471,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'id'                 => array(
 					'description' => __( 'Unique identifier for the post.', 'default' ),
 					'type'        => 'integer',
-					'context'     => array( 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'theme_json_version' => array(
@@ -480,19 +480,19 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'default'     => 2,
 					'minimum'     => 2,
 					'maximum'     => 2,
-					'context'     => array( 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'parent'             => array(
 					'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 					'type'        => 'integer',
-					'context'     => array( 'edit', 'embed' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				// Font face settings come directly from theme.json schema
 				// See https://schemas.wp.org/trunk/theme.json
 				'font_face_settings' => array(
 					'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
 					'type'                 => 'object',
-					'context'              => array( 'edit', 'embed' ),
+					'context'              => array( 'view', 'edit', 'embed' ),
 					'properties'           => array(
 						'fontFamily'            => array(
 							'description' => __( 'CSS font-family value.', 'gutenberg' ),
@@ -600,8 +600,6 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
-
-		$query_params['context']['default'] = 'edit';
 
 		// Remove unneeded params.
 		unset( $query_params['after'] );
