@@ -48,7 +48,7 @@ function Edit( {
 			return;
 		}
 
-		function handleClick( event ) {
+		function handleMouseUp( event ) {
 			// There is a situation whereby there is an existing link in the rich text
 			// and the user clicks on the leftmost edge of that link and fails to activate
 			// the link format, but the click event still fires on the `<a>` element.
@@ -62,27 +62,24 @@ function Edit( {
 			setAddingLink( true );
 		}
 
-		const removeAddingLink = () => {
+		const handleMouseDown = () => {
 			setAddingLink( false );
 		};
 
-		editableContentElement.addEventListener(
-			'mousedown',
-			removeAddingLink
-		);
-		editableContentElement.addEventListener( 'mouseup', handleClick );
+		editableContentElement.addEventListener( 'mousedown', handleMouseDown );
+		editableContentElement.addEventListener( 'mouseup', handleMouseUp );
 
 		return () => {
 			editableContentElement.removeEventListener(
 				'mousedown',
-				removeAddingLink
+				handleMouseDown
 			);
 			editableContentElement.removeEventListener(
 				'mouseup',
-				handleClick
+				handleMouseUp
 			);
 		};
-	}, [ contentRef, isActive, onFocus, addingLink ] );
+	}, [ contentRef, isActive ] );
 
 	function addLink( target ) {
 		const text = getTextContent( slice( value ) );
