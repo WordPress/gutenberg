@@ -23,6 +23,9 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix missing custom color indicator for custom gradients [#57605]
 -   [**] Display a notice when a network connection unavailable [#56934]
 
+## 1.110.1
+-   [**] Fix crash when RichText values are not defined [#58088]
+
 ## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]

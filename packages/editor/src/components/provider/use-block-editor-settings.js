@@ -7,6 +7,7 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
+	fetchBlockPatterns,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -101,7 +102,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
-		restBlockPatterns,
 		restBlockPatternCategories,
 	} = useSelect(
 		( select ) => {
@@ -112,7 +112,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
-				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
@@ -148,7 +147,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
-				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
@@ -164,22 +162,16 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 	const blockPatterns = useMemo(
 		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
+			[ ...( settingsBlockPatterns || [] ) ].filter(
+				( { postTypes } ) => {
 					return (
 						! postTypes ||
 						( Array.isArray( postTypes ) &&
 							postTypes.includes( postType ) )
 					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, postType ]
+				}
+			),
+		[ settingsBlockPatterns, postType ]
 	);
 
 	const blockPatternCategories = useMemo(
@@ -254,8 +246,19 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			isDistractionFree,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
+			__experimentalFetchBlockPatterns: async () => {
+				return ( await fetchBlockPatterns() ).filter(
+					( { postTypes } ) => {
+						return (
+							! postTypes ||
+							( Array.isArray( postTypes ) &&
+								postTypes.includes( postType ) )
+						);
+					}
+				);
+			},
+			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>

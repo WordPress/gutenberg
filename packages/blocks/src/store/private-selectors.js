@@ -52,23 +52,33 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
-		// This is only available for heading
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'textTransform' &&
 			! name &&
-			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
-				element
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
 			)
 		) {
 			return false;
 		}
 
-		// This is only available for headings
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'letterSpacing' &&
 			! name &&
-			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
-				element
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
 			)
 		) {
 			return false;

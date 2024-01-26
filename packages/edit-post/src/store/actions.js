@@ -470,15 +470,6 @@ export function setIsEditingTemplate() {
 }
 
 /**
- * Switches to the template mode.
- */
-export const __unstableSwitchToTemplateMode =
-	() =>
-	( { registry } ) => {
-		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
-	};
-
-/**
  * Create a block based template.
  *
  * @deprecated
@@ -573,6 +564,16 @@ export const toggleDistractionFree =
 					{
 						id: 'core/edit-post/distraction-free-mode/notice',
 						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry
+										.dispatch( preferencesStore )
+										.toggle( 'core', 'distractionFree' );
+								},
+							},
+						],
 					}
 				);
 		} );

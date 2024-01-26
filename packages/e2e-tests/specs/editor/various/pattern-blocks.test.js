@@ -15,41 +15,15 @@ import {
 	openDocumentSettingsSidebar,
 	saveDraft,
 	createReusableBlock,
-	publishPost,
 	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const patternBlockNameInputSelector =
 	'.patterns-menu-items__convert-modal .components-text-control__input';
-const patternBlockInspectorNameInputSelector =
-	'.block-editor-block-inspector .components-text-control__input';
+const patternBlockInspectorNameSelector =
+	'.block-editor-block-inspector h2.block-editor-block-card__title';
 const syncToggleSelectorChecked =
 	'.patterns-menu-items__convert-modal .components-form-toggle.is-checked';
-
-const saveAll = async () => {
-	const publishButtonSelector =
-		'.editor-post-publish-button__button.has-changes-dot';
-	// Wait for the Publish button to become enabled in case the editor is autosaving ATM:.
-	const publishButton = await page.waitForSelector(
-		publishButtonSelector + '[aria-disabled="false"]'
-	);
-	await publishButton.click();
-
-	const saveButtonSelector =
-		'button.editor-entities-saved-states__save-button';
-	const saveButton = await page.waitForSelector( saveButtonSelector );
-	await saveButton.click();
-};
-
-const saveAllButDontPublish = async () => {
-	await saveAll();
-
-	// No need to publish the post.
-	const cancelPublish = await page.waitForSelector(
-		'.editor-post-publish-panel__header-cancel-button button'
-	);
-	await cancelPublish.click();
-};
 
 const clearAllBlocks = async () => {
 	// Remove all blocks from the post so that we're working with a clean slate.
@@ -69,46 +43,24 @@ describe( 'Pattern blocks', () => {
 		await createNewPost();
 	} );
 
-	it( 'can be created, inserted, edited and converted to a regular block.', async () => {
+	it( 'can be created, inserted, and converted to a regular block.', async () => {
 		await createReusableBlock( 'Hello there!', 'Greeting block' );
 		await clearAllBlocks();
 
 		// Insert the reusable block we created above.
 		await insertPattern( 'Greeting block' );
 
-		// Change the block's title.
-		await openDocumentSettingsSidebar();
-		const nameInput = await page.waitForSelector(
-			patternBlockInspectorNameInputSelector
-		);
-		await nameInput.click();
-		await pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.type( 'Surprised greeting block' );
-
-		// Quickly focus the paragraph block.
-		await canvas().click(
-			'.block-editor-block-list__block[data-type="core/block"] p'
-		);
-		await page.keyboard.press( 'Escape' ); // Enter navigation mode.
-		await page.keyboard.press( 'Enter' ); // Enter edit mode.
-
-		// Change the block's content.
-		await page.keyboard.type( 'Oh! ' );
-
-		// Save the reusable block.
-		await saveAllButDontPublish();
-
 		// Check that its content is up to date.
 		const text = await canvas().$eval(
 			'.block-editor-block-list__block[data-type="core/block"] p',
 			( element ) => element.innerText
 		);
-		expect( text ).toMatch( 'Oh! Hello there!' );
+		expect( text ).toMatch( 'Hello there!' );
 
 		await clearAllBlocks();
 
 		// Insert the reusable block we edited above.
-		await insertPattern( 'Surprised greeting block' );
+		await insertPattern( 'Greeting block' );
 
 		// Convert block to a regular block.
 		await clickBlockToolbarButton( 'Options' );
@@ -125,42 +77,7 @@ describe( 'Pattern blocks', () => {
 			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
-		expect( paragraphContent ).toMatch( 'Oh! Hello there!' );
-	} );
-
-	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33072.
-	it( 'can be saved when modified inside of a published post', async () => {
-		await createReusableBlock(
-			'Guten Berg!',
-			'Alternative greeting block'
-		);
-
-		// Make sure the reusable block has loaded properly before attempting to publish the post.
-		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
-
-		await publishPost();
-
-		// Close publish panel.
-		const closePublishPanelSelector =
-			'.editor-post-publish-panel__header button[aria-label="Close panel"]';
-		await page.waitForSelector( closePublishPanelSelector );
-		await page.click( closePublishPanelSelector );
-
-		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
-		await canvas().focus( 'p[aria-label="Block: Paragraph"]' );
-
-		// Change the block's content.
-		await page.keyboard.type( 'Einen ' );
-
-		// Save the reusable block and update the post.
-		await saveAll();
-
-		// Check that its content is up to date.
-		const paragraphContent = await canvas().$eval(
-			'p[aria-label="Block: Paragraph"]',
-			( element ) => element.innerText
-		);
-		expect( paragraphContent ).toMatch( 'Einen Guten Berg!' );
+		expect( paragraphContent ).toMatch( 'Hello there!' );
 	} );
 
 	it( 'can be inserted after refresh', async () => {
@@ -175,8 +92,8 @@ describe( 'Pattern blocks', () => {
 		// Check the title.
 		await openDocumentSettingsSidebar();
 		const title = await page.$eval(
-			patternBlockInspectorNameInputSelector,
-			( element ) => element.value
+			patternBlockInspectorNameSelector,
+			( element ) => element.textContent
 		);
 		expect( title ).toBe( 'Awesome block' );
 	} );
@@ -333,32 +250,6 @@ describe( 'Pattern blocks', () => {
 				expect( content ).toEqual( 'Awesome Paragraph modified' );
 			} )
 		);
-	} );
-
-	// Check for regressions of https://github.com/WordPress/gutenberg/issues/26421.
-	it( 'allows conversion back to blocks when the reusable block has unsaved edits', async () => {
-		await createReusableBlock( '1', 'Edited block' );
-
-		// Make an edit to the reusable block and assert that there's only a
-		// paragraph in a reusable block.
-		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
-		await canvas().click( 'p[aria-label="Block: Paragraph"]' );
-		await page.keyboard.type( '2' );
-		const selector =
-			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Block: Paragraph"][.="12"]';
-		const reusableBlockWithParagraph = await page.$x( selector );
-		expect( reusableBlockWithParagraph ).toBeTruthy();
-
-		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select parent block: Edited block' );
-		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Detach' );
-		await page.waitForXPath( selector, {
-			hidden: true,
-		} );
-
-		// Check that there's only a paragraph.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/27243.

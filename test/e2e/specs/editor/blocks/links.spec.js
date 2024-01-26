@@ -225,10 +225,10 @@ test.describe( 'Links', () => {
 		pageUtils,
 		LinkUtils,
 	} ) => {
-		await LinkUtils.createAndReselectLink();
+		await LinkUtils.createLink();
 
 		// Click on the Edit button.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Edit', exact: true } ).click();
 
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
@@ -251,7 +251,7 @@ test.describe( 'Links', () => {
 	} );
 
 	test( `can remove existing links`, async ( { editor, LinkUtils } ) => {
-		await LinkUtils.createAndReselectLink();
+		await LinkUtils.createLink();
 
 		const linkPopover = LinkUtils.getLinkPopover();
 
@@ -332,10 +332,12 @@ test.describe( 'Links', () => {
 		LinkUtils,
 		pageUtils,
 	} ) => {
-		await LinkUtils.createAndReselectLink();
+		await LinkUtils.createLink();
+		await pageUtils.pressKeys( 'Escape' );
 		// Make a collapsed selection inside the link.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
 		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
@@ -384,7 +386,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Insert a link.
-		await editor.clickBlockToolbarButton( 'Link' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const urlInput = page.getByRole( 'combobox', {
 			name: 'Link',
@@ -424,6 +426,31 @@ test.describe( 'Links', () => {
 				},
 			},
 		] );
+
+		// Test pressing escape from the toolbar button should return focus to the toolbar button
+		// Insert a link.
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		// Expect the "Link" combobox to be visible and focused
+		await expect( urlInput ).toBeVisible();
+		await expect( urlInput ).toBeFocused();
+
+		await page.keyboard.press( 'Escape' );
+		await expect( LinkUtils.getLinkPopover() ).toBeHidden();
+
+		// Focus should return to the Link Toolbar Button that opened the popover
+		await expect(
+			page.getByLabel( 'Link', { exact: true } )
+		).toBeFocused();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is Gutenberg and more!',
+				},
+			},
+		] );
 	} );
 
 	test( `can be created and modified using only the keyboard`, async ( {
@@ -441,10 +468,13 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+K' );
+		const linkPopover = LinkUtils.getLinkPopover();
 		await page.keyboard.type( URL );
 		await pageUtils.pressKeys( 'Enter' );
 
-		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		// Close the link control to return the caret to the canvas
+		await pageUtils.pressKeys( 'Escape' );
 
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
@@ -452,13 +482,15 @@ test.describe( 'Links', () => {
 		await expect( linkPopover ).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
-		// should be displayed.
+		// should not be displayed.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await expect( linkPopover ).toBeVisible();
+		await expect( linkPopover ).toBeHidden();
 
 		// Switch the Link UI into "Edit" mode via keyboard shortcut
 		// and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		await expect(
 			linkPopover.getByRole( 'combobox', {
@@ -474,15 +506,11 @@ test.describe( 'Links', () => {
 
 		// Move back into the RichText.
 		await pageUtils.pressKeys( 'Escape' );
-
-		// ...but the Link Popover should still be active because we are within the link.
-		await expect( linkPopover ).toBeVisible();
+		// Link Popover should be hidden even though it's within the linked text.
+		await expect( linkPopover ).toBeHidden();
 
 		// Move outside of the link entirely.
 		await pageUtils.pressKeys( 'ArrowRight' );
-
-		// Link Popover should now disappear because we are no longer within the link.
-		await expect( linkPopover ).toBeHidden();
 
 		// Append some text to the paragraph to assert that focus has been returned
 		// to the correct location within the RichText.
@@ -540,6 +568,11 @@ test.describe( 'Links', () => {
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
+		const linkPopover = LinkUtils.getLinkPopover();
+
+		// Expect link popover to be visible
+		await expect( linkPopover ).toBeVisible();
+
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
@@ -552,33 +585,30 @@ test.describe( 'Links', () => {
 			},
 		] );
 
+		// Submit the link.
 		await page.keyboard.press( 'Enter' );
 
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
+		// Expect the Link UI to still be visible
+		await expect( linkPopover ).toBeVisible();
 
-		// Edit link.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		// Tab to "Edit" button and enter edit mode again.
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		// Open settings.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
 			.click();
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
-		const checkbox = page.getByLabel( 'Open in new tab' );
+		const checkbox = linkPopover.getByLabel( 'Open in new tab' );
 		await checkbox.click();
 
 		// Toggle should still have focus and be checked.
 		await expect( checkbox ).toBeChecked();
 		await expect( checkbox ).toBeFocused();
-
-		const linkPopover = LinkUtils.getLinkPopover();
 
 		// Tab back to the Submit and apply the link.
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
@@ -606,12 +636,23 @@ test.describe( 'Links', () => {
 			name: 'core/paragraph',
 		} );
 		await page.keyboard.type( 'This is WordPress' );
+
 		// Select "WordPress".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+k' );
+
+		// Close the link control to return the caret to the canvas
+		const linkPopover = LinkUtils.getLinkPopover();
+
 		await page.keyboard.type( 'w.org' );
 
+		// Submit the link
 		await page.keyboard.press( 'Enter' );
+
+		// Close the Link Popover.
+		await pageUtils.pressKeys( 'Escape' );
+
+		await expect( linkPopover ).toBeHidden();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -622,38 +663,28 @@ test.describe( 'Links', () => {
 			},
 		] );
 
-		// Move caret back into the link.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Edit link.
+		// Edit the link again.
 		await pageUtils.pressKeys( 'primary+k' );
 
-		// getByPlaceholder required in order to handle Link Control component
+		// Expect Link UI to be visible again
+		await expect( linkPopover ).toBeVisible();
+
+		// Click on the `Edit` button.
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Change the URL.
+		// Note: getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await linkPopover.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
-		const linkPopover = LinkUtils.getLinkPopover();
-
-		// Update the link.
+		// Save the link.
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
-		// Navigate back to the popover.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
+		// Link UI should be closed.
+		await expect( linkPopover ).toBeHidden();
 
-		// Navigate back to inputs to verify appears as changed.
-		await pageUtils.pressKeys( 'primary+k' );
-
-		expect(
-			await page
-				.getByRole( 'combobox', {
-					name: 'Link',
-				} )
-				.inputValue()
-		).toContain( 'wordpress.org' );
-
+		// The link should have been updated.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
@@ -669,6 +700,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		// Create a block with some text.
 		await editor.insertBlock( {
@@ -683,31 +715,28 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Escape' );
 
 		// Move to edge of text "Gutenberg".
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowLeft' );
-
 		// Select "Gutenberg".
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
+
 		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
 
-		// Move back into the link.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'primary+k' );
+		// Press the "Edit" button
+		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Toggle the Advanced settings to be open.
 		// This should set the editor preference to persist this
 		// UI state.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
@@ -716,25 +745,25 @@ test.describe( 'Links', () => {
 		// Move focus out of Link UI and into Paragraph block.
 		await pageUtils.pressKeys( 'Escape' );
 
-		// Move caret back into the "WordPress" link to trigger
-		// the Link UI for that link.
-		await pageUtils.pressKeys( 'Alt+ArrowRight' );
-		await pageUtils.pressKeys( 'ArrowRight' );
-		await pageUtils.pressKeys( 'ArrowRight' );
+		// Click on the "WordPress" link
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'WordPress',
+			} )
+			.click();
 
-		// Switch Link UI to "edit" mode.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		// press the "edit" button
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Check that the Advanced settings are still expanded/open
 		// and I can see the open in new tab checkbox. This verifies
 		// that the editor preference was persisted.
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+		await expect(
+			linkPopover.getByLabel( 'Open in new tab' )
+		).toBeVisible();
 
 		// Toggle the Advanced settings back to being closed.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
@@ -745,18 +774,24 @@ test.describe( 'Links', () => {
 
 		// Move caret back into the "Gutenberg" link and open
 		// the Link UI for that link.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'primary+k' );
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
+
+		// Switch to "Edit" mode.
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Check that the Advanced settings are still closed.
 		// This verifies that the editor preference was persisted.
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeHidden();
+		await expect(
+			linkPopover.getByLabel( 'Open in new tab' )
+		).toBeHidden();
 	} );
 
 	test( 'can toggle link settings and save', async ( {
-		page,
 		editor,
-		pageUtils,
 		LinkUtils,
 	} ) => {
 		await editor.insertBlock( {
@@ -767,31 +802,35 @@ test.describe( 'Links', () => {
 			},
 		} );
 
-		// Move caret into the link.
-		await pageUtils.pressKeys( 'ArrowRight' );
+		// Click on "Gutenberg" link in the canvas
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
 
-		// Switch Link UI to "edit" mode.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		// Get the Link Popover using the LinkUtils helper
+		const linkPopover = LinkUtils.getLinkPopover();
+
+		// Switch to Edit the link
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Open Advanced Settings
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
+		await linkPopover
 			.getByRole( 'button', {
 				name: 'Advanced',
 			} )
 			.click();
 
 		// expect settings for `Open in new tab` and `No follow`
-		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeChecked();
-		await expect( page.getByLabel( 'nofollow' ) ).not.toBeChecked();
+		await expect(
+			linkPopover.getByLabel( 'Open in new tab' )
+		).not.toBeChecked();
+		await expect( linkPopover.getByLabel( 'nofollow' ) ).not.toBeChecked();
 
 		// Toggle both of the settings
-		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'nofollow' ).click();
-
-		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByLabel( 'Open in new tab' ).click();
+		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
@@ -806,17 +845,20 @@ test.describe( 'Links', () => {
 			},
 		] );
 
-		// Move caret back into the link.
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
+		// Click on "Gutenberg" link in the canvas again
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
 
 		// Edit the link
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Toggle both the settings to be off.
 		// Note: no need to toggle settings again because the open setting should be persisted.
-		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'nofollow' ).click();
+		await linkPopover.getByLabel( 'Open in new tab' ).click();
+		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
 		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
@@ -839,20 +881,16 @@ test.describe( 'Links', () => {
 			editor,
 			LinkUtils,
 		} ) => {
-			await LinkUtils.createAndReselectLink();
+			await LinkUtils.createLink();
 
 			const originalLinkText = 'Gutenberg';
 			const changedLinkText =
 				'    link text that was modified via the Link UI to include spaces     ';
 
-			// Make a collapsed selection inside the link. This is used
-			// as a stress test to ensure we can find the link text from a
-			// collapsed RichTextValue that contains a link format.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowRight' );
+			// Get the LinkPopover using the LinkUtils
+			const linkPopover = LinkUtils.getLinkPopover();
 
-			await editor.showBlockToolbar();
-			await page.getByRole( 'button', { name: 'Edit' } ).click();
+			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 			const textInput = page.getByLabel( 'Text', { exact: true } );
 
@@ -913,13 +951,15 @@ test.describe( 'Links', () => {
 			pageUtils,
 			LinkUtils,
 		} ) => {
-			await LinkUtils.createAndReselectLink();
+			await LinkUtils.createLink();
+			await pageUtils.pressKeys( 'Escape' );
 
 			// Make a collapsed selection inside the link. This is used
 			// as a stress test to ensure we can find the link text from a
 			// collapsed RichTextValue that contains a link format.
 			await pageUtils.pressKeys( 'ArrowLeft' );
 			await pageUtils.pressKeys( 'ArrowRight' );
+			await pageUtils.pressKeys( 'primary+k' );
 
 			const linkPopover = LinkUtils.getLinkPopover();
 
@@ -976,182 +1016,37 @@ test.describe( 'Links', () => {
 				},
 			] );
 		} );
-
-		test( 'should display (capture the) text from the currently active link even if there is a rich text selection', async ( {
-			editor,
-			pageUtils,
-			LinkUtils,
-		} ) => {
-			const originalLinkText = 'Gutenberg';
-
-			await LinkUtils.createAndReselectLink();
-
-			// Make a collapsed selection inside the link in order
-			// to activate the Link UI.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowRight' );
-
-			const linkPopover = LinkUtils.getLinkPopover();
-
-			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
-
-			// Place cursor within the underling RichText link (not the Link UI).
-			await editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.getByRole( 'link', {
-					name: 'Gutenberg',
-				} )
-				.click();
-
-			// Make a selection within the RichText.
-			await pageUtils.pressKeys( 'shift+ArrowRight', {
-				times: 3,
-			} );
-
-			// Making a selection within the link text whilst the Link UI
-			// is open should not alter the value in the Link UI's "Text"
-			// field. It should remain as the full text of the currently
-			// focused link format.
-			await expect(
-				linkPopover.getByLabel( 'Text', { exact: true } )
-			).toHaveValue( originalLinkText );
-		} );
 	} );
 
 	test.describe( 'Disabling Link UI active state', () => {
-		test( 'should not show the Link UI when selection extends beyond link boundary', async ( {
+		test( 'should correctly move focus when link control closes on click outside', async ( {
 			page,
 			pageUtils,
-			editor,
 			LinkUtils,
 		} ) => {
-			const linkedText = `Gutenberg`;
-			const textBeyondLinkedText = ` and more text.`;
-
-			// Create a block with some text.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-			} );
-			await page.keyboard.type(
-				`This is ${ linkedText }${ textBeyondLinkedText }`
-			);
-
-			// Move cursor next to end of `linkedText`.
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: textBeyondLinkedText.length,
-			} );
-
-			// Select the linkedText.
-			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-
-			// Click on the Link button.
-			await editor.clickBlockToolbarButton( 'Link' );
-
-			// Type a URL.
-			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-			// Update the link.
-			await pageUtils.pressKeys( 'Enter' );
-			// Reactivate the link.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowLeft' );
+			await LinkUtils.createLink();
 
 			const linkPopover = LinkUtils.getLinkPopover();
 
 			await expect( linkPopover ).toBeVisible();
 
-			// Make selection starting within the link and moving beyond boundary to the left.
-			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', {
-				times: linkedText.length,
-			} );
+			const optionsButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } );
 
-			// The Link UI should have disappeared (i.e. be inactive).
+			await optionsButton.click();
+
 			await expect( linkPopover ).toBeHidden();
-
-			// Cancel selection and move back within the Link.
-			await pageUtils.pressKeys( 'ArrowRight' );
-
-			// We should see the Link UI displayed again.
-			await expect( linkPopover ).toBeVisible();
-
-			// Make selection starting within the link and moving beyond boundary to the right.
-			await pageUtils.pressKeys( 'shift+ArrowRight', {
-				times: 3,
-			} );
-
-			// The Link UI should have disappeared (i.e. be inactive).
-			await expect( linkPopover ).toBeHidden();
-		} );
-
-		test( 'should not show the Link UI when selection extends into another link', async ( {
-			page,
-			pageUtils,
-			editor,
-			LinkUtils,
-		} ) => {
-			const linkedTextOne = `Gutenberg`;
-			const linkedTextTwo = `Block Editor`;
-			const linkOneURL = 'https://wordpress.org';
-			const linkTwoURL = 'https://wordpress.org/gutenberg';
-
-			// Create a block with some text.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-			} );
-			await page.keyboard.type(
-				`This is the ${ linkedTextOne }${ linkedTextTwo }`
-			);
-
-			// Select the linkedTextTwo.
-			await pageUtils.pressKeys( 'shift+ArrowLeft', {
-				times: linkedTextTwo.length,
-			} );
-
-			// Click on the Link button.
-			await editor.clickBlockToolbarButton( 'Link' );
-
-			// Type a URL.
-			await page.keyboard.type( linkTwoURL );
-
-			// Update the link.
-			await pageUtils.pressKeys( 'Enter' );
-
-			// Move cursor next to the **end** of `linkTextOne`
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: linkedTextTwo.length,
-			} );
-
-			// Select `linkTextOne`
-			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-
-			// Click on the Link button.
-			await editor.clickBlockToolbarButton( 'Link' );
-
-			// Type a URL.
-			await page.keyboard.type( linkOneURL );
-
-			// Update the link.
-			await pageUtils.pressKeys( 'Enter' );
-
-			// Move cursor within `linkTextOne`
-			await pageUtils.pressKeys( 'ArrowLeft', {
-				times: 3,
-			} );
-
-			const linkPopover = LinkUtils.getLinkPopover();
-
-			// Link UI should activate for `linkTextOne`
-			await expect( linkPopover ).toBeVisible();
-
-			// Expand selection so that it overlaps with `linkTextTwo`
-			await pageUtils.pressKeys( 'ArrowRight', {
-				times: 3,
-			} );
-
-			// Link UI should be inactive.
-			await expect( linkPopover ).toBeHidden();
+			// Expect focus on Top toolbar button within dropdown
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Top toolbar Access all block and document tools in a single place',
+				} )
+			).toBeFocused();
+			// Press Escape
+			await pageUtils.pressKeys( 'Escape' );
+			// Expect focus on Top toolbar Options button
+			await expect( optionsButton ).toBeFocused();
 		} );
 
 		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
@@ -1236,7 +1131,7 @@ class LinkUtils {
 		}, isFixed );
 	}
 
-	async createAndReselectLink() {
+	async createLink() {
 		// Create a block with some text.
 		await this.editor.insertBlock( {
 			name: 'core/paragraph',
@@ -1247,16 +1142,19 @@ class LinkUtils {
 		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button.
-		await this.page.getByRole( 'button', { name: 'Link' } ).click();
+		await this.pageUtils.pressKeys( 'primary+k' );
+
+		// get the link popover
+		const linkPopover = this.getLinkPopover();
+
+		// Expect link popover to be visible
+		await expect( linkPopover ).toBeVisible();
 
 		// Type a URL.
 		await this.page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Click on the Submit button.
+		// Submit the link.
 		await this.pageUtils.pressKeys( 'Enter' );
-
-		// Reselect the link.
-		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 	}
 
 	/**
