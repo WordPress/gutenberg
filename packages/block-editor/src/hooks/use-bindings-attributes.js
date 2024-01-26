@@ -52,10 +52,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 							const {
 								placeholder,
 								useValue: [ metaValue = null ] = [],
-							} = source.useSource(
-								props,
-								settings.source.attributes
-							);
+							} = source.useSource( props, settings.source.args );
 
 							if ( placeholder && ! metaValue ) {
 								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.

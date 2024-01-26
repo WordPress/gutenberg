@@ -77,12 +77,12 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 		 * "bindings": {
 		 *   "title": {
 		 *     "source": "core/post-meta",
-		 *     "args": { "value": "text_custom_field" }
+		 *     "args": { "key": "text_custom_field" }
 		 *   },
 		 *   "url": {
 		 *     "source": {
 		 *       "name": "core/post-meta",
-		 *       "attributes": { "value": "text_custom_field" }
+		 *       "args": { "key": "text_custom_field" }
 		 *     }
 		 *   }
 		 * }
@@ -103,10 +103,10 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 
 			$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
 			// Get the value based on the source.
-			if ( ! isset( $binding_source['source']['attributes'] ) ) {
+			if ( ! isset( $binding_source['source']['args'] ) ) {
 				$source_args = array();
 			} else {
-				$source_args = $binding_source['source']['attributes'];
+				$source_args = $binding_source['source']['args'];
 			}
 			$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
 			// If the value is null, process next attribute.
