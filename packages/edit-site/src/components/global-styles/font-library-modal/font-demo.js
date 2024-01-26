@@ -19,7 +19,13 @@ function getPreviewUrl( fontFace ) {
 	}
 }
 
-function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
+function FontFaceDemo( {
+	customPreviewUrl,
+	fontFace,
+	text,
+	checkboxId,
+	style = {},
+} ) {
 	const ref = useRef( null );
 	const [ isIntersecting, setIsIntersecting ] = useState( false );
 	const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );
@@ -65,7 +71,7 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 	}, [ fontFace, isIntersecting, loadFontFaceAsset, isPreviewImage ] );
 
 	return (
-		<div ref={ ref }>
+		<div ref={ ref } id={ checkboxId }>
 			{ isPreviewImage ? (
 				<img
 					src={ previewUrl }
