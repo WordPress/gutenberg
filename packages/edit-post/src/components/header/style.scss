@@ -117,8 +117,7 @@
 			@include break-small() {
 				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
 					position: relative;
-					top: 6px;
-					height: 20px; // By enforcing a small height, we center and afford big buttons, with no focus shift.
+					top: -10px;
 				}
 			}
 		}
