@@ -1,10 +1,11 @@
 .edit-site-patterns {
+	background: #1e1e1e;
 	border-left: 1px solid $gray-800;
-	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
 	padding: 0;
 	overflow-x: auto;
+	min-height: 100%;
 
 	.components-base-control {
 		width: 100%;
@@ -225,16 +226,45 @@
 }
 
 /**
- * DataViews patterns styles
+ * DataViews patterns styles.
  * TODO: when this becomes stable, consolidate styles with the above.
  */
 .edit-site-page-patterns-dataviews {
 	.page-patterns-preview-field {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		border-radius: 3px 3px 0 0;
+
 		&.is-viewtype-grid {
 			.block-editor-block-preview__container {
-				height: auto;
+				height: 100%;
+				border-radius: 3px 3px 0 0;
 			}
 		}
+
+		.page-patterns-preview-field__button {
+			box-shadow: none;
+			border: none;
+			padding: 0;
+			background-color: unset;
+			box-sizing: border-box;
+			cursor: pointer;
+			overflow: hidden;
+			height: 100%;
+			border-radius: 3px 3px 0 0;
+
+			&:focus-visible {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
+
+	.edit-site-patterns__pattern-icon {
+		fill: var(--wp-block-synced-color);
+		flex-shrink: 0;
 	}
 
 	.edit-site-patterns__pattern-lock-icon {
@@ -248,5 +278,48 @@
 		position: sticky;
 		top: 0;
 		z-index: 2;
+	}
+
+	.edit-site-patterns__pattern-title {
+		display: block;
+		width: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: inherit;
+	}
+}
+
+.dataviews-action-modal__duplicate-pattern {
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
+	.patterns-menu-items__convert-modal-categories {
+		position: relative;
+	}
+
+	.components-form-token-field__suggestions-list:not(:empty) {
+		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: $white;
+		width: calc(100% + 2px); // Account for the border width of the token field.
+		left: -1px;
+		min-width: initial;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
+}
+
+.dataviews-action-modal__duplicate-template-part {
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
+		}
 	}
 }

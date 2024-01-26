@@ -399,7 +399,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergInitialTitle() -> String? {
-        return nil
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
+            return nil
+        }
+        return initialProps["initialTitle"]
     }
 
     func gutenbergHostAppNamespace() -> String {
@@ -416,7 +419,6 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
-            .mediaFilesCollectionBlock: true,
             .tiledGalleryBlock: true,
             .videoPressBlock: true,
             .isAudioBlockMediaUploadEnabled: true,

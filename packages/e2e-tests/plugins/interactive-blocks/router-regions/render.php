@@ -7,14 +7,14 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-gutenberg_enqueue_module( 'router-regions-view' );
+wp_enqueue_script_module( 'router-regions-view' );
 ?>
 
 <section>
 	<h2>Region 1</h2>
 	<div
 		data-wp-interactive='{"namespace": "router-regions"}'
-		data-wp-navigation-id="region-1"
+		data-wp-router-region="region-1"
 	>
 		<p
 			data-testid="region-1-text"
@@ -58,7 +58,7 @@ gutenberg_enqueue_module( 'router-regions-view' );
 	<h2>Region 2</h2>
 	<div
 		data-wp-interactive='{"namespace": "router-regions"}'
-		data-wp-navigation-id="region-2"
+		data-wp-router-region="region-2"
 	>
 		<p
 			data-testid="region-2-text"
@@ -88,7 +88,7 @@ gutenberg_enqueue_module( 'router-regions-view' );
 				<h2>Nested region</h2>
 				<div
 					data-wp-interactive='{"namespace": "router-regions"}'
-					data-wp-navigation-id="nested-region"
+					data-wp-router-region="nested-region"
 				>
 					<p
 						data-testid="nested-region-ssr"

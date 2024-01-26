@@ -16,13 +16,12 @@ import {
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
+import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
-import { getNoticeFromUninstallResponse } from './utils/get-notice-from-response';
 import { unlock } from '../../../lock-unlock';
 const { ProgressBar } = unlock( componentsPrivateApis );
 
@@ -33,7 +32,7 @@ function InstalledFonts() {
 		baseThemeFonts,
 		handleSetLibraryFontSelected,
 		refreshLibrary,
-		uninstallFont,
+		uninstallFontFamily,
 		isResolvingLibrary,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
@@ -49,14 +48,24 @@ function InstalledFonts() {
 	const [ notice, setNotice ] = useState( null );
 
 	const handleConfirmUninstall = async () => {
-		const response = await uninstallFont( libraryFontSelected );
-		const uninstallNotice = getNoticeFromUninstallResponse( response );
-		setNotice( uninstallNotice );
-		// If the font was succesfully uninstalled it is unselected
-		if ( ! response?.errors?.length ) {
+		try {
+			await uninstallFontFamily( libraryFontSelected );
+			setNotice( {
+				type: 'success',
+				message: __( 'Font family uninstalled successfully.' ),
+			} );
+
+			// If the font was succesfully uninstalled it is unselected.
 			handleUnselectFont();
+			setIsConfirmDeleteOpen( false );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message:
+					__( 'There was an error uninstalling the font family. ' ) +
+					error.message,
+			} );
 		}
-		setIsConfirmDeleteOpen( false );
 	};
 
 	const handleUninstallClick = async () => {
@@ -77,6 +86,7 @@ function InstalledFonts() {
 		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
 
 	useEffect( () => {
+		handleSelectFont( libraryFontSelected );
 		refreshLibrary();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
@@ -92,7 +102,7 @@ function InstalledFonts() {
 	}, [ notice ] );
 
 	return (
-		<TabLayout
+		<TabPanelLayout
 			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
@@ -173,7 +183,7 @@ function InstalledFonts() {
 					handleCancelUninstall={ handleCancelUninstall }
 				/>
 			) }
-		</TabLayout>
+		</TabPanelLayout>
 	);
 }
 
@@ -181,11 +191,15 @@ function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
 		useContext( FontLibraryContext );
 	return (
-		<HStack justify="space-between">
+		<HStack justify="flex-end">
 			{ isInstalling && <ProgressBar /> }
 			<div>
 				{ shouldDisplayDeleteButton && (
-					<Button variant="tertiary" onClick={ handleUninstallClick }>
+					<Button
+						isDestructive
+						variant="tertiary"
+						onClick={ handleUninstallClick }
+					>
 						{ __( 'Delete' ) }
 					</Button>
 				) }

@@ -29,32 +29,23 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const {
-		shortcut,
-		isRichEditingEnabled,
-		isCodeEditingEnabled,
-		isEditingTemplate,
-		mode,
-	} = useSelect(
-		( select ) => ( {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled:
-				select( editorStore ).getEditorSettings().richEditingEnabled,
-			isCodeEditingEnabled:
-				select( editorStore ).getEditorSettings().codeEditingEnabled,
-			isEditingTemplate:
-				select( editorStore ).getRenderingMode() === 'template-only',
-			mode: select( editPostStore ).getEditorMode(),
-		} ),
-		[]
-	);
+	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } =
+		useSelect(
+			( select ) => ( {
+				shortcut: select(
+					keyboardShortcutsStore
+				).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
+				isRichEditingEnabled:
+					select( editorStore ).getEditorSettings()
+						.richEditingEnabled,
+				isCodeEditingEnabled:
+					select( editorStore ).getEditorSettings()
+						.codeEditingEnabled,
+				mode: select( editPostStore ).getEditorMode(),
+			} ),
+			[]
+		);
 	const { switchEditorMode } = useDispatch( editPostStore );
-
-	if ( isEditingTemplate ) {
-		return null;
-	}
 
 	let selectedMode = mode;
 	if ( ! isRichEditingEnabled && mode === 'visual' ) {

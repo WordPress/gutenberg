@@ -1147,6 +1147,10 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
     }
 
+    public void mediaFileUploadPaused(final int mediaId) {
+        mDeferredEventEmitter.onMediaFileUploadPaused(mediaId);
+    }
+
     public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId, final
                                          WritableNativeMap metadata) {
         mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId, metadata);
