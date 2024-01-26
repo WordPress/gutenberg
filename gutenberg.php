@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the block editor, site editor, and other future WordPress core functionality.
  * Requires at least: 6.3
  * Requires PHP: 7.0
- * Version: 17.6.0-rc.1
+ * Version: 17.6.0-rc.2
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *

@@ -27,14 +27,30 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const renderingMode = useSelect(
-		( select ) => select( editorStore ).getRenderingMode(),
+	const { renderingMode, getPostLinkProps, templateId } = useSelect(
+		( select ) => {
+			const {
+				getRenderingMode,
+				getEditorSettings,
+				getCurrentTemplateId,
+			} = select( editorStore );
+			return {
+				renderingMode: getRenderingMode(),
+				getPostLinkProps: getEditorSettings().getPostLinkProps,
+				templateId: getCurrentTemplateId(),
+			};
+		},
 		[]
 	);
+	const editTemplate = getPostLinkProps
+		? getPostLinkProps( {
+				postId: templateId,
+				postType: 'wp_template',
+		  } )
+		: {};
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
-	const { setRenderingMode } = useDispatch( editorStore );
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
@@ -62,7 +78,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => setRenderingMode( 'template-only' ),
+							onClick: () => editTemplate.onClick(),
 						},
 					],
 				}
@@ -98,7 +114,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				setRenderingMode( 'template-only' );
+				editTemplate.onClick();
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

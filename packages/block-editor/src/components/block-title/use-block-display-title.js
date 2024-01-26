@@ -3,15 +3,14 @@
  */
 import { useSelect } from '@wordpress/data';
 import {
-	getBlockType,
-	__experimentalGetBlockLabel as getBlockLabel,
 	isReusableBlock,
+	__experimentalGetBlockLabel as getBlockLabel,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -35,49 +34,52 @@ export default function useBlockDisplayTitle( {
 	maximumLength,
 	context,
 } ) {
-	const { attributes, name, reusableBlockTitle } = useSelect(
+	const blockTitle = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return {};
+				return null;
 			}
+
 			const {
 				getBlockName,
 				getBlockAttributes,
 				__experimentalGetReusableBlockTitle,
 			} = select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
+
 			const blockName = getBlockName( clientId );
-			if ( ! blockName ) {
-				return {};
+			const blockType = getBlockType( blockName );
+			if ( ! blockType ) {
+				return null;
 			}
-			const isReusable = isReusableBlock( getBlockType( blockName ) );
-			return {
-				attributes: getBlockAttributes( clientId ),
-				name: blockName,
-				reusableBlockTitle:
-					isReusable &&
-					__experimentalGetReusableBlockTitle(
-						getBlockAttributes( clientId ).ref
-					),
-			};
+
+			const attributes = getBlockAttributes( clientId );
+			const isReusable = isReusableBlock( blockType );
+			const reusableBlockTitle = isReusable
+				? __experimentalGetReusableBlockTitle( attributes.ref )
+				: null;
+
+			if ( reusableBlockTitle ) {
+				return reusableBlockTitle;
+			}
+
+			const label = getBlockLabel( blockType, attributes, context );
+			// If the label is defined we prioritize it over a possible block variation title match.
+			if ( label !== blockType.title ) {
+				return label;
+			}
+
+			const match = getActiveBlockVariation( blockName, attributes );
+			// Label will fallback to the title if no label is defined for the current label context.
+			return match?.title || blockType.title;
 		},
-		[ clientId ]
+		[ clientId, context ]
 	);
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	if ( ! name || ! blockInformation ) {
+	if ( ! blockTitle ) {
 		return null;
 	}
-	const blockType = getBlockType( name );
-	const blockLabel = blockType
-		? getBlockLabel( blockType, attributes, context )
-		: null;
-
-	const label = reusableBlockTitle || blockLabel;
-	// Label will fallback to the title if no label is defined for the current
-	// label context. If the label is defined we prioritize it over a
-	// possible block variation title match.
-	const blockTitle =
-		label && label !== blockType.title ? label : blockInformation.title;
 
 	if (
 		maximumLength &&
