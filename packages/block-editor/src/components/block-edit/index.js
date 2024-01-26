@@ -3,7 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 
-import { hasBlockSupport } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -30,6 +29,7 @@ export default function BlockEdit( {
 	mayDisplayControls,
 	mayDisplayParentControls,
 	blockEditingMode,
+	blockType,
 	// The remaining props are passed through the BlockEdit filters and are thus
 	// public API!
 	...props
@@ -43,8 +43,8 @@ export default function BlockEdit( {
 	} = props;
 	const { layout = null } = attributes;
 	const layoutSupport =
-		hasBlockSupport( name, 'layout', false ) ||
-		hasBlockSupport( name, '__experimentalLayout', false );
+		blockType?.supports?.layout ||
+		blockType?.supports?.__experimentalLayout;
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't

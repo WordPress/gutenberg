@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 
@@ -24,11 +23,8 @@ export function addLabelCallback( settings ) {
 		return settings;
 	}
 
-	const supportsBlockNaming = hasBlockSupport(
-		settings,
-		'renaming',
-		true // default value
-	);
+	// Defaults to true.
+	const supportsBlockNaming = settings?.supports?.renaming ?? true;
 
 	// Check whether block metadata is supported before using it.
 	if ( supportsBlockNaming ) {
@@ -66,8 +62,8 @@ function BlockRenameControlPure( { metadata, setAttributes } ) {
 export default {
 	edit: BlockRenameControlPure,
 	attributeKeys: [ 'metadata' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'renaming', true );
+	hasSupport( supports ) {
+		return !! supports.renaming;
 	},
 };
 

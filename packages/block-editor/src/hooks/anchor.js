@@ -4,7 +4,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { hasBlockSupport } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -40,7 +39,7 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'anchor' ) ) {
+	if ( settings.supports?.anchor ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -123,8 +122,8 @@ export default {
 	addSaveProps,
 	edit: BlockEditAnchorControlPure,
 	attributeKeys: [ 'anchor' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'anchor' );
+	hasSupport( supports ) {
+		return !! supports.anchor;
 	},
 };
 
@@ -140,7 +139,7 @@ export default {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'anchor' ) ) {
+	if ( blockType.supports?.anchor ) {
 		extraProps.id = attributes.anchor === '' ? null : attributes.anchor;
 	}
 

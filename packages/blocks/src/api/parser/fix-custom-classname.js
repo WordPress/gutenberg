@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import { hasBlockSupport } from '../registration';
 import { getSaveContent } from '../serializer';
 import { parseWithAttributeSchema } from './get-block-attributes';
 
@@ -42,7 +41,7 @@ export function getHTMLRootElementClasses( innerHTML ) {
  * @return {Object} Filtered block attributes.
  */
 export function fixCustomClassname( blockAttributes, blockType, innerHTML ) {
-	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {
+	if ( blockType?.supports?.customClassName ?? true ) {
 		// To determine difference, serialize block given the known set of
 		// attributes, with the exception of `className`. This will determine
 		// the default set of classes. From there, any difference in innerHTML

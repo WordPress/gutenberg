@@ -10,7 +10,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
-	getBlockSupport,
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
@@ -69,7 +68,6 @@ function UncontrolledInnerBlocks( props ) {
 		orientation,
 		placeholder,
 		layout,
-		name,
 		blockType,
 		innerBlocks,
 		parentLock,
@@ -99,8 +97,8 @@ function UncontrolledInnerBlocks( props ) {
 	);
 
 	const defaultLayoutBlockSupport =
-		getBlockSupport( name, 'layout' ) ||
-		getBlockSupport( name, '__experimentalLayout' ) ||
+		blockType?.supports?.layout ||
+		blockType?.supports?.__experimentalLayout ||
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
@@ -191,7 +189,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const {
 		__experimentalCaptureToolbars,
 		hasOverlay,
-		name,
 		blockType,
 		innerBlocks,
 		parentLock,
@@ -215,25 +212,23 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			const { hasBlockSupport, getBlockType } = select( blocksStore );
+			const { getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
 				__unstableGetEditorMode() === 'navigation';
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const _parentClientId = getBlockRootClientId( clientId );
+			const _blockType = getBlockType( blockName );
 			return {
-				__experimentalCaptureToolbars: hasBlockSupport(
-					blockName,
-					'__experimentalExposeControlsToChildren',
-					false
-				),
+				__experimentalCaptureToolbars:
+					!! _blockType?.supports
+						?.__experimentalExposeControlsToChildren,
 				hasOverlay:
 					blockName !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
 					enableClickThrough,
-				name: blockName,
-				blockType: getBlockType( blockName ),
+				blockType: _blockType,
 				innerBlocks: getBlocks( clientId ),
 				parentLock: getTemplateLock( _parentClientId ),
 				parentClientId: _parentClientId,
@@ -261,7 +256,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
 		layout,
-		name,
 		blockType,
 		innerBlocks,
 		parentLock,

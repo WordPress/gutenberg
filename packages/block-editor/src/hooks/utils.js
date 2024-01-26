@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -123,7 +123,8 @@ export function shouldSkipSerialization(
 	featureSet,
 	feature
 ) {
-	const support = getBlockSupport( blockNameOrType, featureSet );
+	const blockType = getBlockType( blockNameOrType );
+	const support = blockType?.supports?.[ featureSet ];
 	const skipSerialization = support?.__experimentalSkipSerialization;
 
 	if ( Array.isArray( skipSerialization ) ) {
@@ -418,6 +419,7 @@ export function createBlockEditFilter( features ) {
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
 			const context = useBlockEditContext();
+			const blockType = getBlockType( props.name );
 			// CAUTION: code added before this line will be executed for all
 			// blocks, not just those that support the feature! Code added
 			// above this line should be carefully evaluated for its impact on
@@ -437,7 +439,7 @@ export function createBlockEditFilter( features ) {
 
 					if (
 						! shouldDisplayControls ||
-						! hasSupport( props.name )
+						! hasSupport( blockType?.supports ?? {} )
 					) {
 						return null;
 					}
@@ -501,6 +503,7 @@ const BlockPropsPure = memo( BlockProps );
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(
 		( BlockListBlock ) => ( props ) => {
+			const blockType = getBlockType( props.name );
 			const [ allWrapperProps, setAllWrapperProps ] = useState(
 				Array( features.length ).fill( undefined )
 			);
@@ -523,7 +526,7 @@ export function createBlockListBlockFilter( features ) {
 						// Skip rendering if none of the needed attributes are
 						// set.
 						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name )
+						! hasSupport( blockType?.supports ?? {} )
 					) {
 						return null;
 					}
@@ -539,6 +542,7 @@ export function createBlockListBlockFilter( features ) {
 							// function reference.
 							setAllWrapperProps={ setAllWrapperProps }
 							name={ props.name }
+							blockType={ blockType }
 							// This component is pure, so only pass needed
 							// props!!!
 							{ ...neededProps }
@@ -577,7 +581,7 @@ export function createBlockListBlockFilter( features ) {
 }
 
 export function createBlockSaveFilter( features ) {
-	function extraPropsFromHooks( props, name, attributes ) {
+	function extraPropsFromHooks( props, blockType, attributes ) {
 		return features.reduce( ( accu, feature ) => {
 			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
 
@@ -592,12 +596,12 @@ export function createBlockSaveFilter( features ) {
 				// Skip rendering if none of the needed attributes are
 				// set.
 				! Object.keys( neededAttributes ).length ||
-				! hasSupport( name )
+				! hasSupport( blockType?.supports ?? {} )
 			) {
 				return accu;
 			}
 
-			return addSaveProps( accu, name, neededAttributes );
+			return addSaveProps( accu, blockType, neededAttributes );
 		}, props );
 	}
 	addFilter(

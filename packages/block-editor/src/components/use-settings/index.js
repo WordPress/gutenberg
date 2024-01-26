@@ -3,7 +3,7 @@
  */
 import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
-	hasBlockSupport,
+	getBlockType,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -162,11 +162,8 @@ export function useSettings( ...paths ) {
 							select( blockEditorStore ).getBlockName(
 								candidateClientId
 							);
-						return hasBlockSupport(
-							candidateBlockName,
-							'__experimentalSettings',
-							false
-						);
+						return !! getBlockType( candidateBlockName )?.supports
+							?.__experimentalSettings;
 				  } )
 				: [];
 

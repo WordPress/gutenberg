@@ -64,7 +64,7 @@ addFilter(
 export default {
 	addSaveProps,
 	attributeKeys: [ 'className' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'customClassName', true );
+	hasSupport( supports ) {
+		return !! supports.customClassName;
 	},
 };

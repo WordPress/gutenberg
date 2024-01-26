@@ -7,11 +7,7 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import {
-	getBlockSupport,
-	getBlockType,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { getBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
@@ -179,8 +175,8 @@ export default {
 	edit: DuotonePanelPure,
 	useBlockProps,
 	attributeKeys: [ 'style' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'filter.duotone' );
+	hasSupport( supports ) {
+		return !! supports.filter?.duotone;
 	},
 };
 
@@ -195,7 +191,7 @@ export default {
 function addDuotoneAttributes( settings ) {
 	// Previous `color.__experimentalDuotone` support flag is migrated via
 	// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
-	if ( ! hasBlockSupport( settings, 'filter.duotone' ) ) {
+	if ( ! settings?.supports?.filter?.duotone ) {
 		return settings;
 	}
 

@@ -158,8 +158,9 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 export default {
 	useBlockProps,
 	attributeKeys: [ 'minHeight', 'style' ],
-	hasSupport( name ) {
-		return hasDimensionsSupport( name, 'aspectRatio' );
+	hasSupport( supports ) {
+		const support = supports[ DIMENSIONS_SUPPORT_KEY ];
+		return support === true || !! support?.aspectRatio;
 	},
 };
 

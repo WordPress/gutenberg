@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
 
 const ARIA_LABEL_SCHEMA = {
 	type: 'string',
@@ -24,7 +23,7 @@ export function addAttribute( settings ) {
 	if ( settings?.attributes?.ariaLabel?.type ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'ariaLabel' ) ) {
+	if ( settings.supports?.ariaLabel ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -47,7 +46,7 @@ export function addAttribute( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'ariaLabel' ) ) {
+	if ( blockType.supports?.ariaLabel ) {
 		extraProps[ 'aria-label' ] =
 			attributes.ariaLabel === '' ? null : attributes.ariaLabel;
 	}
@@ -58,8 +57,8 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 export default {
 	addSaveProps,
 	attributeKeys: [ 'ariaLabel' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'ariaLabel' );
+	hasSupport( supports ) {
+		return !! supports.ariaLabel;
 	},
 };
 
