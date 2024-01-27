@@ -52,6 +52,7 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import FontLibraryModal from '../global-styles/font-library-modal';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -159,6 +160,7 @@ export default function Layout() {
 	return (
 		<>
 			<CommandMenu />
+			<FontLibraryModal />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }

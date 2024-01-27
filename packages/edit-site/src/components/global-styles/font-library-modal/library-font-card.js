@@ -8,7 +8,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import FontCard from './font-card';
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from '../font-library-provider';
 
 function LibraryFontCard( { font, ...props } ) {
 	const { getFontFacesActivated } = useContext( FontLibraryContext );

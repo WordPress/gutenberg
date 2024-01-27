@@ -20,8 +20,8 @@ import {
 	fetchUninstallFontFamily,
 	fetchFontCollections,
 	fetchFontCollection,
-} from './resolvers';
-import { unlock } from '../../../lock-unlock';
+} from './font-library-modal/resolvers';
+import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import {
 	setUIValuesNeeded,
@@ -32,8 +32,8 @@ import {
 	makeFontFamilyFormData,
 	batchInstallFontFaces,
 	checkFontFaceInstalled,
-} from './utils';
-import { toggleFont } from './utils/toggleFont';
+} from './font-library-modal/utils';
+import { toggleFont } from './font-library-modal/utils/toggleFont';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -110,7 +110,6 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	// Library Fonts
-	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
 	const baseThemeFonts = baseFontFamilies?.theme
@@ -137,12 +136,6 @@ function FontLibraryProvider( { children } ) {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 
-	useEffect( () => {
-		if ( ! modalTabOpen ) {
-			setLibraryFontSelected( null );
-		}
-	}, [ modalTabOpen ] );
-
 	const handleSetLibraryFontSelected = ( font ) => {
 		setNotice( null );
 
@@ -162,10 +155,6 @@ function FontLibraryProvider( { children } ) {
 			...( fontSelected || font ),
 			source: font.source,
 		} );
-	};
-
-	const toggleModal = ( tabName ) => {
-		setModalTabOpen( tabName || null );
 	};
 
 	// Demo
@@ -480,8 +469,6 @@ function FontLibraryProvider( { children } ) {
 				uninstallFontFamily,
 				toggleActivateFont,
 				getAvailableFontsOutline,
-				modalTabOpen,
-				toggleModal,
 				refreshLibrary,
 				notice,
 				setNotice,

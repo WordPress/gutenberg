@@ -21,7 +21,7 @@ import { search, closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanelLayout from './tab-panel-layout';
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from '../font-library-provider';
 import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';

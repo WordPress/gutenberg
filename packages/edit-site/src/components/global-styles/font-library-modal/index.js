@@ -7,6 +7,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -14,8 +16,10 @@ import { useContext } from '@wordpress/element';
 import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from '../font-library-provider';
 import { unlock } from '../../../lock-unlock';
+
+export const FONT_LIBRARY_MODAL_NAME = 'edit-site/font-library';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -39,11 +43,17 @@ const tabsFromCollections = ( collections ) =>
 				: name,
 	} ) );
 
-function FontLibraryModal( {
-	onRequestClose,
-	initialTabId = 'installed-fonts',
-} ) {
+export default function FontLibraryModal() {
 	const { collections, setNotice } = useContext( FontLibraryContext );
+
+	const isModalActive = useSelect( ( select ) =>
+		select( interfaceStore ).isModalActive( FONT_LIBRARY_MODAL_NAME )
+	);
+	const { closeModal } = useDispatch( interfaceStore );
+
+	if ( ! isModalActive ) {
+		return null;
+	}
 
 	const tabs = [
 		...DEFAULT_TABS,
@@ -58,12 +68,12 @@ function FontLibraryModal( {
 	return (
 		<Modal
 			title={ __( 'Fonts' ) }
-			onRequestClose={ onRequestClose }
+			onRequestClose={ closeModal }
 			isFullScreen
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs initialTabId={ initialTabId } onSelect={ onSelect }>
+				<Tabs onSelect={ onSelect }>
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>
@@ -98,5 +108,3 @@ function FontLibraryModal( {
 		</Modal>
 	);
 }
-
-export default FontLibraryModal;

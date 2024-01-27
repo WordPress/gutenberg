@@ -14,6 +14,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Layout from '../layout';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import FontLibraryProvider from '../global-styles/font-library-provider';
 import { unlock } from '../../lock-unlock';
 
 const { RouterProvider } = unlock( routerPrivateApis );
@@ -37,10 +38,12 @@ export default function App() {
 		<SlotFillProvider>
 			<GlobalStylesProvider>
 				<UnsavedChangesWarning />
-				<RouterProvider>
-					<Layout />
-					<PluginArea onError={ onPluginAreaError } />
-				</RouterProvider>
+				<FontLibraryProvider>
+					<RouterProvider>
+						<Layout />
+						<PluginArea onError={ onPluginAreaError } />
+					</RouterProvider>
+				</FontLibraryProvider>
 			</GlobalStylesProvider>
 		</SlotFillProvider>
 	);

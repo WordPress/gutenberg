@@ -16,7 +16,7 @@ import {
  * Internal dependencies
  */
 import TabPanelLayout from './tab-panel-layout';
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from '../font-library-provider';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';

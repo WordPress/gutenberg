@@ -7,7 +7,7 @@ import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from '../font-library-provider';
 import { getFacePreviewStyle } from './utils/preview-styles';
 
 function getPreviewUrl( fontFace ) {

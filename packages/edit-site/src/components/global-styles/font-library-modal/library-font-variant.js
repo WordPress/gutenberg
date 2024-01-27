@@ -12,7 +12,7 @@ import {
  * Internal dependencies
  */
 import { getFontFaceVariantName } from './utils';
-import { FontLibraryContext } from './context';
+import { FontLibraryContext } from '../font-library-provider';
 import FontFaceDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
 

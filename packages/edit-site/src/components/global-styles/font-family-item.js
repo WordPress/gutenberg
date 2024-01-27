@@ -2,28 +2,31 @@
  * WordPress dependencies
  */
 import { _n, sprintf } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalItem as Item,
 	FlexItem,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import { FontLibraryContext } from './font-library-modal/context';
+import { FontLibraryContext } from './font-library-provider';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
+import { FONT_LIBRARY_MODAL_NAME } from './font-library-modal';
 
 function FontFamilyItem( { font } ) {
-	const { handleSetLibraryFontSelected, toggleModal } =
-		useContext( FontLibraryContext );
+	const { handleSetLibraryFontSelected } = useContext( FontLibraryContext );
+	const { openModal } = useDispatch( interfaceStore );
 
 	const variantsCount = font?.fontFace?.length || 1;
 
 	const handleClick = () => {
 		handleSetLibraryFontSelected( font );
-		toggleModal( 'installed-fonts' );
+		openModal( FONT_LIBRARY_MODAL_NAME );
 	};
 
 	const previewStyle = getFamilyPreviewStyle( font );
