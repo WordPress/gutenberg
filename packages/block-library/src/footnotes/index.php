@@ -66,8 +66,27 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
  * Registers the `core/footnotes` block on the server.
  *
  * @since 6.3.0
+ * @since 6.5.0 Added support for custom post types.
  */
 function register_block_core_footnotes() {
+	/*
+	 * Backward compatibility support.
+	 *
+	 * This code was initially registered to run on the `init` hook at the default
+	 * priority of 10. In WordPress 6.5 the code was modified to support custom
+	 * post types and needs to run on a higher priority to ensure that the meta
+	 * data is registered following the registration of custom post types.
+	 *
+	 * This code ensures that themes and plugins that were removing the action
+	 * on the `init` hook at the default priority of 10 to prevent the block's
+	 * registration will continue to work.
+	 */
+	if ( doing_action( 'init' ) && has_action( 'init', 'register_block_core_footnotes', 10 ) ) {
+		remove_action( 'init', 'register_block_core_footnotes', 10 );
+		add_action( 'init', 'register_block_core_footnotes', 100 );
+		return;
+	}
+
 	$post_types = get_post_types(
 		array(
 			'show_in_rest' => true,
