@@ -13,7 +13,10 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { mergeOrigins, hasMergedOrigins } from '../use-settings';
+import {
+	mergeOrigins,
+	hasMergedOrigins,
+} from '../../store/private-selectors/get-inherited-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';

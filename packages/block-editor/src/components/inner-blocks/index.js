@@ -29,7 +29,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_OBJECT = {};
 
@@ -72,6 +72,7 @@ function UncontrolledInnerBlocks( props ) {
 		name,
 		blockType,
 		parentLock,
+		defaultLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -102,9 +103,6 @@ function UncontrolledInnerBlocks( props ) {
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-
-	const [ defaultLayout ] = useSettings( 'layout' );
-
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
 	const memoedLayout = useMemo(
@@ -186,15 +184,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
-	const {
-		__experimentalCaptureToolbars,
-		hasOverlay,
-		name,
-		blockType,
-		parentLock,
-		parentClientId,
-		isDropZoneDisabled,
-	} = useSelect(
+	const selected = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return {};
@@ -210,13 +200,18 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
-			} = select( blockEditorStore );
+				getInheritedSettings,
+			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
 				__unstableGetEditorMode() === 'navigation';
 			const blockEditingMode = getBlockEditingMode( clientId );
-			const _parentClientId = getBlockRootClientId( clientId );
+			const parentClientId = getBlockRootClientId( clientId );
+			const [ defaultLayout ] = getInheritedSettings(
+				clientId,
+				'layout'
+			);
 			return {
 				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
@@ -230,16 +225,27 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					enableClickThrough,
 				name: blockName,
 				blockType: getBlockType( blockName ),
-				parentLock: getTemplateLock( _parentClientId ),
-				parentClientId: _parentClientId,
+				parentLock: getTemplateLock( parentClientId ),
+				parentClientId,
 				isDropZoneDisabled:
 					blockEditingMode !== 'default' ||
 					__unstableHasActiveBlockOverlayActive( clientId ) ||
 					__unstableIsWithinBlockOverlay( clientId ),
+				defaultLayout,
 			};
 		},
 		[ clientId ]
 	);
+	const {
+		__experimentalCaptureToolbars,
+		hasOverlay,
+		name,
+		blockType,
+		parentLock,
+		parentClientId,
+		isDropZoneDisabled,
+		defaultLayout,
+	} = selected;
 
 	const blockDropZoneRef = useBlockDropZone( {
 		dropZoneElement,
@@ -259,6 +265,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		name,
 		blockType,
 		parentLock,
+		defaultLayout,
 		...options,
 	};
 	const InnerBlocks =
