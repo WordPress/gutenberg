@@ -45,13 +45,13 @@ export function getLastInsertedBlocksClientIds( state ) {
 }
 
 /**
- * Returns true if the block with the given client ID and all of its descendants
+ * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID.
  *
- * @return {boolean} Whether the block and its descendants are disabled.
+ * @return {boolean} Whether the block descendants are disabled.
  */
 export const isBlockSubtreeDisabled = createSelector(
 	( state, clientId ) => {
@@ -63,10 +63,7 @@ export const isBlockSubtreeDisabled = createSelector(
 				)
 			);
 		};
-		return (
-			getBlockEditingMode( state, clientId ) === 'disabled' &&
-			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
-		);
+		return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 	},
 	( state ) => [
 		state.blocks.parents,
