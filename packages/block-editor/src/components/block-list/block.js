@@ -109,6 +109,7 @@ function BlockListBlock( {
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	const parentLayout = useLayout() || {};
+	const blockType = getBlockType( name );
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -134,10 +135,9 @@ function BlockListBlock( {
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
 			blockEditingMode={ context.blockEditingMode }
+			blockType={ blockType }
 		/>
 	);
-
-	const blockType = getBlockType( name );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
@@ -534,10 +534,7 @@ function BlockListBlockProvider( props ) {
 				return;
 			}
 
-			const {
-				hasBlockSupport: _hasBlockSupport,
-				getActiveBlockVariation,
-			} = select( blocksStore );
+			const { getActiveBlockVariation } = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
 			const templateLock = getTemplateLock( rootClientId );
 			const canRemove = canRemoveBlock( clientId, rootClientId );
@@ -582,11 +579,9 @@ function BlockListBlockProvider( props ) {
 							( id ) => getBlockName( id ) === blockName
 						) ),
 				mayDisplayParentControls:
-					_hasBlockSupport(
-						getBlockName( clientId ),
-						'__experimentalExposeControlsToChildren',
-						false
-					) && hasSelectedInnerBlock( clientId ),
+					!! blockType?.supports
+						?.__experimentalExposeControlsToChildren &&
+					hasSelectedInnerBlock( clientId ),
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,

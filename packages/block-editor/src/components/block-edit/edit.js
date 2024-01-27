@@ -7,11 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withFilters } from '@wordpress/components';
-import {
-	getBlockDefaultClassName,
-	hasBlockSupport,
-	getBlockType,
-} from '@wordpress/blocks';
+import { getBlockDefaultClassName, getBlockType } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -72,7 +68,7 @@ const EditWithGeneratedProps = ( props ) => {
 	}
 
 	// Generate a class name for the block's editable form.
-	const generatedClassName = hasBlockSupport( blockType, 'className', true )
+	const generatedClassName = blockType.supports?.className
 		? getBlockDefaultClassName( name )
 		: null;
 	const className = classnames(

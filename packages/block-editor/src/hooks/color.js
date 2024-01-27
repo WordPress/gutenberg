@@ -36,8 +36,8 @@ import { store as blockEditorStore } from '../store';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
-const hasColorSupport = ( blockNameOrType ) => {
-	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
+const hasColorSupport = ( blockType ) => {
+	const colorSupport = blockType?.supports?.[ COLOR_SUPPORT_KEY ];
 	return (
 		colorSupport &&
 		( colorSupport.link === true ||
@@ -126,31 +126,27 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject colors classnames.
  *
- * @param {Object}        props           Additional props applied to save element.
- * @param {Object|string} blockNameOrType Block type.
- * @param {Object}        attributes      Block attributes.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockNameOrType, attributes ) {
+export function addSaveProps( props, blockType, attributes ) {
 	if (
-		! hasColorSupport( blockNameOrType ) ||
-		shouldSkipSerialization( blockNameOrType, COLOR_SUPPORT_KEY )
+		! hasColorSupport( blockType ) ||
+		shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY )
 	) {
 		return props;
 	}
 
-	const hasGradient = hasGradientSupport( blockNameOrType );
+	const hasGradient = hasGradientSupport( blockType );
 
 	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	const shouldSerialize = ( feature ) =>
-		! shouldSkipSerialization(
-			blockNameOrType,
-			COLOR_SUPPORT_KEY,
-			feature
-		);
+		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, feature );
 
 	// Primary color classes must come before the `has-text-color`,
 	// `has-background` and `has-link-color` classes to maintain backwards
@@ -337,7 +333,7 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 }
 
 function useBlockProps( {
-	name,
+	blockType,
 	backgroundColor,
 	textColor,
 	gradient,
@@ -358,8 +354,8 @@ function useBlockProps( {
 		[ userPalette, themePalette, defaultPalette ]
 	);
 	if (
-		! hasColorSupport( name ) ||
-		shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
+		! hasColorSupport( blockType ) ||
+		shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY )
 	) {
 		return {};
 	}
@@ -367,7 +363,7 @@ function useBlockProps( {
 
 	if (
 		textColor &&
-		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
+		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, 'text' )
 	) {
 		extraStyles.color = getColorObjectByAttributeValues(
 			colors,
@@ -376,7 +372,7 @@ function useBlockProps( {
 	}
 	if (
 		backgroundColor &&
-		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
+		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, 'background' )
 	) {
 		extraStyles.backgroundColor = getColorObjectByAttributeValues(
 			colors,
@@ -384,7 +380,7 @@ function useBlockProps( {
 		)?.color;
 	}
 
-	const saveProps = addSaveProps( { style: extraStyles }, name, {
+	const saveProps = addSaveProps( { style: extraStyles }, blockType, {
 		textColor,
 		backgroundColor,
 		gradient,
@@ -411,7 +407,16 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
-	hasSupport: hasColorSupport,
+	hasSupport( supports ) {
+		const colorSupport = supports[ COLOR_SUPPORT_KEY ];
+		return (
+			colorSupport &&
+			( colorSupport.link === true ||
+				colorSupport.gradient === true ||
+				colorSupport.background !== false ||
+				colorSupport.text !== false )
+		);
+	},
 };
 
 const MIGRATION_PATHS = {

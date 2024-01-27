@@ -3,11 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import {
-	getBlockSupport,
-	hasBlockSupport,
-	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
-} from '@wordpress/blocks';
+import { __EXPERIMENTAL_ELEMENTS as ELEMENTS } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
@@ -50,8 +46,8 @@ const styleSupportKeys = [
 	SPACING_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( nameOrType ) =>
-	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
+const hasStyleSupport = ( blockType ) =>
+	styleSupportKeys.some( ( key ) => !! blockType?.supports?.[ key ] );
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -280,20 +276,20 @@ export function omitStyle( style, paths, preserveReference = false ) {
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object}                    props           Additional props applied to save element.
- * @param {Object|string}             blockNameOrType Block type.
- * @param {Object}                    attributes      Block attributes.
- * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
+ * @param {Object}                    props      Additional props applied to save element.
+ * @param {Object}                    blockType  Block type.
+ * @param {Object}                    attributes Block attributes.
+ * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
 	props,
-	blockNameOrType,
+	blockType,
 	attributes,
 	skipPaths = skipSerializationPathsSave
 ) {
-	if ( ! hasStyleSupport( blockNameOrType ) ) {
+	if ( ! hasStyleSupport( blockType ) ) {
 		return props;
 	}
 
@@ -301,7 +297,7 @@ export function addSaveProps(
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization =
 			skipSerializationPathsSaveChecks[ indicator ] ||
-			getBlockSupport( blockNameOrType, indicator );
+			blockType?.supports?.[ indicator ];
 
 		if ( skipSerialization === true ) {
 			style = omitStyle( style, path );
@@ -354,7 +350,9 @@ function BlockStyleControls( {
 
 export default {
 	edit: BlockStyleControls,
-	hasSupport: hasStyleSupport,
+	hasSupport( supports ) {
+		return styleSupportKeys.some( ( key ) => !! supports[ key ] );
+	},
 	addSaveProps,
 	attributeKeys: [ 'style' ],
 	useBlockProps,
@@ -372,7 +370,7 @@ const elementTypes = [
 	},
 ];
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { blockType, style } ) {
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 		useBlockProps
 	) }`;
@@ -392,7 +390,7 @@ function useBlockProps( { name, style } ) {
 
 		elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
 			const skipSerialization = shouldSkipSerialization(
-				name,
+				blockType,
 				COLOR_SUPPORT_KEY,
 				elementType
 			);
@@ -451,13 +449,13 @@ function useBlockProps( { name, style } ) {
 		return elementCSSRules.length > 0
 			? elementCSSRules.join( '' )
 			: undefined;
-	}, [ baseElementSelector, blockElementStyles, name ] );
+	}, [ baseElementSelector, blockElementStyles, blockType ] );
 
 	useStyleOverride( { css: styles } );
 
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },
-		name,
+		blockType,
 		{ style },
 		skipSerializationPathsEdit
 	);

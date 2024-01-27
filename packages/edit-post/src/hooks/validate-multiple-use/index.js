@@ -6,7 +6,6 @@ import {
 	findTransform,
 	getBlockTransforms,
 	getBlockType,
-	hasBlockSupport,
 } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -28,7 +27,8 @@ const enhance = compose(
 	 * @return {Component} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
-		const multiple = hasBlockSupport( block.name, 'multiple', true );
+		const blockType = getBlockType( block.name );
+		const multiple = blockType?.supports?.multiple;
 
 		// For block types with `multiple` support, there is no "original
 		// block" to be found in the content, as the block itself is valid.

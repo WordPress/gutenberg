@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -32,13 +32,6 @@ import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 
 const layoutBlockSupportKey = 'layout';
-
-function hasLayoutBlockSupport( blockName ) {
-	return (
-		hasBlockSupport( blockName, 'layout' ) ||
-		hasBlockSupport( blockName, '__experimentalLayout' )
-	);
-}
 
 /**
  * Generates the utility classnames for the given block's layout attributes.
@@ -292,8 +285,8 @@ export default {
 	shareWithChildBlocks: true,
 	edit: LayoutPanelPure,
 	attributeKeys: [ 'layout' ],
-	hasSupport( name ) {
-		return hasLayoutBlockSupport( name );
+	hasSupport( supports ) {
+		return !! supports.layout || !! supports.__experimentalLayout;
 	},
 };
 
@@ -326,7 +319,10 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
 		return settings;
 	}
-	if ( hasLayoutBlockSupport( settings ) ) {
+	if (
+		settings?.supports?.layout ||
+		settings?.supports?.__experimentalLayout
+	) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -395,7 +391,10 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const blockSupportsLayout = hasLayoutBlockSupport( props.name );
+		const blockType = getBlockType( props.name );
+		const blockSupportsLayout =
+			blockType?.supports?.layout ||
+			blockType?.supports?.__experimentalLayout;
 		const shouldRenderLayoutStyles = useSelect(
 			( select ) => {
 				// The callback returns early to avoid block editor subscription.

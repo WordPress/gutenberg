@@ -323,8 +323,8 @@ export default {
 	},
 	useBlockProps,
 	attributeKeys: [ 'style' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+	hasSupport( supports ) {
+		return !! supports[ POSITION_SUPPORT_KEY ];
 	},
 };
 

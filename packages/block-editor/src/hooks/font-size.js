@@ -39,7 +39,7 @@ export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
  * @return {Object} Filtered block settings.
  */
 function addAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_SIZE_SUPPORT_KEY ) ) {
+	if ( ! settings.supports?.[ FONT_SIZE_SUPPORT_KEY ] ) {
 		return settings;
 	}
 
@@ -213,8 +213,8 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fontSize', 'style' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
+	hasSupport( supports ) {
+		return !! supports[ FONT_SIZE_SUPPORT_KEY ];
 	},
 };
 

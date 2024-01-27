@@ -214,6 +214,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 export default {
 	edit: BlockHooksControlPure,
+	enableForAllBlocks: true,
 	hasSupport() {
 		return true;
 	},

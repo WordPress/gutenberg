@@ -91,7 +91,7 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.align ?? {} ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'align' ) ) {
+	if ( settings.supports?.align ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -157,8 +157,8 @@ export default {
 	useBlockProps,
 	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'align', false );
+	hasSupport( supports ) {
+		return !! supports.align;
 	},
 };
 
@@ -188,8 +188,8 @@ function useBlockProps( { name, align } ) {
  */
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;
-	const blockAlign = getBlockSupport( blockType, 'align' );
-	const hasWideBlockSupport = hasBlockSupport( blockType, 'alignWide', true );
+	const blockAlign = blockType.supports?.align;
+	const hasWideBlockSupport = blockType.supports?.alignWide ?? true;
 
 	// Compute valid alignments without taking into account if
 	// the theme supports wide alignments or not.

@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
@@ -23,7 +22,7 @@ export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
  * @return {Object}         Filtered block settings
  */
 function addAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
+	if ( ! settings.supports?.[ FONT_FAMILY_SUPPORT_KEY ] ) {
 		return settings;
 	}
 
@@ -48,7 +47,7 @@ function addAttributes( settings ) {
  * @return {Object}           Filtered props applied to save element
  */
 function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) ) {
+	if ( ! blockType.supports?.[ FONT_FAMILY_SUPPORT_KEY ] ) {
 		return props;
 	}
 
@@ -84,8 +83,8 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fontFamily' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
+	hasSupport( supports ) {
+		return !! supports[ FONT_FAMILY_SUPPORT_KEY ];
 	},
 };
 

@@ -10,7 +10,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
-	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
 	switchToBlockType,
@@ -1778,7 +1777,7 @@ export function canEditBlock( state, clientId ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
-	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
+	if ( getBlockType( nameOrType )?.supports?.lock === false ) {
 		return false;
 	}
 
@@ -1810,7 +1809,7 @@ function getInsertUsage( state, id ) {
  * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
  */
 const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
-	if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
+	if ( blockType?.supports?.inserter === false ) {
 		return false;
 	}
 
@@ -1894,7 +1893,7 @@ const buildBlockTypeItem =
 		const id = blockType.name;
 
 		let isDisabled = false;
-		if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
+		if ( blockType?.supports?.multiple === false ) {
 			isDisabled = getBlocksByClientId(
 				state,
 				getClientIdsWithDescendants( state )
@@ -2805,11 +2804,9 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// also enabled in all modes for blocks that have controlled children
 	// (reusable block, template part, navigation), unless explicitly disabled
 	// with `supports.__experimentalDisableBlockOverlay`.
-	const blockSupportDisable = hasBlockSupport(
-		getBlockName( state, clientId ),
-		'__experimentalDisableBlockOverlay',
-		false
-	);
+	const blockSupportDisable = !! getBlockType(
+		getBlockName( state, clientId )
+	)?.supports?.__experimentalDisableBlockOverlay;
 	const shouldEnableIfUnselected =
 		editorMode === 'navigation' ||
 		( blockSupportDisable

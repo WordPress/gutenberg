@@ -172,17 +172,17 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 /**
  * Determine whether there is block support for border properties.
  *
- * @param {string} blockName Block name.
+ * @param {Object} blockType Block type.
  * @param {string} feature   Border feature to check support for.
  *
  * @return {boolean} Whether there is support.
  */
-export function hasBorderSupport( blockName, feature = 'any' ) {
+export function hasBorderSupport( blockType, feature = 'any' ) {
 	if ( Platform.OS !== 'web' ) {
 		return false;
 	}
 
-	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
+	const support = blockType?.supports?.[ BORDER_SUPPORT_KEY ];
 
 	if ( support === true ) {
 		return true;
@@ -252,16 +252,16 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject border color.
  *
- * @param {Object}        props           Additional props applied to save element.
- * @param {Object|string} blockNameOrType Block type definition.
- * @param {Object}        attributes      Block's attributes.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type definition.
+ * @param {Object} attributes Block's attributes.
  *
  * @return {Object} Filtered props to apply to save element.
  */
-function addSaveProps( props, blockNameOrType, attributes ) {
+function addSaveProps( props, blockType, attributes ) {
 	if (
-		! hasBorderSupport( blockNameOrType, 'color' ) ||
-		shouldSkipSerialization( blockNameOrType, BORDER_SUPPORT_KEY, 'color' )
+		! hasBorderSupport( blockType, 'color' ) ||
+		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return props;
 	}
@@ -294,12 +294,12 @@ export function getBorderClasses( attributes ) {
 	} );
 }
 
-function useBlockProps( { name, borderColor, style } ) {
+function useBlockProps( { blockType, borderColor, style } ) {
 	const { colors } = useMultipleOriginColorsAndGradients();
 
 	if (
-		! hasBorderSupport( name, 'color' ) ||
-		shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
+		! hasBorderSupport( blockType, 'color' ) ||
+		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return {};
 	}
@@ -335,7 +335,7 @@ function useBlockProps( { name, borderColor, style } ) {
 
 	return addSaveProps(
 		{ style: cleanEmptyObject( extraStyles ) || {} },
-		name,
+		blockType,
 		{ borderColor, style }
 	);
 }
@@ -344,8 +344,8 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'borderColor', 'style' ],
-	hasSupport( name ) {
-		return hasBorderSupport( name, 'color' );
+	hasSupport( supports ) {
+		return !! supports.color;
 	},
 };
 

@@ -25,7 +25,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
+	if ( settings?.supports?.className ?? true ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -67,8 +67,8 @@ export default {
 	edit: CustomClassNameControlsPure,
 	addSaveProps,
 	attributeKeys: [ 'className' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'customClassName', true );
+	hasSupport( supports ) {
+		return !! supports.customClassName;
 	},
 };
 
