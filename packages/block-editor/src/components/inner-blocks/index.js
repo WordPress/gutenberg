@@ -71,7 +71,6 @@ function UncontrolledInnerBlocks( props ) {
 		layout,
 		name,
 		blockType,
-		innerBlocks,
 		parentLock,
 	} = props;
 
@@ -92,7 +91,6 @@ function UncontrolledInnerBlocks( props ) {
 
 	useInnerBlockTemplateSync(
 		clientId,
-		innerBlocks,
 		template,
 		templateLock,
 		templateInsertUpdatesSelection
@@ -193,7 +191,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		hasOverlay,
 		name,
 		blockType,
-		innerBlocks,
 		parentLock,
 		parentClientId,
 		isDropZoneDisabled,
@@ -208,7 +205,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				__unstableGetEditorMode,
-				getBlocks,
 				getTemplateLock,
 				getBlockRootClientId,
 				__unstableIsWithinBlockOverlay,
@@ -234,7 +230,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					enableClickThrough,
 				name: blockName,
 				blockType: getBlockType( blockName ),
-				innerBlocks: getBlocks( clientId ),
 				parentLock: getTemplateLock( _parentClientId ),
 				parentClientId: _parentClientId,
 				isDropZoneDisabled:
@@ -263,7 +258,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		layout,
 		name,
 		blockType,
-		innerBlocks,
 		parentLock,
 		...options,
 	};
