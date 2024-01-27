@@ -74,16 +74,20 @@ function register_block_core_footnotes() {
 	 *
 	 * This code was initially registered to run on the `init` hook at the default
 	 * priority of 10. In WordPress 6.5 the code was modified to support custom
-	 * post types and needs to run on a higher priority to ensure that the meta
-	 * data is registered following the registration of custom post types.
+	 * post types and needs to run after the registration of custom post types
+	 * by plugins and themes.
 	 *
-	 * This code ensures that themes and plugins that were removing the action
-	 * on the `init` hook at the default priority of 10 to prevent the block's
-	 * registration will continue to work.
+	 * Due to an order of operations issue this function was running before themes
+	 * or plugins could register to CTPs to run on the default `init` hook. This
+	 * shuffles the priority while allowing for extenders to deregister the block.
+	 *
+	 * As the REST API cancels operations prior to `init, 100` running, this now
+	 * runs on `rest_api_init` too.
 	 */
 	if ( doing_action( 'init' ) && has_action( 'init', 'register_block_core_footnotes', 10 ) ) {
-		remove_action( 'init', 'register_block_core_footnotes', 10 );
+		remove_action( 'init', 'register_block_core_footnotes' );
 		add_action( 'init', 'register_block_core_footnotes', 100 );
+		add_action( 'rest_api_init', 'register_block_core_footnotes', 100 );
 		return;
 	}
 
