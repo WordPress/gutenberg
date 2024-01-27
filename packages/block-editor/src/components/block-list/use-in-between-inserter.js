@@ -74,9 +74,11 @@ export function useInBetweenInserter() {
 					rootClientId = blockElement.getAttribute( 'data-block' );
 				}
 
+				const blockEditingMode = getBlockEditingMode( rootClientId );
+
 				if (
 					getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled' ||
+					blockEditingMode === 'disabled' ||
 					getBlockName( rootClientId ) === 'core/block'
 				) {
 					return;
@@ -124,7 +126,7 @@ export function useInBetweenInserter() {
 				const clientId = element.id.slice( 'block-'.length );
 				if (
 					! clientId ||
-					__unstableIsWithinBlockOverlay( clientId )
+					__unstableIsWithinBlockOverlay( clientId, blockEditingMode )
 				) {
 					return;
 				}

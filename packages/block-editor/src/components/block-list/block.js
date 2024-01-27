@@ -32,6 +32,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
+import { canRemoveBlockCheck, canMoveBlockCheck } from '../../store/utils';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
 
@@ -496,8 +497,6 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled,
 				getTemplateLock,
 				__unstableGetBlockWithoutInnerBlocks,
-				canRemoveBlock,
-				canMoveBlock,
 
 				getSettings,
 				__unstableGetTemporarilyEditingAsBlocks,
@@ -537,9 +536,18 @@ function BlockListBlockProvider( props ) {
 			} = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
 			const templateLock = getTemplateLock( rootClientId );
-			const canRemove = canRemoveBlock( clientId, rootClientId );
-			const canMove = canMoveBlock( clientId, rootClientId );
+			const blockEditingMode = getBlockEditingMode( clientId );
 			const { name: blockName, attributes, isValid } = block;
+			const canRemove = canRemoveBlockCheck(
+				attributes,
+				blockEditingMode,
+				templateLock
+			);
+			const canMove = canMoveBlockCheck(
+				attributes,
+				blockEditingMode,
+				templateLock
+			);
 			const blockType = getBlockType( blockName );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const { outlineMode, supportsLayout } = getSettings();
@@ -552,7 +560,6 @@ function BlockListBlockProvider( props ) {
 			const typing = isTyping();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
-			const blockEditingMode = getBlockEditingMode( clientId );
 
 			return {
 				mode: getBlockMode( clientId ),
@@ -588,9 +595,14 @@ function BlockListBlockProvider( props ) {
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
+				isSubtreeDisabled:
+					blockEditingMode === 'disabled' &&
+					isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
-				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
+				hasOverlay: __unstableHasActiveBlockOverlayActive(
+					clientId,
+					blockEditingMode
+				),
 				initialPosition:
 					_isSelected && __unstableGetEditorMode() === 'edit'
 						? getSelectedBlocksInitialCaretPosition()

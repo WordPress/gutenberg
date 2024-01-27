@@ -49,3 +49,39 @@ export const getAllPatternsDependants = ( state ) => {
 		state.blockPatterns,
 	];
 };
+
+export function canRemoveBlockCheck(
+	attributes,
+	blockEditingMode,
+	templateLock
+) {
+	if ( attributes === null ) {
+		return true;
+	}
+	if ( attributes.lock?.remove !== undefined ) {
+		return ! attributes.lock.remove;
+	}
+	if ( templateLock ) {
+		return false;
+	}
+
+	return blockEditingMode !== 'disabled';
+}
+
+export function canMoveBlockCheck(
+	attributes,
+	blockEditingMode,
+	templateLock
+) {
+	if ( attributes === null ) {
+		return true;
+	}
+	if ( attributes.lock?.move !== undefined ) {
+		return ! attributes.lock.move;
+	}
+	if ( templateLock === 'all' ) {
+		return false;
+	}
+
+	return blockEditingMode !== 'disabled';
+}

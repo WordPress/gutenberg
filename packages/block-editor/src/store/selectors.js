@@ -30,6 +30,8 @@ import {
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
+	canRemoveBlockCheck,
+	canMoveBlockCheck,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -1681,18 +1683,11 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
-	const attributes = getBlockAttributes( state, clientId );
-	if ( attributes === null ) {
-		return true;
-	}
-	if ( attributes.lock?.remove !== undefined ) {
-		return ! attributes.lock.remove;
-	}
-	if ( getTemplateLock( state, rootClientId ) ) {
-		return false;
-	}
-
-	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
+	return canRemoveBlockCheck(
+		getBlockAttributes( state, clientId ),
+		getBlockEditingMode( state, rootClientId ),
+		getTemplateLock( state, rootClientId )
+	);
 }
 
 /**
@@ -1720,18 +1715,11 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
-	const attributes = getBlockAttributes( state, clientId );
-	if ( attributes === null ) {
-		return true;
-	}
-	if ( attributes.lock?.move !== undefined ) {
-		return ! attributes.lock.move;
-	}
-	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
-		return false;
-	}
-
-	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
+	return canMoveBlockCheck(
+		getBlockAttributes( state, clientId ),
+		getBlockEditingMode( state, rootClientId ),
+		getTemplateLock( state, rootClientId )
+	);
 }
 
 /**
@@ -2775,12 +2763,16 @@ export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
 
-export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+export function __unstableHasActiveBlockOverlayActive(
+	state,
+	clientId,
+	blockEditingMode = getBlockEditingMode( state, clientId )
+) {
 	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
 	// 'disabled' then the overlay is redundant since the block can't be
 	// selected. If the mode is 'contentOnly' then the overlay is redundant
 	// since there will be no controls to interact with once selected.
-	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
+	if ( blockEditingMode !== 'default' ) {
 		return false;
 	}
 
@@ -2823,10 +2815,20 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	);
 }
 
-export function __unstableIsWithinBlockOverlay( state, clientId ) {
+export function __unstableIsWithinBlockOverlay(
+	state,
+	clientId,
+	blockEditingMode
+) {
 	let parent = state.blocks.parents.get( clientId );
 	while ( !! parent ) {
-		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
+		if (
+			__unstableHasActiveBlockOverlayActive(
+				state,
+				parent,
+				blockEditingMode
+			)
+		) {
 			return true;
 		}
 		parent = state.blocks.parents.get( parent );

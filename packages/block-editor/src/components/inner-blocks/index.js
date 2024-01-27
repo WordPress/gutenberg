@@ -25,7 +25,10 @@ import useInnerBlockTemplateSync from './use-inner-block-template-sync';
 import useBlockContext from './use-block-context';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
-import { useBlockEditContext } from '../block-edit/context';
+import {
+	useBlockEditContext,
+	blockEditingModeKey,
+} from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
@@ -183,11 +186,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__unstableDisableDropZone,
 		dropZoneElement,
 	} = options;
+	const context = useBlockEditContext();
 	const {
 		clientId,
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
-	} = useBlockEditContext();
+	} = context;
+	const blockEditingMode = context[ blockEditingModeKey ];
 	const {
 		__experimentalCaptureToolbars,
 		hasOverlay,
@@ -213,13 +218,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockRootClientId,
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
-				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
 				__unstableGetEditorMode() === 'navigation';
-			const blockEditingMode = getBlockEditingMode( clientId );
 			const _parentClientId = getBlockRootClientId( clientId );
 			return {
 				__experimentalCaptureToolbars: hasBlockSupport(
@@ -239,11 +242,17 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				parentClientId: _parentClientId,
 				isDropZoneDisabled:
 					blockEditingMode !== 'default' ||
-					__unstableHasActiveBlockOverlayActive( clientId ) ||
-					__unstableIsWithinBlockOverlay( clientId ),
+					__unstableHasActiveBlockOverlayActive(
+						clientId,
+						blockEditingMode
+					) ||
+					__unstableIsWithinBlockOverlay(
+						clientId,
+						blockEditingMode
+					),
 			};
 		},
-		[ clientId ]
+		[ clientId, blockEditingMode ]
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {
