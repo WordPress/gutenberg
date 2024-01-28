@@ -199,9 +199,10 @@ function FontCollection( { slug } ) {
 			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
-				fontsToInstall.length > 0 && (
-					<Footer handleInstall={ handleInstall } />
-				)
+				<Footer
+					handleInstall={ handleInstall }
+					isDisabled={ fontsToInstall.length === 0 }
+				/>
 			}
 		>
 			{ renderConfirmDialog && (
@@ -290,7 +291,7 @@ function FontCollection( { slug } ) {
 	);
 }
 
-function Footer( { handleInstall } ) {
+function Footer( { handleInstall, isDisabled } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
 
 	return (
@@ -299,7 +300,7 @@ function Footer( { handleInstall } ) {
 				variant="primary"
 				onClick={ handleInstall }
 				isBusy={ isInstalling }
-				disabled={ isInstalling }
+				aria-disabled={ isDisabled || isInstalling }
 			>
 				{ __( 'Install' ) }
 			</Button>

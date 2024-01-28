@@ -186,7 +186,7 @@ function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 				) }
 			</div>
 			<Button
-				disabled={ ! fontFamiliesHasChanges }
+				aria-disabled={ ! fontFamiliesHasChanges }
 				variant="primary"
 				onClick={ saveFontFamilies }
 			>
