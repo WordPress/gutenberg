@@ -270,12 +270,16 @@ export const getClientIdsOfDescendants = createSelector(
 			}
 		}
 
+		let index = 0;
+
 		// Add the descendants of the descendants, recursively.
-		for ( const id of ids ) {
+		while ( index < ids.length ) {
+			const id = ids[ index ];
 			const order = state.blocks.order.get( id );
 			if ( order ) {
-				ids.push( ...order );
+				ids.splice( index + 1, 0, ...order );
 			}
+			index++;
 		}
 
 		return ids;
