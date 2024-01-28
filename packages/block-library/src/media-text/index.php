@@ -29,10 +29,9 @@ function render_block_core_media_text( $attributes, $content ) {
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
+		$position = '50% 50%';
 		if ( isset( $attributes['focalPoint'] ) ) {
 			$position = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
-		} else {
-			$position = '50% 50%';
 		}
 		$processor->next_tag( 'figure' );
 		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $position . ';' );
