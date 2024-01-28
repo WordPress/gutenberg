@@ -15,6 +15,7 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getBlockRootClientId,
 	getSettings,
 	canInsertBlockType,
 } from './selectors';
@@ -44,6 +45,43 @@ export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
 
+export function getBlockWithoutAttributes( state, clientId ) {
+	return state.blocks.byClientId.get( clientId );
+}
+
+const EMPTY_ARRAY = [];
+
+export function getSelectedBlockClientIdsUnmemoized( state ) {
+	const { selectionStart, selectionEnd } = state.selection;
+
+	if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
+		return EMPTY_ARRAY;
+	}
+
+	if ( selectionStart.clientId === selectionEnd.clientId ) {
+		return [ selectionStart.clientId ];
+	}
+
+	// Retrieve root client ID to aid in retrieving relevant nested block
+	// order, being careful to allow the falsey empty string top-level root
+	// by explicitly testing against null.
+	const rootClientId = getBlockRootClientId( state, selectionStart.clientId );
+
+	if ( rootClientId === null ) {
+		return EMPTY_ARRAY;
+	}
+
+	const blockOrder = getBlockOrder( state, rootClientId );
+	const startIndex = blockOrder.indexOf( selectionStart.clientId );
+	const endIndex = blockOrder.indexOf( selectionEnd.clientId );
+
+	if ( startIndex > endIndex ) {
+		return blockOrder.slice( endIndex, startIndex + 1 );
+	}
+
+	return blockOrder.slice( startIndex, endIndex + 1 );
+}
+
 /**
  * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
@@ -53,25 +91,17 @@ export function getLastInsertedBlocksClientIds( state ) {
  *
  * @return {boolean} Whether the block descendants are disabled.
  */
-export const isBlockSubtreeDisabled = createSelector(
-	( state, clientId ) => {
-		const isChildSubtreeDisabled = ( childClientId ) => {
-			return (
-				getBlockEditingMode( state, childClientId ) === 'disabled' &&
-				getBlockOrder( state, childClientId ).every(
-					isChildSubtreeDisabled
-				)
-			);
-		};
-		return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockEditingModes,
-		state.blockListSettings,
-	]
-);
+export const isBlockSubtreeDisabled = ( state, clientId ) => {
+	const isChildSubtreeDisabled = ( childClientId ) => {
+		return (
+			getBlockEditingMode( state, childClientId ) === 'disabled' &&
+			getBlockOrder( state, childClientId ).every(
+				isChildSubtreeDisabled
+			)
+		);
+	};
+	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
+};
 
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.

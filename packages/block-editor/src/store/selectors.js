@@ -34,6 +34,7 @@ import {
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+import { getSelectedBlockClientIdsUnmemoized } from './private-selectors';
 
 /**
  * A block selection object.
@@ -757,39 +758,7 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
  * @return {Array} Multi-selected block client IDs.
  */
 export const getSelectedBlockClientIds = createSelector(
-	( state ) => {
-		const { selectionStart, selectionEnd } = state.selection;
-
-		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
-			return EMPTY_ARRAY;
-		}
-
-		if ( selectionStart.clientId === selectionEnd.clientId ) {
-			return [ selectionStart.clientId ];
-		}
-
-		// Retrieve root client ID to aid in retrieving relevant nested block
-		// order, being careful to allow the falsey empty string top-level root
-		// by explicitly testing against null.
-		const rootClientId = getBlockRootClientId(
-			state,
-			selectionStart.clientId
-		);
-
-		if ( rootClientId === null ) {
-			return EMPTY_ARRAY;
-		}
-
-		const blockOrder = getBlockOrder( state, rootClientId );
-		const startIndex = blockOrder.indexOf( selectionStart.clientId );
-		const endIndex = blockOrder.indexOf( selectionEnd.clientId );
-
-		if ( startIndex > endIndex ) {
-			return blockOrder.slice( endIndex, startIndex + 1 );
-		}
-
-		return blockOrder.slice( startIndex, endIndex + 1 );
-	},
+	getSelectedBlockClientIdsUnmemoized,
 	( state ) => [
 		state.blocks.order,
 		state.selection.selectionStart.clientId,
@@ -852,7 +821,10 @@ export const getMultiSelectedBlocks = createSelector(
  * @return {?string} First block client ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockClientId( state ) {
-	return getMultiSelectedBlockClientIds( state )[ 0 ] || null;
+	if ( ! hasMultiSelection( state ) ) {
+		return null;
+	}
+	return getSelectedBlockClientIdsUnmemoized( state )[ 0 ];
 }
 
 /**
@@ -864,8 +836,11 @@ export function getFirstMultiSelectedBlockClientId( state ) {
  * @return {?string} Last block client ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockClientId( state ) {
-	const selectedClientIds = getMultiSelectedBlockClientIds( state );
-	return selectedClientIds[ selectedClientIds.length - 1 ] || null;
+	if ( ! hasMultiSelection( state ) ) {
+		return null;
+	}
+	const selectedClientIds = getSelectedBlockClientIdsUnmemoized( state );
+	return selectedClientIds[ selectedClientIds.length - 1 ];
 }
 
 /**
@@ -892,7 +867,12 @@ export function isFirstMultiSelectedBlock( state, clientId ) {
  * @return {boolean} Whether block is in multi-selection set.
  */
 export function isBlockMultiSelected( state, clientId ) {
-	return getMultiSelectedBlockClientIds( state ).indexOf( clientId ) !== -1;
+	if ( isBlockSelected( state, clientId ) ) {
+		return false;
+	}
+	return (
+		getSelectedBlockClientIdsUnmemoized( state ).indexOf( clientId ) !== -1
+	);
 }
 
 /**
@@ -1004,7 +984,7 @@ export function __unstableIsSelectionCollapsed( state ) {
 }
 
 export function __unstableSelectionHasUnmergeableBlock( state ) {
-	return getSelectedBlockClientIds( state ).some( ( clientId ) => {
+	return getSelectedBlockClientIdsUnmemoized( state ).some( ( clientId ) => {
 		const blockName = getBlockName( state, clientId );
 		const blockType = getBlockType( blockName );
 		return ! blockType.merge;
@@ -2938,7 +2918,7 @@ export const isGroupable = createRegistrySelector(
 			const groupingBlockName = getGroupingBlockName();
 			const _clientIds = clientIds?.length
 				? clientIds
-				: getSelectedBlockClientIds( state );
+				: getSelectedBlockClientIdsUnmemoized( state );
 			const rootClientId = _clientIds?.length
 				? getBlockRootClientId( state, _clientIds[ 0 ] )
 				: undefined;
