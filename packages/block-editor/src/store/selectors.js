@@ -252,24 +252,33 @@ export const __unstableGetClientIdsTree = createSelector(
  * given. Returned ids are ordered first by the order of the ids given, then
  * by the order that they appear in the editor.
  *
- * @param {Object}          state     Global application state.
- * @param {string|string[]} clientIds Client ID(s) for which descendant blocks are to be returned.
+ * @param {Object}          state   Global application state.
+ * @param {string|string[]} rootIds Client ID(s) for which descendant blocks are to be returned.
  *
  * @return {Array} Client IDs of descendants.
  */
 export const getClientIdsOfDescendants = createSelector(
-	( state, clientIds ) => {
-		const givenIds = Array.isArray( clientIds ) ? clientIds : [ clientIds ];
-		const collectedIds = [];
-		for ( const givenId of givenIds ) {
-			for ( const descendantId of getBlockOrder( state, givenId ) ) {
-				collectedIds.push(
-					descendantId,
-					...getClientIdsOfDescendants( state, descendantId )
-				);
+	( state, rootIds ) => {
+		rootIds = Array.isArray( rootIds ) ? [ ...rootIds ] : [ rootIds ];
+		const ids = [];
+
+		// Add the descendants of the root blocks first.
+		for ( const rootId of rootIds ) {
+			const order = state.blocks.order.get( rootId );
+			if ( order ) {
+				ids.push( ...order );
 			}
 		}
-		return collectedIds;
+
+		// Add the descendants of the descendants, recursively.
+		for ( const id of ids ) {
+			const order = state.blocks.order.get( id );
+			if ( order ) {
+				ids.push( ...order );
+			}
+		}
+
+		return ids;
 	},
 	( state ) => [ state.blocks.order ]
 );
@@ -283,19 +292,8 @@ export const getClientIdsOfDescendants = createSelector(
  *
  * @return {Array} ids of top-level and descendant blocks.
  */
-export const getClientIdsWithDescendants = createSelector(
-	( state ) => {
-		const collectedIds = [];
-		for ( const topLevelId of getBlockOrder( state ) ) {
-			collectedIds.push(
-				topLevelId,
-				...getClientIdsOfDescendants( state, topLevelId )
-			);
-		}
-		return collectedIds;
-	},
-	( state ) => [ state.blocks.order ]
-);
+export const getClientIdsWithDescendants = ( state ) =>
+	getClientIdsOfDescendants( state, '' );
 
 /**
  * Returns the total number of blocks, or the total number of blocks with a specific name in a post.
@@ -312,10 +310,14 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return clientIds.reduce( ( accumulator, clientId ) => {
+		let count = 0;
+		for ( const clientId of clientIds ) {
 			const block = state.blocks.byClientId.get( clientId );
-			return block.name === blockName ? accumulator + 1 : accumulator;
-		}, 0 );
+			if ( block.name === blockName ) {
+				count++;
+			}
+		}
+		return count;
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
