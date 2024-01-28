@@ -30,11 +30,11 @@ import {
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
+	getSelectedBlockClientIdsUnmemoized,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-import { getSelectedBlockClientIdsUnmemoized } from './private-selectors';
 
 /**
  * A block selection object.

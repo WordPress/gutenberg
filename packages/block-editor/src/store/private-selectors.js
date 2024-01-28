@@ -15,7 +15,6 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
-	getBlockRootClientId,
 	getSettings,
 	canInsertBlockType,
 } from './selectors';
@@ -23,6 +22,8 @@ import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { store } from './';
 import { unlock } from '../lock-unlock';
+
+export { getSelectedBlockClientIdsUnmemoized } from './utils';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -47,39 +48,6 @@ export function getLastInsertedBlocksClientIds( state ) {
 
 export function getBlockWithoutAttributes( state, clientId ) {
 	return state.blocks.byClientId.get( clientId );
-}
-
-const EMPTY_ARRAY = [];
-
-export function getSelectedBlockClientIdsUnmemoized( state ) {
-	const { selectionStart, selectionEnd } = state.selection;
-
-	if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
-		return EMPTY_ARRAY;
-	}
-
-	if ( selectionStart.clientId === selectionEnd.clientId ) {
-		return [ selectionStart.clientId ];
-	}
-
-	// Retrieve root client ID to aid in retrieving relevant nested block
-	// order, being careful to allow the falsey empty string top-level root
-	// by explicitly testing against null.
-	const rootClientId = getBlockRootClientId( state, selectionStart.clientId );
-
-	if ( rootClientId === null ) {
-		return EMPTY_ARRAY;
-	}
-
-	const blockOrder = getBlockOrder( state, rootClientId );
-	const startIndex = blockOrder.indexOf( selectionStart.clientId );
-	const endIndex = blockOrder.indexOf( selectionEnd.clientId );
-
-	if ( startIndex > endIndex ) {
-		return blockOrder.slice( endIndex, startIndex + 1 );
-	}
-
-	return blockOrder.slice( startIndex, endIndex + 1 );
 }
 
 /**
