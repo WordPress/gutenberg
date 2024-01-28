@@ -121,6 +121,12 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, Record<string, unknown>>} */
 	const overrides = {};
 	for ( const block of blocks ) {
+		if (
+			block.name === 'core/block' &&
+			getHasOverridableBlocks( block.innerBlocks )
+		) {
+			continue;
+		}
 		Object.assign(
 			overrides,
 			getOverridesFromBlocks( block.innerBlocks, defaultValues )
@@ -185,28 +191,37 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const {
-					getBlocks,
-					getBlockEditingMode: editingMode,
-					getSettings,
-				} = select( blockEditorStore );
-				const blocks = getBlocks( patternClientId );
-				const canEdit = canUser( 'update', 'blocks', ref );
+	const {
+		innerBlocks,
+		userCanEdit,
+		getBlockEditingMode,
+		getPostLinkProps,
+		hasParentPattern,
+	} = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const {
+				getBlocks,
+				getBlockEditingMode: editingMode,
+				getSettings,
+				getBlockParentsByBlockName,
+			} = select( blockEditorStore );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					userCanEdit: canEdit,
-					getBlockEditingMode: editingMode,
-					getPostLinkProps: getSettings().getPostLinkProps,
-				};
-			},
-			[ patternClientId, ref ]
-		);
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: editingMode,
+				getPostLinkProps: getSettings().getPostLinkProps,
+				hasParentPattern:
+					getBlockParentsByBlockName( patternClientId, 'core/block' )
+						.length > 0,
+			};
+		},
+		[ patternClientId, ref ]
+	);
 
 	const editOriginalProps = getPostLinkProps
 		? getPostLinkProps( {
@@ -320,6 +335,16 @@ export default function ReusableBlockEdit( {
 	};
 
 	let children = null;
+
+	if ( hasOverridableBlocks && hasParentPattern ) {
+		children = (
+			<Warning>
+				{ __(
+					'You cannot nest a pattern with overrides inside another pattern.'
+				) }
+			</Warning>
+		);
+	}
 
 	if ( hasAlreadyRendered ) {
 		children = (
