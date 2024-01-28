@@ -13,6 +13,9 @@ const ios = {
 		args: [ 'uitesting' ],
 	},
 	autoLaunch: false,
+	simulatorStartupTimeout: 240,
+	reduceMotion: true,
+	maxTypingFrequency: 30,
 };
 
 exports.iosLocal = ( { iPadDevice = false, environment } ) => {

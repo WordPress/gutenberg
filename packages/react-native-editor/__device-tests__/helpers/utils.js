@@ -223,11 +223,6 @@ const typeString = async ( driver, element, str, clear ) => {
 	}
 
 	await element.addValue( str );
-
-	if ( ! isAndroid() ) {
-		// Await the completion of the scroll-to-text-input animation
-		await driver.pause( 3000 );
-	}
 };
 
 /**
@@ -295,11 +290,15 @@ const clickMiddleOfElement = async ( driver, element ) => {
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
+	const borderPadding = 8;
 	await driver
 		.action( 'pointer', {
 			parameters: { pointerType: 'touch' },
 		} )
-		.move( { x: location.x, y: location.y } )
+		.move( {
+			x: location.x + borderPadding,
+			y: location.y + borderPadding,
+		} )
 		.down()
 		.up()
 		.perform();
