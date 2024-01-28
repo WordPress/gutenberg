@@ -28,7 +28,14 @@ import { useCanEditEntity } from '../utils/hooks';
 const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
+	attributes: {
+		textAlign,
+		moreText,
+		showMoreOnNewLine,
+		excerptWordsLength,
+		countExcerptCharactersLength,
+		excerptCharactersLength,
+	},
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -82,6 +89,15 @@ export default function PostExcerptEditor( {
 	 * Do not translate into your own language.
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+
+	/**
+	 * When wordCountType is not 'words', toggle button should
+	 * not be rendered. Hence, Making the countExcerptCharactersLength
+	 * false.
+	 */
+	if ( wordCountType !== 'words' ) {
+		setAttributes( { countExcerptCharactersLength: false } );
+	}
 
 	/**
 	 * When excerpt is editable, strip the html tags from
@@ -151,10 +167,15 @@ export default function PostExcerptEditor( {
 	).trim();
 
 	let trimmedExcerpt = '';
-	if ( wordCountType === 'words' ) {
+	if ( wordCountType === 'words' && ! countExcerptCharactersLength ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( ' ', excerptLength )
+			.split( ' ', excerptWordsLength )
 			.join( ' ' );
+	} else if ( wordCountType === 'words' && countExcerptCharactersLength ) {
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.split( '', excerptCharactersLength )
+			.join( '' )
+			.trim();
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
 		/*
 		 * 1. Split the excerpt at the character limit,
@@ -165,7 +186,7 @@ export default function PostExcerptEditor( {
 		 * so that the spaces are excluded from the word count.
 		 */
 		const excerptWithSpaces = rawOrRenderedExcerpt
-			.split( '', excerptLength )
+			.split( '', excerptWordsLength )
 			.join( '' );
 
 		const numberOfSpaces =
@@ -173,11 +194,11 @@ export default function PostExcerptEditor( {
 			excerptWithSpaces.replaceAll( ' ', '' ).length;
 
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( '', excerptLength + numberOfSpaces )
+			.split( '', excerptWordsLength + numberOfSpaces )
 			.join( '' );
 	} else if ( wordCountType === 'characters_including_spaces' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( '', excerptLength )
+			.split( '', excerptWordsLength )
 			.join( '' );
 	}
 
@@ -227,15 +248,44 @@ export default function PostExcerptEditor( {
 							} )
 						}
 					/>
-					<RangeControl
-						label={ __( 'Max number of words' ) }
-						value={ excerptLength }
-						onChange={ ( value ) => {
-							setAttributes( { excerptLength: value } );
-						} }
-						min="10"
-						max="100"
-					/>
+					{ wordCountType === 'words' && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Set Character Length' ) }
+							checked={ countExcerptCharactersLength }
+							onChange={ ( newCountExcerptCharactersLength ) => {
+								setAttributes( {
+									countExcerptCharactersLength:
+										newCountExcerptCharactersLength,
+								} );
+							} }
+						/>
+					) }
+
+					{ wordCountType === 'words' &&
+					countExcerptCharactersLength ? (
+						<RangeControl
+							label={ __( 'Max number of Characters' ) }
+							value={ excerptCharactersLength }
+							onChange={ ( value ) => {
+								setAttributes( {
+									excerptCharactersLength: value,
+								} );
+							} }
+							min="10"
+							max="1000"
+						/>
+					) : (
+						<RangeControl
+							label={ __( 'Max number of words' ) }
+							value={ excerptWordsLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptWordsLength: value } );
+							} }
+							min="10"
+							max="100"
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>

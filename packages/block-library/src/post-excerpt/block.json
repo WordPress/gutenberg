@@ -17,9 +17,17 @@
 			"type": "boolean",
 			"default": true
 		},
-		"excerptLength": {
+		"excerptWordsLength": {
 			"type": "number",
 			"default": 55
+		},
+		"countExcerptCharactersLength": {
+			"type": "boolean",
+			"default": false
+		},
+		"excerptCharactersLength": {
+			"type": "number",
+			"default": 120
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
