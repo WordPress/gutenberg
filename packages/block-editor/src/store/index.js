@@ -10,16 +10,10 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as privateActions from './private-actions';
 import * as privateSelectors from './private-selectors';
-import { getInheritedSettings } from './get-inherited-settings';
 import * as resolvers from './resolvers';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-
-privateSelectors = {
-	...privateSelectors,
-	getInheritedSettings,
-};
 
 /**
  * Block editor data store configuration.

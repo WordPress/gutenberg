@@ -20,8 +20,10 @@ import {
 } from './selectors';
 import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-import { store } from '.';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+
+export { getBlockSettings } from './get-block-settings';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -262,7 +264,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
 			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( store )
+				select( STORE_NAME )
 			);
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
@@ -320,7 +322,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...unlock( select( store ) ).getFetchedPatterns(),
+			...unlock( select( STORE_NAME ) ).getFetchedPatterns(),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )

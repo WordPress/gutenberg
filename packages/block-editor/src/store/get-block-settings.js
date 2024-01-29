@@ -130,7 +130,7 @@ export function hasMergedOrigins( value ) {
 	);
 }
 
-export function getInheritedSettings( state, clientId, ...paths ) {
+export function getBlockSettings( state, clientId, ...paths ) {
 	const blockName = getBlockName( state, clientId );
 	const candidates = clientId
 		? [

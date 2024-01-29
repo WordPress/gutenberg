@@ -28,7 +28,7 @@ export function useSettings( ...paths ) {
 	const { clientId = null } = useBlockEditContext();
 	return useSelect(
 		( select ) =>
-			unlock( select( blockEditorStore ) ).getInheritedSettings(
+			unlock( select( blockEditorStore ) ).getBlockSettings(
 				clientId,
 				...paths
 			),

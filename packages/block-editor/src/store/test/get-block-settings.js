@@ -6,9 +6,9 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getInheritedSettings } from '../get-inherited-settings';
+import { getBlockSettings } from '../get-block-settings';
 
-describe( 'getInheritedSettings', () => {
+describe( 'getBlockSettings', () => {
 	it( 'uses block setting', () => {
 		const state = {
 			settings: {
@@ -36,7 +36,7 @@ describe( 'getInheritedSettings', () => {
 		};
 
 		expect(
-			getInheritedSettings( state, 'block-1', 'layout.contentSize' )
+			getBlockSettings( state, 'block-1', 'layout.contentSize' )
 		).toEqual( [ '840px' ] );
 	} );
 
@@ -79,7 +79,7 @@ describe( 'getInheritedSettings', () => {
 		);
 
 		expect(
-			getInheritedSettings( state, 'block-1', 'layout.contentSize' )
+			getBlockSettings( state, 'block-1', 'layout.contentSize' )
 		).toEqual( [ '960px' ] );
 
 		removeFilter(
