@@ -73,6 +73,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 		'keywords'         => 'keywords',
 		'example'          => 'example',
 		'variations'       => 'variations',
+		'allowed_blocks'   => 'allowedBlocks',
 	);
 	// Add `block_hooks` to the list of fields to pick.
 	$fields_to_pick['block_hooks'] = 'blockHooks';
