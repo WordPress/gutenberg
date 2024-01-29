@@ -156,7 +156,6 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'category',
 		'parent',
 		'ancestor',
-		'children',
 		'icon',
 		'description',
 		'keywords',
@@ -169,6 +168,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'example',
 		'variations',
 		'blockHooks',
+		'allowedBlocks',
 	];
 
 	const settings = Object.fromEntries(
