@@ -30,43 +30,8 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
 			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
 			$p->set_attribute( 'data-wp-init', 'callbacks.setQueryRef' );
-			// Use context to send translated strings.
-			$p->set_attribute(
-				'data-wp-context',
-				wp_json_encode(
-					array(
-						'loadingText' => __( 'Loading page, please wait.' ),
-						'loadedText'  => __( 'Page Loaded.' ),
-					),
-					JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
-				)
-			);
+			$p->set_attribute( 'data-wp-context', '{}' );
 			$content = $p->get_updated_html();
-
-			// Mark the block as interactive.
-			$block->block_type->supports['interactivity'] = true;
-
-			// Add a div to announce messages using `aria-live`.
-			$html_tag = 'div';
-			if ( ! empty( $attributes['tagName'] ) ) {
-				$html_tag = esc_attr( $attributes['tagName'] );
-			}
-			$last_tag_position = strripos( $content, '</' . $html_tag . '>' );
-			$content           = substr_replace(
-				$content,
-				'<div
-					class="screen-reader-text"
-					aria-live="polite"
-					data-wp-text="context.message"
-				></div>
-				<div
-					class="wp-block-query__enhanced-pagination-animation"
-					data-wp-class--start-animation="state.startAnimation"
-					data-wp-class--finish-animation="state.finishAnimation"
-				></div>',
-				$last_tag_position,
-				0
-			);
 		}
 	}
 
