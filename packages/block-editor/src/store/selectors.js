@@ -1576,8 +1576,13 @@ const canInsertBlockTypeUnmemoized = (
 	// The `allowedBlocks` block list setting can further limit which blocks are allowed children.
 	if ( hasParentAllowedBlock !== false ) {
 		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
-		if ( checkAllowList( parentAllowedBlocks, blockName ) === false ) {
-			hasParentAllowedBlock = false;
+		const hasParentListAllowedBlock = checkAllowList(
+			parentAllowedBlocks,
+			blockName
+		);
+		// Never downgrade the result from `true` to `null`
+		if ( hasParentListAllowedBlock !== null ) {
+			hasParentAllowedBlock = hasParentListAllowedBlock;
 		}
 	}
 
