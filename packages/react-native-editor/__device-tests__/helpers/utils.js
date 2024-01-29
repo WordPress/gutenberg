@@ -408,11 +408,23 @@ const selectTextFromElement = async ( driver, element ) => {
 		// On iOS we can use the context menu to "Select all" text.
 		await clickBeginningOfElement( driver, element );
 
-		const selectAllElement = await driver.$(
-			'//XCUIElementTypeMenuItem[@name="Select All"]'
-		);
-		await selectAllElement.waitForDisplayed( { timeout } );
-		await selectAllElement.click();
+		const selectAllSelector =
+			'//XCUIElementTypeMenuItem[@name="Select All"]';
+		const selectCopySelector = '//XCUIElementTypeMenuItem[@name="Copy"]';
+
+		// Wait for the context menu to be opened, there are cases where it selects the
+		// text automatticaly so the context option will be different.
+		await driver.waitUntil( async function () {
+			return (
+				( await driver.$( selectAllSelector ).isDisplayed() ) ||
+				( await driver.$( selectCopySelector ).isDisplayed() )
+			);
+		} );
+
+		const selectAllElement = await driver.$$( selectAllSelector );
+		if ( selectAllElement.length > 0 ) {
+			await selectAllElement[ 0 ].click();
+		}
 	}
 };
 
