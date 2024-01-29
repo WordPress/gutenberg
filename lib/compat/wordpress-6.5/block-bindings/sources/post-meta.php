@@ -4,8 +4,8 @@
  *
  * @package gutenberg
  */
-if ( function_exists( 'wp_block_bindings_register_source' ) ) {
-	$post_meta_source_callback = function ( $source_attrs ) {
+if ( ! function_exists( 'gutenberg_register_block_bindings_post_meta_source' ) && ! function_exists( 'gutenberg_block_bindings_post_meta_callback' ) ) {
+	function gutenberg_block_bindings_post_meta_callback( $source_attrs ) {
 		if ( ! isset( $source_attrs['key'] ) ) {
 			return null;
 		}
@@ -19,12 +19,17 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 		}
 
 		return get_post_meta( $post_id, $source_attrs['key'], true );
-	};
-	wp_block_bindings_register_source(
-		'core/post-meta',
-		array(
-			'label' => __( 'Post Meta' ),
-			'apply' => $post_meta_source_callback,
-		)
-	);
+	}
+
+	function gutenberg_register_block_bindings_post_meta_source() {
+		wp_block_bindings_register_source(
+			'core/post-meta',
+			array(
+				'label' => __( 'Post Meta' ),
+				'apply' => 'gutenberg_block_bindings_post_meta_callback',
+			)
+		);
+	}
 }
+
+add_action( 'init', 'gutenberg_register_block_bindings_post_meta_source' );
