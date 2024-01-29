@@ -23,7 +23,7 @@ export type CustomSelectButtonProps = {
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	onSelectionChange?: ( newValue: string | string[] ) => void;
+	onChange?: ( newValue: string | string[] ) => void;
 	/**
 	 * Can be used to render select UI with custom styled values.
 	 */

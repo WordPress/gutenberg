@@ -51,10 +51,13 @@ function defaultRenderSelectedValue(
 }
 
 const UnconnectedCustomSelectButton = (
-	props: WordPressComponentProps<
-		CustomSelectButtonProps & CustomSelectStore,
-		'button',
-		false
+	props: Omit<
+		WordPressComponentProps<
+			CustomSelectButtonProps & CustomSelectStore,
+			'button',
+			false
+		>,
+		'onChange'
 	>
 ) => {
 	const {

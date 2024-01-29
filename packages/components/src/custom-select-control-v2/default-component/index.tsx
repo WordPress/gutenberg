@@ -10,10 +10,10 @@ import _CustomSelect from '../custom-select';
 import type { CustomSelectProps } from '../types';
 
 function _NewCustomSelect( props: CustomSelectProps ) {
-	const { defaultValue, onSelectionChange, value, ...restProps } = props;
+	const { defaultValue, onChange, value, ...restProps } = props;
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
-		setValue: ( nextValue ) => onSelectionChange?.( nextValue ),
+		setValue: ( nextValue ) => onChange?.( nextValue ),
 		defaultValue,
 		value,
 	} );
