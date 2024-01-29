@@ -7,9 +7,10 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 	InspectorControls,
+	InspectorAdvancedControls,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const TEMPLATE = [
@@ -22,7 +23,7 @@ const TEMPLATE = [
 ];
 
 function DetailsEdit( { attributes, setAttributes, clientId } ) {
-	const { showContent, summary } = attributes;
+	const { name, showContent, summary } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -58,6 +59,19 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					__next40pxDefaultSize
+					label={ __( 'Name attribute' ) }
+					value={ name }
+					onChange={ ( newName ) =>
+						setAttributes( { name: newName } )
+					}
+					help={ __(
+						'When using the name attribute to assign the same name to a group of detail elements, only one element in the set is opened at a time.'
+					) }
+				/>
+			</InspectorAdvancedControls>
 			<details
 				{ ...innerBlocksProps }
 				open={ hasSelection || showContent }
