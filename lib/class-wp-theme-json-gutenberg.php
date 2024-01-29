@@ -2768,7 +2768,21 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Replace the presets.
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = ! static::get_metadata_boolean( $this->theme_json['settings'], $preset['prevent_override'], true );
+				$override_preset = false;
+				if ( is_array( $preset['prevent_override'] ) ) {
+					$prevent_override = _wp_array_get( $this->theme_json['settings'], $preset['prevent_override'] );
+					/*
+					 * For backwards compatibility with presets converting from a hardcoded `false` 
+					 * for `prevent_override` to a path to a boolean (`defaultFontSizes`, for example),
+					 * the 'merge' value for the new setting both overrides the preset and tells the
+					 * UI to continue to display a merged set of the default values.
+					 */
+					if ( 'merge' === $prevent_override ) {
+						$override_preset = true;
+					} elseif ( is_bool( $prevent_override ) ) {
+						$override_preset = ! $prevent_override;
+					}
+				}
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = $node['path'];
