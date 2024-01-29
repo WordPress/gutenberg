@@ -11,7 +11,6 @@
  * @covers WP_Font_Collection::__construct
  */
 class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
-
 	public function test_should_initialize_data() {
 		$slug = new ReflectionProperty( WP_Font_Collection::class, 'slug' );
 		$slug->setAccessible( true );
@@ -22,16 +21,15 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$description = new ReflectionProperty( WP_Font_Collection::class, 'description' );
 		$description->setAccessible( true );
 
-		$src = new ReflectionProperty( WP_Font_Collection::class, 'src' );
-		$src->setAccessible( true );
+		$font_families = new ReflectionProperty( WP_Font_Collection::class, 'font_families' );
+		$font_families->setAccessible( true );
 
 		$config     = array(
-			'slug'        => 'my-collection',
-			'name'        => 'My Collection',
-			'description' => 'My collection description',
-			'src'         => 'my-collection-data.json',
+			'name'          => 'My Collection',
+			'description'   => 'My collection description',
+			'font_families' => array( 'mock' ),
 		);
-		$collection = new WP_Font_Collection( $config );
+		$collection = new WP_Font_Collection( 'my-collection', $config );
 
 		$actual_slug = $slug->getValue( $collection );
 		$this->assertSame( 'my-collection', $actual_slug, 'Provided slug and initialized slug should match.' );
@@ -45,59 +43,13 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$this->assertSame( 'My collection description', $actual_description, 'Provided description and initialized description should match.' );
 		$description->setAccessible( false );
 
-		$actual_src = $src->getValue( $collection );
-		$this->assertSame( 'my-collection-data.json', $actual_src, 'Provided src and initialized src should match.' );
-		$src->setAccessible( false );
+		$actual_font_families = $font_families->getValue( $collection );
+		$this->assertSame( array( 'mock' ), $actual_font_families, 'Provided font_families and initialized font_families should match.' );
+		$font_families->setAccessible( false );
 	}
 
-	/**
-	 * @dataProvider data_should_do_it_wrong
-	 *
-	 * @param mixed  $config Config of the font collection.
-	 */
-	public function test_should_do_it_wrong( $config ) {
-		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
-		new WP_Font_Collection( $config );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_should_do_it_wrong() {
-		return array(
-			'no id'                           => array(
-				array(
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-					'src'         => 'my-collection-data.json',
-				),
-			),
-
-			'no config'                       => array(
-				'',
-			),
-
-			'empty array'                     => array(
-				array(),
-			),
-
-			'boolean instead of config array' => array(
-				false,
-			),
-
-			'null instead of config array'    => array(
-				null,
-			),
-
-			'missing src'                     => array(
-				array(
-					'slug'        => 'my-collection',
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-				),
-			),
-		);
+	public function test_should_do_it_wrong_missing_font_families() {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::__construct' );
+		new WP_Font_Collection( 'my-collection' );
 	}
 }

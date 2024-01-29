@@ -97,18 +97,20 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string[] $config {
-	 *     Font collection associative array of configuration options.
+	 * @param string   $slug_or_file Font collection slug or path/url to a JSON file defining the font collection.
+	 * @param string[] $args {
+	 *     Optional. Font collection associative array of configuration options.
 	 *
-	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $src            The font collection's data as a JSON file path.
-	 *     @type array  $data           The font collection's data as a PHP array.
+	 *     @type string $name           Name of the font collection.
+	 *     @type string $description    Description of the font collection.
+	 *     @type array  $font_families  Array of font family definitions that are in the collection.
+	 *     @type array  $categories     Array of categories for the fonts that are in the collection.
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
 	 */
-	function wp_register_font_collection( $config ) {
-		return WP_Font_Library::register_font_collection( $config );
+	function wp_register_font_collection( $slug_or_file, $args = array() ) {
+		return WP_Font_Library::register_font_collection( $slug_or_file, $args );
 	}
 }
 
@@ -123,17 +125,10 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	function wp_unregister_font_collection( $collection_id ) {
 		WP_Font_Library::unregister_font_collection( $collection_id );
 	}
-
 }
 
-$google_fonts = array(
-	'slug'        => 'google-fonts',
-	'name'        => 'Google Fonts',
-	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
-);
-
-wp_register_font_collection( $google_fonts );
+// TODO: update to production font collection URL.
+wp_register_font_collection( 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/01aa57731575bd13f9db8d86ab80a2d74e28a1ac/releases/gutenberg-17.6/collections/google-fonts-with-preview.json' );
 
 // @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {
