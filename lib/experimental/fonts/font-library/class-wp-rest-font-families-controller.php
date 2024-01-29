@@ -56,7 +56,20 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
-		return $this->get_items_permissions_check( $request );
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		if ( ! current_user_can( 'read_post', $post->ID ) ) {
+			return new WP_Error(
+				'rest_cannot_read',
+				__( 'Sorry, you are not allowed to access this font family.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
 	}
 
 	/**
