@@ -36,17 +36,17 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-## Allowed blocks (deprecated)
+## Allowed blocks
 
-Using the `allowedBlocks` property, you can define the set of blocks allowed in your `InnerBlocks`. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
+Using the `allowedBlocks` prop, you can further limit, in addition to the `children` field in `block.json`, which blocks can be inserted as direct descendants of this block. It is useful to determine the list of allowed blocks dynamically, individually for each block. For example, determined by a block attribute:
 
 ```js
-const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
+const { allowedBlocks } = attributes;
 //...
-<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />;
+<InnerBlocks allowedBlocks={ allowedBlocks } />;
 ```
 
-This prop is now deprecated in favor of the [`children` block setting](#defining-a-children-block-relationship).
+If the list of allowed blocks is always the same, prefer the [`children` block setting](#defining-a-children-block-relationship) instead.
 
 ## Orientation
 

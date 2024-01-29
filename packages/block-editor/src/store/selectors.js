@@ -1565,20 +1565,20 @@ const canInsertBlockTypeUnmemoized = (
 
 	const parentName = getBlockName( state, rootClientId );
 	const parentBlockType = getBlockType( parentName );
+
+	// Look at the `blockType.children` field to determine whether this is an allowed child block.
 	const parentAllowedChildBlocks = parentBlockType?.children;
 	let hasParentAllowedBlock = checkAllowList(
 		parentAllowedChildBlocks,
 		blockName
 	);
 
-	// If decision can't be made with `blockType.children` (i.e., it's not there)
-	// decide using the `allowedBlocks` block list setting (as a legacy fallback).
-	if ( hasParentAllowedBlock === null ) {
+	// The `allowedBlocks` block list setting can further limit which blocks are allowed children.
+	if ( hasParentAllowedBlock !== false ) {
 		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
-		hasParentAllowedBlock = checkAllowList(
-			parentAllowedBlocks,
-			blockName
-		);
+		if ( checkAllowList( parentAllowedBlocks, blockName ) === false ) {
+			hasParentAllowedBlock = false;
+		}
 	}
 
 	const blockAllowedParentBlocks = blockType.parent;
