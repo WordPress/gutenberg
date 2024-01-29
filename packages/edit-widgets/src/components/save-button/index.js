@@ -26,9 +26,8 @@ function SaveButton() {
 		<Button
 			variant="primary"
 			isBusy={ isSaving }
-			aria-disabled={ isSaving }
+			aria-disabled={ isSaving || ! hasEditedWidgetAreaIds }
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
-			disabled={ ! hasEditedWidgetAreaIds }
 		>
 			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
