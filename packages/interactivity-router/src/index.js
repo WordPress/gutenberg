@@ -78,11 +78,13 @@ pages.set(
 	Promise.resolve( regionsToVdom( document ) )
 );
 
+// Variable to store the current navigation.
+let navigatingTo = '';
+
 export const { state, actions } = store( 'core/router', {
 	state: {
 		url: '',
 		navigation: {
-			target: '',
 			hasStarted: false,
 			hasFinished: false,
 			texts: {},
@@ -115,7 +117,7 @@ export const { state, actions } = store( 'core/router', {
 		*navigate( href, options = {} ) {
 			const url = cleanUrl( href );
 			const { navigation } = state;
-			navigation.target = href;
+			navigatingTo = href;
 			actions.prefetch( url, options );
 
 			// Create a promise that resolves when the specified timeout ends.
@@ -126,7 +128,7 @@ export const { state, actions } = store( 'core/router', {
 
 			// Don't update the navigation status immediately, wait 400 ms.
 			const timeout = setTimeout( () => {
-				if ( navigation.target === href ) {
+				if ( navigatingTo === href ) {
 					navigation.hasStarted = true;
 					navigation.hasFinished = false;
 					navigation.message = navigation.texts.loading;
@@ -144,7 +146,7 @@ export const { state, actions } = store( 'core/router', {
 			// Once the page is fetched, the destination URL could have changed
 			// (e.g., by clicking another link in the meantime). If so, bail
 			// out, and let the newer execution to update the HTML.
-			if ( navigation.target !== href ) return;
+			if ( navigatingTo !== href ) return;
 
 			navigation.hasStarted = false;
 			navigation.hasFinished = true;
