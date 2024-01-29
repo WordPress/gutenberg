@@ -55,4 +55,11 @@ test.describe( 'toVdom - islands', () => {
 		);
 		await expect( el ).toBeHidden();
 	} );
+
+	test( 'islands should recover their namespace if an inner island has changed it', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'directive after different namespace' );
+		await expect( el ).toBeHidden();
+	} );
 } );

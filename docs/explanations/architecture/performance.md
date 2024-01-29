@@ -10,7 +10,7 @@ To ensure the block editor stays performant across releases and development, we 
 - **Typing Time:** The time it takes for the browser to respond while typing on the editor.
 - **Block Selection Time:** The time it takes for the browser to respond after a user selects block. (Inserting a block is also equivalent to selecting a block. Monitoring the selection is sufficient to cover both metrics).
 
-## Key Performance Decisions and Solutions
+## Key performance decisions and solutions
 
 **Data Module Async Mode**
 

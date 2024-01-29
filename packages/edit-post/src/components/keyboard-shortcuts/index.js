@@ -18,24 +18,20 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
-		useSelect( editPostStore );
+	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } =
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
-
 	const {
 		switchEditorMode,
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-		setIsListViewOpened,
 		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const {
 		getBlockName,
@@ -100,16 +96,6 @@ function KeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'f',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-post/toggle-list-view',
-			category: 'global',
-			description: __( 'Open the block list view.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'o',
 			},
 		} );
 
@@ -224,14 +210,6 @@ function KeyboardShortcuts() {
 				? 'edit-post/block'
 				: 'edit-post/document';
 			openGeneralSidebar( sidebarToOpen );
-		}
-	} );
-
-	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
-	useShortcut( 'core/edit-post/toggle-list-view', ( event ) => {
-		if ( ! isListViewOpened() ) {
-			event.preventDefault();
-			setIsListViewOpened( true );
 		}
 	} );
 

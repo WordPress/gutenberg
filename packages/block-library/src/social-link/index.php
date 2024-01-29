@@ -33,7 +33,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	 * The `is_email` returns false for emails with schema.
 	 */
 	if ( is_email( $url ) ) {
-		$url = 'mailto:' . $url;
+		$url = 'mailto:' . antispambot( $url );
 	}
 
 	/**

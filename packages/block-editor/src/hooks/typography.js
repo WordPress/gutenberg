@@ -4,7 +4,6 @@
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -109,7 +108,7 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function TypographyPanelPure( { clientId, name, setAttributes, settings } ) {
+export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	function selector( select ) {
 		const { style, fontFamily, fontSize } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
@@ -146,11 +145,6 @@ function TypographyPanelPure( { clientId, name, setAttributes, settings } ) {
 		/>
 	);
 }
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const TypographyPanel = pure( TypographyPanelPure );
 
 export const hasTypographySupport = ( blockName ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>

@@ -26,6 +26,7 @@ const meta: Meta< typeof CustomSelect > = {
 		value: { control: { type: null } },
 	},
 	parameters: {
+		badges: [ 'wip' ],
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {

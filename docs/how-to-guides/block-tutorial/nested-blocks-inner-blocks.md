@@ -36,7 +36,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-## Allowed Blocks
+## Allowed blocks
 
 Using the `allowedBlocks` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
 
@@ -56,7 +56,7 @@ By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A v
 
 Specifying this prop does not affect the layout of the inner blocks, but results in the block mover icons in the child blocks being displayed horizontally, and also ensures that drag and drop works correctly.
 
-## Default Block
+## Default block
 
 By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` when the block appender is clicked. You can modify the default block and its attributes that are inserted when the initial block appender is clicked by using the `defaultBlock` property. For example:
 
@@ -93,7 +93,7 @@ const MY_TEMPLATE = [
 
 Use the `templateLock` property to lock down the template. Using `all` locks the template completely so no changes can be made. Using `insert` prevents additional blocks from being inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
-### Post Template
+### Post template
 
 Unrelated to `InnerBlocks` but worth mentioning here, you can create a [post template](https://developer.wordpress.org/block-editor/developers/block-api/block-templates/) by post type, that preloads the block editor with a set of blocks.
 
@@ -109,7 +109,7 @@ add_action( 'init', function() {
 } );
 ```
 
-## Using Parent and Ancestor Relationships in Blocks
+## Using parent and ancestor relationships in blocks
 
 A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. Currently, there are two relationships builders can use: `parent` and `ancestor`. The differences are:
 
@@ -118,7 +118,7 @@ A common pattern for using InnerBlocks is to create a custom block that will be 
 
 The key difference between `parent` and `ancestor` is `parent` has finer specificity, while an `ancestor` has greater flexibility in its nested hierarchy.
 
-### Defining Parent Block Relationship
+### Defining parent block relationship
 
 An example of this is the Column block, which is assigned the `parent` block setting. This allows the Column block to only be available as a nested direct descendant in its parent Columns block. Otherwise, the Column block will not be available as an option within the block inserter. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
 
@@ -133,7 +133,7 @@ When defining a direct descendent block, use the `parent` block setting to defin
 }
 ```
 
-### Defining Ancestor Block Relationship
+### Defining an ancestor block relationship
 
 An example of this is the Comment Author Name block, which is assigned the `ancestor` block setting. This allows the Comment Author Name block to only be available as a nested descendant in its ancestral Comment Template block. Otherwise, the Comment Author Name block will not be available as an option within the block inserter. See [Comment Author Name code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/comment-author-name).
 
@@ -150,7 +150,7 @@ When defining a descendent block, use the `ancestor` block setting. This prevent
 }
 ```
 
-## Using a React Hook
+## Using a React hook
 
 You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlocks` component. This hook allows you to take more control over the markup of inner blocks areas.
 

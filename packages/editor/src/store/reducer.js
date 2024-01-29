@@ -292,6 +292,74 @@ export function deviceType( state = 'Desktop', action ) {
 	return state;
 }
 
+/**
+ * Reducer storing the list of all programmatically removed panels.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function removedPanels( state = [], action ) {
+	switch ( action.type ) {
+		case 'REMOVE_PANEL':
+			if ( ! state.includes( action.panelName ) ) {
+				return [ ...state, action.panelName ];
+			}
+	}
+
+	return state;
+}
+
+/**
+ * Reducer to set the block inserter panel open or closed.
+ *
+ * Note: this reducer interacts with the list view panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function blockInserterPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen ? false : state;
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value;
+	}
+	return state;
+}
+
+/**
+ * Reducer to set the list view panel open or closed.
+ *
+ * Note: this reducer interacts with the inserter panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function listViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value ? false : state;
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen;
+	}
+	return state;
+}
+
+/**
+ * This reducer does nothing aside initializing a ref to the list view toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the list view toggle button.
+ */
+export function listViewToggleRef( state = { current: null } ) {
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -305,4 +373,8 @@ export default combineReducers( {
 	postAutosavingLock,
 	renderingMode,
 	deviceType,
+	removedPanels,
+	blockInserterPanel,
+	listViewPanel,
+	listViewToggleRef,
 } );

@@ -3,7 +3,6 @@
  */
 import { h, options, createContext, cloneElement } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import { deepSignal } from 'deepsignal';
 import type { VNode, Context, RefObject } from 'preact';
 
 /**
@@ -60,8 +59,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	state: any;
-	props: any;
+	attributes: h.JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -142,11 +140,10 @@ export const getElement = () => {
 			'Cannot call `getElement()` outside getters and actions used by directives.'
 		);
 	}
-	const { ref, state, props } = getScope();
+	const { ref, attributes } = getScope();
 	return Object.freeze( {
 		ref: ref.current,
-		state,
-		props: deepImmutable( props ),
+		attributes: deepImmutable( attributes ),
 	} );
 };
 
@@ -158,6 +155,8 @@ export const setScope = ( scope: Scope ) => {
 export const resetScope = () => {
 	scopeStack.pop();
 };
+
+export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
 
 export const setNamespace = ( namespace: string ) => {
 	namespaceStack.push( namespace );
@@ -262,7 +261,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-const getEvaluate: GetEvaluate =
+export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
@@ -313,12 +312,12 @@ const Directives = ( {
 	scope.context = useContext( context );
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
-	scope.state = previousScope?.state || useRef( deepSignal( {} ) ).current;
 	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a fresh copy of the vnode element and add the props to the scope.
+	// Create a fresh copy of the vnode element and add the props to the scope,
+	// named as attributes (HTML Attributes).
 	element = cloneElement( element, { ref: scope.ref } );
-	scope.props = element.props;
+	scope.attributes = element.props;
 
 	// Recursively render the wrapper for the next priority level.
 	const children =

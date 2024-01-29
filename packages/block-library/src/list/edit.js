@@ -68,48 +68,40 @@ function useMigrateOnLoad( attributes, clientId ) {
 }
 
 function useOutdentList( clientId ) {
-	const { canOutdent } = useSelect(
-		( innerSelect ) => {
-			const { getBlockRootClientId, getBlock } =
-				innerSelect( blockEditorStore );
-			const parentId = getBlockRootClientId( clientId );
-			return {
-				canOutdent:
-					!! parentId &&
-					getBlock( parentId ).name === 'core/list-item',
-			};
-		},
-		[ clientId ]
-	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
 	const { getBlockRootClientId, getBlockAttributes, getBlock } =
 		useSelect( blockEditorStore );
 
-	return [
-		canOutdent,
-		useCallback( () => {
-			const parentBlockId = getBlockRootClientId( clientId );
-			const parentBlockAttributes = getBlockAttributes( parentBlockId );
-			// Create a new parent block without the inner blocks.
-			const newParentBlock = createBlock(
-				'core/list-item',
-				parentBlockAttributes
-			);
-			const { innerBlocks } = getBlock( clientId );
-			// Replace the parent block with a new parent block without inner blocks,
-			// and make the inner blocks siblings of the parent.
-			replaceBlocks(
-				[ parentBlockId ],
-				[ newParentBlock, ...innerBlocks ]
-			);
-			// Select the last child of the list being outdent.
-			selectionChange( innerBlocks[ innerBlocks.length - 1 ].clientId );
-		}, [ clientId ] ),
-	];
+	return useCallback( () => {
+		const parentBlockId = getBlockRootClientId( clientId );
+		const parentBlockAttributes = getBlockAttributes( parentBlockId );
+		// Create a new parent block without the inner blocks.
+		const newParentBlock = createBlock(
+			'core/list-item',
+			parentBlockAttributes
+		);
+		const { innerBlocks } = getBlock( clientId );
+		// Replace the parent block with a new parent block without inner blocks,
+		// and make the inner blocks siblings of the parent.
+		replaceBlocks( [ parentBlockId ], [ newParentBlock, ...innerBlocks ] );
+		// Select the last child of the list being outdent.
+		selectionChange( innerBlocks[ innerBlocks.length - 1 ].clientId );
+	}, [ clientId ] );
 }
 
 function IndentUI( { clientId } ) {
-	const [ canOutdent, outdentList ] = useOutdentList( clientId );
+	const outdentList = useOutdentList( clientId );
+	const canOutdent = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
+			return (
+				getBlockName( getBlockRootClientId( clientId ) ) ===
+				'core/list-item'
+			);
+		},
+		[ clientId ]
+	);
 	return (
 		<>
 			<ToolbarButton

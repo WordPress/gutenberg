@@ -8,7 +8,6 @@ import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
 	BlockToolbar,
-	BlockTools,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
@@ -120,15 +119,13 @@ export default function SidebarBlockEditor( {
 				{ ( isFixedToolbarActive || ! isMediumViewport ) && (
 					<BlockToolbar hideDragHandle />
 				) }
-				<BlockTools>
-					<BlockCanvas
-						shouldIframe={ false }
-						styles={ settings.defaultEditorStyles }
-						height="100%"
-					>
-						<BlockList renderAppender={ BlockAppender } />
-					</BlockCanvas>
-				</BlockTools>
+				<BlockCanvas
+					shouldIframe={ false }
+					styles={ settings.defaultEditorStyles }
+					height="100%"
+				>
+					<BlockList renderAppender={ BlockAppender } />
+				</BlockCanvas>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

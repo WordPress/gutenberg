@@ -27,6 +27,7 @@
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
+	// Controls height of editor and editor canvas container (style book, global styles revisions previews etc.)
 	iframe {
 		display: block;
 		width: 100%;
@@ -35,8 +36,6 @@
 	}
 
 	.edit-site-visual-editor__editor-canvas {
-		height: 100%;
-
 		&.is-focused {
 			outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
 			outline-offset: calc(-2 * var(--wp-admin-border-width-focus));

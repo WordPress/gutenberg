@@ -36,6 +36,7 @@ export async function initializeEditor( props, { component } = {} ) {
 		const {
 			screenWidth = 320,
 			withGlobalStyles = false,
+			initialTitle = 'test',
 			...rest
 		} = props || {};
 		const editorElement = component
@@ -44,7 +45,7 @@ export async function initializeEditor( props, { component } = {} ) {
 
 		const screen = render(
 			cloneElement( editorElement, {
-				initialTitle: 'test',
+				initialTitle,
 				...( withGlobalStyles ? getGlobalStyles() : {} ),
 				...rest,
 			} )

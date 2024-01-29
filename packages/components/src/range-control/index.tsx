@@ -328,7 +328,7 @@ function UnforwardedRangeControl(
 							className="components-range-control__reset"
 							disabled={ disabled || value === undefined }
 							variant="secondary"
-							isSmall
+							size="small"
 							onClick={ handleOnReset }
 						>
 							{ __( 'Reset' ) }

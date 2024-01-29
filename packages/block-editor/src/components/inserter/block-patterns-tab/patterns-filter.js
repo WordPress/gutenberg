@@ -16,11 +16,13 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { myPatternsCategory, SYNC_TYPES, PATTERN_TYPES } from './utils';
+import {
+	myPatternsCategory,
+	INSERTER_SYNC_TYPES,
+	INSERTER_PATTERN_TYPES,
+} from './utils';
 
-const getShouldDisableSyncFilter = ( sourceFilter ) =>
-	sourceFilter !== PATTERN_TYPES.all && sourceFilter !== PATTERN_TYPES.user;
-
+const getShouldDisableSyncFilter = ( sourceFilter ) => sourceFilter !== 'all';
 const getShouldDisableNonUserSources = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
@@ -39,7 +41,7 @@ export function PatternsFilter( {
 	// this filter themselves.
 	const currentPatternSourceFilter =
 		category.name === myPatternsCategory.name
-			? PATTERN_TYPES.user
+			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
 
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
@@ -56,11 +58,11 @@ export function PatternsFilter( {
 	const patternSyncMenuOptions = useMemo(
 		() => [
 			{
-				value: SYNC_TYPES.all,
+				value: 'all',
 				label: _x( 'All', 'Option that shows all patterns' ),
 			},
 			{
-				value: SYNC_TYPES.full,
+				value: INSERTER_SYNC_TYPES.full,
 				label: _x(
 					'Synced',
 					'Option that shows all synchronized patterns'
@@ -68,7 +70,7 @@ export function PatternsFilter( {
 				disabled: shouldDisableSyncFilter,
 			},
 			{
-				value: SYNC_TYPES.unsynced,
+				value: INSERTER_SYNC_TYPES.unsynced,
 				label: _x(
 					'Not synced',
 					'Option that shows all patterns that are not synchronized'
@@ -82,22 +84,22 @@ export function PatternsFilter( {
 	const patternSourceMenuOptions = useMemo(
 		() => [
 			{
-				value: PATTERN_TYPES.all,
+				value: 'all',
 				label: __( 'All' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
-				value: PATTERN_TYPES.directory,
+				value: INSERTER_PATTERN_TYPES.directory,
 				label: __( 'Pattern Directory' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
-				value: PATTERN_TYPES.theme,
+				value: INSERTER_PATTERN_TYPES.theme,
 				label: __( 'Theme & Plugins' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
-				value: PATTERN_TYPES.user,
+				value: INSERTER_PATTERN_TYPES.user,
 				label: __( 'User' ),
 			},
 		],
@@ -107,7 +109,7 @@ export function PatternsFilter( {
 	function handleSetSourceFilterChange( newSourceFilter ) {
 		setPatternSourceFilter( newSourceFilter );
 		if ( getShouldDisableSyncFilter( newSourceFilter ) ) {
-			setPatternSyncFilter( SYNC_TYPES.all );
+			setPatternSyncFilter( 'all' );
 		}
 	}
 

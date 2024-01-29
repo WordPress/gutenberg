@@ -178,6 +178,19 @@ export class RichTextData {
 	}
 }
 
+for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
+	if ( RichTextData.prototype.hasOwnProperty( name ) ) {
+		continue;
+	}
+
+	Object.defineProperty( RichTextData.prototype, name, {
+		value( ...args ) {
+			// Should we convert back to RichTextData?
+			return this.toHTMLString()[ name ]( ...args );
+		},
+	} );
+}
+
 /**
  * Create a RichText value from an `Element` tree (DOM), an HTML string or a
  * plain text string, with optionally a `Range` object to set the selection. If

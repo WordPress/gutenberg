@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'tovdom-islands-view' );
+wp_enqueue_script_module( 'tovdom-islands-view' );
 ?>
 
 <div>
@@ -66,6 +66,18 @@ gutenberg_enqueue_module( 'tovdom-islands-view' );
 					</span>
 				</div>
 			</div>
+		</div>
+	</div>
+
+
+
+	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
+		<div data-wp-interactive='{ "namespace": "something-new" }'></div>
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="directive after different namespace">
+				The directive above should keep the `tovdom-island` namespace,
+				so this message should not be visible.
+			</span>
 		</div>
 	</div>
 </div>

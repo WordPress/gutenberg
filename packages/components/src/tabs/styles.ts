@@ -22,7 +22,9 @@ export const TabListWrapper = styled.div`
 `;
 
 export const Tab = styled( Ariakit.Tab )`
-	&& {
+	& {
+		display: inline-flex;
+		align-items: center;
 		position: relative;
 		border-radius: 0;
 		height: ${ space( 12 ) };
@@ -37,6 +39,10 @@ export const Tab = styled( Ariakit.Tab )`
 		&[aria-disabled='true'] {
 			cursor: default;
 			opacity: 0.3;
+		}
+
+		&:hover {
+			color: ${ COLORS.theme.accent };
 		}
 
 		&:focus:not( :disabled ) {

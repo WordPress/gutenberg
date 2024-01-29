@@ -6,9 +6,9 @@ Although technically, blocks could be registered only in the client, **registeri
 
 For example, to allow a block [to be styled via `theme.json`](https://developer.wordpress.org/themes/global-settings-and-styles/settings/blocks/), it needs to be registered on the server, otherwise, any styles assigned to it in `theme.json` will be ignored. 
 
-[![Open Block Registration diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://excalidraw.com/#json=PUQu7jpvbKsUHYfpHWn7s,61QnhpZtjykp3s44lbUN_g "Open Block Registration diagram in excalidraw")
+[![Open Block Registration diagram image](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png "Open Block Registration diagram image")
 
-### Registration of the block with PHP (server-side)
+## Registration of the block with PHP (server-side)
 
 Block registration on the server usually takes place in the main plugin PHP file with the `register_block_type` function called on the [init hook](https://developer.wordpress.org/reference/hooks/init/).
 
@@ -44,7 +44,7 @@ add_action( 'init', 'minimal_block_ca6eda___register_block' );
 ```
 _See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php)_
 
-### Registration of the block with JavaScript (client-side)
+## Registration of the block with JavaScript (client-side)
 
 When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
 
@@ -69,6 +69,7 @@ The content of <code>block.json</code> (or any other <code>.json</code> file) ca
 </div>
 
 The client-side block settings object passed as a second parameter includes two especially relevant properties:
+
 - `edit`: The React component that gets used in the editor for our block.
 - `save`: The function that returns the static HTML markup that gets saved to the Database. 
 
@@ -96,3 +97,4 @@ _See the [code above](https://github.com/WordPress/block-development-examples/bl
 - [`register_block_type` PHP function](https://developer.wordpress.org/reference/functions/register_block_type/)
 - [`registerBlockType` JS function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype)
 - [Why a block needs to be registered in both the server and the client?](https://github.com/WordPress/gutenberg/discussions/55884) | GitHub Discussion
+- [Block Registration diagram](https://excalidraw.com/#json=PUQu7jpvbKsUHYfpHWn7s,61QnhpZtjykp3s44lbUN_g)

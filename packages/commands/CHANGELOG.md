@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.21.0 (2024-01-24)
+
+## 0.20.0 (2024-01-10)
+
+## Enhancements
+
+-   Support conditional commands and commands loaders using the "disabled" config.
+
+## 0.19.0 (2023-12-13)
+
 ## 0.18.0 (2023-11-29)
 
 ## 0.17.0 (2023-11-16)

@@ -28,6 +28,11 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	EFFECTS_SUPPORT_KEYS,
+	SHADOW_SUPPORT_KEY,
+	EffectsPanel,
+} from './effects';
+import {
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
@@ -37,6 +42,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	...EFFECTS_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
@@ -110,6 +116,7 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
+	[ `${ SHADOW_SUPPORT_KEY }` ]: [ SHADOW_SUPPORT_KEY ],
 };
 
 /**
@@ -126,10 +133,14 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: [
+		`${ DIMENSIONS_SUPPORT_KEY }.aspectRatio`,
+	], // Skip serialization of aspect ratio in save mode.
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
 };
 
 const skipSerializationPathsSaveChecks = {
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
 };
 
@@ -269,20 +280,20 @@ export function omitStyle( style, paths, preserveReference = false ) {
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object}                    props      Additional props applied to save element.
- * @param {Object}                    blockType  Block type.
- * @param {Object}                    attributes Block attributes.
- * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
+ * @param {Object}                    props           Additional props applied to save element.
+ * @param {Object|string}             blockNameOrType Block type.
+ * @param {Object}                    attributes      Block attributes.
+ * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
 	props,
-	blockType,
+	blockNameOrType,
 	attributes,
 	skipPaths = skipSerializationPathsSave
 ) {
-	if ( ! hasStyleSupport( blockType ) ) {
+	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
 	}
 
@@ -290,7 +301,7 @@ export function addSaveProps(
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization =
 			skipSerializationPathsSaveChecks[ indicator ] ||
-			getBlockSupport( blockType, indicator );
+			getBlockSupport( blockNameOrType, indicator );
 
 		if ( skipSerialization === true ) {
 			style = omitStyle( style, path );
@@ -310,37 +321,6 @@ export function addSaveProps(
 	};
 
 	return props;
-}
-
-/**
- * Filters registered block settings to extend the block edit wrapper
- * to apply the desired styles and classnames properly.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object}.Filtered block settings.
- */
-export function addEditProps( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-
-		return addSaveProps(
-			props,
-			settings,
-			attributes,
-			skipSerializationPathsEdit
-		);
-	};
-
-	return settings;
 }
 
 function BlockStyleControls( {
@@ -367,6 +347,7 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
+			<EffectsPanel { ...passedProps } />
 		</>
 	);
 }
@@ -374,6 +355,7 @@ function BlockStyleControls( {
 export default {
 	edit: BlockStyleControls,
 	hasSupport: hasStyleSupport,
+	addSaveProps,
 	attributeKeys: [ 'style' ],
 	useBlockProps,
 };
@@ -472,23 +454,17 @@ function useBlockProps( { name, style } ) {
 	}, [ baseElementSelector, blockElementStyles, name ] );
 
 	useStyleOverride( { css: styles } );
-	return { className: blockElementsContainerIdentifier };
+
+	return addSaveProps(
+		{ className: blockElementsContainerIdentifier },
+		name,
+		{ style },
+		skipSerializationPathsEdit
+	);
 }
 
 addFilter(
 	'blocks.registerBlockType',
 	'core/style/addAttribute',
 	addAttribute
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/style/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/style/addEditProps',
-	addEditProps
 );

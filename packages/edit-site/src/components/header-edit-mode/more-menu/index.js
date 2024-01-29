@@ -15,6 +15,7 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -37,14 +38,15 @@ import { store as siteEditorStore } from '../../../store';
 export default function MoreMenu( { showIconLabels } ) {
 	const registry = useRegistry();
 
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( siteEditorStore );
+	const { closeGeneralSidebar } = useDispatch( siteEditorStore );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-site', 'fixedToolbar', true );
+			setPreference( 'core', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
@@ -52,7 +54,7 @@ export default function MoreMenu( { showIconLabels } ) {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-site', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	return (
@@ -67,7 +69,7 @@ export default function MoreMenu( { showIconLabels } ) {
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="fixedToolbar"
 								onToggle={ turnOffDistractionFree }
 								label={ __( 'Top toolbar' ) }
@@ -82,7 +84,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="distractionFree"
 								onToggle={ toggleDistractionFree }
 								label={ __( 'Distraction free' ) }
@@ -98,7 +100,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="focusMode"
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }

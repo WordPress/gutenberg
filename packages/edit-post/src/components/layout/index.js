@@ -16,6 +16,7 @@ import {
 	EditorSnackbars,
 	PostSyncStatusModal,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -38,12 +39,9 @@ import {
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
-
+import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
-
-const { useCommands } = unlock( coreCommandsPrivateApis );
-const { useCommandContext } = unlock( commandsPrivateApis );
 
 /**
  * Internal dependencies
@@ -55,8 +53,6 @@ import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
-import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
@@ -67,6 +63,9 @@ import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
+const { useCommands } = unlock( coreCommandsPrivateApis );
+const { useCommandContext } = unlock( commandsPrivateApis );
+const { InserterSidebar, ListViewSidebar } = unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -142,9 +141,10 @@ function Layout() {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
+	const { openGeneralSidebar, closeGeneralSidebar } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -161,7 +161,9 @@ function Layout() {
 		showBlockBreadcrumbs,
 		showMetaBoxes,
 		documentLabel,
+		hasHistory,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
@@ -176,8 +178,8 @@ function Layout() {
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
-			isListViewOpened: select( editPostStore ).isListViewOpened(),
+			isInserterOpened: select( editorStore ).isInserterOpened(),
+			isListViewOpened: select( editorStore ).isListViewOpened(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -187,17 +189,14 @@ function Layout() {
 			nextShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
-			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
-				'showBlockBreadcrumbs'
-			),
+			showIconLabels: get( 'core', 'showIconLabels' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
-				select( blockEditorStore ).getBlockSelectionStart(),
+				!! select( blockEditorStore ).getBlockSelectionStart(),
+			hasHistory: !! getEditorSettings().goBack,
 		};
 	}, [] );
 
@@ -230,9 +229,6 @@ function Layout() {
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
-
-	const [ listViewToggleElement, setListViewToggleElement ] =
-		useState( null );
 
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
@@ -267,11 +263,7 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return (
-				<ListViewSidebar
-					listViewToggleElement={ listViewToggleElement }
-				/>
-			);
+			return <ListViewSidebar />;
 		}
 
 		return null;
@@ -292,7 +284,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<BrowserURL />
+			<BrowserURL hasHistory={ hasHistory } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
@@ -312,7 +304,6 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
-						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }

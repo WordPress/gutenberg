@@ -24,6 +24,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -31,6 +32,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -220,7 +224,7 @@ export default function CoverInspectorControls( {
 						<PanelRow>
 							<Button
 								variant="secondary"
-								isSmall
+								size="small"
 								className="block-library-cover__reset-button"
 								onClick={ onClearMedia }
 							>
@@ -306,7 +310,16 @@ export default function CoverInspectorControls( {
 						value={ minHeight }
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
+							setAttributes( {
+								minHeight: newMinHeight,
+								style: cleanEmptyObject( {
+									...attributes?.style,
+									dimensions: {
+										...attributes?.style?.dimensions,
+										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+									},
+								} ),
+							} )
 						}
 						onUnitChange={ ( nextUnit ) =>
 							setAttributes( {

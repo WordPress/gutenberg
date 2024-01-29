@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHeading as Heading,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -18,8 +15,11 @@ import { DataViews } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
-import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
+import { default as Link, useLink } from '../routes/link';
+import {
+	DEFAULT_VIEWS,
+	DEFAULT_CONFIG_PER_VIEW_TYPE,
+} from '../sidebar-dataviews/default-views';
 import {
 	ENUMERATION_TYPE,
 	LAYOUT_GRID,
@@ -37,31 +37,35 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
-import SideEditor from './side-editor';
+import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-const { useLocation } = unlock( routerPrivateApis );
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'featured-image',
-		primaryField: 'title',
-	},
-	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'featured-image',
-	},
-};
+const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
+	? [ LAYOUT_GRID, LAYOUT_TABLE, LAYOUT_LIST ]
+	: [ LAYOUT_GRID, LAYOUT_TABLE ];
 
-function useView( type ) {
-	const {
-		params: { activeView = 'all', isCustom = 'false' },
-	} = useLocation();
-	const selectedDefaultView =
-		isCustom === 'false' &&
-		DEFAULT_VIEWS[ type ].find( ( { slug } ) => slug === activeView )?.view;
+function useView( postType ) {
+	const { params } = useLocation();
+	const { activeView = 'all', isCustom = 'false', layout } = params;
+	const history = useHistory();
+	const selectedDefaultView = useMemo( () => {
+		const defaultView =
+			isCustom === 'false' &&
+			DEFAULT_VIEWS[ postType ].find(
+				( { slug } ) => slug === activeView
+			)?.view;
+		if ( isCustom === 'false' && layout ) {
+			return {
+				...defaultView,
+				type: layout,
+			};
+		}
+		return defaultView;
+	}, [ isCustom, activeView, layout, postType ] );
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
@@ -87,10 +91,21 @@ function useView( type ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const customView = useMemo( () => {
-		return (
-			editedViewRecord?.content && JSON.parse( editedViewRecord?.content )
-		);
+		const storedView =
+			editedViewRecord?.content &&
+			JSON.parse( editedViewRecord?.content );
+		if ( ! storedView ) {
+			return storedView;
+		}
+
+		return {
+			...storedView,
+			layout: {
+				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
+			},
+		};
 	}, [ editedViewRecord?.content ] );
+
 	const setCustomView = useCallback(
 		( viewToSet ) => {
 			editEntityRecord(
@@ -105,13 +120,26 @@ function useView( type ) {
 		[ editEntityRecord, editedViewRecord?.id ]
 	);
 
+	const setDefaultViewAndUpdateUrl = useCallback(
+		( viewToSet ) => {
+			if ( viewToSet.type !== view?.type ) {
+				history.push( {
+					...params,
+					layout: viewToSet.type,
+				} );
+			}
+			setView( viewToSet );
+		},
+		[ params, view?.type, history ]
+	);
+
 	if ( isCustom === 'false' ) {
-		return [ view, setView ];
+		return [ view, setDefaultViewAndUpdateUrl ];
 	} else if ( isCustom === 'true' && customView ) {
 		return [ customView, setCustomView ];
 	}
 	// Loading state where no the view was not found on custom views or default views.
-	return [ DEFAULT_VIEWS[ type ][ 0 ].view, setView ];
+	return [ DEFAULT_VIEWS[ postType ][ 0 ].view, setDefaultViewAndUpdateUrl ];
 }
 
 // See https://github.com/WordPress/gutenberg/issues/55886
@@ -126,13 +154,60 @@ const STATUSES = [
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
+function FeaturedImage( { item, viewType } ) {
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+	const hasMedia = !! item.featured_media;
+	return (
+		<span
+			className={ {
+				'edit-site-page-pages__media-wrapper':
+					viewType === LAYOUT_TABLE,
+			} }
+		>
+			<button
+				className="page-pages-preview-field__button"
+				type="button"
+				onClick={ onClick }
+				aria-label={ item.title?.rendered || __( '(no title)' ) }
+			>
+				{ hasMedia && (
+					<Media
+						className="edit-site-page-pages__featured-image"
+						id={ item.featured_media }
+						size={
+							viewType === LAYOUT_GRID
+								? [ 'large', 'full', 'medium', 'thumbnail' ]
+								: [ 'thumbnail', 'medium', 'large', 'full' ]
+						}
+					/>
+				) }
+			</button>
+		</span>
+	);
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
-	const [ pageId, setPageId ] = useState( null );
+	const history = useHistory();
+	const { params } = useLocation();
+	const { isCustom = 'false' } = params;
 
-	const onSelectionChange = ( items ) =>
-		setPageId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) => {
+			if ( isCustom === 'false' && view?.type === LAYOUT_LIST ) {
+				history.push( {
+					...params,
+					postId: items.length === 1 ? items[ 0 ].id : undefined,
+				} );
+			}
+		},
+		[ history, params, view?.type, isCustom ]
+	);
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -195,52 +270,35 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item } ) =>
-					!! item.featured_media ? (
-						<Media
-							className="edit-site-page-pages__featured-image"
-							id={ item.featured_media }
-							size={
-								view.type === LAYOUT_GRID
-									? [ 'large', 'full', 'medium', 'thumbnail' ]
-									: [ 'thumbnail', 'medium', 'large', 'full' ]
-							}
-						/>
-					) : null,
+				render: ( { item } ) => (
+					<FeaturedImage item={ item } viewType={ view.type } />
+				),
 				enableSorting: false,
 			},
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 } weight={ 500 }>
-								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-									view.type
-								) ? (
-									<Link
-										params={ {
-											postId: item.id,
-											postType: item.type,
-											canvas: 'edit',
-										} }
-									>
-										{ decodeEntities(
-											item.title?.rendered || item.slug
-										) || __( '(no title)' ) }
-									</Link>
-								) : (
-									decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' )
-								) }
-							</Heading>
-						</VStack>
+					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
+						view.type
+					) ? (
+						<Link
+							params={ {
+								postId: item.id,
+								postType: item.type,
+								canvas: 'edit',
+							} }
+						>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+						</Link>
+					) : (
+						decodeEntities( item.title?.rendered ) ||
+							__( '(no title)' )
 					);
 				},
-				maxWidth: 400,
+				maxWidth: 300,
 				enableHiding: false,
 			},
 			{
@@ -280,7 +338,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors, view ]
+		[ authors, view.type ]
 	);
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
@@ -298,66 +356,73 @@ export default function PagePages() {
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
+	);
+
+	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
+	const openModal = useCallback( () => {
+		if ( ! showAddPageModal ) {
+			setShowAddPageModal( true );
+		}
+	}, [ showAddPageModal ] );
+	const closeModal = useCallback( () => {
+		if ( showAddPageModal ) {
+			setShowAddPageModal( false );
+		}
+	}, [ showAddPageModal ] );
+	const handleNewPage = useCallback(
+		( { type, id } ) => {
+			history.push( {
+				postId: id,
+				postType: type,
+				canvas: 'edit',
+			} );
+			closeModal();
+		},
+		[ history ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
-		<>
-			<Page title={ __( 'Pages' ) }>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					actions={ actions }
-					data={ pages || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.id }
-					isLoading={ isLoadingPages || isLoadingAuthors }
-					view={ view }
-					onChangeView={ onChangeView }
-					onSelectionChange={ onSelectionChange }
-					deferredRendering={ false }
-				/>
-			</Page>
-			{ view.type === LAYOUT_LIST && (
-				<Page>
-					<div className="edit-site-page-pages-preview">
-						{ pageId !== null ? (
-							<SideEditor
-								postId={ pageId }
-								postType={ postType }
-							/>
-						) : (
-							<div
-								style={ {
-									display: 'flex',
-									flexDirection: 'column',
-									justifyContent: 'center',
-									textAlign: 'center',
-									height: '100%',
-								} }
-							>
-								<p>{ __( 'Select a page to preview' ) }</p>
-							</div>
-						) }
-					</div>
-				</Page>
-			) }
-		</>
+		<Page
+			title={ __( 'Pages' ) }
+			actions={
+				<>
+					<Button variant="primary" onClick={ openModal }>
+						{ __( 'Add new page' ) }
+					</Button>
+					{ showAddPageModal && (
+						<AddNewPageModal
+							onSave={ handleNewPage }
+							onClose={ closeModal }
+						/>
+					) }
+				</>
+			}
+		>
+			<DataViews
+				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
+				data={ pages || EMPTY_ARRAY }
+				isLoading={ isLoadingPages || isLoadingAuthors }
+				view={ view }
+				onChangeView={ onChangeView }
+				onSelectionChange={ onSelectionChange }
+				supportedLayouts={ SUPPORTED_LAYOUTS }
+			/>
+		</Page>
 	);
 }

@@ -51,48 +51,6 @@ export function editedPost( state = {}, action ) {
 }
 
 /**
- * Reducer to set the block inserter panel open or closed.
- *
- * Note: this reducer interacts with the navigation and list view panels reducers
- * to make sure that only one of the three panels is open at the same time.
- *
- * @param {boolean|Object} state  Current state.
- * @param {Object}         action Dispatched action.
- */
-export function blockInserterPanel( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_IS_LIST_VIEW_OPENED':
-			return action.isOpen ? false : state;
-		case 'SET_IS_INSERTER_OPENED':
-			return action.value;
-		case 'SET_CANVAS_MODE':
-			return false;
-	}
-	return state;
-}
-
-/**
- * Reducer to set the list view panel open or closed.
- *
- * Note: this reducer interacts with the navigation and inserter panels reducers
- * to make sure that only one of the three panels is open at the same time.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- */
-export function listViewPanel( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_IS_INSERTER_OPENED':
-			return action.value ? false : state;
-		case 'SET_IS_LIST_VIEW_OPENED':
-			return action.isOpen;
-		case 'SET_CANVAS_MODE':
-			return false;
-	}
-	return state;
-}
-
-/**
  * Reducer to set the save view panel open or closed.
  *
  * @param {Object} state  Current state.
@@ -143,8 +101,6 @@ function editorCanvasContainerView( state = undefined, action ) {
 export default combineReducers( {
 	settings,
 	editedPost,
-	blockInserterPanel,
-	listViewPanel,
 	saveViewPanel,
 	canvasMode,
 	editorCanvasContainerView,

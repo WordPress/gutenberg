@@ -143,11 +143,14 @@ test.describe( 'Pages', () => {
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Site title text' } )
+			.click( { force: true } );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Site title text' } )
 			.fill( 'New Site Title' );
 
 		// Go back to page editing focus.
 		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'region', { name: 'Editor content' } )
 			.getByRole( 'button', { name: 'Back' } )
 			.click();
 
@@ -196,15 +199,15 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		const templatePreviewButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByRole( 'menuitem', { name: 'Template preview' } );
+			.getByRole( 'menuitemcheckbox', { name: 'Template preview' } );
 
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'true'
 		);
 		await templatePreviewButton.click();
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'false'
 		);
 
@@ -229,7 +232,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		await templatePreviewButton.click();
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'true'
 		);
 

@@ -38,16 +38,10 @@ export default function BlockToolbarPopover( {
 	const { stopTyping } = useDispatch( blockEditorStore );
 	const isToolbarForced = useRef( false );
 
-	useShortcut(
-		'core/block-editor/focus-toolbar',
-		() => {
-			isToolbarForced.current = true;
-			stopTyping( true );
-		},
-		{
-			isDisabled: false,
-		}
-	);
+	useShortcut( 'core/block-editor/focus-toolbar', () => {
+		isToolbarForced.current = true;
+		stopTyping( true );
+	} );
 
 	useEffect( () => {
 		isToolbarForced.current = false;

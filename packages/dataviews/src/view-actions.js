@@ -3,24 +3,25 @@
  */
 import {
 	Button,
-	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { chevronRightSmall, check, arrowUp, arrowDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { memo } from '@wordpress/element';
+import { settings } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import { VIEW_LAYOUTS, SORTING_DIRECTIONS } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
+	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
@@ -35,86 +36,81 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 	}
 	const activeView = _availableViews.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
+				<DropdownMenuItem
 					suffix={
-						<>
-							{ activeView.label }
-							<Icon icon={ chevronRightSmall } />
-						</>
+						<span aria-hidden="true">{ activeView.label }</span>
 					}
 				>
-					{ __( 'Layout' ) }
-				</DropdownSubMenuTrigger>
+					<DropdownMenuItemLabel>
+						{ __( 'Layout' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			}
 		>
 			{ _availableViews.map( ( availableView ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuRadioItem
 						key={ availableView.type }
-						role="menuitemradio"
-						aria-checked={ availableView.id === view.type }
-						prefix={
-							availableView.type === view.type && (
-								<Icon icon={ check } />
-							)
-						}
-						onSelect={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
+						value={ availableView.type }
+						name="view-actions-available-view"
+						checked={ availableView.type === view.type }
+						hideOnClick={ true }
+						onChange={ ( e ) => {
 							onChangeView( {
 								...view,
-								type: availableView.type,
+								type: e.target.value,
 							} );
 						} }
 					>
-						{ availableView.label }
-					</DropdownMenuItem>
+						<DropdownMenuItemLabel>
+							{ availableView.label }
+						</DropdownMenuItemLabel>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
 const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
-					suffix={
-						<>
-							{ view.perPage }
-							<Icon icon={ chevronRightSmall } />
-						</>
-					}
+				<DropdownMenuItem
+					suffix={ <span aria-hidden="true">{ view.perPage }</span> }
 				>
-					{ /* TODO: probably label per view type. */ }
-					{ __( 'Rows per page' ) }
-				</DropdownSubMenuTrigger>
+					<DropdownMenuItemLabel>
+						{ /* TODO: probably label per view type. */ }
+						{ __( 'Rows per page' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			}
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuRadioItem
 						key={ size }
-						role="menuitemradio"
-						aria-checked={ view.perPage === size }
-						prefix={
-							view.perPage === size && <Icon icon={ check } />
-						}
-						onSelect={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
-							onChangeView( { ...view, perPage: size, page: 1 } );
+						value={ size }
+						name="view-actions-page-size"
+						checked={ view.perPage === size }
+						onChange={ () => {
+							onChangeView( {
+								...view,
+								// `e.target.value` holds the same value as `size` but as a string,
+								// so we use `size` directly to avoid parsing to int.
+								perPage: size,
+								page: 1,
+							} );
 						} }
 					>
-						{ size }
-					</DropdownMenuItem>
+						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
@@ -127,27 +123,22 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 		return null;
 	}
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
-					suffix={ <Icon icon={ chevronRightSmall } /> }
-				>
-					{ __( 'Fields' ) }
-				</DropdownSubMenuTrigger>
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>
+						{ __( 'Fields' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			}
 		>
 			{ hidableFields?.map( ( field ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuCheckboxItem
 						key={ field.id }
-						role="menuitemcheckbox"
-						prefix={
-							! view.hiddenFields?.includes( field.id ) && (
-								<Icon icon={ check } />
-							)
-						}
-						onSelect={ ( event ) => {
-							event.preventDefault();
+						value={ field.id }
+						checked={ ! view.hiddenFields?.includes( field.id ) }
+						onChange={ () => {
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields?.includes(
@@ -163,19 +154,16 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 							} );
 						} }
 					>
-						{ field.header }
-					</DropdownMenuItem>
+						<DropdownMenuItemLabel>
+							{ field.header }
+						</DropdownMenuItemLabel>
+					</DropdownMenuCheckboxItem>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
-// This object is used to construct the sorting options per sortable field.
-const sortingItemsInfo = {
-	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
-	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
-};
 function SortMenu( { fields, view, onChangeView } ) {
 	const sortableFields = fields.filter(
 		( field ) => field.enableSorting !== false
@@ -187,82 +175,82 @@ function SortMenu( { fields, view, onChangeView } ) {
 		( field ) => field.id === view.sort?.field
 	);
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
+				<DropdownMenuItem
 					suffix={
-						<>
+						<span aria-hidden="true">
 							{ currentSortedField?.header }
-							<Icon icon={ chevronRightSmall } />
-						</>
+						</span>
 					}
 				>
-					{ __( 'Sort by' ) }
-				</DropdownSubMenuTrigger>
+					<DropdownMenuItemLabel>
+						{ __( 'Sort by' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			}
 		>
 			{ sortableFields?.map( ( field ) => {
 				const sortedDirection = view.sort?.direction;
 				return (
-					<DropdownSubMenu
+					<DropdownMenu
 						key={ field.id }
 						trigger={
-							<DropdownSubMenuTrigger
-								suffix={ <Icon icon={ chevronRightSmall } /> }
-							>
-								{ field.header }
-							</DropdownSubMenuTrigger>
+							<DropdownMenuItem>
+								<DropdownMenuItemLabel>
+									{ field.header }
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
 						}
-						side="left"
+						style={ {
+							minWidth: '220px',
+						} }
 					>
-						{ Object.entries( sortingItemsInfo ).map(
+						{ Object.entries( SORTING_DIRECTIONS ).map(
 							( [ direction, info ] ) => {
-								const isActive =
-									currentSortedField &&
+								const isChecked =
+									currentSortedField !== undefined &&
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
+
+								const value = `${ field.id }-${ direction }`;
+
 								return (
-									<DropdownMenuItem
-										key={ direction }
-										role="menuitemradio"
-										aria-checked={ isActive }
-										prefix={ <Icon icon={ info.icon } /> }
-										suffix={
-											isActive && <Icon icon={ check } />
-										}
-										onSelect={ ( event ) => {
-											event.preventDefault();
-											if (
-												sortedDirection === direction
-											) {
-												onChangeView( {
-													...view,
-													sort: undefined,
-												} );
-											} else {
-												onChangeView( {
-													...view,
-													sort: {
-														field: field.id,
-														direction,
-													},
-												} );
-											}
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-actions-sorting"
+										value={ value }
+										checked={ isChecked }
+										onChange={ () => {
+											onChangeView( {
+												...view,
+												sort: {
+													field: field.id,
+													direction,
+												},
+											} );
 										} }
 									>
-										{ info.label }
-									</DropdownMenuItem>
+										<DropdownMenuItemLabel>
+											{ info.label }
+										</DropdownMenuItemLabel>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }
-					</DropdownSubMenu>
+					</DropdownMenu>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
-export default function ViewActions( {
+const ViewActions = memo( function ViewActions( {
 	fields,
 	view,
 	onChangeView,
@@ -272,14 +260,8 @@ export default function ViewActions( {
 		<DropdownMenu
 			trigger={
 				<Button
-					variant="tertiary"
 					size="compact"
-					icon={
-						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-							?.icon ||
-						VIEW_LAYOUTS.find( ( v ) => v.type === LAYOUT_TABLE )
-							.icon
-					}
+					icon={ settings }
 					label={ __( 'View options' ) }
 				/>
 			}
@@ -304,4 +286,6 @@ export default function ViewActions( {
 			</DropdownMenuGroup>
 		</DropdownMenu>
 	);
-}
+} );
+
+export default ViewActions;

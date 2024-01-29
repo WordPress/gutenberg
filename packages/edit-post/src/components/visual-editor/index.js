@@ -10,8 +10,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { BlockTools } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -31,6 +30,7 @@ export default function VisualEditor( { styles } ) {
 		renderingMode,
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
 		const { getEditorSettings, getRenderingMode } = select( editorStore );
@@ -44,6 +44,8 @@ export default function VisualEditor( { styles } ) {
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
 			} ),
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
@@ -58,8 +60,6 @@ export default function VisualEditor( { styles } ) {
 	if ( ! hasMetaBoxes && renderingMode === 'post-only' ) {
 		paddingBottom = '40vh';
 	}
-
-	const ref = useRef();
 
 	styles = useMemo(
 		() => [
@@ -77,24 +77,21 @@ export default function VisualEditor( { styles } ) {
 	const isToBeIframed =
 		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 			! hasMetaBoxes ) ||
-		renderingMode === 'template-only';
+		isEditingTemplate;
 
 	return (
-		<BlockTools
-			__unstableContentRef={ ref }
+		<div
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode': renderingMode === 'template-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
 			<EditorCanvas
-				ref={ ref }
 				disableIframe={ ! isToBeIframed }
 				styles={ styles }
 				// We should auto-focus the canvas (title) on load.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus={ ! isWelcomeGuideVisible }
 			/>
-		</BlockTools>
+		</div>
 	);
 }

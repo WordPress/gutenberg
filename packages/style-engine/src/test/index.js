@@ -224,6 +224,14 @@ describe( 'getCSSRules', () => {
 		expect(
 			getCSSRules(
 				{
+					background: {
+						backgroundImage: {
+							source: 'file',
+							url: 'https://example.com/image.jpg',
+						},
+						backgroundRepeat: 'no-repeat',
+						backgroundSize: '300px',
+					},
 					color: {
 						text: '#dddddd',
 						background: '#555555',
@@ -371,6 +379,21 @@ describe( 'getCSSRules', () => {
 				key: 'boxShadow',
 				value: '10px 10px red',
 			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "url( 'https://example.com/image.jpg' )",
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundRepeat',
+				value: 'no-repeat',
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundSize',
+				value: '300px',
+			},
 		] );
 	} );
 
@@ -397,6 +420,70 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector a',
 				key: 'padding',
 				value: '11px',
+			},
+		] );
+	} );
+
+	it( 'should output fallback cover background size when no size is provided', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundImage: {
+							source: 'file',
+							url: 'https://example.com/image.jpg',
+						},
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "url( 'https://example.com/image.jpg' )",
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundSize',
+				value: 'cover',
+			},
+		] );
+	} );
+
+	it( 'should output fallback center position for contain background size', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundImage: {
+							source: 'file',
+							url: 'https://example.com/image.jpg',
+						},
+						backgroundSize: 'contain',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "url( 'https://example.com/image.jpg' )",
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundSize',
+				value: 'contain',
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundPosition',
+				value: 'center',
 			},
 		] );
 	} );

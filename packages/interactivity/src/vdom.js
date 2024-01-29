@@ -10,7 +10,8 @@ import { directivePrefix as p } from './constants';
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
-let namespace = null;
+const namespaces = [];
+const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -42,7 +43,7 @@ export function toVdom( root ) {
 	);
 
 	function walk( node ) {
-		const { attributes, nodeType } = node;
+		const { attributes, nodeType, localName } = node;
 
 		if ( nodeType === 3 ) return [ node.data ];
 		if ( nodeType === 4 ) {
@@ -79,7 +80,7 @@ export function toVdom( root ) {
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
-						namespace = value?.namespace ?? null;
+						namespaces.push( value?.namespace ?? null );
 					} else {
 						directives.push( [ n, ns, value ] );
 					}
@@ -92,7 +93,7 @@ export function toVdom( root ) {
 
 		if ( ignore && ! island )
 			return [
-				h( node.localName, {
+				h( localName, {
 					...props,
 					innerHTML: node.innerHTML,
 					__directives: { ignore: true },
@@ -107,7 +108,7 @@ export function toVdom( root ) {
 						directiveParser.exec( name );
 					if ( ! obj[ prefix ] ) obj[ prefix ] = [];
 					obj[ prefix ].push( {
-						namespace: ns ?? namespace,
+						namespace: ns ?? currentNamespace(),
 						value,
 						suffix,
 					} );
@@ -117,17 +118,26 @@ export function toVdom( root ) {
 			);
 		}
 
-		let child = treeWalker.firstChild();
-		if ( child ) {
-			while ( child ) {
-				const [ vnode, nextChild ] = walk( child );
-				if ( vnode ) children.push( vnode );
-				child = nextChild || treeWalker.nextSibling();
+		if ( localName === 'template' ) {
+			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
+				toVdom( childNode )
+			);
+		} else {
+			let child = treeWalker.firstChild();
+			if ( child ) {
+				while ( child ) {
+					const [ vnode, nextChild ] = walk( child );
+					if ( vnode ) children.push( vnode );
+					child = nextChild || treeWalker.nextSibling();
+				}
+				treeWalker.parentNode();
 			}
-			treeWalker.parentNode();
 		}
 
-		return [ h( node.localName, props, children ) ];
+		// Restore previous namespace.
+		if ( island ) namespaces.pop();
+
+		return [ h( localName, props, children ) ];
 	}
 
 	return walk( treeWalker.currentNode );

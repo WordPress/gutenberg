@@ -21,14 +21,13 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript
+        name: JavaScript (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
         strategy:
             fail-fast: false
             matrix:
-                node: ['16']
+                node: ['20', '21']
 
         steps:
             - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -40,7 +39,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Npm build
+            - name: npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.

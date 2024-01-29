@@ -6,11 +6,6 @@ TabPanels organize content across different screens, data sets, and interactions
 
 ![The “Document” tab selected in the sidebar TabPanel.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541785098230_TabPanel.png)
 
-## Table of contents
-
-1. Design guidelines
-2. Development guidelines
-
 ## Design guidelines
 
 ### Usage

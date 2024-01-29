@@ -21,3 +21,13 @@
 		border-radius: 0;
 	}
 }
+
+// Needs specificity, because this panel is just a button
+.components-panel__body.is-opened.editor-post-last-revision__panel {
+	padding: 0;
+	height: $grid-unit-60;
+
+	.editor-post-last-revision__title.components-button.components-button {
+		padding: $grid-unit-20;
+	}
+}

@@ -36,6 +36,7 @@ import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 import { deleteAllPatternCategories } from './patterns';
+import { setGutenbergExperiments } from './gutenberg-experiments';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -205,6 +206,9 @@ class RequestUtils {
 		getThemeGlobalStylesRevisions.bind( this );
 	/** @borrows deleteAllPatternCategories as this.deleteAllPatternCategories */
 	deleteAllPatternCategories = deleteAllPatternCategories.bind( this );
+	/** @borrows setGutenbergExperiments as this.setGutenbergExperiments */
+	setGutenbergExperiments: typeof setGutenbergExperiments =
+		setGutenbergExperiments.bind( this );
 }
 
 export type { StorageState };

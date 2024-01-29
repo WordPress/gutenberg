@@ -9,6 +9,7 @@ import removeAccents from 'remove-accents';
  */
 import {
 	RichText,
+	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -52,30 +53,34 @@ export default function save( { attributes } ) {
 	);
 	const TagName = type === 'textarea' ? 'textarea' : 'input';
 
+	const blockProps = useBlockProps.save();
+
 	if ( 'hidden' === type ) {
 		return <input type={ type } name={ name } value={ value } />;
 	}
 
-	/* eslint-disable jsx-a11y/label-has-associated-control */
 	return (
-		<label
-			className={ classNames( 'wp-block-form-input__label', {
-				'is-label-inline': inlineLabel,
-			} ) }
-		>
-			<span className="wp-block-form-input__label-content">
-				<RichText.Content value={ label } />
-			</span>
-			<TagName
-				className={ inputClasses }
-				type={ 'textarea' === type ? undefined : type }
-				name={ name || getNameFromLabel( label ) }
-				required={ required }
-				aria-required={ required }
-				placeholder={ placeholder || undefined }
-				style={ inputStyle }
-			/>
-		</label>
+		<div { ...blockProps }>
+			{ /* eslint-disable jsx-a11y/label-has-associated-control */ }
+			<label
+				className={ classNames( 'wp-block-form-input__label', {
+					'is-label-inline': inlineLabel,
+				} ) }
+			>
+				<span className="wp-block-form-input__label-content">
+					<RichText.Content value={ label } />
+				</span>
+				<TagName
+					className={ inputClasses }
+					type={ 'textarea' === type ? undefined : type }
+					name={ name || getNameFromLabel( label ) }
+					required={ required }
+					aria-required={ required }
+					placeholder={ placeholder || undefined }
+					style={ inputStyle }
+				/>
+			</label>
+			{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
+		</div>
 	);
-	/* eslint-enable jsx-a11y/label-has-associated-control */
 }

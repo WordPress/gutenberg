@@ -5,7 +5,6 @@ import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockCanvas,
 	BlockEditorProvider,
-	BlockTools,
 	BlockInspector,
 } from '@wordpress/block-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -46,9 +45,9 @@ export default function EditorFullPage() {
 				<div className="playground__sidebar">
 					<BlockInspector />
 				</div>
-				<BlockTools className="playground__content">
+				<div className="playground__content">
 					<BlockCanvas height="100%" styles={ editorStyles } />
-				</BlockTools>
+				</div>
 			</BlockEditorProvider>
 		</div>
 	);

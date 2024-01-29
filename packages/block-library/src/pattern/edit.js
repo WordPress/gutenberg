@@ -3,12 +3,19 @@
  */
 import { cloneBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
+	Warning,
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useParsePatternDependencies } from './recursion-detector';
 
 const PatternEdit = ( { attributes, clientId } ) => {
 	const selectedPattern = useSelect(
@@ -31,6 +38,9 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	} = useDispatch( blockEditorStore );
 	const { getBlockRootClientId, getBlockEditingMode } =
 		useSelect( blockEditorStore );
+
+	const [ hasRecursionError, setHasRecursionError ] = useState( false );
+	const parsePatternDependencies = useParsePatternDependencies();
 
 	// Duplicated in packages/edit-site/src/components/start-template-options/index.js.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
@@ -64,7 +74,14 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	// This change won't be saved.
 	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
-		if ( selectedPattern?.blocks ) {
+		if ( ! hasRecursionError && selectedPattern?.blocks ) {
+			try {
+				parsePatternDependencies( selectedPattern );
+			} catch ( error ) {
+				setHasRecursionError( true );
+				return;
+			}
+
 			// We batch updates to block list settings to avoid triggering cascading renders
 			// for each container block included in a tree and optimize initial render.
 			// Since the above uses microtasks, we need to use a microtask here as well,
@@ -93,7 +110,8 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		}
 	}, [
 		clientId,
-		selectedPattern?.blocks,
+		hasRecursionError,
+		selectedPattern,
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceBlocks,
 		getBlockEditingMode,
@@ -102,6 +120,20 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	] );
 
 	const props = useBlockProps();
+
+	if ( hasRecursionError ) {
+		return (
+			<div { ...props }>
+				<Warning>
+					{ sprintf(
+						// translators: A warning in which %s is the name of a pattern.
+						__( 'Pattern "%s" cannot be rendered inside itself.' ),
+						selectedPattern?.name
+					) }
+				</Warning>
+			</div>
+		);
+	}
 
 	return <div { ...props } />;
 };

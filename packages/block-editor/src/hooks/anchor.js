@@ -120,6 +120,7 @@ function BlockEditAnchorControlPure( {
 }
 
 export default {
+	addSaveProps,
 	edit: BlockEditAnchorControlPure,
 	attributeKeys: [ 'anchor' ],
 	hasSupport( name ) {
@@ -147,8 +148,3 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/editor/anchor/save-props',
-	addSaveProps
-);

@@ -6,23 +6,24 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown, chevronRightSmall, check } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 import { unlock } from './lock-unlock';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 const FilterText = ( { activeElement, filterInView, filter } ) => {
@@ -74,9 +75,13 @@ function WithSeparators( { children } ) {
 
 export default function FilterSummary( { filter, view, onChangeView } ) {
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
+	const otherFilters = view.filters.filter(
+		( f ) => f.field !== filter.field
+	);
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
 	);
+	const activeOperator = filterInView?.operator || filter.operators[ 0 ];
 
 	return (
 		<DropdownMenu
@@ -95,125 +100,87 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 			<WithSeparators>
 				<DropdownMenuGroup>
 					{ filter.elements.map( ( element ) => {
+						const isActive = activeElement?.value === element.value;
 						return (
-							<DropdownMenuItem
+							<DropdownMenuRadioItemCustom
 								key={ element.value }
-								role="menuitemradio"
-								aria-checked={
-									activeElement?.value === element.value
-								}
-								prefix={
-									activeElement?.value === element.value && (
-										<Icon icon={ check } />
-									)
-								}
-								onSelect={ () =>
-									onChangeView( ( currentView ) => ( {
-										...currentView,
+								name={ `filter-summary-${ filter.field }` }
+								value={ element.value }
+								checked={ isActive }
+								onClick={ () =>
+									onChangeView( {
+										...view,
 										page: 1,
 										filters: [
-											...view.filters.filter(
-												( f ) =>
-													f.field !== filter.field
-											),
+											...otherFilters,
 											{
 												field: filter.field,
-												operator:
-													filterInView?.operator ||
-													filter.operators[ 0 ],
-												value:
-													activeElement?.value ===
-													element.value
-														? undefined
-														: element.value,
+												operator: activeOperator,
+												value: isActive
+													? undefined
+													: element.value,
 											},
 										],
-									} ) )
+									} )
 								}
 							>
-								{ element.label }
-							</DropdownMenuItem>
+								<DropdownMenuItemLabel>
+									{ element.label }
+								</DropdownMenuItemLabel>
+								{ !! element.description && (
+									<DropdownMenuItemHelpText>
+										{ element.description }
+									</DropdownMenuItemHelpText>
+								) }
+							</DropdownMenuRadioItemCustom>
 						);
 					} ) }
 				</DropdownMenuGroup>
 				{ filter.operators.length > 1 && (
-					<DropdownSubMenu
+					<DropdownMenu
 						trigger={
-							<DropdownSubMenuTrigger
+							<DropdownMenuItem
 								suffix={
-									<>
-										{ filterInView.operator === OPERATOR_IN
-											? __( 'Is' )
-											: __( 'Is not' ) }
-										<Icon icon={ chevronRightSmall } />{ ' ' }
-									</>
+									<span aria-hidden="true">
+										{ OPERATORS[ activeOperator ]?.label }
+									</span>
 								}
 							>
-								{ __( 'Conditions' ) }
-							</DropdownSubMenuTrigger>
+								<DropdownMenuItemLabel>
+									{ __( 'Conditions' ) }
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
 						}
 					>
-						<DropdownMenuItem
-							key="in-filter"
-							role="menuitemradio"
-							aria-checked={
-								filterInView?.operator === OPERATOR_IN
-							}
-							prefix={
-								filterInView?.operator === OPERATOR_IN && (
-									<Icon icon={ check } />
-								)
-							}
-							onSelect={ () =>
-								onChangeView( ( currentView ) => ( {
-									...currentView,
-									page: 1,
-									filters: [
-										...view.filters.filter(
-											( f ) => f.field !== filter.field
-										),
-										{
-											field: filter.field,
-											operator: OPERATOR_IN,
-											value: filterInView?.value,
-										},
-									],
-								} ) )
-							}
-						>
-							{ __( 'Is' ) }
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							key="not-in-filter"
-							role="menuitemradio"
-							aria-checked={
-								filterInView?.operator === OPERATOR_NOT_IN
-							}
-							prefix={
-								filterInView?.operator === OPERATOR_NOT_IN && (
-									<Icon icon={ check } />
-								)
-							}
-							onSelect={ () =>
-								onChangeView( ( currentView ) => ( {
-									...currentView,
-									page: 1,
-									filters: [
-										...view.filters.filter(
-											( f ) => f.field !== filter.field
-										),
-										{
-											field: filter.field,
-											operator: OPERATOR_NOT_IN,
-											value: filterInView?.value,
-										},
-									],
-								} ) )
-							}
-						>
-							{ __( 'Is not' ) }
-						</DropdownMenuItem>
-					</DropdownSubMenu>
+						{ Object.entries( OPERATORS ).map(
+							( [ operator, { label, key } ] ) => (
+								<DropdownMenuRadioItemCustom
+									key={ key }
+									name={ `filter-summary-${ filter.field }-conditions` }
+									value={ operator }
+									checked={ activeOperator === operator }
+									onChange={ ( e ) => {
+										onChangeView( {
+											...view,
+											page: 1,
+											filters: [
+												...otherFilters,
+												{
+													field: filter.field,
+													operator: e.target.value,
+													value: filterInView?.value,
+												},
+											],
+										} );
+									} }
+								>
+									<DropdownMenuItemLabel>
+										{ label }
+									</DropdownMenuItemLabel>
+								</DropdownMenuRadioItemCustom>
+							)
+						) }
+					</DropdownMenu>
 				) }
 			</WithSeparators>
 		</DropdownMenu>

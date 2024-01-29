@@ -23,6 +23,8 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
@@ -40,8 +42,6 @@ import {
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
-import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
-import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
@@ -50,7 +50,6 @@ import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
@@ -58,8 +57,11 @@ import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
-const { ExperimentalEditorProvider: EditorProvider } =
-	unlock( editorPrivateApis );
+const {
+	ExperimentalEditorProvider: EditorProvider,
+	InserterSidebar,
+	ListViewSidebar,
+} = unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -84,7 +86,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { listViewToggleElement, isLoading } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -100,25 +102,23 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		contextPost,
 		editorMode,
 		canvasMode,
-		renderingMode,
 		blockEditorMode,
 		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		postTypeLabel,
 	} = useSelect( ( select ) => {
-		const {
-			getEditedPostContext,
-			getEditorMode,
-			getCanvasMode,
-			isInserterOpened,
-			isListViewOpened,
-		} = unlock( select( editSiteStore ) );
+		const { get } = select( preferencesStore );
+		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { getRenderingMode } = select( editorStore );
+		const { isInserterOpened, isListViewOpened, getPostTypeLabel } =
+			select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -134,21 +134,15 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				: undefined,
 			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
-			renderingMode: getRenderingMode(),
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
-				'showIconLabels'
-			),
-			showBlockBreadcrumbs: select( preferencesStore ).get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			showIconLabels: get( 'core', 'showIconLabels' ),
+			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
 
@@ -248,38 +242,32 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && <KeyboardShortcutsEditMode /> }
+								{ isEditMode && (
+									<>
+										<KeyboardShortcutsEditMode />
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+									</>
+								) }
 							</>
 						}
 						secondarySidebar={
 							isEditMode &&
 							( ( shouldShowInserter && <InserterSidebar /> ) ||
-								( shouldShowListView && (
-									<ListViewSidebar
-										listViewToggleElement={
-											listViewToggleElement
-										}
-									/>
-								) ) )
+								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
 							isEditMode &&
 							isRightSidebarOpen && (
 								<>
 									<ComplementaryArea.Slot scope="core/edit-site" />
-									<SidebarFixedBottomSlot />
 								</>
 							)
 						}
 						footer={
 							shouldShowBlockBreadcrumbs && (
 								<BlockBreadcrumb
-									rootLabelText={
-										postWithTemplate &&
-										renderingMode !== 'template-only'
-											? __( 'Page' )
-											: __( 'Template' )
-									}
+									rootLabelText={ postTypeLabel }
 								/>
 							)
 						}

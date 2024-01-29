@@ -694,6 +694,16 @@ test.describe( 'Multi-block selection', () => {
 		} );
 
 		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1 ] );
+
+		await paragraph1.click( {
+			position: { x: -1, y: 0 },
+			// Use force since it's outside the bounding box of the element.
+			force: true,
+		} );
+
+		await expect
 			.poll( () =>
 				page.evaluate( () => window.getSelection().rangeCount )
 			)

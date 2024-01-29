@@ -9,6 +9,7 @@ import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/com
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -86,8 +87,8 @@ function SidebarNavigationScreenGlobalStylesContent() {
 export default function SidebarNavigationScreenGlobalStyles() {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
-	const { openGeneralSidebar, setIsListViewOpened } =
-		useDispatch( editSiteStore );
+	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { setIsListViewOpened } = useDispatch( editorStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
