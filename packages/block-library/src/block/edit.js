@@ -237,10 +237,12 @@ export default function ReusableBlockEdit( {
 		[ patternClientId, ref ]
 	);
 
-	const editOriginal = onSelectEntityRecord( {
-		postId: ref,
-		postType: 'wp_block',
-	} );
+	const editOriginal = onSelectEntityRecord
+		? onSelectEntityRecord( {
+				postId: ref,
+				postType: 'wp_block',
+		  } )
+		: undefined;
 
 	// Sync the editing mode of the pattern block with the inner blocks.
 	useEffect( () => {
