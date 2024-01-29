@@ -139,7 +139,7 @@ function MediaContainer( props, ref ) {
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
-	if ( mediaUrl || featuredImageURL || props.useFeaturedImage ) {
+	if ( mediaUrl || featuredImageURL || useFeaturedImage ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
