@@ -83,14 +83,14 @@ class WP_Font_Library {
 	}
 
 	/**
-	 * Register a new font collection from a metadata file.
+	 * Register a new font collection from a json file.
 	 *
 	 * @since 6.5.0
 	 *
 	 * @param string $file_or_url File path or URL to a JSON file containing the font collection data.
 	 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
 	 */
-	public static function register_font_collection_from_metadata( $file_or_url ) {
+	public static function register_font_collection_from_json( $file_or_url ) {
 		$args = WP_Font_Collection::load_from_json( $file_or_url );
 		if ( is_wp_error( $args ) ) {
 			return $args;
