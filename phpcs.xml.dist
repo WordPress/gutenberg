@@ -127,6 +127,7 @@
 				<element value="build_template_part_block_instance_variations"/>
 				<element value="build_template_part_block_variations"/>
 				<element value="build_variation_for_navigation_link"/>
+				<element value="build_variation_for_post_terms"/>
 				<element value="classnames_for_block_core_search"/>
 				<element value="comments_block_form_defaults"/>
 				<element value="enqueue_legacy_post_comments_block_styles"/>

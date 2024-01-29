@@ -65,7 +65,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
  *
  * @return array
  */
-function block_core_post_terms_build_variation_for_post_terms( $taxonomy ) {
+function build_variation_for_post_terms( $taxonomy ) {
 	$variation = array(
 		'name'        => $taxonomy->name,
 		'title'       => $taxonomy->label,
@@ -85,9 +85,59 @@ function block_core_post_terms_build_variation_for_post_terms( $taxonomy ) {
 }
 
 /**
- * Registers the `core/post-terms` block on the server.
+ * Register a variation for a taxonomy for the post-terms block.
+ *
+ * @param array $variation Variation array from build_variation_for_post_terms.
+ * @return void
  */
-function register_block_core_post_terms() {
+function block_core_post_terms_register_variation( $variation ) {
+	// Directly set the variations on the registered block type
+	// because there's no server side registration for variations (see #47170).
+	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
+	// If the block is not registered yet, bail early.
+	// Variation will be registered in register_block_core_post_terms then.
+	if ( ! $navigation_block_type ) {
+		return;
+	}
+
+	$navigation_block_type->variations = array_merge(
+		$navigation_block_type->variations,
+		array( $variation )
+	);
+}
+
+/**
+ * Unregister a variation for a taxonomy for the post-terms block.
+ *
+ * @param string $name Name of the taxonomy (which was used as variation name).
+ * @return void
+ */
+function block_core_post_terms_unregister_variation( $name ) {
+	// Directly get the variations from the registered block type
+	// because there's no server side (un)registration for variations (see #47170).
+	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
+	// If the block is not registered (yet), there's no need to remove a variation.
+	if ( ! $navigation_block_type || empty( $navigation_block_type->variations ) ) {
+		return;
+	}
+	$variations = $navigation_block_type->variations;
+	// Search for the variation and remove it from the array.
+	foreach ( $variations as $i => $variation ) {
+		if ( $variation['name'] === $name ) {
+			unset( $variations[ $i ] );
+			break;
+		}
+	}
+	// Reindex array after removing one variation.
+	$navigation_block_type->variations = array_values( $variations );
+}
+
+/**
+ * Returns an array of variations for the post-terms block.
+ *
+ * @return array
+ */
+function build_post_term_block_variations() {
 	// This will only handle taxonomies registered until this point (init on priority 9).
 	// See action hooks below for other taxonomies.
 	// See https://github.com/WordPress/gutenberg/issues/52569 for details.
@@ -107,7 +157,7 @@ function register_block_core_post_terms() {
 
 	// Create and register the eligible taxonomies variations.
 	foreach ( $taxonomies as $taxonomy ) {
-		$variation = block_core_post_terms_build_variation_for_post_terms( $taxonomy );
+		$variation = build_variation_for_post_terms( $taxonomy );
 		// Set the category variation as the default one.
 		if ( 'category' === $taxonomy->name ) {
 			$variation['isDefault'] = true;
@@ -150,18 +200,10 @@ add_action( 'unregistered_taxonomy', 'block_core_post_terms_unregister_taxonomy_
  * @return void
  */
 function block_core_post_terms_register_taxonomy_variation( $taxonomy, $object_type, $args ) {
-	if ( isset( $args['publicly_queryable'] ) && $args['publicly_queryable'] ) {
-		$variation = block_core_post_terms_build_variation_for_post_terms( (object) $args );
-		// Directly set the variations on the registered block type
-		// because there's no server side registration for variations (see #47170).
-		$post_terms_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
-		// If the block is not registered yet, bail early.
-		// Variation will be registered in register_block_core_post_terms then.
-		if ( ! $post_terms_block_type ) {
-			return;
-		}
-
-		$post_terms_block_type->variations[] = $variation;
+	if ( isset( $args['publicly_queryable'] ) && $args['publicly_queryable']
+		&& isset( $args['show_in_rest'] ) && $args['show_in_rest'] ) {
+		$variation = build_variation_for_post_terms( (object) $args );
+		block_core_post_terms_register_variation( $variation );
 	}
 }
 
@@ -172,20 +214,5 @@ function block_core_post_terms_register_taxonomy_variation( $taxonomy, $object_t
  * @return void
  */
 function block_core_post_terms_unregister_taxonomy_variation( $taxonomy ) {
-	// Directly get the variations from the registered block type
-	// because there's no server side (un)registration for variations (see #47170).
-	$post_terms_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
-	// If the block is not registered (yet), there's no need to remove a variation.
-	if ( ! $post_terms_block_type || empty( $post_terms_block_type->variations ) ) {
-		return;
-	}
-	// Search for the variation and remove it from the array.
-	foreach ( $post_terms_block_type->variations as $i => $variation ) {
-		if ( $variation['name'] === $taxonomy ) {
-			unset( $post_terms_block_type->variations[ $i ] );
-			break;
-		}
-	}
-	// Reindex array after removing one variation.
-	$post_terms_block_type->variations = array_values( $post_terms_block_type->variations );
+	block_core_post_terms_unregister_variation( $taxonomy );
 }

@@ -18,9 +18,11 @@ class Block_Post_Terms_Variations_Test extends WP_UnitTestCase {
 			'book_type',
 			array( 'post' ),
 			array(
-				'labels' => array(
+				'labels'             => array(
 					'name' => 'Book Type',
 				),
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
 			)
 		);
 
@@ -75,9 +77,11 @@ class Block_Post_Terms_Variations_Test extends WP_UnitTestCase {
 			'temp_book_type',
 			'custom_book',
 			array(
-				'labels' => array(
+				'labels'             => array(
 					'name' => 'Book Type',
 				),
+				'publicly_queryable' => true,
+				'show_in_rest'       => true,
 			)
 		);
 
