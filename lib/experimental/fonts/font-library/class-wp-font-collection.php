@@ -142,12 +142,12 @@ class WP_Font_Collection {
 
 		$data = wp_json_file_decode( $file, array( 'associative' => true ) );
 		if ( empty( $data ) ) {
-			return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data JSON file contents.', 'gutenberg' ) );
+			return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection JSON file contents.', 'gutenberg' ) );
 		}
 
 		if ( empty( $data['slug'] ) ) {
 			// translators: %s: Font collection JSON file path.
-			return new WP_Error( 'font_collection_invalid', sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $file ) );
+			return new WP_Error( 'font_collection_invalid_metadata', sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $file ) );
 		}
 
 		static::$collection_json_cache[ $file ] = $data;

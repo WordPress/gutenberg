@@ -109,8 +109,22 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
 	 */
-	function wp_register_font_collection( $slug_or_file, $args = array() ) {
-		return WP_Font_Library::register_font_collection( $slug_or_file, $args );
+	function wp_register_font_collection( $slug, $args = array() ) {
+		return WP_Font_Library::register_font_collection( $slug, $args );
+	}
+}
+
+if ( ! function_exists( 'wp_register_font_collection_from_metadata' ) ) {
+	/**
+	 * Registers a new Font Collection from a metadata file in the Font Library.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $file_or_url File path or URL to a JSON file containing the font collection data.
+	 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
+	 */
+	function wp_register_font_collection_from_metadata( $file_or_url ) {
+		return WP_Font_Library::register_font_collection_from_metadata( $file_or_url );
 	}
 }
 
@@ -128,7 +142,7 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 }
 
 // TODO: update to production font collection URL.
-wp_register_font_collection( 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/01aa57731575bd13f9db8d86ab80a2d74e28a1ac/releases/gutenberg-17.6/collections/google-fonts-with-preview.json' );
+wp_register_font_collection_from_metadata( 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/01aa57731575bd13f9db8d86ab80a2d74e28a1ac/releases/gutenberg-17.6/collections/google-fonts-with-preview.json' );
 
 // @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {

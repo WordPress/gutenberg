@@ -57,23 +57,12 @@ class WP_Font_Library {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string $slug_or_file Font collection slug or path to a JSON file containing the font collection config.
-	 * @param array  $args         Font collection config options.
-	 *                             See {@see wp_register_font_collection()} for the supported fields.
-	 * @return WP_Font_Collection|WP_Error A font collection is it was registered successfully and a WP_Error otherwise.
+	 * @param string $slug Font collection slug.
+	 * @param array  $args Font collection config options.
+	 *                     See {@see wp_register_font_collection()} for the supported fields.
+	 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
 	 */
-	public static function register_font_collection( $slug_or_file, $args = array() ) {
-		if ( file_exists( $slug_or_file ) || wp_http_validate_url( $slug_or_file ) ) {
-			$args = WP_Font_Collection::load_from_json( $slug_or_file );
-			if ( is_wp_error( $args ) ) {
-				return $args;
-			}
-
-			$slug = $args['slug'];
-		} else {
-			$slug = $slug_or_file;
-		}
-
+	public static function register_font_collection( $slug, $args = array() ) {
 		$new_collection = new WP_Font_Collection( $slug, $args );
 
 		if ( self::is_collection_registered( $new_collection->slug ) ) {
@@ -91,6 +80,28 @@ class WP_Font_Library {
 		}
 		self::$collections[ $slug ] = $new_collection;
 		return $new_collection;
+	}
+
+	/**
+	 * Register a new font collection from a metadata file.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $file_or_url File path or URL to a JSON file containing the font collection data.
+	 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
+	 */
+	public static function register_font_collection_from_metadata( $file_or_url ) {
+		if ( file_exists( $file_or_url ) || wp_http_validate_url( $file_or_url ) ) {
+			$args = WP_Font_Collection::load_from_json( $file_or_url );
+			if ( is_wp_error( $args ) ) {
+				return $args;
+			}
+
+			return self::register_font_collection( $args['slug'], $args );
+		}
+
+		// translators: %s: File path or URL to font collection JSON file.
+		return new WP_Error( 'font_collection_invalid_metadata', sprintf( __( 'The provided file path or url is not valid: "%s".', 'gutenberg' ), $file_or_url ) );
 	}
 
 	/**
