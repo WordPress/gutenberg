@@ -1160,7 +1160,7 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
-
+		//var_dump($this->get_settings());
 		if ( is_string( $types ) ) {
 			// Dispatch error and map old arguments to new ones.
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
@@ -2082,6 +2082,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
+	 * @since 6.5.0 Passing current theme JSON settings to wp_get_typography_font_size_value().
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
@@ -2152,7 +2153,7 @@ class WP_Theme_JSON_Gutenberg {
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
 				 */
-				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ), $settings );
 			}
 
 			if ( 'aspect-ratio' === $css_property ) {
