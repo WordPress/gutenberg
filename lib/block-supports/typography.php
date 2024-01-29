@@ -433,7 +433,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.4.0 Added configurable min and max viewport width values to the typography.fluid theme.json schema.
  * @since 6.5.0 Changing the type and name of the bool argument $should_use_fluid_typography.
  *
- * @param array $preset                     {
+ * @param array $preset       {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.
@@ -441,7 +441,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  *     @type string|int|float $size CSS font-size value, including units where applicable.
  * }
  * @param bool|array $settings Optional Theme JSON settings array that overrides any global theme settings.
- *                             As a bool, it acts as an override to switch fluid typography "on" (`true`) or "off" (`false`).
+ *                             As a bool (deprecated), it acts as an override to switch fluid typography "on" (`true`) or "off" (`false`).
  *                             Can be used for unit testing. Default is `array()`.
  *
  * @return string|null Font-size value or `null` if a size is not passed in $preset.
@@ -464,6 +464,7 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	 * If the settings argument is a boolean, it's a fluid typography override.
 	 */
 	if ( is_bool( $settings ) ) {
+		_deprecated_argument( __FUNCTION__, '6.5.0', __( '`boolean` type for second argument `$settings` is deprecated. Use `array()` instead.', 'gutenberg' ) );
 		$settings = array(
 			'typography' => array(
 				'fluid' => $settings,
@@ -471,8 +472,8 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 		);
 	}
 
-	// Checks if fluid font sizes are activated.
-	$global_settings             = gutenberg_get_global_settings( array(), 'base' );
+	// Fallback to global settings as default.
+	$global_settings             = gutenberg_get_global_settings();
 	$settings                    = wp_parse_args(
 		$settings,
 		$global_settings

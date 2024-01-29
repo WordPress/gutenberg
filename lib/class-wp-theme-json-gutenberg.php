@@ -1160,7 +1160,7 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
-		//var_dump($this->get_settings());
+
 		if ( is_string( $types ) ) {
 			// Dispatch error and map old arguments to new ones.
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
@@ -2152,6 +2152,7 @@ class WP_Theme_JSON_Gutenberg {
 				 * whether the incoming value can be converted to a fluid value.
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
+				 * Pass the current theme_json settings to override any global settings.
 				 */
 				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ), $settings );
 			}

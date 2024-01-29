@@ -151,9 +151,8 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 }
 
 function useBlockProps( { name, fontSize, style } ) {
-	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
-		'typography.fontSizes',
-		'typography.fluid',
+	const [ typography, layout ] = useSettings(
+		'typography',
 		'layout'
 	);
 
@@ -173,18 +172,11 @@ function useBlockProps( { name, fontSize, style } ) {
 	let props;
 
 	if ( style?.typography?.fontSize ) {
-		const fluidSettings = getFluidTypographyOptionsFromSettings( {
-			typography: {
-				fluid: fluidTypographySettings,
-			},
-			layout: layoutSettings,
-		} );
-
 		props = {
 			style: {
 				fontSize: getTypographyFontSizeValue(
 					{ size: style.typography.fontSize },
-					fluidSettings
+					{ typography, layout }
 				),
 			},
 		};
@@ -194,7 +186,7 @@ function useBlockProps( { name, fontSize, style } ) {
 		props = {
 			style: {
 				fontSize: getFontSize(
-					fontSizes,
+					typography?.fontSizes,
 					fontSize,
 					style?.typography?.fontSize
 				).size,
