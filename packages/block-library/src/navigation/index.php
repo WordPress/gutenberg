@@ -1413,8 +1413,8 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	}
 }
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
-// that are not present in Gutenberg's WP 6.4 compatibility layer.
+// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+// that are not present in Gutenberg's WP 6.5 compatibility layer.
 if ( function_exists( 'get_hooked_block_markup' ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
@@ -1445,8 +1445,8 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	return $response;
 }
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
-// that are not present in Gutenberg's WP 6.4 compatibility layer.
+// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+// that are not present in Gutenberg's WP 6.5 compatibility layer.
 if ( function_exists( 'get_hooked_block_markup' ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }
