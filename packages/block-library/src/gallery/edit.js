@@ -542,23 +542,6 @@ function GalleryEdit( props ) {
 							__next40pxDefaultSize
 						/>
 					) }
-					<SelectControl
-						__nextHasNoMarginBottom
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ setLinkTo }
-						options={ linkOptions }
-						hideCancelButton={ true }
-						size="__unstable-large"
-					/>
-					{ hasLinkTo && (
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Open in new tab' ) }
-							checked={ linkTarget === '_blank' }
-							onChange={ toggleOpenInNewTab }
-						/>
-					) }
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
 							__nextHasNoMarginBottom
@@ -573,6 +556,15 @@ function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 					) }
+					<SelectControl
+						__nextHasNoMarginBottom
+						label={ __( 'Link to' ) }
+						value={ linkTo }
+						onChange={ setLinkTo }
+						options={ linkOptions }
+						hideCancelButton={ true }
+						size="__unstable-large"
+					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Crop images' ) }
@@ -585,6 +577,14 @@ function GalleryEdit( props ) {
 						checked={ !! randomOrder }
 						onChange={ toggleRandomOrder }
 					/>
+					{ hasLinkTo && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open images in new tab' ) }
+							checked={ linkTarget === '_blank' }
+							onChange={ toggleOpenInNewTab }
+						/>
+					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
