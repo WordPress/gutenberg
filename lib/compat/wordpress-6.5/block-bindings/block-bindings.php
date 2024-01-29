@@ -2,60 +2,72 @@
 /**
  * Block Bindings API
  *
- * This file contains functions for managing block bindings in WordPress.
+ * Contains functions for managing block bindings in WordPress.
  *
- * @since 17.6.0
- * @package gutenberg
+ * @package WordPress
+ * @subpackage Block Bindings
+ * @since 6.5.0
  */
 
 /**
- * Retrieves the singleton instance of WP_Block_Bindings.
+ * Registers a new block bindings source.
  *
- * @return WP_Block_Bindings The WP_Block_Bindings instance.
+ * Sources are used to override block's original attributes with a value
+ * coming from the source. Once a source is registered, it can be used by a
+ * block by setting its `metadata.bindings` attribute to a value that refers
+ * to the source.
+ *
+ * @since 6.5.0
+ *
+ * @param string   $source_name       The name of the source.
+ * @param array    $source_properties {
+ *     The array of arguments that are used to register a source.
+ *
+ *     @type string   $label              The label of the source.
+ *     @type callback $get_value_callback A callback executed when the source is processed during block rendering.
+ *                                        The callback should have the following signature:
+ *
+ *                                        `function ($source_args, $block_instance,$attribute_name): mixed`
+ *                                            - @param array    $source_args    Array containing source arguments
+ *                                                                              used to look up the override value,
+ *                                                                              i.e. {"key": "foo"}.
+ *                                            - @param WP_Block $block_instance The block instance.
+ *                                            - @param string   $attribute_name The name of an attribute .
+ *                                        The callback has a mixed return type; it may return a string to override
+ *                                        the block's original value, null, false to remove an attribute, etc.
+ * }
+ * @return array|false Source when the registration was successful, or `false` on failure.
  */
-if ( ! function_exists( 'wp_block_bindings' ) ) {
-	function wp_block_bindings() {
-		static $instance = null;
-		if ( is_null( $instance ) ) {
-			$instance = new WP_Block_Bindings();
-		}
-		return $instance;
+if ( ! function_exists( 'register_block_bindings_source' ) ) {
+	function register_block_bindings_source( $source_name, array $source_properties ) {
+		return WP_Block_Bindings_Registry::get_instance()->register( $source_name, $source_properties );
 	}
 }
 
 /**
- * Registers a new source for block bindings.
+ * Unregisters a block bindings source.
  *
- * @param string   $source_name The name of the source.
- * @param array    $source_properties   The array of arguments that are used to register a source. The array has two elements:
- *                                1. string   $label        The label of the source.
- *                                2. callback $apply        A callback
- *                                executed when the source is processed during
- *                                block rendering. The callback should have the
- *                                following signature:
+ * @since 6.5.0
  *
- *                                  `function (object $source_attrs, object $block_instance, string $attribute_name): string`
- *                                          - @param object $source_attrs: Object containing source ID used to look up the override value, i.e. {"value": "{ID}"}.
- *                                          - @param object $block_instance: The block instance.
- *                                          - @param string $attribute_name: The name of an attribute used to retrieve an override value from the block context.
- *                                 The callback should return a string that will be used to override the block's original value.
- *
- * @return void
+ * @param string $source_name Block bindings source name including namespace.
+ * @return array|false The unregistred block bindings source on success and `false` otherwise.
  */
-if ( ! function_exists( 'wp_block_bindings_register_source' ) ) {
-	function wp_block_bindings_register_source( $source_name, array $source_properties ) {
-		wp_block_bindings()->register_source( $source_name, $source_properties );
+if ( ! function_exists( 'unregister_block_bindings_source' ) ) {
+	function unregister_block_bindings_source( $source_name ) {
+		return WP_Block_Bindings_Registry::get_instance()->unregister( $source_name );
 	}
 }
 
 /**
- * Retrieves the list of registered block sources.
+ * Retrieves the list of all registered block bindings sources.
  *
- * @return array The list of registered block sources.
+ * @since 6.5.0
+ *
+ * @return array The array of registered block bindings sources.
  */
-if ( ! function_exists( 'wp_block_bindings_get_sources' ) ) {
-	function wp_block_bindings_get_sources() {
-		return wp_block_bindings()->get_sources();
+if ( ! function_exists( 'get_all_registered_block_bindings_sources' ) ) {
+	function get_all_registered_block_bindings_sources() {
+		return WP_Block_Bindings_Registry::get_instance()->get_all_registered();
 	}
 }
 
@@ -69,7 +81,7 @@ if ( ! function_exists( 'wp_block_bindings_get_sources' ) ) {
  * @return string The modified block content.
  */
 function gutenberg_block_bindings_replace_html( $block_content, $block_name, $block_attr, $source_value ) {
-			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( null === $block_type ) {
 		return;
 	}

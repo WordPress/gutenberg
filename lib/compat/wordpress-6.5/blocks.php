@@ -86,7 +86,7 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 		 * }
 		 */
 
-		$block_bindings_sources = wp_block_bindings_get_sources();
+		$block_bindings_sources = get_all_registered_block_bindings_sources();
 		$modified_block_content = $block_content;
 		foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
 
