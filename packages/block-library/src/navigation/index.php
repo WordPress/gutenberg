@@ -1354,8 +1354,8 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
  * of those hooked blocks should be exempted from insertion.
  *
- * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
- * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
+ * @param array        $inner_blocks Parsed inner blocks of a Navigation block.
+ * @param WP_Post|null $post         Optional. `wp_navigation` post object corresponding to the block. Default null.
  * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
  */
 function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null ) {
