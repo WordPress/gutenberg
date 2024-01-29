@@ -7,7 +7,6 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
-	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -328,14 +327,11 @@ export default function Image( {
 
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
-	const showLightboxToggle =
+	const showLightboxSetting =
 		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
-
-	const lightboxToggleDisabled =
-		linkDestination && linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -439,6 +435,7 @@ export default function Image( {
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }
+						showLightboxSetting={ showLightboxSetting }
 						lightboxEnabled={ lightboxChecked }
 					/>
 				) }
@@ -533,34 +530,6 @@ export default function Image( {
 							onChange={ updateImage }
 							options={ imageSizeOptions }
 						/>
-					) }
-					{ showLightboxToggle && (
-						<ToolsPanelItem
-							hasValue={ () => !! lightbox }
-							label={ __( 'Expand on click' ) }
-							onDeselect={ () => {
-								setAttributes( { lightbox: undefined } );
-							} }
-							isShownByDefault={ true }
-						>
-							<ToggleControl
-								label={ __( 'Expand on click' ) }
-								checked={ lightboxChecked }
-								onChange={ ( newValue ) => {
-									setAttributes( {
-										lightbox: { enabled: newValue },
-									} );
-								} }
-								disabled={ lightboxToggleDisabled }
-								help={
-									lightboxToggleDisabled
-										? __(
-												'“Expand on click” scales the image up, and can’t be combined with a link.'
-										  )
-										: ''
-								}
-							/>
-						</ToolsPanelItem>
 					) }
 				</ToolsPanel>
 			</InspectorControls>

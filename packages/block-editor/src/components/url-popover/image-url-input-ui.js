@@ -68,6 +68,7 @@ const ImageURLInputUI = ( {
 	linkTarget,
 	linkClass,
 	rel,
+	showLightboxSetting,
 	lightboxEnabled,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -300,29 +301,31 @@ const ImageURLInputUI = ( {
 										{ link.title }
 									</MenuItem>
 								) ) }
-								<MenuItem
-									key="expand-on-click"
-									className="block-editor-url-popover__expand-on-click"
-									icon={ expandIcon }
-									iconPosition="left"
-									onClick={ () => {
-										setUrlInput( null );
-										onChangeUrl( {
-											lightbox: { enabled: true },
-											linkDestination:
-												LINK_DESTINATION_NONE,
-											href: '',
-										} );
-										stopEditLink();
-									} }
-								>
-									<p>{ __( 'Expand on click' ) }</p>
-									<p className="expand-on-click__description">
-										{ __(
-											'Scales the image with a lightbox effect'
-										) }
-									</p>
-								</MenuItem>
+								{ showLightboxSetting && (
+									<MenuItem
+										key="expand-on-click"
+										className="block-editor-url-popover__expand-on-click"
+										icon={ expandIcon }
+										iconPosition="left"
+										onClick={ () => {
+											setUrlInput( null );
+											onChangeUrl( {
+												lightbox: { enabled: true },
+												linkDestination:
+													LINK_DESTINATION_NONE,
+												href: '',
+											} );
+											stopEditLink();
+										} }
+									>
+										<p>{ __( 'Expand on click' ) }</p>
+										<p className="expand-on-click__description">
+											{ __(
+												'Scales the image with a lightbox effect'
+											) }
+										</p>
+									</MenuItem>
+								) }
 							</NavigableMenu>
 						)
 					}
