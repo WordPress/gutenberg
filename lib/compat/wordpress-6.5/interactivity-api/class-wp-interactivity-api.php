@@ -18,12 +18,13 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @var array
 		 */
 		private static $directive_processors = array(
-			'data-wp-interactive' => 'data_wp_interactive_processor',
-			'data-wp-context'     => 'data_wp_context_processor',
-			'data-wp-bind'        => 'data_wp_bind_processor',
-			'data-wp-class'       => 'data_wp_class_processor',
-			'data-wp-style'       => 'data_wp_style_processor',
-			'data-wp-text'        => 'data_wp_text_processor',
+			'data-wp-interactive'   => 'data_wp_interactive_processor',
+			'data-wp-router-region' => 'data_wp_router_region_processor',
+			'data-wp-context'       => 'data_wp_context_processor',
+			'data-wp-bind'          => 'data_wp_bind_processor',
+			'data-wp-class'         => 'data_wp_class_processor',
+			'data-wp-style'         => 'data_wp_style_processor',
+			'data-wp-text'          => 'data_wp_text_processor',
 		);
 
 		/**
@@ -671,6 +672,62 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				} else {
 					$p->set_content_between_balanced_tags( '' );
 				}
+			}
+		}
+
+		/**
+		 * Processes the `data-wp-router-region` directive.
+		 *
+		 * It renders in the footer a set of HTML elements to notify users about
+		 * client-side navigations. More concretely, the elements added are 1) a
+		 * top loading bar to visually inform that a navigation is in progress
+		 * and 2) an `aria-live` region for accessible navigation announcements.
+		 *
+		 * The same action is registered everytime the directive is processed to
+		 * prevent element duplication.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_Interactivity_API_Directives_Processor $p The directives processor instance.
+		 */
+		private function data_wp_router_region_processor( WP_Interactivity_API_Directives_Processor $p ) {
+			if ( ! $p->is_tag_closer() ) {
+				/*
+				 * The state could be declared multiple times here but is
+				 * doesn't matter as the values are always the same.
+				 */
+				wp_interactivity_state(
+					'core/router',
+					array(
+						'navigation' => array(
+							'message'     => '',
+							'hasStarted'  => false,
+							'hasFinished' => false,
+							'texts'       => array(
+								'loading' => __( 'Loading page, please wait.' ),
+								'loaded'  => __( 'Page Loaded.' ),
+							),
+						),
+					)
+				);
+
+				$callback = static function () {
+					echo <<<HTML
+					<div
+						class="screen-reader-text"
+						aria-live="polite"
+						data-wp-interactive='{"namespace":"core/router"}'
+						data-wp-text="state.navigation.message"
+					></div>
+					<div
+						class="wp-block-query__enhanced-pagination-animation"
+						data-wp-interactive='{"namespace":"core/router"}'
+						data-wp-class--start-animation="state.navigation.hasStarted"
+						data-wp-class--finish-animation="state.navigation.hasFinished"
+					></div>
+HTML;
+				};
+				add_action( 'wp_footer', $callback );
 			}
 		}
 	}
