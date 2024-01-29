@@ -519,7 +519,6 @@ function BlockListBlockProvider( props ) {
 				isBlockBeingDragged,
 				hasBlockMovingClientId,
 				canInsertBlockType,
-				getBlockRootClientId,
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
@@ -556,6 +555,7 @@ function BlockListBlockProvider( props ) {
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
+
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
@@ -614,7 +614,7 @@ function BlockListBlockProvider( props ) {
 					movingClientId &&
 					canInsertBlockType(
 						getBlockName( movingClientId ),
-						getBlockRootClientId( clientId )
+						rootClientId
 					),
 				isEditingDisabled: blockEditingMode === 'disabled',
 				hasEditableOutline:
