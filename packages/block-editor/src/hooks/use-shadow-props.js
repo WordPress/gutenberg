@@ -18,20 +18,6 @@ export function getShadowClassesAndStyles( attributes ) {
 	const shadow = attributes.style?.shadow || '';
 
 	return {
-		className: undefined,
 		style: getInlineStyles( { shadow } ),
 	};
-}
-
-/**
- * Derives the shadow related props for a block from its shadow block support
- * attributes.
- *
- * @param {Object} attributes Block attributes.
- *
- * @return {Object} ClassName & style props from shadow block support.
- */
-export function useShadowProps( attributes ) {
-	const shadowProps = getShadowClassesAndStyles( attributes );
-	return shadowProps;
 }
