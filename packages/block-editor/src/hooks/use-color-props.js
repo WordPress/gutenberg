@@ -120,6 +120,10 @@ export function useColorProps( attributes ) {
 		[ userGradients, themeGradients, defaultGradients ]
 	);
 
+	if ( ! backgroundColor && ! textColor && ! gradient ) {
+		return {};
+	}
+
 	const colorProps = getColorClassesAndStyles( attributes );
 
 	// Force inline styles to apply colors when themes do not load their color

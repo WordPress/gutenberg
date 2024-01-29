@@ -39,19 +39,21 @@ export function getBorderClassesAndStyles( attributes ) {
  */
 export function useBorderProps( attributes ) {
 	const { colors } = useMultipleOriginColorsAndGradients();
-	const borderProps = getBorderClassesAndStyles( attributes );
 	const { borderColor } = attributes;
+
+	if ( ! borderColor ) {
+		return {};
+	}
 
 	// Force inline styles to apply named border colors when themes do not load
 	// their color stylesheets in the editor.
-	if ( borderColor ) {
-		const borderColorObject = getMultiOriginColor( {
-			colors,
-			namedColor: borderColor,
-		} );
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const borderColorObject = getMultiOriginColor( {
+		colors,
+		namedColor: borderColor,
+	} );
 
-		borderProps.style.borderColor = borderColorObject.color;
-	}
+	borderProps.style.borderColor = borderColorObject.color;
 
 	return borderProps;
 }
