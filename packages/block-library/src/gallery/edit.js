@@ -382,12 +382,6 @@ function GalleryEdit( props ) {
 		setAttributes( { imageCrop: ! imageCrop } );
 	}
 
-	function getImageCropHelp( checked ) {
-		return checked
-			? __( 'Thumbnails are cropped to align.' )
-			: __( 'Thumbnails are not cropped.' );
-	}
-
 	function toggleRandomOrder() {
 		setAttributes( { randomOrder: ! randomOrder } );
 	}
@@ -584,7 +578,6 @@ function GalleryEdit( props ) {
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
-						help={ getImageCropHelp }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
