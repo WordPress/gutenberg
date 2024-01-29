@@ -2674,7 +2674,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 6. Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
-			$block_rules .= static::to_ruleset( $style_variation_selector, $individual_style_variation_declarations );
+			$block_rules .= static::to_ruleset( ":where($style_variation_selector)", $individual_style_variation_declarations );
 		}
 
 		return $block_rules;
