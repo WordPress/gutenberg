@@ -91,17 +91,12 @@ class WP_Font_Library {
 	 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
 	 */
 	public static function register_font_collection_from_metadata( $file_or_url ) {
-		if ( file_exists( $file_or_url ) || wp_http_validate_url( $file_or_url ) ) {
-			$args = WP_Font_Collection::load_from_json( $file_or_url );
-			if ( is_wp_error( $args ) ) {
-				return $args;
-			}
-
-			return self::register_font_collection( $args['slug'], $args );
+		$args = WP_Font_Collection::load_from_json( $file_or_url );
+		if ( is_wp_error( $args ) ) {
+			return $args;
 		}
 
-		// translators: %s: File path or URL to font collection JSON file.
-		return new WP_Error( 'font_collection_invalid_metadata', sprintf( __( 'The provided file path or url is not valid: "%s".', 'gutenberg' ), $file_or_url ) );
+		return self::register_font_collection( $args['slug'], $args );
 	}
 
 	/**

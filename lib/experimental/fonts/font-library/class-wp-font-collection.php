@@ -120,7 +120,9 @@ class WP_Font_Collection {
 
 		if ( ! $url && ! $file ) {
 			// translators: %s: File path or url to font collection json file.
-			return new WP_Error( 'font_collection_loading_failed', sprintf( __( 'Font collection JSON file "%s" is invalid or does not exist.', 'gutenberg' ), $file_or_url ) );
+			$message = sprintf( __( 'Font collection JSON file "%s" is invalid or does not exist.', 'gutenberg' ), $file_or_url );
+			_doing_it_wrong( __METHOD__, $message, '6.5.0' );
+			return new WP_Error( 'font_collection_json_missing', $message );
 		}
 
 		return $url ? self::load_from_url( $url ) : self::load_from_file( $file );
@@ -146,8 +148,10 @@ class WP_Font_Collection {
 		}
 
 		if ( empty( $data['slug'] ) ) {
-			// translators: %s: Font collection JSON file path.
-			return new WP_Error( 'font_collection_invalid_metadata', sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $file ) );
+			// translators: %s: Font collection JSON URL.
+			$message = sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $file );
+			_doing_it_wrong( __METHOD__, $message, '6.5.0' );
+			return new WP_Error( 'font_collection_invalid_json', $message );
 		}
 
 		static::$collection_json_cache[ $file ] = $data;
@@ -187,7 +191,9 @@ class WP_Font_Collection {
 
 			if ( empty( $data['slug'] ) ) {
 				// translators: %s: Font collection JSON URL.
-				return new WP_Error( 'font_collection_invalid', sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $url ) );
+				$message = sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $url );
+				_doing_it_wrong( __METHOD__, $message, '6.5.0' );
+				return new WP_Error( 'font_collection_invalid_json', $message );
 			}
 
 			set_site_transient( $transient_key, $data, DAY_IN_SECONDS );
