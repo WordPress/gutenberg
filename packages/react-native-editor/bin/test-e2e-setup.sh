@@ -25,12 +25,12 @@ output=$($APPIUM_CMD driver list --installed --json)
 
 echo $output
 
-if echo "$output" | grep -q 'uiautomator2'; then
-	log_info "UiAutomator2 available."
-else
+# if echo "$output" | grep -q 'uiautomator2'; then
+# 	log_info "UiAutomator2 available."
+# else
 	log_info "UiAutomator2 not found, installing..."
 	$APPIUM_CMD driver install uiautomator2@2.32.3
-fi
+# fi
 
 if echo "$output" | grep -q 'xcuitest'; then
 	log_info "XCUITest available."
