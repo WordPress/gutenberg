@@ -123,13 +123,7 @@ class WP_Font_Collection {
 			return new WP_Error( 'font_collection_loading_failed', sprintf( __( 'Font collection JSON file "%s" is invalid or does not exist.', 'gutenberg' ), $file_or_url ) );
 		}
 
-		$data = $url ? self::load_from_url( $url ) : self::load_from_file( $file );
-
-		if ( is_wp_error( $data ) ) {
-			return $data;
-		}
-
-		return $data;
+		return $url ? self::load_from_url( $url ) : self::load_from_file( $file );
 	}
 
 	/**
