@@ -62,10 +62,6 @@ const restrictedImports = [
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
 	},
 	{
-		name: 'puppeteer-testing-library',
-		message: '`puppeteer-testing-library` is still experimental.',
-	},
-	{
 		name: '@emotion/css',
 		message:
 			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
@@ -359,6 +355,26 @@ module.exports = {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'Literal[value=/--wp-admin-theme-/]',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
 			},
 		},
 		{

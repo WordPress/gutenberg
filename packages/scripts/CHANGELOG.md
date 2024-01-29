@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 27.1.0 (2024-01-24)
+
+## 27.0.0 (2024-01-10)
+
+### New Features
+
+-   Add experimental support for `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).
+
+### Breaking Changes
+
+-   Drop support for Node.js versions < 18.
+
 ## 26.19.0 (2023-12-13)
 
 ### Bug Fix

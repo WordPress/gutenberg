@@ -7,14 +7,14 @@ test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.activatePlugin( 'gutenberg-test-dataviews' ),
+			requestUtils.setGutenbergExperiments( [ 'gutenberg-dataviews' ] ),
 		] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deactivatePlugin( 'gutenberg-test-dataviews' ),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.setGutenbergExperiments( [] ),
 		] );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
@@ -86,7 +86,7 @@ test.describe( 'Templates', () => {
 	test( 'Field visibility', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		await page.getByRole( 'button', { name: 'Description' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Hide' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 		await expect(
 			page.getByRole( 'button', { name: 'Description' } )
 		).toBeHidden();

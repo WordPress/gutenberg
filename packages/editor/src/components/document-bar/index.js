@@ -48,40 +48,32 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { isEditingTemplate, templateId, postType, postId } = useSelect(
-		( select ) => {
-			const {
-				getRenderingMode,
-				getCurrentTemplateId,
-				getCurrentPostId,
-				getCurrentPostType,
-			} = select( editorStore );
-			const _templateId = getCurrentTemplateId();
-			return {
-				isEditingTemplate:
-					!! _templateId && getRenderingMode() === 'template-only',
-				templateId: _templateId,
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-			};
-		},
-		[]
-	);
-	const { getEditorSettings } = useSelect( editorStore );
-	const { setRenderingMode } = useDispatch( editorStore );
+	const { postType, postId, goBack } = useSelect( ( select ) => {
+		const {
+			getCurrentPostId,
+			getCurrentPostType,
+			getEditorSettings: getSettings,
+		} = select( editorStore );
+		const back = getSettings().goBack;
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			goBack: typeof back === 'function' ? back : undefined,
+			getEditorSettings: getSettings,
+		};
+	}, [] );
+
+	const handleOnBack = () => {
+		if ( goBack ) {
+			goBack();
+		}
+	};
 
 	return (
 		<BaseDocumentActions
-			postType={ isEditingTemplate ? 'wp_template' : postType }
-			postId={ isEditingTemplate ? templateId : postId }
-			onBack={
-				isEditingTemplate
-					? () =>
-							setRenderingMode(
-								getEditorSettings().defaultRenderingMode
-							)
-					: undefined
-			}
+			postType={ postType }
+			postId={ postId }
+			onBack={ goBack ? handleOnBack : undefined }
 		/>
 	);
 }

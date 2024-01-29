@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
+import { isValidElementType } from 'react-is';
 
 /**
  * WordPress dependencies
@@ -113,8 +114,8 @@ export const processBlockType =
 			error( 'The "save" property must be a valid function.' );
 			return;
 		}
-		if ( 'edit' in settings && typeof settings.edit !== 'function' ) {
-			error( 'The "edit" property must be a valid function.' );
+		if ( 'edit' in settings && ! isValidElementType( settings.edit ) ) {
+			error( 'The "edit" property must be a valid component.' );
 			return;
 		}
 

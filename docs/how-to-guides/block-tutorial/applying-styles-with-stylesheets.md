@@ -6,7 +6,7 @@ A block typically inserts markup (HTML) into post content that you want to style
 
 ## Before you start
 
-You will need a basic block and WordPress development environment to implement the examples shown in this guide. See the [create a basic block](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md) or [block tutorial](/docs/getting-started/create-block/README.md) to get setup.
+You will need a basic block and WordPress development environment to implement the examples shown in this guide. See the [create a basic block](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md) or [block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) to get setup.
 
 ## Methods to add style
 

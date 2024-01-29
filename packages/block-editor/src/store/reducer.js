@@ -453,14 +453,25 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let markNextChangeAsNotPersistent = false;
+	let explicitPersistent;
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
-		if ( action.type === 'SYNC_DERIVED_BLOCK_ATTRIBUTES' ) {
-			return nextState.isPersistentChange
-				? { ...nextState, isPersistentChange: false }
-				: nextState;
+		let nextIsPersistentChange;
+		if ( action.type === 'SET_EXPLICIT_PERSISTENT' ) {
+			explicitPersistent = action.isPersistentChange;
+			nextIsPersistentChange = state.isPersistentChange ?? true;
+		}
+
+		if ( explicitPersistent !== undefined ) {
+			nextIsPersistentChange = explicitPersistent;
+			return nextIsPersistentChange === nextState.isPersistentChange
+				? nextState
+				: {
+						...nextState,
+						isPersistentChange: nextIsPersistentChange,
+				  };
 		}
 
 		const isExplicitPersistentChange =
@@ -473,7 +484,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = state?.isPersistentChange ?? true;
+			nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -1588,13 +1599,19 @@ export function blocksMode( state = {}, action ) {
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index, __unstableWithInserter, operation } =
-				action;
+			const {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+				nearestSide,
+			} = action;
 			const nextState = {
 				rootClientId,
 				index,
 				__unstableWithInserter,
 				operation,
+				nearestSide,
 			};
 
 			// Bail out updates if the states are the same.
@@ -1896,6 +1913,21 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 }
 
 /**
+ * Reducer returning the focus mode that should be used when temporarily edit as blocks finishes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function temporarilyEditingFocusModeRevert( state = '', action ) {
+	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
+		return action.focusModeToRevert;
+	}
+	return state;
+}
+
+/**
  * Reducer returning a map of block client IDs to block editing modes.
  *
  * @param {Map}    state  Current state.
@@ -1991,6 +2023,29 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				useSource: action.useSource,
+				lockAttributesEditing: action.lockAttributesEditing,
+			},
+		};
+	}
+	return state;
+}
+
+function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -2013,6 +2068,7 @@ const combinedReducers = combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
+	temporarilyEditingFocusModeRevert,
 	blockVisibility,
 	blockEditingModes,
 	styleOverrides,
@@ -2020,6 +2076,8 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	blockBindingsSources,
+	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

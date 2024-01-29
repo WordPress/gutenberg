@@ -13,7 +13,6 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableInstagramEmbed: Boolean,
     val enableLoomEmbed: Boolean,
     val enableSmartframeEmbed: Boolean,
-    val enableMediaFilesCollectionBlocks: Boolean,
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
@@ -70,7 +69,6 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_LAYOUT_GRID_BLOCK, enableLayoutGridBlock)
         putBoolean(PROP_CAPABILITIES_TILED_GALLERY_BLOCK, enableTiledGalleryBlock)
         putBoolean(PROP_CAPABILITIES_VIDEOPRESS_BLOCK, enableVideoPressBlock)
-        putBoolean(PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK, enableMediaFilesCollectionBlocks)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
@@ -92,7 +90,6 @@ data class GutenbergProps @JvmOverloads constructor(
                     content?.let { putString(PROP_INITIAL_DATA, it) }
                 }
 
-        private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
         private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
@@ -105,6 +102,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
         private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 
+        const val PROP_INITIAL_TITLE = "initialTitle"
         const val PROP_INITIAL_DATA = "initialData"
         const val PROP_STYLES = "rawStyles"
         const val PROP_FEATURES = "rawFeatures"
@@ -118,7 +116,6 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
         const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"
         const val PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK = "smartframeEmbed"
-        const val PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK = "mediaFilesCollectionBlock"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_XPOSTS = "xposts"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"

@@ -34,7 +34,8 @@ function getEditorCanvasContainerTitle( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
-			return __( 'Global styles revisions' );
+		case 'global-styles-revisions:style-book':
+			return __( 'Style Revisions' );
 		default:
 			return '';
 	}
@@ -62,7 +63,7 @@ function EditorCanvasContainer( {
 			).getEditorCanvasContainerView();
 
 			const _showListViewByDefault = select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'showListViewByDefault'
 			);
 
@@ -87,12 +88,12 @@ function EditorCanvasContainer( {
 	);
 
 	function onCloseContainer() {
-		if ( typeof onClose === 'function' ) {
-			onClose();
-		}
 		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 	}
 
 	function closeOnEscape( event ) {

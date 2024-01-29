@@ -12,7 +12,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
-	__experimentalRecursionProvider as RecursionProvider,
+	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
@@ -36,6 +36,8 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 } = unlock( blockEditorPrivateApis );
+
+const noop = () => {};
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -89,6 +91,7 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
+		showEditorPadding,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -125,7 +128,7 @@ function EditorCanvas( {
 
 		return {
 			renderingMode: _renderingMode,
-			postContentAttributes: getEditorSettings().postContentAttributes,
+			postContentAttributes: editorSettings.postContentAttributes,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -135,6 +138,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
+			showEditorPadding: !! editorSettings.goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -283,12 +287,10 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const contentRef = useMergeRefs(
-		[
-			localRef,
-			renderingMode === 'post-only' ? typewriterRef : undefined,
-		].filter( ( r ) => !! r )
-	);
+	const contentRef = useMergeRefs( [
+		localRef,
+		renderingMode === 'post-only' ? typewriterRef : noop,
+	] );
 
 	return (
 		<BlockCanvas
@@ -299,6 +301,9 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
+				className: classnames( 'editor-canvas__iframe', {
+					'has-editor-padding': showEditorPadding,
+				} ),
 				...iframeProps,
 				style: {
 					...iframeProps?.style,
@@ -359,7 +364,8 @@ function EditorCanvas( {
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+							: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+						renderingMode !== 'all' && 'is-' + renderingMode
 					) }
 					layout={ blockListLayout }
 					dropZoneElement={

@@ -81,14 +81,14 @@ describe( 'actions', () => {
 			const registry = createRegistryWithStores();
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'distractionFree', true );
+				.set( 'core', 'distractionFree', true );
 			registry
 				.dispatch( editSiteStore )
 				.openGeneralSidebar( 'edit-site/global-styles' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
 	} );
@@ -98,18 +98,18 @@ describe( 'actions', () => {
 			const registry = createRegistryWithStores();
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'distractionFree', true );
+				.set( 'core', 'distractionFree', true );
 			registry.dispatch( editSiteStore ).switchEditorMode( 'visual' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( true );
 			registry.dispatch( editSiteStore ).switchEditorMode( 'text' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
 	} );
@@ -120,7 +120,7 @@ describe( 'actions', () => {
 			// Enable everything that shouldn't be enabled in distraction free mode.
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'fixedToolbar', true );
+				.set( 'core', 'fixedToolbar', true );
 			registry.dispatch( editorStore ).setIsListViewOpened( true );
 			registry
 				.dispatch( editSiteStore )
@@ -130,7 +130,7 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'fixedToolbar' )
+					.get( 'core', 'fixedToolbar' )
 			).toBe( true );
 			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
 				false
@@ -146,7 +146,7 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( true );
 		} );
 	} );

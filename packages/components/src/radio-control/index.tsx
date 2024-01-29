@@ -92,7 +92,10 @@ export function RadioControl(
 							}
 							{ ...additionalProps }
 						/>
-						<label htmlFor={ `${ id }-${ index }` }>
+						<label
+							className="components-radio-control__label"
+							htmlFor={ `${ id }-${ index }` }
+						>
 							{ option.label }
 						</label>
 					</div>

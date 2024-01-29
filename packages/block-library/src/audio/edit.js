@@ -42,22 +42,19 @@ function AudioEdit( {
 	className,
 	setAttributes,
 	onReplace,
-	isSelected,
+	isSelected: isSingleSelected,
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
 	const isTemporaryAudio = ! id && isBlobURL( src );
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
-	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
-				mediaUpload( {
+				getSettings().mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectAudio( media ),
 					onError: ( e ) => onUploadError( e ),
@@ -146,17 +143,19 @@ function AudioEdit( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="audio/*"
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ isSingleSelected && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="audio/*"
+						onSelect={ onSelectAudio }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
@@ -200,16 +199,17 @@ function AudioEdit( {
 					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Audio caption text' ) }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>

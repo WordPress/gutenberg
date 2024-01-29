@@ -349,6 +349,17 @@ export function listViewPanel( state = false, action ) {
 	return state;
 }
 
+/**
+ * This reducer does nothing aside initializing a ref to the list view toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the list view toggle button.
+ */
+export function listViewToggleRef( state = { current: null } ) {
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -365,4 +376,5 @@ export default combineReducers( {
 	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
+	listViewToggleRef,
 } );

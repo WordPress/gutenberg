@@ -409,6 +409,19 @@ _Returns_
 
 -   `WPBlock[]`: Block objects.
 
+### getBlocksByName
+
+Returns all blocks that match a blockName. Results include nested blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _blockName_ `?string`: Optional block name, if not specified, returns an empty array.
+
+_Returns_
+
+-   `Array`: Array of clientIds of blocks with name equal to blockName.
+
 ### getBlockSelectionEnd
 
 Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.
@@ -587,18 +600,6 @@ _Properties_
 -   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
-
-### getLastFocus
-
-Returns the element of the last element that had focus when focus left the editor canvas.
-
-_Parameters_
-
--   _state_ `Object`: Block editor state.
-
-_Returns_
-
--   `Object`: Element.
 
 ### getLastMultiSelectedBlockClientId
 
@@ -1662,18 +1663,6 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
-
-### setLastFocus
-
-Action that sets the element that had focus when focus leaves the editor canvas.
-
-_Parameters_
-
--   _lastFocus_ `Object`: The last focused element.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### setNavigationMode
 

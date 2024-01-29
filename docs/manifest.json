@@ -96,6 +96,12 @@
 		"parent": "fundamentals"
 	},
 	{
+		"title": "Static or Dynamic rendering of a block",
+		"slug": "static-dynamic-rendering",
+		"markdown_source": "../docs/getting-started/fundamentals/static-dynamic-rendering.md",
+		"parent": "fundamentals"
+	},
+	{
 		"title": "Working with Javascript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
 		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
@@ -212,8 +218,38 @@
 	{
 		"title": "Curating the Editor Experience",
 		"slug": "curating-the-editor-experience",
-		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience.md",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/README.md",
 		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Locking API",
+		"slug": "block-locking",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/block-locking.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Patterns",
+		"slug": "patterns",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/patterns.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Filters and hooks",
+		"slug": "filters-and-hooks",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/filters-and-hooks.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Disable Editor functionality",
+		"slug": "disable-editor-functionality",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/disable-editor-functionality.md",
+		"parent": "curating-the-editor-experience"
 	},
 	{
 		"title": "Enqueueing assets in the Editor",
@@ -271,8 +307,8 @@
 	},
 	{
 		"title": "Global Settings & Styles (theme.json)",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
+		"slug": "global-settings-and-styles",
+		"markdown_source": "../docs/how-to-guides/themes/global-settings-and-styles.md",
 		"parent": "themes"
 	},
 	{
@@ -759,12 +795,6 @@
 		"title": "DropZone",
 		"slug": "drop-zone",
 		"markdown_source": "../packages/components/src/drop-zone/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DropdownMenuV2Ariakit",
-		"slug": "dropdown-menu-v2-ariakit",
-		"markdown_source": "../packages/components/src/dropdown-menu-v2-ariakit/README.md",
 		"parent": "components"
 	},
 	{
@@ -1641,6 +1671,12 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/interactivity-router",
+		"slug": "packages-interactivity-router",
+		"markdown_source": "../packages/interactivity-router/README.md",
 		"parent": "packages"
 	},
 	{

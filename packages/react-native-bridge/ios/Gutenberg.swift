@@ -296,6 +296,7 @@ extension Gutenberg {
         case succeeded = 2
         case failed = 3
         case reset = 4
+        case paused = 11
     }
 
     public enum MediaSaveState: Int, MediaState {

@@ -3,6 +3,11 @@
  */
 import { Platform } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { undoIgnoreBlocks } from './undo-ignore';
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -291,10 +296,77 @@ export function deleteStyleOverride( id ) {
 	};
 }
 
-export function syncDerivedBlockAttributes( clientId, attributes ) {
+/**
+ * A higher-order action that mark every change inside a callback as "non-persistent"
+ * and ignore pushing to the undo history stack. It's primarily used for synchronized
+ * derived updates from the block editor without affecting the undo history.
+ *
+ * @param {() => void} callback The synchronous callback to derive updates.
+ */
+export function syncDerivedUpdates( callback ) {
+	return ( { dispatch, select, registry } ) => {
+		registry.batch( () => {
+			// Mark every change in the `callback` as non-persistent.
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: false,
+			} );
+			callback();
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: undefined,
+			} );
+
+			// Ignore pushing undo stack for the updated blocks.
+			const updatedBlocks = select.getBlocks();
+			undoIgnoreBlocks.add( updatedBlocks );
+		} );
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param {Object} lastFocus The last focused element.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setLastFocus( lastFocus = null ) {
 	return {
-		type: 'SYNC_DERIVED_BLOCK_ATTRIBUTES',
-		clientIds: [ clientId ],
-		attributes,
+		type: 'LAST_FOCUS',
+		lastFocus,
+	};
+}
+
+/**
+ * Action that stops temporarily editing as blocks.
+ *
+ * @param {string} clientId The block's clientId.
+ */
+export function stopEditingAsBlocks( clientId ) {
+	return ( { select, dispatch } ) => {
+		const focusModeToRevert =
+			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateSettings( { focusMode: focusModeToRevert } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks();
+	};
+}
+
+export function registerBlockBindingsSource( source ) {
+	return {
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		useSource: source.useSource,
+		lockAttributesEditing: source.lockAttributesEditing,
 	};
 }

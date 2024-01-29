@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, memo } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
 import { useDebouncedInput } from '@wordpress/compose';
 
-export default function Search( { label, view, onChangeView } ) {
+const Search = memo( function Search( { label, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
 		view.search
 	);
@@ -18,11 +18,11 @@ export default function Search( { label, view, onChangeView } ) {
 		onChangeViewRef.current = onChangeView;
 	}, [ onChangeView ] );
 	useEffect( () => {
-		onChangeViewRef.current( ( currentView ) => ( {
-			...currentView,
+		onChangeViewRef.current( {
+			...view,
 			page: 1,
 			search: debouncedSearch,
-		} ) );
+		} );
 	}, [ debouncedSearch ] );
 	const searchLabel = label || __( 'Filter list' );
 	return (
@@ -35,4 +35,6 @@ export default function Search( { label, view, onChangeView } ) {
 			size="compact"
 		/>
 	);
-}
+} );
+
+export default Search;

@@ -6,7 +6,7 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import RCTAztecView from '@wordpress/react-native-aztec';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
@@ -190,47 +190,15 @@ export function subscribeOnRedoPressed( callback ) {
 	return gutenbergBridgeEvents.addListener( 'onRedoPressed', callback );
 }
 
-export function useIsConnected() {
-	const [ isConnected, setIsConnected ] = useState( null );
-
-	useEffect( () => {
-		let isCurrent = true;
-
-		RNReactNativeGutenbergBridge.requestConnectionStatus(
-			( isBridgeConnected ) => {
-				if ( ! isCurrent ) {
-					return;
-				}
-
-				setIsConnected( isBridgeConnected );
-			}
-		);
-
-		return () => {
-			isCurrent = false;
-		};
-	}, [] );
-
-	useEffect( () => {
-		const subscription = subscribeConnectionStatus(
-			( { isConnected: isBridgeConnected } ) => {
-				setIsConnected( isBridgeConnected );
-			}
-		);
-
-		return () => {
-			subscription.remove();
-		};
-	}, [] );
-
-	return { isConnected };
-}
-
-function subscribeConnectionStatus( callback ) {
+export function subscribeConnectionStatus( callback ) {
 	return gutenbergBridgeEvents.addListener(
 		'connectionStatusChange',
 		callback
 	);
+}
+
+export function requestConnectionStatus( callback ) {
+	return RNReactNativeGutenbergBridge.requestConnectionStatus( callback );
 }
 
 /**
@@ -526,7 +494,11 @@ export function showAndroidSoftKeyboard() {
 		return;
 	}
 
-	RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+	const hasFocusedTextInput = RCTAztecView.InputState.isFocused();
+
+	if ( hasFocusedTextInput ) {
+		RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+	}
 }
 
 /**

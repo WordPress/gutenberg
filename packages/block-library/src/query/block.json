@@ -47,11 +47,11 @@
 		"enhancedPagination": "enhancedPagination"
 	},
 	"supports": {
+		"interactivity": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true
 	},
 	"editorStyle": "wp-block-query-editor",
-	"style": "wp-block-query",
-	"viewScript": "file:./view.min.js"
+	"style": "wp-block-query"
 }
