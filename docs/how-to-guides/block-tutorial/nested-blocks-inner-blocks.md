@@ -113,7 +113,7 @@ add_action( 'init', function() {
 
 ## Using parent, ancestor and children relationships in blocks
 
-A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. There are three relationships that builders can use: `parent`, `ancestor` and `allowedBlocks`. The differences are:
+A common pattern for using InnerBlocks is to create a custom block that will only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. There are three relationships that builders can use: `parent`, `ancestor` and `allowedBlocks`. The differences are:
 
 - If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a __direct descendant of the parent__.
 - If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a __descendent of the parent__.
