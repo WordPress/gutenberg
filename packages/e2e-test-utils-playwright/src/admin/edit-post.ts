@@ -21,4 +21,6 @@ export async function editPost( this: Admin, postId: string | number ) {
 		welcomeGuide: false,
 		fullscreenMode: false,
 	} );
+
+	await this.editor.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 }
