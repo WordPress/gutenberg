@@ -23,8 +23,6 @@ import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-ta
 import { store } from './';
 import { unlock } from '../lock-unlock';
 
-export { getSelectedBlockClientIdsUnmemoized } from './utils';
-
 /**
  * Returns true if the block interface is hidden, or false otherwise.
  *

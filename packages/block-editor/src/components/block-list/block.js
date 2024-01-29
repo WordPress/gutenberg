@@ -513,7 +513,7 @@ function BlockListBlockProvider( props ) {
 				getBlockEditingMode,
 				getBlockName,
 				isFirstMultiSelectedBlock,
-				getSelectedBlockClientIdsUnmemoized,
+				getMultiSelectedBlockClientIds,
 				hasSelectedInnerBlock,
 
 				getBlockIndex,
@@ -583,7 +583,7 @@ function BlockListBlockProvider( props ) {
 				mayDisplayControls:
 					_isSelected ||
 					( isFirstMultiSelectedBlock( clientId ) &&
-						getSelectedBlockClientIdsUnmemoized().every(
+						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === blockName
 						) ),
 				mayDisplayParentControls:

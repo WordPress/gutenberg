@@ -1,8 +1,3 @@
-/**
- * Internal dependencies
- */
-import { getBlockRootClientId, getBlockOrder } from './selectors';
-
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
 		return list;
@@ -54,36 +49,3 @@ export const getAllPatternsDependants = ( state ) => {
 		state.blockPatterns,
 	];
 };
-
-const EMPTY_ARRAY = [];
-
-export function getSelectedBlockClientIdsUnmemoized( state ) {
-	const { selectionStart, selectionEnd } = state.selection;
-
-	if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
-		return EMPTY_ARRAY;
-	}
-
-	if ( selectionStart.clientId === selectionEnd.clientId ) {
-		return [ selectionStart.clientId ];
-	}
-
-	// Retrieve root client ID to aid in retrieving relevant nested block
-	// order, being careful to allow the falsey empty string top-level root
-	// by explicitly testing against null.
-	const rootClientId = getBlockRootClientId( state, selectionStart.clientId );
-
-	if ( rootClientId === null ) {
-		return EMPTY_ARRAY;
-	}
-
-	const blockOrder = getBlockOrder( state, rootClientId );
-	const startIndex = blockOrder.indexOf( selectionStart.clientId );
-	const endIndex = blockOrder.indexOf( selectionEnd.clientId );
-
-	if ( startIndex > endIndex ) {
-		return blockOrder.slice( endIndex, startIndex + 1 );
-	}
-
-	return blockOrder.slice( startIndex, endIndex + 1 );
-}
