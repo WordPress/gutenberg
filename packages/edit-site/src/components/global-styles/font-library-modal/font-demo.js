@@ -23,7 +23,6 @@ function FontFaceDemo( {
 	customPreviewUrl,
 	fontFace,
 	text,
-	checkboxId,
 	onClick,
 	style = {},
 } ) {
@@ -77,7 +76,6 @@ function FontFaceDemo( {
 	return (
 		<div
 			ref={ ref }
-			id={ checkboxId }
 			onClick={ onClick }
 			onKeyDown={ onClick }
 			tabIndex={ -1 }
