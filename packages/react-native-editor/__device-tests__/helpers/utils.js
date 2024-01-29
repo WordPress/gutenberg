@@ -406,7 +406,7 @@ const selectTextFromElement = async ( driver, element ) => {
 			.perform();
 	} else {
 		// On iOS we can use the context menu to "Select all" text.
-		await longPressMiddleOfElement( driver, element );
+		await clickBeginningOfElement( driver, element );
 
 		const selectAllElement = await driver.$(
 			'//XCUIElementTypeMenuItem[@name="Select All"]'
@@ -534,23 +534,16 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
-	} else if ( toggleOn ) {
+	} else {
+		const action = toggleOn ? 'Switch to HTML' : 'Switch To Visual';
+		await driver.waitUntil( driver.$( '~editor-menu-button' ).isDisplayed );
 		const moreOptionsButton = await driver.$( '~editor-menu-button' );
 		await moreOptionsButton.click();
 
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="Switch to HTML"]'
-		);
-	} else {
-		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
-		await driver.pause( 3000 );
-		const moreOptionsButton = await driver.$( '~editor-menu-button' );
-		await moreOptionsButton.click();
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="Switch To Visual"]'
-		);
+		await driver.waitUntil( driver.$( `~${ action }` ).isDisplayed );
+
+		const actionButton = await driver.$( `~${ action }` );
+		await actionButton.click();
 	}
 };
 
