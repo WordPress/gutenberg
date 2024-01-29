@@ -723,13 +723,13 @@ const launchApp = async ( driver, initialProps = {} ) => {
 		await driver.execute( 'mobile: startActivity', {
 			component: ANDROID_COMPONENT_NAME,
 			stop: true,
-			// extras: [
-			// 	[
-			// 		's',
-			// 		'initialProps',
-			// 		`'${ JSON.stringify( initialProps ) }'`,
-			// 	],
-			// ],
+			extras: [
+				[
+					's',
+					'initialProps',
+					`'${ JSON.stringify( initialProps ) }'`,
+				],
+			],
 		} );
 	} else {
 		await driver.execute( 'mobile: terminateApp', {
