@@ -231,7 +231,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$settings = json_decode( $value, true );
 
 		if ( isset( $settings['fontFamily'] ) ) {
-			$settings['fontFamily'] = WP_Font_Family_Utils::format_font_family( $settings['fontFamily'] );
+			$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
 		}
 
 		return $settings;
@@ -309,7 +309,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			array(
 				'post_type'              => $this->post_type,
 				'posts_per_page'         => 1,
-				'title'                  => WP_Font_Family_Utils::get_font_face_slug( $settings ),
+				'title'                  => WP_Font_Utils::get_font_face_slug( $settings ),
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 			)
@@ -731,7 +731,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 		// Store this "slug" as the post_title rather than post_name, since it uses the fontFamily setting,
 		// which may contain multibyte characters.
-		$title = WP_Font_Family_Utils::get_font_face_slug( $settings );
+		$title = WP_Font_Utils::get_font_face_slug( $settings );
 
 		$prepared_post->post_type    = $this->post_type;
 		$prepared_post->post_parent  = $request['font_family_id'];
