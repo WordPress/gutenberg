@@ -1565,14 +1565,30 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
-	const hasParentAllowedBlock = checkAllowList(
-		parentAllowedBlocks,
+	const parentName = getBlockName( state, rootClientId );
+	const parentBlockType = getBlockType( parentName );
+
+	// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
+	const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
+	let hasParentAllowedBlock = checkAllowList(
+		parentAllowedChildBlocks,
 		blockName
 	);
 
+	// The `allowedBlocks` block list setting can further limit which blocks are allowed children.
+	if ( hasParentAllowedBlock !== false ) {
+		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
+		const hasParentListAllowedBlock = checkAllowList(
+			parentAllowedBlocks,
+			blockName
+		);
+		// Never downgrade the result from `true` to `null`
+		if ( hasParentListAllowedBlock !== null ) {
+			hasParentAllowedBlock = hasParentListAllowedBlock;
+		}
+	}
+
 	const blockAllowedParentBlocks = blockType.parent;
-	const parentName = getBlockName( state, rootClientId );
 	const hasBlockAllowedParent = checkAllowList(
 		blockAllowedParentBlocks,
 		parentName
