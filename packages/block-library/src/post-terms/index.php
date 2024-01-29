@@ -61,6 +61,8 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 /**
  * Returns the available variations for the `core/post-terms` block.
  *
+ * @since 6.5.0
+ *
  * @return array The available variations for the block.
  */
 function build_post_term_block_variations() {
@@ -72,9 +74,11 @@ function build_post_term_block_variations() {
 		'objects'
 	);
 
-	// Split the available taxonomies to `built_in` and custom ones,
-	// in order to prioritize the `built_in` taxonomies at the
-	// search results.
+	/*
+	 * Split the available taxonomies to `built_in` and custom ones,
+	 * in order to prioritize the `built_in` taxonomies at the
+	 * search results.
+	 */
 	$built_ins         = array();
 	$custom_variations = array();
 
