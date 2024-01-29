@@ -17,13 +17,11 @@ import {
 	getBlockEditingMode,
 	getSettings,
 	canInsertBlockType,
-} from '../selectors';
-import { checkAllowListRecursive, getAllPatternsDependants } from '../utils';
-import { INSERTER_PATTERN_TYPES } from '../../components/inserter/block-patterns-tab/utils';
-import { store } from '..';
-import { unlock } from '../../lock-unlock';
-
-export { getInheritedSettings } from './get-inherited-settings';
+} from './selectors';
+import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
+import { store } from '.';
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -175,7 +173,7 @@ export function getStyleOverrides( state ) {
 	return state.styleOverrides;
 }
 
-/** @typedef {import('../actions').InserterMediaCategory} InserterMediaCategory */
+/** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
 /**
  * Returns the registered inserter media categories through the public API.
  *

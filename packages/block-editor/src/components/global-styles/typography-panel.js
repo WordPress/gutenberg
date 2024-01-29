@@ -16,7 +16,7 @@ import { useCallback } from '@wordpress/element';
 import {
 	mergeOrigins,
 	hasMergedOrigins,
-} from '../../store/private-selectors/get-inherited-settings';
+} from '../../store/get-inherited-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';

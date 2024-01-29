@@ -10,13 +10,13 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getValueFromObjectPath } from '../../utils/object';
+import { getValueFromObjectPath } from '../utils/object';
 import {
 	getBlockParents,
 	getBlockName,
 	getSettings,
 	getBlockAttributes,
-} from '../selectors';
+} from './selectors';
 
 const blockedPaths = [
 	'color',
