@@ -70,6 +70,7 @@ function URLPopover( {
 			focusOnMount={ focusOnMount }
 			placement={ computedPlacement }
 			shift
+			variant="toolbar"
 			{ ...popoverProps }
 		>
 			<div className="block-editor-url-popover__input-container">
@@ -82,6 +83,7 @@ function URLPopover( {
 							label={ __( 'Link settings' ) }
 							onClick={ toggleSettingsVisibility }
 							aria-expanded={ isSettingsExpanded }
+							size="compact"
 						/>
 					) }
 				</div>
