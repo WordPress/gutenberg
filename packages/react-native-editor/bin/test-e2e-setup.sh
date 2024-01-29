@@ -29,14 +29,14 @@ if echo "$output" | grep -q 'uiautomator2'; then
 	log_info "UiAutomator2 available."
 else
 	log_info "UiAutomator2 not found, installing..."
-	$APPIUM_CMD driver install uiautomator2
+	$APPIUM_CMD driver install uiautomator2@2.32.3
 fi
 
 if echo "$output" | grep -q 'xcuitest'; then
 	log_info "XCUITest available."
 else
 	log_info "XCUITest not found, installing..."
-	$APPIUM_CMD driver install xcuitest
+	$APPIUM_CMD driver install xcuitest@5.7.0
 fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
