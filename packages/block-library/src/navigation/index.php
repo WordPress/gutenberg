@@ -1392,10 +1392,6 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	if ( ! isset( $post->ID ) ) {
-		return;
-	}
-
 	// We run the Block Hooks mechanism so it will return the list of ignored hooked blocks
 	// in the mock root Navigation block's metadata attribute.
 	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
