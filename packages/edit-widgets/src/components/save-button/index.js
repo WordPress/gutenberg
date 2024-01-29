@@ -22,12 +22,14 @@ function SaveButton() {
 	}, [] );
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
+	const isDisabled = isSaving || ! hasEditedWidgetAreaIds;
+
 	return (
 		<Button
 			variant="primary"
 			isBusy={ isSaving }
-			aria-disabled={ isSaving || ! hasEditedWidgetAreaIds }
-			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
+			aria-disabled={ isDisabled }
+			onClick={ isDisabled ? undefined : saveEditedWidgetAreas }
 		>
 			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
