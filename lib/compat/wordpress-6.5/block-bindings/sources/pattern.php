@@ -36,8 +36,8 @@ if ( ! function_exists( 'gutenberg_register_block_bindings_pattern_overrides_sou
 		register_block_bindings_source(
 			'core/pattern-attributes',
 			array(
-				'label' => __( 'Pattern Attributes' ),
-				'apply' => 'gutenberg_block_bindings_pattern_overrides_callback',
+				'label'              => __( 'Pattern Attributes' ),
+				'get_value_callback' => 'gutenberg_block_bindings_pattern_overrides_callback',
 			)
 		);
 	}

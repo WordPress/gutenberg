@@ -99,7 +99,7 @@ if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 				continue;
 			}
 
-			$source_callback = $block_bindings_sources[ $binding_source['source'] ]['apply'];
+			$source_callback = $block_bindings_sources[ $binding_source['source'] ]['get_value_callback'];
 			// Get the value based on the source.
 			if ( ! isset( $binding_source['args'] ) ) {
 				$source_args = array();

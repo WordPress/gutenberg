@@ -29,8 +29,8 @@ if ( ! function_exists( 'gutenberg_register_block_bindings_post_meta_source' ) &
 		register_block_bindings_source(
 			'core/post-meta',
 			array(
-				'label' => __( 'Post Meta' ),
-				'apply' => 'gutenberg_block_bindings_post_meta_callback',
+				'label'              => __( 'Post Meta' ),
+				'get_value_callback' => 'gutenberg_block_bindings_post_meta_callback',
 			)
 		);
 	}
