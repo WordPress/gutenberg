@@ -129,7 +129,7 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
  */
 function render_block_core_home_link( $attributes, $content, $block ) {
 	if ( empty( $attributes['label'] ) ) {
-		return '';
+		$attributes['label'] = __( 'Home' );
 	}
 	$aria_current = '';
 
