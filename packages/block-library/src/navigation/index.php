@@ -192,7 +192,7 @@ class WP_Navigation_Block_Renderer {
 			// it encounters whitespace. This code strips it.
 			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
-			if ( function_exists( 'get_hooked_blocks' ) ) {
+			if ( function_exists( 'get_hooked_block_markup' ) ) {
 				// Run Block Hooks algorithm to inject hooked blocks.
 				$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
 				$root_nav_block = parse_blocks( $markup )[0];
@@ -987,7 +987,7 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 
-		if ( function_exists( 'get_hooked_blocks' ) ) {
+		if ( function_exists( 'get_hooked_block_markup' ) ) {
 			// Run Block Hooks algorithm to inject hooked blocks.
 			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
 			$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
@@ -1415,7 +1415,7 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
 // that are not present in Gutenberg's WP 6.4 compatibility layer.
-if ( function_exists( 'get_hooked_blocks' ) ) {
+if ( function_exists( 'get_hooked_block_markup' ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
@@ -1447,6 +1447,6 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
 // that are not present in Gutenberg's WP 6.4 compatibility layer.
-if ( function_exists( 'get_hooked_blocks' ) ) {
+if ( function_exists( 'get_hooked_block_markup' ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }
