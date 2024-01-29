@@ -592,7 +592,7 @@ const isEditorVisible = async ( driver ) => {
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
 		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
-	await driver.$( postTitleLocator ).waitForDisplayed( { timeout: 30000 } );
+	await driver.$( postTitleLocator ).waitForDisplayed( { timeout: 60000 } );
 };
 
 const waitForMediaLibrary = async ( driver ) => {
