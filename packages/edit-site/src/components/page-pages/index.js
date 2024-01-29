@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -62,6 +67,9 @@ function useView( postType ) {
 			return {
 				...defaultView,
 				type: layout,
+				layout: {
+					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
+				},
 			};
 		}
 		return defaultView;
@@ -165,7 +173,6 @@ function FeaturedImage( { item, viewType } ) {
 		viewType === LAYOUT_GRID
 			? [ 'large', 'full', 'medium', 'thumbnail' ]
 			: [ 'thumbnail', 'medium', 'large', 'full' ];
-
 	const media = hasMedia ? (
 		<Media
 			className="edit-site-page-pages__featured-image"
@@ -173,26 +180,21 @@ function FeaturedImage( { item, viewType } ) {
 			size={ size }
 		/>
 	) : null;
-
+	if ( viewType === LAYOUT_LIST ) {
+		return media;
+	}
 	return (
-		<span
-			className={ {
+		<button
+			className={ classNames( 'page-pages-preview-field__button', {
 				'edit-site-page-pages__media-wrapper':
 					viewType === LAYOUT_TABLE,
-			} }
+			} ) }
+			type="button"
+			onClick={ onClick }
+			aria-label={ item.title?.rendered || __( '(no title)' ) }
 		>
-			{ viewType === LAYOUT_LIST && media }
-			{ viewType !== LAYOUT_LIST && (
-				<button
-					className="page-pages-preview-field__button"
-					type="button"
-					onClick={ onClick }
-					aria-label={ item.title?.rendered || __( '(no title)' ) }
-				>
-					{ media }
-				</button>
-			) }
-		</span>
+			{ media }
+		</button>
 	);
 }
 
@@ -280,6 +282,7 @@ export default function PagePages() {
 					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
+				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
