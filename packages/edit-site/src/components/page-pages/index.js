@@ -282,6 +282,7 @@ export default function PagePages() {
 					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
+				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
