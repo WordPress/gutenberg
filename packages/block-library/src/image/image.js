@@ -411,15 +411,15 @@ export default function Image( {
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					getBlockBindingsSource( urlBinding?.source?.name )
+					getBlockBindingsSource( urlBinding?.source )
 						?.lockAttributesEditing === true,
 				lockAltControls:
 					!! altBinding &&
-					getBlockBindingsSource( altBinding?.source?.name )
+					getBlockBindingsSource( altBinding?.source )
 						?.lockAttributesEditing === true,
 				lockTitleControls:
 					!! titleBinding &&
-					getBlockBindingsSource( titleBinding?.source?.name )
+					getBlockBindingsSource( titleBinding?.source )
 						?.lockAttributesEditing === true,
 			};
 		},
