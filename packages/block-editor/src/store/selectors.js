@@ -148,7 +148,11 @@ export function getBlockAttributes( state, clientId ) {
  * @return {Object} Parsed block object.
  */
 export function getBlock( state, clientId ) {
-	return state.blocks.tree.get( clientId ) ?? null;
+	if ( ! state.blocks.byClientId.has( clientId ) ) {
+		return null;
+	}
+
+	return state.blocks.tree.get( clientId );
 }
 
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
