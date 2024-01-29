@@ -298,7 +298,9 @@ function Footer( { handleInstall, isDisabled } ) {
 		<Flex justify="flex-end">
 			<Button
 				variant="primary"
-				onClick={ handleInstall }
+				onClick={
+					isDisabled || isInstalling ? undefined : handleInstall
+				}
 				isBusy={ isInstalling }
 				aria-disabled={ isDisabled || isInstalling }
 			>
