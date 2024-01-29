@@ -93,17 +93,17 @@ function bootstrappedBlockTypes( state = {}, action ) {
 					};
 				}
 
-				// The `children` prop is not yet included in the server provided
+				// The `allowedBlocks` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.5.
 				if (
-					serverDefinition.children === undefined &&
-					blockType.children
+					serverDefinition.allowedBlocks === undefined &&
+					blockType.allowedBlocks
 				) {
 					newDefinition = {
 						...serverDefinition,
 						...newDefinition,
-						children: blockType.children,
+						allowedBlocks: blockType.allowedBlocks,
 					};
 				}
 			} else {
