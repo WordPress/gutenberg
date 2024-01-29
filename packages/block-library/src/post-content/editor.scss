@@ -1,4 +1,21 @@
-// Disable text selection in the post content placeholder.
-.wp-block-post-content.wp-block-post-content {
-	user-select: none;
+.wp-block-post-content__placeholder {
+	&.has-illustration::before {
+		background: none;
+		border: 1px solid currentColor;
+	}
+
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
+
+	.components-placeholder__fieldset {
+		align-self: center;
+		font-family: inherit;
+		font-size: inherit;
+
+		p {
+			font-family: inherit;
+			font-size: inherit;
+		}
+	}
 }

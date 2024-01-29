@@ -15,6 +15,8 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { Placeholder } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
@@ -104,25 +106,18 @@ function Content( props ) {
 	);
 }
 
-function Placeholder( { layoutClassNames } ) {
+function PostContentPlaceholder( { layoutClassNames } ) {
 	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
-			<p>
-				{ __(
-					'This is the Content block, it will display all the blocks in any single post or page.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
-				) }
-			</p>
+			<Placeholder
+				className="wp-block-post-content__placeholder"
+				withIllustration
+			>
+				<p>
+					{ __( 'This block will be replaced with your content.' ) }
+				</p>
+			</Placeholder>
 		</div>
 	);
 }
@@ -157,7 +152,7 @@ export default function PostContentEdit( {
 					layoutClassNames={ layoutClassNames }
 				/>
 			) : (
-				<Placeholder layoutClassNames={ layoutClassNames } />
+				<PostContentPlaceholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);
