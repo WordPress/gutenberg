@@ -301,8 +301,10 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 			),
 		),
 		'post_format' => array(
-			// The item_link and item_link_description for post formats is the
-			// same as for tags, so need to be overridden.
+			/*
+			 * The item_link and item_link_description for post formats is the
+			 * same as for tags, so need to be overridden.
+			 */
 			'title'       => __( 'Post Format Link' ),
 			'description' => __( 'A link to a post format' ),
 			'attributes'  => array(
@@ -323,17 +325,22 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 }
 
 /**
- * Register a variation for a post type / taxonomy for the navigation link block.
+ * Registers a variation for a post type / taxonomy for the navigation link block.
+ *
+ * @since 6.5.0
  *
  * @param array $variation Variation array from build_variation_for_navigation_link.
- * @return void
  */
 function block_core_navigation_link_register_variation( $variation ) {
-	// Directly set the variations on the registered block type
-	// because there's no server side registration for variations (see #47170).
+	/*
+	 * Directly set the variations on the registered block type
+	 * because there's no server side registration for variations (see #47170).
+	 */
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
-	// If the block is not registered yet, bail early.
-	// Variation will be registered in register_block_core_navigation_link then.
+	/*
+	 * If the block is not registered yet, bail early.
+	 * Variation will be registered in register_block_core_navigation_link then.
+	 */
 	if ( ! $navigation_block_type ) {
 		return;
 	}
@@ -345,14 +352,17 @@ function block_core_navigation_link_register_variation( $variation ) {
 }
 
 /**
- * Unregister a variation for a post type / taxonomy for the navigation link block.
+ * Unregisters a variation for a post type / taxonomy for the navigation link block.
+ *
+ * @since 6.5.0
  *
  * @param string $name Name of the post type / taxonomy (which was used as variation name).
- * @return void
  */
 function block_core_navigation_link_unregister_variation( $name ) {
-	// Directly get the variations from the registered block type
-	// because there's no server side (un)registration for variations (see #47170).
+	/*
+	 * Directly get the variations from the registered block type
+	 * because there's no server side (un)registration for variations (see #47170).
+	 */
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
 	// If the block is not registered (yet), there's no need to remove a variation.
 	if ( ! $navigation_block_type || empty( $navigation_block_type->variations ) ) {
@@ -371,22 +381,27 @@ function block_core_navigation_link_unregister_variation( $name ) {
 }
 
 /**
- * Register the navigation link block.
- * Returns an array of variations for the navigation link block.
+ * Returns the available variations for the `core/navigation-link` block.
+ *
+ * @since 6.5.0
  *
  * @return array
  */
 function build_navigation_link_block_variations() {
-	// This will only handle post types and taxonomies registered until this point (init on priority 9).
-	// See action hooks below for other post types and taxonomies.
-	// See https://github.com/WordPress/gutenberg/issues/53826 for details.
+	/*
+	 * This will only handle post types and taxonomies registered until this point (init on priority 9).
+	 * See action hooks below for other post types and taxonomies.
+	 * See https://github.com/WordPress/gutenberg/issues/53826 for details.
+	 */
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
 
-	// Use two separate arrays as a way to order the variations in the UI.
-	// Known variations (like Post Link and Page Link) are added to the
-	// `built_ins` array. Variations for custom post types and taxonomies are
-	// added to the `variations` array and will always appear after `built-ins.
+	/*
+	 * Use two separate arrays as a way to order the variations in the UI.
+	 * Known variations (like Post Link and Page Link) are added to the
+	 * `built_ins` array. Variations for custom post types and taxonomies are
+	 * added to the `variations` array and will always appear after `built-ins.
+	 */
 	$built_ins  = array();
 	$variations = array();
 
@@ -415,7 +430,7 @@ function build_navigation_link_block_variations() {
 }
 
 /**
- * Register the navigation link block.
+ * Registers the navigation link block.
  *
  * @uses render_block_core_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
@@ -430,8 +445,10 @@ function register_block_core_navigation_link() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
-// Register actions for all post types and taxonomies, to add variations when they are registered.
-// All post types/taxonomies registered before register_block_core_navigation_link, will be handled by that function.
+/*
+ * Register actions for all post types and taxonomies, to add variations when they are registered.
+ * All post types/taxonomies registered before register_block_core_navigation_link, will be handled by that function.
+ */
 add_action( 'registered_post_type', 'block_core_navigation_link_register_post_type_variation', 10, 2 );
 add_action( 'registered_taxonomy', 'block_core_navigation_link_register_taxonomy_variation', 10, 3 );
 // Handle unregistering of post types and taxonomies and remove the variations.
@@ -439,12 +456,13 @@ add_action( 'unregistered_post_type', 'block_core_navigation_link_unregister_pos
 add_action( 'unregistered_taxonomy', 'block_core_navigation_link_unregister_taxonomy_variation' );
 
 /**
- * Register custom post type variations for navigation link on post type registration
+ * Registers a custom post type variation for the navigation link block on post type registration
  * Handles all post types registered after the block is registered in register_navigation_link_post_type_variations
+ *
+ * @since 6.5.0
  *
  * @param string       $post_type The post type name passed from registered_post_type action hook.
  * @param WP_Post_Type $post_type_object The post type object passed from registered_post_type.
- * @return void
  */
 function block_core_navigation_link_register_post_type_variation( $post_type, $post_type_object ) {
 	if ( $post_type_object->show_in_nav_menus ) {
@@ -454,13 +472,14 @@ function block_core_navigation_link_register_post_type_variation( $post_type, $p
 }
 
 /**
- * Register a custom taxonomy variation for navigation link on taxonomy registration
+ * Registers a custom taxonomy variation for the navigation link block on taxonomy registration
  * Handles all taxonomies registered after the block is registered in register_navigation_link_post_type_variations
+ *
+ * @since 6.5.0
  *
  * @param string       $taxonomy Taxonomy slug.
  * @param array|string $object_type Object type or array of object types.
  * @param array        $args Array of taxonomy registration arguments.
- * @return void
  */
 function block_core_navigation_link_register_taxonomy_variation( $taxonomy, $object_type, $args ) {
 	if ( isset( $args['show_in_nav_menus'] ) && $args['show_in_nav_menus'] ) {
@@ -472,8 +491,9 @@ function block_core_navigation_link_register_taxonomy_variation( $taxonomy, $obj
 /**
  * Unregisters a custom post type variation for navigation link on post type unregistration.
  *
+ * @since 6.5.0
+ *
  * @param string $post_type The post type name passed from unregistered_post_type action hook.
- * @return void
  */
 function block_core_navigation_link_unregister_post_type_variation( $post_type ) {
 	block_core_navigation_link_unregister_variation( $post_type );
@@ -482,8 +502,9 @@ function block_core_navigation_link_unregister_post_type_variation( $post_type )
 /**
  * Unregisters a custom taxonomy variation for navigation link on taxonomy unregistration.
  *
+ * @since 6.5.0
+ *
  * @param string $taxonomy The taxonomy name passed from unregistered_taxonomy action hook.
- * @return void
  */
 function block_core_navigation_link_unregister_taxonomy_variation( $taxonomy ) {
 	block_core_navigation_link_unregister_variation( $taxonomy );
