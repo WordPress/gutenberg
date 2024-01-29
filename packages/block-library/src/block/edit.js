@@ -340,7 +340,7 @@ export default function ReusableBlockEdit( {
 		children = (
 			<Warning>
 				{ __(
-					'You cannot nest a pattern with overrides inside another pattern.'
+					'You cannot edit a pattern with overrides when it is nested in another pattern.'
 				) }
 			</Warning>
 		);
