@@ -325,6 +325,11 @@ describe( 'editor utils', () => {
 					'.wp-block.is-style-custom:where(.outer .inner:first-child)',
 			},
 			{
+				type: 'wrapping :where',
+				selector: ':where(.outer .inner:first-child)',
+				expected: ':where(.outer.is-style-custom .inner:first-child)',
+			},
+			{
 				type: 'complex',
 				selector:
 					'.wp:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',

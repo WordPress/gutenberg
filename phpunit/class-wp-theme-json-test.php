@@ -2551,6 +2551,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'selector' => '.wp-block:where(.outer .inner:first-child)',
 				'expected' => '.wp-block.is-style-custom:where(.outer .inner:first-child)',
 			),
+			'wrapping :where selector' => array(
+				'selector' => ':where(.outer .inner:first-child)',
+				'expected' => ':where(.outer.is-style-custom .inner:first-child)',
+			),
 			'complex'                  => array(
 				'selector' => '.wp:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
 				'expected' => '.wp.is-style-custom:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp.is-style-custom:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
