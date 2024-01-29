@@ -169,7 +169,8 @@ class WP_Font_Collection {
 			return static::$collection_json_cache[ $url ];
 		}
 
-		$transient_key = 'wp_font_collection_url_' . $url;
+		// Limit key to 167 characters to avoid failure in the case of a long url.
+		$transient_key = substr( 'wp_font_collection_url_' . $url, 0, 167 );
 		$data          = get_site_transient( $transient_key );
 
 		if ( false === $data ) {
