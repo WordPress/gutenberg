@@ -60,9 +60,6 @@ const renderRegions = ( page ) => {
 	}
 };
 
-// Variable to store the current navigation.
-let navigatingTo = '';
-
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 window.addEventListener( 'popstate', async () => {
@@ -82,6 +79,15 @@ pages.set(
 );
 
 export const { state, actions } = store( 'core/router', {
+	state: {
+		url: '',
+		navigation: {
+			target: '',
+			hasStarted: false,
+			hasFinished: false,
+			texts: {},
+		},
+	},
 	actions: {
 		/**
 		 * Navigates to the specified page.
@@ -108,7 +114,8 @@ export const { state, actions } = store( 'core/router', {
 		 */
 		*navigate( href, options = {} ) {
 			const url = cleanUrl( href );
-			navigatingTo = href;
+			const { navigation } = state;
+			navigation.target = href;
 			actions.prefetch( url, options );
 
 			// Create a promise that resolves when the specified timeout ends.
@@ -117,21 +124,45 @@ export const { state, actions } = store( 'core/router', {
 				setTimeout( resolve, options.timeout ?? 10000 )
 			);
 
+			// Don't update the navigation status immediately, wait 400 ms.
+			const timeout = setTimeout( () => {
+				if ( navigation.target === href ) {
+					navigation.hasStarted = true;
+					navigation.hasFinished = false;
+					navigation.message = navigation.texts.loading;
+				}
+			}, 400 );
+
 			const page = yield Promise.race( [
 				pages.get( url ),
 				timeoutPromise,
 			] );
 
+			// Dismiss loading message if it hasn't been added yet.
+			clearTimeout( timeout );
+
 			// Once the page is fetched, the destination URL could have changed
 			// (e.g., by clicking another link in the meantime). If so, bail
 			// out, and let the newer execution to update the HTML.
-			if ( navigatingTo !== href ) return;
+			if ( navigation.target !== href ) return;
+
+			navigation.hasStarted = false;
+			navigation.hasFinished = true;
+			// Announce that the page has been loaded. If the message is the
+			// same, we use a no-break space similar to the @wordpress/a11y
+			// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
+			navigation.message =
+				navigation.texts.loaded +
+				( navigation.message === navigation.texts.loaded
+					? '\u00A0'
+					: '' );
 
 			if ( page ) {
 				renderRegions( page );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
+				state.url = href;
 			} else {
 				window.location.assign( href );
 				yield new Promise( () => {} );
