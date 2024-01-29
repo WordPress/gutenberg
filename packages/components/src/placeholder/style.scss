@@ -1,5 +1,6 @@
 // This needs specificity to override individual block styles.
 .components-placeholder.components-placeholder {
+	font-size: $default-font-size;
 	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
