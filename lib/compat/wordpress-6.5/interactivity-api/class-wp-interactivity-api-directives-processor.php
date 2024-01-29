@@ -68,6 +68,52 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 		}
 
 		/**
+		 * Appends content after the closing tag of a balanced tag or after a void
+		 * tag.
+		 *
+		 * This method positions the processor in the opening tag of the appended
+		 * content, if it exists.
+		 *
+		 * @access private
+		 *
+		 * @param string $new_content The string to append after the closing tag.
+		 * @return bool Whether the content was successfully appended.
+		 */
+		public function append_content_after_closing_tag_on_balanced_or_void_tags( string $new_content ): bool {
+			if ( empty( $new_content ) ) {
+				return false;
+			}
+
+			$this->get_updated_html();
+
+			if ( $this->is_void() ) {
+				$bookmark = 'start_of_void_tag';
+				$this->set_bookmark( $bookmark );
+				$end = $this->bookmarks[ $bookmark ]->start + $this->bookmarks[ $bookmark ]->length + 1;
+				$this->release_bookmark( $bookmark );
+			} else {
+				$bookmarks = $this->get_balanced_tag_bookmarks();
+				if ( ! $bookmarks ) {
+					return false;
+				}
+				list( $start_name, $end_name ) = $bookmarks;
+
+				$end = $this->bookmarks[ $end_name ]->start + $this->bookmarks[ $end_name ]->length + 1;
+
+				$this->seek( $end_name );
+				$this->release_bookmark( $start_name );
+				$this->release_bookmark( $end_name );
+			}
+
+			$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $end, 0, $new_content );
+
+			// Move the processor to the opening tag of the appended content.
+			$this->next_tag();
+
+			return true;
+		}
+
+		/**
 		 * Returns a pair of bookmarks for the current opening tag and the matching
 		 * closing tag.
 		 *
