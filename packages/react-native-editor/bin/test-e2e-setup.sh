@@ -23,6 +23,8 @@ function log_error() {
 
 output=$($APPIUM_CMD driver list --installed --json)
 
+echo $output
+
 if echo "$output" | grep -q 'uiautomator2'; then
 	log_info "UiAutomator2 available."
 else
