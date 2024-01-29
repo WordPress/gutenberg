@@ -166,9 +166,10 @@ function Preview( { item, viewType } ) {
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
 			>
-				{ viewType === LAYOUT_LIST ? (
+				{ viewType === LAYOUT_LIST && ! isEmpty && (
 					<BlockPreview blocks={ blocks } />
-				) : (
+				) }
+				{ viewType !== LAYOUT_LIST && (
 					<button
 						className="page-templates-preview-field__button"
 						type="button"
