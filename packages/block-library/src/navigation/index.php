@@ -976,12 +976,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
-
-	if ( class_exists( 'WP_Navigation_Fallback' ) ) {
-		$navigation_post = WP_Navigation_Fallback::get_fallback();
-	} else {
-		$navigation_post = Gutenberg_Navigation_Fallback::get_fallback();
-	}
+	$navigation_post = WP_Navigation_Fallback::get_fallback();
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
@@ -1397,10 +1392,6 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	if ( ! isset( $post->ID ) ) {
-		return;
-	}
-
 	// We run the Block Hooks mechanism so it will return the list of ignored hooked blocks
 	// in the mock root Navigation block's metadata attribute.
 	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
