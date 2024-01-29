@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "27.0.0",
+	"version": "27.1.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

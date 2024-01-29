@@ -437,7 +437,7 @@ function ViewTable( {
 	);
 
 	return (
-		<div>
+		<div className="dataviews-view-table-wrapper">
 			<table
 				className="dataviews-view-table"
 				aria-busy={ isLoading }
@@ -506,7 +506,10 @@ function ViewTable( {
 							</th>
 						) ) }
 						{ !! actions?.length && (
-							<th data-field-id="actions">
+							<th
+								data-field-id="actions"
+								className="dataviews-view-table__actions-column"
+							>
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
@@ -536,7 +539,7 @@ function ViewTable( {
 											minWidth: 20,
 										} }
 									>
-										<span className="dataviews-view-table__cell-content-wrapper">
+										<div className="dataviews-view-table__cell-content-wrapper">
 											<SingleSelectionCheckbox
 												id={
 													getItemId( item ) || index
@@ -550,7 +553,7 @@ function ViewTable( {
 												data={ data }
 												primaryField={ primaryField }
 											/>
-										</span>
+										</div>
 									</td>
 								) }
 								{ visibleFields.map( ( field ) => (
@@ -564,7 +567,7 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										<span
+										<div
 											className={ classnames(
 												'dataviews-view-table__cell-content-wrapper',
 												{
@@ -577,11 +580,11 @@ function ViewTable( {
 											{ field.render( {
 												item,
 											} ) }
-										</span>
+										</div>
 									</td>
 								) ) }
 								{ !! actions?.length && (
-									<td>
+									<td className="dataviews-view-table__actions-column">
 										<ItemActions
 											item={ item }
 											actions={ actions }

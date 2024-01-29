@@ -7,9 +7,6 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.setGutenbergExperiments( [
-				'gutenberg-pattern-partial-syncing',
-			] ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -20,7 +17,6 @@ test.describe( 'Pattern Overrides', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.setGutenbergExperiments( [] ),
 			requestUtils.activateTheme( 'twentytwentyone' ),
 		] );
 	} );
@@ -176,7 +172,7 @@ test.describe( 'Pattern Overrides', () => {
 						ref: patternId,
 						overrides: {
 							[ editableParagraphId ]: {
-								content: 'I would word it this way',
+								content: [ 1, 'I would word it this way' ],
 							},
 						},
 					},
@@ -187,7 +183,7 @@ test.describe( 'Pattern Overrides', () => {
 						ref: patternId,
 						overrides: {
 							[ editableParagraphId ]: {
-								content: 'This one is different',
+								content: [ 1, 'This one is different' ],
 							},
 						},
 					},
@@ -215,5 +211,114 @@ test.describe( 'Pattern Overrides', () => {
 				'This one can’t',
 			] );
 		} );
+	} );
+
+	test( 'retains override values when converting a pattern block to regular blocks', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphId = 'paragraph-id';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":{"name":"pattern_attributes"}}}}} -->
+<p>Editable</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Make an edit to the pattern.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.focus();
+		await page.keyboard.type( 'edited ' );
+
+		// Convert back to regular blocks.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.showBlockToolbar();
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		// Check that the overrides remain.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'edited Editable',
+					metadata: undefined,
+				},
+			},
+		] );
+	} );
+
+	test( 'Supports `undefined` attribute values in patterns', async ( {
+		page,
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		const buttonId = 'button-id';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern with overrides',
+			content: `<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":{"name":"pattern_attributes"}},"url":{"source":{"name":"pattern_attributes"}},"linkTarget":{"source":{"name":"pattern_attributes"}}}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener">wp.org</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button' } )
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.focus();
+
+		await expect(
+			page.getByRole( 'link', { name: 'wp.org' } )
+		).toContainText( 'opens in a new tab' );
+
+		const openInNewTabCheckbox = page.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+		await expect( openInNewTabCheckbox ).toBeChecked();
+
+		await openInNewTabCheckbox.setChecked( false );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/block',
+				attributes: {
+					ref: id,
+					overrides: {
+						[ buttonId ]: {
+							linkTarget: [ 0 ],
+						},
+					},
+				},
+			},
+		] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const link = page.getByRole( 'link', { name: 'wp.org' } );
+		await expect( link ).toHaveAttribute( 'href', 'http://wp.org' );
+		await expect( link ).toHaveAttribute( 'target', '' );
 	} );
 } );

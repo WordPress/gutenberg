@@ -109,6 +109,16 @@ function ScreenBlock( { name, variation } ) {
 		settings.spacing.blockGap = false;
 	}
 
+	// Only allow `aspectRatio` support if the block is not the grouping block.
+	// The grouping block allows the user to use Group, Row and Stack variations,
+	// and it is highly likely that the user will not want to set an aspect ratio
+	// for all three at once. Until there is the ability to set a different aspect
+	// ratio for each variation, we disable the aspect ratio controls for the
+	// grouping block in global styles.
+	if ( settings?.dimensions?.aspectRatio && name === 'core/group' ) {
+		settings.dimensions.aspectRatio = false;
+	}
+
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );

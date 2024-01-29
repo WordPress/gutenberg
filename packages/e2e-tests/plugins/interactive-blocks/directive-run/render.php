@@ -5,12 +5,12 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-run-view' );
+wp_enqueue_script_module( 'directive-run-view' );
 ?>
 
 <div
 	data-wp-interactive='{ "namespace": "directive-run" }'
-	data-wp-navigation-id='test-directive-run'
+	data-wp-router-region='test-directive-run'
 >
 	<div data-testid="hydrated" data-wp-text="state.isHydrated"></div>
 	<div data-testid="mounted" data-wp-text="state.isMounted"></div>

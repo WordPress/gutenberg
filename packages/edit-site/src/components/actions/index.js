@@ -32,21 +32,28 @@ export const trashPostAction = {
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
+	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal } ) => {
-		// Todo - handle multiple posts
-		const post = posts[ 0 ];
+	RenderModal: ( { items: posts, closeModal, onPerform } ) => {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ sprintf(
-						// translators: %s: The page's title.
-						__( 'Are you sure you want to delete "%s"?' ),
-						decodeEntities( post.title.rendered )
-					) }
+					{ posts.length === 1
+						? sprintf(
+								// translators: %s: The page's title.
+								__( 'Are you sure you want to delete "%s"?' ),
+								decodeEntities( posts[ 0 ].title.rendered )
+						  )
+						: sprintf(
+								// translators: %d: The number of pages (2 or more).
+								__(
+									'Are you sure you want to delete %d pages?'
+								),
+								posts.length
+						  ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -55,38 +62,97 @@ export const trashPostAction = {
 					<Button
 						variant="primary"
 						onClick={ async () => {
-							try {
-								await deleteEntityRecord(
-									'postType',
-									post.type,
-									post.id,
-									{},
-									{ throwOnError: true }
-								);
-								createSuccessNotice(
-									sprintf(
-										/* translators: The page's title. */
+							const promiseResult = await Promise.allSettled(
+								posts.map( ( post ) => {
+									return deleteEntityRecord(
+										'postType',
+										post.type,
+										post.id,
+										{},
+										{ throwOnError: true }
+									);
+								} )
+							);
+							// If all the promises were fulfilled with success.
+							if (
+								promiseResult.every(
+									( { status } ) => status === 'fulfilled'
+								)
+							) {
+								let successMessage;
+								if ( promiseResult.length === 1 ) {
+									successMessage = sprintf(
+										/* translators: The posts's title. */
 										__( '"%s" moved to the Trash.' ),
-										decodeEntities( post.title.rendered )
-									),
-									{
-										type: 'snackbar',
-										id: 'edit-site-page-trashed',
-									}
-								);
-							} catch ( error ) {
-								const errorMessage =
-									error.message &&
-									error.code !== 'unknown_error'
-										? error.message
-										: __(
-												'An error occurred while moving the page to the trash.'
-										  );
-
-								createErrorNotice( errorMessage, {
+										decodeEntities(
+											posts[ 0 ].title.rendered
+										)
+									);
+								} else {
+									successMessage = __(
+										'Pages moved to the Trash.'
+									);
+								}
+								createSuccessNotice( successMessage, {
 									type: 'snackbar',
+									id: 'edit-site-page-trashed',
 								} );
+							} else {
+								// If there was at lease one failure.
+								let errorMessage;
+								// If we were trying to move a single post to the trash.
+								if ( promiseResult.length === 1 ) {
+									if ( promiseResult[ 0 ].reason?.message ) {
+										errorMessage =
+											promiseResult[ 0 ].reason.message;
+									} else {
+										errorMessage = __(
+											'An error occurred while moving the post to the trash.'
+										);
+									}
+									// If we were trying to move multiple posts to the trash
+								} else {
+									const errorMessages = new Set();
+									const failedPromises = promiseResult.filter(
+										( { status } ) => status === 'rejected'
+									);
+									for ( const failedPromise of failedPromises ) {
+										if ( failedPromise.reason?.message ) {
+											errorMessages.add(
+												failedPromise.reason.message
+											);
+										}
+									}
+									if ( errorMessages.size === 0 ) {
+										errorMessage = __(
+											'An error occurred while moving the posts to the trash.'
+										);
+									} else if ( errorMessages.size === 1 ) {
+										errorMessage = sprintf(
+											/* translators: %s: an error message */
+											__(
+												'An error occurred while moving the posts to the trash: %s'
+											),
+											[ ...errorMessages ][ 0 ]
+										);
+									} else {
+										errorMessage = sprintf(
+											/* translators: %s: a list of comma separated error messages */
+											__(
+												'Some errors occurred while moving the pages to the trash: %s'
+											),
+											[ ...errorMessages ].join( ',' )
+										);
+									}
+									createErrorNotice( errorMessage, {
+										type: 'snackbar',
+									} );
+								}
 							}
+							if ( onPerform ) {
+								onPerform();
+							}
+							closeModal();
 						} }
 					>
 						{ __( 'Delete' ) }
@@ -108,40 +174,94 @@ export function usePermanentlyDeletePostAction() {
 			label: __( 'Permanently delete' ),
 			isPrimary: true,
 			icon: trash,
+			supportsBulk: true,
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
 			async callback( posts ) {
-				// Todo - handle multiple posts
-				const post = posts[ 0 ];
-				try {
-					await deleteEntityRecord(
-						'postType',
-						post.type,
-						post.id,
-						{ force: true },
-						{ throwOnError: true }
-					);
-					createSuccessNotice(
-						sprintf(
+				const promiseResult = await Promise.allSettled(
+					posts.map( ( post ) => {
+						return deleteEntityRecord(
+							'postType',
+							post.type,
+							post.id,
+							{ force: true },
+							{ throwOnError: true }
+						);
+					} )
+				);
+				// If all the promises were fulfilled with success.
+				if (
+					promiseResult.every(
+						( { status } ) => status === 'fulfilled'
+					)
+				) {
+					let successMessage;
+					if ( promiseResult.length === 1 ) {
+						successMessage = sprintf(
 							/* translators: The posts's title. */
 							__( '"%s" permanently deleted.' ),
-							decodeEntities( post.title.rendered )
-						),
-						{
-							type: 'snackbar',
-							id: 'edit-site-post-permanently-deleted',
+							decodeEntities( posts[ 0 ].title.rendered )
+						);
+					} else {
+						successMessage = __(
+							'The posts were permanently deleted.'
+						);
+					}
+					createSuccessNotice( successMessage, {
+						type: 'snackbar',
+						id: 'edit-site-post-permanently-deleted',
+					} );
+				} else {
+					// If there was at lease one failure.
+					let errorMessage;
+					// If we were trying to permanently delete a single post.
+					if ( promiseResult.length === 1 ) {
+						if ( promiseResult[ 0 ].reason?.message ) {
+							errorMessage = promiseResult[ 0 ].reason.message;
+						} else {
+							errorMessage = __(
+								'An error occurred while permanently deleting the post.'
+							);
 						}
-					);
-				} catch ( error ) {
-					const errorMessage =
-						error.message && error.code !== 'unknown_error'
-							? error.message
-							: __(
-									'An error occurred while permanently deleting the post.'
-							  );
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
+						// If we were trying to permanently delete multiple posts
+					} else {
+						const errorMessages = new Set();
+						const failedPromises = promiseResult.filter(
+							( { status } ) => status === 'rejected'
+						);
+						for ( const failedPromise of failedPromises ) {
+							if ( failedPromise.reason?.message ) {
+								errorMessages.add(
+									failedPromise.reason.message
+								);
+							}
+						}
+						if ( errorMessages.size === 0 ) {
+							errorMessage = __(
+								'An error occurred while permanently deleting the posts.'
+							);
+						} else if ( errorMessages.size === 1 ) {
+							errorMessage = sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while permanently deleting the posts: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+							);
+						} else {
+							errorMessage = sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while permanently deleting the posts: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+							);
+						}
+						createErrorNotice( errorMessage, {
+							type: 'snackbar',
+						} );
+					}
 				}
 			},
 		} ),
@@ -161,40 +281,63 @@ export function useRestorePostAction() {
 			label: __( 'Restore' ),
 			isPrimary: true,
 			icon: backup,
+			supportsBulk: true,
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
 			async callback( posts ) {
-				// Todo - handle multiple posts
-				const post = posts[ 0 ];
-				await editEntityRecord( 'postType', post.type, post.id, {
-					status: 'draft',
-				} );
 				try {
-					await saveEditedEntityRecord(
-						'postType',
-						post.type,
-						post.id,
-						{ throwOnError: true }
-					);
+					for ( const post of posts ) {
+						await editEntityRecord(
+							'postType',
+							post.type,
+							post.id,
+							{
+								status: 'draft',
+							}
+						);
+						await saveEditedEntityRecord(
+							'postType',
+							post.type,
+							post.id,
+							{ throwOnError: true }
+						);
+					}
+
 					createSuccessNotice(
-						sprintf(
-							/* translators: The posts's title. */
-							__( '"%s" has been restored.' ),
-							decodeEntities( post.title.rendered )
-						),
+						posts.length > 1
+							? sprintf(
+									/* translators: The number of posts. */
+									__( '%d posts have been restored.' ),
+									posts.length
+							  )
+							: sprintf(
+									/* translators: The number of posts. */
+									__( '"%s" has been restored.' ),
+									decodeEntities( posts[ 0 ].title.rendered )
+							  ),
 						{
 							type: 'snackbar',
 							id: 'edit-site-post-restored',
 						}
 					);
 				} catch ( error ) {
-					const errorMessage =
-						error.message && error.code !== 'unknown_error'
-							? error.message
-							: __(
-									'An error occurred while restoring the post.'
-							  );
+					let errorMessage;
+					if (
+						error.message &&
+						error.code !== 'unknown_error' &&
+						error.message
+					) {
+						errorMessage = error.message;
+					} else if ( posts.length > 1 ) {
+						errorMessage = __(
+							'An error occurred while restoring the posts.'
+						);
+					} else {
+						errorMessage = __(
+							'An error occurred while restoring the post.'
+						);
+					}
 
 					createErrorNotice( errorMessage, { type: 'snackbar' } );
 				}

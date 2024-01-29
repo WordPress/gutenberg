@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, RawHTML, useContext } from '@wordpress/element';
+import { memo, useCallback, RawHTML, useContext } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -21,7 +21,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
-import { compose, pure } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -133,6 +133,7 @@ function BlockListBlock( {
 			}
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
+			blockEditingMode={ context.blockEditingMode }
 		/>
 	);
 
@@ -554,7 +555,7 @@ function BlockListBlockProvider( props ) {
 			const typing = isTyping();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
-
+			const blockEditingMode = getBlockEditingMode( clientId );
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
@@ -573,7 +574,7 @@ function BlockListBlockProvider( props ) {
 				themeSupportsLayout: supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
-				blockEditingMode: getBlockEditingMode( clientId ),
+				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
 					( isFirstMultiSelectedBlock( clientId ) &&
@@ -589,7 +590,9 @@ function BlockListBlockProvider( props ) {
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
+				isSubtreeDisabled:
+					blockEditingMode === 'disabled' &&
+					isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
 				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
 				initialPosition:
@@ -613,8 +616,7 @@ function BlockListBlockProvider( props ) {
 						getBlockName( movingClientId ),
 						getBlockRootClientId( clientId )
 					),
-				isEditingDisabled:
-					getBlockEditingMode( clientId ) === 'disabled',
+				isEditingDisabled: blockEditingMode === 'disabled',
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
@@ -738,4 +740,4 @@ function BlockListBlockProvider( props ) {
 	);
 }
 
-export default pure( BlockListBlockProvider );
+export default memo( BlockListBlockProvider );

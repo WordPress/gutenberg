@@ -78,8 +78,7 @@ describe( 'createRegistrySelector', () => {
 		expect( registry.select( uiStore ).getElementCount() ).toBe( 1 );
 	} );
 
-	// Even without createSelector, this fails in trunk.
-	it.skip( 'can bind one selector to multiple registries', () => {
+	it( 'can bind one selector to multiple registries (createRegistrySelector)', () => {
 		const registry1 = createRegistry();
 		const registry2 = createRegistry();
 
@@ -100,6 +99,26 @@ describe( 'createRegistrySelector', () => {
 
 		expect( registry1.select( uiStore ).getElementCount() ).toBe( 1 );
 		expect( registry2.select( uiStore ).getElementCount() ).toBe( 1 );
+	} );
+
+	it( 'can bind one selector to multiple registries (createRegistrySelector + createSelector)', () => {
+		const registry1 = createRegistry();
+		registry1.register( elementsStore );
+		registry1.register( uiStore );
+		registry1.dispatch( elementsStore ).add( 'Carbon' );
+
+		const registry2 = createRegistry();
+		registry2.register( elementsStore );
+		registry2.register( uiStore );
+		registry2.dispatch( elementsStore ).add( 'Helium' );
+
+		// Expects the `getFilteredElements` to be bound separately and independently to the two registries
+		expect( registry1.select( uiStore ).getFilteredElements() ).toEqual( [
+			'Carbon',
+		] );
+		expect( registry2.select( uiStore ).getFilteredElements() ).toEqual( [
+			'Helium',
+		] );
 	} );
 
 	it( 'can bind a memoized selector to a registry', () => {

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block",
-	"version": "4.33.0",
+	"version": "4.34.0",
 	"description": "Generates PHP, JS and CSS code for registering a block for a WordPress plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

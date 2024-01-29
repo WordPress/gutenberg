@@ -15,6 +15,10 @@ export function usePostLinkProps() {
 	const history = useHistory();
 
 	return ( params, state ) => {
-		return getPostLinkProps( history, params, state );
+		return getPostLinkProps(
+			history,
+			{ ...params, focusMode: true, canvas: 'edit' },
+			state
+		);
 	};
 }
