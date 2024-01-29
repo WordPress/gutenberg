@@ -157,20 +157,24 @@ export default function ListViewSidebar() {
 
 				<Tabs.TabPanel
 					ref={ listViewContainerRef }
-					className="editor-list-view-sidebar__list-view-container editor-list-view-sidebar__tabs-tabpanel"
+					className="editor-list-view-sidebar__tabs-tabpanel"
 					tabId="list-view"
 					focusable={ false }
 				>
-					<div className="editor-list-view-sidebar__list-view-panel-content">
-						<ListView dropZoneElement={ dropZoneElement } />
+					<div className="editor-list-view-sidebar__list-view-container">
+						<div className="editor-list-view-sidebar__list-view-panel-content">
+							<ListView dropZoneElement={ dropZoneElement } />
+						</div>
 					</div>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel
-					className="editor-list-view-sidebar__list-view-container"
+					className="editor-list-view-sidebar__tabs-tabpanel"
 					tabId="outline"
 					focusable={ false }
 				>
-					<ListViewOutline />
+					<div className="editor-list-view-sidebar__list-view-container">
+						<ListViewOutline />
+					</div>
 				</Tabs.TabPanel>
 			</Tabs>
 		</div>
