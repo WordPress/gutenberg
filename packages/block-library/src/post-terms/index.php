@@ -85,17 +85,22 @@ function build_variation_for_post_terms( $taxonomy ) {
 }
 
 /**
- * Register a variation for a taxonomy for the post-terms block.
+ * Registers a variation for a taxonomy for the post-terms block.
+ *
+ * @since 6.X.Y
  *
  * @param array $variation Variation array from build_variation_for_post_terms.
- * @return void
  */
 function block_core_post_terms_register_variation( $variation ) {
-	// Directly set the variations on the registered block type
-	// because there's no server side registration for variations (see #47170).
+	/*
+	 * Directly set the variations on the registered block type
+	 * because there's no server side registration for variations (see #47170).
+	 */
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
-	// If the block is not registered yet, bail early.
-	// Variation will be registered in register_block_core_post_terms then.
+	/*
+	 * If the block is not registered yet, bail early.
+	 * Variation will be registered in register_block_core_post_terms then.
+	 */
 	if ( ! $navigation_block_type ) {
 		return;
 	}
@@ -107,14 +112,17 @@ function block_core_post_terms_register_variation( $variation ) {
 }
 
 /**
- * Unregister a variation for a taxonomy for the post-terms block.
+ * Unregisters a variation for a taxonomy for the post-terms block.
+ *
+ * @since 6.X.Y
  *
  * @param string $name Name of the taxonomy (which was used as variation name).
- * @return void
  */
 function block_core_post_terms_unregister_variation( $name ) {
-	// Directly get the variations from the registered block type
-	// because there's no server side (un)registration for variations (see #47170).
+	/*
+	 * Directly get the variations from the registered block type
+	 * because there's no server side (un)registration for variations (see #47170).
+	 */
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
 	// If the block is not registered (yet), there's no need to remove a variation.
 	if ( ! $navigation_block_type || empty( $navigation_block_type->variations ) ) {
@@ -135,12 +143,16 @@ function block_core_post_terms_unregister_variation( $name ) {
 /**
  * Returns an array of variations for the post-terms block.
  *
+ * @since 6.5.0
+ *
  * @return array
  */
 function build_post_term_block_variations() {
-	// This will only handle taxonomies registered until this point (init on priority 9).
-	// See action hooks below for other taxonomies.
-	// See https://github.com/WordPress/gutenberg/issues/52569 for details.
+	/*
+	 * This will only handle taxonomies registered until this point (init on priority 9).
+	 * See action hooks below for other taxonomies.
+	 * See https://github.com/WordPress/gutenberg/issues/52569 for details.
+	 */
 	$taxonomies = get_taxonomies(
 		array(
 			'publicly_queryable' => true,
@@ -149,9 +161,10 @@ function build_post_term_block_variations() {
 		'objects'
 	);
 
-	// Split the available taxonomies to `built_in` and custom ones,
-	// in order to prioritize the `built_in` taxonomies at the
-	// search results.
+	/* Split the available taxonomies to `built_in` and custom ones,
+	 * in order to prioritize the `built_in` taxonomies at the
+	 * search results.
+	 */
 	$built_ins         = array();
 	$custom_variations = array();
 
@@ -185,14 +198,18 @@ function register_block_core_post_terms() {
 	);
 }
 add_action( 'init', 'register_block_core_post_terms' );
-// Register actions for all taxonomies, to add variations when they are registered.
-// All taxonomies registered before register_block_core_post_terms, will be handled by that function.
+/*
+ * Register actions for all taxonomies, to add variations when they are registered.
+ * All taxonomies registered before register_block_core_post_terms, will be handled by that function.
+ */
 add_action( 'registered_taxonomy', 'block_core_post_terms_register_taxonomy_variation', 10, 3 );
 add_action( 'unregistered_taxonomy', 'block_core_post_terms_unregister_taxonomy_variation', 10, 3 );
 
 /**
- * Register a custom taxonomy variation for post terms on taxonomy registration
+ * Registers a custom taxonomy variation for the post-terms block on taxonomy registration
  * Handles all taxonomies registered after the block is registered in register_block_core_post_terms
+ *
+ * @since 6.X.Y
  *
  * @param string       $taxonomy Taxonomy slug.
  * @param array|string $object_type Object type or array of object types.
@@ -210,8 +227,9 @@ function block_core_post_terms_register_taxonomy_variation( $taxonomy, $object_t
 /**
  * Unregisters a custom taxonomy variation for post terms block on taxonomy unregistration.
  *
+ * @since 6.X.Y
+ *
  * @param string $taxonomy The taxonomy name passed from unregistered_taxonomy action hook.
- * @return void
  */
 function block_core_post_terms_unregister_taxonomy_variation( $taxonomy ) {
 	block_core_post_terms_unregister_variation( $taxonomy );
