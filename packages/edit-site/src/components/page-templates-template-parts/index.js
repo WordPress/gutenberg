@@ -192,11 +192,13 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
+		const usedType = window?.__experimentalAdminViews
+			? layout ?? DEFAULT_VIEW.type
+			: DEFAULT_VIEW.type;
 		return {
 			...DEFAULT_VIEW,
-			type: window?.__experimentalAdminViews
-				? layout ?? DEFAULT_VIEW.type
-				: DEFAULT_VIEW.type,
+			type: usedType,
+			layout: defaultConfigPerViewType[ usedType ],
 			filters:
 				activeView !== 'all'
 					? [
