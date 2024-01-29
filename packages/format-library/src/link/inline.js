@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -11,16 +11,17 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchor,
 	removeFormat,
 	slice,
 	replace,
 	split,
 	concat,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
+	useCachedTruthy,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -29,7 +30,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
-import useLinkInstanceKey from './use-link-instance-key';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -42,9 +42,9 @@ const LINK_SETTINGS = [
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
-	addingLink,
 	value,
 	onChange,
+	onFocusOutside,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -90,12 +90,9 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// LinkControl calls `onChange` immediately upon the toggling a setting.
-		// Before merging the next value with the current link value, check if
-		// the setting was toggled.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			nextValue.url === undefined;
+		const hasLink = linkValue?.url;
+		const isNewLink = ! hasLink;
+
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -178,16 +175,14 @@ function InlineLinkUI( {
 				newValue = concat( valBefore, newValAfter );
 			}
 
-			newValue.start = newValue.end;
-
-			// Hides the Link UI.
-			newValue.activeFormats = [];
 			onChange( newValue );
 		}
 
-		// Focus should only be shifted back to the formatted segment when the
-		// URL is submitted.
-		if ( ! didToggleSetting ) {
+		// Focus should only be returned to the rich text on submit if this link is not
+		// being created for the first time. If it is then focus should remain within the
+		// Link UI because it should remain open for the user to modify the link they have
+		// just created.
+		if ( ! isNewLink ) {
 			stopAddingLink();
 		}
 
@@ -210,19 +205,24 @@ function InlineLinkUI( {
 		settings,
 	} );
 
-	// Generate a string based key that is unique to this anchor reference.
-	// This is used to force re-mount the LinkControl component to avoid
-	// potential stale state bugs caused by the component not being remounted
-	// See https://github.com/WordPress/gutenberg/pull/34742.
-	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
+	//  As you change the link by interacting with the Link UI
+	//  the return value of document.getSelection jumps to the field you're editing,
+	//  not the highlighted text. Given that useAnchor uses document.getSelection,
+	//  it will return null, since it can't find the <mark> element within the Link UI.
+	//  This caches the last truthy value of the selection anchor reference.
+	// This ensures the Popover is positioned correctly on initial submission of the link.
+	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
 
-	// Focus should only be moved into the Popover when the Link is being created or edited.
-	// When the Link is in "preview" mode focus should remain on the rich text because at
-	// this point the Link dialog is informational only and thus the user should be able to
-	// continue editing the rich text.
-	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
+	// If the link is not active (i.e. it is a new link) then we need to
+	// override the getBoundingClientRect method on the anchor element
+	// to return the cached value of the selection represented by the text
+	// that the user selected to be linked.
+	// If the link is active (i.e. it is an existing link) then we allow
+	// the default behaviour of the popover anchor to be used. This will get
+	// the anchor based on the `<a>` element in the rich text.
+	if ( ! isActive ) {
+		popoverAnchor.getBoundingClientRect = () => cachedRect;
+	}
 
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
@@ -253,24 +253,31 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
-			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			onFocusOutside={ () => stopAddingLink( false ) }
+			onFocusOutside={ onFocusOutside }
 			placement="bottom"
+			offset={ 10 }
 			shift
 		>
 			<LinkControl
-				key={ forceRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
-				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
 				settings={ LINK_SETTINGS }
+				showInitialSuggestions={ true }
+				suggestionsQuery={ {
+					// always show Pages as initial suggestions
+					initialSuggestionsSearchOptions: {
+						type: 'post',
+						subtype: 'page',
+						perPage: 20,
+					},
+				} }
 			/>
 		</Popover>
 	);

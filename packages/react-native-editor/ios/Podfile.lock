@@ -13,14 +13,14 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.71.15)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.111.0):
+  - Gutenberg (1.111.2):
     - React-Core (= 0.71.15)
     - React-CoreModules (= 0.71.15)
     - React-RCTImage (= 0.71.15)
     - RNTAztecView
-  - hermes-engine (0.71.15):
-    - hermes-engine/Pre-built (= 0.71.15)
-  - hermes-engine/Pre-built (0.71.15)
+  - hermes-engine (0.71.11):
+    - hermes-engine/Pre-built (= 0.71.11)
+  - hermes-engine/Pre-built (0.71.11)
   - libevent (2.1.12)
   - libwebp (1.2.3):
     - libwebp/demux (= 1.2.3)
@@ -429,7 +429,7 @@ PODS:
     - React-RCTImage
   - RNSVG (13.9.0):
     - React-Core
-  - RNTAztecView (1.111.0):
+  - RNTAztecView (1.111.2):
     - React-Core
     - WordPress-Aztec-iOS (= 1.19.9)
   - SDWebImage (5.11.1):
@@ -617,8 +617,8 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 8f5ee005451bf28f6a3ae995914b2f04b3584122
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  Gutenberg: c1fabb905bbb59cf2fe1144fa1a0f4fb476ef97d
-  hermes-engine: 04437e4291ede4af0c76c25e7efd0eacb8fd25e5
+  Gutenberg: 0bcdba988e55a27b78422d2f6b6fec1868b8e5bb
+  hermes-engine: 34c863b446d0135b85a6536fa5fd89f48196f848
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
@@ -662,7 +662,7 @@ SPEC CHECKSUMS:
   RNReanimated: d4f363f4987ae0ade3e36ff81c94e68261bf4b8d
   RNScreens: 68fd1060f57dd1023880bf4c05d74784b5392789
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
-  RNTAztecView: 1985084da164a50b19ce73e3b82395f89bbac7a6
+  RNTAztecView: 129120dde150fce9554f28272321310aa18a0d82
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: fbebd569c61baa252b3f5058c0a2a9a6ada686bb

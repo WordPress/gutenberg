@@ -141,7 +141,16 @@ test.describe( 'Synced pattern', () => {
 				{
 					name: 'core/block',
 					attributes: { ref: expect.any( Number ) },
-					innerBlocks: [],
+					innerBlocks: [
+						{
+							attributes: {
+								content: 'A useful paragraph to reuse',
+								dropCap: false,
+							},
+							innerBlocks: [],
+							name: 'core/paragraph',
+						},
+					],
 				},
 			] );
 		const after = await editor.getBlocks();
@@ -166,5 +175,150 @@ test.describe( 'Synced pattern', () => {
 		await page.getByRole( 'option', { name: 'My synced pattern' } ).click();
 
 		await expect.poll( editor.getBlocks ).toEqual( [ ...after, ...after ] );
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33072.
+	test( 'can be saved when modified inside of a published post', async ( {
+		page,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Alternative greeting block',
+			content:
+				'<!-- wp:paragraph -->\n<p>Guten Tag!</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		await editor.publishPost();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'link', { name: 'Edit original' } )
+			.click();
+
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+
+		// Navigate to the pattern focus mode.
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Alternative greeting block',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Change the block's content.
+		await page.keyboard.type( 'Einen ' );
+
+		// Save the reusable block and update the post.
+		await editorTopBar.getByRole( 'button', { name: 'Update' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Pattern updated.' } )
+			.click();
+
+		// Go back to the post.
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/block',
+				attributes: { ref: id },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Einen Guten Tag!',
+							dropCap: false,
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/26421.
+	test( 'allows conversion back to blocks when the reusable block has unsaved edits', async ( {
+		page,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Synced pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Before Edit</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'link', { name: 'Edit original' } )
+			.click();
+
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+
+		// Navigate to the pattern focus mode.
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Synced pattern',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		// Make an edit to the source pattern.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.fill( 'After Edit' );
+
+		// Go back to the post.
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		const expectedParagraphBlock = {
+			name: 'core/paragraph',
+			attributes: { content: 'After Edit' },
+		};
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/block',
+				attributes: { ref: id },
+				innerBlocks: [ expectedParagraphBlock ],
+			},
+		] );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ expectedParagraphBlock ] );
 	} );
 } );

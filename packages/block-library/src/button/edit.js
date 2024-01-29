@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { unlock } from '../lock-unlock';
 
 /**
  * WordPress dependencies
@@ -32,6 +33,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
@@ -164,6 +166,7 @@ function ButtonEdit( props ) {
 		text,
 		url,
 		width,
+		metadata,
 	} = attributes;
 
 	const TagName = tagName || 'a';
@@ -184,6 +187,7 @@ function ButtonEdit( props ) {
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
@@ -228,6 +232,26 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					getBlockBindingsSource( metadata?.bindings?.url?.source )
+						?.lockAttributesEditing === true,
+			};
+		},
+		[ isSelected ]
+	);
+
 	return (
 		<>
 			<div
@@ -266,6 +290,7 @@ function ButtonEdit( props ) {
 						...borderProps.style,
 						...colorProps.style,
 						...spacingProps.style,
+						...shadowProps.style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {
@@ -287,7 +312,7 @@ function ButtonEdit( props ) {
 						} }
 					/>
 				) }
-				{ ! isURLSet && isLinkTag && (
+				{ ! isURLSet && isLinkTag && ! lockUrlControls && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -296,7 +321,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && isLinkTag && (
+				{ isURLSet && isLinkTag && ! lockUrlControls && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -307,43 +332,46 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
-			{ isLinkTag && isSelected && ( isEditingURL || isURLSet ) && (
-				<Popover
-					placement="bottom"
-					onClose={ () => {
-						setIsEditingURL( false );
-						richTextRef.current?.focus();
-					} }
-					anchor={ popoverAnchor }
-					focusOnMount={ isEditingURL ? 'firstElement' : false }
-					__unstableSlotName={ '__unstable-block-tools-after' }
-					shift
-				>
-					<LinkControl
-						value={ linkValue }
-						onChange={ ( {
-							url: newURL,
-							opensInNewTab: newOpensInNewTab,
-							nofollow: newNofollow,
-						} ) =>
-							setAttributes(
-								getUpdatedLinkAttributes( {
-									rel,
-									url: newURL,
-									opensInNewTab: newOpensInNewTab,
-									nofollow: newNofollow,
-								} )
-							)
-						}
-						onRemove={ () => {
-							unlink();
+			{ isLinkTag &&
+				isSelected &&
+				( isEditingURL || isURLSet ) &&
+				! lockUrlControls && (
+					<Popover
+						placement="bottom"
+						onClose={ () => {
+							setIsEditingURL( false );
 							richTextRef.current?.focus();
 						} }
-						forceIsEditingLink={ isEditingURL }
-						settings={ LINK_SETTINGS }
-					/>
-				</Popover>
-			) }
+						anchor={ popoverAnchor }
+						focusOnMount={ isEditingURL ? 'firstElement' : false }
+						__unstableSlotName={ '__unstable-block-tools-after' }
+						shift
+					>
+						<LinkControl
+							value={ linkValue }
+							onChange={ ( {
+								url: newURL,
+								opensInNewTab: newOpensInNewTab,
+								nofollow: newNofollow,
+							} ) =>
+								setAttributes(
+									getUpdatedLinkAttributes( {
+										rel,
+										url: newURL,
+										opensInNewTab: newOpensInNewTab,
+										nofollow: newNofollow,
+									} )
+								)
+							}
+							onRemove={ () => {
+								unlink();
+								richTextRef.current?.focus();
+							} }
+							forceIsEditingLink={ isEditingURL }
+							settings={ LINK_SETTINGS }
+						/>
+					</Popover>
+				) }
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }

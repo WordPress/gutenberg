@@ -49,7 +49,7 @@ function gutenberg_register_taxonomy_patterns() {
 			'singular_name'              => _x( 'Pattern Category', 'taxonomy singular name' ),
 			'add_new_item'               => __( 'Add New Category' ),
 			'add_or_remove_items'        => __( 'Add or remove pattern categories' ),
-			'back_to_items'              => __( '&larr; Go to pattern categories' ),
+			'back_to_items'              => __( '&larr; Go to Pattern Categories' ),
 			'choose_from_most_used'      => __( 'Choose from the most used pattern categories' ),
 			'edit_item'                  => __( 'Edit Pattern Category' ),
 			'item_link'                  => __( 'Pattern Category Link' ),

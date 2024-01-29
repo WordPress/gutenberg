@@ -56,9 +56,11 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<BlockInfo.Slot />
-			<PanelBody title={ __( 'Content' ) }>
-				<BlockQuickNavigation clientIds={ contentClientIds } />
-			</PanelBody>
+			{ contentClientIds.length > 0 && (
+				<PanelBody title={ __( 'Content' ) }>
+					<BlockQuickNavigation clientIds={ contentClientIds } />
+				</PanelBody>
+			) }
 		</div>
 	);
 }
@@ -93,8 +95,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			topLevelLockedBlock:
 				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
-				( _selectedBlockName === 'core/block' &&
-					window.__experimentalPatternPartialSyncing )
+				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
 					: undefined ),
 		};
@@ -307,6 +308,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ __( 'Background' ) }
 					/>
 					<PositionControls />
+					<InspectorControls.Slot
+						group="effects"
+						label={ __( 'Effects' ) }
+					/>
 					<div>
 						<AdvancedControls />
 					</div>

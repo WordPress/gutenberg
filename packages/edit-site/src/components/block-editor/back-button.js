@@ -24,11 +24,14 @@ function BackButton() {
 	const isTemplatePart = location.params.postType === TEMPLATE_PART_POST_TYPE;
 	const isNavigationMenu = location.params.postType === NAVIGATION_POST_TYPE;
 	const isPattern = location.params.postType === PATTERN_TYPES.user;
-	const previousTemplateId = location.state?.fromTemplateId;
 
-	const isFocusMode = isTemplatePart || isNavigationMenu || isPattern;
+	const isFocusMode =
+		location.params.focusMode ||
+		isTemplatePart ||
+		isNavigationMenu ||
+		isPattern;
 
-	if ( ! isFocusMode || ( ! previousTemplateId && ! isPattern ) ) {
+	if ( ! isFocusMode ) {
 		return null;
 	}
 

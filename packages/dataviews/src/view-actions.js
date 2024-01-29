@@ -267,13 +267,11 @@ const ViewActions = memo( function ViewActions( {
 			}
 		>
 			<DropdownMenuGroup>
-				{ window?.__experimentalAdminViews && (
-					<ViewTypeMenu
-						view={ view }
-						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
-					/>
-				) }
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }

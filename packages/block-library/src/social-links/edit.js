@@ -27,8 +27,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
-const ALLOWED_BLOCKS = [ 'core/social-link' ];
-
 const sizeOptions = [
 	{ name: __( 'Small' ), value: 'has-small-icon-size' },
 	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
@@ -106,7 +104,6 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
