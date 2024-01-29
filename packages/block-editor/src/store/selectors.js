@@ -2880,25 +2880,42 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
-			const blockEditingMode = state.blockEditingModes.get( clientId );
-			if ( blockEditingMode ) {
-				return blockEditingMode;
+			let currentClientId = clientId;
+
+			while ( true ) {
+				const blockEditingMode =
+					state.blockEditingModes.get( currentClientId );
+				if ( blockEditingMode ) {
+					if (
+						blockEditingMode === 'contentOnly' &&
+						currentClientId !== clientId
+					) {
+						return 'default';
+					}
+					return blockEditingMode;
+				}
+
+				if ( ! currentClientId ) {
+					return 'default';
+				}
+
+				const rootClientId =
+					state.blocks.parents.get( currentClientId );
+				const templateLock =
+					state.blockListSettings[ rootClientId ]?.templateLock;
+
+				if ( templateLock === 'contentOnly' ) {
+					const name = getBlockName( state, currentClientId );
+					const isContent =
+						select(
+							blocksStore
+						).__experimentalHasContentRoleAttribute( name );
+					return isContent ? 'contentOnly' : 'disabled';
+				}
+
+				// Update currentClientId to move up to the parent for the next iteration
+				currentClientId = rootClientId;
 			}
-			if ( ! clientId ) {
-				return 'default';
-			}
-			const rootClientId = getBlockRootClientId( state, clientId );
-			const templateLock = getTemplateLock( state, rootClientId );
-			if ( templateLock === 'contentOnly' ) {
-				const name = getBlockName( state, clientId );
-				const isContent =
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					);
-				return isContent ? 'contentOnly' : 'disabled';
-			}
-			const parentMode = getBlockEditingMode( state, rootClientId );
-			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}
 );
 
