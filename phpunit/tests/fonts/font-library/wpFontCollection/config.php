@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Collection::get_content().
+ * Test WP_Font_Collection properties.
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,9 +8,8 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Collection::get_content
  */
-class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
+class Tests_Fonts_WpFontCollection_Config extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
@@ -53,6 +52,8 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_get_json_config
+	 *
+	 * @covers WP_Font_Collection::load_from_json
 	 *
 	 * @param array $config Font collection config options.
 	 * @param array $expected_data Expected output data.
@@ -105,6 +106,8 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_get_php_config
+	 *
+	 * @covers WP_Font_Collection::__construct
 	 *
 	 * @param array $config Font collection config options.
 	 * @param array $expected_data Expected output data.
