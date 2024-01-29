@@ -33,7 +33,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalUseShadowProps as useShadowProps,
+	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
