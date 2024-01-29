@@ -11,7 +11,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo, useState, useEffect } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,13 +41,10 @@ function Revisions( { userConfig, blocks } ) {
 		return {};
 	}, [ baseConfig, userConfig ] );
 
-	const renderedBlocksArray = useMemo(
+	const renderedBlocks = useMemo(
 		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
 		[ blocks ]
 	);
-	const [ isHide, setIsHide ] = useState( true );
-	const to = setTimeout( () => setIsHide( false ), 750 );
-	useEffect( () => () => clearTimeout( to ), [] );
 
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -66,10 +63,7 @@ function Revisions( { userConfig, blocks } ) {
 			: settings.styles;
 
 	const showCanvas =
-		! isHide &&
-		!! editorStyles &&
-		!! originalSettings &&
-		!! renderedBlocksArray.length;
+		!! editorStyles && !! originalSettings && !! renderedBlocks.length;
 
 	return (
 		<EditorCanvasContainer
@@ -92,7 +86,7 @@ function Revisions( { userConfig, blocks } ) {
 				</style>
 				<Disabled className="edit-site-revisions__example-preview__content">
 					<ExperimentalBlockEditorProvider
-						value={ renderedBlocksArray }
+						value={ renderedBlocks }
 						settings={ settings }
 					>
 						{ showCanvas ? (

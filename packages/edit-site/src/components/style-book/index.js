@@ -466,14 +466,14 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 						aria-hidden
 					>
 						<Disabled className="edit-site-style-book__example-preview__content">
-							{ showCanvas ? (
-								<ExperimentalBlockEditorProvider
-									value={ renderedBlocks }
-									settings={ settings }
-								>
+							<ExperimentalBlockEditorProvider
+								value={ renderedBlocks }
+								settings={ settings }
+							>
+								{ showCanvas ? (
 									<BlockList renderAppender={ false } />
-								</ExperimentalBlockEditorProvider>
-							) : null }
+								) : null }
+							</ExperimentalBlockEditorProvider>
 						</Disabled>
 					</div>
 				</CompositeItem>
