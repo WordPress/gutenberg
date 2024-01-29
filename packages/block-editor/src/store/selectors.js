@@ -157,12 +157,13 @@ export function getBlock( state, clientId ) {
 
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	( state, clientId ) => {
-		if ( ! state.blocks.byClientId.has( clientId ) ) {
+		const block = state.blocks.byClientId.get( clientId );
+		if ( ! block ) {
 			return null;
 		}
 
 		return {
-			...state.blocks.byClientId.get( clientId ),
+			...block,
 			attributes: getBlockAttributes( state, clientId ),
 		};
 	},
@@ -540,9 +541,7 @@ export function getSelectedBlock( state ) {
  * @return {?string} Root client ID, if exists
  */
 export function getBlockRootClientId( state, clientId ) {
-	return state.blocks.parents.has( clientId )
-		? state.blocks.parents.get( clientId )
-		: null;
+	return state.blocks.parents.get( clientId ) ?? null;
 }
 
 /**
@@ -558,8 +557,7 @@ export const getBlockParents = createSelector(
 	( state, clientId, ascending = false ) => {
 		const parents = [];
 		let current = clientId;
-		while ( !! state.blocks.parents.get( current ) ) {
-			current = state.blocks.parents.get( current );
+		while ( ( current = state.blocks.parents.get( current ) ) ) {
 			parents.push( current );
 		}
 
@@ -2737,13 +2735,10 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
-		while ( state.blocks.parents.has( current ) ) {
-			current = state.blocks.parents.get( current );
+		while ( ( current = state.blocks.parents.get( current ) ) ) {
 			if (
-				( current &&
-					getBlockName( state, current ) === 'core/block' ) ||
-				( current &&
-					getTemplateLock( state, current ) === 'contentOnly' )
+				getBlockName( state, current ) === 'core/block' ||
+				getTemplateLock( state, current ) === 'contentOnly'
 			) {
 				result = current;
 			}
@@ -2869,8 +2864,9 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
-			if ( state.blockEditingModes.has( clientId ) ) {
-				return state.blockEditingModes.get( clientId );
+			const blockEditingMode = state.blockEditingModes.get( clientId );
+			if ( blockEditingMode ) {
+				return blockEditingMode;
 			}
 			if ( ! clientId ) {
 				return 'default';
