@@ -713,18 +713,48 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 
 				$callback = static function () {
 					echo <<<HTML
-					<div
-						class="screen-reader-text"
-						aria-live="polite"
-						data-wp-interactive='{"namespace":"core/router"}'
-						data-wp-text="state.navigation.message"
-					></div>
-					<div
-						class="wp-block-query__enhanced-pagination-animation"
-						data-wp-interactive='{"namespace":"core/router"}'
-						data-wp-class--start-animation="state.navigation.hasStarted"
-						data-wp-class--finish-animation="state.navigation.hasFinished"
-					></div>
+<style>
+.wp-interactivity-router_loading-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	max-width: 100vw !important;
+	height: 4px;
+	background-color: var(--wp--preset--color--primary, #000);
+	opacity: 0
+}
+.wp-interactivity-router_loading-bar.start-animation {
+	animation: wp-interactivity-router_loading-bar-start-animation 30s cubic-bezier(0.03, 0.5, 0, 1) forwards
+}
+.wp-interactivity-router_loading-bar.finish-animation {
+	animation: wp-interactivity-router_loading-bar-finish-animation 300ms ease-in
+}
+
+@keyframes wp-interactivity-router_loading-bar-start-animation {
+	0% { transform: scaleX(0); transform-origin: 0% 0%; opacity: 1 }
+	100% { transform: scaleX(1); transform-origin: 0% 0%; opacity: 1 }
+}
+@keyframes wp-interactivity-router_loading-bar-finish-animation {
+	0% { opacity: 1 }
+	50% { opacity: 1 }
+	100% { opacity: 0 }
+}
+</style>
+<div
+	class="wp-interactivity-router_loading-bar"
+	data-wp-interactive='{"namespace":"core/router"}'
+	data-wp-class--start-animation="state.navigation.hasStarted"
+	data-wp-class--finish-animation="state.navigation.hasFinished"
+></div>
+<div
+	class="screen-reader-text"
+	aria-live="polite"
+	data-wp-interactive='{"namespace":"core/router"}'
+	data-wp-text="state.navigation.message"
+></div>
 HTML;
 				};
 				add_action( 'wp_footer', $callback );
