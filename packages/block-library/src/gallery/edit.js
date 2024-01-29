@@ -548,19 +548,6 @@ function GalleryEdit( props ) {
 							__next40pxDefaultSize
 						/>
 					) }
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Crop images' ) }
-						checked={ !! imageCrop }
-						onChange={ toggleImageCrop }
-						help={ getImageCropHelp }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Random order' ) }
-						checked={ !! randomOrder }
-						onChange={ toggleRandomOrder }
-					/>
 					<SelectControl
 						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
@@ -592,6 +579,19 @@ function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 					) }
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Crop images' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+						help={ getImageCropHelp }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Randomize images' ) }
+						checked={ !! randomOrder }
+						onChange={ toggleRandomOrder }
+					/>
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
