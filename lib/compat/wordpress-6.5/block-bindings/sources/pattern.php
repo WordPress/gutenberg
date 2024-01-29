@@ -29,6 +29,10 @@ if ( ! function_exists( 'gutenberg_register_block_bindings_pattern_overrides_sou
 	}
 
 	function gutenberg_register_block_bindings_pattern_overrides_source() {
+		// Override the "core/pattern-attributes" source from core.
+		if ( array_key_exists( 'core/pattern-attributes', get_all_registered_block_bindings_sources() ) ) {
+			unregister_block_bindings_source( 'core/pattern-attributes' );
+		}
 		register_block_bindings_source(
 			'core/pattern-attributes',
 			array(
