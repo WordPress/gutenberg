@@ -414,12 +414,15 @@ const selectTextFromElement = async ( driver, element ) => {
 
 		// Wait for the context menu to be opened, there are cases where it selects the
 		// text automatticaly so the context option will be different.
-		await driver.waitUntil( async function () {
-			return (
-				( await driver.$( selectAllSelector ).isDisplayed() ) ||
-				( await driver.$( selectCopySelector ).isDisplayed() )
-			);
-		} );
+		await driver.waitUntil(
+			async function () {
+				return (
+					( await driver.$( selectAllSelector ).isDisplayed() ) ||
+					( await driver.$( selectCopySelector ).isDisplayed() )
+				);
+			},
+			{ timeout: 8000 }
+		);
 
 		const selectAllElement = await driver.$$( selectAllSelector );
 		if ( selectAllElement.length > 0 ) {
