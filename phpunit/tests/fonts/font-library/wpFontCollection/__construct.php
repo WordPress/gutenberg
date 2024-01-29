@@ -11,41 +11,63 @@
  * @covers WP_Font_Collection::__construct
  */
 class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
-	public function test_should_initialize_data() {
-		$slug = new ReflectionProperty( WP_Font_Collection::class, 'slug' );
-		$slug->setAccessible( true );
-
-		$name = new ReflectionProperty( WP_Font_Collection::class, 'name' );
-		$name->setAccessible( true );
-
-		$description = new ReflectionProperty( WP_Font_Collection::class, 'description' );
-		$description->setAccessible( true );
-
-		$font_families = new ReflectionProperty( WP_Font_Collection::class, 'font_families' );
-		$font_families->setAccessible( true );
-
-		$config     = array(
-			'name'          => 'My Collection',
-			'description'   => 'My collection description',
-			'font_families' => array( 'mock' ),
+	/**
+	 * @dataProvider data_should_assign_properties_from_php_config
+	 *
+	 * @param array $config Font collection config options.
+	 * @param array $expected_data Expected output data.
+	 */
+	public function test_should_assign_properties_from_php_config( $slug, $config, $expected_data ) {
+		$collection = new WP_Font_Collection( $slug, $config );
+		$data       = array(
+			'slug'          => $collection->slug,
+			'name'          => $collection->name,
+			'description'   => $collection->description,
+			'font_families' => $collection->font_families,
+			'categories'    => $collection->categories,
 		);
-		$collection = new WP_Font_Collection( 'my-collection', $config );
+		$this->assertSame( $expected_data, $data );
+	}
 
-		$actual_slug = $slug->getValue( $collection );
-		$this->assertSame( 'my-collection', $actual_slug, 'Provided slug and initialized slug should match.' );
-		$slug->setAccessible( false );
-
-		$actual_name = $name->getValue( $collection );
-		$this->assertSame( 'My Collection', $actual_name, 'Provided name and initialized name should match.' );
-		$name->setAccessible( false );
-
-		$actual_description = $description->getValue( $collection );
-		$this->assertSame( 'My collection description', $actual_description, 'Provided description and initialized description should match.' );
-		$description->setAccessible( false );
-
-		$actual_font_families = $font_families->getValue( $collection );
-		$this->assertSame( array( 'mock' ), $actual_font_families, 'Provided font_families and initialized font_families should match.' );
-		$font_families->setAccessible( false );
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_should_assign_properties_from_php_config() {
+		return array(
+			'with font_families and categories'     => array(
+				'slug'          => 'my-collection',
+				'config'        => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
+				),
+				'expected_data' => array(
+					'slug'          => 'my-collection',
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
+				),
+			),
+			'with font_families without categories' => array(
+				'slug'          => 'my-collection',
+				'config'        => array(
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( 'mock' ),
+				),
+				'expected_data' => array(
+					'slug'          => 'my-collection',
+					'name'          => 'My Collection',
+					'description'   => 'My collection description',
+					'font_families' => array( 'mock' ),
+					'categories'    => array(),
+				),
+			),
+		);
 	}
 
 	public function test_should_do_it_wrong_missing_font_families() {

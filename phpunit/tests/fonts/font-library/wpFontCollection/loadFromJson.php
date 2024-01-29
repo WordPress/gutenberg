@@ -9,20 +9,17 @@
  * @group font-library
  *
  */
-class Tests_Fonts_WpFontCollection_Config extends WP_UnitTestCase {
-
+class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
 		// Mock the wp_remote_request() function.
 		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
-		add_filter( 'http_request_host_is_external', '__return_true' );
 	}
 
 	public function tear_down() {
 		// Remove the mock to not affect other tests.
 		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
-		remove_filter( 'http_request_host_is_external', '__return_true' );
 
 		parent::tear_down();
 	}
@@ -58,7 +55,7 @@ class Tests_Fonts_WpFontCollection_Config extends WP_UnitTestCase {
 	 * @param array $config Font collection config options.
 	 * @param array $expected_data Expected output data.
 	 */
-	public function test_should_get_json_config( $json, $expected_data ) {
+	public function test_should_load_json_config( $json, $expected_data ) {
 		$config     = WP_Font_Collection::load_from_json( $json );
 		$collection = new WP_Font_Collection( $config['slug'], $config );
 		$data       = array(
@@ -99,67 +96,6 @@ class Tests_Fonts_WpFontCollection_Config extends WP_UnitTestCase {
 					'description'   => 'My collection description',
 					'font_families' => array( 'mock' ),
 					'categories'    => array( 'mock' ),
-				),
-			),
-		);
-	}
-
-	/**
-	 * @dataProvider data_should_get_php_config
-	 *
-	 * @covers WP_Font_Collection::__construct
-	 *
-	 * @param array $config Font collection config options.
-	 * @param array $expected_data Expected output data.
-	 */
-	public function test_should_get_php_config( $slug, $config, $expected_data ) {
-		$collection = new WP_Font_Collection( $slug, $config );
-		$data       = array(
-			'slug'          => $collection->slug,
-			'name'          => $collection->name,
-			'description'   => $collection->description,
-			'font_families' => $collection->font_families,
-			'categories'    => $collection->categories,
-		);
-		$this->assertSame( $expected_data, $data );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array[]
-	 */
-	public function data_should_get_php_config() {
-		return array(
-			'with font_families and categories'     => array(
-				'slug'          => 'my-collection',
-				'config'        => array(
-					'name'          => 'My Collection',
-					'description'   => 'My collection description',
-					'font_families' => array( 'mock' ),
-					'categories'    => array( 'mock' ),
-				),
-				'expected_data' => array(
-					'slug'          => 'my-collection',
-					'name'          => 'My Collection',
-					'description'   => 'My collection description',
-					'font_families' => array( 'mock' ),
-					'categories'    => array( 'mock' ),
-				),
-			),
-			'with font_families without categories' => array(
-				'slug'          => 'my-collection',
-				'config'        => array(
-					'name'          => 'My Collection',
-					'description'   => 'My collection description',
-					'font_families' => array( 'mock' ),
-				),
-				'expected_data' => array(
-					'slug'          => 'my-collection',
-					'name'          => 'My Collection',
-					'description'   => 'My collection description',
-					'font_families' => array( 'mock' ),
-					'categories'    => array(),
 				),
 			),
 		);
