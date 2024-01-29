@@ -1566,8 +1566,8 @@ const canInsertBlockTypeUnmemoized = (
 	const parentName = getBlockName( state, rootClientId );
 	const parentBlockType = getBlockType( parentName );
 
-	// Look at the `blockType.children` field to determine whether this is an allowed child block.
-	const parentAllowedChildBlocks = parentBlockType?.children;
+	// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
+	const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
 	let hasParentAllowedBlock = checkAllowList(
 		parentAllowedChildBlocks,
 		blockName

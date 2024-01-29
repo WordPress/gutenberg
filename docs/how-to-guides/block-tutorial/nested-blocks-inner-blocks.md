@@ -38,7 +38,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 ## Allowed blocks
 
-Using the `allowedBlocks` prop, you can further limit, in addition to the `children` field in `block.json`, which blocks can be inserted as direct descendants of this block. It is useful to determine the list of allowed blocks dynamically, individually for each block. For example, determined by a block attribute:
+Using the `allowedBlocks` prop, you can further limit, in addition to the `allowedBlocks` field in `block.json`, which blocks can be inserted as direct descendants of this block. It is useful to determine the list of allowed blocks dynamically, individually for each block. For example, determined by a block attribute:
 
 ```js
 const { allowedBlocks } = attributes;
@@ -46,7 +46,7 @@ const { allowedBlocks } = attributes;
 <InnerBlocks allowedBlocks={ allowedBlocks } />;
 ```
 
-If the list of allowed blocks is always the same, prefer the [`children` block setting](#defining-a-children-block-relationship) instead.
+If the list of allowed blocks is always the same, prefer the [`allowedBlocks` block setting](#defining-a-children-block-relationship) instead.
 
 ## Orientation
 
@@ -113,11 +113,11 @@ add_action( 'init', function() {
 
 ## Using parent, ancestor and children relationships in blocks
 
-A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. There are three relationships that builders can use: `parent`, `ancestor` and `children`. The differences are:
+A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. There are three relationships that builders can use: `parent`, `ancestor` and `allowedBlocks`. The differences are:
 
 - If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a __direct descendant of the parent__.
 - If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a __descendent of the parent__.
-- If you assign the `children` then you’re stating a relationship in the opposite direction, i.e., which blocks can be used and inserted as __direct descendants of this block__.
+- If you assign the `allowedBlocks` then you’re stating a relationship in the opposite direction, i.e., which blocks can be used and inserted as __direct descendants of this block__.
 
 The key difference between `parent` and `ancestor` is `parent` has finer specificity, while an `ancestor` has greater flexibility in its nested hierarchy.
 
@@ -155,17 +155,17 @@ When defining a descendent block, use the `ancestor` block setting. This prevent
 
 ### Defining a children block relationship
 
-An example of this is the Navigation block, which is assigned the `children` block setting. This makes only a certain subset of block types to be available as direct descendants of the Navigation block. See [Navigation code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/navigation).
+An example of this is the Navigation block, which is assigned the `allowedBlocks` block setting. This makes only a certain subset of block types to be available as direct descendants of the Navigation block. See [Navigation code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/navigation).
 
-The `children` setting can be extended by builders of custom blocks. The custom block can hook into the `blocks.registerBlockType` filter and add itself to the available children of the Navigation.
+The `allowedBlocks` setting can be extended by builders of custom blocks. The custom block can hook into the `blocks.registerBlockType` filter and add itself to the available children of the Navigation.
 
-When defining a set of possible descendant blocks, use the `children` block setting. This limits what blocks are showing in the inserter when inserting a new child block.
+When defining a set of possible descendant blocks, use the `allowedBlocks` block setting. This limits what blocks are showing in the inserter when inserting a new child block.
 
 ```json
 {
 	"title": "Navigation",
 	"name": "core/navigation",
-	"children": [ "core/navigation-link", "core/search", "core/social-links", "core/page-list", "core/spacer" ],
+	"allowedBlocks": [ "core/navigation-link", "core/search", "core/social-links", "core/page-list", "core/spacer" ],
 	// ...
 }
 ```

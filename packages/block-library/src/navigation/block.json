@@ -4,7 +4,7 @@
 	"name": "core/navigation",
 	"title": "Navigation",
 	"category": "theme",
-	"children": [
+	"allowedBlocks": [
 		"core/navigation-link",
 		"core/search",
 		"core/social-links",

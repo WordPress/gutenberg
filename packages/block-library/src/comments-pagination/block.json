@@ -5,7 +5,7 @@
 	"title": "Comments Pagination",
 	"category": "theme",
 	"parent": [ "core/comments" ],
-	"children": [
+	"allowedBlocks": [
 		"core/comments-pagination-previous",
 		"core/comments-pagination-numbers",
 		"core/comments-pagination-next"

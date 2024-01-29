@@ -4,7 +4,7 @@
 	"name": "core/gallery",
 	"title": "Gallery",
 	"category": "media",
-	"children": [ "core/image" ],
+	"allowedBlocks": [ "core/image" ],
 	"description": "Display multiple images in a rich gallery.",
 	"keywords": [ "images", "photos" ],
 	"textdomain": "default",

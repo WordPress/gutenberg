@@ -73,9 +73,9 @@
 				"type": "string"
 			}
 		},
-		"children": {
+		"allowedBlocks": {
 			"type": "array",
-			"description": "The `children` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
+			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
 			"items": {
 				"type": "string"
 			}

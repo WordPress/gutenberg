@@ -186,19 +186,19 @@ Setting `parent` lets a block require that it is only available when nested with
 
 The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
-### Children
+### Allowed Blocks
 
 -   Type: `string[]`
 -   Optional
 -   Localized: No
--   Property: `children`
+-   Property: `allowedBlocks`
 -   Since: `WordPress 6.5.0`
 
 ```json
-{ "children": [ "my-block/product" ] }
+{ "allowedBlocks": [ "my-block/product" ] }
 ```
 
-The `children` specifies which block types can be the direct children of the block. For example, a ‘List’ block can allow only ‘List Item’ blocks as children.
+The `allowedBlocks` specifies which block types can be the direct children of the block. For example, a ‘List’ block can allow only ‘List Item’ blocks as children.
 
 ### Icon
 

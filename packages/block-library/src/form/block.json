@@ -5,7 +5,7 @@
 	"name": "core/form",
 	"title": "Form",
 	"category": "common",
-	"children": [
+	"allowedBlocks": [
 		"core/paragraph",
 		"core/heading",
 		"core/form-input",

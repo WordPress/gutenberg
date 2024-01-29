@@ -4,7 +4,7 @@
 	"name": "core/columns",
 	"title": "Columns",
 	"category": "design",
-	"children": [ "core/column" ],
+	"allowedBlocks": [ "core/column" ],
 	"description": "Display content in multiple columns, with blocks added to each column.",
 	"textdomain": "default",
 	"attributes": {

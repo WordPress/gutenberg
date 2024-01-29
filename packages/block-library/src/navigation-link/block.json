@@ -5,7 +5,7 @@
 	"title": "Custom Link",
 	"category": "design",
 	"parent": [ "core/navigation" ],
-	"children": [
+	"allowedBlocks": [
 		"core/navigation-link",
 		"core/navigation-submenu",
 		"core/page-list"

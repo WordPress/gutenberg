@@ -275,16 +275,16 @@ The `ancestor` property makes a block available inside the specified block types
 ancestor: [ 'core/columns' ],
 ```
 
-#### children (optional)
+#### allowedBlocks (optional)
 
 -   **Type:** `Array`
 -   **Since**: `WordPress 6.5.0`
 
-Setting the `children` property will limit which block types can be nested as direct children of the block.
+Setting the `allowedBlocks` property will limit which block types can be nested as direct children of the block.
 
 ```js
 // Only allow the Columns block to be nested as direct child of this block
-children: [ 'core/columns' ],
+allowedBlocks: [ 'core/columns' ],
 ```
 
 #### blockHooks (optional)

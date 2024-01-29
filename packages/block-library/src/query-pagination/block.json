@@ -5,7 +5,7 @@
 	"title": "Pagination",
 	"category": "theme",
 	"parent": [ "core/query" ],
-	"children": [
+	"allowedBlocks": [
 		"core/query-pagination-previous",
 		"core/query-pagination-numbers",
 		"core/query-pagination-next"

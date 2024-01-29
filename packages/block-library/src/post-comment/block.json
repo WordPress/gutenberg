@@ -5,7 +5,7 @@
 	"name": "core/post-comment",
 	"title": "Comment (deprecated)",
 	"category": "theme",
-	"children": [
+	"allowedBlocks": [
 		"core/avatar",
 		"core/comment-author-name",
 		"core/comment-content",
