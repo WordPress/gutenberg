@@ -4,6 +4,7 @@
 	"name": "core/list",
 	"title": "List",
 	"category": "text",
+	"allowedBlocks": [ "core/list-item" ],
 	"description": "Create a bulleted or numbered list.",
 	"keywords": [ "bullet list", "ordered list", "numbered list" ],
 	"textdomain": "default",
