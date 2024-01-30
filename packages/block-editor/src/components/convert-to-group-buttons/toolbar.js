@@ -4,7 +4,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { group, row, stack } from '@wordpress/icons';
+import { gallery, group, row, stack } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -24,12 +24,19 @@ function BlockGroupToolbar() {
 		useConvertToGroupButtonProps();
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
-	const { canRemove, variations } = useSelect(
+	const { canInsertGallery, canRemove, variations } = useSelect(
 		( select ) => {
 			const { canRemoveBlocks } = select( blockEditorStore );
-			const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations, getBlockType } = select( blocksStore );
+
+			const isGalleryBlockAvailable = !! getBlockType( 'core/gallery' );
+
+			const areAllBlocksImages = blocksSelection.every(
+				( { name } ) => name === 'core/image'
+			);
 
 			return {
+				canInsertGallery: isGalleryBlockAvailable && areAllBlocksImages,
 				canRemove: canRemoveBlocks( clientIds ),
 				variations: getBlockVariations(
 					groupingBlockName,
@@ -37,8 +44,16 @@ function BlockGroupToolbar() {
 				),
 			};
 		},
-		[ clientIds, groupingBlockName ]
+		[ blocksSelection, clientIds, groupingBlockName ]
 	);
+
+	const onConvertToGallery = () => {
+		const newBlocks = switchToBlockType( blocksSelection, 'core/gallery' );
+
+		if ( newBlocks && newBlocks.length > 0 ) {
+			replaceBlocks( clientIds, newBlocks );
+		}
+	};
 
 	const onConvertToGroup = ( layout ) => {
 		const newBlocks = switchToBlockType(
@@ -78,6 +93,13 @@ function BlockGroupToolbar() {
 
 	return (
 		<ToolbarGroup>
+			{ canInsertGallery && (
+				<ToolbarButton
+					icon={ gallery }
+					label={ _x( 'Gallery', 'block name' ) }
+					onClick={ onConvertToGallery }
+				/>
+			) }
 			<ToolbarButton
 				icon={ group }
 				label={ _x( 'Group', 'verb' ) }
