@@ -21,14 +21,13 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
 		};
 	}, [] );
-	const availableTaxonomies = ( taxonomies ?? [] ).filter( ( taxonomy ) =>
-		taxonomy.types.includes( postType )
+	const visibleTaxonomies = ( taxonomies ?? [] ).filter(
+		( taxonomy ) =>
+			// In some circumstances .visibility can end up as undefined so optional chaining operator required.
+			// https://github.com/WordPress/gutenberg/issues/40326
+			taxonomy.types.includes( postType ) && taxonomy.visibility?.show_ui
 	);
-	const visibleTaxonomies = availableTaxonomies.filter(
-		// In some circumstances .visibility can end up as undefined so optional chaining operator required.
-		// https://github.com/WordPress/gutenberg/issues/40326
-		( taxonomy ) => taxonomy.visibility?.show_ui
-	);
+
 	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
