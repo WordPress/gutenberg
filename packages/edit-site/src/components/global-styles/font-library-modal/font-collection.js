@@ -146,15 +146,13 @@ function FontCollection( { slug } ) {
 		setNotice( null );
 
 		const fontFamily = fontsToInstall[ 0 ];
-
 		try {
 			if ( fontFamily?.fontFace ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
 						if ( fontFace.src ) {
-							fontFace.file = await downloadFontFaceAssets(
-								fontFace.src
-							);
+							fontFace.file =
+								await downloadFontFaceAssets( fontFace );
 						}
 					} )
 				);
