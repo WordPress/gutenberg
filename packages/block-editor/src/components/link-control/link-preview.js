@@ -56,8 +56,15 @@ export default function LinkPreview( {
 
 	let icon;
 
+	const attachmentImg =
+		value.type === 'attachment' && isImageUrl( value?.url )
+			? value.url
+			: null;
+
 	if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
+	} else if ( attachmentImg ) {
+		icon = <img src={ attachmentImg } alt="" />;
 	} else if ( isEmptyURL ) {
 		icon = <Icon icon={ info } size={ 32 } />;
 	} else {
@@ -154,4 +161,14 @@ export default function LinkPreview( {
 			{ additionalControls && additionalControls() }
 		</div>
 	);
+}
+
+/**
+ * Checks if the url is an image.
+ * @param {string} url the url we are checking.
+ * @return {boolean} true if the url is an image url.
+ */
+function isImageUrl( url ) {
+	const pattern = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g;
+	return pattern.test( url );
 }
