@@ -1348,6 +1348,8 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
  * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
  * of those hooked blocks should be exempted from insertion.
+ * 
+ * @since 6.5.0
  *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
@@ -1388,6 +1390,8 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 
 /**
  * Updates the post meta with the list of ignored hooked blocks when the navigation is created or updated via the REST API.
+ * 
+ * @since 6.5.0
  *
  * @param WP_Post $post Post object.
  */
@@ -1421,6 +1425,8 @@ if ( function_exists( 'get_hooked_block_markup' ) ) {
 
 /**
  * Hooks into the REST API response for the core/navigation block and adds the first and last inner blocks.
+ * 
+ * @since 6.5.0
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Post          $post     Post object.
