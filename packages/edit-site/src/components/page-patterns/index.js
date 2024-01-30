@@ -325,6 +325,7 @@ export default function DataviewsPatterns() {
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
+					isPrimary: true,
 				},
 				enableSorting: false,
 			} );
