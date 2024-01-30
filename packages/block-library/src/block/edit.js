@@ -45,14 +45,14 @@ function isPartiallySynced( block ) {
 		) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-attributes'
+			( binding ) => binding.source === 'core/pattern-overrides'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
 	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-attributes'
+			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }

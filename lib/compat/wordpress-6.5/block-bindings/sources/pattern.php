@@ -28,14 +28,14 @@ function gutenberg_block_bindings_pattern_overrides_callback( $source_attrs, $bl
 }
 
 function gutenberg_register_block_bindings_pattern_overrides_source() {
-	// Override the "core/pattern-attributes" source from core.
-	if ( array_key_exists( 'core/pattern-attributes', get_all_registered_block_bindings_sources() ) ) {
-		unregister_block_bindings_source( 'core/pattern-attributes' );
+	// Override the "core/pattern-overrides" source from core.
+	if ( array_key_exists( 'core/pattern-overrides', get_all_registered_block_bindings_sources() ) ) {
+		unregister_block_bindings_source( 'core/pattern-overrides' );
 	}
 	register_block_bindings_source(
-		'core/pattern-attributes',
+		'core/pattern-overrides',
 		array(
-			'label'              => __( 'Pattern Attributes' ),
+			'label'              => _x( 'Pattern Overrides', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_pattern_overrides_callback',
 		)
 	);
