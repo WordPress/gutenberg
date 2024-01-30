@@ -55,12 +55,11 @@ export default function DocumentBar() {
 				getCurrentPostType,
 				getEditorSettings: getSettings,
 			} = select( editorStore );
-			const back = getSettings().onNavigateToPreviousEntityRecord;
 			return {
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
 				onNavigateToPreviousEntityRecord:
-					typeof back === 'function' ? back : undefined,
+					getSettings().onNavigateToPreviousEntityRecord,
 				getEditorSettings: getSettings,
 			};
 		},
