@@ -86,6 +86,8 @@ const ImageComponent = ( {
 
 			if ( url.startsWith( 'file:///' ) ) {
 				setLocalURL( url );
+				setNetworkURL( null );
+				setNetworkImageLoaded( false );
 			} else if ( url.startsWith( 'https://' ) ) {
 				if ( Platform.isIOS ) {
 					setNetworkURL( url );
