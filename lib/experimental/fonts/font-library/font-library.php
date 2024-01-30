@@ -130,7 +130,8 @@ $google_fonts = array(
 	'slug'        => 'google-fonts',
 	'name'        => 'Google Fonts',
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
+	// TODO: update this url to the wordpress.org cdn hosted file.
+	'src'         => 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/main/releases/gutenberg-17.6/collections/google-fonts-with-preview.json',
 );
 
 wp_register_font_collection( $google_fonts );
