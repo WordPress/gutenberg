@@ -35,7 +35,7 @@ function gutenberg_register_block_bindings_pattern_overrides_source() {
 	register_block_bindings_source(
 		'core/pattern-overrides',
 		array(
-			'label'              => _x( 'Pattern Overrides', 'Label for the block bindings source used for partially synced overrides' ),
+			'label'              => _x( 'Pattern Overrides', 'Label for the block bindings source used for synced pattern overrides' ),
 			'get_value_callback' => 'gutenberg_block_bindings_pattern_overrides_callback',
 		)
 	);
