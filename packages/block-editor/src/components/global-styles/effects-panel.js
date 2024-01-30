@@ -26,7 +26,7 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { mergeOrigins } from '../use-settings';
+import { mergeOrigins } from '../../store/get-block-settings';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 
