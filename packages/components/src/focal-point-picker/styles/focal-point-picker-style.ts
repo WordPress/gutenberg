@@ -30,7 +30,7 @@ export const MediaContainer = styled.div`
 	height: 100%;
 
 	&:after {
-		bottom: 0;
+		bottom: 0px;
 		box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 );
 		content: '';
 		left: 0px;
