@@ -7,6 +7,18 @@
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
+		"slug": {
+			"type": "string",
+			"description": "Slug of the font collection. Must be unique and URL friendly."
+		},
+		"name": {
+			"type": "string",
+			"description": "Name of the font collection."
+		},
+		"description": {
+			"type": "string",
+			"description": "Description of the font collection."
+		},
 		"font_families": {
 			"type": "array",
 			"description": "Array of font families ready to be installed",
@@ -14,10 +26,44 @@
 				"type": "object",
 				"properties": {
 					"font_family_settings": {
-						"description": "Font family settings as in theme.json",
-						"allOf": [
-							{ "$ref": "./theme.json#/definitions/fontFamily" }
-						]
+						"description": "Font family settings similar to theme.json but without fontFace key.",
+						"type": "object",
+						"properties": {
+							"name": {
+								"description": "Name of the font family preset, translatable.",
+								"type": "string"
+							},
+							"slug": {
+								"description": "Kebab-case unique identifier for the font family preset.",
+								"type": "string"
+							},
+							"fontFamily": {
+								"description": "CSS font-family value.",
+								"type": "string"
+							}
+						},
+						"additionalProperties": false
+					},
+					"font_faces": {
+						"description": "Array of font-face declarations.",
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"preview": {
+									"type": "string",
+									"description": "URL to a preview image of the font face"
+								},
+								"font_face_settings": {
+									"description": "Font face settings as in theme.json",
+									"allOf": [
+										{
+											"$ref": "./theme.json#/definitions/fontFace"
+										}
+									]
+								}
+							}
+						}
 					},
 					"categories": {
 						"type": "array",
@@ -25,6 +71,10 @@
 						"items": {
 							"type": "string"
 						}
+					},
+					"preview": {
+						"type": "string",
+						"description": "URL to a preview image of the font family"
 					}
 				},
 				"required": [ "font_family_settings" ],
@@ -50,5 +100,5 @@
 		}
 	},
 	"additionalProperties": false,
-	"required": [ "$schema", "font_families" ]
+	"required": [ "$schema", "slug", "name", "font_families" ]
 }
