@@ -216,15 +216,27 @@ export function hasShadowSupport( blockName ) {
 }
 
 /**
- * Computes the label for the border panel based on the block's support for shadow.
+ * Computes the label for the border panel based on the block's support for border and shadow.
  *
  * @param {string} blockName Block name.
- * @return {string} The label for the border panel.
+ *
+ * @return {string | undefined} The label for the border panel.
  */
 export function getBorderPanelLabel( blockName ) {
-	return hasShadowSupport( blockName )
-		? __( 'Border & Shadow' )
-		: __( 'Border' );
+	const supportsBorder = hasBorderSupport( blockName );
+	const supportsShadow = hasShadowSupport( blockName );
+
+	if ( supportsBorder && supportsShadow ) {
+		return __( 'Border & Shadow' );
+	}
+
+	if ( supportsBorder ) {
+		return __( 'Border' );
+	}
+
+	if ( supportsShadow ) {
+		return __( 'Shadow' );
+	}
 }
 
 /**
