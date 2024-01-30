@@ -355,7 +355,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output' => null,
 			),
 
-			'returns value when fluid is `false`'        => array(
+			'returns value when fluid config is empty`'  => array(
 				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => false,
@@ -363,6 +363,18 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'settings'        => array(
 					'typography' => array(
 						'fluid' => true,
+					),
+				),
+				'expected_output' => '28px',
+			),
+
+			'returns value when fluid is empty array'    => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => array(),
 					),
 				),
 				'expected_output' => '28px',

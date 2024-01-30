@@ -61,6 +61,19 @@ describe( 'typography utils', () => {
 			},
 
 			{
+				message: 'should return value when fluid config is empty`',
+				preset: {
+					size: '28px',
+				},
+				settings: {
+					typography: {
+						fluid: {},
+					},
+				},
+				expected: '28px',
+			},
+
+			{
 				message:
 					'should return  clamp value with `minViewportWidth` override',
 				preset: {
