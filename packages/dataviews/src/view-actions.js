@@ -83,8 +83,9 @@ function PageSizeMenu( { view, onChangeView } ) {
 					suffix={ <span aria-hidden="true">{ view.perPage }</span> }
 				>
 					<DropdownMenuItemLabel>
-						{ /* TODO: probably label per view type. */ }
-						{ __( 'Rows per page' ) }
+						{ view.type === 'grid'
+							? __( 'Entries per page' )
+							: __( 'Rows per page' ) }
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
