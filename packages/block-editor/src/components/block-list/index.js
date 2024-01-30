@@ -155,25 +155,42 @@ function Items( {
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
+	const selected = useSelect(
+		( select ) => {
+			const {
+				getBlockOrder,
+				getSelectedBlockClientIds,
+				__unstableGetVisibleBlocks,
+				__unstableGetTemporarilyEditingAsBlocks,
+			} = select( blockEditorStore );
+			const order = getBlockOrder( rootClientId );
+			const selectedBlocks = getSelectedBlockClientIds();
+			const visibleBlocks = __unstableGetVisibleBlocks();
+			let hasVisibleBlocks = false;
+			let hasSelectedBlocks = false;
+			for ( const clientId of selectedBlocks ) {
+				if ( visibleBlocks.has( clientId ) ) {
+					hasVisibleBlocks = true;
+				}
+				if ( selectedBlocks.includes( clientId ) ) {
+					hasSelectedBlocks = true;
+				}
+			}
+			return {
+				order,
+				// Only pass selectedBlocks and visibleBlocks if they are
+				// relevant to the root block. Otherwise changes in visible
+				// blocks or selected blocks cause all block lists to re-render.
+				selectedBlocks: hasSelectedBlocks ? selectedBlocks : null,
+				visibleBlocks: hasVisibleBlocks ? visibleBlocks : null,
+				temporarilyEditingAsBlocks:
+					__unstableGetTemporarilyEditingAsBlocks(),
+			};
+		},
+		[ rootClientId ]
+	);
 	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockOrder,
-					getSelectedBlockClientIds,
-					__unstableGetVisibleBlocks,
-					__unstableGetTemporarilyEditingAsBlocks,
-				} = select( blockEditorStore );
-				return {
-					order: getBlockOrder( rootClientId ),
-					selectedBlocks: getSelectedBlockClientIds(),
-					visibleBlocks: __unstableGetVisibleBlocks(),
-					temporarilyEditingAsBlocks:
-						__unstableGetTemporarilyEditingAsBlocks(),
-				};
-			},
-			[ rootClientId ]
-		);
+		selected;
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -183,8 +200,8 @@ function Items( {
 					value={
 						// Only provide data asynchronously if the block is
 						// not visible and not selected.
-						! visibleBlocks.has( clientId ) &&
-						! selectedBlocks.includes( clientId )
+						! visibleBlocks?.has( clientId ) &&
+						! selectedBlocks?.includes( clientId )
 					}
 				>
 					<BlockListBlock
