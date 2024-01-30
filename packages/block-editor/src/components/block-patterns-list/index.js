@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useAsyncList } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';
 
@@ -165,7 +165,7 @@ function BlockPatternsList(
 	{
 		isDraggable,
 		blockPatterns,
-		shownPatterns,
+		asyncListStep,
 		onHover,
 		onClickPattern,
 		orientation,
@@ -177,6 +177,9 @@ function BlockPatternsList(
 ) {
 	const compositeStore = useCompositeStore( { orientation } );
 	const { setActiveId } = compositeStore;
+	const shownPatterns = useAsyncList( blockPatterns, {
+		step: asyncListStep,
+	} );
 
 	useEffect( () => {
 		// We reset the active composite item whenever the

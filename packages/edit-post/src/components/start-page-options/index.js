@@ -9,7 +9,6 @@ import {
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useAsyncList } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -48,12 +47,10 @@ function useStartPatterns() {
 }
 
 function PatternSelection( { blockPatterns, onChoosePattern } ) {
-	const shownBlockPatterns = useAsyncList( blockPatterns );
 	const { resetEditorBlocks } = useDispatch( editorStore );
 	return (
 		<BlockPatternsList
 			blockPatterns={ blockPatterns }
-			shownPatterns={ shownBlockPatterns }
 			onClickPattern={ ( _pattern, blocks ) => {
 				resetEditorBlocks( blocks );
 				onChoosePattern();

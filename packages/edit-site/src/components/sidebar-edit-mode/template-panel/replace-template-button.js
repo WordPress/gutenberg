@@ -7,7 +7,6 @@ import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress
 import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useAsyncList } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -76,13 +75,10 @@ export default function ReplaceTemplateButton( {
 }
 
 function TemplatesList( { availableTemplates, onSelect } ) {
-	const shownTemplates = useAsyncList( availableTemplates );
-
 	return (
 		<BlockPatternsList
 			label={ __( 'Templates' ) }
 			blockPatterns={ availableTemplates }
-			shownPatterns={ shownTemplates }
 			onClickPattern={ onSelect }
 		/>
 	);
