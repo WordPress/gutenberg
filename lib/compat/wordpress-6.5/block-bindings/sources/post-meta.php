@@ -28,7 +28,7 @@ function gutenberg_register_block_bindings_post_meta_source() {
 	register_block_bindings_source(
 		'core/post-meta',
 		array(
-			'label'              => __( 'Post Meta' ),
+			'label'              => _x( 'Post Meta', 'Label for the block bindings source used to connect with post meta' ),
 			'get_value_callback' => 'gutenberg_block_bindings_post_meta_callback',
 		)
 	);
