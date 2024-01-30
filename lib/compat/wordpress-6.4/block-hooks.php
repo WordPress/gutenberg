@@ -109,14 +109,6 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
  * @return void
  */
 function gutenberg_add_hooked_block( $hooked_block, $position, $anchor_block ) {
-		$hooked_block_array = array(
-			'blockName'    => $hooked_block,
-			'attrs'        => array(),
-			'innerHTML'    => '',
-			'innerContent' => array(),
-			'innerBlocks'  => array(),
-		);
-
 		/*
 		 * The block-types REST API controller uses objects of the `WP_Block_Type` class, which are
 		 * in turn created upon block type registration. However, that class does not contain
