@@ -23,7 +23,7 @@ import { search, closeSmall } from '@wordpress/icons';
 import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
-import FontCard from './font-card';
+import CollectionFontCard from './collection-font-card';
 import filterFonts from './utils/filter-fonts';
 import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
@@ -148,13 +148,14 @@ function FontCollection( { slug } ) {
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
-			if ( fontFamily?.fontFace ) {
+			if ( fontFamily?.font_faces ) {
 				await Promise.all(
-					fontFamily.fontFace.map( async ( fontFace ) => {
-						if ( fontFace.src ) {
-							fontFace.file = await downloadFontFaceAssets(
-								fontFace.src
-							);
+					fontFamily.font_faces.map( async ( face ) => {
+						if ( face.font_face_setttings.src ) {
+							face.font_face_setttings.file =
+								await downloadFontFaceAssets(
+									face.font_face_setttings.src
+								);
 						}
 					} )
 				);
@@ -277,12 +278,10 @@ function FontCollection( { slug } ) {
 			{ ! renderConfirmDialog && ! selectedFont && (
 				<FontsGrid>
 					{ fonts.map( ( font ) => (
-						<FontCard
+						<CollectionFontCard
 							key={ font.font_family_settings.slug }
-							font={ font.font_family_settings }
-							onClick={ () => {
-								setSelectedFont( font.font_family_settings );
-							} }
+							font={ font }
+							onClick={ setSelectedFont }
 						/>
 					) ) }
 				</FontsGrid>
