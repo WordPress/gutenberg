@@ -243,7 +243,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ mediaType === 'image' && (
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={ __( 'Crop image to fill entire column' ) }
+					label={ __( 'Crop image to fill' ) }
 					checked={ !! imageFill }
 					onChange={ () =>
 						setAttributes( {
@@ -296,6 +296,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ mediaUrl && (
 				<RangeControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
