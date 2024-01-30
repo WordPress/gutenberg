@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
@@ -10,29 +10,9 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import { store as postEditorStore } from '../../../store';
 
 function WritingMenu() {
-	const registry = useRegistry();
-
-	const { closeGeneralSidebar } = useDispatch( postEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { setIsInserterOpened, setIsListViewOpened } =
-		useDispatch( editorStore );
-
-	const toggleDistractionFree = () => {
-		registry.batch( () => {
-			setPreference( 'core', 'fixedToolbar', true );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-		} );
-	};
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -59,7 +39,6 @@ function WritingMenu() {
 			<PreferenceToggleMenuItem
 				scope="core"
 				name="distractionFree"
-				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }
 				info={ __( 'Write with calmness' ) }
 				messageActivated={ __( 'Distraction free mode activated' ) }

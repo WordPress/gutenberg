@@ -541,6 +541,11 @@ export const toggleDistractionFree =
 		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', false );
+		}
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
