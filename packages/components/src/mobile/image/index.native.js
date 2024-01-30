@@ -99,7 +99,11 @@ const ImageComponent = ( {
 							setNetworkImageLoaded( true );
 						},
 						() => {
-							// handle error
+							// This callback is called when the image fails to load,
+							// but these events are handled by `isUploadFailed`
+							// and `isUploadPaused` events instead.
+							//
+							// Ignoring the error event will persist the local image URI.
 						}
 					);
 				}
