@@ -8,13 +8,14 @@
 /**
  * When the `core/file` block is rendering, check if we need to enqueue the `wp-block-file-view` script.
  *
- * @param array    $attributes The block attributes.
- * @param string   $content    The block content.
- * @param WP_Block $block      The parsed block.
+ * @param array                $attributes The block attributes.
+ * @param string               $content    The block content.
+ * @deprecated 6.5.0 @param WP_Block $block The parsed block.
  *
  * @return string Returns the block content.
  */
-function render_block_core_file( $attributes, $content ) {
+//phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+function render_block_core_file( $attributes, $content, $deprecated_block ) {
 	// Update object's aria-label attribute if present in block HTML.
 	// Match an aria-label attribute from an object tag.
 	$pattern = '@<object.+(?<attribute>aria-label="(?<filename>[^"]+)?")@i';

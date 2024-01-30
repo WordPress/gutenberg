@@ -11,12 +11,13 @@
  * @since 6.3.0 Using block.json `viewScript` to register script, and update `view_script_handles()` only when needed.
  *
  * @param array    $attributes The block attributes.
- * @param string   $content    The saved content.
- * @param WP_Block $block      The parsed block.
+ * @deprecated 6.5.0 @param string   $content    The saved content.
+ * @deprecated 6.5.0 @param WP_Block $block      The parsed block.
  *
  * @return string The search block markup.
  */
-function render_block_core_search( $attributes ) {
+//phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+function render_block_core_search( $attributes, $deprecated_content, $deprecated_block ) {
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
