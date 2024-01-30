@@ -157,10 +157,10 @@
 		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
 		<properties>
 			<property name="forbidden_functions" type="array">
-				<element value="(G|g)utenberg.*"/>
+				<element value="[Gg]utenberg.*"/>
 			</property>
 			<property name="forbidden_classes" type="array">
-				<element value="(G|g)utenberg.*"/>
+				<element value="[Gg]utenberg.*"/>
 			</property>
 		</properties>
 	</rule>
