@@ -162,10 +162,18 @@ function BlockPatternsListAsync( {
 	onHover,
 	onClickPattern,
 	showTitlesAsTooltip,
+	setActiveId,
 } ) {
 	const shownPatterns = useAsyncList( blockPatterns, {
 		step: asyncListStep,
 	} );
+
+	useEffect( () => {
+		// We reset the active composite item whenever the
+		// available patterns change, to make sure that
+		// focus is put back to the start.
+		setActiveId( undefined );
+	}, [ setActiveId, shownPatterns, blockPatterns ] );
 
 	return blockPatterns.map( ( pattern ) => {
 		const isShown = shownPatterns.includes( pattern );
@@ -207,17 +215,6 @@ function BlockPatternsList(
 ) {
 	const compositeStore = useCompositeStore( { orientation } );
 	const { setActiveId } = compositeStore;
-	const shownPatterns = useAsyncList( blockPatterns, {
-		step: asyncListStep,
-	} );
-
-	useEffect( () => {
-		// We reset the active composite item whenever the
-		// available patterns change, to make sure that
-		// focus is put back to the start.
-		setActiveId( undefined );
-	}, [ setActiveId, shownPatterns, blockPatterns ] );
-
 	return (
 		<Composite
 			store={ compositeStore }
@@ -233,6 +230,7 @@ function BlockPatternsList(
 				onHover={ onHover }
 				onClickPattern={ onClickPattern }
 				showTitlesAsTooltip={ showTitlesAsTooltip }
+				setActiveId={ setActiveId }
 			/>
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
