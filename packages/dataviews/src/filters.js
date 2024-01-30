@@ -26,8 +26,11 @@ const sanitizeOperators = ( field ) => {
 	);
 };
 
+const isPrimaryFilter = ( field ) => field.filterBy?.isPrimary;
+
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
+	const primaryFilters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
 			return;
@@ -43,6 +46,18 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 				if ( ! field.elements?.length ) {
 					return;
 				}
+
+				if ( isPrimaryFilter( field ) ) {
+					primaryFilters.push( {
+						field: field.id,
+						name: field.header,
+						elements: field.elements,
+						operators,
+						isVisible: true,
+					} );
+					return;
+				}
+
 				filters.push( {
 					field: field.id,
 					name: field.header,
@@ -74,6 +89,16 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 				return null;
 			}
 
+			return (
+				<FilterSummary
+					key={ filter.field }
+					filter={ filter }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+			);
+		} ),
+		...primaryFilters.map( ( filter ) => {
 			return (
 				<FilterSummary
 					key={ filter.field }
