@@ -235,6 +235,12 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 	}
 
+	.block-editor-link-control__search-item-media-thumbnail {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		object-fit: cover;
+	}
+
 	&.is-error .block-editor-link-control__search-item-icon {
 		top: 0;
 		width: 32px;

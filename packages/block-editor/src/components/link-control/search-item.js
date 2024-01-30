@@ -18,6 +18,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import isImageUrl from './is-url-image';
+
 const ICONS_MAP = {
 	post: postList,
 	page,
@@ -28,6 +33,7 @@ const ICONS_MAP = {
 
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
+	let imageURL = null;
 
 	if ( isURL ) {
 		icon = globe;
@@ -41,9 +47,23 @@ function SearchItemIcon( { isURL, suggestion } ) {
 				icon = verse;
 			}
 		}
+
+		if ( suggestion.kind === 'media' && isImageUrl( suggestion.url ) ) {
+			imageURL = suggestion.url;
+		}
 	}
 
-	if ( icon ) {
+	if ( imageURL ) {
+		return (
+			<span className="block-editor-link-control__search-item-icon'">
+				<img
+					className="block-editor-link-control__search-item-media-thumbnail"
+					src={ imageURL }
+					alt=""
+				/>
+			</span>
+		);
+	} else if ( icon ) {
 		return (
 			<Icon
 				className="block-editor-link-control__search-item-icon"

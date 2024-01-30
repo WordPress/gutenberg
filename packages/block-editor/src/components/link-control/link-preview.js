@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * Internal dependencies
+ */
+import isImageUrl from './is-url-image';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -64,7 +69,14 @@ export default function LinkPreview( {
 	if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
 	} else if ( attachmentImg ) {
-		icon = <img src={ attachmentImg } alt="" />;
+		//TODO we don't have an alt text for this image
+		icon = (
+			<img
+				className="block-editor-link-control__search-item-media-thumbnail"
+				src={ attachmentImg }
+				alt=""
+			/>
+		);
 	} else if ( isEmptyURL ) {
 		icon = <Icon icon={ info } size={ 32 } />;
 	} else {
@@ -161,14 +173,4 @@ export default function LinkPreview( {
 			{ additionalControls && additionalControls() }
 		</div>
 	);
-}
-
-/**
- * Checks if the url is an image.
- * @param {string} url the url we are checking.
- * @return {boolean} true if the url is an image url.
- */
-function isImageUrl( url ) {
-	const pattern = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g;
-	return pattern.test( url );
 }
