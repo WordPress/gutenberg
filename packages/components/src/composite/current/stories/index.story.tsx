@@ -35,6 +35,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		CompositeItem,
 	},
 	parameters: {
+		badges: [ 'private' ],
 		docs: {
 			source: { transform },
 			extractArgTypes: ( component: React.FunctionComponent ) => {
