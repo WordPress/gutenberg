@@ -1390,7 +1390,7 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 
 /**
  * Updates the post meta with the list of ignored hooked blocks when the navigation is created or updated via the REST API.
- * 
+ *
  * @since 6.5.0
  *
  * @param WP_Post $post Post object.
@@ -1425,7 +1425,7 @@ if ( function_exists( 'get_hooked_block_markup' ) ) {
 
 /**
  * Hooks into the REST API response for the core/navigation block and adds the first and last inner blocks.
- * 
+ *
  * @since 6.5.0
  *
  * @param WP_REST_Response $response The response object.
