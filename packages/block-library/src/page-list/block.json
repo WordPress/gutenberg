@@ -4,6 +4,7 @@
 	"name": "core/page-list",
 	"title": "Page List",
 	"category": "widgets",
+	"allowedBlocks": [ "core/page-list-item" ],
 	"description": "Display a list of all pages.",
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",

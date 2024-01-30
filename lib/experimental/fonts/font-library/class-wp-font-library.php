@@ -69,7 +69,7 @@ class WP_Font_Library {
 
 		$new_collection = new WP_Font_Collection( $config );
 
-		if ( self::is_collection_registered( $new_collection->get_config()['slug'] ) ) {
+		if ( self::is_collection_registered( $new_collection->slug ) ) {
 			$error_message = sprintf(
 				/* translators: %s: Font collection slug. */
 				__( 'Font collection with slug: "%s" is already registered.', 'gutenberg' ),
@@ -82,7 +82,7 @@ class WP_Font_Library {
 			);
 			return new WP_Error( 'font_collection_registration_error', $error_message );
 		}
-		self::$collections[ $new_collection->get_config()['slug'] ] = $new_collection;
+		self::$collections[ $new_collection->slug ] = $new_collection;
 		return $new_collection;
 	}
 

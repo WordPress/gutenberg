@@ -4,6 +4,16 @@
 
 ### Enhancements
 
+-   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))
+
+### Bug Fixes
+
+-   Ensure Preact is used in published packages ([58258](https://github.com/WordPress/gutenberg/pull/58258).
+
+## 4.0.0 (2024-01-24)
+
+### Enhancements
+
 -   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
 -   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([#57891](https://github.com/WordPress/gutenberg/pull/57891))
 -   Export `withScope()` and allow to use it with asynchronous operations. ([#58013](https://github.com/WordPress/gutenberg/pull/58013))

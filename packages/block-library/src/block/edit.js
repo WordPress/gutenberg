@@ -45,14 +45,14 @@ function isPartiallySynced( block ) {
 		) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source.name === 'pattern_attributes'
+			( binding ) => binding.source === 'core/pattern-overrides'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
 	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
+			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }
@@ -252,7 +252,6 @@ export default function ReusableBlockEdit( {
 		? getPostLinkProps( {
 				postId: ref,
 				postType: 'wp_block',
-				canvas: 'edit',
 		  } )
 		: {};
 
@@ -409,7 +408,7 @@ export default function ReusableBlockEdit( {
 							disabled={ ! overrides }
 							__experimentalIsFocusable
 						>
-							{ __( 'Reset to original' ) }
+							{ __( 'Reset' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>

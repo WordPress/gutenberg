@@ -30,6 +30,7 @@ const meta: Meta< typeof Tabs > = {
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
+		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

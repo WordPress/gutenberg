@@ -57,6 +57,7 @@ test.describe( 'Post Editor Template mode', () => {
 		);
 
 		// Save changes.
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Publish"i]' );
 		await page.click( 'role=button[name="Save"i]' );
 
@@ -249,6 +250,7 @@ class PostEditorTemplateMode {
 	}
 
 	async saveTemplateWithoutPublishing() {
+		await this.page.click( 'role=button[name="Back"i]' );
 		await this.page.click( 'role=button[name="Publish"i]' );
 		const editorPublishRegion = this.page.locator(
 			'role=region[name="Editor publish"i]'

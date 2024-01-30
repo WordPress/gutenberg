@@ -44,16 +44,16 @@ class Tests_Fonts_WpFontCollection_IsConfigValid extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_is_config_valid_should_call_doing_ti_wrong
+	 * @dataProvider data_is_config_valid_should_call_doing_it_wrong
 	 *
 	 * @param mixed  $config Config of the font collection.
 	 */
-	public function test_is_config_valid_should_call_doing_ti_wrong( $config ) {
+	public function test_is_config_valid_should_call_doing_it_wrong( $config ) {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid', 'Should call _doing_it_wrong if the config is not valid.' );
 		$this->assertFalse( WP_Font_Collection::is_config_valid( $config ), 'Should return false if the config is not valid.' );
 	}
 
-	public function data_is_config_valid_should_call_doing_ti_wrong() {
+	public function data_is_config_valid_should_call_doing_it_wrong() {
 		return array(
 			'with missing slug'               => array(
 				'config' => array(

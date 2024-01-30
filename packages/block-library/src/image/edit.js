@@ -25,6 +25,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import Image from './image';
 
 /**
@@ -93,7 +94,7 @@ function hasSize( image, size ) {
 export function ImageEdit( {
 	attributes,
 	setAttributes,
-	isSelected,
+	isSelected: isSingleSelected,
 	className,
 	insertBlocksAfter,
 	onReplace,
@@ -141,14 +142,7 @@ export function ImageEdit( {
 	}, [ align ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			imageDefaultSize: settings.imageDefaultSize,
-			mediaUpload: settings.mediaUpload,
-		};
-	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -181,6 +175,8 @@ export function ImageEdit( {
 		}
 
 		setTemporaryURL();
+
+		const { imageDefaultSize } = getSettings();
 
 		// Try to use the previous selected image size if its available
 		// otherwise try the default image size or fallback to "full"
@@ -264,7 +260,7 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				sizeSlug: imageDefaultSize,
+				sizeSlug: getSettings().imageDefaultSize,
 			} );
 		}
 	}
@@ -280,6 +276,10 @@ export function ImageEdit( {
 		const file = getBlobByURL( url );
 
 		if ( file ) {
+			const { mediaUpload } = getSettings();
+			if ( ! mediaUpload ) {
+				return;
+			}
 			mediaUpload( {
 				filesList: [ file ],
 				onFileChange: ( [ img ] ) => {
@@ -333,19 +333,37 @@ export function ImageEdit( {
 	} );
 
 	// Much of this description is duplicated from MediaPlaceholder.
-	const isUrlAttributeConnected = !! metadata?.bindings?.url;
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					getBlockBindingsSource( metadata?.bindings?.url?.source )
+						?.lockAttributesEditing === true,
+			};
+		},
+		[ isSingleSelected ]
+	);
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
 				className={ classnames( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
-						!! borderProps.className && ! isSelected,
+						!! borderProps.className && ! isSingleSelected,
 				} ) }
 				withIllustration={ true }
-				icon={ isUrlAttributeConnected ? pluginsIcon : icon }
+				icon={ lockUrlControls ? pluginsIcon : icon }
 				label={ __( 'Image' ) }
 				instructions={
-					! isUrlAttributeConnected &&
+					! lockUrlControls &&
 					__(
 						'Upload an image file, pick one from your media library, or add one with a URL.'
 					)
@@ -361,7 +379,7 @@ export function ImageEdit( {
 					...borderProps.style,
 				} }
 			>
-				{ isUrlAttributeConnected ? (
+				{ lockUrlControls ? (
 					<span
 						className={ 'block-bindings-media-placeholder-message' }
 					>
@@ -380,7 +398,7 @@ export function ImageEdit( {
 				temporaryURL={ temporaryURL }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				isSelected={ isSelected }
+				isSingleSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				onReplace={ onReplace }
 				onSelectImage={ onSelectImage }

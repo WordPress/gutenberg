@@ -20,8 +20,10 @@ import {
 } from './selectors';
 import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-import { store } from './';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+
+export { getBlockSettings } from './get-block-settings';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -45,13 +47,13 @@ export function getLastInsertedBlocksClientIds( state ) {
 }
 
 /**
- * Returns true if the block with the given client ID and all of its descendants
+ * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID.
  *
- * @return {boolean} Whether the block and its descendants are disabled.
+ * @return {boolean} Whether the block descendants are disabled.
  */
 export const isBlockSubtreeDisabled = createSelector(
 	( state, clientId ) => {
@@ -63,10 +65,7 @@ export const isBlockSubtreeDisabled = createSelector(
 				)
 			);
 		};
-		return (
-			getBlockEditingMode( state, clientId ) === 'disabled' &&
-			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
-		);
+		return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 	},
 	( state ) => [
 		state.blocks.parents,
@@ -265,7 +264,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
 			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( store )
+				select( STORE_NAME )
 			);
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
@@ -323,7 +322,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...unlock( select( store ) ).getFetchedPatterns(),
+			...unlock( select( STORE_NAME ) ).getFetchedPatterns(),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
