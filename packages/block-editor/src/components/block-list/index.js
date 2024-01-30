@@ -172,7 +172,7 @@ function Items( {
 				if ( visibleBlocks.has( clientId ) ) {
 					hasVisibleBlocks = true;
 				}
-				if ( order.includes( clientId ) ) {
+				if ( selectedBlocks.includes( clientId ) ) {
 					hasSelectedBlocks = true;
 				}
 			}
