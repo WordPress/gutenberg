@@ -8,6 +8,7 @@ import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -41,13 +42,13 @@ export function SidebarComplementaryAreaFills() {
 			SIDEBAR_BLOCK,
 			SIDEBAR_TEMPLATE,
 		].includes( _sidebar );
-		const settings = select( editSiteStore ).getSettings();
 		return {
 			sidebar: _sidebar,
 			isEditorSidebarOpened: _isEditorSidebarOpened,
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
-			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
+			supportsGlobalStyles:
+				select( coreStore ).getCurrentTheme()?.is_block_theme,
 			isEditingPage: select( editSiteStore ).isPage(),
 		};
 	}, [] );

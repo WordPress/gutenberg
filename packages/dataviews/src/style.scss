@@ -387,16 +387,14 @@
 				border-radius: $grid-unit-05;
 			}
 		}
-		h3 {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+		.dataviews-view-list__primary-field {
+			min-height: $grid-unit-05 * 5;
 		}
 	}
 
 	.dataviews-view-list__media-wrapper {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: $grid-unit-50;
+		height: $grid-unit-50;
 		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
@@ -429,17 +427,13 @@
 
 	.dataviews-view-list__fields {
 		color: $gray-700;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		display: flex;
+		gap: $grid-unit-10;
+		flex-wrap: wrap;
+		font-size: 12px;
+		line-height: $grid-unit-20;
 
 		.dataviews-view-list__field {
-			margin-right: $grid-unit-15;
-
-			&:last-child {
-				margin-right: 0;
-			}
-
 			&:empty {
 				display: none;
 			}

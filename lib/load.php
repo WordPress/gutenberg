@@ -112,11 +112,13 @@ require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivit
 require __DIR__ . '/compat/wordpress-6.5/interactivity-api/interactivity-api.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings.php';
+if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
+	require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings-registry.php';
+}
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/post-meta.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/pattern.php';
-
+require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -137,7 +139,7 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
 // Loads the Font Library.
 require __DIR__ . '/experimental/fonts/font-library/class-wp-font-collection.php';
 require __DIR__ . '/experimental/fonts/font-library/class-wp-font-library.php';
-require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
+require __DIR__ . '/experimental/fonts/font-library/class-wp-font-utils.php';
 require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-families-controller.php';
 require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-faces-controller.php';
 require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-collections-controller.php';

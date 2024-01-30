@@ -2475,4 +2475,90 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			$actual
 		);
 	}
+
+	/**
+	 * Tests the correct application of a block style variation's selector to
+	 * a block's selector.
+	 *
+	 * @dataProvider data_get_block_style_variation_selector
+	 *
+	 * @param string $selector  CSS selector.
+	 * @param string $expected  Expected block style variation CSS selector.
+	 */
+	public function test_get_block_style_variation_selector( $selector, $expected ) {
+		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
+
+		$func = $theme_json->getMethod( 'get_block_style_variation_selector' );
+		$func->setAccessible( true );
+
+		$actual = $func->invoke( null, 'custom', $selector );
+
+		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
+	 * Data provider for generating block style variation selectors.
+	 *
+	 * @return array[]
+	 */
+	public function data_get_block_style_variation_selector() {
+		return array(
+			'empty block selector'     => array(
+				'selector' => '',
+				'expected' => '.is-style-custom',
+			),
+			'class selector'           => array(
+				'selector' => '.wp-block',
+				'expected' => '.wp-block.is-style-custom',
+			),
+			'id selector'              => array(
+				'selector' => '#wp-block',
+				'expected' => '#wp-block.is-style-custom',
+			),
+			'element tag selector'     => array(
+				'selector' => 'p',
+				'expected' => 'p.is-style-custom',
+			),
+			'attribute selector'       => array(
+				'selector' => '[style*="color"]',
+				'expected' => '[style*="color"].is-style-custom',
+			),
+			'descendant selector'      => array(
+				'selector' => '.wp-block .inner',
+				'expected' => '.wp-block.is-style-custom .inner',
+			),
+			'comma separated selector' => array(
+				'selector' => '.wp-block .inner, .wp-block .alternative',
+				'expected' => '.wp-block.is-style-custom .inner, .wp-block.is-style-custom .alternative',
+			),
+			'pseudo selector'          => array(
+				'selector' => 'div:first-child',
+				'expected' => 'div.is-style-custom:first-child',
+			),
+			':is selector'             => array(
+				'selector' => '.wp-block:is(.outer .inner:first-child)',
+				'expected' => '.wp-block.is-style-custom:is(.outer .inner:first-child)',
+			),
+			':not selector'            => array(
+				'selector' => '.wp-block:not(.outer .inner:first-child)',
+				'expected' => '.wp-block.is-style-custom:not(.outer .inner:first-child)',
+			),
+			':has selector'            => array(
+				'selector' => '.wp-block:has(.outer .inner:first-child)',
+				'expected' => '.wp-block.is-style-custom:has(.outer .inner:first-child)',
+			),
+			':where selector'          => array(
+				'selector' => '.wp-block:where(.outer .inner:first-child)',
+				'expected' => '.wp-block.is-style-custom:where(.outer .inner:first-child)',
+			),
+			'wrapping :where selector' => array(
+				'selector' => ':where(.outer .inner:first-child)',
+				'expected' => ':where(.outer.is-style-custom .inner:first-child)',
+			),
+			'complex'                  => array(
+				'selector' => '.wp:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
+				'expected' => '.wp.is-style-custom:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp.is-style-custom:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
+			),
+		);
+	}
 }
