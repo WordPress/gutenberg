@@ -1,13 +1,11 @@
 .edit-site-site-icon__icon {
 	fill: currentColor;
-	// Make the WordPress icon not so small.
-	padding: $grid-unit-05 * 0.5;
 	// Matches SiteIcon motion, smoothing out the transition.
 	transition: padding	0.3s ease-out;
 
 	.edit-site-layout.is-full-canvas & {
 		// Make the WordPress icon not so big in full canvas.
-		padding: $grid-unit-15;
+		padding: $grid-unit-15 * 0.5; // 6px.
 	}
 }
 
