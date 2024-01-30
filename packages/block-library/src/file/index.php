@@ -69,7 +69,7 @@ function register_block_core_file() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/file',
-		$module_url ?? includes_url( 'blocks/file/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/file/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);

@@ -203,7 +203,7 @@ function register_block_core_search() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/search',
-		$module_url ?? includes_url( 'blocks/search/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/search/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);

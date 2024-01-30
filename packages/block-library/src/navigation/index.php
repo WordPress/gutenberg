@@ -1081,7 +1081,7 @@ function register_block_core_navigation() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/navigation',
-		$module_url ?? includes_url( 'blocks/navigation/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/navigation/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);

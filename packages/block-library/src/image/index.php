@@ -329,7 +329,7 @@ function register_block_core_image() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/image',
-		$module_url ?? includes_url( 'blocks/image/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/image/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);

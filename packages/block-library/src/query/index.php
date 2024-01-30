@@ -105,7 +105,7 @@ function register_block_core_query() {
 
 	wp_register_script_module(
 		'@wordpress/block-library/query',
-		$module_url ?? includes_url( 'blocks/query/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/query/view.min.js' ),
 		array(
 			array(
 				'id'     => '@wordpress/interactivity',
