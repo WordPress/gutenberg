@@ -1276,6 +1276,7 @@ class WP_Theme_JSON_Gutenberg {
 			$root_selector          = static::ROOT_BLOCK_SELECTOR;
 			$columns_selector       = '.wp-block-columns';
 			$post_template_selector = '.wp-block-post-template';
+
 			if ( ! empty( $options['scope'] ) ) {
 				$root_selector          = static::scope_selector( $options['scope'], $root_selector );
 				$columns_selector       = static::scope_selector( $options['scope'], $columns_selector );

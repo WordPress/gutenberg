@@ -4,13 +4,17 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import {
+	GlobalStylesContext,
+	toStyles,
+	getBlockSelectors,
+} from '../components/global-styles';
 import { useStyleOverride } from './utils';
-import { toStyles, getBlockSelectors } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
 
 export default {
@@ -19,8 +23,9 @@ export default {
 	useBlockProps,
 };
 
-function useBlockSyleVariation( name, variation ) {
-	const { settings, styles } = useSelect( ( select ) => {
+function useBlockSyleVariation( name, variation, id ) {
+	const { user: userStyles } = useContext( GlobalStylesContext );
+	const globalStyles = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
 			settings: getSettings().__experimentalFeatures,
@@ -28,29 +33,59 @@ function useBlockSyleVariation( name, variation ) {
 		};
 	}, [] );
 
+	if ( ! variation ) {
+		return {};
+	}
+
+	const settings = userStyles?.settings ?? globalStyles?.settings;
+	const styles = userStyles?.styles ?? globalStyles?.styles;
+
+	// The variation style data is all that is needed to generate
+	// the styles for the current application to a block. The variation
+	// name is updated to match the instance specific class name.
+	const variationStyles = styles?.blocks?.[ name ]?.variations?.[ variation ];
+	const variationOnlyStyles = {
+		blocks: {
+			[ name ]: {
+				variations: {
+					[ `${ variation }-${ id }` ]: variationStyles,
+				},
+			},
+		},
+	};
+
 	return {
 		settings,
-		styles: styles?.blocks?.[ name ]?.variations?.[ variation ],
+		styles: variationOnlyStyles,
 	};
 }
 
 function useBlockProps( { name, style } ) {
 	const variation = style?.variation;
-	const className = `is-style-${ variation }-${ useInstanceId(
-		useBlockProps
-	) }`;
-
-	const { settings, styles } = useBlockSyleVariation( name, variation );
+	const id = useInstanceId( useBlockProps );
+	const className = `is-style-${ variation }-${ id }`;
 
 	const getBlockStyles = useSelect( ( select ) => {
 		return select( blocksStore ).getBlockStyles;
 	}, [] );
 
+	const { settings, styles } = useBlockSyleVariation(
+		name,
+		variation,
+		id,
+		getBlockStyles()
+	);
+
 	const variationStyles = useMemo( () => {
+		if ( ! variation ) {
+			return;
+		}
+
 		const variationConfig = { settings, styles };
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
-			getBlockStyles
+			getBlockStyles,
+			id
 		);
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
@@ -71,12 +106,11 @@ function useBlockProps( { name, style } ) {
 				marginReset: false,
 				presets: false,
 				rootPadding: false,
-				scopeSelector: `.${ className }`,
 			}
 		);
-	}, [ variation, settings, styles, className ] );
+	}, [ variation, settings, styles, getBlockStyles, id ] );
 
 	useStyleOverride( { css: variationStyles } );
 
-	return { className };
+	return variation ? { className } : {};
 }

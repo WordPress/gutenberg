@@ -90,6 +90,10 @@ function gutenberg_render_variation_support_styles( $pre_render, $block ) {
 	$class_name = gutenberg_get_variation_class_name( $block, $variation );
 	$class_name = ".$class_name";
 
+	if ( ! is_admin() ) {
+		remove_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
+	}
+
 	$variation_theme_json = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 	$variation_styles     = $variation_theme_json->get_stylesheet(
 		array( 'styles' ),
@@ -100,6 +104,10 @@ function gutenberg_render_variation_support_styles( $pre_render, $block ) {
 			'scope'                   => $class_name,
 		)
 	);
+
+	if ( ! is_admin() ) {
+		add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
+	}
 
 	if ( empty( $variation_styles ) ) {
 		return null;
