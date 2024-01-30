@@ -124,7 +124,7 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 			$start_name = 'start_of_balanced_tag_' . ++$i;
 
 			$this->set_bookmark( $start_name );
-			if ( ! $this->next_balanced_closer() ) {
+			if ( ! $this->next_balanced_tag_closer_tag() ) {
 				$this->release_bookmark( $start_name );
 				return null;
 			}
@@ -139,13 +139,13 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 		 * Finds the matching closing tag for an opening tag.
 		 *
 		 * When called while the processor is on an open tag, it traverses the HTML
-		 * until it finds the matching closing tag, respecting any in-between content,
-		 * including nested tags of the same name. Returns false when called on a
-		 * closing or void tag, or if no matching closing tag was found.
+		 * until it finds the matching closing tag, respecting any in-between
+		 * content, including nested tags of the same name. Returns false when
+		 * called on a closing or void tag, or if no matching closing tag was found.
 		 *
 		 * @return bool Whether a matching closing tag was found.
 		 */
-		private function next_balanced_closer(): bool {
+		public function next_balanced_tag_closer_tag(): bool {
 			$depth    = 0;
 			$tag_name = $this->get_tag();
 

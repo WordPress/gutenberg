@@ -627,4 +627,93 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 		$this->assertTrue( $result );
 		$this->assertEquals( $content . $new_content, $p );
 	}
+
+	/**
+	 * Tests that the `next_balanced_tag_closer_tag` method finds a closing tag
+	 * for a standard tag.
+	 *
+	 * @covers ::next_balanced_tag_closer_tag
+	 */
+	public function test_next_balanced_tag_closer_tag_standard_tags() {
+			$content = '<div>Text</div>';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+			$this->assertTrue( $p->next_balanced_tag_closer_tag() );
+			$this->assertEquals( 'DIV', $p->get_tag() );
+			$this->assertTrue( $p->is_tag_closer() );
+	}
+
+	/**
+	 * Tests that the `next_balanced_tag_closer_tag` method returns false for a
+	 * self-closing tag.
+	 *
+	 * @covers ::next_balanced_tag_closer_tag
+	 */
+	public function test_next_balanced_tag_closer_tag_void_tag() {
+			$content = '<img src="image.jpg" />';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+			$this->assertFalse( $p->next_balanced_tag_closer_tag() );
+
+			$content = '<img src="image.jpg" /><div>Text</div>';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+			$this->assertFalse( $p->next_balanced_tag_closer_tag() );
+	}
+
+	/**
+	 * Tests that the `next_balanced_tag_closer_tag` method correctly handles
+	 * nested tags.
+	 *
+	 * @covers ::next_balanced_tag_closer_tag
+	 */
+	public function test_next_balanced_tag_closer_tag_nested_tags() {
+			$content = '<div><span>Nested content</span></div>';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+			$this->assertTrue( $p->next_balanced_tag_closer_tag() );
+			$this->assertEquals( 'DIV', $p->get_tag() );
+			$this->assertTrue( $p->is_tag_closer() );
+
+			$content = '<div><div>Nested content</div></div>';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+			$this->assertTrue( $p->next_balanced_tag_closer_tag() );
+			$this->assertEquals( 'DIV', $p->get_tag() );
+			$this->assertTrue( $p->is_tag_closer() );
+			$this->assertFalse( $p->next_tag() ); // No more content.
+	}
+
+	/**
+	 * Tests that the `next_balanced_tag_closer_tag` method returns false when no
+	 * matching closing tag is found.
+	 *
+	 * @covers ::next_balanced_tag_closer_tag
+	 */
+	public function test_next_balanced_tag_closer_tag_no_matching_closing_tag() {
+			$content = '<div>No closing tag here';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+
+			$content = '<div><div>No closing tag here</div>';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			$p->next_tag();
+			$this->assertFalse( $p->next_balanced_tag_closer_tag() );
+		$this->assertFalse( $p->next_balanced_tag_closer_tag() );
+	}
+
+	/**
+	 * Test that the `next_balanced_tag_closer_tag` method returns false when
+	 * returned on a closing tag.
+	 *
+	 * @covers ::next_balanced_tag_closer_tag
+	 */
+	public function test_next_balanced_tag_closer_tag_on_closing_tag() {
+			$content = '<div>Closing tag after this</div>';
+			$p       = new WP_Interactivity_API_Directives_Processor( $content );
+			// Visit opening tag first and then closing tag.
+			$p->next_tag();
+			$p->next_tag( array( 'tag_closers' => 'visit' ) );
+			$this->assertFalse( $p->next_balanced_tag_closer_tag() );
+	}
 }
