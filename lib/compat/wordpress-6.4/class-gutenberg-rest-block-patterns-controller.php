@@ -40,7 +40,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Block_Patterns_Co
 
 		$hooked_blocks = get_hooked_blocks();
 
-		$before_block_visitor = '_inject_theme_attribute_in_template_part_block';
+		$before_block_visitor = null;
 		$after_block_visitor  = null;
 		if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
 			$before_block_visitor = make_before_block_visitor( $hooked_blocks, $item );
