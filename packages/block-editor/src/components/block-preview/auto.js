@@ -10,7 +10,7 @@ import { Disabled } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import Iframe from '../iframe';
+import ShadowDom from '../iframe/shadow-dom';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';
 
@@ -77,22 +77,22 @@ function ScaledBlockPreview( {
 				minHeight,
 			} }
 		>
-			<Iframe
-				contentRef={ useRefEffect( ( bodyElement ) => {
-					const {
-						ownerDocument: { documentElement },
-					} = bodyElement;
-					documentElement.classList.add(
-						'block-editor-block-preview__content-iframe'
-					);
-					documentElement.style.position = 'absolute';
-					documentElement.style.width = '100%';
+			<ShadowDom
+				// contentRef={ useRefEffect( ( bodyElement ) => {
+				// 	const {
+				// 		ownerDocument: { documentElement },
+				// 	} = bodyElement;
+				// 	documentElement.classList.add(
+				// 		'block-editor-block-preview__content-iframe'
+				// 	);
+				// 	documentElement.style.position = 'absolute';
+				// 	documentElement.style.width = '100%';
 
-					// Necessary for contentResizeListener to work.
-					bodyElement.style.boxSizing = 'border-box';
-					bodyElement.style.position = 'absolute';
-					bodyElement.style.width = '100%';
-				}, [] ) }
+				// 	// Necessary for contentResizeListener to work.
+				// 	bodyElement.style.boxSizing = 'border-box';
+				// 	bodyElement.style.position = 'absolute';
+				// 	bodyElement.style.width = '100%';
+				// }, [] ) }
 				aria-hidden
 				tabIndex={ -1 }
 				style={ {
@@ -112,7 +112,7 @@ function ScaledBlockPreview( {
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
 				<MemoizedBlockList renderAppender={ false } />
-			</Iframe>
+			</ShadowDom>
 		</Disabled>
 	);
 }
