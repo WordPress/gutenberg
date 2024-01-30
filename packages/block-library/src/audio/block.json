@@ -42,6 +42,14 @@
 			"source": "attribute",
 			"selector": "audio",
 			"attribute": "preload"
+		},
+		"borderRadius": {
+			"type": "string",
+			"default": "0px"
+		},
+		"captionContent": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
@@ -53,6 +61,28 @@
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false
+			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
 			}
 		}
 	},

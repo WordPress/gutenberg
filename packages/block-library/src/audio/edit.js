@@ -13,6 +13,7 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
+	Button
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -22,11 +23,12 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	RichText
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { audio as icon } from '@wordpress/icons';
+import { border, audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -123,7 +125,26 @@ function AudioEdit( {
 
 	const blockProps = useBlockProps( {
 		className: classes,
+		style:{
+			borderRadius: attributes.borderRadius
+		}
 	} );
+
+	const borderStyleHandler = ( borderType ) => {
+		console.log( attributes.borderRadius );
+		if( borderType === 'rounded' ){
+			setAttributes( { borderRadius: "15px" } );
+			return;
+		}
+		setAttributes( { borderRadius: "0px" } );
+	}
+
+	useEffect(() => {
+		console.log(attributes.borderRadius);
+		 blockProps.style = {
+			borderRadius: attributes.borderRadius,
+		};
+	}, [attributes.borderRadius]);
 
 	if ( ! src ) {
 		return (
@@ -193,6 +214,22 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorControls group="styles">
+				<PanelBody title="Styles" initialOpen={true}>
+					<Button
+						className='border-btn'
+						onClick={ () => borderStyleHandler("default") }
+					>
+						Default
+					</Button>
+					<Button
+						className='border-btn'
+						onClick={ ()=> borderStyleHandler("rounded") }
+					>
+						Rounded
+					</Button>
+				</PanelBody>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
 					Disable the audio tag if the block is not selected
@@ -203,6 +240,17 @@ function AudioEdit( {
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
+				<RichText
+					{ ...blockProps }
+					tagName='p'
+					value={ attributes.captionContent }
+					allowedFormats={ [ 'core/bold', 'core/italic' ] }
+					onChange={ ( captionContent ) => setAttributes( { captionContent } ) }
+					placeholder={__( 'Enter the caption for the Audio' )}
+					style={{
+						padding:'0px'
+					}}
+				/>
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

@@ -12,13 +12,21 @@ export default function save( { attributes } ) {
 
 	return (
 		src && (
-			<figure { ...useBlockProps.save() }>
+			<figure { ...useBlockProps.save({
+				style:{
+					borderRadius: attributes.borderRadius
+				}
+			}) }>
 				<audio
 					controls="controls"
 					src={ src }
 					autoPlay={ autoplay }
 					loop={ loop }
 					preload={ preload }
+				/>
+				<RichText.Content
+					tagName='p'
+					value={attributes.captionContent}
 				/>
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content
