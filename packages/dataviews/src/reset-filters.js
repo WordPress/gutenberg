@@ -4,17 +4,10 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function hasActiveFilters( view ) {
-	return (
-		view.search !== '' ||
-		view.filters?.some( ( { value } ) => value !== undefined )
-	);
-}
-
 export default function ResetFilter( { view, onChangeView } ) {
 	return (
 		<Button
-			disabled={ ! hasActiveFilters( view ) }
+			disabled={ view.search === '' && view.filters?.length === 0 }
 			__experimentalIsFocusable
 			size="compact"
 			variant="tertiary"
