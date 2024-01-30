@@ -13,9 +13,9 @@ import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
-import Search from './search';
+import Search from './filters/search';
 import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
-import BulkActions from './bulk-actions';
+import BulkActions from './actions/bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
