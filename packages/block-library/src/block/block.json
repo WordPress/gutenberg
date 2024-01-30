@@ -4,7 +4,7 @@
 	"name": "core/block",
 	"title": "Pattern",
 	"category": "reusable",
-	"description": "Designs that can be reused across your site.",
+	"description": "Reuse this design across your site.",
 	"keywords": [ "reusable" ],
 	"textdomain": "default",
 	"attributes": {
