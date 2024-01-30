@@ -155,6 +155,36 @@ function BlockPattern( {
 	);
 }
 
+function BlockPatternsListAsync( {
+	isDraggable,
+	blockPatterns,
+	asyncListStep,
+	onHover,
+	onClickPattern,
+	showTitlesAsTooltip,
+} ) {
+	const shownPatterns = useAsyncList( blockPatterns, {
+		step: asyncListStep,
+	} );
+
+	return blockPatterns.map( ( pattern ) => {
+		const isShown = shownPatterns.includes( pattern );
+		return isShown ? (
+			<BlockPattern
+				key={ pattern.name }
+				id={ pattern.name }
+				pattern={ pattern }
+				onClick={ onClickPattern }
+				onHover={ onHover }
+				isDraggable={ isDraggable }
+				showTooltip={ showTitlesAsTooltip }
+			/>
+		) : (
+			<BlockPatternPlaceholder key={ pattern.name } />
+		);
+	} );
+}
+
 function BlockPatternPlaceholder() {
 	return (
 		<div className="block-editor-block-patterns-list__item is-placeholder" />
@@ -196,22 +226,14 @@ function BlockPatternsList(
 			aria-label={ label }
 			ref={ ref }
 		>
-			{ blockPatterns.map( ( pattern ) => {
-				const isShown = shownPatterns.includes( pattern );
-				return isShown ? (
-					<BlockPattern
-						key={ pattern.name }
-						id={ pattern.name }
-						pattern={ pattern }
-						onClick={ onClickPattern }
-						onHover={ onHover }
-						isDraggable={ isDraggable }
-						showTooltip={ showTitlesAsTooltip }
-					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
-				);
-			} ) }
+			<BlockPatternsListAsync
+				isDraggable={ isDraggable }
+				blockPatterns={ blockPatterns }
+				asyncListStep={ asyncListStep }
+				onHover={ onHover }
+				onClickPattern={ onClickPattern }
+				showTitlesAsTooltip={ showTitlesAsTooltip }
+			/>
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
