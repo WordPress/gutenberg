@@ -155,6 +155,14 @@
 	</rule>
 	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses">
 		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+		<!--
+			Refactoring required: the functions and classes prefixed with 'Gutenberg_' in the files that are being excluded
+			through the 'exclude-pattern' statements below must be guarded, as they are available only in the Gutenberg context,
+			not in Core.
+		-->
+		<exclude-pattern>./packages/block-library/src/form-input/index.php</exclude-pattern>
+		<exclude-pattern>./packages/block-library/src/form-submission-notification/index.php</exclude-pattern>
+		<exclude-pattern>./packages/block-library/src/form/index.php</exclude-pattern>
 		<properties>
 			<property name="forbidden_functions" type="array">
 				<element value="[Gg]utenberg.*"/>

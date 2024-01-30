@@ -46,8 +46,6 @@ function render_block_core_form( $attributes, $content ) {
  * Additional data to add to the view.js script for this block.
  */
 function block_core_form_view_script() {
-	// Refactoring required: this function must be guarded as it is available only in Gutenberg, and not in Core.
-	// phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
 		return;
 	}
@@ -203,8 +201,6 @@ add_action( 'wp', 'block_core_form_privacy_form' );
  * Registers the `core/form` block on server.
  */
 function register_block_core_form() {
-	// Refactoring required: this function must be guarded as it is available only in Gutenberg, and not in Core.
-    // phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
 		return;
 	}

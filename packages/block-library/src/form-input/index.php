@@ -32,8 +32,6 @@ function render_block_core_form_input( $attributes, $content ) {
  * Registers the `core/form-input` block on server.
  */
 function register_block_core_form_input() {
-	// Refactoring required: this function must be guarded as it is available only in Gutenberg, and not in Core.
-	// phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
 		return;
 	}
