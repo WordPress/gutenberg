@@ -3,7 +3,7 @@
  */
 import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -16,6 +16,7 @@ import {
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -33,17 +34,35 @@ const icons = {
 	wp_template_part: symbolFilled,
 };
 
+function useDebouncedValue( value ) {
+	const [ debouncedValue, setDebouncedValue ] = useState( '' );
+	const debounced = useDebounce( setDebouncedValue, 400 );
+
+	useEffect( () => {
+		debounced( value );
+		return () => debounced.cancel();
+	}, [ debounced, value ] );
+
+	return debouncedValue;
+}
+
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
 		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const delayedSearch = useDebouncedValue( search );
 		const { records, isLoading } = useSelect(
 			( select ) => {
-				const { getEntityRecords } = select( coreStore );
+				if ( ! delayedSearch ) {
+					return {
+						isLoading: false,
+					};
+				}
+
 				const query = {
-					search: !! search ? search : undefined,
+					search: delayedSearch,
 					per_page: 10,
-					orderby: search ? 'relevance' : 'date',
+					orderby: 'relevance',
 					status: [
 						'publish',
 						'future',
@@ -53,14 +72,18 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					],
 				};
 				return {
-					records: getEntityRecords( 'postType', postType, query ),
+					records: select( coreStore ).getEntityRecords(
+						'postType',
+						postType,
+						query
+					),
 					isLoading: ! select( coreStore ).hasFinishedResolution(
 						'getEntityRecords',
 						[ 'postType', postType, query ]
 					),
 				};
 			},
-			[ search ]
+			[ delayedSearch ]
 		);
 
 		const commands = useMemo( () => {
