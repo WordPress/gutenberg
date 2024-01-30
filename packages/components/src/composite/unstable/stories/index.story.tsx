@@ -4,11 +4,6 @@
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
- * WordPress dependencies
- */
-import { isRTL } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import {
@@ -17,29 +12,48 @@ import {
 	CompositeItem,
 	useCompositeState,
 } from '..';
+
 import Legacy from '../../legacy/stories/index.story';
+import { UseCompositeStatePlaceholder, transform } from './utils';
 
-type InitialState = Parameters< typeof useCompositeState >[ 0 ];
+Composite.displayName = 'Composite';
+CompositeGroup.displayName = 'CompositeGroup';
+CompositeItem.displayName = 'CompositeItem';
 
-const Placeholder = ( _: InitialState ) => <></>;
-
-const meta: Meta< typeof Placeholder > = {
+const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 	title: 'Components/Composite/Composite (Unstable)',
 	id: 'components-composite-unstable',
-	component: Placeholder,
-	args: {
-		rtl: isRTL(),
-		loop: false,
-		shift: false,
-		wrap: false,
+	component: UseCompositeStatePlaceholder,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		Composite,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		CompositeGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		CompositeItem,
 	},
 	argTypes: { ...Legacy.argTypes },
+	parameters: {
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { transform },
+		},
+	},
+	decorators: [
+		// Because of the way Reakit caches state, this is a hack to make sure
+		// stories update when config is changed.
+		( Story ) => (
+			<div key={ Math.random() }>
+				<Story />
+			</div>
+		),
+	],
 };
 export default meta;
 
-export const TwoDimensionsWithStateProp: StoryFn< typeof Placeholder > = (
-	initialState
-) => {
+export const TwoDimensionsWithStateProp: StoryFn<
+	typeof UseCompositeStatePlaceholder
+> = ( initialState ) => {
 	const state = useCompositeState( initialState );
 
 	return (
@@ -67,9 +81,9 @@ export const TwoDimensionsWithStateProp: StoryFn< typeof Placeholder > = (
 };
 TwoDimensionsWithStateProp.args = {};
 
-export const TwoDimensionsWithSpreadProps: StoryFn< typeof Placeholder > = (
-	initialState
-) => {
+export const TwoDimensionsWithSpreadProps: StoryFn<
+	typeof UseCompositeStatePlaceholder
+> = ( initialState ) => {
 	const state = useCompositeState( initialState );
 
 	return (
@@ -97,9 +111,9 @@ export const TwoDimensionsWithSpreadProps: StoryFn< typeof Placeholder > = (
 };
 TwoDimensionsWithSpreadProps.args = {};
 
-export const OneDimensionWithStateProp: StoryFn< typeof Placeholder > = (
-	initialState
-) => {
+export const OneDimensionWithStateProp: StoryFn<
+	typeof UseCompositeStatePlaceholder
+> = ( initialState ) => {
 	const state = useCompositeState( initialState );
 
 	return (
@@ -117,9 +131,9 @@ export const OneDimensionWithStateProp: StoryFn< typeof Placeholder > = (
 };
 OneDimensionWithStateProp.args = {};
 
-export const OneDimensionWithSpreadProps: StoryFn< typeof Placeholder > = (
-	initialState
-) => {
+export const OneDimensionWithSpreadProps: StoryFn<
+	typeof UseCompositeStatePlaceholder
+> = ( initialState ) => {
 	const state = useCompositeState( initialState );
 
 	return (

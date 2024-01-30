@@ -26,7 +26,10 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 	args: {},
 	parameters: {
 		controls: { exclude: /^unstable_/ },
-		docs: { source: { transform } },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { transform },
+		},
 	},
 	argTypes: {
 		orientation: { control: 'select' },

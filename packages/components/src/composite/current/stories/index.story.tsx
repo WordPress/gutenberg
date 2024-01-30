@@ -37,6 +37,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 	parameters: {
 		badges: [ 'private' ],
 		docs: {
+			canvas: { sourceState: 'shown' },
 			source: { transform },
 			extractArgTypes: ( component: React.FunctionComponent ) => {
 				const name = component.displayName;
