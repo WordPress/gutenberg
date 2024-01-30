@@ -272,7 +272,7 @@ function gutenberg_parse_and_serialize_blocks( $block_template ) {
 		return $block_template;
 	}
 
-	$before_block_visitor = '_inject_theme_attribute_in_template_part_block';
+	$before_block_visitor = null; // Prior to WP 6.4, the `theme` attribute was injected in Core's _build_block_template_result_from_file.
 	$after_block_visitor  = null;
 	$hooked_blocks        = get_hooked_blocks();
 
@@ -445,7 +445,7 @@ if ( ! function_exists( 'make_before_block_visitor' ) ) {
 		 * @return string The serialized markup for the given block, with the markup for any hooked blocks prepended to it.
 		 */
 		return function ( &$block, &$parent_block = null, $prev = null ) use ( $hooked_blocks, $context ) {
-			_inject_theme_attribute_in_template_part_block( $block );
+			// No `theme` injection into Template Part blocks: Prior to WP 6.4, this was done by Core's _build_block_template_result_from_file.
 
 			$markup = '';
 
