@@ -486,7 +486,7 @@ Returns an array containing the clientIds of all descendants of the blocks given
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
+-   _rootIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 

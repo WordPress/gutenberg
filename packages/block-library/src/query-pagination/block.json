@@ -5,6 +5,11 @@
 	"title": "Pagination",
 	"category": "theme",
 	"parent": [ "core/query" ],
+	"allowedBlocks": [
+		"core/query-pagination-previous",
+		"core/query-pagination-numbers",
+		"core/query-pagination-next"
+	],
 	"description": "Displays a paginated navigation to next/previous set of posts, when applicable.",
 	"textdomain": "default",
 	"attributes": {
