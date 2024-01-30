@@ -489,11 +489,6 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
-						"defaultFontSizes": {
-							"description": "Allow users to choose font sizes from the default font size presets.",
-							"type": "boolean",
-							"default": true
-						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
