@@ -38,7 +38,12 @@ function WithSeparators( { children } ) {
 }
 
 export default function AddFilter( { filters, view, onChangeView } ) {
-	if ( filters.length === 0 ) {
+	let _filters = filters;
+	if ( view.type !== LAYOUT_LIST ) {
+		_filters = filters.filter( ( { isPrimary } ) => ! isPrimary );
+	}
+
+	if ( _filters.length === 0 ) {
 		return null;
 	}
 
@@ -72,7 +77,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 		>
 			<WithSeparators>
 				<DropdownMenuGroup>
-					{ filters.map( ( filter ) => {
+					{ _filters.map( ( filter ) => {
 						const filterInView = view.filters.find(
 							( f ) => f.field === filter.field
 						);

@@ -26,11 +26,9 @@ const sanitizeOperators = ( field ) => {
 	);
 };
 
-const isPrimaryFilter = ( field ) => field.filterBy?.isPrimary;
-
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
-	const primaryFilters = [];
+	let primaryFilters = 0;
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
 			return;
@@ -47,30 +45,26 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					return;
 				}
 
-				if ( isPrimaryFilter( field ) ) {
-					primaryFilters.push( {
-						field: field.id,
-						name: field.header,
-						elements: field.elements,
-						operators,
-						isVisible: true,
-					} );
-					return;
-				}
-
+				const isPrimary = !! field.filterBy?.isPrimary;
 				filters.push( {
 					field: field.id,
 					name: field.header,
 					elements: field.elements,
 					operators,
-					isVisible: view.filters.some(
-						( f ) =>
-							f.field === field.id &&
-							[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
-								f.operator
-							)
-					),
+					isVisible: isPrimary
+						? true
+						: view.filters.some(
+								( f ) =>
+									f.field === field.id &&
+									[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
+										f.operator
+									)
+						  ),
+					isPrimary,
 				} );
+				if ( isPrimary ) {
+					primaryFilters++;
+				}
 		}
 	} );
 
@@ -98,16 +92,6 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 				/>
 			);
 		} ),
-		...primaryFilters.map( ( filter ) => {
-			return (
-				<FilterSummary
-					key={ filter.field }
-					filter={ filter }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-			);
-		} ),
 	];
 
 	// Reset should be hidden when either:
@@ -115,17 +99,19 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	// - the layout is list
 	// - or there is only one primary filter and none secondary filters
 	if (
-		( filters.length > 0 || primaryFilters > 1 ) &&
-		view.type !== LAYOUT_LIST
+		view.type === LAYOUT_LIST ||
+		( filters.length === 1 && primaryFilters === 1 )
 	) {
-		filterComponents.push(
-			<ResetFilters
-				key="reset-filters"
-				view={ view }
-				onChangeView={ onChangeView }
-			/>
-		);
+		return filterComponents;
 	}
+
+	filterComponents.push(
+		<ResetFilters
+			key="reset-filters"
+			view={ view }
+			onChangeView={ onChangeView }
+		/>
+	);
 
 	return filterComponents;
 } );
