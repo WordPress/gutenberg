@@ -246,12 +246,11 @@ function gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_blo
  * @return WP_Block_Template[] Updated array of found block templates.
  */
 function gutenberg_parse_and_serialize_block_templates( $query_result ) {
-	foreach ( $query_result as $block_template ) {
-		if ( empty( $block_template->content ) || 'custom' === $block_template->source ) {
+	foreach ( $query_result as $index => $block_template ) {
+		if ( 'custom' === $block_template->source ) {
 			continue;
 		}
-		$blocks                  = parse_blocks( $block_template->content );
-		$block_template->content = gutenberg_serialize_blocks( $blocks );
+		$query_result[ $index ] = gutenberg_parse_and_serialize_blocks( $block_template );
 	}
 
 	return $query_result;
