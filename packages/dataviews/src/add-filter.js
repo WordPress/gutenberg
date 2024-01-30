@@ -38,12 +38,9 @@ function WithSeparators( { children } ) {
 }
 
 export default function AddFilter( { filters, view, onChangeView } ) {
-	const filtersToDisplay = [];
-	filters.forEach( ( filter ) => {
-		if ( ! filter.isPrimary || view.type === LAYOUT_LIST ) {
-			filtersToDisplay.push( filter );
-		}
-	} );
+	const filtersToDisplay = filters.filter(
+		( filter ) => ! filter.isPrimary || view.type === LAYOUT_LIST
+	);
 
 	if ( filtersToDisplay.length === 0 ) {
 		return null;
