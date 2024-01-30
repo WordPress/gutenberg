@@ -110,7 +110,14 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 		} ),
 	];
 
-	if ( filterComponents.length > 1 && view.type !== LAYOUT_LIST ) {
+	// Reset should be hidden when either:
+	//
+	// - the layout is list
+	// - or there is only one primary filter
+	if (
+		( filters.length > 0 || primaryFilters > 1 ) &&
+		view.type !== LAYOUT_LIST
+	) {
 		filterComponents.push(
 			<ResetFilters
 				key="reset-filters"
