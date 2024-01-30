@@ -37,23 +37,26 @@ type PlacementToInitialTranslationTuple = [
 	CSSProperties[ 'translate' ],
 ];
 
-let offsetHeightSpy: jest.SpiedGetter<
-	typeof HTMLElement.prototype.offsetHeight
->;
-
 beforeAll( () => {
-	offsetHeightSpy = jest
-		.spyOn( HTMLElement.prototype, 'offsetHeight', 'get' )
-		.mockImplementation( function getOffsetHeight( this: HTMLElement ) {
-			if ( this.tagName === 'BODY' ) {
-				return window.outerHeight;
-			}
-			return 50;
-		} );
+	// This mock is necessary because deep in the weeds, `useConstrained` relies
+	// on `focusable` to return a list of DOM elements that can be focused. Part
+	// of this process involves checking that an element has an intrinsic size,
+	// which will always fail in JSDom.
+	//
+	// https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61
+	jest.spyOn(
+		HTMLElement.prototype,
+		'offsetHeight',
+		'get'
+	).mockImplementation( function getOffsetHeight( this: HTMLElement ) {
+		// The `1` returned here is somewhat arbitrary – it just needs to be a
+		// non-zero integer.
+		return 1;
+	} );
 } );
 
 afterAll( () => {
-	offsetHeightSpy?.mockRestore();
+	jest.restoreAllMocks();
 } );
 
 // There's no matching `placement` for 'middle center' positions,
