@@ -73,6 +73,13 @@
 				"type": "string"
 			}
 		},
+		"allowedBlocks": {
+			"type": "array",
+			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
+			"items": {
+				"type": "string"
+			}
+		},
 		"icon": {
 			"type": "string",
 			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts)."

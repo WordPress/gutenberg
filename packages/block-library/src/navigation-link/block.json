@@ -5,6 +5,11 @@
 	"title": "Custom Link",
 	"category": "design",
 	"parent": [ "core/navigation" ],
+	"allowedBlocks": [
+		"core/navigation-link",
+		"core/navigation-submenu",
+		"core/page-list"
+	],
 	"description": "Add a page, link, or another item to your navigation.",
 	"textdomain": "default",
 	"attributes": {
