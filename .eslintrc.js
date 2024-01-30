@@ -406,5 +406,11 @@ module.exports = {
 				],
 			},
 		},
+		{
+			files: [ 'packages/interactivity*/src/**' ],
+			rules: {
+				'react/react-in-jsx-scope': 'error',
+			},
+		},
 	],
 };

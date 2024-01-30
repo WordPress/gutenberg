@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Family_Utils::format_font_family().
+ * Test WP_Font_Utils::format_font_family().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,9 +8,9 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Family_Utils::format_font_family
+ * @covers WP_Font_Utils::format_font_family
  */
-class Tests_Fonts_WpFontsFamilyUtils_FormatFontFamily extends WP_UnitTestCase {
+class Tests_Fonts_WpFontUtils_FormatFontFamily extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_format_font_family
@@ -21,7 +21,7 @@ class Tests_Fonts_WpFontsFamilyUtils_FormatFontFamily extends WP_UnitTestCase {
 	public function test_should_format_font_family( $font_family, $expected ) {
 		$this->assertSame(
 			$expected,
-			WP_Font_Family_Utils::format_font_family(
+			WP_Font_Utils::format_font_family(
 				$font_family
 			)
 		);

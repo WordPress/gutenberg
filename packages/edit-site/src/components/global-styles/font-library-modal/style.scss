@@ -25,11 +25,6 @@
 }
 
 .font-library-modal__tabpanel-layout {
-
-	.font-library-modal__tabpanel-layout__main {
-		padding-bottom: $grid-unit-80;
-	}
-
 	.font-library-modal__tabpanel-layout__footer {
 		border-top: 1px solid $gray-300;
 		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
@@ -39,7 +34,6 @@
 		width: 100%;
 		background-color: $white;
 	}
-
 }
 
 .font-library-modal__fonts-grid {
@@ -106,10 +100,6 @@ button.font-library-modal__upload-area {
 
 	.font-library-modal__upload-area__text {
 		color: $gray-700;
-	}
-
-	.font-library-modal__upload-area__notice {
-		margin: 0;
 	}
 }
 

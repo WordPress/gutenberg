@@ -555,7 +555,7 @@ function BlockListBlockProvider( props ) {
 			const typing = isTyping();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
-
+			const blockEditingMode = getBlockEditingMode( clientId );
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
@@ -574,7 +574,7 @@ function BlockListBlockProvider( props ) {
 				themeSupportsLayout: supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
-				blockEditingMode: getBlockEditingMode( clientId ),
+				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
 					( isFirstMultiSelectedBlock( clientId ) &&
@@ -590,7 +590,9 @@ function BlockListBlockProvider( props ) {
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
+				isSubtreeDisabled:
+					blockEditingMode === 'disabled' &&
+					isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
 				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
 				initialPosition:
@@ -614,8 +616,7 @@ function BlockListBlockProvider( props ) {
 						getBlockName( movingClientId ),
 						getBlockRootClientId( clientId )
 					),
-				isEditingDisabled:
-					getBlockEditingMode( clientId ) === 'disabled',
+				isEditingDisabled: blockEditingMode === 'disabled',
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,

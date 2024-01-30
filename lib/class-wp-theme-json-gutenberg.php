@@ -435,7 +435,6 @@ class WP_Theme_JSON_Gutenberg {
 			'fontFamily' => null,
 			'name'       => null,
 			'slug'       => null,
-			'preview'    => null,
 			'fontFace'   => array(
 				array(
 					'ascentOverride'        => null,
@@ -451,7 +450,6 @@ class WP_Theme_JSON_Gutenberg {
 					'sizeAdjust'            => null,
 					'src'                   => null,
 					'unicodeRange'          => null,
-					'preview'               => null,
 				),
 			),
 		),

@@ -56,7 +56,20 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
-		return $this->get_items_permissions_check( $request );
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		if ( ! current_user_can( 'read_post', $post->ID ) ) {
+			return new WP_Error(
+				'rest_cannot_read',
+				__( 'Sorry, you are not allowed to access this font family.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
 	}
 
 	/**
@@ -133,7 +146,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		$settings = json_decode( $value, true );
 
 		if ( isset( $settings['fontFamily'] ) ) {
-			$settings['fontFamily'] = WP_Font_Family_Utils::format_font_family( $settings['fontFamily'] );
+			$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
 		}
 
 		// Provide default for preview, if not provided.
@@ -230,7 +243,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			$data['font_family_settings'] = $this->get_settings_from_post( $item );
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'edit';
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
 
@@ -274,7 +287,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				'id'                   => array(
 					'description' => __( 'Unique identifier for the post.', 'default' ),
 					'type'        => 'integer',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'theme_json_version'   => array(
@@ -283,12 +296,12 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 					'default'     => 2,
 					'minimum'     => 2,
 					'maximum'     => 2,
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'font_faces'           => array(
 					'description' => __( 'The IDs of the child font faces in the font family.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 					'items'       => array(
 						'type' => 'integer',
 					),
@@ -298,7 +311,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				'font_family_settings' => array(
 					'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
 					'type'                 => 'object',
-					'context'              => array( 'edit' ),
+					'context'              => array( 'view', 'edit', 'embed' ),
 					'properties'           => array(
 						'name'       => array(
 							'description' => 'Name of the font family preset, translatable.',
@@ -338,8 +351,6 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
-		$query_params['context']['default'] = 'edit';
-
 		// Remove unneeded params.
 		unset( $query_params['after'] );
 		unset( $query_params['modified_after'] );
@@ -360,21 +371,6 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		 * @param array $query_params JSON Schema-formatted collection parameters.
 		 */
 		return apply_filters( 'rest_wp_font_family_collection_params', $query_params );
-	}
-
-	/**
-	 * Retrieves the query params for the font family collection, defaulting to the 'edit' context.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $args Optional. Additional arguments for context parameter. Default empty array.
-	 * @return array Context parameter details.
-	 */
-	public function get_context_param( $args = array() ) {
-		if ( isset( $args['default'] ) ) {
-			$args['default'] = 'edit';
-		}
-		return parent::get_context_param( $args );
 	}
 
 	/**
