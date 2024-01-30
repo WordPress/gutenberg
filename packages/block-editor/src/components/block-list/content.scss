@@ -321,7 +321,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		border: 1px dotted rgba(var(--wp-admin-theme-color--rgb), 1);
 		border-radius: $radius-block-ui;
 		animation: block-editor-has-editable-outline__fade-out-animation 0.3s ease-out;
-		animation-delay: 3s;
+		animation-delay: 1s;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 	}
