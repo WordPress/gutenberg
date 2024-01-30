@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 17.5.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Navigation: Update the navigaiton renderer class name so that it doesn't clash with the one backported to core. ([58429](https://github.com/WordPress/gutenberg/pull/58429))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@scruffian
+
+
 = 17.6.0-rc.2 =
 
 ## Changelog
