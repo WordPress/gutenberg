@@ -406,6 +406,23 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			return array( $default_namespace, $directive_value );
 		}
 
+		/**
+		 * Transforms a kebab-case string to camelCase.
+		 *
+		 * @param string $str The kebab-case string to transform to camelCase.
+		 * @return string The transformed camelCase string.
+		 */
+		private function kebab_to_camel_case( string $str ): string {
+			return lcfirst(
+				preg_replace_callback(
+					'/(-)([a-z])/',
+					function ( $matches ) {
+						return strtoupper( $matches[2] );
+					},
+					strtolower( preg_replace( '/-+$/', '', $str ) )
+				)
+			);
+		}
 
 		/**
 		 * Processes the `data-wp-interactive` directive.

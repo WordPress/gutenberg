@@ -567,4 +567,26 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 		$result = $this->evaluate( 'otherPlugin::context.nested.key' );
 		$this->assertEquals( 'otherPlugin-context-nested', $result );
 	}
+
+	/**
+	 * Tests kebab_to_camel_case method with typical cases.
+	 *
+	 * @covers ::kebab_to_camel_case
+	 */
+	public function test_kebab_to_camel_case() {
+		$method = new ReflectionMethod( $this->interactivity, 'kebab_to_camel_case' );
+		$method->setAccessible( true );
+
+		$this->assertSame( '', $method->invoke( $this->interactivity, '' ) );
+		$this->assertSame( 'item', $method->invoke( $this->interactivity, 'item' ) );
+		$this->assertSame( 'myItem', $method->invoke( $this->interactivity, 'my-item' ) );
+		$this->assertSame( 'my_item', $method->invoke( $this->interactivity, 'my_item' ) );
+		$this->assertSame( 'myItem', $method->invoke( $this->interactivity, 'My-iTem' ) );
+		$this->assertSame( 'myItemWithMultipleHyphens', $method->invoke( $this->interactivity, 'my-item-with-multiple-hyphens' ) );
+		$this->assertSame( 'myItemWith-DoubleHyphens', $method->invoke( $this->interactivity, 'my-item-with--double-hyphens' ) );
+		$this->assertSame( 'myItemWith_underScore', $method->invoke( $this->interactivity, 'my-item-with_under-score' ) );
+		$this->assertSame( 'myItem', $method->invoke( $this->interactivity, '-my-item' ) );
+		$this->assertSame( 'myItem', $method->invoke( $this->interactivity, 'my-item-' ) );
+		$this->assertSame( 'myItem', $method->invoke( $this->interactivity, '-my-item-' ) );
+	}
 }
