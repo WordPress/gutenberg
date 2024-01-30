@@ -27,17 +27,25 @@ function BlockGroupToolbar() {
 
 	const { canInsertGallery, canRemove, variations } = useSelect(
 		( select ) => {
-			const { canRemoveBlocks } = select( blockEditorStore );
-			const { getBlockVariations, getBlockType } = select( blocksStore );
+			const {
+				canRemoveBlocks,
+				getBlockRootClientId,
+				getBlockTransformItems,
+			} = select( blockEditorStore );
+			const { getBlockVariations } = select( blocksStore );
 
-			const isGalleryBlockAvailable = !! getBlockType( 'core/gallery' );
-
-			const areAllBlocksImages = blocksSelection.every(
-				( { name } ) => name === 'core/image'
+			const rootClientId = getBlockRootClientId( blocksSelection[ 0 ] );
+			const possibleBlockTransformations = getBlockTransformItems(
+				blocksSelection,
+				rootClientId
+			);
+			const canTransformToGallery = possibleBlockTransformations.some(
+				( { name, isDisabled } ) =>
+					name === 'core/gallery' && ! isDisabled
 			);
 
 			return {
-				canInsertGallery: isGalleryBlockAvailable && areAllBlocksImages,
+				canInsertGallery: canTransformToGallery,
 				canRemove: canRemoveBlocks( clientIds ),
 				variations: getBlockVariations(
 					groupingBlockName,
@@ -101,7 +109,10 @@ function BlockGroupToolbar() {
 			{ canInsertGallery && (
 				<ToolbarButton
 					icon={ gallery }
-					label={ _x( 'Gallery', 'block name' ) }
+					label={ _x(
+						'Gallery',
+						'action: convert blocks to gallery'
+					) }
 					onClick={ onConvertToGallery }
 				/>
 			) }
