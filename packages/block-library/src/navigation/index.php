@@ -1348,7 +1348,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
  * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
  * of those hooked blocks should be exempted from insertion.
- * 
+ *
  * @since 6.5.0
  *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
