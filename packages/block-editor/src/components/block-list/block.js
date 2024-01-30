@@ -538,7 +538,6 @@ function BlockListBlockProvider( props ) {
 				getActiveBlockVariation,
 			} = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
-			const templateLock = getTemplateLock( rootClientId );
 			const canRemove = canRemoveBlock( clientId, rootClientId );
 			const canMove = canMoveBlock( clientId, rootClientId );
 			const { name: blockName, attributes, isValid } = block;
@@ -559,7 +558,8 @@ function BlockListBlockProvider( props ) {
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
-				isLocked: !! templateLock,
+				isLocked: !! getTemplateLock( rootClientId ),
+				templateLock: getTemplateLock( clientId ),
 				canRemove,
 				canMove,
 				// Users of the editor.BlockListBlock filter used to be able to
@@ -663,6 +663,7 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
@@ -699,6 +700,7 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,

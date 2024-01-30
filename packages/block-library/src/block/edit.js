@@ -35,9 +35,7 @@ import { parse, cloneBlock } from '@wordpress/blocks';
  */
 import { unlock } from '../lock-unlock';
 
-const { useLayoutClasses, useFlashEditableBlocks } = unlock(
-	blockEditorPrivateApis
-);
+const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 function isPartiallySynced( block ) {
@@ -314,7 +312,6 @@ export default function ReusableBlockEdit( {
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	const blockProps = useBlockProps( {
-		ref: useFlashEditableBlocks( patternClientId ),
 		className: classnames(
 			'block-library-block__reusable-block-container',
 			layout && layoutClasses,

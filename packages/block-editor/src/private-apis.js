@@ -24,7 +24,7 @@ import {
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
-import useFlashEditableBlocks from './components/use-flash-editable-blocks';
+import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 
 /**
  * Private @wordpress/block-editor APIs.

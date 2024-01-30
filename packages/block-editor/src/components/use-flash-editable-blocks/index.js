@@ -10,45 +10,53 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-export default function useFlashEditableBlocks( rootClientId = '' ) {
+export function useFlashEditableBlocks( {
+	clientId = '',
+	isEnabled = true,
+} = {} ) {
 	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
 
-	return useRefEffect( ( element ) => {
-		const flashEditableBlocks = () => {
-			getEnabledClientIdsTree( rootClientId ).forEach(
-				( { clientId } ) => {
-					const blockElement = element.querySelector(
-						`[data-block="${ clientId }"]`
-					);
-					if ( ! blockElement ) {
-						return;
+	return useRefEffect(
+		( element ) => {
+			if ( ! isEnabled ) {
+				return;
+			}
+
+			const flashEditableBlocks = () => {
+				getEnabledClientIdsTree( clientId ).forEach(
+					( { clientId: id } ) => {
+						const block = element.querySelector(
+							`[data-block="${ id }"]`
+						);
+						if ( ! block ) {
+							return;
+						}
+						block.classList.remove( 'has-editable-outline' );
+						// Force reflow to trigger the animation.
+						// eslint-disable-next-line no-unused-expressions
+						block.offsetWidth;
+						block.classList.add( 'has-editable-outline' );
 					}
-					blockElement.classList.remove( 'has-editable-outline' );
-					// Force reflow to trigger the animation.
-					// eslint-disable-next-line no-unused-expressions
-					blockElement.offsetWidth;
-					blockElement.classList.add( 'has-editable-outline' );
+				);
+			};
+
+			const handleClick = ( event ) => {
+				const shouldFlash =
+					event.target === element ||
+					event.target.classList.contains( 'is-root-container' );
+				if ( ! shouldFlash ) {
+					return;
 				}
-			);
-		};
+				if ( event.defaultPrevented ) {
+					return;
+				}
+				event.preventDefault();
+				flashEditableBlocks();
+			};
 
-		const handleClick = ( event ) => {
-			const shouldFlash =
-				event.target === element ||
-				event.target.classList.contains( 'is-root-container' );
-			if ( ! shouldFlash ) {
-				return;
-			}
-			if ( event.defaultPrevented ) {
-				return;
-			}
-			event.preventDefault();
-			flashEditableBlocks();
-		};
-
-		element.addEventListener( 'click', handleClick );
-		return () => {
-			element.removeEventListener( 'click', handleClick );
-		};
-	} );
+			element.addEventListener( 'click', handleClick );
+			return () => element.removeEventListener( 'click', handleClick );
+		},
+		[ isEnabled ]
+	);
 }

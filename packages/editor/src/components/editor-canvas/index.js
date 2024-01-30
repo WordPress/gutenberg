@@ -288,11 +288,12 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const flashEditableBlocksRef = useFlashEditableBlocks();
 	const contentRef = useMergeRefs( [
 		localRef,
 		renderingMode === 'post-only' ? typewriterRef : noop,
-		renderingMode === 'template-locked' ? flashEditableBlocksRef : noop,
+		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
 	] );
 
 	return (

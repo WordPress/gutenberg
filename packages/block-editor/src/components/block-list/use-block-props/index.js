@@ -25,6 +25,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -98,6 +99,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
+		templateLock,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -114,6 +116,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
+		useFlashEditableBlocks( {
+			clientId,
+			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
+		} ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
