@@ -89,11 +89,20 @@ class WP_Font_Collection {
 	 * }
 	 */
 	public function __construct( $slug, $args = array() ) {
-		$this->slug          = $slug;
+		$this->slug          = sanitize_title( $slug );
 		$this->name          = isset( $args['name'] ) ? $args['name'] : __( 'Unnamed Font Collection', 'gutenberg' );
 		$this->description   = isset( $args['description'] ) ? $args['description'] : '';
 		$this->font_families = isset( $args['font_families'] ) ? $args['font_families'] : array();
 		$this->categories    = isset( $args['categories'] ) ? $args['categories'] : array();
+
+		if ( $this->slug !== $slug ) {
+			_doing_it_wrong(
+				__METHOD__,
+				/* translators: %s: Font collection slug. */
+				sprintf( __( 'Font collection slug "%s" is not valid. Slugs must use only alphanumeric characters, dashes, and underscores.', 'gutenberg' ), $slug ),
+				'6.5.0'
+			);
+		}
 
 		if ( empty( $args['font_families'] ) ) {
 			_doing_it_wrong(

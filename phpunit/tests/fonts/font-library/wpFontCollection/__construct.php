@@ -74,4 +74,9 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::__construct' );
 		new WP_Font_Collection( 'my-collection' );
 	}
+
+	public function test_should_do_it_wrong_invalid_slug() {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::__construct' );
+		new WP_Font_Collection( 'slug with spaces', array( 'font_families' => array( 'mock' ) ) );
+	}
 }
