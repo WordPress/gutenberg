@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+
 ### Bug Fix
 
 -   `DateTime`: Add a timezone offset value for display purposes. ([#56682](https://github.com/WordPress/gutenberg/pull/56682)).
