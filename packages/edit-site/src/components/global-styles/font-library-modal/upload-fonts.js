@@ -192,7 +192,7 @@ function UploadFonts() {
 								className="font-library-modal__upload-area"
 								onClick={ openFileDialog }
 							>
-								<span>{ __( 'Upload font' ) }</span>
+								{ __( 'Upload font' ) }
 							</Button>
 						) }
 					/>
