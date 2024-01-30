@@ -342,7 +342,7 @@ export default function ChildLayoutControl( {
 						options={ widthOptions }
 						onChange={ onChangeWidth }
 						__nextUnconstrainedWidth
-						__next36pxDefaultSize
+						__next40pxDefaultSize
 					/>
 				</FlexBlock>
 
@@ -350,7 +350,7 @@ export default function ChildLayoutControl( {
 					childLayout[ widthProp ] === 'fixedNoShrink' ) && (
 					<FlexBlock>
 						<UnitControl
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							onChange={ ( _value ) => {
 								onChange( {
 									style: {
@@ -375,7 +375,7 @@ export default function ChildLayoutControl( {
 						options={ heightOptions }
 						onChange={ onChangeHeight }
 						__nextUnconstrainedWidth
-						__next36pxDefaultSize
+						__next40pxDefaultSize
 					/>
 				</FlexBlock>
 
@@ -383,7 +383,7 @@ export default function ChildLayoutControl( {
 					childLayout[ heightProp ] === 'fixedNoShrink' ) && (
 					<FlexBlock>
 						<UnitControl
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							onChange={ ( _value ) => {
 								onChange( {
 									style: {

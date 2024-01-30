@@ -79,7 +79,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newAttributes ) => {
 		setAttributes( {
-			...attributes,
 			...cleanEmptyObject( newAttributes ),
 		} );
 	};
@@ -111,7 +110,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				onChange={ onChange }
 				defaultControls={ defaultControls }
 				onVisualize={ setVisualizedProperty }
-				align={ attributes?.align }
 				clientId={ clientId }
 			/>
 			{ !! settings?.spacing?.padding && (

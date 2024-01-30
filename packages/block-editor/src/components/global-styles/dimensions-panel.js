@@ -547,23 +547,6 @@ export default function DimensionsPanel( {
 					/>
 				</VStack>
 			) }
-			{ showMinHeightControl && (
-				<ToolsPanelItem
-					hasValue={ hasMinHeightValue }
-					label={ __( 'Min. height' ) }
-					onDeselect={ resetMinHeightValue }
-					isShownByDefault={
-						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
-					}
-					panelId={ panelId }
-				>
-					<HeightControl
-						label={ __( 'Min. height' ) }
-						value={ minHeightValue }
-						onChange={ setMinHeightValue }
-					/>
-				</ToolsPanelItem>
-			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }
@@ -720,28 +703,6 @@ export default function DimensionsPanel( {
 						DEFAULT_CONTROLS.aspectRatio
 					}
 				/>
-			) }
-			{ showChildLayoutControl && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasChildLayoutValue }
-					label={ childLayoutOrientationLabel }
-					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={
-						defaultControls.childLayout ??
-						DEFAULT_CONTROLS.childLayout
-					}
-					panelId={ panelId }
-				>
-					<ChildLayoutControl
-						value={ inheritedValue }
-						onChange={ setChildLayout }
-						parentLayout={ settings?.parentLayout }
-						align={ align }
-						clientId={ clientId }
-					/>
-				</VStack>
 			) }
 		</Wrapper>
 	);

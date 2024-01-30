@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	CustomSelectControl,
 	FlexBlock,
@@ -25,7 +25,6 @@ import {
 } from '@wordpress/components';
 
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
 import {
 	arrowRight,
 	arrowDown,
@@ -44,7 +43,6 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import { useSettings } from '../components/use-settings';
 import { getLayoutType } from '../layouts';
-import { useLayout } from '../components/block-list/layout';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
@@ -786,165 +784,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 		);
 	},
 	'withLayoutStyles'
-);
-
-/**
- * Override the default block element to add the child layout styles.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withChildLayoutStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const parentLayout = useLayout() || {};
-		const { orientation } = parentLayout;
-		const { attributes } = props;
-		const { style: { layout = {} } = {} } = attributes;
-		const { width, height } = layout;
-		const disableLayoutStyles = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return !! getSettings().disableLayoutStyles;
-		} );
-		const shouldRenderChildLayoutStyles = ! disableLayoutStyles;
-
-		const id = useInstanceId( BlockListBlock );
-		const selector = `.wp-container-content-${ id }`;
-
-		const isConstrained =
-			parentLayout.type === 'constrained' ||
-			parentLayout.type === 'default' ||
-			parentLayout.type === undefined;
-
-		const widthProp =
-			isConstrained || orientation === 'vertical'
-				? 'selfAlign'
-				: 'selfStretch';
-		const heightProp =
-			isConstrained || orientation === 'vertical'
-				? 'selfStretch'
-				: 'selfAlign';
-
-		let css = '';
-
-		if ( isConstrained || orientation === 'vertical' ) {
-			// set width
-			if ( layout[ widthProp ] === 'fixed' && width ) {
-				css += `${ selector } {
-					max-width: ${ width };
-				}`;
-			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
-				css += `${ selector } {
-					width: ${ width };
-				}`;
-			} else if ( layout[ widthProp ] === 'fill' ) {
-				css += `${ selector } {
-					align-self: stretch;
-				}`;
-			} else if ( layout[ widthProp ] === 'fit' ) {
-				css += `${ selector } {
-					width: fit-content;
-				}`;
-			}
-
-			// set height
-			if ( layout[ heightProp ] === 'fixed' && height ) {
-				css += `${ selector } {
-					max-height: ${ height };
-					flex-grow: 0;
-					flex-shrink: 1;
-					flex-basis: ${ height };
-				}`;
-			} else if ( layout[ heightProp ] === 'fixedNoShrink' && height ) {
-				css += `${ selector } {
-					height: ${ height };
-					flex-shrink: 0;
-					flex-grow: 0;
-					flex-basis: auto;
-				}`;
-			} else if ( layout[ heightProp ] === 'fill' ) {
-				css += `${ selector } {
-					flex-grow: 1;
-					flex-shrink: 1;
-					flex-basis: 100%;
-				}`;
-			} else if ( layout[ heightProp ] === 'fit' ) {
-				css += `${ selector } {
-					flex-grow: 0;
-					flex-shrink: 0;
-					flex-basis: auto;
-					height: auto;
-				}`;
-			}
-		} else {
-			// set width
-			if ( layout[ widthProp ] === 'fixed' && width ) {
-				css += `${ selector } {
-					max-width: ${ width };
-					flex-grow: 0;
-					flex-shrink: 1;
-					flex-basis: ${ width };
-					
-				}`;
-			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
-				css += `${ selector } {
-					width: ${ width };
-					flex-shrink: 0;
-					flex-grow: 0;
-					flex-basis: auto;
-				}`;
-			} else if ( layout[ widthProp ] === 'fill' ) {
-				css += `${ selector } {
-					flex-grow: 1;
-					flex-shrink: 1;
-					flex-basis: 100%;
-				}`;
-			} else if ( layout[ widthProp ] === 'fit' ) {
-				css += `${ selector } {
-					flex-grow: 0;
-					flex-shrink: 0;
-					flex-basis: auto;
-					width: fit-content;
-				}`;
-			}
-
-			// set height
-			if ( layout[ heightProp ] === 'fill' ) {
-				css += `${ selector } {
-					align-self: stretch;
-				}`;
-			} else if ( layout[ heightProp ] === 'fit' ) {
-				css += `${ selector } {
-						height: fit-content;
-					}`;
-			} else if ( layout[ heightProp ] === 'fixedNoShrink' ) {
-				css += `${ selector } {
-						height: ${ height };
-					}`;
-			}
-		}
-
-		// Attach a `wp-container-content` id-based classname.
-		const className = classnames( props?.className, {
-			[ `wp-container-content-${ id }` ]:
-				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-		} );
-
-		const { setStyleOverride, deleteStyleOverride } = unlock(
-			useDispatch( blockEditorStore )
-		);
-
-		useEffect( () => {
-			if ( ! css ) return;
-			setStyleOverride( id, { css } );
-			return () => {
-				deleteStyleOverride( id );
-			};
-		}, [ id, css, setStyleOverride, deleteStyleOverride ] );
-
-		return <BlockListBlock { ...props } className={ className } />;
-	},
-	'withChildLayoutStyles'
 );
 
 addFilter(
