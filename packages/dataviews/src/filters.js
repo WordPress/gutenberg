@@ -51,15 +51,15 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					name: field.header,
 					elements: field.elements,
 					operators,
-					isVisible: isPrimary
-						? true
-						: view.filters.some(
-								( f ) =>
-									f.field === field.id &&
-									[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
-										f.operator
-									)
-						  ),
+					isVisible:
+						isPrimary ||
+						view.filters.some(
+							( f ) =>
+								f.field === field.id &&
+								[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
+									f.operator
+								)
+						),
 					isPrimary,
 				} );
 				if ( isPrimary ) {
