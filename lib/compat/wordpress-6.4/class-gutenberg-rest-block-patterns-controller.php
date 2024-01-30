@@ -28,7 +28,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Block_Patterns_Co
 		$response = parent::prepare_item_for_response( $item, $request );
 
 		// Run the polyfill for Block Hooks only if it isn't already handled in WordPress core.
-		if ( function_exists( 'traverse_and_serialize_blocks' ) ) {
+		if ( version_compare( get_bloginfo( 'version' ), '6.4', '>=' ) ) {
 			return $response;
 		}
 
