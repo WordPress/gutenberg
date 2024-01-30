@@ -78,21 +78,21 @@ function ScaledBlockPreview( {
 			} }
 		>
 			<ShadowDom
-				// contentRef={ useRefEffect( ( bodyElement ) => {
-				// 	const {
-				// 		ownerDocument: { documentElement },
-				// 	} = bodyElement;
-				// 	documentElement.classList.add(
-				// 		'block-editor-block-preview__content-iframe'
-				// 	);
-				// 	documentElement.style.position = 'absolute';
-				// 	documentElement.style.width = '100%';
+				contentRef={ useRefEffect( ( bodyElement ) => {
+					// const {
+					// 	ownerDocument: { documentElement },
+					// } = bodyElement;
+					// documentElement.classList.add(
+					// 	'block-editor-block-preview__content-iframe'
+					// );
+					// documentElement.style.position = 'absolute';
+					// documentElement.style.width = '100%';
 
-				// 	// Necessary for contentResizeListener to work.
-				// 	bodyElement.style.boxSizing = 'border-box';
-				// 	bodyElement.style.position = 'absolute';
-				// 	bodyElement.style.width = '100%';
-				// }, [] ) }
+					// Necessary for contentResizeListener to work.
+					bodyElement.style.boxSizing = 'border-box';
+					bodyElement.style.position = 'relative';
+					bodyElement.style.width = '100%';
+				}, [] ) }
 				aria-hidden
 				tabIndex={ -1 }
 				style={ {

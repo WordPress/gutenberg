@@ -15,7 +15,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 
 function Iframe( {
@@ -38,7 +37,21 @@ function Iframe( {
 	const [ shadow, setShadow ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const setRef = useRefEffect( ( node ) => {
-		setShadow( node.attachShadow( { mode: 'open' } ) );
+		const _shadow = node.attachShadow( { mode: 'open' } );
+		const html = document.createElement( 'html' );
+		_shadow.appendChild( html );
+		setShadow( _shadow );
+		// Ideally ALL classes that are added through get_body_class should
+		// be added in the editor too, which we'll somehow have to get from
+		// the server in the future (which will run the PHP filters).
+		setBodyClasses(
+			Array.from( node.ownerDocument.body.classList ).filter(
+				( name ) =>
+					name.startsWith( 'admin-color-' ) ||
+					name.startsWith( 'post-type-' ) ||
+					name === 'wp-embed-responsive'
+			)
+		);
 	}, [] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
@@ -64,24 +77,24 @@ function Iframe( {
 			>
 				{ shadow &&
 					createPortal(
-						<html lang="en">
-							<body
-								ref={ bodyRef }
-								className={ classnames(
-									'block-editor-iframe__body',
-									'editor-styles-wrapper',
-									...bodyClasses
-								) }
-							>
-								<div
-									dangerouslySetInnerHTML={ {
-										__html: styles,
-									} }
-								></div>
+						<body
+							ref={ bodyRef }
+							className={ classnames(
+								'block-editor-iframe__body',
+								'editor-styles-wrapper',
+								...bodyClasses
+							) }
+						>
+							<div
+								dangerouslySetInnerHTML={ {
+									__html: styles,
+								} }
+							></div>
+							<StyleProvider document={ shadow }>
 								{ children }
-							</body>
-						</html>,
-						shadow
+							</StyleProvider>
+						</body>,
+						shadow.firstElementChild
 					) }
 			</div>
 		</>
