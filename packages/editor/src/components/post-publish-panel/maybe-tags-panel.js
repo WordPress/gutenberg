@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
@@ -34,13 +34,8 @@ const TagsPanel = () => {
 	);
 };
 
-class MaybeTagsPanel extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			hadTagsWhenOpeningThePanel: props.hasTags,
-		};
-	}
+const MaybeTagsPanel = ( { hasTags } ) => {
+	const [ hadTagsWhenOpeningThePanel ] = useState( hasTags );
 
 	/*
 	 * We only want to show the tag panel if the post didn't have
@@ -52,14 +47,12 @@ class MaybeTagsPanel extends Component {
 	 * hiding this panel and keeping the user from adding
 	 * more than one tag.
 	 */
-	render() {
-		if ( ! this.state.hadTagsWhenOpeningThePanel ) {
-			return <TagsPanel />;
-		}
-
-		return null;
+	if ( ! hadTagsWhenOpeningThePanel ) {
+		return <TagsPanel />;
 	}
-}
+
+	return null;
+};
 
 export default compose(
 	withSelect( ( select ) => {
