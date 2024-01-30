@@ -38,8 +38,16 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Block_Patterns_Co
 			return $response;
 		}
 
+		$hooked_blocks = get_hooked_blocks();
+
+		$before_block_visitor = '_inject_theme_attribute_in_template_part_block';
+		$after_block_visitor  = null;
+		if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
+			$before_block_visitor = make_before_block_visitor( $hooked_blocks, $item );
+			$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $item );
+		}
 		$blocks          = parse_blocks( $data['content'] );
-		$data['content'] = gutenberg_serialize_blocks( $blocks ); // Serialize or render?
+		$data['content'] = traverse_and_serialize_blocks( $blocks, $before_block_visitor, $after_block_visitor );
 
 		return rest_ensure_response( $data );
 	}
