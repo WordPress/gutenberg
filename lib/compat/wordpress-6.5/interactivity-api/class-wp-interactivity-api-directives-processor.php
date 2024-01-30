@@ -71,7 +71,7 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 		 * Appends content after the closing tag of a balanced tag or after a void
 		 * tag.
 		 *
-		 * This method positions the processor in the opening tag of the appended
+		 * This method positions the processor in the last tag of the appended
 		 * content, if it exists.
 		 *
 		 * @access private
@@ -100,7 +100,6 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 
 				$end = $this->bookmarks[ $end_name ]->start + $this->bookmarks[ $end_name ]->length + 1;
 
-				$this->seek( $end_name );
 				$this->release_bookmark( $start_name );
 				$this->release_bookmark( $end_name );
 			}
@@ -142,6 +141,8 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 		 * until it finds the matching closing tag, respecting any in-between
 		 * content, including nested tags of the same name. Returns false when
 		 * called on a closing or void tag, or if no matching closing tag was found.
+		 *
+		 * @access private
 		 *
 		 * @return bool Whether a matching closing tag was found.
 		 */
