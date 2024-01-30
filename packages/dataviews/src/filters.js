@@ -28,7 +28,6 @@ const sanitizeOperators = ( field ) => {
 
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
-	let primaryFilters = 0;
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
 			return;
@@ -62,9 +61,6 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 						),
 					isPrimary,
 				} );
-				if ( isPrimary ) {
-					primaryFilters++;
-				}
 		}
 	} );
 
@@ -94,24 +90,15 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 		} ),
 	];
 
-	// Reset should be hidden when either:
-	//
-	// - the layout is list
-	// - or there is only one primary filter and none secondary filters
-	if (
-		view.type === LAYOUT_LIST ||
-		( filters.length === 1 && primaryFilters === 1 )
-	) {
-		return filterComponents;
+	if ( filterComponents.length > 1 && view.type !== LAYOUT_LIST ) {
+		filterComponents.push(
+			<ResetFilters
+				key="reset-filters"
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
+		);
 	}
-
-	filterComponents.push(
-		<ResetFilters
-			key="reset-filters"
-			view={ view }
-			onChangeView={ onChangeView }
-		/>
-	);
 
 	return filterComponents;
 } );
