@@ -28,10 +28,10 @@ import {
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
+import { unlock } from '../lock-unlock';
+import ItemActions from '../actions/item-actions';
+import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from '../constants';
+import { DropdownMenuRadioItemCustom } from '../dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,

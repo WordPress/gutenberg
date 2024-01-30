@@ -12,7 +12,7 @@ import { useMemo, useState, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
+import { unlock } from '../lock-unlock';
 
 const {
 	DropdownMenuV2: DropdownMenu,

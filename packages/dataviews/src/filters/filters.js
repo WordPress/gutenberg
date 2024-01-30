@@ -14,7 +14,7 @@ import {
 	OPERATOR_IN,
 	OPERATOR_NOT_IN,
 	LAYOUT_LIST,
-} from './constants';
+} from '../constants';
 
 const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;

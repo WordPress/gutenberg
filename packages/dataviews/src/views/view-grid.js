@@ -12,7 +12,7 @@ import { useAsyncList } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ItemActions from './item-actions';
+import ItemActions from '../actions/item-actions';
 
 export default function ViewGrid( {
 	data,

@@ -13,9 +13,9 @@ import { Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
-import { unlock } from './lock-unlock';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
+import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from '../constants';
+import { unlock } from '../lock-unlock';
+import { DropdownMenuRadioItemCustom } from '../dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,

@@ -12,9 +12,9 @@ import { Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import { LAYOUT_LIST, OPERATORS } from './constants';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
+import { unlock } from '../lock-unlock';
+import { LAYOUT_LIST, OPERATORS } from '../constants';
+import { DropdownMenuRadioItemCustom } from '../dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,
