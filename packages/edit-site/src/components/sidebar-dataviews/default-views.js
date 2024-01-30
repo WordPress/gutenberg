@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 
 /**
@@ -42,14 +42,14 @@ const DEFAULT_PAGE_BASE = {
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {
-		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
+		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_TABLE ],
 	},
 };
 
 export const DEFAULT_VIEWS = {
 	page: [
 		{
-			title: __( 'All' ),
+			title: _x( 'All', 'pages' ),
 			slug: 'all',
 			view: DEFAULT_PAGE_BASE,
 		},

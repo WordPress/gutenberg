@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]
 
 ## 1.111.2
 -   [*] [internal] Remove `mediaFilesCollectionBlock` initial prop [#58140]

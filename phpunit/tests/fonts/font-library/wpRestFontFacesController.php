@@ -69,7 +69,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 	public static function create_font_face_post( $parent_id, $settings = array() ) {
 		$settings = array_merge( self::$default_settings, $settings );
-		$title    = WP_Font_Family_Utils::get_font_face_slug( $settings );
+		$title    = WP_Font_Utils::get_font_face_slug( $settings );
 		return self::factory()->post->create(
 			wp_slash(
 				array(

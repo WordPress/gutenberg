@@ -346,9 +346,8 @@ export function ImageEdit( {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource(
-						metadata?.bindings?.url?.source?.name
-					)?.lockAttributesEditing === true,
+					getBlockBindingsSource( metadata?.bindings?.url?.source )
+						?.lockAttributesEditing === true,
 			};
 		},
 		[ isSingleSelected ]

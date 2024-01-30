@@ -1,18 +1,18 @@
 <?php
 /**
- * Test WP_Font_Family_Utils::get_font_face_slug().
+ * Test WP_Font_Utils::get_font_face_slug().
  *
  * @package WordPress
  * @subpackage Font Library
  * *
- * @covers WP_Font_Family_Utils::get_font_face_slug
+ * @covers WP_Font_Utils::get_font_face_slug
  */
-class Tests_Fonts_WpFontsFamilyUtils_GetFontFamilySlug extends WP_UnitTestCase {
+class Tests_Fonts_WpFontUtils_GetFontFaceSlug extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_get_font_face_slug_normalizes_values
 	 */
 	public function test_get_font_face_slug_normalizes_values( $settings, $expected_slug ) {
-		$slug = WP_Font_Family_Utils::get_font_face_slug( $settings );
+		$slug = WP_Font_Utils::get_font_face_slug( $settings );
 
 		$this->assertSame( $expected_slug, $slug );
 	}

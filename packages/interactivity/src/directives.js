@@ -1,6 +1,9 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
+import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
