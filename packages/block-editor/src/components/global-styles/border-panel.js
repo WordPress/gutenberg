@@ -337,7 +337,7 @@ function renderShadowToggle() {
 						icon={ shadowIcon }
 						size={ 24 }
 					/>
-					<FlexItem>{ __( 'Shadow' ) }</FlexItem>
+					<FlexItem>{ __( 'Box shadow' ) }</FlexItem>
 				</HStack>
 			</Button>
 		);
@@ -357,7 +357,7 @@ function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	return (
 		<div className="block-editor-global-styles-effects-panel__shadow-popover-container">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
+				<Heading level={ 5 }>{ __( 'Presets' ) }</Heading>
 				<ShadowPresets
 					presets={ shadows }
 					activeShadow={ shadow }
