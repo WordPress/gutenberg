@@ -18,9 +18,9 @@ PODS:
     - React-CoreModules (= 0.71.15)
     - React-RCTImage (= 0.71.15)
     - RNTAztecView
-  - hermes-engine (0.71.11):
-    - hermes-engine/Pre-built (= 0.71.11)
-  - hermes-engine/Pre-built (0.71.11)
+  - hermes-engine (0.71.15):
+    - hermes-engine/Pre-built (= 0.71.15)
+  - hermes-engine/Pre-built (0.71.15)
   - libevent (2.1.12)
   - libwebp (1.2.3):
     - libwebp/demux (= 1.2.3)
@@ -618,7 +618,7 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   Gutenberg: 0bcdba988e55a27b78422d2f6b6fec1868b8e5bb
-  hermes-engine: 34c863b446d0135b85a6536fa5fd89f48196f848
+  hermes-engine: 04437e4291ede4af0c76c25e7efd0eacb8fd25e5
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
