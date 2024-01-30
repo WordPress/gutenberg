@@ -58,9 +58,17 @@ function render_block_core_pattern( $attributes ) {
 
 	// Backward compatibility for handling Block Hooks and injecting the theme attribute in the Gutenberg plugin.
 	// This can be removed when the minimum supported WordPress is >= 6.4.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && ! function_exists( 'traverse_and_serialize_blocks' ) ) {
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && version_compare( get_bloginfo( 'version' ), '6.4', '<' ) ) {
+		$hooked_blocks = get_hooked_blocks();
+
+		$before_block_visitor = null;
+		$after_block_visitor  = null;
+		if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
+			$before_block_visitor = make_before_block_visitor( $hooked_blocks, $pattern );
+			$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $pattern );
+		}
 		$blocks  = parse_blocks( $content );
-		$content = gutenberg_serialize_blocks( $blocks );
+		$content = traverse_and_serialize_blocks( $blocks, $before_block_visitor, $after_block_visitor );
 	}
 
 	$seen_refs[ $attributes['slug'] ] = true;
