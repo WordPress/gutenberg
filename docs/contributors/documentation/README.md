@@ -111,7 +111,7 @@ An example, the link to this page is: `/docs/contributors/documentation/README.m
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
 
-A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
+A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples.
 
 Here is an example `codetabs` section:
 

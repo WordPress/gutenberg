@@ -14,7 +14,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
 
 /**
@@ -33,7 +33,7 @@ import { downloadFontFaceAssets } from './utils';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
-	name: __( 'All' ),
+	name: _x( 'All', 'font categories' ),
 };
 function FontCollection( { slug } ) {
 	const requiresPermission = slug === 'google-fonts';
