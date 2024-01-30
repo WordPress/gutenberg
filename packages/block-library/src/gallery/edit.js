@@ -567,13 +567,13 @@ function GalleryEdit( props ) {
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Crop images' ) }
+						label={ __( 'Crop images to fit' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Randomize images' ) }
+						label={ __( 'Randomize order' ) }
 						checked={ !! randomOrder }
 						onChange={ toggleRandomOrder }
 					/>
