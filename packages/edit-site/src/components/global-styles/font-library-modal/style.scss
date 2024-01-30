@@ -71,6 +71,14 @@
 	width: auto;
 }
 
+.font-library-modal__font-variant_demo-text {
+	white-space: nowrap;
+	flex-shrink: 0;
+	font-size: 18px;
+	transition: opacity 0.3s ease-in-out;
+	@include reduce-motion("transition");
+}
+
 .font-library-modal__font-variant {
 	border-bottom: 1px solid $gray-200;
 	padding-bottom: $grid-unit-20;
