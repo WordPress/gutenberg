@@ -1,5 +1,80 @@
 == Changelog ==
 
+= 17.6.0-rc.3 =
+
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+- Aspect ratio: Remove support on the Group block for now. ([58414](https://github.com/WordPress/gutenberg/pull/58414))
+- Image block: Move UI for lightbox from sidebar to the content toolbar alongside link settings. ([57608](https://github.com/WordPress/gutenberg/pull/57608))
+
+#### Font Library
+- Improve font collection rest controller. ([58222](https://github.com/WordPress/gutenberg/pull/58222))
+- Make notices more consistent. ([58180](https://github.com/WordPress/gutenberg/pull/58180))
+
+#### REST API
+- Updates Font Families and Font Faces endpoints context param. ([58287](https://github.com/WordPress/gutenberg/pull/58287))
+
+#### Patterns
+- Change text on pattern reset button. ([58286](https://github.com/WordPress/gutenberg/pull/58286))
+
+#### Template Editor
+- Remove `template-only` mode from editor and edit-post packages. ([57700](https://github.com/WordPress/gutenberg/pull/57700))
+
+
+### Bug Fixes
+
+- Interactivity: Fix broken react usage in published package. ([58258](https://github.com/WordPress/gutenberg/pull/58258))
+
+#### Data Views
+- DataViews: Fix safari grid row height issue. ([58302](https://github.com/WordPress/gutenberg/pull/58302))
+- DataViews: Fix table view cell wrapper and BlockPreviews. ([58062](https://github.com/WordPress/gutenberg/pull/58062))
+
+#### Typography
+- Revert "Add defaultFontSizes option to theme.json (#56661)". ([58456](https://github.com/WordPress/gutenberg/pull/58456))
+
+#### Block Library
+- Block Hooks API: Update Navigation block feature gate. ([58388](https://github.com/WordPress/gutenberg/pull/58388))
+
+#### Synced Patterns
+- Block Bindings: Fix bindings image placeholder showing in patterns overrides. ([58252](https://github.com/WordPress/gutenberg/pull/58252))
+
+
+### Code Quality
+
+- Shadow: Remove additional wrapper around getShadowClassesAndStyles. ([58297](https://github.com/WordPress/gutenberg/pull/58297))
+
+#### Block Library
+- Block Hooks API: Remove $post check from Navigation hooked blocks meta fn. ([58379](https://github.com/WordPress/gutenberg/pull/58379))
+- Post navigation link: Coding standard fixes. ([58380](https://github.com/WordPress/gutenberg/pull/58380))
+- Update docblock for render_block_core_pattern. ([58382](https://github.com/WordPress/gutenberg/pull/58382))
+- Block Hooks API: Update doc block for block_core_navigation_insert_hooked_blocks. ([58378](https://github.com/WordPress/gutenberg/pull/58378))
+
+#### Font Library
+- Remove unused utilities and rename class. ([58342](https://github.com/WordPress/gutenberg/pull/58342))
+- Rename the slug of the google fonts collection from 'default-font-collection' to 'google-fonts'. ([58331](https://github.com/WordPress/gutenberg/pull/58331))
+- Refactored download/upload logic to support font faces with multiple src assets. ([58216](https://github.com/WordPress/gutenberg/pull/58216))
+- Font Library: Addresses additional REST API feedback. ([58333](https://github.com/WordPress/gutenberg/pull/58333))
+
+#### Synced Patterns
+- Block Bindings: Change `core/pattern-attributes` source for `core/pattern-overrides`. ([58434](https://github.com/WordPress/gutenberg/pull/58434))
+
+#### Custom Fields
+- Block Bindings: Simplify block bindings object. ([58337](https://github.com/WordPress/gutenberg/pull/58337))
+- Block Bindings: Adapt block bindings to wordpress code latest changes. ([58383](https://github.com/WordPress/gutenberg/pull/58383))
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @artemiomorales @c4rl0sbr4v0 @carolinan @creativecoder @dsas @glendaviesnz @madhusudhand @matiasbenedetto @mikachan @ntsekouras @pbking @SantosGuillamot @sirreal @tjcafferkey
+
+
 = 17.6.0-rc.2 =
 
 ## Changelog
