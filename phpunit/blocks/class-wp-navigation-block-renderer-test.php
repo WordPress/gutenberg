@@ -25,7 +25,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$navigation_link_block = new WP_Block( $parsed_block, $context );
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
-		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
+		$reflection = new ReflectionClass( WP_Navigation_Block_Renderer_Gutenberg::class );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
 		// Invoke the private method.
@@ -53,7 +53,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$site_title_block = new WP_Block( $parsed_block, $context );
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
-		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
+		$reflection = new ReflectionClass( WP_Navigation_Block_Renderer_Gutenberg::class );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
 		// Invoke the private method.
@@ -71,7 +71,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	 * @covers WP_Navigation_Block_Renderer::get_inner_blocks_from_navigation_post
 	 */
 	public function test_gutenberg_get_inner_blocks_from_navigation_post_returns_empty_block_list() {
-		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
+		$reflection = new ReflectionClass( WP_Navigation_Block_Renderer_Gutenberg::class );
 		$method     = $reflection->getMethod( 'get_inner_blocks_from_navigation_post' );
 		$method->setAccessible( true );
 		$attributes = array( 'ref' => 0 );
