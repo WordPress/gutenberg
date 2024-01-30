@@ -12,9 +12,9 @@ import {
 /**
  * Internal dependencies
  */
-import ViewTable from './views/view-table';
-import ViewGrid from './views/view-grid';
-import ViewList from './views/view-list';
+import ViewTable from './layouts/table';
+import ViewGrid from './layouts/grid';
+import ViewList from './layouts/list';
 
 // Field types.
 export const ENUMERATION_TYPE = 'enumeration';
