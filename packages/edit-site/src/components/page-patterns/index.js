@@ -83,7 +83,7 @@ const DEFAULT_VIEW = {
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
-	filters: [ { field: 'sync-status', operator: 'in', value: undefined } ],
+	filters: [],
 };
 
 const SYNC_FILTERS = [
@@ -278,7 +278,6 @@ export default function DataviewsPatterns() {
 			syncStatus: viewSyncStatus,
 		}
 	);
-
 	const fields = useMemo( () => {
 		const _fields = [
 			{
