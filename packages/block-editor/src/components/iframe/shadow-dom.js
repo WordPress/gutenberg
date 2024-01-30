@@ -26,7 +26,7 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+	const { resolvedAssets } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
 			resolvedAssets: settings.__unstableResolvedAssets,
