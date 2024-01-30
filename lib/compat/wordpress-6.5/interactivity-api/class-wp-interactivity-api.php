@@ -178,11 +178,30 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @return string The processed HTML content. It returns the original content when the HTML contains unbalanced tags.
 		 */
 		public function process_directives( string $html ): string {
-			$p               = new WP_Interactivity_API_Directives_Processor( $html );
-			$tag_stack       = array();
-			$namespace_stack = array();
 			$context_stack   = array();
-			$unbalanced      = false;
+			$namespace_stack = array();
+			$result          = $this->process_directives_args( $html, $context_stack, $namespace_stack );
+			return null === $result ? $html : $result;
+		}
+
+		/**
+		 * Processes the interactivity directives contained within the HTML content
+		 * and updates the markup accordingly.
+		 *
+		 * It needs the context and namespace stacks to be passed by reference and
+		 * it returns null if the HTML contains unbalanced tags.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $html            The HTML content to process.
+		 * @param array  $context_stack   The reference to the array used to keep track of contexts during processing.
+		 * @param array  $namespace_stack The reference to the array used to manage namespaces during processing.
+		 * @return string|null The processed HTML content. It returns null when the HTML contains unbalanced tags.
+		 */
+		private function process_directives_args( string $html, array &$context_stack, array &$namespace_stack ) {
+			$p          = new WP_Interactivity_API_Directives_Processor( $html );
+			$tag_stack  = array();
+			$unbalanced = false;
 
 			$directive_processor_prefixes          = array_keys( self::$directive_processors );
 			$directive_processor_prefixes_reversed = array_reverse( $directive_processor_prefixes );
@@ -266,11 +285,11 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			}
 
 			/*
-			 * It returns the original content if the HTML is unbalanced because
-			 * unbalanced HTML is not safe to process. In that case, the Interactivity
-			 * API runtime will update the HTML on the client side during the hydration.
+			 * It returns null if the HTML is unbalanced because unbalanced HTML is
+			 * not safe to process. In that case, the Interactivity API runtime will
+			 * update the HTML on the client side during the hydration.
 			 */
-			return $unbalanced || 0 < count( $tag_stack ) ? $html : $p->get_updated_html();
+			return $unbalanced || 0 < count( $tag_stack ) ? null : $p->get_updated_html();
 		}
 
 		/**
