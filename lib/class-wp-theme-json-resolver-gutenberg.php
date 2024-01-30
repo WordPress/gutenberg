@@ -1,8 +1,8 @@
 <?php
 /**
- * WP_Theme_JSON_Resolver class
+ * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package gutenberg
+ * @package Gutenberg
  * @since 5.8.0
  */
 
@@ -14,6 +14,7 @@
  * This is a low-level API that may need to do breaking changes. Please,
  * use gutenberg_get_global_settings, gutenberg_get_global_styles, and gutenberg_get_global_stylesheet instead.
  *
+ * @since 5.8.0
  * @access private
  */
 #[AllowDynamicProperties]
