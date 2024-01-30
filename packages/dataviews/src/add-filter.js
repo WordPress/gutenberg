@@ -38,12 +38,14 @@ function WithSeparators( { children } ) {
 }
 
 export default function AddFilter( { filters, view, onChangeView } ) {
-	let _filters = filters;
-	if ( view.type !== LAYOUT_LIST ) {
-		_filters = filters.filter( ( { isPrimary } ) => ! isPrimary );
-	}
+	const filtersToDisplay = [];
+	filters.forEach( ( filter ) => {
+		if ( ! filter.isPrimary || view.type === LAYOUT_LIST ) {
+			filtersToDisplay.push( filter );
+		}
+	} );
 
-	if ( _filters.length === 0 ) {
+	if ( filtersToDisplay.length === 0 ) {
 		return null;
 	}
 
@@ -77,7 +79,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 		>
 			<WithSeparators>
 				<DropdownMenuGroup>
-					{ _filters.map( ( filter ) => {
+					{ filtersToDisplay.map( ( filter ) => {
 						const filterInView = view.filters.find(
 							( f ) => f.field === filter.field
 						);
