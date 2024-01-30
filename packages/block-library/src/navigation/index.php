@@ -1355,7 +1355,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * of those hooked blocks should be exempted from insertion.
  *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
- * @param WP_Post $post        `wp_navigation` post object corresponding to the block.
+ * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
  * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
  */
 function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
