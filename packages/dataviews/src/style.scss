@@ -301,10 +301,6 @@
 		}
 	}
 
-	.dataviews-view-grid__primary-field {
-		padding: $grid-unit-10;
-	}
-
 	.dataviews-view-grid__fields {
 		position: relative;
 		font-size: 12px;
@@ -498,4 +494,12 @@
 
 .dataviews-bulk-edit-button.components-button {
 	flex-shrink: 0;
+}
+
+.dataviews-view-grid__title-actions .dataviews-view-table-selection-checkbox {
+	margin-left: $grid-unit-10;
+}
+
+.dataviews-view-grid__card.has-no-pointer-events * {
+	pointer-events: none;
 }
