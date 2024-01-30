@@ -13,7 +13,7 @@ export const PointerCircle = styled.div`
 	width: 40px;
 	will-change: transform;
 	z-index: 10000;
-	background: rgba( 255, 255, 255, 0.3 );
+	background: rgba( 255, 255, 255, 0.4 );
 	border: 1px solid rgba( 255, 255, 255, 0.3 );
 	border-radius: 50%;
 	backdrop-filter: blur( 16px ) saturate( 180% );
