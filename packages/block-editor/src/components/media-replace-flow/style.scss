@@ -27,7 +27,7 @@
 	}
 
 	.block-editor-link-control {
-		width: 300px; // Hardcoded width avoids resizing of control when switching between preview/edit.
+		width: 200px; // Hardcoded width avoids resizing of control when switching between preview/edit.
 
 		.block-editor-url-input {
 			padding: 0; // Cancel unnecessary default 1px padding in this case.

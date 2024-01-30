@@ -27,7 +27,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $slug;
+	public $slug;
 
 	/**
 	 * The name of the font collection.
@@ -36,7 +36,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $name;
+	public $name;
 
 	/**
 	 * Description of the font collection.
@@ -45,7 +45,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $description;
+	public $description;
 
 	/**
 	 * Source of the font collection.
@@ -54,7 +54,7 @@ class WP_Font_Collection {
 	 *
 	 * @var string
 	 */
-	private $src;
+	public $src;
 
 	/**
 	 * Array of font families in the collection.
@@ -63,7 +63,7 @@ class WP_Font_Collection {
 	 *
 	 * @var array
 	 */
-	private $font_families;
+	public $font_families;
 
 	/**
 	 * Categories associated with the font collection.
@@ -72,7 +72,7 @@ class WP_Font_Collection {
 	 *
 	 * @var array
 	 */
-	private $categories;
+	public $categories;
 
 
 	/**
@@ -138,32 +138,20 @@ class WP_Font_Collection {
 			( empty( $config['src'] ) && empty( $config['font_families'] ) ) ||
 			( ! empty( $config['src'] ) && ! empty( $config['font_families'] ) )
 		) {
-			_doing_it_wrong( __METHOD__, __( 'Font Collection config "src" option OR "font_families" option are required.', 'gutenberg' ), '6.5.0' );
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %1$s: src, %2$s: font_families */
+					__( 'Font Collection config "%1$s" option OR "%2$s" option is required.', 'gutenberg' ),
+					'src',
+					'font_families'
+				),
+				'6.5.0'
+			);
 			return false;
 		}
 
 		return true;
-	}
-
-	/**
-	 * Gets the font collection config.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return array {
-	 *     An array of font collection config.
-	 *
-	 *     @type string $slug        The font collection's unique slug.
-	 *     @type string $name        The font collection's name.
-	 *     @type string $description The font collection's description.
-	 * }
-	 */
-	public function get_config() {
-		return array(
-			'slug'        => $this->slug,
-			'name'        => $this->name,
-			'description' => $this->description,
-		);
 	}
 
 	/**

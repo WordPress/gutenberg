@@ -160,8 +160,7 @@ export function RichTextWrapper(
 				if (
 					blockTypeAttributes?.[ attribute ]?.source ===
 						'rich-text' &&
-					getBlockBindingsSource( args.source.name )
-						?.lockAttributesEditing
+					getBlockBindingsSource( args.source )?.lockAttributesEditing
 				) {
 					shouldDisableEditing = true;
 					break;

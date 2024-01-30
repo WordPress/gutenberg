@@ -1,52 +1,38 @@
 .block-editor-url-popover__additional-controls {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid $gray-900;
+	padding: $grid-unit-10 $grid-unit-10;
 }
 
-.block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
-	box-shadow: none;
-}
-
-.block-editor-url-popover__additional-controls div[role="menu"] > .components-button {
-	padding-left: $grid-unit-15;
+.block-editor-url-popover__input-container {
+	padding: $grid-unit-10;
+	padding-left: $grid-unit-20;
 }
 
 .block-editor-url-popover__row {
 	display: flex;
+	gap: $grid-unit-05;
 }
 
 // Any children of the popover-row that are not the settings-toggle
 // should take up as much space as possible.
 .block-editor-url-popover__row > :not(.block-editor-url-popover__settings-toggle) {
 	flex-grow: 1;
+	gap: $grid-unit-05;
 }
 
-// Mimic toolbar component styles for the icons in this popover.
-.block-editor-url-popover .components-button.has-icon {
-	padding: 3px;
+.block-editor-url-popover__additional-controls .components-button.has-icon {
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	height: auto;
+	text-align: left;
 
 	> svg {
-		padding: 5px;
-		border-radius: $radius-block-ui;
-		height: 30px;
-		width: 30px;
-	}
-
-	&:not(:disabled):focus {
-		box-shadow: none;
-
-		> svg {
-			@include block-toolbar-button-style__focus();
-		}
+		margin-right: $grid-unit-10;
 	}
 }
 
 .block-editor-url-popover__settings-toggle {
 	flex-shrink: 0;
-
-	// Add a left divider to the toggle button.
-	border-radius: 0;
-	border-left: $border-width solid $gray-300;
-	margin-left: 1px;
 
 	&[aria-expanded="true"] .dashicon {
 		transform: rotate(180deg);
@@ -56,7 +42,7 @@
 .block-editor-url-popover__settings {
 	display: block;
 	padding: $grid-unit-20;
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid $gray-900;
 }
 
 .block-editor-url-popover__link-editor,
@@ -65,16 +51,50 @@
 }
 
 .block-editor-url-popover__link-viewer-url {
-	margin: $grid-unit-10 - $border-width;
+	display: flex;
+	align-items: center;
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	min-width: 150px;
-	max-width: 500px;
+	margin-right: $grid-unit-10;
 
 	&.has-invalid-link {
 		color: $alert-red;
 	}
+}
+
+.block-editor-url-popover__expand-on-click {
+	display: flex;
+	align-items: center;
+	min-width: $modal-min-width;
+	overflow: hidden;
+	white-space: nowrap;
+
+	.fullscreen-icon {
+		padding-right: $grid-unit-05;
+
+		> svg {
+			width: $icon-size;
+			height: $icon-size;
+		}
+	}
+
+	.text {
+		flex-grow: 1;
+
+		p {
+			margin: 0;
+		}
+	}
+
+	.description {
+		color: $gray-600;
+	}
+
+	.remove-link {
+		margin-right: $grid-unit-10;
+	}
+
 }
