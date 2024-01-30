@@ -39,10 +39,6 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 		...faceStyles,
 		...style,
 	};
-	const imageDemoStyle = {
-		height: '23px',
-		width: 'auto',
-	};
 
 	useEffect( () => {
 		const observer = new window.IntersectionObserver( ( [ entry ] ) => {
@@ -71,7 +67,7 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 					src={ previewUrl }
 					loading="lazy"
 					alt={ text }
-					style={ imageDemoStyle }
+					className="font-library-modal__font-variant_demo-image"
 				/>
 			) : (
 				<Text style={ textDemoStyle }>{ text }</Text>

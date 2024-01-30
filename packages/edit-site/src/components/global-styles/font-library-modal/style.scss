@@ -65,6 +65,17 @@
 	margin-top: -1px; /* To collapse the margin with the previous element */
 }
 
+.font-library-modal__font-variant_demo-image {
+	display: block;
+	height: $grid-unit-30;
+	width: auto;
+}
+
+.font-library-modal__font-variant {
+	border-bottom: 1px solid $gray-200;
+	padding-bottom: $grid-unit-20;
+}
+
 .font-library-modal__tabs {
 	[role="tablist"] {
 		position: sticky;
