@@ -147,11 +147,11 @@
 		}
 
 		&.is-selected {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background-color: var(--wp-admin-theme-color-lighter-125);
 			color: $gray-700;
 
 			&:hover {
-				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+				background-color: var(--wp-admin-theme-color-lighter-120);
 			}
 		}
 	}

@@ -58,7 +58,7 @@
 			}
 
 			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+				background: var(--wp-admin-theme-color-lighter-125);
 
 				* {
 					color: var(--wp-admin-theme-color);
@@ -156,7 +156,7 @@
 
 	.edit-site-add-new-template__template-icon {
 		padding: $grid-unit-10;
-		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		background: var(--wp-admin-theme-color-lighter-120);
 		border-radius: 100%;
 		max-height: $grid-unit-50;
 		max-width: $grid-unit-50;
@@ -186,7 +186,7 @@
 
 		&:hover {
 			color: var(--wp-admin-theme-color-darker-10);
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background: var(--wp-admin-theme-color-lighter-120);
 			border-color: transparent;
 
 			span {

@@ -428,6 +428,14 @@
 	// Hexadecimal css vars do not work in the rgba function.
 	--wp-admin-theme-color: #{$color-primary};
 	--wp-admin-theme-color--rgb: #{hex-to-rgb($color-primary)};
+
+	// Lighter shades.
+	--wp-admin-theme-color-lighter-120: #{lighten($color-primary, 62%)};
+	--wp-admin-theme-color-lighter-120--rgb: #{hex-to-rgb(lighten($color-primary, 62%))};
+
+	--wp-admin-theme-color-lighter-125: #{lighten($color-primary, 63%)};
+	--wp-admin-theme-color-lighter-125--rgb: #{hex-to-rgb(lighten($color-primary, 63%))};
+
 	// Darker shades.
 	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
 	--wp-admin-theme-color-darker-10--rgb: #{hex-to-rgb(darken($color-primary, 5%))};

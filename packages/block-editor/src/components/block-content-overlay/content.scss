@@ -19,7 +19,7 @@
 	}
 
 	&:hover:not(.is-dragging-blocks):not(.is-multi-selected)::before {
-		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		background: var(--wp-admin-theme-color-lighter-125);
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
 
