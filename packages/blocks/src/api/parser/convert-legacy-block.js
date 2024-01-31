@@ -77,5 +77,20 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
+	// Convert pattern overrides added during experimental phase.
+	if (
+		name === 'core/paragraph' ||
+		name === 'core/heading' ||
+		name === 'core/image' ||
+		name === 'core/button'
+	) {
+		if (
+			newAttributes.metadata?.bindings?.content?.source?.name ===
+			'pattern_attributes'
+		) {
+			newAttributes.metadata.bindings.content.source =
+				'core/pattern-overrides';
+		}
+	}
 	return [ name, newAttributes ];
 }
