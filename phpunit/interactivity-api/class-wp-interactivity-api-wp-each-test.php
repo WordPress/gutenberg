@@ -418,7 +418,7 @@ class Tests_WP_Interactivity_API_WP_Each extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that the `data-wp-each` directive works with nestded template tags.
+	 * Tests that the `data-wp-each` directive works with nested template tags.
 	 *
 	 * @covers ::process_directives
 	 */
