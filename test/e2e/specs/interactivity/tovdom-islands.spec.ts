@@ -44,7 +44,7 @@ test.describe( 'toVdom - islands', () => {
 	} ) => {
 		const el = page.getByTestId( 'island inside another island' );
 		const templates = el.locator( 'template' );
-		expect( await templates.count() ).toEqual( 1 );
+		await expect( templates ).toHaveCount( 1 );
 	} );
 
 	test( 'islands inside inner blocks of isolated islands should be hydrated', async ( {
