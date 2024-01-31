@@ -750,6 +750,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$current_settings = $theme_json_resolver->get_theme_data()->get_settings();
 		$line_height      = $current_settings['typography']['lineHeight'];
 		$this->assertTrue( $line_height, 'lineHeight setting after add_theme_support() should be true.' );
+		remove_theme_support( 'custom-line-height' );
 	}
 
 	/**
