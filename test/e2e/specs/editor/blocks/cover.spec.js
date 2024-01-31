@@ -153,7 +153,7 @@ test.describe( 'Cover', () => {
 			name: 'Editor settings',
 		} );
 		await coverBlockEditorSettings
-			.getByRole( 'tab', { name: 'Styles' } )
+			.getByRole( 'tab', { name: 'Settings' } )
 			.click();
 
 		// Ensure there the default value for the minimum height of cover is undefined.
