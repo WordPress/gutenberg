@@ -25,7 +25,13 @@ import {
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
-function EditorCanvas( { enableResizing, settings, children, ...props } ) {
+function EditorCanvas( {
+	enableResizing,
+	settings,
+	children,
+	containerHeight,
+	...props
+} ) {
 	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
 		useSelect( ( select ) => {
 			const { getBlockCount, __unstableGetEditorMode } =
@@ -109,13 +115,20 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			iframeProps={ {
 				expand: isZoomOutMode,
 				scale: isZoomOutMode ? 0.45 : undefined,
-				frameSize: isZoomOutMode ? 100 : undefined,
+				frameSize: isZoomOutMode ? 50 : undefined,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
 					{
 						'is-focused': isFocused && canvasMode === 'view',
 					}
 				),
+				maxHeight:
+					isZoomOutMode && containerHeight
+						? containerHeight
+						: undefined,
+				style: {
+					transition: isZoomOutMode ? 'none' : undefined,
+				},
 				...props,
 				...( canvasMode === 'view' ? viewModeProps : {} ),
 			} }

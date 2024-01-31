@@ -107,6 +107,7 @@ function Iframe( {
 	scale = 1,
 	frameSize = 0,
 	expand = false,
+	maxHeight,
 	readonly,
 	forwardedRef: ref,
 	...props
@@ -239,7 +240,12 @@ function Iframe( {
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
 	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
-	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
+	// const maxHeight = props.style?.maxHeight || 0;
+	const maxContentHeight =
+		maxHeight && contentHeight > maxHeight
+			? maxHeight / ( 1 - scale )
+			: contentHeight;
+	const marginFromScaling = ( maxContentHeight * ( 1 - scale ) ) / 2;
 
 	return (
 		<>
@@ -250,7 +256,7 @@ function Iframe( {
 				style={ {
 					border: 0,
 					...props.style,
-					height: expand ? contentHeight : props.style?.height,
+					height: expand ? maxContentHeight : props.style?.height,
 					marginTop:
 						scale !== 1
 							? -marginFromScaling + frameSize
@@ -263,7 +269,7 @@ function Iframe( {
 						scale !== 1
 							? `scale( ${ scale } )`
 							: props.style?.transform,
-					transition: 'all .3s',
+					transition: props.style?.transition || 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }

@@ -6,8 +6,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
-
+import {
+	useViewportMatch,
+	useResizeObserver,
+	useRefEffect,
+} from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -59,12 +63,25 @@ export default function SiteEditorCanvas() {
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 	const forceFullHeight = isNavigationFocusMode;
+	const [ containerHeight, setContainerHeight ] = useState();
+	const containerRef = useRefEffect(
+		( node ) => {
+			if ( ! node && ! node?.offsetHeight ) {
+				return;
+			}
+			setContainerHeight( node?.offsetHeight );
+		},
+		[ window.innerHeight ]
+	);
 
 	return (
 		<EditorCanvasContainer.Slot>
 			{ ( [ editorCanvasView ] ) =>
 				editorCanvasView ? (
-					<div className="edit-site-visual-editor is-focus-mode">
+					<div
+						className="edit-site-visual-editor is-focus-mode"
+						ref={ containerRef }
+					>
 						{ editorCanvasView }
 					</div>
 				) : (
@@ -73,6 +90,7 @@ export default function SiteEditorCanvas() {
 							'is-focus-mode': isFocusMode || !! editorCanvasView,
 							'is-view-mode': isViewMode,
 						} ) }
+						ref={ containerRef }
 					>
 						<BackButton />
 						<ResizableEditor
@@ -86,6 +104,7 @@ export default function SiteEditorCanvas() {
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
+								containerHeight={ containerHeight }
 							>
 								{ resizeObserver }
 							</EditorCanvas>
