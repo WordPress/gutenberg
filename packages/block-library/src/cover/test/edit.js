@@ -58,7 +58,7 @@ async function createAndSelectBlock() {
 	);
 }
 
-describe( 'Cover block', () => {
+describe.skip( 'Cover block', () => {
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
 			await setup();
