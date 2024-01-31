@@ -188,7 +188,8 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								label={ __( 'Focal point picker' ) }
+								__next40pxDefaultSize
+								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
 								onDragStart={ imperativeFocalPointPreview }

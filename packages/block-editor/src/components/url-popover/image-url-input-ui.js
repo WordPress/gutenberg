@@ -241,11 +241,11 @@ const ImageURLInputUI = ( {
 			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Add link' ) }
+				label={ __( 'Link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
-				isActive={ !! url }
+				isActive={ !! url || lightboxEnabled }
 			/>
 			{ isOpen && (
 				<URLPopover

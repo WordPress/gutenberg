@@ -798,6 +798,20 @@
 				}
 			]
 		},
+		"viewStyle": {
+			"description": "Block type frontend style definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
 		"variations": {
 			"type": "array",
 			"description": "Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality.",

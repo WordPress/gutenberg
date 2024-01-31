@@ -6,10 +6,6 @@
  * @since 5.8.0
  */
 
-if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Class that encapsulates the processing of structures that adhere to the theme.json spec.
  *
@@ -155,7 +151,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'              => array( 'typography', 'fontSizes' ),
-			'prevent_override'  => array( 'typography', 'defaultFontSizes' ),
+			'prevent_override'  => false,
 			'use_default_names' => true,
 			'value_func'        => 'gutenberg_get_typography_font_size_value',
 			'css_vars'          => '--wp--preset--font-size--$slug',
@@ -413,20 +409,19 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'typography'                    => array(
-			'fluid'            => null,
-			'customFontSize'   => null,
-			'defaultFontSizes' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'lineHeight'       => null,
-			'textColumns'      => null,
-			'textDecoration'   => null,
-			'textTransform'    => null,
-			'writingMode'      => null,
+			'fluid'          => null,
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textColumns'    => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 	);
 

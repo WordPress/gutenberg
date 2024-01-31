@@ -9,15 +9,15 @@
 
 namespace GutenbergCS\Gutenberg\Tests\CodeAnalysis;
 
-use GutenbergCS\Gutenberg\Sniffs\CodeAnalysis\GuardedFunctionAndClassNamesSniff;
+use GutenbergCS\Gutenberg\Sniffs\CodeAnalysis\ForbiddenFunctionsAndClassesSniff;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 use PHP_CodeSniffer\Ruleset;
 
 /**
- * Unit test class for the GuardedFunctionAndClassNames sniff.
+ * Unit test class for the ForbiddenFunctionsAndClassesSniff sniff.
  */
-final class GuardedFunctionAndClassNamesUnitTest extends AbstractSniffUnitTest {
+final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Holds the original Ruleset instance.
@@ -33,10 +33,33 @@ final class GuardedFunctionAndClassNamesUnitTest extends AbstractSniffUnitTest {
 	 */
 	public function getErrorList() {
 		return array(
+			3  => 1,
+			5  => 1,
 			7  => 1,
-			17 => 1,
-			25 => 1,
+			9  => 1,
+			11 => 1,
+
+			16 => 1,
+			18 => 1,
+			20 => 1,
+			22 => 1,
+			24 => 1,
+
+			33 => 1,
 			35 => 1,
+			37 => 1,
+			39 => 1,
+			41 => 1,
+
+			46 => 1,
+			47 => 1,
+			65 => 1,
+			66 => 1,
+
+			70 => 1,
+			71 => 1,
+			89 => 1,
+			90 => 1,
 		);
 	}
 
@@ -64,7 +87,7 @@ final class GuardedFunctionAndClassNamesUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Prepares the environment before executing tests. Specifically, sets prefixes for the
-	 * GuardedFunctionAndClassNames sniff.This is needed since AbstractSniffUnitTest class
+	 * ForbiddenFunctionsAndClassesSniff sniff.This is needed since AbstractSniffUnitTest class
 	 * doesn't apply sniff properties from the Gutenberg/ruleset.xml file.
 	 *
 	 * @param string $filename The name of the file being tested.
@@ -87,20 +110,19 @@ final class GuardedFunctionAndClassNamesUnitTest extends AbstractSniffUnitTest {
 		$current_ruleset                                  = clone self::$original_ruleset;
 		$GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] = $current_ruleset;
 
-		if ( ! isset( $current_ruleset->sniffs[ GuardedFunctionAndClassNamesSniff::class ] )
-			|| ( ! $current_ruleset->sniffs[ GuardedFunctionAndClassNamesSniff::class ] instanceof GuardedFunctionAndClassNamesSniff )
+		if ( ! isset( $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] )
+			|| ( ! $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] instanceof ForbiddenFunctionsAndClassesSniff )
 		) {
 			throw new \RuntimeException( 'Cannot set ruleset parameters required for this test.' );
 		}
 
-		$sniff                     = $current_ruleset->sniffs[ GuardedFunctionAndClassNamesSniff::class ];
-		$sniff->functionsWhiteList = array(
-			'/^_?gutenberg.+/',
+		$sniff                      = $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ];
+		$sniff->forbidden_functions = array(
+			'[Gg]utenberg.*',
 		);
 
-		$sniff->classesWhiteList = array(
-			'/^Gutenberg.+/',
-			'/^.+_Gutenberg$/',
+		$sniff->forbidden_classes = array(
+			'[Gg]utenberg.*',
 		);
 	}
 }

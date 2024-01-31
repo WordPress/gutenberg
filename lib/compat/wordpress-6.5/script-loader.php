@@ -10,14 +10,15 @@
  * Changes to the inline script output should be synced with Core in the file
  * src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
  *
- * @since 6.5.0
+ * @since 6.4.0 Added relative time date strings.
+ * @since 6.5.0 Added timezone offset value.
  *
  * @global WP_Locale $wp_locale WordPress date and time locale object.
  *
  * @param WP_Scripts $scripts WP_Scripts object.
  */
-function gutenberg_update_wp_date_timezone_settings( $scripts ) {
-	if ( $scripts->query( 'wp-date', 'registered' ) ) {
+function gutenberg_update_wp_date_settings( $scripts ) {
+	if ( did_action( 'init' ) && $scripts->query( 'wp-date', 'registered' ) ) {
 		global $wp_locale;
 		// Calculate the timezone abbr (EDT, PST) if possible.
 		$timezone_string = get_option( 'timezone_string', 'UTC' );
@@ -98,4 +99,4 @@ function gutenberg_update_wp_date_timezone_settings( $scripts ) {
 	}
 }
 
-add_action( 'wp_default_scripts', 'gutenberg_update_wp_date_timezone_settings' );
+add_action( 'wp_default_scripts', 'gutenberg_update_wp_date_settings' );
