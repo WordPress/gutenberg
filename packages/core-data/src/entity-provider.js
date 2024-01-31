@@ -8,7 +8,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -153,7 +153,7 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, editedBlocks, meta } = useSelect(
+	const { editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {};
@@ -162,7 +162,6 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
 				editedBlocks: editedRecord.blocks,
-				content: editedRecord.content,
 				meta: editedRecord.meta,
 			};
 		},
@@ -180,10 +179,8 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return editedBlocks;
 		}
 
-		return content && typeof content !== 'function'
-			? parse( content )
-			: EMPTY_ARRAY;
-	}, [ id, editedBlocks, content ] );
+		return EMPTY_ARRAY;
+	}, [ id, editedBlocks ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
