@@ -45,6 +45,7 @@ function WritingMenu() {
 			<PreferenceToggleMenuItem
 				scope="core"
 				name="distractionFree"
+				handleToggling={ false }
 				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }
 				info={ __( 'Write with calmness' ) }

@@ -79,6 +79,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								name="distractionFree"
 								label={ __( 'Distraction free' ) }
 								info={ __( 'Write with calmness' ) }
+								handleToggling={ false }
 								onToggle={ toggleDistractionFree }
 								messageActivated={ __(
 									'Distraction free mode activated'
