@@ -70,14 +70,17 @@ const ControlledTemplate: StoryFn< typeof NewCustomSelect > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Label',
-	defaultValue: 'Select a size...',
+	defaultValue: 'Select a color...',
 	children: (
 		<>
-			<CustomSelectItem value="Small">
-				<span style={ { fontSize: '75%' } }>Small</span>
+			<CustomSelectItem value="Blue">
+				<span style={ { color: 'blue' } }>Blue</span>
 			</CustomSelectItem>
-			<CustomSelectItem value="Something bigger">
-				<span style={ { fontSize: '200%' } }>Something bigger</span>
+			<CustomSelectItem value="Purple">
+				<span style={ { color: 'purple' } }>Purple</span>
+			</CustomSelectItem>
+			<CustomSelectItem value="Pink">
+				<span style={ { color: 'deeppink' } }>Pink</span>
 			</CustomSelectItem>
 		</>
 	),
