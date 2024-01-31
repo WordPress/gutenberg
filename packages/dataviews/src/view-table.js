@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { isAppleOS } from '@wordpress/keycodes';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
@@ -34,6 +35,9 @@ import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
 import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
@@ -381,6 +385,191 @@ function SingleSelectionCheckbox( {
 	);
 }
 
+let currentRowToggleState = null;
+const actionTypeAttribute = 'data-action-type';
+
+function getActionByProximity( context, target, indexDiff ) {
+	const actions = Array.from(
+		context?.querySelectorAll( `[${ actionTypeAttribute }]` )
+	);
+	if ( ! actions ) return;
+	const index = actions.findIndex( ( el ) => el === target );
+	const proximalIndex =
+		( index + indexDiff + actions.length ) % actions.length;
+	return actions[ proximalIndex ];
+}
+
+function getPreviousAction( context, target ) {
+	return getActionByProximity( context, target, -1 );
+}
+
+function getNextAction( context, target ) {
+	return getActionByProximity( context, target, 1 );
+}
+
+function TableRow( {
+	compositeStore,
+	data,
+	getItemId,
+	index,
+	item,
+	isSelectable,
+	selection,
+	onSelectionChange,
+	...props
+} ) {
+	const ref = useRef( null );
+	const id = getItemId( item );
+	const isSelected = isSelectable && selection.includes( id );
+	const className = classnames( 'dataviews-view-table__row', {
+		'is-selected': isSelected,
+	} );
+	const onKeyDown = ( event ) => {
+		const { key, altKey, ctrlKey, metaKey, shiftKey, target, repeat } =
+			event;
+		const actionType = target.getAttribute( actionTypeAttribute );
+
+		if ( target !== ref.current ) {
+			// We're currently focused on a child of this row
+
+			if ( ! shiftKey ) {
+				// This is rather naive, and may need revisiting as we
+				// add further functionality to data views, but ideally
+				// interactive child elements would `preventDefault`
+				// to remove conflicts anyway.
+
+				if ( key === 'Escape' ) {
+					event.preventDefault();
+					ref.current.focus();
+				} else if ( key === 'ArrowLeft' && actionType ) {
+					event.preventDefault();
+					getPreviousAction( ref.current, target )?.focus();
+				} else if ( key === 'ArrowRight' && actionType ) {
+					event.preventDefault();
+					getNextAction( ref.current, target )?.focus();
+				} else if ( key === 'ArrowUp' ) {
+					event.preventDefault();
+					compositeStore.move( compositeStore.previous() );
+				} else if ( key === 'ArrowDown' ) {
+					event.preventDefault();
+					compositeStore.move( compositeStore.next() );
+				}
+			}
+		}
+
+		// Everything below this deals with selecting the table row
+		if ( ! isSelectable ) return;
+
+		if ( key === ' ' && ! repeat && ! actionType ) {
+			// Toggle the selected state of the row on `space`, and keep
+			// track of the action in case of multi-row selection.
+			currentRowToggleState = ! isSelected;
+			onSelectionChange(
+				data.filter( ( _item ) => {
+					const itemId = getItemId( _item );
+					return id === itemId
+						? ! isSelected
+						: selection.includes( itemId );
+				} )
+			);
+			event.preventDefault();
+		} else if (
+			( key === 'ArrowDown' || key === 'ArrowUp' ) &&
+			shiftKey &&
+			! isSelected
+		) {
+			// Shift+{Up,Down} selects this row, as well as the next one
+			// (handled in `onKeyUp` below)
+			onSelectionChange(
+				data.filter( ( _item ) => {
+					const itemId = getItemId( _item );
+					return id === itemId || selection.includes( itemId );
+				} )
+			);
+		} else if (
+			key === 'a' &&
+			! shiftKey &&
+			! altKey &&
+			! ( isAppleOS() ? ctrlKey : metaKey ) &&
+			( isAppleOS() ? metaKey : ctrlKey )
+		) {
+			// {Ctrl,Cmd}+a selects all the rows (provided no other
+			// modifier key was pressed).
+			onSelectionChange( data );
+			event.preventDefault();
+		}
+	};
+	const onKeyUp = isSelectable
+		? ( event ) => {
+				const { key, shiftKey, target, repeat } = event;
+
+				// Bail if the event wasn't triggered on the row itself.
+				if ( target !== ref.current ) return;
+
+				if ( key === ' ' && ! repeat ) {
+					// Clear any current toggle action
+					currentRowToggleState = null;
+				} else if (
+					( key === 'ArrowDown' || key === 'ArrowUp' ) &&
+					( shiftKey || currentRowToggleState !== null )
+				) {
+					// If the user arrowed into the row, and either the shift
+					// key was engaged, or a selection action is underway,
+					// change the selection appropriately.
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId( _item );
+							if ( currentRowToggleState === false ) {
+								return (
+									id !== itemId &&
+									selection.includes( itemId )
+								);
+							}
+							return (
+								id === itemId || selection.includes( itemId )
+							);
+						} )
+					);
+					event.preventDefault();
+				}
+		  }
+		: undefined;
+	const onFocus = ( event ) => {
+		const { target, relatedTarget } = event;
+		const originActionType =
+			relatedTarget?.getAttribute( actionTypeAttribute );
+
+		// Bail if the event wasn't triggered on the row itself, or if
+		// the origin isn't an action toggle.
+		if ( target !== ref.current || ! originActionType ) return;
+
+		// Bail if the event is happening inside of the current row.
+		if ( ref.current.contains( relatedTarget ) ) return;
+
+		const correlatedTarget = target.querySelector(
+			`[${ actionTypeAttribute }="${ originActionType }"]`
+		);
+
+		// If there's a matching action in the current row, focus that
+		// instead of the row itself.
+		correlatedTarget?.focus();
+	};
+
+	return (
+		<CompositeItem
+			ref={ ref }
+			onKeyDown={ onKeyDown }
+			onKeyUp={ onKeyUp }
+			onFocus={ onFocus }
+			aria-selected={ isSelectable ? isSelected : undefined }
+			render={ <tr /> }
+			className={ className }
+			tabIndex={ -1 }
+			{ ...props }
+		/>
+	);
+}
+
 function ViewTable( {
 	view,
 	onChangeView,
@@ -407,6 +596,10 @@ function ViewTable( {
 
 	const asyncData = useAsyncList( data );
 	const tableNoticeId = useId();
+	const compositeStore = useCompositeStore( {
+		rtl: isRTL(),
+		orientation: 'vertical',
+	} );
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -438,7 +631,9 @@ function ViewTable( {
 
 	return (
 		<div className="dataviews-view-table-wrapper">
-			<table
+			<Composite
+				store={ compositeStore }
+				render={ <table /> }
 				className="dataviews-view-table"
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
@@ -520,16 +715,15 @@ function ViewTable( {
 				<tbody>
 					{ hasData &&
 						usedData.map( ( item, index ) => (
-							<tr
+							<TableRow
 								key={ getItemId( item ) }
-								className={ classnames(
-									'dataviews-view-table__row',
-									{
-										'is-selected': selection.includes(
-											getItemId( item ) || index
-										),
-									}
-								) }
+								data={ data }
+								getItemId={ getItemId }
+								item={ item }
+								isSelectable={ hasBulkActions }
+								selection={ selection }
+								onSelectionChange={ onSelectionChange }
+								compositeStore={ compositeStore }
 							>
 								{ hasBulkActions && (
 									<td
@@ -556,33 +750,44 @@ function ViewTable( {
 										</div>
 									</td>
 								) }
-								{ visibleFields.map( ( field ) => (
-									<td
-										key={ field.id }
-										style={ {
-											width: field.width || undefined,
-											minWidth:
-												field.minWidth || undefined,
-											maxWidth:
-												field.maxWidth || undefined,
-										} }
-									>
-										<div
-											className={ classnames(
-												'dataviews-view-table__cell-content-wrapper',
-												{
-													'dataviews-view-table__primary-field':
-														primaryField?.id ===
-														field.id,
-												}
-											) }
+								{ visibleFields.map( ( field ) => {
+									const isPrimaryField =
+										primaryField?.id === field.id;
+									const CellType = isPrimaryField
+										? 'th'
+										: 'td';
+									const scope = isPrimaryField
+										? 'row'
+										: undefined;
+
+									return (
+										<CellType
+											key={ field.id }
+											scope={ scope }
+											style={ {
+												width: field.width || undefined,
+												minWidth:
+													field.minWidth || undefined,
+												maxWidth:
+													field.maxWidth || undefined,
+											} }
 										>
-											{ field.render( {
-												item,
-											} ) }
-										</div>
-									</td>
-								) ) }
+											<div
+												className={ classnames(
+													'dataviews-view-table__cell-content-wrapper',
+													{
+														'dataviews-view-table__primary-field':
+															isPrimaryField,
+													}
+												) }
+											>
+												{ field.render( {
+													item,
+												} ) }
+											</div>
+										</CellType>
+									);
+								} ) }
 								{ !! actions?.length && (
 									<td className="dataviews-view-table__actions-column">
 										<ItemActions
@@ -591,10 +796,10 @@ function ViewTable( {
 										/>
 									</td>
 								) }
-							</tr>
+							</TableRow>
 						) ) }
 				</tbody>
-			</table>
+			</Composite>
 			<div
 				className={ classnames( {
 					'dataviews-loading': isLoading,

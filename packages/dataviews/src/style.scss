@@ -125,8 +125,16 @@
 			border-bottom: 0;
 		}
 
-		&:hover {
+		&:hover,
+		&:focus-visible {
 			background-color: #f8f8f8;
+		}
+
+		&:focus-visible {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
 		}
 
 		.components-checkbox-control__input {
@@ -174,6 +182,7 @@
 		}
 	}
 	tbody {
+		th,
 		td {
 			vertical-align: top;
 		}
