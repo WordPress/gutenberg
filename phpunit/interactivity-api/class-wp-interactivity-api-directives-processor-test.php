@@ -699,7 +699,6 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
 		$this->assertFalse( $p->next_balanced_tag_closer_tag() );
-		$this->assertFalse( $p->next_balanced_tag_closer_tag() );
 	}
 
 	/**
