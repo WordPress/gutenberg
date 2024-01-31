@@ -47,6 +47,7 @@ export function useHasBorderPanel( settings ) {
 		useHasBorderRadiusControl( settings ),
 		useHasBorderStyleControl( settings ),
 		useHasBorderWidthControl( settings ),
+		useHasShadowControl( settings ),
 	];
 
 	return controls.some( Boolean );
