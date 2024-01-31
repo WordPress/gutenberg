@@ -19,13 +19,7 @@ function getPreviewUrl( fontFace ) {
 	}
 }
 
-function FontFaceDemo( {
-	customPreviewUrl,
-	fontFace,
-	text,
-	onClick,
-	style = {},
-} ) {
+function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 	const ref = useRef( null );
 	const [ isIntersecting, setIsIntersecting ] = useState( false );
 	const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );
@@ -49,9 +43,6 @@ function FontFaceDemo( {
 		height: '23px',
 		width: 'auto',
 	};
-	const containerStyle = {
-		cursor: 'pointer',
-	};
 
 	useEffect( () => {
 		const observer = new window.IntersectionObserver( ( [ entry ] ) => {
@@ -74,14 +65,7 @@ function FontFaceDemo( {
 	}, [ fontFace, isIntersecting, loadFontFaceAsset, isPreviewImage ] );
 
 	return (
-		<div
-			ref={ ref }
-			onClick={ onClick }
-			onKeyDown={ onClick }
-			tabIndex={ -1 }
-			role="button"
-			style={ containerStyle }
-		>
+		<div ref={ ref }>
 			{ isPreviewImage ? (
 				<img
 					src={ previewUrl }

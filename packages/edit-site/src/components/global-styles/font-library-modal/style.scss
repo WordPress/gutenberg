@@ -63,15 +63,6 @@
 	border: 1px solid $gray-200;
 	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
-
-	// Hide the checkbox label while still allowing screen-readers to read it.
-	// Visual label is part of the `FontFaceDemo` component.
-	label {
-		display: inline-block;
-		width: 0;
-		height: 0;
-		overflow: hidden;
-	}
 }
 
 .font-library-modal__font-variant {
