@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo } from '@wordpress/element';
+import { createContext, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, chevronDown } from '@wordpress/icons';
 
@@ -58,6 +58,7 @@ const UnconnectedCustomSelectButton = (
 ) => {
 	const {
 		renderSelectedValue,
+		setUnmountOnHide,
 		size = 'default',
 		store,
 		...restProps
@@ -76,6 +77,12 @@ const UnconnectedCustomSelectButton = (
 			size={ size }
 			hasCustomRenderProp={ !! renderSelectedValue }
 			store={ store }
+			moveOnKeyDown
+			showOnKeyDown={ false }
+			// mount component onFocus to keep selection on keydown behavior
+			// see https://github.com/WordPress/gutenberg/pull/57902#discussion_r1473087447
+			onFocus={ () => setUnmountOnHide?.( false ) }
+			onBlur={ () => setUnmountOnHide?.( true ) }
 		>
 			<div>{ computedRenderSelectedValue( currentValue ) }</div>
 			<Icon icon={ chevronDown } size={ 18 } />
@@ -97,6 +104,8 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 		...restProps
 	} = props;
 
+	const [ unmountOnHide, setUnmountOnHide ] = useState( true );
+
 	return (
 		<>
 			{ hideLabelFromVision ? (
@@ -106,12 +115,16 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 					{ label }
 				</Styled.CustomSelectLabel>
 			) }
-			<CustomSelectButton { ...restProps } store={ store } />
+			<CustomSelectButton
+				{ ...restProps }
+				setUnmountOnHide={ setUnmountOnHide }
+				store={ store }
+			/>
 			<Styled.CustomSelectPopover
 				gutter={ 12 }
 				store={ store }
 				sameWidth
-				unmountOnHide
+				unmountOnHide={ unmountOnHide }
 			>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
