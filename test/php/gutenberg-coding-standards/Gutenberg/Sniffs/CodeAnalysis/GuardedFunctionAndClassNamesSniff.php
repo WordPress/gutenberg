@@ -171,7 +171,7 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 					$className
 				);
 
-				$phpcsFile->addError( $incorrect_guarded_error_message, $classToken, 'ClassIncorrectlyGuardedAgainstRedeclaration' );
+				$phpcsFile->addError( $incorrect_guarded_error_message, $classToken, 'ClassNotProperlyGuardedAgainstRedeclaration' );
 				return;
 			}
 		}
