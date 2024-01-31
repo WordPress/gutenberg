@@ -8,7 +8,7 @@
  * @group fonts
  * @group font-library
  *
- * @covers wp_get_font_dir
+ * @covers ::wp_get_font_dir
  */
 class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 	private $dir_defaults;
