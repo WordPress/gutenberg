@@ -740,15 +740,23 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				$inner_content    = $p->get_content_between_balanced_tags();
 
 				/*
-				 * It doesn't process associative arrays because those will be deserialized
-				 * as objects in JS.
+				 * It doesn't process associative arrays because those will be
+				 * deserialized as objects in JS.
+				 *
+				 * It doesn't process empty or non-array values.
 				 *
 				 * It doesn't process templates that contain top-level texts because
-				 * those texts can't be identified to be removed in the client.
-				 * Note: there might be top-level texts in between balanced tags, but
-				 * those cannot be identified at this moment.
+				 * those texts can't be identified to be removed in the client.  Note:
+				 * there might be top-level texts in between balanced tags, but those
+				 * cannot be identified at this moment.
 				 */
-				if ( ! array_is_list( $result ) || ! str_starts_with( $inner_content, '<' ) || ! str_ends_with( $inner_content, '>' ) ) {
+				if (
+					empty( $result ) ||
+					! is_array( $result ) ||
+					! array_is_list( $result ) ||
+					! str_starts_with( $inner_content, '<' ) ||
+					! str_ends_with( $inner_content, '>' )
+				) {
 					return;
 				}
 

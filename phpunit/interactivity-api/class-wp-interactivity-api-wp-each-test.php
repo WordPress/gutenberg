@@ -513,4 +513,43 @@ class Tests_WP_Interactivity_API_WP_Each extends WP_UnitTestCase {
 		$new      = $this->interactivity->process_directives( $original );
 		$this->assertEquals( $original, $new );
 	}
+
+	/**
+	 * Tests that the `data-wp-each` directive doesn't process if it doesn't get
+	 * an array.
+	 *
+	 * @covers ::process_directives
+	 */
+	public function test_wp_each_doesnt_process_if_not_array() {
+		$original = '' .
+			'<template data-wp-each="myPlugin::state.list">' .
+				'<span data-wp-text="myPlugin::context.item"></span>' .
+			'</template>' .
+			'<div data-wp-bind--id="myPlugin::state.after">Text</div>';
+		$expected = '' .
+			'<template data-wp-each="myPlugin::state.list">' .
+				'<span data-wp-text="myPlugin::context.item"></span>' .
+			'</template>' .
+			'<div id="after-wp-each" data-wp-bind--id="myPlugin::state.after">Text</div>';
+
+		$this->interactivity->state( 'myPlugin', array( 'list' => null ) );
+		$new = $this->interactivity->process_directives( $original );
+		$this->assertEquals( $expected, $new );
+
+		$this->interactivity->state( 'myPlugin', array( 'list' => 'Text' ) );
+		$new = $this->interactivity->process_directives( $original );
+		$this->assertEquals( $expected, $new );
+
+		$this->interactivity->state( 'myPlugin', array( 'list' => 100 ) );
+		$new = $this->interactivity->process_directives( $original );
+		$this->assertEquals( $expected, $new );
+
+		$this->interactivity->state( 'myPlugin', array( 'list' => false ) );
+		$new = $this->interactivity->process_directives( $original );
+		$this->assertEquals( $expected, $new );
+
+		$this->interactivity->state( 'myPlugin', array( 'list' => true ) );
+		$new = $this->interactivity->process_directives( $original );
+		$this->assertEquals( $expected, $new );
+	}
 }
