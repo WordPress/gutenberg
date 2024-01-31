@@ -435,3 +435,32 @@ describe.each( [
 		} );
 	} );
 } );
+
+describe( 'static typing', () => {
+	<>
+		{ /* @ts-expect-error - when `options` prop is passed, `onChange` should have legacy signature */ }
+		<CustomSelect
+			label="foo"
+			options={ [] }
+			onChange={ ( _: string | string[] ) => undefined }
+		/>
+		<CustomSelect
+			label="foo"
+			options={ [] }
+			onChange={ ( _: { selectedItem: unknown } ) => undefined }
+		/>
+		<CustomSelect
+			label="foo"
+			onChange={ ( _: string | string[] ) => undefined }
+		>
+			foobar
+		</CustomSelect>
+		{ /* @ts-expect-error - when `children` are passed, `onChange` should have new default signature */ }
+		<CustomSelect
+			label="foo"
+			onChange={ ( _: { selectedItem: unknown } ) => undefined }
+		>
+			foobar
+		</CustomSelect>
+	</>;
+} );
