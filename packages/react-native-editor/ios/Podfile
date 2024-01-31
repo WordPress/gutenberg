@@ -4,7 +4,7 @@ require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 # Uncomment the next line to define a global platform for your project
-app_ios_deployment_target = Gem::Version.new('13.0')
+app_ios_deployment_target = Gem::Version.new('13.4')
 platform :ios, app_ios_deployment_target.version
 install! 'cocoapods', min_ios_version_supported
 prepare_react_native_project!
