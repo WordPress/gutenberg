@@ -402,6 +402,19 @@ class Tests_WP_Interactivity_API_WP_Each extends WP_UnitTestCase {
 			'</template>';
 		$new      = $this->interactivity->process_directives( $original );
 		$this->assertEquals( $original, $new );
+
+		// But it should work fine with spaces and linebreaks.
+		$original = '
+			<template data-wp-each="myPlugin::state.list">
+				<span class="test" data-wp-bind--id="myPlugin::context.item"></span>
+			</template>';
+		$new      = $this->interactivity->process_directives( $original );
+		$p = new WP_HTML_Tag_Processor( $new );
+		$p->next_tag( array( 'class_name' => 'test' ) );
+		$p->next_tag( array( 'class_name' => 'test' ) );
+		$this->assertEquals( '1', $p->get_attribute( 'id') );
+		$p->next_tag( array( 'class_name' => 'test' ) );
+		$this->assertEquals( '2', $p->get_attribute( 'id') );
 	}
 
 	/**

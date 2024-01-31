@@ -754,8 +754,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					empty( $result ) ||
 					! is_array( $result ) ||
 					! array_is_list( $result ) ||
-					! str_starts_with( $inner_content, '<' ) ||
-					! str_ends_with( $inner_content, '>' )
+					! str_starts_with( trim( $inner_content ), '<' ) ||
+					! str_ends_with( trim( $inner_content ), '>' )
 				) {
 					return;
 				}
