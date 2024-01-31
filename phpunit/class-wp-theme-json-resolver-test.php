@@ -586,7 +586,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array(
-				'page-home' => array(
+				'page-home'                   => array(
 					'title'     => 'Homepage',
 					'postTypes' => array( 'page' ),
 				),
@@ -637,7 +637,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			$this->assertSameSets( $user_cpt, $new_user_cpt, "User CPTs do not match on run {$i}." );
 		}
 		$this->assertSame( 1, $global_styles_query_count, 'Unexpected SQL queries detected for the wp_global_style post type after creation.' );
-
 	}
 
 	/**
@@ -838,7 +837,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
-		$styles = array_filter(
+		$styles     = array_filter(
 			$styles,
 			static function ( $element ) {
 				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
