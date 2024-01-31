@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect, select } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -34,7 +34,19 @@ const TagsPanel = () => {
 	);
 };
 
-const MaybeTagsPanel = ( { hasTags } ) => {
+const MaybeTagsPanel = () => {
+	const { tags } = useSelect( ( _select ) => {
+		const tagsTaxonomy = _select( coreStore ).getTaxonomy( 'post_tag' );
+		const _tags =
+			tagsTaxonomy &&
+			_select( editorStore ).getEditedPostAttribute(
+				tagsTaxonomy.rest_base
+			);
+		return {
+			tags: _tags,
+		};
+	}, [] );
+	const hasTags = tags && tags.length;
 	const [ hadTagsWhenOpeningThePanel ] = useState( hasTags );
 
 	/*
@@ -55,24 +67,14 @@ const MaybeTagsPanel = ( { hasTags } ) => {
 };
 
 export default compose(
-	withSelect( ( select ) => {
+	ifCondition( () => {
 		const postType = select( editorStore ).getCurrentPostType();
 		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
-		const tags =
+		const isPostTypeSupported =
 			tagsTaxonomy &&
-			select( editorStore ).getEditedPostAttribute(
-				tagsTaxonomy.rest_base
-			);
-		return {
-			areTagsFetched: tagsTaxonomy !== undefined,
-			isPostTypeSupported:
-				tagsTaxonomy &&
-				tagsTaxonomy.types.some( ( type ) => type === postType ),
-			hasTags: tags && tags.length,
-		};
-	} ),
-	ifCondition(
-		( { areTagsFetched, isPostTypeSupported } ) =>
-			isPostTypeSupported && areTagsFetched
-	)
+			tagsTaxonomy.types.some( ( type ) => type === postType );
+		const areTagsFetched = tagsTaxonomy !== undefined;
+
+		return isPostTypeSupported && areTagsFetched;
+	} )
 )( MaybeTagsPanel );
