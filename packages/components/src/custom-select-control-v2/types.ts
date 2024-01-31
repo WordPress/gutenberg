@@ -86,9 +86,11 @@ type Option = {
  * The legacy object returned from the onChange event.
  */
 type LegacyOnChangeObject = {
-	selectedItem: Option;
 	highlightedIndex?: number;
+	inputValue?: string;
 	isOpen?: boolean;
+	type?: string;
+	selectedItem: Option;
 };
 
 export type LegacyCustomSelectProps = {
