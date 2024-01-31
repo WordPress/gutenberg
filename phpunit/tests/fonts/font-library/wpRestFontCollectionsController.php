@@ -152,13 +152,13 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 5, $properties );
-		$this->assertArrayHasKey( 'slug', $properties );
-		$this->assertArrayHasKey( 'name', $properties );
-		$this->assertArrayHasKey( 'description', $properties );
-		$this->assertArrayHasKey( 'font_families', $properties );
-		$this->assertArrayHasKey( 'categories', $properties );
+		$this->assertCount( 5, $properties, 'There should be 5 properties in the response data schema.' );
+		$this->assertArrayHasKey( 'slug', $properties, 'The slug property should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'name', $properties, 'The name property should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'description', $properties, 'The description property should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'font_families', $properties, 'The slug font_families should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'categories', $properties, 'The categories property should exist in the response data schema.' );
 	}
 }

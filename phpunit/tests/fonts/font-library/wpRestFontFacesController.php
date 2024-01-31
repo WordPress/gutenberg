@@ -151,9 +151,10 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
-		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
-		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+		$endpoint_data = $data['endpoints'][0];
+		$this->assertArrayNotHasKey( 'allow_batch', $endpoint_data, 'The allow_batch property should not exist in the endpoint data.' );
+		$this->assertSame( 'view', $endpoint_data['args']['context']['default'], 'The endpoint\'s args::context::default should be set to view.' );
+		$this->assertSame( array( 'view', 'embed', 'edit' ), $endpoint_data['args']['context']['enum'], 'The endpoint\'s args::context::enum should be set to [ view, embed, edit ].' );
 	}
 
 	/**
@@ -177,11 +178,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertCount( 2, $data );
-		$this->assertArrayHasKey( '_links', $data[0] );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200' );
+		$this->assertCount( 2, $data, 'There should be 2 properties in the response data.' );
+		$this->assertArrayHasKey( '_links', $data[0], 'The _links property should exist in the response data 0.' );
 		$this->check_font_face_data( $data[0], self::$font_face_id2, $data[0]['_links'] );
-		$this->assertArrayHasKey( '_links', $data[1] );
+		$this->assertArrayHasKey( '_links', $data[1], 'The _links property should exist in the response data 1.' );
 		$this->check_font_face_data( $data[1], self::$font_face_id1, $data[1]['_links'] );
 	}
 
@@ -192,11 +193,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 401, 'The response should return an error with a "rest_cannot_read" code and 401 status.' );
 
 		wp_set_current_user( self::$editor_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 403, 'The response should return an error with a "rest_cannot_read" code and 403 status.' );
 	}
 
 	/**
@@ -218,7 +219,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->check_font_face_data( $data, self::$font_face_id1, $response->get_links() );
 	}
 
@@ -233,8 +234,9 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertArrayNotHasKey( 'extra', $data['font_face_settings'] );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
+		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in the response data.' );
+		$this->assertArrayNotHasKey( 'extra', $data['font_face_settings'], 'The extra property should exist in the font_face_settings data.' );
 	}
 
 	/**
@@ -260,8 +262,9 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( $empty_settings, $data['font_face_settings'] );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
+		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in the response data.' );
+		$this->assertSame( $empty_settings, $data['font_face_settings'], 'The empty settings should exist in the font_face_settings data.' );
 
 		wp_delete_post( $font_face_id, true );
 	}
@@ -284,11 +287,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$request = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . self::$font_face_id1 );
 
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 401, 'The response should return an error with a "rest_cannot_read" code and 401 status.' );
 
 		wp_set_current_user( self::$editor_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 403, 'The response should return an error with a "rest_cannot_read" code and 403 status.' );
 	}
 
 	/**
@@ -311,7 +314,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->assertSame( self::$font_family_id, $data['parent'], 'The returned parent id should match the font family id.' );
 	}
 
@@ -353,7 +356,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
 		$this->check_file_meta( $data['id'], array( $data['font_face_settings']['src'] ) );
 
@@ -365,7 +368,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 				'fontFamily' => '"Open Sans"',
 				'fontWeight' => '200',
 				'fontStyle'  => 'normal',
-			)
+			),
+			'The font_face_settings data should match the expected data.'
 		);
 
 		$this->assertSame( self::$font_family_id, $data['parent'], 'The returned parent id should match the font family id.' );
@@ -398,12 +402,12 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
 		$this->check_file_meta( $data['id'], $data['font_face_settings']['src'] );
 
 		$settings = $data['font_face_settings'];
-		$this->assertCount( 4, $settings['src'] );
+		$this->assertCount( 4, $settings['src'], 'There should be 4 items in the font_face_settings::src data.' );
 
 		wp_delete_post( $data['id'], true );
 	}
@@ -471,7 +475,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
 
 		wp_delete_post( $data['id'], true );
@@ -508,9 +512,9 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
-		$this->assertArrayHasKey( 'font_face_settings', $data );
-		$this->assertSame( $properties, $data['font_face_settings'] );
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
+		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in the response data.' );
+		$this->assertSame( $properties, $data['font_face_settings'], 'The font_face_settings should match the expected properties.' );
 
 		wp_delete_post( $data['id'], true );
 	}
@@ -548,10 +552,10 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_duplicate_font_face', $response, 400 );
+		$this->assertErrorResponse( 'rest_duplicate_font_face', $response, 400, 'The response should return an error for "rest_duplicate_font_face" with 400 status.' );
 		$expected_message = 'A font face matching those settings already exists.';
 		$message          = $response->as_error()->get_error_messages()[0];
-		$this->assertSame( $expected_message, $message );
+		$this->assertSame( $expected_message, $message, 'The response error message should match.' );
 
 		wp_delete_post( $font_face_id, true );
 	}
@@ -576,8 +580,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
-		$this->assertArrayHasKey( 'theme_json_version', $data );
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
+		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in the response data.' );
 		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
 
 		wp_delete_post( $data['id'], true );
@@ -681,10 +685,10 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400, 'The response should return an error for "rest_invalid_param" with 400 status.' );
 		$expected_message = 'font_face_settings parameter must be a valid JSON string.';
 		$message          = $response->as_error()->get_all_error_data()[0]['params']['font_face_settings'];
-		$this->assertSame( $expected_message, $message );
+		$this->assertSame( $expected_message, $message, 'The response error message should match.' );
 	}
 
 	/**
@@ -706,10 +710,10 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400, 'The response should return an error for "rest_invalid_param" with 400 status.' );
 		$expected_message = 'File ' . array_keys( $files )[0] . ' must be used in font_face_settings[src].';
 		$message          = $response->as_error()->get_all_error_data()[0]['params']['font_face_settings'];
-		$this->assertSame( $expected_message, $message );
+		$this->assertSame( $expected_message, $message, 'The response error message should match.' );
 	}
 
 	/**
@@ -729,8 +733,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
-		$this->assertSame( $expected, $data['font_face_settings']['fontFamily'] );
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
+		$this->assertSame( $expected, $data['font_face_settings']['fontFamily'], 'The response fontFamily should match.' );
 	}
 
 	/**
@@ -779,8 +783,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$request->set_param( 'force', true );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertNull( get_post( $font_face_id ) );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 201.' );
+		$this->assertNull( get_post( $font_face_id ), 'The deleted post should not exist.' );
 	}
 
 	/**
@@ -793,15 +797,15 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		// Attempt trashing.
 		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501, 'The response should return an error for "rest_trash_not_supported" with 501 status.' );
 
 		$request->set_param( 'force', 'false' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501, 'When "force" is false, the response should return an error for "rest_trash_not_supported" with 501 status.' );
 
 		// Ensure the post still exists.
 		$post = get_post( $font_face_id );
-		$this->assertNotEmpty( $post );
+		$this->assertNotEmpty( $post, 'The post should still exists.' );
 	}
 
 	/**
@@ -835,7 +839,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$other_font_family_id . '/font-faces/' . self::$font_face_id1 );
 		$request->set_param( 'force', true );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_font_face_parent_id_mismatch', $response, 404 );
+		$this->assertErrorResponse( 'rest_font_face_parent_id_mismatch', $response, 404, 'The response should return an error for "rest_font_face_parent_id_mismatch" with 404 status.' );
 
 		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '"';
 		$this->assertSame( $expected_message, $response->as_error()->get_error_messages()[0], 'The message must contain the correct parent ID.' );
@@ -850,12 +854,12 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_delete', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 401, 'The response should return an error for "rest_cannot_delete" with 401 status for an invalid user.' );
 
 		wp_set_current_user( self::$editor_id );
 		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403, 'The response should return an error for "rest_cannot_delete" with 403 status for a user without permission.' );
 	}
 
 	/**
@@ -867,7 +871,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->check_font_face_data( $data, self::$font_face_id2, $response->get_links() );
 	}
 
@@ -879,34 +883,37 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 4, $properties );
-		$this->assertArrayHasKey( 'id', $properties );
-		$this->assertArrayHasKey( 'theme_json_version', $properties );
-		$this->assertArrayHasKey( 'parent', $properties );
-		$this->assertArrayHasKey( 'font_face_settings', $properties );
+		$this->assertCount( 4, $properties, 'There should be 4 properties in the schema::properties data.' );
+		$this->assertArrayHasKey( 'id', $properties, 'The id property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The id property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'parent', $properties, 'The id property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'font_face_settings', $properties, 'The id property should exist in the schema::properties data.' );
 	}
 
 	protected function check_font_face_data( $data, $post_id, $links ) {
 		$post = get_post( $post_id );
 
-		$this->assertArrayHasKey( 'id', $data );
-		$this->assertSame( $post->ID, $data['id'] );
+		$this->assertArrayHasKey( 'id', $data, 'The id property should exist in response data.' );
+		$this->assertSame( $post->ID, $data['id'], 'The "id" from the response data should match the post ID.' );
 
-		$this->assertArrayHasKey( 'parent', $data );
-		$this->assertSame( $post->post_parent, $data['parent'] );
+		$this->assertArrayHasKey( 'parent', $data, 'The parent property should exist in response data.' );
+		$this->assertSame( $post->post_parent, $data['parent'], 'The "parent" from the response data should match the post parent.' );
 
-		$this->assertArrayHasKey( 'theme_json_version', $data );
-		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'] );
+		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in response data.' );
+		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'], 'The "theme_json_version" from the response data should match WP_Theme_JSON::LATEST_SCHEMA.' );
 
-		$this->assertArrayHasKey( 'font_face_settings', $data );
-		$this->assertSame( $post->post_content, wp_json_encode( $data['font_face_settings'] ) );
+		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in response data.' );
+		$this->assertSame( $post->post_content, wp_json_encode( $data['font_face_settings'] ), 'The encoded "font_face_settings" from the response data should match the post content.' );
 
-		$this->assertNotEmpty( $links );
-		$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->post_parent . '/font-faces/' . $post->ID ), $links['self'][0]['href'] );
-		$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->post_parent . '/font-faces' ), $links['collection'][0]['href'] );
-		$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->post_parent ), $links['parent'][0]['href'] );
+		$this->assertNotEmpty( $links, 'The links should not be empty in the response data.' );
+		$expected = rest_url( 'wp/v2/font-families/' . $post->post_parent . '/font-faces/' . $post->ID );
+		$this->assertSame( $expected, $links['self'][0]['href'], 'The links URL from the response data should match the post\'s REST endpoint.' );
+		$expected = rest_url( 'wp/v2/font-families/' . $post->post_parent . '/font-faces' );
+		$this->assertSame( $expected, $links['collection'][0]['href'], 'The links collection URL from the response data should match the REST endpoint.' );
+		$expected = rest_url( 'wp/v2/font-families/' . $post->post_parent );
+		$this->assertSame( $expected, $links['parent'][0]['href'], 'The links for a parent URL from the response data should match the parent\'s REST endpoint.' );
 	}
 
 	protected function check_file_meta( $font_face_id, $srcs ) {

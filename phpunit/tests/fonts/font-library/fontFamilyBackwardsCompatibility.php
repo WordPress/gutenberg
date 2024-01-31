@@ -33,68 +33,68 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 		list( $font_face1, $font_face2, $font_face3 ) = $font_faces;
 
 		// Updated font family post.
-		$this->assertSame( 'wp_font_family', $font_family->post_type );
-		$this->assertSame( 'publish', $font_family->post_status );
+		$this->assertSame( 'wp_font_family', $font_family->post_type, 'The font family post type should be wp_font_family.' );
+		$this->assertSame( 'publish', $font_family->post_status, 'The font family post status should be publish.' );
 
 		$font_family_title = 'Open Sans';
-		$this->assertSame( $font_family_title, $font_family->post_title );
+		$this->assertSame( $font_family_title, $font_family->post_title, 'The font family post title should be Open Sans.' );
 
 		$font_family_slug = 'open-sans';
-		$this->assertSame( $font_family_slug, $font_family->post_name );
+		$this->assertSame( $font_family_slug, $font_family->post_name, 'The font family post name should be open-sans.' );
 
 		$font_family_content = wp_json_encode( json_decode( '{"fontFamily":"\'Open Sans\', sans-serif","preview":"https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans.svg"}', true ) );
-		$this->assertSame( $font_family_content, $font_family->post_content );
+		$this->assertSame( $font_family_content, $font_family->post_content, 'The font family post content should match.' );
 
 		$meta = get_post_meta( $font_family_id, '_gutenberg_legacy_font_family', true );
-		$this->assertSame( $legacy_content, $meta );
+		$this->assertSame( $legacy_content, $meta, 'The _gutenberg_legacy_font_family post meta content should match.' );
 
 		// First font face post.
-		$this->assertSame( 'wp_font_face', $font_face1->post_type );
-		$this->assertSame( $font_family_id, $font_face1->post_parent );
-		$this->assertSame( 'publish', $font_face1->post_status );
+		$this->assertSame( 'wp_font_face', $font_face1->post_type, 'The 1st font face post type should be wp_font_face.' );
+		$this->assertSame( $font_family_id, $font_face1->post_parent, 'The 1st font face post parent should match.' );
+		$this->assertSame( 'publish', $font_face1->post_status, 'The 1st font face post status should be publish.' );
 
 		$font_face1_title = 'open sans;normal;400;100%;U+0-10FFFF';
-		$this->assertSame( $font_face1_title, $font_face1->post_title );
-		$this->assertSame( sanitize_title( $font_face1_title ), $font_face1->post_name );
+		$this->assertSame( $font_face1_title, $font_face1->post_title, 'The 1st font face post title should match.' );
+		$this->assertSame( sanitize_title( $font_face1_title ), $font_face1->post_name, 'The 1st font face post name should match.' );
 
 		$font_face1_content = wp_json_encode( json_decode( '{"fontFamily":"Open Sans","fontStyle":"normal","fontWeight":"400","preview":"https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg","src":"https://fonts.gstatic.com/s/opensans/v35/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0C4nY1M2xLER.ttf"}' ) );
-		$this->assertSame( $font_face1_content, $font_face1->post_content );
+		$this->assertSame( $font_face1_content, $font_face1->post_content, 'The 1st font face post content should match.' );
 
 		// With a remote url, file post meta should not be set.
 		$meta = get_post_meta( $font_face1->ID, '_wp_font_face_file', true );
-		$this->assertSame( '', $meta );
+		$this->assertSame( '', $meta, 'The _wp_font_face_file post meta for the 1st font face should be an empty string.' );
 
 		// Second font face post.
-		$this->assertSame( 'wp_font_face', $font_face2->post_type );
-		$this->assertSame( $font_family_id, $font_face2->post_parent );
-		$this->assertSame( 'publish', $font_face2->post_status );
+		$this->assertSame( 'wp_font_face', $font_face2->post_type, 'The 2nd font face post type should be wp_font_face.' );
+		$this->assertSame( $font_family_id, $font_face2->post_parent, 'The 2md font face post type should be wp_font_face.' );
+		$this->assertSame( 'publish', $font_face2->post_status, 'The 2nd font face post status should be publish.' );
 
 		$font_face2_title = 'open sans;italic;400;100%;U+0-10FFFF';
-		$this->assertSame( $font_face2_title, $font_face2->post_title );
-		$this->assertSame( sanitize_title( $font_face2_title ), $font_face2->post_name );
+		$this->assertSame( $font_face2_title, $font_face2->post_title, 'The 2nd font face post title should match.' );
+		$this->assertSame( sanitize_title( $font_face2_title ), $font_face2->post_name, 'The 2nd font face post name should match.' );
 
 		$font_face2_content = wp_json_encode( json_decode( '{"fontFamily":"Open Sans","fontStyle":"italic","fontWeight":"400","preview":"https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-italic.svg","src":"https://fonts.gstatic.com/s/opensans/v35/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkaVcUwaERZjA.ttf"}' ) );
-		$this->assertSame( $font_face2_content, $font_face2->post_content );
+		$this->assertSame( $font_face2_content, $font_face2->post_content, 'The 2nd font face post content should match.' );
 
 		// With a remote url, file post meta should not be set.
 		$meta = get_post_meta( $font_face2->ID, '_wp_font_face_file', true );
-		$this->assertSame( '', $meta );
+		$this->assertSame( '', $meta, 'The _wp_font_face_file post meta for the 2nd font face should be an empty string.' );
 
 		// Third font face post.
-		$this->assertSame( 'wp_font_face', $font_face3->post_type );
-		$this->assertSame( $font_family_id, $font_face3->post_parent );
-		$this->assertSame( 'publish', $font_face3->post_status );
+		$this->assertSame( 'wp_font_face', $font_face3->post_type, 'The 3rd font face post type should be wp_font_face.' );
+		$this->assertSame( $font_family_id, $font_face3->post_parent, 'The 3rd font face post type should be wp_font_face.' );
+		$this->assertSame( 'publish', $font_face3->post_status, 'The 3rd font face post status should be publish.' );
 
 		$font_face3_title = 'open sans;normal;700;100%;U+0-10FFFF';
-		$this->assertSame( $font_face3_title, $font_face3->post_title );
-		$this->assertSame( sanitize_title( $font_face3_title ), $font_face3->post_name );
+		$this->assertSame( $font_face3_title, $font_face3->post_title, 'The 3rd font face post title should match.' );
+		$this->assertSame( sanitize_title( $font_face3_title ), $font_face3->post_name, 'The 3rd font face post name should match.' );
 
 		$font_face3_content = wp_json_encode( json_decode( '{"fontFamily":"Open Sans","fontStyle":"normal","fontWeight":"700","preview":"https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-700-normal.svg","src":"https://fonts.gstatic.com/s/opensans/v35/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsg-1y4nY1M2xLER.ttf"}' ) );
-		$this->assertSame( $font_face3_content, $font_face3->post_content );
+		$this->assertSame( $font_face3_content, $font_face3->post_content, 'The 3rd font face post content should match.' );
 
 		// With a remote url, file post meta should not be set.
 		$meta = get_post_meta( $font_face3->ID, '_wp_font_face_file', true );
-		$this->assertSame( '', $meta );
+		$this->assertSame( '', $meta, 'The _wp_font_face_file post meta for the 3rd font face should be an empty string.' );
 
 		wp_delete_post( $font_family_id, true );
 		wp_delete_post( $font_face1->ID, true );
@@ -110,13 +110,13 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 		gutenberg_convert_legacy_font_family_format();
 
 		$font_faces = $this->get_font_faces( $font_family_id );
-		$this->assertCount( 1, $font_faces );
+		$this->assertCount( 1, $font_faces, 'There should be 1 font face.' );
 		$font_face = reset( $font_faces );
 
 		// Check that file meta is present.
 		$file_path = 'open-sans_normal_400.ttf';
 		$meta      = get_post_meta( $font_face->ID, '_wp_font_face_file', true );
-		$this->assertSame( $file_path, $meta );
+		$this->assertSame( $file_path, $meta, 'The _wp_font_face_file should match.' );
 
 		wp_delete_post( $font_family_id, true );
 		wp_delete_post( $font_face->ID, true );

@@ -36,8 +36,8 @@ class Tests_Fonts_FontLibraryHooks extends WP_UnitTestCase {
 
 		wp_delete_post( $font_family_id, true );
 
-		$this->assertNull( get_post( $font_face_id ) );
-		$this->assertNotNull( get_post( $other_font_face_id ) );
+		$this->assertNull( get_post( $font_face_id ), 'Font face post should also have been deleted.' );
+		$this->assertNotNull( get_post( $other_font_face_id ), 'The other post should exist.' );
 	}
 
 	public function test_deleting_font_faces_deletes_associated_font_files() {
@@ -46,8 +46,8 @@ class Tests_Fonts_FontLibraryHooks extends WP_UnitTestCase {
 
 		wp_delete_post( $font_face_id, true );
 
-		$this->assertFalse( file_exists( $font_path ) );
-		$this->assertTrue( file_exists( $other_font_path ) );
+		$this->assertFalse( file_exists( $font_path ), 'The font file should have been deleted when the post was deleted' );
+		$this->assertTrue( file_exists( $other_font_path ), 'The other font file should exist' );
 	}
 
 	protected function create_font_face_with_file( $filename ) {
