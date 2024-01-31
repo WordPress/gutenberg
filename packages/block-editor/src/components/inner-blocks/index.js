@@ -224,7 +224,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
-				isDropZoneDisabled: blockEditingMode !== 'default',
+				isDropZoneDisabled: blockEditingMode === 'disabled',
 				defaultLayout,
 			};
 		},
