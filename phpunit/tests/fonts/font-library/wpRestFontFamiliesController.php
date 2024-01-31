@@ -8,9 +8,9 @@
  *
  * @group restapi
  *
- * @coversDefaultClass WP_REST_Font_Families_Controller_Test
+ * @coversDefaultClass WP_REST_Font_Families_Controller
  */
-class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 	protected static $editor_id;
 
@@ -54,7 +54,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 				'fontFamily' => 'Helvetica, Arial, sans-serif',
 			)
 		);
-		self::$font_face_id1   = WP_REST_Font_Faces_Controller_Test::create_font_face_post(
+		self::$font_face_id1   = Tests_REST_WpRestFontFacesController::create_font_face_post(
 			self::$font_family_id1,
 			array(
 				'fontFamily' => '"Open Sans"',
@@ -63,7 +63,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 				'src'        => home_url( '/wp-content/fonts/open-sans-medium.ttf' ),
 			)
 		);
-		self::$font_face_id2   = WP_REST_Font_Faces_Controller_Test::create_font_face_post(
+		self::$font_face_id2   = Tests_REST_WpRestFontFacesController::create_font_face_post(
 			self::$font_family_id1,
 			array(
 				'fontFamily' => '"Open Sans"',

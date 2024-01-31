@@ -8,9 +8,9 @@
  *
  * @group restapi
  *
- * @coversDefaultClass WP_REST_Font_Faces_Controller_Test
+ * @coversDefaultClass WP_REST_Font_Faces_Controller
  */
-class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 	protected static $editor_id;
 
@@ -28,8 +28,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	);
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$font_family_id       = WP_REST_Font_Families_Controller_Test::create_font_family_post();
-		self::$other_font_family_id = WP_REST_Font_Families_Controller_Test::create_font_family_post();
+		self::$font_family_id       = Tests_REST_WpRestFontFamiliesController::create_font_family_post();
+		self::$other_font_family_id = Tests_REST_WpRestFontFamiliesController::create_font_family_post();
 
 		self::$font_face_id1 = self::create_font_face_post(
 			self::$font_family_id,

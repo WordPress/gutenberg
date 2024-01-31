@@ -4,9 +4,12 @@
  *
  * @package WordPress
  * @subpackage Font Library
+ *
+ * @group fonts
+ * @group font-library
  */
+class Tests_Fonts_FontLibraryHooks extends WP_UnitTestCase {
 
-class Tests_Font_Library_Hooks extends WP_UnitTestCase {
 	public function test_deleting_font_family_deletes_child_font_faces() {
 		$font_family_id       = self::factory()->post->create(
 			array(

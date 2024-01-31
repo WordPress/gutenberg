@@ -10,7 +10,7 @@
  *
  * @coversDefaultClass WP_REST_Font_Collections_Controller
  */
-class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 	protected static $editor_id;
 	protected static $mock_file;
