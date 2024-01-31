@@ -569,7 +569,7 @@ class Tests_WP_Interactivity_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests kebab_to_camel_case method with typical cases.
+	 * Tests the `kebab_to_camel_case` method.
 	 *
 	 * @covers ::kebab_to_camel_case
 	 */
