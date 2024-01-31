@@ -134,7 +134,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		/**
 		 * Sanitizes the font family settings when creating or updating a font family.
 		 *
-		* @since 6.5.0
+		 * @since 6.5.0
 		 *
 		 * @param string          $value   Encoded JSON string of font family settings.
 		 * @param WP_REST_Request $request Request object.
@@ -265,12 +265,12 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		}
 
 		/**
-	 * Retrieves the post's schema, conforming to JSON Schema.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return array Item schema data.
-	 */
+		 * Retrieves the post's schema, conforming to JSON Schema.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return array Item schema data.
+		 */
 		public function get_item_schema() {
 			if ( $this->schema ) {
 				return $this->add_additional_fields_schema( $this->schema );
