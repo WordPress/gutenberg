@@ -13,17 +13,17 @@
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p class=\"has-large-font-size\">My Content</p>\n\t\t",
+				"innerHTML": "\r\n\t\t<p class=\"has-large-font-size\">My Content</p>\r\n\t\t",
 				"innerContent": [
-					"\n\t\t<p class=\"has-large-font-size\">My Content</p>\n\t\t"
+					"\r\n\t\t<p class=\"has-large-font-size\">My Content</p>\r\n\t\t"
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\"\n\t\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=);background-position:50% 50%\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>\n",
+		"innerHTML": "\r\n<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\r\n\t<figure class=\"wp-block-media-text__media\">\r\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\r\n\t\t\talt=\"My alt text\" /></figure>\r\n\t<div class=\"wp-block-media-text__content\">\r\n\t\t\r\n\t</div>\r\n</div>\r\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\"\n\t\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=);background-position:50% 50%\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t",
+			"\r\n<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\r\n\t<figure class=\"wp-block-media-text__media\">\r\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\r\n\t\t\talt=\"My alt text\" /></figure>\r\n\t<div class=\"wp-block-media-text__content\">\r\n\t\t",
 			null,
-			"\n\t</div>\n</div>\n"
+			"\r\n\t</div>\r\n</div>\r\n"
 		]
 	}
 ]
