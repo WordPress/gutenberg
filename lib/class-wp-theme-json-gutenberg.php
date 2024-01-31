@@ -2723,7 +2723,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Duotone preset also has origins.
 	 *
-	 * @param WP_Theme_JSON $incoming Data to merge.
+	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
 		$incoming_data    = $incoming->get_raw_data();
