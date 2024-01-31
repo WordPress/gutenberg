@@ -274,7 +274,7 @@
 		justify-content: flex-start;
 
 		.dataviews-view-grid__title-actions {
-			padding: 0 $grid-unit-05;
+			padding: $grid-unit-05 $grid-unit 0 $grid-unit-05;
 		}
 
 		.dataviews-view-grid__primary-field {
