@@ -670,10 +670,7 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await page
-			.getByLabel( 'Block tools' )
-			.getByLabel( 'Insert link' )
-			.click();
+		await page.getByLabel( 'Block tools' ).getByLabel( 'Add link' ).click();
 
 		// This form lacks distinguishing qualities other than the
 		// class name, so we use page.locator() instead of page.getByRole()
@@ -696,7 +693,9 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
 
-	test( 'should upload external image', async ( { editor } ) => {
+	test( 'should upload external image to media library', async ( {
+		editor,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/image',
 			attributes: {
@@ -704,7 +703,7 @@ test.describe( 'Image', () => {
 			},
 		} );
 
-		await editor.clickBlockToolbarButton( 'Upload external image' );
+		await editor.clickBlockToolbarButton( 'Upload image to media library' );
 
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'

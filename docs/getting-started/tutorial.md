@@ -327,7 +327,7 @@ Save the file and confirm that the block appears correctly in the Editor and on 
 
 ### Cleaning up
 
-When you use the `create-block` package to scaffold a block, it might include files that you don't need. In the case of this tutorial, the block doesn't use stylesheets or font end JavaScipt. Clean up the plugin's `src/` folder with the following actions.
+When you use the `create-block` package to scaffold a block, it might include files that you don't need. In the case of this tutorial, the block doesn't use stylesheets or front end JavaScript. Clean up the plugin's `src/` folder with the following actions.
 
 1. In the `edit.js` file, remove the lines that import `editor.scss`
 2. In the `index.js` file, remove the lines that import `style.scss`
@@ -715,7 +715,7 @@ Compare this to a statically rendered block like the Paragraph block.
 
 The HTML of the paragraph is stored in post content and saved in the database.
 
-You can learn more about dynamic and static rendering in the [Fundamentals documentation](https://developer.wordpress.org/block-editor/getting-started/fundamentals/). While most blocks are either dynamically or statically rendered, you can build a block that utilizes both methods.
+You can learn more about dynamic and static rendering in the [Fundamentals documentation](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). While most blocks are either dynamically or statically rendered, you can build a block that utilizes both methods.
 
 ### Why add static rendering?
 

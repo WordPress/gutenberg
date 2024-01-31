@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-init-view' );
+wp_enqueue_script_module( 'directive-init-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-init" }'>

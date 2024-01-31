@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external } from '@wordpress/icons';
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
@@ -16,6 +16,7 @@ import {
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -43,10 +44,13 @@ export default function MoreMenu( { showIconLabels } ) {
 		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme().is_block_theme;
+	}, [] );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-site', 'fixedToolbar', true );
+			setPreference( 'core', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
@@ -54,7 +58,7 @@ export default function MoreMenu( { showIconLabels } ) {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-site', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	return (
@@ -69,7 +73,7 @@ export default function MoreMenu( { showIconLabels } ) {
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="fixedToolbar"
 								onToggle={ turnOffDistractionFree }
 								label={ __( 'Top toolbar' ) }
@@ -84,7 +88,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="distractionFree"
 								onToggle={ toggleDistractionFree }
 								label={ __( 'Distraction free' ) }
@@ -100,7 +104,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="focusMode"
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }
@@ -120,7 +124,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							fillProps={ { onClick: onClose } }
 						/>
 						<MenuGroup label={ __( 'Tools' ) }>
-							<SiteExport />
+							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
 								onClick={ () =>
 									openModal(

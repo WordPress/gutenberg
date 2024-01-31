@@ -4,6 +4,7 @@
 	"name": "core/gallery",
 	"title": "Gallery",
 	"category": "media",
+	"allowedBlocks": [ "core/image" ],
 	"description": "Display multiple images in a rich gallery.",
 	"keywords": [ "images", "photos" ],
 	"textdomain": "default",
@@ -79,6 +80,10 @@
 		"imageCrop": {
 			"type": "boolean",
 			"default": true
+		},
+		"randomOrder": {
+			"type": "boolean",
+			"default": false
 		},
 		"fixedHeight": {
 			"type": "boolean",

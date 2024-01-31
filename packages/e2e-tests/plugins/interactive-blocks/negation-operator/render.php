@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'negation-operator-view' );
+wp_enqueue_script_module( 'negation-operator-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "negation-operator" }'>

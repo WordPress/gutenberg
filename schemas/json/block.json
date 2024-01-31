@@ -73,6 +73,13 @@
 				"type": "string"
 			}
 		},
+		"allowedBlocks": {
+			"type": "array",
+			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
+			"items": {
+				"type": "string"
+			}
+		},
 		"icon": {
 			"type": "string",
 			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts)."
@@ -316,6 +323,11 @@
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
 					"properties": {
+						"aspectRatio": {
+							"type": "boolean",
+							"description": "Allow blocks to define an aspect ratio value.",
+							"default": false
+						},
 						"minHeight": {
 							"type": "boolean",
 							"description": "Allow blocks to define a minimum height value.",
@@ -342,6 +354,11 @@
 				"inserter": {
 					"type": "boolean",
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
+					"default": true
+				},
+				"renaming": {
+					"type": "boolean",
+					"description": "By default, a block can be renamed by a user from the block 'Options' dropdown or the 'Advanced' panel. To disable this behavior, set renaming to false.",
 					"default": true
 				},
 				"layout": {
@@ -538,6 +555,11 @@
 						}
 					}
 				},
+				"shadow": {
+					"type": "boolean",
+					"description": "Allow blocks to define a box shadow.",
+					"default": false
+				},
 				"typography": {
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific typography property, its attributes definition is extended to include the style attribute.",
@@ -609,6 +631,7 @@
 							"type": "object",
 							"properties": {
 								"root": { "type": "string" },
+								"aspectRatio": { "type": "string" },
 								"minHeight": { "type": "string" }
 							}
 						}

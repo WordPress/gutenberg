@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
-import { PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const InserterDraggableBlocks = ( {
 	isEnabled,
@@ -42,7 +42,7 @@ const InserterDraggableBlocks = ( {
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				const parsedBlocks =
-					pattern?.type === PATTERN_TYPES.user &&
+					pattern?.type === INSERTER_PATTERN_TYPES.user &&
 					pattern?.syncStatus !== 'unsynced'
 						? [ createBlock( 'core/block', { ref: pattern.id } ) ]
 						: blocks;

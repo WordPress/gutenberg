@@ -31,7 +31,7 @@ import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-d
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenPage() {
+export default function SidebarNavigationScreenPage( { backPath } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const history = useHistory();
 	const {
@@ -88,6 +88,7 @@ export default function SidebarNavigationScreenPage() {
 
 	return record ? (
 		<SidebarNavigationScreen
+			backPath={ backPath }
 			title={ decodeEntities(
 				record?.title?.rendered || __( '(no title)' )
 			) }

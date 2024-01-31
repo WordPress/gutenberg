@@ -27,7 +27,7 @@ function WritingMenu() {
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', true );
+			setPreference( 'core', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
@@ -35,7 +35,7 @@ function WritingMenu() {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-post', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -46,7 +46,7 @@ function WritingMenu() {
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="fixedToolbar"
 				onToggle={ turnOffDistractionFree }
 				label={ __( 'Top toolbar' ) }
@@ -57,7 +57,7 @@ function WritingMenu() {
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="distractionFree"
 				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }
@@ -67,7 +67,7 @@ function WritingMenu() {
 				shortcut={ displayShortcut.primaryShift( '\\' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
@@ -78,7 +78,7 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Show and hide admin UI' ) }
+				info={ __( 'Show and hide the admin user interface' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }

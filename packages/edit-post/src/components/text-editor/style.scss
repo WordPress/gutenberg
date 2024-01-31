@@ -39,10 +39,8 @@
 	margin-right: auto;
 
 	@include break-large() {
-		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
 		padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
 	}
-
 }
 
 // Exit code editor toolbar.
@@ -69,9 +67,5 @@
 		margin: 0 auto 0 0;
 		font-size: $default-font-size;
 		color: $gray-900;
-	}
-
-	.components-button svg {
-		order: 1;
 	}
 }

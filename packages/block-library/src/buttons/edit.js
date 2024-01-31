@@ -14,15 +14,8 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as buttonBlockName } from '../button';
-
-const ALLOWED_BLOCKS = [ buttonBlockName ];
-
 const DEFAULT_BLOCK = {
-	name: buttonBlockName,
+	name: 'core/button',
 	attributesToCopy: [
 		'backgroundColor',
 		'border',
@@ -48,24 +41,22 @@ function ButtonsEdit( { attributes, className } ) {
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;
 		const buttonVariations = select( blocksStore ).getBlockVariations(
-			buttonBlockName,
+			'core/button',
 			'inserter'
 		);
 		return {
-			preferredStyle:
-				preferredStyleVariations?.value?.[ buttonBlockName ],
+			preferredStyle: preferredStyleVariations?.value?.[ 'core/button' ],
 			hasButtonVariations: buttonVariations.length > 0,
 		};
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		defaultBlock: DEFAULT_BLOCK,
 		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
 		directInsert: ! hasButtonVariations,
 		template: [
 			[
-				buttonBlockName,
+				'core/button',
 				{ className: preferredStyle && `is-style-${ preferredStyle }` },
 			],
 		],

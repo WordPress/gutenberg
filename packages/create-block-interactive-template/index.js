@@ -14,8 +14,14 @@ module.exports = {
 		supports: {
 			interactivity: true,
 		},
+		viewScript: null,
+		viewModule: 'file:./view.js',
 		render: 'file:./render.php',
 		example: {},
+		customScripts: {
+			build: 'wp-scripts build --experimental-modules',
+			start: 'wp-scripts start --experimental-modules',
+		},
 	},
 	variants: {
 		basic: {},

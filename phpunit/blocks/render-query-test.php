@@ -69,7 +69,7 @@ HTML;
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
 		$this->assertSame( '{"loadingText":"Loading page, please wait.","loadedText":"Page Loaded."}', $p->get_attribute( 'data-wp-context' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( '{"namespace":"core/query"}', $p->get_attribute( 'data-wp-interactive' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-post' ) );
@@ -127,7 +127,7 @@ HTML;
 		$p = new WP_HTML_Tag_Processor( $output );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 
@@ -205,7 +205,7 @@ HTML;
 		$p = new WP_HTML_Tag_Processor( $output );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 
@@ -254,17 +254,17 @@ HTML;
 
 		// Query 0 contains a plugin block inside query-2 -> disabled.
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 
 		// Query 1 does not contain a plugin block -> enabled.
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-1', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-1', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( null, $p->get_attribute( 'data-wp-navigation-disabled' ) );
 
 		// Query 2 contains a plugin block -> disabled.
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-2', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-2', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 }

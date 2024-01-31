@@ -24,7 +24,6 @@ export default function DocumentTools( {
 	blockEditorMode,
 	hasFixedToolbar,
 	isDistractionFree,
-	showIconLabels,
 } ) {
 	const { isVisualMode } = useSelect( ( select ) => {
 		const { getEditorMode } = select( editSiteStore );
@@ -42,7 +41,6 @@ export default function DocumentTools( {
 
 	return (
 		<EditorDocumentTools
-			showIconLabels={ showIconLabels }
 			disableBlockTools={ ! isVisualMode }
 			listViewLabel={ __( 'List View' ) }
 		>

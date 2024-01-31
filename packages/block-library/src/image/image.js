@@ -7,7 +7,6 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
-	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -96,7 +95,7 @@ export default function Image( {
 	temporaryURL,
 	attributes,
 	setAttributes,
-	isSelected,
+	isSingleSelected,
 	insertBlocksAfter,
 	onReplace,
 	onSelectImage,
@@ -124,6 +123,7 @@ export default function Image( {
 		linkTarget,
 		sizeSlug,
 		lightbox,
+		metadata,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -132,57 +132,32 @@ export default function Image( {
 
 	const imageRef = useRef();
 	const { allowResize = true } = context;
-	const { getBlock } = useSelect( blockEditorStore );
+	const { getBlock, getSettings } = useSelect( blockEditorStore );
 
-	const { image } = useSelect(
-		( select ) => {
-			const { getMedia } = select( coreStore );
-			return {
-				image:
-					id && isSelected
-						? getMedia( id, { context: 'view' } )
-						: null,
-			};
-		},
-		[ id, isSelected ]
+	const image = useSelect(
+		( select ) =>
+			id && isSingleSelected
+				? select( coreStore ).getMedia( id, { context: 'view' } )
+				: null,
+		[ id, isSingleSelected ]
 	);
 
-	const {
-		canInsertCover,
-		imageEditing,
-		imageSizes,
-		maxWidth,
-		mediaUpload,
-		multiImageSelection,
-	} = useSelect(
+	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-				getSettings,
-				canInsertBlockType,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
 
 			const rootClientId = getBlockRootClientId( clientId );
 			const settings = getSettings();
-			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {
 				imageEditing: settings.imageEditing,
 				imageSizes: settings.imageSizes,
 				maxWidth: settings.maxWidth,
-				mediaUpload: settings.mediaUpload,
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
 				),
-				multiImageSelection:
-					multiSelectedClientIds.length &&
-					multiSelectedClientIds.every(
-						( _clientId ) =>
-							getBlockName( _clientId ) === 'core/image'
-					),
 			};
 		},
 		[ clientId ]
@@ -211,7 +186,6 @@ export default function Image( {
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
-	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -219,8 +193,8 @@ export default function Image( {
 	useEffect( () => {
 		if (
 			! isExternalImage( id, url ) ||
-			! isSelected ||
-			! canUploadMedia
+			! isSingleSelected ||
+			! getSettings().mediaUpload
 		) {
 			setExternalBlob();
 			return;
@@ -235,7 +209,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
+	}, [ id, url, isSingleSelected, externalBlob ] );
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -280,6 +254,22 @@ export default function Image( {
 		setAttributes( props );
 	}
 
+	function onSetLightbox( enable ) {
+		if ( enable && ! lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: true },
+			} );
+		} else if ( ! enable && lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -303,6 +293,10 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
+		const { mediaUpload } = getSettings();
+		if ( ! mediaUpload ) {
+			return;
+		}
 		mediaUpload( {
 			filesList: [ externalBlob ],
 			onFileChange( [ img ] ) {
@@ -325,13 +319,13 @@ export default function Image( {
 	}
 
 	useEffect( () => {
-		if ( ! isSelected ) {
+		if ( ! isSingleSelected ) {
 			setIsEditingImage( false );
 		}
-	}, [ isSelected ] );
+	}, [ isSingleSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
-	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
+	const allowCrop = isSingleSelected && canEditImage && ! isEditingImage;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -349,13 +343,11 @@ export default function Image( {
 
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
-	const showLightboxToggle =
+	const showLightboxSetting =
 		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
-
-	const lightboxToggleDisabled = linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -410,10 +402,46 @@ export default function Image( {
 		</InspectorControls>
 	);
 
+	const {
+		lockUrlControls = false,
+		lockAltControls = false,
+		lockTitleControls = false,
+	} = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return {};
+			}
+
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+			const {
+				url: urlBinding,
+				alt: altBinding,
+				title: titleBinding,
+			} = metadata?.bindings || {};
+			return {
+				lockUrlControls:
+					!! urlBinding &&
+					getBlockBindingsSource( urlBinding?.source )
+						?.lockAttributesEditing === true,
+				lockAltControls:
+					!! altBinding &&
+					getBlockBindingsSource( altBinding?.source )
+						?.lockAttributesEditing === true,
+				lockTitleControls:
+					!! titleBinding &&
+					getBlockBindingsSource( titleBinding?.source )
+						?.lockAttributesEditing === true,
+			};
+		},
+		[ isSingleSelected ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! multiImageSelection && ! isEditingImage && (
+				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
 					<ImageURLInputUI
 						url={ href || '' }
 						onChangeUrl={ onSetHref }
@@ -423,6 +451,9 @@ export default function Image( {
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }
+						showLightboxSetting={ showLightboxSetting }
+						lightboxEnabled={ lightboxChecked }
+						onSetLightbox={ onSetLightbox }
 					/>
 				) }
 				{ allowCrop && (
@@ -432,7 +463,7 @@ export default function Image( {
 						label={ __( 'Crop' ) }
 					/>
 				) }
-				{ ! multiImageSelection && canInsertCover && (
+				{ isSingleSelected && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
@@ -440,7 +471,7 @@ export default function Image( {
 					/>
 				) }
 			</BlockControls>
-			{ ! multiImageSelection && ! isEditingImage && (
+			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -453,13 +484,13 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! multiImageSelection && externalBlob && (
+			{ isSingleSelected && externalBlob && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
-							label={ __( 'Upload external image' ) }
+							label={ __( 'Upload image to media library' ) }
 						/>
 					</ToolbarGroup>
 				</BlockControls>
@@ -470,7 +501,7 @@ export default function Image( {
 					resetAll={ resetAll }
 					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 				>
-					{ ! multiImageSelection && (
+					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
 							isShownByDefault={ true }
@@ -483,16 +514,27 @@ export default function Image( {
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
+								disabled={ lockAltControls }
 								help={
-									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									lockAltControls ? (
+										<>
 											{ __(
-												'Describe the purpose of the image.'
+												'Connected to a custom field'
 											) }
-										</ExternalLink>
-										<br />
-										{ __( 'Leave empty if decorative.' ) }
-									</>
+										</>
+									) : (
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
 								}
 								__nextHasNoMarginBottom
 							/>
@@ -506,34 +548,6 @@ export default function Image( {
 							options={ imageSizeOptions }
 						/>
 					) }
-					{ showLightboxToggle && (
-						<ToolsPanelItem
-							hasValue={ () => !! lightbox }
-							label={ __( 'Expand on click' ) }
-							onDeselect={ () => {
-								setAttributes( { lightbox: undefined } );
-							} }
-							isShownByDefault={ true }
-						>
-							<ToggleControl
-								label={ __( 'Expand on click' ) }
-								checked={ lightboxChecked }
-								onChange={ ( newValue ) => {
-									setAttributes( {
-										lightbox: { enabled: newValue },
-									} );
-								} }
-								disabled={ lightboxToggleDisabled }
-								help={
-									lightboxToggleDisabled
-										? __(
-												'“Expand on click” scales the image up, and can’t be combined with a link.'
-										  )
-										: ''
-								}
-							/>
-						</ToolsPanelItem>
-					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -542,17 +556,22 @@ export default function Image( {
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
+					disabled={ lockTitleControls }
 					help={
-						<>
-							{ __(
-								'Describe the role of this image on the page.'
-							) }
-							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+						lockTitleControls ? (
+							<>{ __( 'Connected to a custom field' ) }</>
+						) : (
+							<>
 								{ __(
-									'(Note: many devices and browsers do not display this text.)'
+									'Describe the role of this image on the page.'
 								) }
-							</ExternalLink>
-						</>
+								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+									{ __(
+										'(Note: many devices and browsers do not display this text.)'
+									) }
+								</ExternalLink>
+							</>
+						)
 					}
 				/>
 			</InspectorControls>
@@ -711,7 +730,7 @@ export default function Image( {
 					width: currentWidth ?? 'auto',
 					height: currentHeight ?? 'auto',
 				} }
-				showHandle={ isSelected }
+				showHandle={ isSingleSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
@@ -747,7 +766,8 @@ export default function Image( {
 	}
 
 	if ( ! url && ! temporaryURL ) {
-		return sizeControls;
+		// Add all controls if the image attributes are connected.
+		return metadata?.bindings ? controls : sizeControls;
 	}
 
 	return (
@@ -759,12 +779,10 @@ export default function Image( {
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				isSelected={ isSelected }
+				isSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					! multiImageSelection && hasNonContentControls
-				}
+				showToolbarButton={ isSingleSelected && hasNonContentControls }
 			/>
 		</>
 	);

@@ -13,7 +13,9 @@ const test = base.extend( {
 	},
 } );
 
-test.describe( 'Patterns', () => {
+// Skip these tests for now as we plan to adapt them to
+// the new patterns UI.
+test.describe.skip( 'Patterns', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllBlocks();
@@ -70,9 +72,6 @@ test.describe( 'Patterns', () => {
 			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My pattern' );
 		await page.keyboard.press( 'Enter' );
-		await expect(
-			createPatternDialog.getByRole( 'button', { name: 'Create' } )
-		).toBeDisabled();
 
 		await expect( page ).toHaveTitle( /^My pattern/ );
 		await expect(

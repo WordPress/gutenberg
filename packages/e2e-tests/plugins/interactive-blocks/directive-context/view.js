@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate, getContext } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
 store( 'directive-context', {
 	state: {
@@ -28,7 +28,7 @@ store( 'directive-context', {
 const html = `
 		<div
 			data-wp-interactive='{ "namespace": "directive-context-navigate" }'
-			data-wp-navigation-id="navigation"
+			data-wp-router-region="navigation"
 			data-wp-context='{ "text": "second page" }'
 		>
 			<div data-testid="navigation text" data-wp-text="context.text"></div>
@@ -50,10 +50,14 @@ const { actions } = store( 'directive-context-navigate', {
 			ctx.newText = 'some new text';
 		},
 		navigate() {
-			return navigate( window.location, {
-				force: true,
-				html,
-			} );
+			return import( '@wordpress/interactivity-router' ).then(
+				( { actions: routerActions } ) =>
+					routerActions.navigate(
+						window.location,
+						{ force: true, html },
+					)
+			);
+
 		},
 		*asyncNavigate() {
 			yield actions.navigate();

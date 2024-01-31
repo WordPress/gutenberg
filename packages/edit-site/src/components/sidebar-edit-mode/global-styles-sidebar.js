@@ -44,7 +44,7 @@ export default function GlobalStylesSidebar() {
 			'visual' === select( editSiteStore ).getEditorMode();
 		const _isEditCanvasMode = 'edit' === getCanvasMode();
 		const _showListViewByDefault = select( preferencesStore ).get(
-			'core/edit-site',
+			'core',
 			'showListViewByDefault'
 		);
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =

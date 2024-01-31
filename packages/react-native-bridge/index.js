@@ -3,6 +3,11 @@
  */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import RCTAztecView from '@wordpress/react-native-aztec';
+
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
 const isAndroid = Platform.OS === 'android';
@@ -489,7 +494,11 @@ export function showAndroidSoftKeyboard() {
 		return;
 	}
 
-	RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+	const hasFocusedTextInput = RCTAztecView.InputState.isFocused();
+
+	if ( hasFocusedTextInput ) {
+		RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+	}
 }
 
 /**

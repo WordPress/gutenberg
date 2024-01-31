@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useEffect, useId, useState } from '@wordpress/element';
+import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -192,6 +192,7 @@ export function useBlockSettings( name, parentLayout ) {
 		blockGap,
 		spacingSizes,
 		units,
+		aspectRatio,
 		minHeight,
 		layout,
 		borderColor,
@@ -218,6 +219,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -237,6 +239,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'spacing.blockGap',
 		'spacing.spacingSizes',
 		'spacing.units',
+		'dimensions.aspectRatio',
 		'dimensions.minHeight',
 		'layout',
 		'border.color',
@@ -262,7 +265,8 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.link',
 		'color.text',
 		'color.heading',
-		'color.button'
+		'color.button',
+		'shadow'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -332,10 +336,12 @@ export function useBlockSettings( name, parentLayout ) {
 				width: borderWidth,
 			},
 			dimensions: {
+				aspectRatio,
 				minHeight,
 			},
 			layout,
 			parentLayout,
+			shadow,
 		};
 	}, [
 		backgroundImage,
@@ -356,6 +362,7 @@ export function useBlockSettings( name, parentLayout ) {
 		blockGap,
 		spacingSizes,
 		units,
+		aspectRatio,
 		minHeight,
 		layout,
 		parentLayout,
@@ -383,6 +390,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );
@@ -390,10 +398,10 @@ export function useBlockSettings( name, parentLayout ) {
 
 export function createBlockEditFilter( features ) {
 	// We don't want block controls to re-render when typing inside a block.
-	// `pure` will prevent re-renders unless props change, so only pass the
+	// `memo` will prevent re-renders unless props change, so only pass the
 	// needed props and not the whole attributes object.
 	features = features.map( ( settings ) => {
-		return { ...settings, Edit: pure( settings.edit ) };
+		return { ...settings, Edit: memo( settings.edit ) };
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
@@ -476,7 +484,7 @@ function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
 	return null;
 }
 
-const BlockPropsPure = pure( BlockProps );
+const BlockPropsPure = memo( BlockProps );
 
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(

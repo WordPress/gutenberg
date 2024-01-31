@@ -188,7 +188,7 @@ function UnforwardedUnitControl(
 			isUnitSelectTabbable={ isUnitSelectTabbable }
 			onChange={ handleOnUnitChange }
 			size={
-				size === 'small' ||
+				[ 'small', 'compact' ].includes( size ) ||
 				( size === 'default' && ! props.__next40pxDefaultSize )
 					? 'small'
 					: 'default'

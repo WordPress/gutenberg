@@ -17,23 +17,12 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { STORE_NAME } from '../../../store/constants';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
-import { store as editSiteStore } from '../../../store';
-import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
 const SettingsHeader = ( { sidebarName } ) => {
-	const { isEditingPage, entityType } = useSelect( ( select ) => {
-		const { getEditedPostType, isPage } = select( editSiteStore );
-		const { getRenderingMode } = select( editorStore );
-
-		return {
-			isEditingPage: isPage() && getRenderingMode() !== 'template-only',
-			entityType: getEditedPostType(),
-		};
-	} );
-
-	const entityLabel =
-		POST_TYPE_LABELS[ entityType ] ||
-		POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ];
+	const postTypeLabel = useSelect(
+		( select ) => select( editorStore ).getPostTypeLabel(),
+		[]
+	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openTemplateSettings = () =>
@@ -41,22 +30,11 @@ const SettingsHeader = ( { sidebarName } ) => {
 	const openBlockSettings = () =>
 		enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 
-	let templateAriaLabel;
-	if ( isEditingPage ) {
-		templateAriaLabel =
-			sidebarName === SIDEBAR_TEMPLATE
-				? // translators: ARIA label for the Template sidebar tab, selected.
-				  __( 'Page (selected)' )
-				: // translators: ARIA label for the Template Settings Sidebar tab, not selected.
-				  __( 'Page' );
-	} else {
-		templateAriaLabel =
-			sidebarName === SIDEBAR_TEMPLATE
-				? // translators: ARIA label for the Template sidebar tab, selected.
-				  sprintf( __( '%s (selected)' ), entityLabel )
-				: // translators: ARIA label for the Template Settings Sidebar tab, not selected.
-				  entityLabel;
-	}
+	const documentAriaLabel =
+		sidebarName === SIDEBAR_TEMPLATE
+			? // translators: ARIA label for the Template sidebar tab, selected.
+			  sprintf( __( '%s (selected)' ), postTypeLabel )
+			: postTypeLabel;
 
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
@@ -70,10 +48,10 @@ const SettingsHeader = ( { sidebarName } ) => {
 							'is-active': sidebarName === SIDEBAR_TEMPLATE,
 						}
 					) }
-					aria-label={ templateAriaLabel }
-					data-label={ isEditingPage ? __( 'Page' ) : entityLabel }
+					aria-label={ documentAriaLabel }
+					data-label={ postTypeLabel }
 				>
-					{ isEditingPage ? __( 'Page' ) : entityLabel }
+					{ postTypeLabel }
 				</Button>
 			</li>
 			<li>

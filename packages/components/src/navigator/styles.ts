@@ -7,10 +7,10 @@ export const navigatorProviderWrapper = css`
 	/* Prevents horizontal overflow while animating screen transitions */
 	overflow-x: hidden;
 	/* Mark this subsection of the DOM as isolated, providing performance benefits
-	 * by limiting calculations of layout, style, paint, size, or any combination
-	 * to a DOM subtree rather than the entire page.
+	 * by limiting calculations of layout, style and paint to a DOM subtree rather
+	 * than the entire page.
 	 */
-	contain: strict;
+	contain: content;
 `;
 
 const fadeInFromRight = keyframes( {
