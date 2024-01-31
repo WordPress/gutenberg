@@ -230,10 +230,14 @@ export default function ReusableBlockEdit( {
 		  } )
 		: {};
 
-	useEffect(
-		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
-		[ innerBlocks, setBlockEditingMode ]
-	);
+	useEffect( () => {
+		if ( hasParentPattern ) {
+			setBlockEditMode( setBlockEditingMode, innerBlocks, 'disabled' );
+			return;
+		}
+
+		setBlockEditMode( setBlockEditingMode, innerBlocks );
+	}, [ hasParentPattern, innerBlocks, setBlockEditingMode ] );
 
 	const hasOverridableBlocks = useMemo(
 		() => getHasOverridableBlocks( innerBlocks ),
@@ -335,16 +339,6 @@ export default function ReusableBlockEdit( {
 	};
 
 	let children = null;
-
-	if ( hasOverridableBlocks && hasParentPattern ) {
-		children = (
-			<Warning>
-				{ __(
-					'You cannot edit a pattern with overrides when it is nested in another pattern.'
-				) }
-			</Warning>
-		);
-	}
 
 	if ( hasAlreadyRendered ) {
 		children = (
