@@ -115,7 +115,7 @@ function EditorCanvas( {
 			iframeProps={ {
 				expand: isZoomOutMode,
 				scale: isZoomOutMode ? 0.45 : undefined,
-				frameSize: isZoomOutMode ? 50 : undefined,
+				frameSize: isZoomOutMode ? 100 : undefined,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
 					{
