@@ -281,8 +281,12 @@
 			min-height: $grid-unit-50;
 		}
 		&.is-selected {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			background-color: #aecae1;
+			border-color: var(--wp-admin-theme-color);
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
+			.dataviews-view-grid__fields .dataviews-view-grid__field .dataviews-view-grid__field-value {
+				color: $gray-900;
+			}
 		}
 	}
 
