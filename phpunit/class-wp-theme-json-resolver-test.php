@@ -737,6 +737,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_theme_data
 	 */
 	public function test_get_theme_data_theme_supports_overrides_theme_json() {
+		switch_theme( 'default' );
+
 		// Test that get_theme_data() returns a WP_Theme_JSON_Gutenberg object.
 		$theme_json_resolver = new WP_Theme_JSON_Resolver_Gutenberg();
 		$theme_json_resolver->get_merged_data();
@@ -750,6 +752,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$previous_settings    = $theme_data->get_settings();
 		$previous_line_height = $previous_settings['typography']['lineHeight'];
 		$this->assertFalse( $previous_line_height, 'lineHeight setting from theme.json should be false.' );
+
 		add_theme_support( 'custom-line-height' );
 		$current_settings = $theme_json_resolver->get_theme_data()->get_settings();
 		$line_height      = $current_settings['typography']['lineHeight'];
