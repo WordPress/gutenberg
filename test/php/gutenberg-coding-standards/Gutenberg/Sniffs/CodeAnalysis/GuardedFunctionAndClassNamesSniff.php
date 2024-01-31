@@ -182,13 +182,13 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		$result               = preg_match( $regexp, $content );
 
 		if ( 1 === $result ) {
-			$incorrect_guarded_error_message = sprintf(
+			$notProperlyGuardedErrorMessage = sprintf(
 				'The class "%s" is not properly guarded against redeclaration. Please ensure the entire class body is wrapped within an "if ( ! class_exists( \'%s\' ) ) {" statement.',
 				$className,
 				$className
 			);
 
-			$phpcsFile->addError( $incorrect_guarded_error_message, $classToken, 'ClassNotProperlyGuardedAgainstRedeclaration' );
+			$phpcsFile->addError( $notProperlyGuardedErrorMessage, $classToken, 'ClassNotProperlyGuardedAgainstRedeclaration' );
 			return;
 		}
 
