@@ -6,10 +6,6 @@
  * @since 5.8.0
  */
 
-if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Class that encapsulates the processing of structures that adhere to the theme.json spec.
  *

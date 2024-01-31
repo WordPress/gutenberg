@@ -6,10 +6,6 @@
  * @since 5.8.0
  */
 
-if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Class that abstracts the processing of the different data sources
  * for site-level config and offers an API to work with them.
