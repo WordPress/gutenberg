@@ -8,25 +8,29 @@ class BlockCrashBoundary extends Component {
 		super( ...arguments );
 
 		this.state = {
-			hasError: false,
+			error: null,
 		};
 	}
 
+	static getDerivedStateFromError( error ) {
+		return { error };
+	}
+
 	componentDidCatch( error, info ) {
-		this.setState( {
-			hasError: true,
-		} );
 		// TODO: Send error to tracking service.
+		// eslint-disable-next-line no-console
 		console.log( { error } );
+		// eslint-disable-next-line no-console
 		console.log( 'Stack trace:', info.componentStack );
 	}
 
 	render() {
-		if ( this.state.hasError ) {
-			return this.props.fallback;
+		const { error } = this.state;
+		if ( ! error ) {
+			return this.props.children;
 		}
 
-		return this.props.children;
+		return this.props.fallback;
 	}
 }
 
