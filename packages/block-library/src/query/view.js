@@ -23,7 +23,9 @@ store( 'core/query', {
 		*navigate( event ) {
 			const ctx = getContext();
 			const { ref } = getElement();
-			const { queryRef } = ctx;
+			const queryRef = ref.closest(
+				'.wp-block-query[data-wp-router-region]'
+			);
 			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 
 			if ( isValidLink( ref ) && isValidEvent( event ) && ! isDisabled ) {
@@ -41,8 +43,10 @@ store( 'core/query', {
 			}
 		},
 		*prefetch() {
-			const { queryRef } = getContext();
 			const { ref } = getElement();
+			const queryRef = ref.closest(
+				'.wp-block-query[data-wp-router-region]'
+			);
 			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 			if ( isValidLink( ref ) && ! isDisabled ) {
 				const { actions } = yield import(
@@ -62,11 +66,6 @@ store( 'core/query', {
 				);
 				yield actions.prefetch( ref.href );
 			}
-		},
-		setQueryRef() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.queryRef = ref;
 		},
 	},
 } );
