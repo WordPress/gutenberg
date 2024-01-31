@@ -11,8 +11,14 @@ import {
 	store as preferencesStore,
 } from '@wordpress/preferences';
 
+/**
+ * Internal dependencies
+ */
+import { store as postEditorStore } from '../../../store';
+
 function WritingMenu() {
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const { toggleDistractionFree } = useDispatch( postEditorStore );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -39,6 +45,7 @@ function WritingMenu() {
 			<PreferenceToggleMenuItem
 				scope="core"
 				name="distractionFree"
+				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }
 				info={ __( 'Write with calmness' ) }
 				messageActivated={ __( 'Distraction free mode activated' ) }

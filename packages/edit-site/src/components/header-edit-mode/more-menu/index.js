@@ -33,6 +33,7 @@ import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
+import { store as editSiteStore } from '../../../store';
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -40,6 +41,8 @@ export default function MoreMenu( { showIconLabels } ) {
 	const isBlockBasedTheme = useSelect( ( select ) => {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
+
+	const { toggleDistractionFree } = useDispatch( editSiteStore );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -76,6 +79,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								name="distractionFree"
 								label={ __( 'Distraction free' ) }
 								info={ __( 'Write with calmness' ) }
+								onToggle={ toggleDistractionFree }
 								messageActivated={ __(
 									'Distraction free mode activated'
 								) }
