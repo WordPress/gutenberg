@@ -255,12 +255,28 @@ const ImageComponent = ( {
 		shapeStyle,
 	];
 
+	// On iOS, add 1 to height to account for the 1px non-visible image
+	// that is used to determine when the network image has loaded
+	// We also must verify that it is not NaN, as it can be NaN when the image is loading.
+	// This is not necessary on Android as the non-visible image is not used.
+	let calculatedSelectedHeight;
+	if ( Platform.isIOS ) {
+		calculatedSelectedHeight =
+			containerSize && ! isNaN( containerSize.height )
+				? containerSize.height + 1
+				: 0;
+	} else {
+		calculatedSelectedHeight = containerSize?.height;
+	}
+
 	const imageSelectedStyles = [
 		usePreferredColorSchemeStyle(
 			styles.imageBorder,
 			styles.imageBorderDark
 		),
-		{ height: containerSize?.height },
+		{
+			height: calculatedSelectedHeight,
+		},
 	];
 
 	return (
