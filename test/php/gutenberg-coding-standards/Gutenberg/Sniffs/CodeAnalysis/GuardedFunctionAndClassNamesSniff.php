@@ -133,12 +133,6 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 
 	/**
 	 * Classes should be wrapped with !function_exists() to avoid fatal errors.
-	 * E.g.:
-	 * if ( class_exists( 'WP_Navigation' ) ) {
-	 *     return;
-	 * }
-	 *
-	 * Alternatively:
 	 *
 	 * if ( ! class_exists( 'WP_Navigation' ) ) {
 	 *    class WP_Navigation { ... }

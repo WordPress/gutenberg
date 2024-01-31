@@ -93,6 +93,7 @@
 			</property>
 			<property name="classesWhiteList" type="array">
 				<element value="/^Gutenberg.+/"/>
+				<element value="/^.+_Gutenberg/"/>
 			</property>
 		</properties>
 	</rule>
