@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	render,
-	directivePrefix,
-	toVdom,
-	getRegionRootFragment,
-	store,
-} from '@wordpress/interactivity';
+import { render, store, privateApis } from '@wordpress/interactivity';
+
+const { directivePrefix, getRegionRootFragment, initialVdom, toVdom } =
+	privateApis(
+		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.'
+	);
 
 // The cache of visited and prefetched pages.
 const pages = new Map();
@@ -36,12 +35,14 @@ const fetchPage = async ( url, { html } ) => {
 
 // Return an object with VDOM trees of those HTML regions marked with a
 // `router-region` directive.
-const regionsToVdom = ( dom ) => {
+const regionsToVdom = ( dom, { vdom } = {} ) => {
 	const regions = {};
 	const attrName = `data-${ directivePrefix }-router-region`;
 	dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
 		const id = region.getAttribute( attrName );
-		regions[ id ] = toVdom( region );
+		regions[ id ] = vdom?.has( region )
+			? vdom.get( region )
+			: toVdom( region );
 	} );
 	const title = dom.querySelector( 'title' )?.innerText;
 	return { regions, title };
@@ -74,10 +75,10 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
-// Cache the current regions.
+// Cache the initial page using the intially parsed vDOM.
 pages.set(
 	getPagePath( window.location ),
-	Promise.resolve( regionsToVdom( document ) )
+	Promise.resolve( regionsToVdom( document, { vdom: initialVdom } ) )
 );
 
 // Variable to store the current navigation.
