@@ -12,6 +12,7 @@ import {
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
+	SelectControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
@@ -23,6 +24,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 export default function CategoriesEdit( {
 	attributes: {
 		displayAsDropdown,
+		listStyleType,
 		showHierarchy,
 		showPostCounts,
 		showOnlyTopLevel,
@@ -136,6 +138,7 @@ export default function CategoriesEdit( {
 
 	const blockProps = useBlockProps( {
 		className: classes,
+		style: listStyleType ? { listStyleType } : undefined,
 	} );
 
 	return (
@@ -148,6 +151,25 @@ export default function CategoriesEdit( {
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
+					{ ! displayAsDropdown && (
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __( 'List style' ) }
+							onChange={ ( newListStyleType ) =>
+								setAttributes( {
+									listStyleType: newListStyleType,
+								} )
+							}
+							options={ [
+								{ label: __( 'Default' ), value: 'inherit' },
+								{ label: __( 'None' ), value: 'none' },
+								{ label: __( 'Disc' ), value: 'disc' },
+								{ label: __( 'Circle' ), value: 'circle' },
+								{ label: __( 'Square' ), value: 'square' },
+							] }
+							value={ listStyleType }
+						/>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }

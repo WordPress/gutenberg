@@ -26,6 +26,10 @@
 		"showEmpty": {
 			"type": "boolean",
 			"default": false
+		},
+		"listStyleType": {
+			"type": "string",
+			"default": "inherit"
 		}
 	},
 	"supports": {
