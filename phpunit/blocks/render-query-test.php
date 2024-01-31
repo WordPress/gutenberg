@@ -247,7 +247,7 @@ HTML;
 		$p = new WP_HTML_Tag_Processor( $output );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 }

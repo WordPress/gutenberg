@@ -106,9 +106,8 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
+	$is_interactive = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] );
 	$block_name     = $parsed_block['blockName'];
-	$block_object   = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-	$is_interactive = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) && isset( $block_object->supports['interactivity'] ) && $block_object->supports['interactivity'];
 
 	if ( 'core/query' === $block_name && $is_interactive ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
@@ -125,8 +124,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 * @return string Returns the modified output of the query block.
 			 */
 			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries, &$render_query_callback ) {
-				$block_object   = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-				$is_interactive = isset( $block['attrs']['enhancedPagination'] ) && true === $block['attrs']['enhancedPagination'] && isset( $block['attrs']['queryId'] ) && isset( $block_object->supports['interactivity'] ) && $block_object->supports['interactivity'];
+				$is_interactive = isset( $block['attrs']['enhancedPagination'] ) && true === $block['attrs']['enhancedPagination'] && isset( $block['attrs']['queryId'] );
 
 				if ( ! $is_interactive ) {
 					return $content;
@@ -156,7 +154,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
-		( ! $is_interactive )
+		( ! str_starts_with( $block_name, 'core/' ) || 'core/post-content' === $block_name )
 	) {
 		foreach ( $enhanced_query_stack as $query_id ) {
 			$dirty_enhanced_queries[ $query_id ] = true;
