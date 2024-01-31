@@ -8,11 +8,17 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 
-function FontsGrid( { title, children, pageSize = 32 } ) {
+/**
+ * Internal dependencies
+ */
+import FontCard from './font-card';
+
+const PAGE_SIZE = 32;
+
+function FontsGrid( { title, fonts, onChange } ) {
 	const [ lastItem, setLastItem ] = useState( null );
 	const [ page, setPage ] = useState( 1 );
-	const itemsLimit = page * pageSize;
-	const items = children.slice( 0, itemsLimit );
+	const itemsLimit = page * PAGE_SIZE;
 
 	useEffect( () => {
 		if ( lastItem ) {
@@ -40,16 +46,16 @@ function FontsGrid( { title, children, pageSize = 32 } ) {
 					</>
 				) }
 				<div className="font-library-modal__fonts-grid__main">
-					{ items.map( ( child, i ) => {
-						if ( i === itemsLimit - 1 ) {
-							return (
-								<div key={ child.key } ref={ setLastItem }>
-									{ child }
-								</div>
-							);
-						}
-						return <div key={ child.key }>{ child }</div>;
-					} ) }
+					{ fonts.slice( 0, itemsLimit ).map( ( font, i ) => (
+						<FontCard
+							key={ i }
+							font={ font }
+							ref={
+								i === itemsLimit - 1 ? setLastItem : undefined
+							}
+							onChange={ onChange }
+						/>
+					) ) }
 				</div>
 			</VStack>
 		</div>

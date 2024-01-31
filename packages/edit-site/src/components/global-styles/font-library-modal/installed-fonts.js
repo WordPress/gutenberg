@@ -19,7 +19,6 @@ import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
-import LibraryFontCard from './library-font-card';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
 import { unlock } from '../../../lock-unlock';
 const { ProgressBar } = unlock( componentsPrivateApis );
@@ -123,35 +122,19 @@ function InstalledFonts() {
 					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
-							<FontsGrid>
-								{ baseCustomFonts.map( ( font ) => (
-									<LibraryFontCard
-										font={ font }
-										key={ font.slug }
-										onClick={ () => {
-											handleSelectFont( font );
-										} }
-									/>
-								) ) }
-							</FontsGrid>
+							<FontsGrid
+								fonts={ baseCustomFonts }
+								onChange={ handleSelectFont }
+							/>
 							<Spacer margin={ 8 } />
 						</>
 					) }
-
 					{ baseThemeFonts.length > 0 && (
-						<>
-							<FontsGrid title={ __( 'Theme Fonts' ) }>
-								{ baseThemeFonts.map( ( font ) => (
-									<LibraryFontCard
-										font={ font }
-										key={ font.slug }
-										onClick={ () => {
-											handleSelectFont( font );
-										} }
-									/>
-								) ) }
-							</FontsGrid>
-						</>
+						<FontsGrid
+							title={ __( 'Theme Fonts' ) }
+							fonts={ baseThemeFonts }
+							onChange={ handleSelectFont }
+						/>
 					) }
 				</>
 			) }

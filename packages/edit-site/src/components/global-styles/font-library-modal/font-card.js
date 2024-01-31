@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalText as Text,
 	Button,
@@ -9,22 +9,37 @@ import {
 	FlexItem,
 	Icon,
 } from '@wordpress/components';
+import { forwardRef, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import FontDemo from './font-demo';
 import { getFamilyPreviewStyle } from './utils/preview-styles';
+import { FontLibraryContext } from './context';
 import { chevronRight } from '@wordpress/icons';
 
-function FontCard( { font, onClick, variantsText } ) {
+function FontCard( { font, onChange }, forwardedRef ) {
+	const { getFontFacesActivated } = useContext( FontLibraryContext );
+
+	const variantsInstalled =
+		font?.fontFace?.length > 0 ? font.fontFace.length : 1;
+	const variantsActive = getFontFacesActivated(
+		font.slug,
+		font.source
+	).length;
+	const variantsText = sprintf(
+		/* translators: 1: Active font variants, 2: Total font variants. */
+		__( '%1$s/%2$s variants active' ),
+		variantsActive,
+		variantsInstalled
+	);
 	const fakeFontFace = {
 		fontStyle: 'normal',
 		fontWeight: '400',
 		fontFamily: font.fontFamily,
 		fake: true,
 	};
-
 	const displayFontFace =
 		font.fontFace && font.fontFace.length
 			? font?.fontFace?.find(
@@ -38,12 +53,13 @@ function FontCard( { font, onClick, variantsText } ) {
 	const variantsCount = font.fontFace?.length || 1;
 
 	const style = {
-		cursor: !! onClick ? 'pointer' : 'default',
+		cursor: !! onChange ? 'pointer' : 'default',
 	};
 
 	return (
 		<Button
-			onClick={ onClick }
+			ref={ forwardedRef }
+			onClick={ () => onChange( font ) }
 			style={ style }
 			className="font-library-modal__font-card"
 		>
@@ -78,4 +94,4 @@ function FontCard( { font, onClick, variantsText } ) {
 	);
 }
 
-export default FontCard;
+export default forwardRef( FontCard );

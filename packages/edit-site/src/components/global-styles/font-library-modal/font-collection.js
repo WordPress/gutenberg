@@ -23,7 +23,6 @@ import { search, closeSmall } from '@wordpress/icons';
 import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
-import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
 import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
@@ -275,17 +274,10 @@ function FontCollection( { slug } ) {
 			) }
 
 			{ ! renderConfirmDialog && ! selectedFont && (
-				<FontsGrid>
-					{ fonts.map( ( font ) => (
-						<FontCard
-							key={ font.font_family_settings.slug }
-							font={ font.font_family_settings }
-							onClick={ () => {
-								setSelectedFont( font.font_family_settings );
-							} }
-						/>
-					) ) }
-				</FontsGrid>
+				<FontsGrid
+					fonts={ fonts.map( ( font ) => font.font_family_settings ) }
+					onChange={ setSelectedFont }
+				/>
 			) }
 		</TabPanelLayout>
 	);
