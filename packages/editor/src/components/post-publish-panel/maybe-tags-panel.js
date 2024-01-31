@@ -34,31 +34,24 @@ const TagsPanel = () => {
 };
 
 const MaybeTagsPanel = () => {
-	const { tags, isPostTypeSupported, areTagsFetched } = useSelect(
-		( select ) => {
-			const postType = select( editorStore ).getCurrentPostType();
-			const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
-			const _isPostTypeSupported =
-				tagsTaxonomy &&
-				tagsTaxonomy.types.some( ( type ) => type === postType );
-			const _areTagsFetched = tagsTaxonomy !== undefined;
-			const _tags =
-				tagsTaxonomy &&
-				select( editorStore ).getEditedPostAttribute(
-					tagsTaxonomy.rest_base
-				);
-			return {
-				tags: _tags,
-				isPostTypeSupported: _isPostTypeSupported,
-				areTagsFetched: _areTagsFetched,
-			};
-		},
-		[]
-	);
-	const hasTags = tags && tags.length;
+	const { hasTags, isPostTypeSupported } = useSelect( ( select ) => {
+		const postType = select( editorStore ).getCurrentPostType();
+		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
+		const _isPostTypeSupported = tagsTaxonomy?.types?.includes( postType );
+		const areTagsFetched = tagsTaxonomy !== undefined;
+		const tags =
+			tagsTaxonomy &&
+			select( editorStore ).getEditedPostAttribute(
+				tagsTaxonomy.rest_base
+			);
+		return {
+			hasTags: !! tags?.length,
+			isPostTypeSupported: areTagsFetched && _isPostTypeSupported,
+		};
+	}, [] );
 	const [ hadTagsWhenOpeningThePanel ] = useState( hasTags );
 
-	if ( ! isPostTypeSupported || ! areTagsFetched ) {
+	if ( ! isPostTypeSupported ) {
 		return null;
 	}
 
