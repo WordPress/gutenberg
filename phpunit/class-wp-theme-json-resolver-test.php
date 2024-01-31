@@ -44,11 +44,15 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	private static $property_core_orig_value;
 
 	/**
+	 * Theme root directory.
+	 *
 	 * @var string|null
 	 */
 	private $theme_root;
 
 	/**
+	 * Original theme directory.
+	 *
 	 * @var array|null
 	 */
 	private $orig_theme_dir;
