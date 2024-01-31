@@ -265,26 +265,24 @@ export default function BorderPanel( {
 				</ToolsPanelItem>
 			) }
 			{ hasShadowControl && (
-				<>
+				<ToolsPanelItem
+					label={ __( 'Shadow' ) }
+					hasValue={ hasShadow }
+					onDeselect={ resetShadow }
+					isShownByDefault={ defaultControls.shadow }
+					panelId={ panelId }
+				>
 					<BaseControl.VisualLabel as="legend">
 						{ __( 'Shadow' ) }
 					</BaseControl.VisualLabel>
-					<ToolsPanelItem
-						label={ __( 'Shadow' ) }
-						hasValue={ hasShadow }
-						onDeselect={ resetShadow }
-						isShownByDefault={ defaultControls.shadow }
-						panelId={ panelId }
-					>
-						<ItemGroup isBordered isSeparated>
-							<ShadowPopover
-								shadow={ shadow }
-								onShadowChange={ setShadow }
-								settings={ settings }
-							/>
-						</ItemGroup>
-					</ToolsPanelItem>
-				</>
+					<ItemGroup isBordered isSeparated>
+						<ShadowPopover
+							shadow={ shadow }
+							onShadowChange={ setShadow }
+							settings={ settings }
+						/>
+					</ItemGroup>
+				</ToolsPanelItem>
 			) }
 		</Wrapper>
 	);
