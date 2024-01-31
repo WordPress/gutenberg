@@ -1,13 +1,9 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import * as Ariakit from '@ariakit/react';
-/**
  * WordPress dependencies
  */
 import { createContext, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { Icon, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -82,7 +78,7 @@ const UnconnectedCustomSelectButton = (
 			store={ store }
 		>
 			<div>{ computedRenderSelectedValue( currentValue ) }</div>
-			<Ariakit.SelectArrow />
+			<Icon icon={ chevronDown } size={ 18 } />
 		</Styled.CustomSelectButton>
 	);
 };
