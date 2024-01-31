@@ -134,12 +134,12 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		/**
 		 * Sanitizes the font family settings when creating or updating a font family.
 		 *
-		* @since 6.5.0
-		*
-		* @param string          $value   Encoded JSON string of font family settings.
-		* @param WP_REST_Request $request Request object.
-		* @return array                   Decoded array font family settings.
-		*/
+		 * @since 6.5.0
+		 *
+		 * @param string          $value   Encoded JSON string of font family settings.
+		 * @param WP_REST_Request $request Request object.
+		 * @return array                   Decoded array font family settings.
+		 */
 		public function sanitize_font_family_settings( $value ) {
 			$settings = json_decode( $value, true );
 
@@ -264,7 +264,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 			return apply_filters( 'rest_prepare_wp_font_family', $response, $item, $request );
 		}
 
-			/**
+		/**
 		 * Retrieves the post's schema, conforming to JSON Schema.
 		 *
 		 * @since 6.5.0

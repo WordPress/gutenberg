@@ -14,21 +14,8 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_Font_Library
 
 	public function test_should_unregister_font_collection() {
 		// Registers two mock font collections.
-		$config = array(
-			'slug'        => 'mock-font-collection-1',
-			'name'        => 'Mock Collection to be unregistered',
-			'description' => 'A mock font collection to be unregistered.',
-			'src'         => 'my-collection-data.json',
-		);
-		WP_Font_Library::register_font_collection( $config );
-
-		$config = array(
-			'slug'        => 'mock-font-collection-2',
-			'name'        => 'Mock Collection',
-			'description' => 'A mock font collection.',
-			'src'         => 'my-mock-data.json',
-		);
-		WP_Font_Library::register_font_collection( $config );
+		WP_Font_Library::register_font_collection( 'mock-font-collection-1', array( 'font_families' => array( 'mock' ) ) );
+		WP_Font_Library::register_font_collection( 'mock-font-collection-2', array( 'font_families' => array( 'mock' ) ) );
 
 		// Unregister mock font collection.
 		WP_Font_Library::unregister_font_collection( 'mock-font-collection-1' );

@@ -170,27 +170,10 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$fields = $this->get_fields_for_response( $request );
 			$item   = array();
 
-			$config_fields = array( 'slug', 'name', 'description' );
+			$config_fields = array( 'slug', 'name', 'description', 'font_families', 'categories' );
 			foreach ( $config_fields as $field ) {
 				if ( in_array( $field, $fields, true ) ) {
 					$item[ $field ] = $collection->$field;
-				}
-			}
-
-			$data_fields = array( 'font_families', 'categories' );
-			if ( in_array( 'font_families', $fields, true ) || in_array( 'categories', $fields, true ) ) {
-				$content = $collection->get_content();
-
-				// If there was an error getting the collection data, return the error.
-				if ( is_wp_error( $content ) ) {
-					$content->add_data( array( 'status' => 500 ) );
-					return $content;
-				}
-
-				foreach ( $data_fields as $field ) {
-					if ( in_array( $field, $fields, true ) ) {
-						$item[ $field ] = $content[ $field ];
-					}
 				}
 			}
 

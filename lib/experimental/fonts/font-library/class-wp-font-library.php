@@ -55,23 +55,19 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $config Font collection config options.
-		 *                      See {@see wp_register_font_collection()} for the supported fields.
-		 * @return WP_Font_Collection|WP_Error A font collection is it was registered successfully and a WP_Error otherwise.
+		 * @param string $slug Font collection slug.
+		 * @param array  $args Font collection config options.
+		 *                     See {@see wp_register_font_collection()} for the supported fields.
+		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
 		 */
-		public static function register_font_collection( $config ) {
-			if ( ! WP_Font_Collection::is_config_valid( $config ) ) {
-				$error_message = __( 'Font collection config is invalid.', 'gutenberg' );
-				return new WP_Error( 'font_collection_registration_error', $error_message );
-			}
-
-			$new_collection = new WP_Font_Collection( $config );
+		public static function register_font_collection( $slug, $args = array() ) {
+			$new_collection = new WP_Font_Collection( $slug, $args );
 
 			if ( self::is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
-					/* translators: %s: Font collection slug. */
+				/* translators: %s: Font collection slug. */
 					__( 'Font collection with slug: "%s" is already registered.', 'gutenberg' ),
-					$config['slug']
+					$new_collection->slug
 				);
 				_doing_it_wrong(
 					__METHOD__,
@@ -82,6 +78,23 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 			}
 			self::$collections[ $new_collection->slug ] = $new_collection;
 			return $new_collection;
+		}
+
+		/**
+		 * Register a new font collection from a json file.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $file_or_url File path or URL to a JSON file containing the font collection data.
+		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
+		 */
+		public static function register_font_collection_from_json( $file_or_url ) {
+			$args = WP_Font_Collection::load_from_json( $file_or_url );
+			if ( is_wp_error( $args ) ) {
+				return $args;
+			}
+
+			return self::register_font_collection( $args['slug'], $args );
 		}
 
 		/**
@@ -135,7 +148,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $slug Font collection slug.
-		 * @return array List of font collections.
+		 * @return WP_Font_Collection Font collection object.
 		 */
 		public static function get_font_collection( $slug ) {
 			if ( array_key_exists( $slug, self::$collections ) ) {
