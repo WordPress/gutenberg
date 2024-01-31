@@ -168,7 +168,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const imperativeFocalPointPreview = ( value ) => {
 		const { style } = refMediaContainer.current.resizable;
 		const { x, y } = value;
-		style.backgroundPosition = `${ x * 100 }% ${ y * 100 }%`;
+		style.objectPosition = `${ x * 100 }% ${ y * 100 }%`;
 	};
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
@@ -252,7 +252,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					}
 				/>
 			) }
-			{ imageFill && mediaUrl && mediaType === 'image' && (
+			{ imageFill && mediaUrl && (
 				<FocalPointPicker
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize

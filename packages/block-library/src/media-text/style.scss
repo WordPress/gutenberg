@@ -41,6 +41,7 @@
 	grid-row: 1;
 	/*!rtl:end:ignore*/
 	margin: 0;
+	position: relative;
 }
 
 .wp-block-media-text .wp-block-media-text__content {
@@ -86,16 +87,23 @@
 	height: 100%;
 }
 
-.wp-block-media-text.is-image-fill .wp-block-media-text__media img {
-	// The image is visually hidden but accessible to assistive technologies.
-	position: absolute;
-	width: 1px;
-	height: 1px;
+.wp-block-media-text.is-image-fill .wp-block-media-text__media img,
+.wp-block-media-text.is-image-fill .wp-block-media-text__media video {
+	border: none;
+	bottom: 0;
+	box-shadow: none;
+	height: 100%;
+	left: 0;
+	margin: 0;
+	max-height: none;
+	max-width: none;
+	object-fit: cover;
+	outline: none;
 	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	border: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 100%;
 }
 /*
 * Here we here not able to use a mobile first CSS approach.

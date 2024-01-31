@@ -21,6 +21,7 @@ import { forwardRef } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
+export const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 /**
  * Constants
@@ -28,17 +29,18 @@ import { media as icon } from '@wordpress/icons';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const noop = () => {};
 
-export function imageFillStyles( url, focalPoint ) {
-	return url
-		? {
-				backgroundImage: `url(${ url })`,
-				backgroundPosition: focalPoint
-					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
-							focalPoint.y * 100
-					  ) }%`
-					: `50% 50%`,
-		  }
-		: {};
+export function imageFillStyles( focalPoint ) {
+	return {
+		objectPosition: focalPoint
+			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+					focalPoint.y * 100
+			  ) }%`
+			: `50% 50%`,
+	};
+}
+
+export function focalPosition( { x, y } = DEFAULT_FOCAL_POINT ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }
 
 const ResizableBoxContainer = forwardRef(
@@ -132,14 +134,15 @@ function MediaContainer( props, ref ) {
 			left: enableResize && mediaPosition === 'right',
 		};
 
-		const backgroundStyles =
-			mediaType === 'image' && imageFill
-				? imageFillStyles( mediaUrl, focalPoint )
-				: {};
+		const mediaStyles = imageFill ? imageFillStyles( focalPoint ) : {};
 
 		const mediaTypeRenderers = {
-			image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
-			video: () => <video controls src={ mediaUrl } />,
+			image: () => (
+				<img src={ mediaUrl } alt={ mediaAlt } style={ mediaStyles } />
+			),
+			video: () => (
+				<video controls src={ mediaUrl } style={ mediaStyles } />
+			),
 		};
 
 		return (
@@ -150,7 +153,6 @@ function MediaContainer( props, ref ) {
 					'editor-media-container__resizer',
 					{ 'is-transient': isTemporaryMedia }
 				) }
-				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
 				minWidth="10%"
 				maxWidth="100%"
