@@ -526,7 +526,6 @@ function BlockListBlockProvider( props ) {
 				isBlockBeingDragged,
 				hasBlockMovingClientId,
 				canInsertBlockType,
-				getBlockRootClientId,
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
@@ -547,7 +546,6 @@ function BlockListBlockProvider( props ) {
 				getActiveBlockVariation,
 			} = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
-			const templateLock = getTemplateLock( rootClientId );
 			const canRemove = canRemoveBlock( clientId, rootClientId );
 			const canMove = canMoveBlock( clientId, rootClientId );
 			const attributes = getBlockAttributes( clientId );
@@ -565,10 +563,12 @@ function BlockListBlockProvider( props ) {
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
+
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
-				isLocked: !! templateLock,
+				isLocked: !! getTemplateLock( rootClientId ),
+				templateLock: getTemplateLock( clientId ),
 				canRemove,
 				canMove,
 				blockWithoutAttributes,
@@ -619,9 +619,12 @@ function BlockListBlockProvider( props ) {
 					movingClientId &&
 					canInsertBlockType(
 						getBlockName( movingClientId ),
-						getBlockRootClientId( clientId )
+						rootClientId
 					),
 				isEditingDisabled: blockEditingMode === 'disabled',
+				hasEditableOutline:
+					blockEditingMode !== 'disabled' &&
+					getBlockEditingMode( rootClientId ) === 'disabled',
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
@@ -665,7 +668,9 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
+		hasEditableOutline,
 		className,
 		defaultClassName,
 	} = selectedProps;
@@ -709,7 +714,9 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
+		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
 		mayDisplayControls,
