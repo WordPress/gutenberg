@@ -39,6 +39,16 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static $seen_menu_names = array();
 
+	private static function get_inner_blocks_content( $inner_blocks ) {
+		static $inner_blocks_content = array();
+		if ( empty( $inner_blocks_content ) ) {
+			foreach ( $inner_blocks as $inner_block ) {
+				array_push( $inner_blocks_content, $inner_block->render() );
+			}
+		}
+		return $inner_blocks_content;
+	}
+
 	/**
 	 * Returns whether or not this is responsive navigation.
 	 *
@@ -61,9 +71,9 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not a navigation has a submenu.
 	 */
 	private static function has_submenus( $inner_blocks ) {
-		foreach ( $inner_blocks as $inner_block ) {
-			$inner_block_content = $inner_block->render();
-			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
+		$inner_blocks_content = static::get_inner_blocks_content( $inner_blocks );
+		foreach ( $inner_blocks_content as $inner_block_content ) {
+			$p = new WP_HTML_Tag_Processor( $inner_block_content );
 			if ( $p->next_tag(
 				array(
 					'name'       => 'LI',
