@@ -201,6 +201,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
 				getBlockSettings,
+				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -208,7 +209,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableGetEditorMode() === 'navigation';
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
-			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 			return {
 				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
@@ -228,7 +228,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blockEditingMode !== 'default' ||
 					__unstableHasActiveBlockOverlayActive( clientId ) ||
 					__unstableIsWithinBlockOverlay( clientId ),
-				defaultLayout,
+				defaultLayout:
+					getBlockCount( clientId ) === 0
+						? null
+						: getBlockSettings( clientId, 'layout' )[ 0 ],
 			};
 		},
 		[ clientId ]
