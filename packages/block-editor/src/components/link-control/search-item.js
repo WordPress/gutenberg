@@ -55,7 +55,7 @@ function SearchItemIcon( { isURL, suggestion } ) {
 
 	if ( imageURL ) {
 		return (
-			<span className="block-editor-link-control__search-item-icon'">
+			<span className="block-editor-link-control__search-item-icon">
 				<img
 					className="block-editor-link-control__search-item-media-thumbnail"
 					src={ imageURL }
