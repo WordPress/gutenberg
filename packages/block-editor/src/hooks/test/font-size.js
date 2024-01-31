@@ -20,6 +20,14 @@ import _fontSize from '../font-size';
 
 const noop = () => {};
 
+function addUseSettingFilter( callback ) {
+	addFilter(
+		'blockEditor.useSetting.before',
+		'test/useSetting.before',
+		callback
+	);
+}
+
 describe( 'useBlockProps', () => {
 	const blockSettings = {
 		save: () => noop,
@@ -37,35 +45,35 @@ describe( 'useBlockProps', () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
+		removeFilter(
+			'blockEditor.useSetting.before',
+			'test/useSetting.before'
+		);
 	} );
 
 	it( 'should return preset classname', () => {
 		registerBlockType( blockSettings.name, blockSettings );
-		addFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before',
-			( result, path ) => {
-				if ( 'typography.fontSizes' === path ) {
-					return [
-						{
-							name: 'A larger font',
-							size: '32px',
-							slug: 'larger',
-						},
-					];
-				}
-
-				if ( 'typography.fluid' === path ) {
-					return false;
-				}
-
-				if ( 'layout' === path ) {
-					return {};
-				}
-
-				return result;
+		addUseSettingFilter( ( result, path ) => {
+			if ( 'typography.fontSizes' === path ) {
+				return [
+					{
+						name: 'A larger font',
+						size: '32px',
+						slug: 'larger',
+					},
+				];
 			}
-		);
+
+			if ( 'typography.fluid' === path ) {
+				return false;
+			}
+
+			if ( 'layout' === path ) {
+				return {};
+			}
+
+			return result;
+		} );
 
 		const { result } = renderHook( () =>
 			_fontSize.useBlockProps( {
@@ -85,25 +93,21 @@ describe( 'useBlockProps', () => {
 
 	it( 'should return custom font size', () => {
 		registerBlockType( blockSettings.name, blockSettings );
-		addFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before',
-			( result, path ) => {
-				if ( 'typography.fontSizes' === path ) {
-					return [];
-				}
-
-				if ( 'typography.fluid' === path ) {
-					return false;
-				}
-
-				if ( 'layout' === path ) {
-					return {};
-				}
-
-				return result;
+		addUseSettingFilter( ( result, path ) => {
+			if ( 'typography.fontSizes' === path ) {
+				return [];
 			}
-		);
+
+			if ( 'typography.fluid' === path ) {
+				return false;
+			}
+
+			if ( 'layout' === path ) {
+				return {};
+			}
+
+			return result;
+		} );
 
 		const { result } = renderHook( () =>
 			_fontSize.useBlockProps( {
@@ -126,25 +130,21 @@ describe( 'useBlockProps', () => {
 
 	it( 'should convert custom font sizes to fluid', () => {
 		registerBlockType( blockSettings.name, blockSettings );
-		addFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before',
-			( result, path ) => {
-				if ( 'typography.fontSizes' === path ) {
-					return [];
-				}
-
-				if ( 'typography.fluid' === path ) {
-					return true;
-				}
-
-				if ( 'layout' === path ) {
-					return {};
-				}
-
-				return result;
+		addUseSettingFilter( ( result, path ) => {
+			if ( 'typography.fontSizes' === path ) {
+				return [];
 			}
-		);
+
+			if ( 'typography.fluid' === path ) {
+				return true;
+			}
+
+			if ( 'layout' === path ) {
+				return {};
+			}
+
+			return result;
+		} );
 
 		const { result } = renderHook( () =>
 			_fontSize.useBlockProps( {
@@ -159,11 +159,6 @@ describe( 'useBlockProps', () => {
 		const { style } = result.current;
 		expect( style.fontSize ).toBe(
 			'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)'
-		);
-
-		removeFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before'
 		);
 	} );
 } );
