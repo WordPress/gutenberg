@@ -14,7 +14,7 @@ import InspectorControls from '../inspector-controls';
 import { getBorderPanelLabel } from '../../hooks/border';
 
 const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
-	const borderPanelLabel = getBorderPanelLabel( blockName );
+	const borderPanelLabel = getBorderPanelLabel( { blockName } );
 
 	return (
 		<>

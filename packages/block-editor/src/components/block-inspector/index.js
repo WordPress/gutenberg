@@ -140,7 +140,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 						/>
 						<InspectorControls.Slot
 							group="border"
-							label={ getBorderPanelLabel( selectedBlockName ) }
+							label={ getBorderPanelLabel( {
+								blockName: selectedBlockName,
+							} ) }
 						/>
 						<InspectorControls.Slot group="styles" />
 					</>
@@ -249,7 +251,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const borderPanelLabel = getBorderPanelLabel( blockName );
+	const borderPanelLabel = getBorderPanelLabel( { blockName } );
 
 	return (
 		<div className="block-editor-block-inspector">

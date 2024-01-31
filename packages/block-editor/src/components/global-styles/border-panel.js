@@ -217,7 +217,10 @@ export default function BorderPanel( {
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
 
-	const label = getBorderPanelLabel( name );
+	const label = getBorderPanelLabel( {
+		blockName: name,
+		controls: defaultControls,
+	} );
 
 	return (
 		<Wrapper
