@@ -63,7 +63,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns whether or not a navigation has a submenu.
 	 *
-	 * //@param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param string $inner_blocks_content_rendered A rendered inner block.
 	 * @return bool Returns whether or not a navigation has a submenu.
 	 */
 	private static function has_submenus( $inner_blocks_content_rendered ) {
