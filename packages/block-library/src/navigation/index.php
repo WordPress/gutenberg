@@ -192,7 +192,7 @@ class WP_Navigation_Block_Renderer {
 			// it encounters whitespace. This code strips it.
 			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
-			if ( function_exists( 'get_hooked_blocks' ) ) {
+			if ( function_exists( 'get_hooked_block_markup' ) ) {
 				// Run Block Hooks algorithm to inject hooked blocks.
 				$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
 				$root_nav_block = parse_blocks( $markup )[0];
@@ -987,7 +987,7 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 
-		if ( function_exists( 'get_hooked_blocks' ) ) {
+		if ( function_exists( 'get_hooked_block_markup' ) ) {
 			// Run Block Hooks algorithm to inject hooked blocks.
 			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
 			$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
@@ -1075,9 +1075,13 @@ function register_block_core_navigation() {
 		)
 	);
 
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
+	}
+
 	wp_register_script_module(
 		'@wordpress/block-library/navigation',
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/navigation.min.js' ) : includes_url( 'blocks/navigation/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/navigation/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
@@ -1353,7 +1357,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
  * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
  */
-function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null ) {
+function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 	$before_block_visitor = null;
 	$after_block_visitor  = null;
 	$hooked_blocks        = get_hooked_blocks();
@@ -1392,10 +1396,6 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	if ( ! isset( $post->ID ) ) {
-		return;
-	}
-
 	// We run the Block Hooks mechanism so it will return the list of ignored hooked blocks
 	// in the mock root Navigation block's metadata attribute.
 	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
@@ -1417,9 +1417,9 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	}
 }
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
-// that are not present in Gutenberg's WP 6.4 compatibility layer.
-if ( function_exists( 'get_hooked_blocks' ) ) {
+// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+// that are not present in Gutenberg's WP 6.5 compatibility layer.
+if ( function_exists( 'get_hooked_block_markup' ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
@@ -1449,8 +1449,8 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	return $response;
 }
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
-// that are not present in Gutenberg's WP 6.4 compatibility layer.
-if ( function_exists( 'get_hooked_blocks' ) ) {
+// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+// that are not present in Gutenberg's WP 6.5 compatibility layer.
+if ( function_exists( 'get_hooked_block_markup' ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }

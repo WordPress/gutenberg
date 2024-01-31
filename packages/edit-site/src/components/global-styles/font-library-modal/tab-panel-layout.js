@@ -12,6 +12,7 @@ import {
 	FlexBlock,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 function TabPanelLayout( {
 	title,
@@ -33,6 +34,7 @@ function TabPanelLayout( {
 								onClick={ handleBack }
 								icon={ chevronLeft }
 								size="small"
+								label={ __( 'Back' ) }
 							/>
 						) }
 						{ title && (

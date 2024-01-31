@@ -65,11 +65,6 @@
 	margin-top: -1px; /* To collapse the margin with the previous element */
 }
 
-.font-library-modal__font-variant {
-	border-bottom: 1px solid $gray-200;
-	padding-bottom: $grid-unit-20;
-}
-
 .font-library-modal__tabs {
 	[role="tablist"] {
 		position: sticky;
@@ -100,23 +95,6 @@ button.font-library-modal__upload-area {
 
 	.font-library-modal__upload-area__text {
 		color: $gray-700;
-	}
-}
-
-.font-library-modal__font-variant_demo-wrapper {
-	white-space: nowrap;
-	overflow: hidden;
-	width: 100%;
-	position: relative;
-
-	&::after {
-		content: "";
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		width: 30vw;
-		height: 100%;
-		background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
 	}
 }
 
