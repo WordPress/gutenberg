@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { compose, ifCondition } from '@wordpress/compose';
-import { useSelect, select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -35,19 +34,33 @@ const TagsPanel = () => {
 };
 
 const MaybeTagsPanel = () => {
-	const { tags } = useSelect( ( _select ) => {
-		const tagsTaxonomy = _select( coreStore ).getTaxonomy( 'post_tag' );
-		const _tags =
-			tagsTaxonomy &&
-			_select( editorStore ).getEditedPostAttribute(
-				tagsTaxonomy.rest_base
-			);
-		return {
-			tags: _tags,
-		};
-	}, [] );
+	const { tags, isPostTypeSupported, areTagsFetched } = useSelect(
+		( select ) => {
+			const postType = select( editorStore ).getCurrentPostType();
+			const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
+			const _isPostTypeSupported =
+				tagsTaxonomy &&
+				tagsTaxonomy.types.some( ( type ) => type === postType );
+			const _areTagsFetched = tagsTaxonomy !== undefined;
+			const _tags =
+				tagsTaxonomy &&
+				select( editorStore ).getEditedPostAttribute(
+					tagsTaxonomy.rest_base
+				);
+			return {
+				tags: _tags,
+				isPostTypeSupported: _isPostTypeSupported,
+				areTagsFetched: _areTagsFetched,
+			};
+		},
+		[]
+	);
 	const hasTags = tags && tags.length;
 	const [ hadTagsWhenOpeningThePanel ] = useState( hasTags );
+
+	if ( ! isPostTypeSupported || ! areTagsFetched ) {
+		return null;
+	}
 
 	/*
 	 * We only want to show the tag panel if the post didn't have
@@ -66,15 +79,4 @@ const MaybeTagsPanel = () => {
 	return null;
 };
 
-export default compose(
-	ifCondition( () => {
-		const postType = select( editorStore ).getCurrentPostType();
-		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
-		const isPostTypeSupported =
-			tagsTaxonomy &&
-			tagsTaxonomy.types.some( ( type ) => type === postType );
-		const areTagsFetched = tagsTaxonomy !== undefined;
-
-		return isPostTypeSupported && areTagsFetched;
-	} )
-)( MaybeTagsPanel );
+export default MaybeTagsPanel;
