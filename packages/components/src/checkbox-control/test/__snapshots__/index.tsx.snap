@@ -11,8 +11,8 @@ Snapshot Diff:
         >
           <input
             class="components-checkbox-control__input"
--           id="inspector-checkbox-control-5"
-+           id="inspector-checkbox-control-6"
+-           id="inspector-checkbox-control-6"
++           id="inspector-checkbox-control-7"
             type="checkbox"
             value="1"
 +         />
