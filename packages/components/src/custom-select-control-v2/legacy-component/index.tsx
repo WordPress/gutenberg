@@ -44,9 +44,8 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 				inputValue: '',
 				isOpen: state.open,
 				selectedItem: {
-					// Value will always be a string for the legacy component
-					name: value as string,
-					key: value as string,
+					name: value,
+					key: value,
 				},
 				type: '',
 			};

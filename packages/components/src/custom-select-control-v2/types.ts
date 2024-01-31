@@ -60,7 +60,12 @@ export type _CustomSelectProps = {
 };
 
 export type CustomSelectProps = _CustomSelectProps &
-	Exclude< CustomSelectButtonProps, { size: 'small' } >;
+	Exclude<
+		CustomSelectButtonProps,
+		{ size: 'small' } & {
+			options?: never;
+		}
+	>;
 
 /**
  * The legacy object structure for the options array.
@@ -68,7 +73,7 @@ export type CustomSelectProps = _CustomSelectProps &
 type Option = {
 	key: string;
 	name: string;
-	style?: {};
+	style?: React.CSSProperties;
 	className?: string;
 	__experimentalHint?: string;
 };
@@ -76,13 +81,14 @@ type Option = {
 /**
  * The legacy object returned from the onChange event.
  */
-type OnChangeObject = {
+type LegacyOnChangeObject = {
 	selectedItem: Option;
 	highlightedIndex?: number;
 	isOpen?: boolean;
 };
 
 export type LegacyCustomSelectProps = {
+	children?: never;
 	/**
 	 * Optional classname for the component.
 	 */
@@ -106,7 +112,7 @@ export type LegacyCustomSelectProps = {
 	 * Function called with the control's internal state changes. The `selectedItem`
 	 * property contains the next selected item.
 	 */
-	onChange?: ( newValue: OnChangeObject ) => void;
+	onChange?: ( newValue: LegacyOnChangeObject ) => void;
 	/**
 	 * A handler for `onBlur` events.
 	 */
