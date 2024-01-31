@@ -49,6 +49,22 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 		return acc;
 	}, 0 );
 
+	const isPrimary = ( field ) =>
+		filters.some( ( f ) => f.field === field && f.isPrimary );
+	let isDisabled = true;
+	if ( view.search !== '' ) {
+		isDisabled = false;
+	} else if (
+		view.filters?.length > 0 &&
+		( view.filters.some( ( filter ) => filter.value !== undefined ) ||
+			view.filters.some(
+				( filter ) =>
+					filter.value === undefined && ! isPrimary( filter.field )
+			) )
+	) {
+		isDisabled = false;
+	}
+
 	return (
 		<DropdownMenu
 			trigger={
@@ -243,9 +259,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					} ) }
 				</DropdownMenuGroup>
 				<DropdownMenuItem
-					disabled={
-						view.search === '' && view.filters?.length === 0
-					}
+					disabled={ isDisabled }
 					hideOnClick={ false }
 					onClick={ () => {
 						onChangeView( {
