@@ -165,6 +165,13 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 			$regexp               = sprintf( '/if\s*\(\s*!\s*class_exists\s*\(\s*(\'|")%s(\'|")/', preg_quote( $className, '/' ) );
 			$result               = preg_match( $regexp, $content );
 			if ( 1 === $result ) {
+				$incorrect_guarded_error_message = sprintf(
+					'The class "%s" is not properly guarded against redeclaration. Please ensure the entire class body is wrapped within an "if ( ! class_exists( \'%s\' )) {" statement.',
+					$className,
+					$className
+				);
+
+				$phpcsFile->addError( $incorrect_guarded_error_message, $classToken, 'ClassIncorrectlyGuardedAgainstRedeclaration' );
 				return;
 			}
 		}
