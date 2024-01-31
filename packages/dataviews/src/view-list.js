@@ -10,10 +10,8 @@ import { useAsyncList } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Button,
 } from '@wordpress/components';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { info } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 export default function ViewList( {
@@ -23,7 +21,7 @@ export default function ViewList( {
 	isLoading,
 	getItemId,
 	onSelectionChange,
-	onDetailsChange,
+	rowActions,
 	selection,
 	deferredRendering,
 } ) {
@@ -116,17 +114,7 @@ export default function ViewList( {
 									</VStack>
 								</HStack>
 							</div>
-							{ onDetailsChange && (
-								<Button
-									className="dataviews-view-list__details-button"
-									onClick={ () =>
-										onDetailsChange( [ item ] )
-									}
-									icon={ info }
-									label={ __( 'View details' ) }
-									size="compact"
-								/>
-							) }
+							{ rowActions( item ) }
 						</HStack>
 					</li>
 				);

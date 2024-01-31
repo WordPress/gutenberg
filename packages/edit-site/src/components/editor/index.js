@@ -7,7 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Notice } from '@wordpress/components';
+import {
+	Notice,
+	Button,
+	__unstableMotion as motion,
+} from '@wordpress/components';
+import { edit } from '@wordpress/icons';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -189,6 +194,39 @@ export default function Editor( { isLoading } ) {
 
 	return (
 		<>
+			{ ! isEditMode && (
+				<motion.div
+					className="edit-site-editor__action"
+					layout
+					initial={ {
+						background:
+							'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.3) 100%)',
+					} }
+					animate={ {
+						background:
+							'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.1) 90%)',
+						opacity: 0,
+						transition: { delay: 5, duration: 0.5 },
+					} }
+					whileHover={ {
+						background:
+							'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.0) 90%)',
+					} }
+				>
+					<Button
+						icon={ edit }
+						className="edit-site-editor__action-item"
+					>
+						Click to edit
+					</Button>
+					{ /* <Button
+							icon={ edit }
+							className="edit-site-editor__action-item"
+						>
+							Edit template
+						</Button> */ }
+				</motion.div>
+			) }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
@@ -208,6 +246,7 @@ export default function Editor( { isLoading } ) {
 					useSubRegistry={ false }
 				>
 					<SidebarComplementaryAreaFills />
+
 					{ isEditMode && <StartTemplateOptions /> }
 					<InterfaceSkeleton
 						isDistractionFree={ true }

@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { edit, info } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -175,6 +176,19 @@ export default function PagePages() {
 				history.push( {
 					postId: items[ 0 ].id,
 					postType,
+				} );
+			}
+		},
+		[ history, postType ]
+	);
+
+	const onEditChange = useCallback(
+		( item ) => {
+			if ( !! postType ) {
+				history.push( {
+					postId: item.id,
+					postType,
+					canvas: 'edit',
 				} );
 			}
 		},
@@ -421,7 +435,24 @@ export default function PagePages() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				onDetailsChange={ onDetailsChange }
+				rowActions={ ( item ) => (
+					<HStack alignment="right" spacing={ 2 }>
+						<Button
+							className="dataviews-view-list__details-button"
+							onClick={ () => onEditChange( item ) }
+							icon={ edit }
+							label={ __( 'Edit' ) }
+							size="compact"
+						/>
+						<Button
+							className="dataviews-view-list__details-button"
+							onClick={ () => onDetailsChange( [ item ] ) }
+							icon={ info }
+							label={ __( 'View details' ) }
+							size="compact"
+						/>
+					</HStack>
+				) }
 			/>
 		</Page>
 	);

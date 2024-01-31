@@ -30,4 +30,32 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
+
+// Editor floating actions
+.edit-site-editor__action {
+	display: flex;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: $grid-unit-20;
+	gap: $grid-unit-10;
+	z-index: 10;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+}
+
+.edit-site-editor__action-item.has-icon.has-text {
+	background: rgba(255, 255, 255);
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-20;
+	border-radius: 999px;
+	text-align: center;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	border: none;
+	justify-content: center;
+}
+
 @include editor-left(".edit-site .components-editor-notices__snackbar")
