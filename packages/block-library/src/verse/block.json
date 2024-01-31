@@ -56,7 +56,10 @@
 			"color": true,
 			"style": true
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"style": "wp-block-verse",
 	"editorStyle": "wp-block-verse-editor"

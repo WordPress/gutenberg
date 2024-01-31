@@ -45,7 +45,10 @@
 		"spacing": {
 			"margin": true
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-embed-editor",
 	"style": "wp-block-embed"

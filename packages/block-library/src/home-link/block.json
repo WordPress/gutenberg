@@ -37,7 +37,10 @@
 				"fontSize": true
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-home-link-editor",
 	"style": "wp-block-home-link"

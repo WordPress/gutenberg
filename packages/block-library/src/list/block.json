@@ -72,7 +72,10 @@
 		"__experimentalSelector": "ol,ul",
 		"__experimentalOnMerge": true,
 		"__experimentalSlashInserter": true,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

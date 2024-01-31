@@ -148,7 +148,10 @@
 		},
 		"interactivity": true,
 		"renaming": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

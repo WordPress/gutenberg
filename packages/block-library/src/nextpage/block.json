@@ -12,7 +12,10 @@
 		"customClassName": false,
 		"className": false,
 		"html": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-nextpage-editor"
 }

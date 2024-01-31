@@ -40,6 +40,9 @@
 			"margin": true,
 			"padding": true
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	}
 }

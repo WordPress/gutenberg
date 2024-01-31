@@ -59,7 +59,10 @@
 		"spacing": {
 			"blockGap": true
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"styles": [
 		{

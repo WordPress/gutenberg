@@ -44,7 +44,10 @@
 	"supports": {
 		"align": true,
 		"html": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-rss-editor",
 	"style": "wp-block-rss"

@@ -49,7 +49,10 @@
 			"__experimentalTextTransform": true,
 			"__experimentalLetterSpacing": true
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-tag-cloud-editor"
 }

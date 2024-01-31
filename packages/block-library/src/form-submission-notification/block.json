@@ -17,6 +17,9 @@
 		}
 	},
 	"supports": {
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	}
 }

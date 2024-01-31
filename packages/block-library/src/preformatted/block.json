@@ -41,7 +41,10 @@
 				"fontSize": true
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"style": "wp-block-preformatted"
 }

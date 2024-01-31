@@ -54,7 +54,10 @@
 				"fontSize": true
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-comments-pagination-editor",
 	"style": "wp-block-comments-pagination"

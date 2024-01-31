@@ -25,7 +25,10 @@
 		"html": false,
 		"reusable": false,
 		"renaming": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }

@@ -79,7 +79,10 @@
 				"padding": false
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

@@ -120,7 +120,10 @@
 			}
 		},
 		"__experimentalSelector": ".wp-block-button .wp-block-button__link",
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },

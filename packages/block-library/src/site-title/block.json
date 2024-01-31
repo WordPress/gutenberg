@@ -59,7 +59,10 @@
 				"fontSize": true
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-site-title-editor",
 	"style": "wp-block-site-title"

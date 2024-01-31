@@ -51,7 +51,10 @@
 			"background": false,
 			"__experimentalDuotone": "img"
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"selectors": {
 		"border": ".wp-block-avatar img"

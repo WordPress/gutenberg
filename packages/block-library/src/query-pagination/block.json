@@ -60,7 +60,10 @@
 				"fontSize": true
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-query-pagination-editor",
 	"style": "wp-block-query-pagination"

@@ -133,7 +133,10 @@
 		"layout": {
 			"allowJustification": false
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-cover-editor",
 	"style": "wp-block-cover"

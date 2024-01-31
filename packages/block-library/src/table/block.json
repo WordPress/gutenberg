@@ -196,7 +196,10 @@
 			}
 		},
 		"__experimentalSelector": ".wp-block-table > table",
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"styles": [
 		{

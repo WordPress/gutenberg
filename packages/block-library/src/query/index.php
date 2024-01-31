@@ -106,10 +106,16 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
-	$is_interactive = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] );
-	$block_name     = $parsed_block['blockName'];
+	$block_name   = $parsed_block['blockName'];
+	$block_object = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
-	if ( 'core/query' === $block_name && $is_interactive ) {
+	$is_interactive_bool   = isset( $block_object->supports['interactivity'] ) && true === $block_object->supports['interactivity'];
+	$is_interactive_object = isset( $block_object->supports['interactivity']['interactive'] ) && true === $block_object->supports['interactivity']['interactive'];
+	$client_navigation     = isset( $block_object->supports['interactivity']['clientNavigation'] ) && true === $block_object->supports['interactivity']['clientNavigation'];
+
+	$is_interactive = $is_interactive_bool || $is_interactive_object;
+
+	if ( 'core/query' === $block_name && $is_interactive && isset( $parsed_block['attrs']['queryId'] ) ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
 
 		if ( ! isset( $render_query_callback ) ) {
@@ -154,7 +160,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
-		( ! str_starts_with( $block_name, 'core/' ) || 'core/post-content' === $block_name )
+		( ! $client_navigation )
 	) {
 		foreach ( $enhanced_query_stack as $query_id ) {
 			$dirty_enhanced_queries[ $query_id ] = true;

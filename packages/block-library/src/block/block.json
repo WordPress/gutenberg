@@ -20,6 +20,9 @@
 		"html": false,
 		"inserter": false,
 		"renaming": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	}
 }

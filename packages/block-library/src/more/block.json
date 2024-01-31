@@ -21,7 +21,10 @@
 		"className": false,
 		"html": false,
 		"multiple": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-more-editor"
 }

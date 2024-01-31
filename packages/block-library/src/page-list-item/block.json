@@ -46,7 +46,10 @@
 		"lock": false,
 		"inserter": false,
 		"__experimentalToolbar": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

@@ -89,7 +89,10 @@
 				"padding": false
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-video-editor",
 	"style": "wp-block-video"

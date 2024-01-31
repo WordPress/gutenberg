@@ -13,6 +13,9 @@
 	"textdomain": "default",
 	"style": [ "wp-block-form-submit-button" ],
 	"supports": {
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	}
 }

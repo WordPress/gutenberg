@@ -65,7 +65,10 @@
 		},
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"

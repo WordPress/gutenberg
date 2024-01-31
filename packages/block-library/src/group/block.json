@@ -88,7 +88,10 @@
 		"layout": {
 			"allowSizingOnChildren": true
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

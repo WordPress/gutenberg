@@ -55,7 +55,10 @@
 				"padding": false
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-audio-editor",
 	"style": "wp-block-audio"

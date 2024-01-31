@@ -40,7 +40,10 @@
 				"type": "flex"
 			}
 		},
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	},
 	"editorStyle": "wp-block-buttons-editor",
 	"style": "wp-block-buttons"

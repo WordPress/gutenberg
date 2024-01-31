@@ -24,6 +24,9 @@
 		"inserter": false,
 		"html": false,
 		"reusable": false,
-		"clientNavigation": true
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": false
+		}
 	}
 }
