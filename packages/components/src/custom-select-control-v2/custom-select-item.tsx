@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
+import { Icon, check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -22,12 +23,10 @@ export function CustomSelectItem( {
 		>
 			{ children ?? props.value }
 			<Styled.SelectedItemCheckmark
-				// set initial size of check to prevent inline overrides
-				// due to legacy style options
-				style={ {
-					fontSize: 'initial',
-				} }
-			/>
+				style={ { width: '30px', height: '30px' } }
+			>
+				<Icon icon={ check } />
+			</Styled.SelectedItemCheckmark>
 		</Styled.CustomSelectItem>
 	);
 }

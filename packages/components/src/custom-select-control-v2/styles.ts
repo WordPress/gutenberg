@@ -102,12 +102,14 @@ export const CustomSelectItem = styled( Ariakit.SelectItem )`
 	align-items: center;
 	justify-content: space-between;
 	padding: ${ space( 2 ) };
+	line-height: 2.15rem;
 	&[data-active-item] {
 		background-color: ${ COLORS.gray[ 300 ] };
 	}
 `;
 
 export const SelectedItemCheckmark = styled( Ariakit.SelectItemCheck )`
-	justify-self: center;
-	padding: ${ space( 1 ) };
+	display: flex;
+	align-items: center;
+	justify-content: end;
 `;
