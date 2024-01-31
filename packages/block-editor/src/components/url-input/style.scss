@@ -14,9 +14,10 @@ $input-size: 300px;
 		@include break-small() {
 			width: $input-size;
 		}
-		padding: $input-padding;
-		margin-left: 0;
-		margin-right: 0;
+		padding: $grid-unit-10;
+		padding-left: $grid-unit-20;
+		margin: 0;
+		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
 
 		&:not(:focus) {
 			border-color: transparent;

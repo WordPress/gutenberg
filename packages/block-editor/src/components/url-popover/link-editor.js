@@ -40,7 +40,6 @@ export default function LinkEditor( {
 				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }
 				type="submit"
-				size="compact"
 			/>
 		</form>
 	);
