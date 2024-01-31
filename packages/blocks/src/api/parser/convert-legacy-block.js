@@ -77,5 +77,33 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
+	// Convert pattern overrides added during experimental phase.
+	// Only four blocks were supported initially.
+	// These checks can be removed in WordPress 6.6.
+	if (
+		newAttributes.metadata?.bindings &&
+		( name === 'core/paragraph' ||
+			name === 'core/heading' ||
+			name === 'core/image' ||
+			name === 'core/button' )
+	) {
+		const bindings = [
+			'content',
+			'url',
+			'title',
+			'alt',
+			'text',
+			'linkTarget',
+		];
+		bindings.forEach( ( binding ) => {
+			if (
+				newAttributes.metadata.bindings[ binding ]?.source?.name ===
+				'pattern_attributes'
+			) {
+				newAttributes.metadata.bindings[ binding ].source =
+					'core/pattern-overrides';
+			}
+		} );
+	}
 	return [ name, newAttributes ];
 }
