@@ -24,6 +24,12 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			'data-wp-class'       => 'data_wp_class_processor',
 			'data-wp-style'       => 'data_wp_style_processor',
 			'data-wp-text'        => 'data_wp_text_processor',
+			/*
+			 * `data-wp-each` needs to be processed in the last place because it moves
+			 * the cursor to the end of the processed items to prevent them to be
+			 * processed twice.
+			 */
+			'data-wp-each'        => 'data_wp_each_processor',
 		);
 
 		/**
@@ -279,7 +285,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						: array( $this, self::$directive_processors[ $directive_prefix ] );
 					call_user_func_array(
 						$func,
-						array( $p, &$context_stack, &$namespace_stack )
+						array( $p, &$context_stack, &$namespace_stack, &$tag_stack )
 					);
 				}
 			}
@@ -709,6 +715,104 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				}
 			}
 		}
-	}
 
+		/**
+		 * Processes the `data-wp-each` directive.
+		 *
+		 * This directive gets an array passed as reference and iterates over it
+		 * generating new content for each item based on the inner markup of the
+		 * `template` tag.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param array                                     $context_stack   The reference to the context stack.
+		 * @param array                                     $namespace_stack The reference to the store namespace stack.
+		 * @param array                                     $tag_stack       The reference to the tag stack.
+		 */
+		private function data_wp_each_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack, array &$tag_stack ) {
+			if ( ! $p->is_tag_closer() && 'TEMPLATE' === $p->get_tag() ) {
+				$attribute_name   = $p->get_attribute_names_with_prefix( 'data-wp-each' )[0];
+				$extracted_suffix = $this->extract_prefix_and_suffix( $attribute_name );
+				$item_name        = isset( $extracted_suffix[1] ) ? $this->kebab_to_camel_case( $extracted_suffix[1] ) : 'item';
+				$attribute_value  = $p->get_attribute( $attribute_name );
+				$result           = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
+				$inner_content    = $p->get_content_between_balanced_tags();
+
+				/*
+				 * It doesn't process associative arrays because those will be deserialized
+				 * as objects in JS.
+				 *
+				 * It doesn't process templates that contain top-level texts because
+				 * those texts can't be identified to be removed in the client.
+				 * Note: there might be top-level texts in between balanced tags, but
+				 * those cannot be identified at this moment.
+				 */
+				if ( ! array_is_list( $result ) || ! str_starts_with( $inner_content, '<' ) || ! str_ends_with( $inner_content, '>' ) ) {
+					return;
+				}
+
+				// Extracts the namespace from the directive attribute value.
+				$namespace_value         = end( $namespace_stack );
+				list( $namespace_value ) = is_string( $attribute_value ) && ! empty( $attribute_value )
+					? $this->extract_directive_value( $attribute_value, $namespace_value )
+					: array( $namespace_value, null );
+
+				$processed_content        = '';
+				$number_of_top_level_tags = 0;
+				// Processes the inner content for each item of the array.
+				foreach ( $result as $item ) {
+					// Creates a new context that includes the current item of the array.
+					array_push(
+						$context_stack,
+						array_replace_recursive(
+							end( $context_stack ) !== false ? end( $context_stack ) : array(),
+							array( $namespace_value => array( $item_name => $item ) )
+						)
+					);
+
+					// Processes the inner content with the new context.
+					$processed_item = $this->process_directives_args( $inner_content, $context_stack, $namespace_stack );
+
+					if ( null === $processed_item ) {
+						// If the HTML is unbalanced, stop processing it.
+						return array_pop( $context_stack );
+					}
+
+					// Adds the `data-wp-each-child` to each top-level tag.
+					$i = new WP_Interactivity_API_Directives_Processor( $processed_item );
+					while ( $i->next_tag() ) {
+						$number_of_top_level_tags += 1;
+						$i->set_attribute( 'data-wp-each-child', true );
+						/*
+						 * Moves to the tag closer of the current top-level tag so the next
+						 * call to `next_tag()` moves to the opener tag of the next
+						 * top-level tag.
+						 */
+						$i->next_balanced_tag_closer_tag();
+					}
+					$processed_content .= $i->get_updated_html();
+
+					// Removes the current context from the stack.
+					array_pop( $context_stack );
+				}
+
+				// Appends the processed content after the tag closer of the template.
+				$p->append_content_after_closing_tag_on_balanced_or_void_tags( $processed_content );
+
+				// Moves the cursor to the end of the processed items.
+				do {
+					$p->next_balanced_tag_closer_tag();
+					if ( $number_of_top_level_tags > 1 ) {
+						$number_of_top_level_tags -= 1;
+					} else {
+						break;
+					}
+				} while ( $p->next_tag() );
+
+				// Pops the last tag because it skipped the closing tag of the template tag.
+				array_pop( $tag_stack );
+			}
+		}
+	}
 }
