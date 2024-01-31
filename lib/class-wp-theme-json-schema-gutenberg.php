@@ -143,7 +143,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * @param array $path Path to the property to be removed.
 	 */
 	private static function unset_setting_by_path( &$settings, $path ) {
-		$tmp_settings = &$settings;
+		$tmp_settings = &$settings; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$last_key     = array_pop( $path );
 		foreach ( $path as $key ) {
 			$tmp_settings = &$tmp_settings[ $key ];
