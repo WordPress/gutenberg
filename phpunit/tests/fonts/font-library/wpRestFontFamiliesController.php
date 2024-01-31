@@ -24,8 +24,9 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		'name'       => 'Open Sans',
 		'slug'       => 'open-sans',
 		'fontFamily' => '"Open Sans", sans-serif',
-		'preview'    => 'https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg',
 	);
+
+	protected static $default_preview = 'https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg';
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id  = $factory->user->create(
@@ -44,7 +45,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 				'name'       => 'Open Sans',
 				'slug'       => 'open-sans',
 				'fontFamily' => '"Open Sans", sans-serif',
-				'preview'    => 'https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg',
+				'preview'    => self::$default_preview,
 			)
 		);
 		self::$font_family_id2 = self::create_font_family_post(
@@ -81,7 +82,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 	public static function create_font_family_post( $settings = array() ) {
 		$settings = array_merge( self::$default_settings, $settings );
-		return self::factory()->post->create(
+		$post_id  = self::factory()->post->create(
 			wp_slash(
 				array(
 					'post_type'    => 'wp_font_family',
@@ -91,12 +92,17 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 					'post_content' => wp_json_encode(
 						array(
 							'fontFamily' => $settings['fontFamily'],
-							'preview'    => $settings['preview'],
 						)
 					),
 				)
 			)
 		);
+
+		if ( isset( $settings['preview'] ) ) {
+			update_post_meta( $post_id, '_font_family_preview_url', $settings['preview'] );
+		}
+
+		return $post_id;
 	}
 
 	/**
@@ -272,7 +278,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	/**
 	 * @covers WP_REST_Font_Families_Controller::prepare_item_for_response
 	 */
-	public function test_get_item_malformed_post_content_returns_empty_settings() {
+	public function test_get_item_malformed_post_content_returns_empty_values() {
 		$font_family_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_font_family',
@@ -286,7 +292,6 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			// Slug will default to the post id.
 			'slug'       => (string) $font_family_id,
 			'fontFamily' => '',
-			'preview'    => '',
 		);
 
 		wp_set_current_user( self::$admin_id );
@@ -295,6 +300,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( '', $data['preview'] );
 		$this->assertSame( $empty_settings, $data['font_family_settings'] );
 
 		wp_delete_post( $font_family_id, true );
@@ -334,6 +340,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'preview', self::$default_preview );
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -394,18 +401,20 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 *
 	 * @covers WP_REST_Font_Faces_Controller::sanitize_font_family_settings
 	 */
-	public function test_create_item_with_default_preview( $settings ) {
+	public function test_create_item_with_default_preview( $settings, $preview ) {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$request->set_param( 'theme_json_version', 2 );
+		if ( null !== $preview ) {
+			$request->set_param( 'preview', $preview );
+		}
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 201, $response->get_status() );
-		$response_settings = $data['font_family_settings'];
-		$this->assertArrayHasKey( 'preview', $response_settings );
-		$this->assertSame( '', $response_settings['preview'] );
+		$this->assertArrayHasKey( 'preview', $data );
+		$this->assertSame( '', $data['preview'] );
 
 		wp_delete_post( $data['id'], true );
 	}
@@ -419,9 +428,11 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		return array(
 			'No preview param' => array(
 				'settings' => $default_settings,
+				'preview'  => null,
 			),
 			'Empty preview'    => array(
-				'settings' => array_merge( $default_settings, array( 'preview' => '' ) ),
+				'settings' => $default_settings,
+				'preview'  => '',
 			),
 		);
 	}
@@ -520,17 +531,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param(
-			'font_family_settings',
-			wp_json_encode(
-				array(
-					'name'       => 'Open Sans',
-					'slug'       => 'open-sans',
-					'fontFamily' => '"Open Sans", sans-serif',
-					'preview'    => 'https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg',
-				)
-			)
-		);
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_create', $response, 403 );
 	}
@@ -544,8 +545,8 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$settings = array(
 			'name'       => 'Open Sans',
 			'fontFamily' => '"Open Sans, "Noto Sans", sans-serif',
-			'preview'    => 'https://s.w.org/images/fonts/16.9/previews/open-sans/open-sans-400-normal.svg',
 		);
+		$preview  = 'https://s.w.org/images/fonts/16.9/previews/open-sans/updated-preview.svg';
 
 		$font_family_id = self::create_font_family_post( array( 'slug' => 'open-sans-2' ) );
 		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
@@ -553,6 +554,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			'font_family_settings',
 			wp_json_encode( $settings )
 		);
+		$request->set_param( 'preview', $preview );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -563,11 +565,38 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			'name'       => $settings['name'],
 			'slug'       => 'open-sans-2',
 			'fontFamily' => $settings['fontFamily'],
-			'preview'    => $settings['preview'],
 		);
 		$this->assertSame( $expected_settings, $data['font_family_settings'] );
+		$this->assertSame( $preview, $data['preview'] );
 
 		wp_delete_post( $font_family_id, true );
+	}
+
+	/**
+	 * @dataProvider data_update_item_preview
+	 * @covers WP_REST_Font_Families_Controller::update_item
+	 */
+	public function test_update_item_preview( $preview ) {
+		wp_set_current_user( self::$admin_id );
+
+		$font_family_id = self::create_font_family_post( array( 'preview' => self::$default_preview ) );
+		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
+		$request->set_param( 'preview', $preview );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( $preview, $data['preview'] );
+
+		wp_delete_post( $font_family_id, true );
+	}
+
+	public function data_update_item_preview() {
+		return array(
+			array( 'https://s.w.org/images/fonts/16.7/previews/opened-sans/opened-sans-400-normal.svg' ),
+			// Empty preview is allowed.
+			array( '' ),
+		);
 	}
 
 	/**
@@ -596,9 +625,6 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		return array(
 			array( array( 'name' => 'Opened Sans' ) ),
 			array( array( 'fontFamily' => '"Opened Sans", sans-serif' ) ),
-			array( array( 'preview' => 'https://s.w.org/images/fonts/16.7/previews/opened-sans/opened-sans-400-normal.svg' ) ),
-			// Empty preview is allowed.
-			array( array( 'preview' => '' ) ),
 		);
 	}
 
@@ -803,9 +829,10 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$this->assertSame( 200, $response->get_status() );
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 4, $properties );
+		$this->assertCount( 5, $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'theme_json_version', $properties );
+		$this->assertArrayHasKey( 'preview', $properties );
 		$this->assertArrayHasKey( 'font_faces', $properties );
 		$this->assertArrayHasKey( 'font_family_settings', $properties );
 	}
@@ -818,6 +845,11 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$this->assertArrayHasKey( 'theme_json_version', $data );
 		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'] );
+
+		$this->assertArrayHasKey( 'preview', $data );
+		$preview          = get_post_meta( $post_id, '_font_family_preview_url', true );
+		$expected_preview = $preview ? $preview : '';
+		$this->assertSame( $expected_preview, $data['preview'] );
 
 		$font_face_ids = get_children(
 			array(
@@ -840,7 +872,6 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			'name'       => $post->post_title,
 			'slug'       => $post->post_name,
 			'fontFamily' => $settings['fontFamily'],
-			'preview'    => $settings['preview'],
 		);
 		$this->assertSame( $expected_settings, $settings );
 
@@ -858,8 +889,8 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->ID . '/font-faces/' . $font_face_ids[ $index ] ), $link['href'] );
 
 			$embeddable = isset( $link['attributes']['embeddable'] )
-				? $link['attributes']['embeddable']
-				: $link['embeddable'];
+			? $link['attributes']['embeddable']
+			: $link['embeddable'];
 			$this->assertTrue( $embeddable );
 		}
 	}

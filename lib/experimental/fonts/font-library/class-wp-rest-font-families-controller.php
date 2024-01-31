@@ -149,11 +149,6 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
 		}
 
-		// Provide default for preview, if not provided.
-		if ( ! isset( $settings['preview'] ) ) {
-			$settings['preview'] = '';
-		}
-
 		return $settings;
 	}
 
@@ -166,6 +161,14 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		if ( ! empty( $request['id'] ) ) {
+			return new WP_Error(
+				'rest_post_exists',
+				__( 'Cannot create existing post.', 'default' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		$settings = $request->get_param( 'font_family_settings' );
 
 		// Check that the font family slug is unique.
@@ -174,7 +177,6 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				'post_type'              => $this->post_type,
 				'posts_per_page'         => 1,
 				'name'                   => $settings['slug'],
-				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 			)
 		);
@@ -187,8 +189,27 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		return parent::create_item( $request );
+		return $this->create_or_update_font_family( $request );
 	}
+
+	/**
+	 * Updates a single font family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function update_item( $request ) {
+		$valid_check = $this->get_post( $request['id'] );
+		if ( is_wp_error( $valid_check ) ) {
+			return $valid_check;
+		}
+
+		$post_before = get_post( $request['id'] );
+		return $this->create_or_update_font_family( $request, false, $post_before );
+	}
+
 
 	/**
 	 * Deletes a single font family.
@@ -237,6 +258,11 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 
 		if ( rest_is_field_included( 'font_faces', $fields ) ) {
 			$data['font_faces'] = $this->get_font_face_ids( $item->ID );
+		}
+
+		if ( rest_is_field_included( 'preview', $fields ) ) {
+			$preview         = get_post_meta( $item->ID, '_font_family_preview_url', true );
+			$data['preview'] = $preview ? $preview : '';
 		}
 
 		if ( rest_is_field_included( 'font_family_settings', $fields ) ) {
@@ -298,6 +324,12 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 					'maximum'     => 2,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
+				'preview'              => array(
+					'description' => __( 'URL to a preview image of the font family.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
 				'font_faces'           => array(
 					'description' => __( 'The IDs of the child font faces in the font family.', 'gutenberg' ),
 					'type'        => 'array',
@@ -323,10 +355,6 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 						),
 						'fontFamily' => array(
 							'description' => 'CSS font-family value.',
-							'type'        => 'string',
-						),
-						'preview'    => array(
-							'description' => 'URL to a preview image of the font family.',
 							'type'        => 'string',
 						),
 					),
@@ -385,12 +413,13 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			$properties = $this->get_item_schema()['properties'];
 			return array(
 				'theme_json_version'   => $properties['theme_json_version'],
+				'preview'              => $properties['preview'],
 				// When creating or updating, font_family_settings is stringified JSON, to work with multipart/form-data.
 				// Font families don't currently support file uploads, but may accept preview files in the future.
 				'font_family_settings' => array(
 					'description'       => __( 'font-family declaration in theme.json format, encoded as a string.', 'gutenberg' ),
 					'type'              => 'string',
-					'required'          => true,
+					'required'          => WP_REST_Server::CREATABLE === $method ? true : false,
 					'validate_callback' => array( $this, 'validate_font_family_settings' ),
 					'sanitize_callback' => array( $this, 'sanitize_font_family_settings' ),
 				),
@@ -485,7 +514,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 
 			$prepared_post->ID = $existing_post->ID;
 			$existing_settings = $this->get_settings_from_post( $existing_post );
-			$settings          = array_merge( $existing_settings, $settings );
+			$settings          = empty( $settings ) ? $existing_settings : array_merge( $existing_settings, $settings );
 		}
 
 		$prepared_post->post_type   = $this->post_type;
@@ -518,7 +547,95 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			'name'       => isset( $post->post_title ) && $post->post_title ? $post->post_title : '',
 			'slug'       => isset( $post->post_name ) && $post->post_name ? $post->post_name : '',
 			'fontFamily' => isset( $settings_json['fontFamily'] ) && $settings_json['fontFamily'] ? $settings_json['fontFamily'] : '',
-			'preview'    => isset( $settings_json['preview'] ) && $settings_json['preview'] ? $settings_json['preview'] : '',
 		);
+	}
+
+	/**
+	 * Creates or updates a font family post from a request.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request     Request object.
+	 * @param bool            $is_creating True when creating a post, false when updating.
+	 * @param WP_Post|null    $post_before Post before it was updated, or null if creating.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	protected function create_or_update_font_family( $request, $is_creating = true, $post_before = null ) {
+		$is_updating   = ! $is_creating;
+		$prepared_post = $this->prepare_item_for_database( $request );
+
+		if ( is_wp_error( $prepared_post ) ) {
+			return $prepared_post;
+		}
+
+		$post_id = wp_insert_post( wp_slash( (array) $prepared_post ), true, false );
+
+		if ( is_wp_error( $post_id ) ) {
+			if ( 'db_insert_error' === $post_id->get_error_code() ) {
+				$post_id->add_data( array( 'status' => 500 ) );
+			} else {
+				$post_id->add_data( array( 'status' => 400 ) );
+			}
+
+			return $post_id;
+		}
+
+		$post = get_post( $post_id );
+
+		/**
+		 * Fires after a single post is created or updated via the REST API.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_Post         $post     Inserted or updated post object.
+		 * @param WP_REST_Request $request  Request object.
+		 * @param bool            $creating True when creating a post, false when updating.
+		 */
+		do_action( 'rest_insert_wp_font_family', $post, $request, $is_creating );
+
+		if ( isset( $request['preview'] ) && ( $request['preview'] || $is_updating ) ) {
+			$preview_update = update_post_meta( $post->ID, '_font_family_preview_url', $request['preview'] );
+
+			if ( false === $preview_update ) {
+				return new WP_Error(
+					'rest_font_family_database_error',
+					/* translators: %s: Custom field key. */
+					__( 'Could not update the font family preview value in the database.', 'gutenberg' ),
+					array( 'status' => WP_Http::INTERNAL_SERVER_ERROR )
+				);
+			}
+		}
+
+		$post          = get_post( $post_id );
+		$fields_update = $this->update_additional_fields_for_object( $post, $request );
+
+		if ( is_wp_error( $fields_update ) ) {
+			return $fields_update;
+		}
+
+		$request->set_param( 'context', 'edit' );
+
+		/**
+		 * Fires after a single font family is completely created or updated via the REST API.
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param WP_Post         $post     Inserted or updated post object.
+		 * @param WP_REST_Request $request  Request object.
+		 * @param bool            $creating True when creating a post, false when updating.
+		 */
+		do_action( 'rest_after_insert_wp_font_family', $post, $request, $is_creating );
+
+		wp_after_insert_post( $post, $is_updating, $post_before );
+
+		$response = $this->prepare_item_for_response( $post, $request );
+		$response = rest_ensure_response( $response );
+
+		if ( $is_creating ) {
+			$response->set_status( 201 );
+			$response->header( 'Location', rest_url( rest_get_route_for_post( $post ) ) );
+		}
+
+		return $response;
 	}
 }
