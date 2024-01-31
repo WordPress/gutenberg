@@ -148,7 +148,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $slug Font collection slug.
-		 * @return array List of font collections.
+		 * @return WP_Font_Collection Font collections object.
 		 */
 		public static function get_font_collection( $slug ) {
 			if ( array_key_exists( $slug, self::$collections ) ) {

@@ -222,12 +222,14 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			'https://example.com/?id=10&data=lzB%252Fzd%252FZA%253D%253D',
 			'https://example.com/?id=10&data=lzB%2Fzd%FZA%3D%3D',
 			'https://example.com/?id=10&data=1234',
+			'https://example.com/?arrayParams[]=1&arrayParams[]=2&arrayParams[]=3',
 		);
 
 		$urls_after_render = array(
 			'https://example.com/?id=10&#038;data=lzB%2Fzd%2FZA%3D%3D',
 			'https://example.com/?id=10&#038;data=lzB%2Fzd%FZA%3D%3D',
 			'https://example.com/?id=10&#038;data=1234',
+			'https://example.com/?arrayParams%5B%5D=1&#038;arrayParams%5B%5D=2&#038;arrayParams%5B%5D=3',
 		);
 
 		foreach ( $urls_before_render as $idx => $link ) {

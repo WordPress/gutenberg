@@ -110,6 +110,8 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 					'6.5.0'
 				);
 			}
+
+			return true;
 		}
 
 		/**
