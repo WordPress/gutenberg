@@ -155,19 +155,18 @@ const parsedBlocksCache = new WeakMap();
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, editedBlocks, meta, entityRecord } = useSelect(
+	const { getEntityRecord } = useSelect( STORE_NAME );
+	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecord, getEntityRecord } =
-				select( STORE_NAME );
+			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
 				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
 				meta: editedRecord.meta,
-				entityRecord: getEntityRecord( kind, name, id ),
 			};
 		},
 		[ kind, name, id ]
@@ -188,6 +187,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return EMPTY_ARRAY;
 		}
 
+		const entityRecord = getEntityRecord( kind, name, id );
 		let _blocks = parsedBlocksCache.get( entityRecord );
 
 		if ( ! _blocks ) {
@@ -196,7 +196,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		}
 
 		return _blocks;
-	}, [ id, editedBlocks, content ] );
+	}, [ kind, name, id, editedBlocks, content, getEntityRecord ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
