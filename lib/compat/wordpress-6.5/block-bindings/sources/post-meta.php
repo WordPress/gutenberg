@@ -17,6 +17,13 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs ) {
 		$post_id = get_the_ID();
 	}
 
+	// If a post isn't public, we need to prevent
+	// unauthorized users from accessing the post meta.
+	$post = get_post( $post_id );
+	if ( ( $post && 'publish' !== $post->post_status && ! current_user_can( 'read_post', $post_id ) ) || post_password_required( $post_id ) ) {
+		return null;
+	}
+
 	return get_post_meta( $post_id, $source_attrs['key'], true );
 }
 
@@ -28,7 +35,7 @@ function gutenberg_register_block_bindings_post_meta_source() {
 	register_block_bindings_source(
 		'core/post-meta',
 		array(
-			'label'              => __( 'Post Meta' ),
+			'label'              => _x( 'Post Meta', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_post_meta_callback',
 		)
 	);
