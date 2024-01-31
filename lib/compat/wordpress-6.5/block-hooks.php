@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-function respect_ignored_hooked_blocks_post_meta_on_wp_navigation_post ( $hooked_block_types, $relative_position, $anchor_block_type, $context ) {
+function respect_ignored_hooked_blocks_post_meta_on_wp_navigation_post( $hooked_block_types, $relative_position, $anchor_block_type, $context ) {
 	// Only apply this filter if $context is a wp_navigation post object.
 	if ( ! $context instanceof WP_Post || 'wp_navigation' !== $context->post_type ) {
 		return $hooked_block_types;
