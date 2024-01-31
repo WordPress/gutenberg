@@ -84,12 +84,24 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		name === 'core/image' ||
 		name === 'core/button'
 	) {
-		if (
-			newAttributes.metadata?.bindings?.content?.source?.name ===
-			'pattern_attributes'
-		) {
-			newAttributes.metadata.bindings.content.source =
-				'core/pattern-overrides';
+		if ( newAttributes.metadata?.bindings ) {
+			const bindings = [
+				'content',
+				'url',
+				'title',
+				'alt',
+				'text',
+				'linkTarget',
+			];
+			bindings.forEach( ( binding ) => {
+				if (
+					newAttributes.metadata.bindings[ binding ]?.source?.name ===
+					'pattern_attributes'
+				) {
+					newAttributes.metadata.bindings[ binding ].source =
+						'core/pattern-overrides';
+				}
+			} );
 		}
 	}
 	return [ name, newAttributes ];
