@@ -94,6 +94,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 		filterComponents.push(
 			<ResetFilters
 				key="reset-filters"
+				filters={ filters }
 				view={ view }
 				onChangeView={ onChangeView }
 			/>
