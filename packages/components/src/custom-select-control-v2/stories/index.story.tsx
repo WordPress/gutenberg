@@ -25,6 +25,7 @@ const meta: Meta< typeof CustomSelect > = {
 		renderSelectedValue: { control: { type: null } },
 		value: { control: { type: null } },
 	},
+	tags: [ 'sb-wip' ],
 	parameters: {
 		badges: [ 'wip' ],
 		actions: { argTypesRegex: '^on.*' },

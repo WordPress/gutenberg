@@ -56,6 +56,7 @@ const meta: Meta< typeof DropdownMenu > = {
 		children: { control: { type: null } },
 		trigger: { control: { type: null } },
 	},
+	tags: [ 'sb-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		badges: [ 'private' ],
