@@ -13,11 +13,10 @@
 class Tests_Fonts_WpFontLibrary_GetMimeTypes extends WP_Font_Library_UnitTestCase {
 
 	/**
-	 *
 	 * @dataProvider data_should_supply_correct_mime_type_for_php_version
 	 *
-	 * @param array $php_version_id PHP_VERSION_ID value.
-	 * @param array $expected Expected mime types.
+	 * @param int   $php_version_id PHP_VERSION_ID value.
+	 * @param array $expected       Expected mime types.
 	 */
 	public function test_should_supply_correct_mime_type_for_php_version( $php_version_id, $expected ) {
 		$mimes = WP_Font_Library::get_expected_font_mime_types_per_php_version( $php_version_id );
@@ -27,7 +26,7 @@ class Tests_Fonts_WpFontLibrary_GetMimeTypes extends WP_Font_Library_UnitTestCas
 	/**
 	 * Data provider.
 	 *
-	 * @return array[]
+	 * @return array
 	 */
 	public function data_should_supply_correct_mime_type_for_php_version() {
 		return array(

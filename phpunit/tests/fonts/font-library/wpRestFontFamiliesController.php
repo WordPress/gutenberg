@@ -143,26 +143,45 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Families_Controller::get_context_param
+	 * @doesNotPerformAssertions
 	 */
 	public function test_context_param() {
-		// Collection.
-		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
-		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
-		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+		// See test_get_context_param().
+	}
 
-		// Single.
-		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families/' . self::$font_family_id1 );
+	/**
+	 * @dataProvider data_get_context_param
+	 *
+	 * @covers WP_REST_Font_Families_Controller::get_context_param
+	 *
+	 * @param bool $single_route Whether to test a single route.
+	 */
+	public function test_get_context_param( $single_route ) {
+		$route = '/wp/v2/font-families';
+		if ( $single_route ) {
+			$route .= '/' . self::$font_family_id1;
+		}
+
+		$request  = new WP_REST_Request( 'OPTIONS', $route );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+
 		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
 		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_context_param() {
+		return array(
+			'Collection' => array( false ),
+			'Single'     => array( true ),
+		);
+	}
 
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::get_items
@@ -371,6 +390,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	 * @dataProvider data_create_item_invalid_theme_json_version
 	 *
 	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 *
+	 * @param int $theme_json_version Version to test.
 	 */
 	public function test_create_item_invalid_theme_json_version( $theme_json_version ) {
 		wp_set_current_user( self::$admin_id );
@@ -382,6 +403,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_create_item_invalid_theme_json_version() {
 		return array(
 			array( 1 ),
@@ -393,6 +419,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	 * @dataProvider data_create_item_with_default_preview
 	 *
 	 * @covers WP_REST_Font_Faces_Controller::sanitize_font_family_settings
+	 *
+	 * @param array $settings Settings to test.
 	 */
 	public function test_create_item_with_default_preview( $settings ) {
 		wp_set_current_user( self::$admin_id );
@@ -410,6 +438,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		wp_delete_post( $data['id'], true );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_create_item_with_default_preview() {
 		$default_settings = array(
 			'name'       => 'Open Sans',
@@ -430,6 +463,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	 * @dataProvider data_create_item_invalid_settings
 	 *
 	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_settings
+	 *
+	 * @param array $settings Settings to test.
 	 */
 	public function test_create_item_invalid_settings( $settings ) {
 		wp_set_current_user( self::$admin_id );
@@ -441,6 +476,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_create_item_invalid_settings() {
 		return array(
 			'Missing name'          => array(
@@ -572,7 +612,10 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 	/**
 	 * @dataProvider data_update_item_individual_settings
+	 *
 	 * @covers WP_REST_Font_Families_Controller::update_item
+	 *
+	 * @param array $settings Settings to test.
 	 */
 	public function test_update_item_individual_settings( $settings ) {
 		wp_set_current_user( self::$admin_id );
@@ -592,6 +635,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		wp_delete_post( $font_family_id, true );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_update_item_individual_settings() {
 		return array(
 			array( array( 'name' => 'Opened Sans' ) ),
@@ -602,10 +650,13 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		);
 	}
 
-		/**
+	/**
 	 * @dataProvider data_update_item_santize_font_family
 	 *
 	 * @covers WP_REST_Font_Families_Controller::sanitize_font_face_settings
+	 *
+	 * @param string $font_family_setting Font family setting to test.
+	 * @param string $expected            Expected result.
 	 */
 	public function test_update_item_santize_font_family( $font_family_setting, $expected ) {
 		wp_set_current_user( self::$admin_id );
@@ -622,11 +673,25 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		wp_delete_post( $font_family_id, true );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_update_item_santize_font_family() {
 		return array(
-			array( 'Libre Barcode 128 Text', '"Libre Barcode 128 Text"' ),
-			array( 'B612 Mono', '"B612 Mono"' ),
-			array( 'Open Sans, Noto Sans, sans-serif', '"Open Sans", "Noto Sans", sans-serif' ),
+			'multiword font with integer' => array(
+				'font_family_setting' => 'Libre Barcode 128 Text',
+				'expected'            => '"Libre Barcode 128 Text"',
+			),
+			'multiword font'              => array(
+				'font_family_setting' => 'B612 Mono',
+				'expected'            => '"B612 Mono"',
+			),
+			'comma-separated fonts'       => array(
+				'font_family_setting' => 'Open Sans, Noto Sans, sans-serif',
+				'expected'            => '"Open Sans", "Noto Sans", sans-serif',
+			),
 		);
 	}
 
@@ -634,6 +699,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	 * @dataProvider data_update_item_invalid_settings
 	 *
 	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 *
+	 * @param array $settings Settings to test.
 	 */
 	public function test_update_item_empty_settings( $settings ) {
 		wp_set_current_user( self::$admin_id );
@@ -646,6 +713,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_update_item_invalid_settings() {
 		return array(
 			'Empty name'            => array(

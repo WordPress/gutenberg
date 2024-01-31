@@ -39,7 +39,6 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 		wp_unregister_font_collection( 'mock-col-slug' );
 	}
 
-
 	/**
 	 * @covers WP_REST_Font_Collections_Controller::register_routes
 	 */
