@@ -1,6 +1,6 @@
 <?php
 /**
- * Block hooks compatiiility layer.
+ * Block hooks compatibility layer.
  *
  * @package gutenberg
  */
