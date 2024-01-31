@@ -28,7 +28,8 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 
 	public function test_fonts_dir() {
 		$font_dir = wp_get_font_dir();
-		$this->assertEquals( $font_dir, static::$dir_defaults );
+
+		$this->assertSame( $font_dir, static::$dir_defaults );
 	}
 
 	public function test_fonts_dir_with_filter() {
@@ -58,7 +59,7 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 			'error'   => false,
 		);
 
-		$this->assertEquals( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
+		$this->assertSame( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
 
 		// Remove the filter.
 		remove_filter( 'font_dir', 'set_new_values' );
@@ -66,6 +67,6 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 		// Gets the fonts dir.
 		$font_dir = wp_get_font_dir();
 
-		$this->assertEquals( $font_dir, static::$dir_defaults, 'The wp_get_font_dir() method should return the default values.' );
+		$this->assertSame( $font_dir, static::$dir_defaults, 'The wp_get_font_dir() method should return the default values.' );
 	}
 }

@@ -61,7 +61,7 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 		$response = rest_get_server()->dispatch( $request );
 		$content  = $response->get_data();
 		$this->assertIsArray( $content );
-		$this->assertEquals( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status() );
 	}
 
 	/**
@@ -71,7 +71,7 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status(), 'Response code is not 200' );
+		$this->assertSame( 200, $response->get_status(), 'Response code is not 200' );
 
 		$response_data = $response->get_data();
 		$this->assertArrayHasKey( 'name', $response_data, 'Response data does not have the name key.' );

@@ -21,7 +21,7 @@ class Tests_Fonts_WpFontLibrary_GetMimeTypes extends WP_Font_Library_UnitTestCas
 	 */
 	public function test_should_supply_correct_mime_type_for_php_version( $php_version_id, $expected ) {
 		$mimes = WP_Font_Library::get_expected_font_mime_types_per_php_version( $php_version_id );
-		$this->assertEquals( $mimes, $expected );
+		$this->assertSame( $mimes, $expected );
 	}
 
 	/**
