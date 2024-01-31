@@ -235,15 +235,6 @@ function makeFileNameFromFontFace( fontFace ) {
 		'fontFamily',
 		'fontStyle',
 		'fontWeight',
-		'fontDisplay',
-		'fontStretch',
-		'ascentOverride',
-		'descentOverride',
-		'fontVariant',
-		'fontFeatureSettings',
-		'fontVariationSettings',
-		'lineGapOverride',
-		'sizeAdjust',
 		'unicodeRange',
 	];
 	let name = properties.reduce( ( acc, property ) => {
