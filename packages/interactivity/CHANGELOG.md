@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.1 (2024-01-31)
+
 ### Bug Fixes
 
 -   Ensure Preact is used in published packages ([58258](https://github.com/WordPress/gutenberg/pull/58258).
