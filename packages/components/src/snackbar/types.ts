@@ -38,6 +38,7 @@ export type SnackbarListProps = {
 			content: string;
 		}
 	>;
+	maxVisible?: number;
 	onRemove: ( id: string ) => void;
 	children?: NoticeChildren | Array< NoticeChildren >;
 };

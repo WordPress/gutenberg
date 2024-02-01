@@ -36,6 +36,7 @@ function Notices() {
 			/>
 			<SnackbarList
 				notices={ snackbarNotices }
+				maxVisible={ 3 }
 				className="edit-widgets-notices__snackbar"
 				onRemove={ removeNotice }
 			/>
