@@ -267,8 +267,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'caption' => true,
 			),
 			'dimensions' => array(
-				'minHeight'   => true,
 				'aspectRatio' => true,
+				'minHeight'   => true,
 			),
 			'position'   => array(
 				'sticky' => true,
@@ -306,8 +306,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'caption' => true,
 					),
 					'dimensions' => array(
-						'minHeight'   => true,
 						'aspectRatio' => true,
+						'minHeight'   => true,
 					),
 					'position'   => array(
 						'sticky' => true,
@@ -454,6 +454,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					'blocks'   => array(
+						'core/cover'        => array(
+							'dimensions' => array(
+								'aspectRatio' => '16/9',
+							),
+						),
 						'core/group'        => array(
 							'color'      => array(
 								'gradient' => 'var:preset|gradient|custom-gradient',
@@ -535,7 +540,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$variables = 'body{--wp--preset--color--grey: grey;--wp--preset--gradient--custom-gradient: linear-gradient(135deg,rgba(0,0,0) 0%,rgb(0,0,0) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--big: 41px;--wp--preset--font-family--arial: Arial, serif;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
-		$styles    = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}.wp-element-button, .wp-block-button__link{box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}.wp-block-group{background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}.wp-block-group a:where(:not(.wp-element-button)){color: #111;}.wp-block-heading{color: #123456;}.wp-block-heading a:where(:not(.wp-element-button)){background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a:where(:not(.wp-element-button)){background-color: #777;color: #555;}.wp-block-post-excerpt{column-count: 2;}.wp-block-image{margin-bottom: 30px;}.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder{border-top-left-radius: 10px;border-bottom-right-radius: 1em;}.wp-block-image img, .wp-block-image .components-placeholder{filter: var(--wp--preset--duotone--custom-duotone);}';
+		$styles    = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}.wp-element-button, .wp-block-button__link{box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}.wp-block-cover{min-height: unset;aspect-ratio: 16/9;}.wp-block-group{background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}.wp-block-group a:where(:not(.wp-element-button)){color: #111;}.wp-block-heading{color: #123456;}.wp-block-heading a:where(:not(.wp-element-button)){background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a:where(:not(.wp-element-button)){background-color: #777;color: #555;}.wp-block-post-excerpt{column-count: 2;}.wp-block-image{margin-bottom: 30px;}.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder{border-top-left-radius: 10px;border-bottom-right-radius: 1em;}.wp-block-image img, .wp-block-image .components-placeholder{filter: var(--wp--preset--duotone--custom-duotone);}';
 		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-custom-gradient-gradient-background{background: var(--wp--preset--gradient--custom-gradient) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-big-font-size{font-size: var(--wp--preset--font-size--big) !important;}.has-arial-font-family{font-family: var(--wp--preset--font-family--arial) !important;}';
 		$all       = $variables . $styles . $presets;
 
@@ -3871,19 +3876,22 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that invalid properties are removed from the theme.json inside indexed arrays as settings.typography.fontFamilies.
+	 */
 	public function test_sanitize_indexed_arrays() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => '2',
-				'badKey2'  => 'I am Evil!!!!',
+				'badKey2'  => 'I am Evil!',
 				'settings' => array(
-					'badKey3'    => 'I am Evil!!!!',
+					'badKey3'    => 'I am Evil!',
 					'typography' => array(
-						'badKey4'      => 'I am Evil!!!!',
+						'badKey4'      => 'I am Evil!',
 						'fontFamilies' => array(
 							'custom' => array(
 								array(
-									'badKey4'    => 'I am Evil!!!!',
+									'badKey4'    => 'I am Evil!',
 									'name'       => 'Arial',
 									'slug'       => 'arial',
 									'fontFamily' => 'Arial, sans-serif',
@@ -3891,20 +3899,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 							'theme'  => array(
 								array(
-									'badKey5'    => 'I am Evil!!!!',
+									'badKey5'    => 'I am Evil!',
 									'name'       => 'Piazzolla',
 									'slug'       => 'piazzolla',
 									'fontFamily' => 'Piazzolla',
 									'fontFace'   => array(
 										array(
-											'badKey6'    => 'I am Evil!!!!',
+											'badKey6'    => 'I am Evil!',
 											'fontFamily' => 'Piazzolla',
 											'fontStyle'  => 'italic',
 											'fontWeight' => '400',
 											'src'        => 'https://example.com/font.ttf',
 										),
 										array(
-											'badKey7'    => 'I am Evil!!!!',
+											'badKey7'    => 'I am Evil!',
 											'fontFamily' => 'Piazzolla',
 											'fontStyle'  => 'italic',
 											'fontWeight' => '400',
@@ -3913,20 +3921,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									),
 								),
 								array(
-									'badKey8'    => 'I am Evil!!!!',
+									'badKey8'    => 'I am Evil!',
 									'name'       => 'Inter',
 									'slug'       => 'Inter',
 									'fontFamily' => 'Inter',
 									'fontFace'   => array(
 										array(
-											'badKey9'    => 'I am Evil!!!!',
+											'badKey9'    => 'I am Evil!',
 											'fontFamily' => 'Inter',
 											'fontStyle'  => 'italic',
 											'fontWeight' => '400',
 											'src'        => 'https://example.com/font.ttf',
 										),
 										array(
-											'badKey10'   => 'I am Evil!!!!',
+											'badKey10'   => 'I am Evil!',
 											'fontFamily' => 'Inter',
 											'fontStyle'  => 'italic',
 											'fontWeight' => '400',
@@ -4486,6 +4494,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests generating the spacing presets array based on the spacing scale provided.
 	 *
 	 * @dataProvider data_set_spacing_sizes_when_invalid
+	 *
+	 * @param array $spacing_scale   Example spacing scale definitions from the data provider.
+	 * @param array $expected_output Expected output from data provider.
 	 */
 	public function test_set_spacing_sizes_when_invalid( $spacing_scale, $expected_output ) {
 		$this->expectException( Exception::class );
@@ -4834,7 +4845,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
 		$reflection->setAccessible( true );
 
-		$this->assertEquals( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
+		$this->assertSame( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
 	}
 
 	/**
