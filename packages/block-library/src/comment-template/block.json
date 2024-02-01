@@ -28,10 +28,6 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		},
-		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
 		}
 	},
 	"style": "wp-block-comment-template"
