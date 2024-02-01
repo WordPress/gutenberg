@@ -4,6 +4,8 @@
  * Test WP_Theme_JSON_Resolver_Gutenberg class.
  *
  * @package Gutenberg
+ *
+ * @since 5.8.0
  */
 
 class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
@@ -121,13 +123,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function filter_set_locale_to_polish() {
 		return 'pl_PL';
-	}
-
-	public function filter_db_query( $query ) {
-		if ( preg_match( '#post_type = \'wp_global_styles\'#', $query ) ) {
-			$this->queries[] = $query;
-		}
-		return $query;
 	}
 
 	public function test_translations_are_applied() {
@@ -785,21 +780,21 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that get_merged_data returns the data merged up to the proper origin.
+	 * Tests that get_merged_data returns the data merged up to the proper origin.
 	 *
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
 	 *
 	 * @dataProvider data_get_merged_data_returns_origin
 	 *
-	 * @param string $origin            What origin to get data from.
-	 * @param bool   $core_palette      Whether the core palette is present.
-	 * @param string $core_palette_text Message.
-	 * @param string $block_styles      Whether the block styles are present.
-	 * @param string $block_styles_text Message.
+	 * @param string $origin             What origin to get data from.
+	 * @param bool   $core_palette       Whether the core palette is present.
+	 * @param string $core_palette_text  Message.
+	 * @param string $block_styles       Whether the block styles are present.
+	 * @param string $block_styles_text  Message.
 	 * @param bool   $theme_palette      Whether the theme palette is present.
 	 * @param string $theme_palette_text Message.
-	 * @param bool   $user_palette      Whether the user palette is present.
-	 * @param string $user_palette_text Message.
+	 * @param bool   $user_palette       Whether the user palette is present.
+	 * @param string $user_palette_text  Message.
 	 */
 	public function test_get_merged_data_returns_origin( $origin, $core_palette, $core_palette_text, $block_styles, $block_styles_text, $theme_palette, $theme_palette_text, $user_palette, $user_palette_text ) {
 		// Make sure there is data from the blocks origin.
@@ -864,7 +859,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * and that the core values have the proper data.
 	 *
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
-	 *
 	 */
 	public function test_get_merged_data_returns_origin_proper() {
 		// Make sure the theme has a theme.json
@@ -901,9 +895,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for test_get_merged_data_returns_origin
+	 * Data provider for test_get_merged_data_returns_origin.
 	 *
-	 * @return array
+	 * @return array[]
 	 */
 	public function data_get_merged_data_returns_origin() {
 		return array(
@@ -954,13 +948,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-
 	/**
-	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child,
+	 * Tests that get_style_variations returns all variations, including parent theme variations if the theme is a child,
 	 * and that the child variation overwrites the parent variation of the same name.
 	 *
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_style_variations
-	 **/
+	 */
 	public function test_get_style_variations_returns_all_variations() {
 		// Switch to a child theme.
 		switch_theme( 'block-theme-child' );
