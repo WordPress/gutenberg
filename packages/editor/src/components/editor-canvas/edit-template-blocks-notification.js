@@ -27,27 +27,18 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { renderingMode, getPostLinkProps, templateId } = useSelect(
-		( select ) => {
-			const {
-				getRenderingMode,
-				getEditorSettings,
-				getCurrentTemplateId,
-			} = select( editorStore );
-			return {
-				renderingMode: getRenderingMode(),
-				getPostLinkProps: getEditorSettings().getPostLinkProps,
-				templateId: getCurrentTemplateId(),
-			};
-		},
-		[]
-	);
-	const editTemplate = getPostLinkProps
-		? getPostLinkProps( {
-				postId: templateId,
-				postType: 'wp_template',
-		  } )
-		: {};
+	const editTemplate = useSelect( ( select ) => {
+		const { getEditorSettings, getCurrentTemplateId } =
+			select( editorStore );
+		const { getPostLinkProps } = getEditorSettings();
+		return getPostLinkProps
+			? getPostLinkProps( {
+					postId: getCurrentTemplateId(),
+					postType: 'wp_template',
+			  } )
+			: {};
+	}, [] );
+
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
@@ -58,18 +49,17 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
-			if ( renderingMode !== 'template-locked' ) {
-				return;
-			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
+
 			const isNoticeAlreadyShowing = getNotices().some(
 				( notice ) => notice.id === lastNoticeId.current
 			);
 			if ( isNoticeAlreadyShowing ) {
 				return;
 			}
+
 			const { notice } = await createInfoNotice(
 				__( 'Edit your template to edit this block.' ),
 				{
@@ -87,9 +77,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		};
 
 		const handleDblClick = ( event ) => {
-			if ( renderingMode !== 'template-locked' ) {
-				return;
-			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
@@ -106,7 +93,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, renderingMode, contentRef.current ] );
+	}, [ lastNoticeId, contentRef.current ] );
 
 	return (
 		<ConfirmDialog

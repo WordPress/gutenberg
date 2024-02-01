@@ -197,10 +197,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableGetEditorMode,
 				getTemplateLock,
 				getBlockRootClientId,
-				__unstableIsWithinBlockOverlay,
-				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
 				getBlockSettings,
+				isDraggingBlocks,
 			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -219,15 +218,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blockName !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough,
+					enableClickThrough &&
+					! isDraggingBlocks(),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
-				isDropZoneDisabled:
-					blockEditingMode !== 'default' ||
-					__unstableHasActiveBlockOverlayActive( clientId ) ||
-					__unstableIsWithinBlockOverlay( clientId ),
+				isDropZoneDisabled: blockEditingMode === 'disabled',
 				defaultLayout,
 			};
 		},
