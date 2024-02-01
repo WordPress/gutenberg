@@ -220,6 +220,25 @@ describe.each( [
 	} );
 
 	it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
+		render(
+			<CustomSelect
+				{ ...props }
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+				__experimentalShowSelectedHint
+			/>
+		);
+
+		expect( screen.getByText( /hint/i ) ).toBeVisible();
+	} );
+
+	it( 'shows selected hint in list of options when added', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -241,7 +260,7 @@ describe.each( [
 			screen.getByRole( 'combobox', { name: 'Custom select' } )
 		);
 
-		expect( screen.getByText( 'Hint' ) ).toBeVisible();
+		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
 	} );
 
 	it( 'Should return object onChange', async () => {
