@@ -1936,9 +1936,26 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
+
+		let initialAttributes = {};
+
+		const hookedBlocksForCurrentBlock = getBlockTypes()?.filter(
+			( { blockHooks } ) => blockHooks && id in blockHooks
+		);
+
+		if ( hookedBlocksForCurrentBlock?.length ) {
+			initialAttributes = {
+				metadata: {
+					ignoredHookedBlocks: hookedBlocksForCurrentBlock.map(
+						( { name } ) => name
+					),
+				},
+			};
+		}
+
 		return {
 			...blockItemBase,
-			initialAttributes: {},
+			initialAttributes,
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
