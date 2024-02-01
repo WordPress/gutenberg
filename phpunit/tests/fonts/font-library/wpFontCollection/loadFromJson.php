@@ -31,9 +31,9 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
 
 		$config = WP_Font_Collection::load_from_json( 'https://localhost/fonts/mock-font-collection.json' );
-		$this->assertSame( self::$mock_collection_data, $config );
-
 		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
+
+		$this->assertSame( self::$mock_collection_data, $config );
 	}
 
 	public function test_should_error_with_invalid_file_path() {
@@ -54,9 +54,9 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 		add_filter( 'pre_http_request', array( $this, 'mock_request_invalid_response' ), 10, 3 );
 
 		$config = WP_Font_Collection::load_from_json( 'https://localhost/fonts/missing-collection.json' );
-		$this->assertWPError( $config, 'font_collection_json_missing' );
-
 		remove_filter( 'pre_http_request', array( $this, 'mock_request_invalid_response' ) );
+
+		$this->assertWPError( $config, 'font_collection_json_missing' );
 	}
 
 	public function test_should_error_with_invalid_json_from_file() {
@@ -72,9 +72,9 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 		add_filter( 'pre_http_request', array( $this, 'mock_request_invalid_json' ), 10, 3 );
 
 		$config = WP_Font_Collection::load_from_json( 'https://localhost/fonts/invalid-collection.json' );
-		$this->assertWPError( $config, 'font_collection_decode_error' );
-
 		remove_filter( 'pre_http_request', array( $this, 'mock_request_invalid_json' ) );
+
+		$this->assertWPError( $config, 'font_collection_decode_error' );
 	}
 
 	public function test_should_error_with_json_from_file_missing_slug() {
@@ -93,9 +93,9 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::load_from_url' );
 
 		$config = WP_Font_Collection::load_from_json( 'https://localhost/fonts/missing-slug.json' );
-		$this->assertWPError( $config, 'font_collection_invalid_json' );
-
 		remove_filter( 'pre_http_request', array( $this, 'mock_request_missing_slug' ) );
+
+		$this->assertWPError( $config, 'font_collection_invalid_json' );
 	}
 
 	public function mock_request( $preempt, $args, $url ) {

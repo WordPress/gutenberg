@@ -20,6 +20,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	protected static $font_face_id1;
 	protected static $font_face_id2;
 
+	private static $post_ids_to_cleanup = array();
+
 	protected static $default_settings = array(
 		'name'       => 'Open Sans',
 		'slug'       => 'open-sans',
@@ -72,16 +74,32 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 				'src'        => home_url( '/wp-content/fonts/open-sans-bold.ttf' ),
 			)
 		);
+
+		static::$post_ids_to_cleanup = array();
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
+
+		wp_delete_post( self::$font_family_id1 );
+		wp_delete_post( self::$font_family_id2 );
+		wp_delete_post( self::$font_face_id1 );
+		wp_delete_post( self::$font_face_id2 );
+	}
+
+	public function tear_down() {
+		foreach ( static::$post_ids_to_cleanup as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+		static::$post_ids_to_cleanup = array();
+
+		parent::tear_down();
 	}
 
 	public static function create_font_family_post( $settings = array() ) {
 		$settings = array_merge( self::$default_settings, $settings );
-		return self::factory()->post->create(
+		$post_id  = self::factory()->post->create(
 			wp_slash(
 				array(
 					'post_type'    => 'wp_font_family',
@@ -97,6 +115,10 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 				)
 			)
 		);
+
+		static::$post_ids_to_cleanup[] = $post_id;
+
+		return $post_id;
 	}
 
 	/**
@@ -286,8 +308,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->assertArrayNotHasKey( 'fontFace', $data['font_family_settings'], 'The fontFace property should not exist in the font_family_settings data.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -301,6 +321,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 				'post_content' => 'invalid',
 			)
 		);
+
+		static::$post_ids_to_cleanup[] = $font_family_id;
 
 		$empty_settings = array(
 			'name'       => '',
@@ -317,8 +339,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->assertSame( $empty_settings, $data['font_family_settings'], 'The empty settings should exist in the font_family_settings data.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -365,8 +385,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$reponse_settings = $data['font_family_settings'];
 		$this->assertSame( $settings, $reponse_settings, 'The expected settings should exist in the font_family_settings data.' );
 		$this->assertEmpty( $data['font_faces'], 'The font_faces should be empty or not exist in the response data.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -381,11 +399,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
+		static::$post_ids_to_cleanup[] = $data['id'];
+
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in the response data.' );
 		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -432,12 +450,12 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
+		static::$post_ids_to_cleanup[] = $data['id'];
+
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$response_settings = $data['font_family_settings'];
 		$this->assertArrayHasKey( 'preview', $response_settings, 'The preview property should exist in the font_family_settings data.' );
 		$this->assertSame( '', $response_settings['preview'], 'The preview data should be an empty string.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -608,8 +626,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 			'preview'    => $settings['preview'],
 		);
 		$this->assertSame( $expected_settings, $data['font_family_settings'], 'The response font_family_settings should match expected settings.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -633,8 +649,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$value = current( $settings );
 		$this->assertArrayHasKey( $key, $data['font_family_settings'], 'The expected key should exist in the font_family_settings data.' );
 		$this->assertSame( $value, $data['font_family_settings'][ $key ], 'The font_family_settings data should match.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -671,8 +685,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->assertSame( $expected, $data['font_family_settings']['fontFamily'], 'The font family should match.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -821,8 +833,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		// Ensure the post still exists.
 		$post = get_post( $font_family_id );
 		$this->assertNotEmpty( $post, 'The post should still exists.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -850,8 +860,6 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . $font_family_id );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403, 'The response should return an error for "rest_cannot_delete" with 403 status for a user without permission.' );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -885,7 +893,8 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	protected function check_font_family_data( $data, $post_id, $links ) {
-		$post = get_post( $post_id );
+		static::$post_ids_to_cleanup[] = $post_id;
+		$post                          = get_post( $post_id );
 
 		$this->assertArrayHasKey( 'id', $data, 'The id property should exist in response data.' );
 		$this->assertSame( $post->ID, $data['id'], 'The "id" from the response data should match the post ID.' );

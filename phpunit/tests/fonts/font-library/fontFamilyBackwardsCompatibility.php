@@ -8,16 +8,23 @@
  * @subpackage Font Library
  */
 class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
+	private $post_ids_to_delete = array();
+
 	public function set_up() {
 		parent::set_up();
 
+		$this->post_ids_to_delete = array();
 		delete_option( 'gutenberg_font_family_format_converted' );
 	}
 
 	public function tear_down() {
-		parent::tear_down();
+		foreach ( $this->post_ids_to_delete as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
 
 		delete_option( 'gutenberg_font_family_format_converted' );
+
+		parent::tear_down();
 	}
 
 	public function test_font_faces_with_remote_src() {
@@ -27,7 +34,7 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 
 		gutenberg_convert_legacy_font_family_format();
 
-		$font_family = get_post( $font_family_id );
+		$font_family = $this->get_post( $font_family_id );
 		$font_faces  = $this->get_font_faces( $font_family_id );
 
 		list( $font_face1, $font_face2, $font_face3 ) = $font_faces;
@@ -95,11 +102,6 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 		// With a remote url, file post meta should not be set.
 		$meta = get_post_meta( $font_face3->ID, '_wp_font_face_file', true );
 		$this->assertSame( '', $meta, 'The _wp_font_face_file post meta for the 3rd font face should be an empty string.' );
-
-		wp_delete_post( $font_family_id, true );
-		wp_delete_post( $font_face1->ID, true );
-		wp_delete_post( $font_face2->ID, true );
-		wp_delete_post( $font_face3->ID, true );
 	}
 
 	public function test_font_faces_with_local_src() {
@@ -110,6 +112,7 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 		gutenberg_convert_legacy_font_family_format();
 
 		$font_faces = $this->get_font_faces( $font_family_id );
+
 		$this->assertCount( 1, $font_faces, 'There should be 1 font face.' );
 		$font_face = reset( $font_faces );
 
@@ -117,9 +120,6 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 		$file_path = 'open-sans_normal_400.ttf';
 		$meta      = get_post_meta( $font_face->ID, '_wp_font_face_file', true );
 		$this->assertSame( $file_path, $meta, 'The _wp_font_face_file should match.' );
-
-		wp_delete_post( $font_family_id, true );
-		wp_delete_post( $font_face->ID, true );
 	}
 
 	public function test_migration_only_runs_once() {
@@ -135,12 +135,10 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 		// Meta with backup content will not be present if migration isn't triggered.
 		$meta = get_post_meta( $font_family_id, '_gutenberg_legacy_font_family', true );
 		$this->assertSame( '', $meta );
-
-		wp_delete_post( $font_family_id, true );
 	}
 
 	protected function create_font_family( $content ) {
-		return wp_insert_post(
+		$post_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_font_family',
 				'post_status'  => 'publish',
@@ -149,10 +147,22 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 				'post_content' => $content,
 			)
 		);
+
+		$this->store_id_for_cleanup_in_teardown( $post_id );
+
+		return $post_id;
+	}
+
+	private function get_post( $post_id ) {
+		$post = get_post( $post_id );
+
+		$this->store_id_for_cleanup_in_teardown( $post );
+
+		return $post;
 	}
 
 	protected function get_font_faces( $font_family_id ) {
-		return get_posts(
+		$posts = get_posts(
 			array(
 				'post_parent' => $font_family_id,
 				'post_type'   => 'wp_font_face',
@@ -160,5 +170,24 @@ class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
 				'orderby'     => 'id',
 			)
 		);
+
+		$this->store_id_for_cleanup_in_teardown( $posts );
+
+		return $posts;
+	}
+
+	private function store_id_for_cleanup_in_teardown( $post ) {
+		if ( null === $post ) {
+			return;
+		}
+
+		$posts = is_array( $post ) ? $post : array( $post );
+
+		foreach ( $posts as $post ) {
+			if ( null === $post ) {
+				continue;
+			}
+			$this->post_ids_to_delete[] = is_int( $post ) ? $post : $post->ID;
+		}
 	}
 }

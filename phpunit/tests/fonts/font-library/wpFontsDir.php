@@ -59,10 +59,10 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 			'error'   => false,
 		);
 
-		$this->assertSame( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
-
 		// Remove the filter.
 		remove_filter( 'font_dir', 'set_new_values' );
+
+		$this->assertSame( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
 
 		// Gets the fonts dir.
 		$font_dir = wp_get_font_dir();

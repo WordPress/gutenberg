@@ -20,6 +20,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	protected static $font_face_id1;
 	protected static $font_face_id2;
 
+	private static $post_ids_for_cleanup = array();
+
 	protected static $default_settings = array(
 		'fontFamily' => '"Open Sans"',
 		'fontWeight' => '400',
@@ -60,17 +62,32 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 				'role' => 'editor',
 			)
 		);
+
+		self::$post_ids_for_cleanup = array();
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
+
+		wp_delete_post( self::$font_family_id, true );
+		wp_delete_post( self::$other_font_family_id, true );
+		wp_delete_post( self::$font_face_id1, true );
+		wp_delete_post( self::$font_face_id2, true );
+	}
+
+	public function tear_down() {
+		foreach ( self::$post_ids_for_cleanup as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+		self::$post_ids_for_cleanup = array();
+		parent::tear_down();
 	}
 
 	public static function create_font_face_post( $parent_id, $settings = array() ) {
 		$settings = array_merge( self::$default_settings, $settings );
 		$title    = WP_Font_Utils::get_font_face_slug( $settings );
-		return self::factory()->post->create(
+		$post_id  = self::factory()->post->create(
 			wp_slash(
 				array(
 					'post_type'    => 'wp_font_face',
@@ -82,6 +99,10 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 				)
 			)
 		);
+
+		self::$post_ids_for_cleanup[] = $post_id;
+
+		return $post_id;
 	}
 
 	/**
@@ -252,6 +273,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 			)
 		);
 
+		self::$post_ids_for_cleanup[] = $font_face_id;
+
 		$empty_settings = array(
 			'fontFamily' => '',
 			'src'        => array(),
@@ -265,8 +288,6 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in the response data.' );
 		$this->assertSame( $empty_settings, $data['font_face_settings'], 'The empty settings should exist in the font_face_settings data.' );
-
-		wp_delete_post( $font_face_id, true );
 	}
 
 	/**
@@ -373,8 +394,6 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		);
 
 		$this->assertSame( self::$font_family_id, $data['parent'], 'The returned parent id should match the font family id.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -408,8 +427,6 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$settings = $data['font_face_settings'];
 		$this->assertCount( 4, $settings['src'], 'There should be 4 items in the font_face_settings::src data.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -477,8 +494,6 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -511,12 +526,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		wp_delete_post( $data['id'], true );
 
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in the response data.' );
 		$this->assertSame( $properties, $data['font_face_settings'], 'The font_face_settings should match the expected properties.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -538,13 +552,13 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
 	public function test_create_item_with_duplicate_properties() {
-		$settings     = array(
+		$settings = array(
 			'fontFamily' => '"Open Sans"',
 			'fontWeight' => '200',
 			'fontStyle'  => 'italic',
 			'src'        => home_url( '/wp-content/fonts/open-sans-italic-light.ttf' ),
 		);
-		$font_face_id = self::create_font_face_post( self::$font_family_id, $settings );
+		self::create_font_face_post( self::$font_family_id, $settings );
 
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
@@ -556,8 +570,6 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$expected_message = 'A font face matching those settings already exists.';
 		$message          = $response->as_error()->get_error_messages()[0];
 		$this->assertSame( $expected_message, $message, 'The response error message should match.' );
-
-		wp_delete_post( $font_face_id, true );
 	}
 
 	/**
@@ -579,12 +591,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		wp_delete_post( $data['id'], true );
 
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in the response data.' );
 		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
-
-		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -893,7 +904,8 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	}
 
 	protected function check_font_face_data( $data, $post_id, $links ) {
-		$post = get_post( $post_id );
+		self::$post_ids_for_cleanup[] = $post_id;
+		$post                         = get_post( $post_id );
 
 		$this->assertArrayHasKey( 'id', $data, 'The id property should exist in response data.' );
 		$this->assertSame( $post->ID, $data['id'], 'The "id" from the response data should match the post ID.' );
