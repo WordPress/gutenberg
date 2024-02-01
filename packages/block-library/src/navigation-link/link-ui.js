@@ -5,6 +5,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	Popover,
 	Button,
+	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -25,6 +26,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronLeftSmall, plus } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -76,12 +78,34 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 		[ clientId ]
 	);
 
+	const dialogTitleId = useInstanceId(
+		LinkControl,
+		`link-ui-block-inserter__title`
+	);
+	const dialogDescritionId = useInstanceId(
+		LinkControl,
+		`link-ui-block-inserter__description`
+	);
+
 	if ( ! clientId ) {
 		return null;
 	}
 
 	return (
-		<div className="link-ui-block-inserter">
+		<div
+			className="link-ui-block-inserter"
+			role="dialog"
+			aria-labelledby={ dialogTitleId }
+			aria-describedby={ dialogDescritionId }
+		>
+			<VisuallyHidden>
+				<h2 id={ dialogTitleId }>{ __( 'Add block' ) }</h2>
+
+				<p id={ dialogDescritionId }>
+					{ __( 'Choose a block to add to your Navigation.' ) }
+				</p>
+			</VisuallyHidden>
+
 			<Button
 				className="link-ui-block-inserter__back"
 				icon={ chevronLeftSmall }
@@ -90,6 +114,7 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 					onBack();
 				} }
 				size="small"
+				aria-label={ __( 'Return to link search dialog.' ) }
 			>
 				{ __( 'Back' ) }
 			</Button>
