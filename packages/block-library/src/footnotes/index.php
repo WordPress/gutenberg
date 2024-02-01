@@ -68,27 +68,6 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
  * @since 6.3.0
  */
 function register_block_core_footnotes() {
-	$post_types = get_post_types(
-		array(
-			'show_in_rest' => true,
-			'public'       => true,
-		)
-	);
-	foreach ( $post_types as $post_type ) {
-		// Only register the meta field if the post type supports the editor, custom fields, and revisions.
-		if ( post_type_supports( $post_type, 'editor' ) && post_type_supports( $post_type, 'custom-fields' ) && post_type_supports( $post_type, 'revisions' ) ) {
-			register_post_meta(
-				$post_type,
-				'footnotes',
-				array(
-					'show_in_rest'      => true,
-					'single'            => true,
-					'type'              => 'string',
-					'revisions_enabled' => true,
-				)
-			);
-		}
-	}
 	register_block_type_from_metadata(
 		__DIR__ . '/footnotes',
 		array(
