@@ -843,43 +843,35 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Generate a schema for blocks.
 		// - Block styles can contain `elements` & `variations` definitions.
-		// - Variations can contain styles for inner `blocks`.
 		// - Variations definitions cannot be nested.
-		// - Variations inner block styles cannot contain `elements`.
+		// - Variations can contain styles for inner `blocks`.
+		// - Variation inner `blocks` styles can contain `elements`.
 		//
-		// As each variation needs a `blocks` schema but without `elements` and
+		// As each variation needs a `blocks` schema but further nested
 		// inner `blocks`, the overall schema will be generated in multiple
 		// passes.
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]   = $styles_non_top_level;
+			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 
 		$block_style_variation_styles             = static::VALID_STYLES;
 		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
 		$block_style_variation_styles['elements'] = $schema_styles_elements;
 
-		// Generate schema for shared variations i.e. those that can be
-		// referenced with block style variations and live under
-		// styles.blocks.variations. These variations could be any valid block
-		// style variation. The schema will differ in that these variations
-		// cannot reference another.
-		//
-		// NOTE: The size of the schema array is already very large given
-		// entries for each individual block. This is compounded when multiple
-		// variations need to added to the schema. Would multiple passes for
-		// validation offer any improvements?
-		$unique_variations                              = array_unique(
+		// Generate schema for shared block style variations i.e. those that can
+		// be reused across block types and live under `styles.blocks.variations`.
+		$unique_variations = array_unique(
 			call_user_func_array( 'array_merge', array_values( $valid_variations ) )
 		);
+
+		// Shared block style variations have an additional property to those
+		// defined under individual block types so they can specify eligible
+		// block types.
 		$shared_variation_styles                        = $block_style_variation_styles;
 		$shared_variation_styles['supportedBlockTypes'] = null;
 		$schema_shared_style_variations                 = array_fill_keys( $unique_variations, $shared_variation_styles );
-
-		// Allow refs only within the individual block type variations properties.
-		// Assigning it before `$schema_shared_style_variations` would mean
-		// shared variations would allow `ref` properties.
-		$block_style_variation_styles['ref'] = null;
 
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
@@ -901,10 +893,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
-
-			// The element styles schema can now be added for this block to the
-			// styles.blocks.$block schema.
-			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 
 		$schema['styles']                                 = static::VALID_STYLES;

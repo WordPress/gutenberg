@@ -687,6 +687,24 @@ export const getNodesWithStyles = ( tree, blockSelectors, rootSelector ) => {
 								variationName
 							];
 
+						// Process the variation's inner element styles.
+						// This comes before the inner block styles so the
+						// element styles within the block type styles take
+						// precedence over these.
+						Object.entries( variation?.elements ?? {} ).forEach(
+							( [ element, elementStyles ] ) => {
+								if ( elementStyles && ELEMENTS[ element ] ) {
+									nodes.push( {
+										styles: elementStyles,
+										selector: scopeSelector(
+											variationSelector,
+											ELEMENTS[ element ]
+										),
+									} );
+								}
+							}
+						);
+
 						// Process the variations inner block type styles.
 						Object.entries( variation?.blocks ?? {} ).forEach(
 							( [
@@ -724,21 +742,32 @@ export const getNodesWithStyles = ( tree, blockSelectors, rootSelector ) => {
 										variationBlockStyles
 									),
 								} );
-							}
-						);
 
-						// Process the variations inner element styles.
-						Object.entries( variation?.elements ?? {} ).forEach(
-							( [ element, elementStyles ] ) => {
-								if ( elementStyles && ELEMENTS[ element ] ) {
-									nodes.push( {
-										styles: elementStyles,
-										selector: scopeSelector(
-											variationSelector,
-											ELEMENTS[ element ]
-										),
-									} );
-								}
+								// Process element styles for the inner blocks
+								// of the variation.
+								Object.entries(
+									variationBlockStyles.elements ?? {}
+								).forEach(
+									( [
+										variationBlockElement,
+										variationBlockElementStyles,
+									] ) => {
+										if (
+											variationBlockElementStyles &&
+											ELEMENTS[ variationBlockElement ]
+										) {
+											nodes.push( {
+												styles: variationBlockElementStyles,
+												selector: scopeSelector(
+													variationBlockSelector,
+													ELEMENTS[
+														variationBlockElement
+													]
+												),
+											} );
+										}
+									}
+								);
 							}
 						);
 					}

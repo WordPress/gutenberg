@@ -156,32 +156,36 @@ function useGlobalStylesContext() {
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 
+	// TODO: Where is the right place to resolve shared block style
+	// variations within the site editor when they are in a theme
+	// style variation's data that simply gets applied to the "user"
+	// origin styles?
+	const userConfigWithVariations = useMemo( () => {
+		if ( ! userConfig ) {
+			return userConfig;
+		}
+		return resolveBlockStyleVariations( userConfig );
+	}, [ userConfig ] );
+
 	const mergedConfig = useMemo( () => {
-		if ( ! baseConfig || ! userConfig ) {
+		if ( ! baseConfig || ! userConfigWithVariations ) {
 			return {};
 		}
-		// TODO: Where is the right place to resolve shared block style
-		// variations within the site editor when they are in a theme
-		// style variation's data that simply gets applied to the "user"
-		// origin styles?
-		const configWithResolvedVariations =
-			resolveBlockStyleVariations( userConfig );
-		return mergeBaseAndUserConfigs(
-			baseConfig,
-			configWithResolvedVariations
-		);
-	}, [ userConfig, baseConfig ] );
+
+		return mergeBaseAndUserConfigs( baseConfig, userConfigWithVariations );
+	}, [ userConfigWithVariations, baseConfig ] );
+
 	const context = useMemo( () => {
 		return {
 			isReady: isUserConfigReady && isBaseConfigReady,
-			user: userConfig,
+			user: userConfigWithVariations,
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
 		};
 	}, [
 		mergedConfig,
-		userConfig,
+		userConfigWithVariations,
 		baseConfig,
 		setUserConfig,
 		isUserConfigReady,
