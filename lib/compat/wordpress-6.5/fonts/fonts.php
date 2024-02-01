@@ -97,10 +97,10 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string   $slug Font collection slug or path/url to a JSON file defining the font collection.
-	 * @param string[] $args {
-	 *     Optional. Font collection associative array of configuration options, or a file path or url to a JSON
-	 *     file containing the font collection configuration.
+	 * @param string          $slug Font collection slug or path/url to a JSON file defining the font collection.
+	 * @param array|string $data_or_file {
+	 *     Font collection associative array of data, or a file path or url to a JSON
+	 *     file containing the font collection.
 	 *
 	 *     @type string $name           Name of the font collection.
 	 *     @type string $description    Description of the font collection.
@@ -110,8 +110,8 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
 	 */
-	function wp_register_font_collection( $slug, $args_or_file = array() ) {
-		return WP_Font_Library::register_font_collection( $slug, $args_or_file );
+	function wp_register_font_collection( $slug, $data_or_file ) {
+		return WP_Font_Library::register_font_collection( $slug, $data_or_file );
 	}
 }
 

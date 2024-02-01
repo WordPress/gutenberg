@@ -56,13 +56,13 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $slug         Font collection slug.
-		 * @param array  $args_or_file Font collection config options or a file path or url to a JSON file
-		 *                             containing the font collection configuration.
+		 * @param array  $data_or_file Font collection data array or a file path or url to a JSON file
+		 *                             containing the font collection.
 		 *                             See {@see wp_register_font_collection()} for the supported fields.
 		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
 		 */
-		public static function register_font_collection( $slug, $args_or_file = array() ) {
-			$new_collection = new WP_Font_Collection( $slug, $args_or_file );
+		public static function register_font_collection( $slug, $data_or_file ) {
+			$new_collection = new WP_Font_Collection( $slug, $data_or_file );
 
 			if ( self::is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
