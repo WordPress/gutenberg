@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { useCallback, useContext, useEffect } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -39,10 +39,37 @@ const FillContents = ( {
 	isEditingPage,
 	supportsGlobalStyles,
 } ) => {
+	const tabListRef = useRef( null );
 	// Because `DefaultSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
+
+	// This effect addresses a race condition caused by tabbing from the last
+	// block in the editor into the settings sidebar. Without this effect, the
+	// selected tab and browser focus can become separated in an unexpected way.
+	useEffect( () => {
+		const tabsElements = Array.from(
+			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
+		);
+		const selectedTabElement = tabsElements.find(
+			// We are purposefully using a custom `data-tab-id` attribute here
+			// because we don't want rely on any assumptions about `Tabs`
+			// component internals.
+			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
+		);
+		const activeElement = selectedTabElement?.ownerDocument.activeElement;
+		const tabsHasFocus = tabsElements.some( ( element ) => {
+			return activeElement && activeElement.id === element.id;
+		} );
+		if (
+			tabsHasFocus &&
+			selectedTabElement &&
+			selectedTabElement.id !== activeElement?.id
+		) {
+			selectedTabElement?.focus();
+		}
+	}, [ sidebarName ] );
 
 	return (
 		<>
@@ -53,7 +80,7 @@ const FillContents = ( {
 				closeLabel={ __( 'Close Settings' ) }
 				header={
 					<Tabs.Context.Provider value={ tabsContextValue }>
-						<SettingsHeader />
+						<SettingsHeader ref={ tabListRef } />
 					</Tabs.Context.Provider>
 				}
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
