@@ -32,7 +32,7 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 -	**Name:** core/avatar
 -	**Category:** theme
--	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
+-	**Supports:** align, color (~~background~~, ~~text~~), filter (duotone), spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
 ## Pattern
@@ -238,7 +238,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), layout (~~allowJustification~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), layout (~~allowJustification~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
 
 ## Details
@@ -536,7 +536,7 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 
 -	**Name:** core/post-author
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), filter (duotone), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** avatarSize, byline, isLink, linkTarget, showAvatar, showBio, textAlign
 
 ## Author Biography
@@ -629,7 +629,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/post-featured-image
 -	**Category:** theme
--	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
+-	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), filter (duotone), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
@@ -825,7 +825,7 @@ Display an image to represent this site. Update this block and the changes apply
 
 -	**Name:** core/site-logo
 -	**Category:** theme
--	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
+-	**Supports:** align, color (~~background~~, ~~text~~), filter (duotone), spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, shouldSyncIcon, width
 
 ## Site Tagline
