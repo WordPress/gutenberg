@@ -151,29 +151,48 @@ export default function BlockList( settings ) {
 function Items( {
 	placeholder,
 	rootClientId,
-	renderAppender,
+	renderAppender: CustomAppender,
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockOrder,
-					getSelectedBlockClientIds,
-					__unstableGetVisibleBlocks,
-					__unstableGetTemporarilyEditingAsBlocks,
-				} = select( blockEditorStore );
-				return {
-					order: getBlockOrder( rootClientId ),
-					selectedBlocks: getSelectedBlockClientIds(),
-					visibleBlocks: __unstableGetVisibleBlocks(),
-					temporarilyEditingAsBlocks:
-						__unstableGetTemporarilyEditingAsBlocks(),
-				};
-			},
-			[ rootClientId ]
-		);
+	const {
+		order,
+		selectedBlocks,
+		visibleBlocks,
+		temporarilyEditingAsBlocks,
+		shouldRenderAppender,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockOrder,
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+				__unstableGetVisibleBlocks,
+				__unstableGetTemporarilyEditingAsBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			return {
+				order: getBlockOrder( rootClientId ),
+				selectedBlocks: getSelectedBlockClientIds(),
+				visibleBlocks: __unstableGetVisibleBlocks(),
+				temporarilyEditingAsBlocks:
+					__unstableGetTemporarilyEditingAsBlocks(),
+				shouldRenderAppender:
+					CustomAppender !== false &&
+					( CustomAppender
+						? ! getTemplateLock( rootClientId ) &&
+						  ! getBlockEditingMode( rootClientId ) ===
+								'disabled' &&
+						  ! __unstableGetEditorMode() === 'zoom-out'
+						: rootClientId === selectedBlockClientId ||
+						  ( ! rootClientId && ! selectedBlockClientId ) ),
+			};
+		},
+		[ rootClientId, CustomAppender ]
+	);
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -199,11 +218,13 @@ function Items( {
 					clientId={ temporarilyEditingAsBlocks }
 				/>
 			) }
-			<BlockListAppender
-				tagName={ __experimentalAppenderTagName }
-				rootClientId={ rootClientId }
-				renderAppender={ renderAppender }
-			/>
+			{ shouldRenderAppender && (
+				<BlockListAppender
+					tagName={ __experimentalAppenderTagName }
+					rootClientId={ rootClientId }
+					CustomAppender={ CustomAppender }
+				/>
+			) }
 		</LayoutProvider>
 	);
 }
