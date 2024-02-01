@@ -8,7 +8,7 @@ import { renderToString } from '@wordpress/element';
  */
 import { convertLegacyBlockNameAndAttributes } from './parser/convert-legacy-block';
 import { createBlock } from './factory';
-import { getBlockType } from './registration';
+import { getBlockType, getBlockTypes } from './registration';
 
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
@@ -114,6 +114,23 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 					name,
 					normalizedAttributes
 				);
+
+			const hookedBlocksForCurrentBlock = getBlockTypes()?.filter(
+				( { blockHooks } ) => blockHooks && blockName in blockHooks
+			);
+
+			if ( hookedBlocksForCurrentBlock?.length ) {
+				const { metadata, ...otherAttributes } = blockAttributes;
+				blockAttributes = {
+					metadata: {
+						ignoredHookedBlocks: hookedBlocksForCurrentBlock.map(
+							( hookedBlock ) => hookedBlock.name
+						),
+						...blockAttributes.metadata,
+					},
+					...otherAttributes,
+				};
+			}
 
 			// If a Block is undefined at this point, use the core/missing block as
 			// a placeholder for a better user experience.
