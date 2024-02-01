@@ -186,6 +186,7 @@ const imageTitleLabel = 'Title attribute';
 test.describe( 'Block bindings - Template context', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
 	test.beforeEach( async ( { admin, editor } ) => {
@@ -199,6 +200,7 @@ test.describe( 'Block bindings - Template context', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
 	test.describe( 'Paragraph', () => {
@@ -245,7 +247,7 @@ test.describe( 'Block bindings - Template context', () => {
 	} );
 
 	test.describe( 'Heading', () => {
-		test( 'Should show the value of the custom field', async ( {
+		test( 'Should show the key of the custom field', async ( {
 			editor,
 		} ) => {
 			await editor.insertBlock( contentBindingHeadingBlock );
@@ -288,7 +290,7 @@ test.describe( 'Block bindings - Template context', () => {
 	} );
 
 	test.describe( 'Button', () => {
-		test( 'Should show the value of the custom field when text is bound', async ( {
+		test( 'Should show the key of the custom field when text is bound', async ( {
 			editor,
 		} ) => {
 			await editor.insertBlock( textBindingButtonBlock );
@@ -595,6 +597,7 @@ test.describe( 'Block bindings - Template context', () => {
 test.describe( 'Block bindings - Post/page context', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -607,6 +610,7 @@ test.describe( 'Block bindings - Post/page context', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
 	test.describe( 'Paragraph', () => {
