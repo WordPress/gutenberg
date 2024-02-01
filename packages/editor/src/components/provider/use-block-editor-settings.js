@@ -76,7 +76,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalArchiveTitleNameLabel',
 ];
 
-if ( window.__experimentalStaticBlockPreviews === true ) {
+if ( window.__experimentalServerBlockPreviews === true ) {
 	BLOCK_EDITOR_SETTINGS.push( 'blockPreview' );
 }
 

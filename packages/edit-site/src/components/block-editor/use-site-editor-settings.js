@@ -12,7 +12,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { usePostLinkProps } from './use-post-link-props';
-import StaticBlockPreview from '../static-block-preview';
+import ServerBlockPreview from '../server-block-preview';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -122,21 +122,17 @@ export function useSpecificEditorSettings() {
 	const defaultEditorSettings = useMemo( () => {
 		const defaultSettings = {
 			...settings,
-
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			blockPreview: window.__experimentalStaticBlockPreviews
-				? StaticBlockPreview
-				: undefined,
 			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
-		if ( window.__experimentalStaticBlockPreviews === true ) {
-			defaultSettings.blockPreview = StaticBlockPreview;
+		if ( window.__experimentalServerBlockPreviews === true ) {
+			defaultSettings.blockPreview = ServerBlockPreview;
 		}
 		return defaultSettings;
 	}, [

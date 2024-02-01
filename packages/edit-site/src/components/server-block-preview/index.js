@@ -12,7 +12,7 @@ import { serialize } from '@wordpress/blocks';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function StaticBlockPreview( props ) {
+export default function ServerBlockPreview( props ) {
 	const { blocks } = props;
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();

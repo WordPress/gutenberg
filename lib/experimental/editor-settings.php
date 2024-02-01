@@ -29,8 +29,8 @@ function gutenberg_enable_experiments() {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
 	}
 
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-static-block-previews', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalStaticBlockPreviews = true', 'before' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-server-block-previews', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalServerBlockPreviews = true', 'before' );
 	}
 }
 

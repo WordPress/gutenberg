@@ -127,14 +127,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-static-block-previews',
-		__( 'Static block previews', 'gutenberg' ),
+		'gutenberg-server-block-previews',
+		__( 'Server block previews', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Static Block Previews', 'gutenberg' ),
-			'id'    => 'gutenberg-static-block-previews',
+			'label' => __( 'Server Block Previews', 'gutenberg' ),
+			'id'    => 'gutenberg-server-block-previews',
 		)
 	);
 
