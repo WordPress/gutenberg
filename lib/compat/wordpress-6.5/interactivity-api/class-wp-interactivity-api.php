@@ -691,7 +691,10 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @param WP_Interactivity_API_Directives_Processor $p The directives processor instance.
 		 */
 		private function data_wp_router_region_processor( WP_Interactivity_API_Directives_Processor $p ) {
-			if ( ! $p->is_tag_closer() ) {
+			static $has_added_markup = false;
+
+			if ( ! $p->is_tag_closer() && ! $has_added_markup ) {
+				$has_added_markup = true;
 				/*
 				 * The state could be declared multiple times here but is
 				 * doesn't matter as the values are always the same.
