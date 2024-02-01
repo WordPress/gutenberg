@@ -53,7 +53,16 @@ if ( ! class_exists( 'Gutenberg_Render_Blocks_Controller' ) ) {
 		 * Checks if a given request has access to create items.
 		 */
 		public function get_permissions_check() {
-				return true;
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return new WP_Error(
+					'block_cannot_read',
+					__( 'Sorry, you are not allowed to preview blocks as this user.' ),
+					array(
+						'status' => rest_authorization_required_code(),
+					)
+				);
+			}
+			return true;
 		}
 
 		/**
