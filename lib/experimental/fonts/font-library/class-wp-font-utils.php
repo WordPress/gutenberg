@@ -133,5 +133,78 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 
 			return join( ';', $slug_elements );
 		}
+
+		/**
+		 * Sanitize a tree of data using an schema that defines the sanitization to apply to each key.
+		 *
+		 * It removes the keys not in the schema and applies the sanitizator to the values.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $tree The data to sanitize.
+		 * @param array $schema The schema used for sanitization.
+		 * @return array The sanitized data.
+		 */
+		public static function sanitize_from_schema( $tree, $schema ) {
+			if ( ! is_array( $tree ) ) {
+				return $tree;
+			}
+
+			if ( ! is_array( $schema ) ) {
+				return array();
+			}
+
+			foreach ( $tree as $key => $value ) {
+				// Remove keys not in the schema or with null/empty values.
+				if ( ! array_key_exists( $key, $schema ) ) {
+					unset( $tree[ $key ] );
+					continue;
+				}
+
+				// Check if the value is an array and requires further processing.
+				if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+
+					if ( ! wp_is_numeric_array( $value ) ) {
+						// If it is an associative or indexed array., process as a single object.
+						$tree[ $key ] = self::sanitize_from_schema( $value, $schema[ $key ] );
+
+						if ( empty( $tree[ $key ] ) ) {
+							unset( $tree[ $key ] );
+						}
+					} else {
+						// If indexed, process each item in the array.
+						foreach ( $value as $item_key => $item_value ) {
+							if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
+								$tree[ $key ][ $item_key ] = self::sanitize_from_schema( $item_value, $schema[ $key ][0] );
+							} else {
+								$tree[ $key ][ $item_key ] = self::apply_sanitizator( $item_value, $schema[ $key ][0] );
+							}
+						}
+					}
+				} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
+					unset( $tree[ $key ] );
+				} else {
+					$tree[ $key ] = self::apply_sanitizator( $tree[ $key ], $schema[ $key ] );
+				}
+			}
+
+			return $tree;
+		}
+
+		/**
+		 * Apply the sanitizator to the value.
+		 *
+		 * @since 6.5.0
+		 * @param mixed $value The value to sanitize.
+		 * @param mixed $sanitizator The sanitizator to apply.
+		 * @return mixed The sanitized value.
+		 */
+		private static function apply_sanitizator( $value, $sanitizator ) {
+			if ( $sanitizator === null ) {
+				return $value;
+
+			}
+			return call_user_func( $sanitizator, $value );
+		}
 	}
 }
