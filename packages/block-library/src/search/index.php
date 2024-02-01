@@ -197,9 +197,13 @@ function register_block_core_search() {
 		)
 	);
 
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
+	}
+
 	wp_register_script_module(
 		'@wordpress/block-library/search',
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/search.min.js' ) : includes_url( 'blocks/search/view.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/search/view.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);

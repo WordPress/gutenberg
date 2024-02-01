@@ -10,12 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '../store';
 
 export default {
-	name: 'post_meta',
+	name: 'core/post-meta',
 	label: __( 'Post Meta' ),
 	useSource( props, sourceAttributes ) {
 		const { getCurrentPostType } = useSelect( editorStore );
 		const { context } = props;
-		const { value: metaKey } = sourceAttributes;
+		const { key: metaKey } = sourceAttributes;
 		const postType = context.postType
 			? context.postType
 			: getCurrentPostType();

@@ -20,8 +20,10 @@ import {
 } from './selectors';
 import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-import { store } from './';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+
+export { getBlockSettings } from './get-block-settings';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -44,6 +46,10 @@ export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
 
+export function getBlockWithoutAttributes( state, clientId ) {
+	return state.blocks.byClientId.get( clientId );
+}
+
 /**
  * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
@@ -53,25 +59,17 @@ export function getLastInsertedBlocksClientIds( state ) {
  *
  * @return {boolean} Whether the block descendants are disabled.
  */
-export const isBlockSubtreeDisabled = createSelector(
-	( state, clientId ) => {
-		const isChildSubtreeDisabled = ( childClientId ) => {
-			return (
-				getBlockEditingMode( state, childClientId ) === 'disabled' &&
-				getBlockOrder( state, childClientId ).every(
-					isChildSubtreeDisabled
-				)
-			);
-		};
-		return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockEditingModes,
-		state.blockListSettings,
-	]
-);
+export const isBlockSubtreeDisabled = ( state, clientId ) => {
+	const isChildSubtreeDisabled = ( childClientId ) => {
+		return (
+			getBlockEditingMode( state, childClientId ) === 'disabled' &&
+			getBlockOrder( state, childClientId ).every(
+				isChildSubtreeDisabled
+			)
+		);
+	};
+	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
+};
 
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.
@@ -262,7 +260,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
 			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( store )
+				select( STORE_NAME )
 			);
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
@@ -320,7 +318,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...unlock( select( store ) ).getFetchedPatterns(),
+			...unlock( select( STORE_NAME ) ).getFetchedPatterns(),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )

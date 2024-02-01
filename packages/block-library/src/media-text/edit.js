@@ -295,7 +295,7 @@ function MediaTextEdit( {
 				mediaType === 'image' && (
 					<FocalPointPicker
 						__nextHasNoMarginBottom
-						label={ __( 'Focal point picker' ) }
+						label={ __( 'Focal point' ) }
 						url={
 							useFeaturedImage && featuredImageURL
 								? featuredImageURL

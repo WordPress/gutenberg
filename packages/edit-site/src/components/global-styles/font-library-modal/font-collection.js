@@ -14,7 +14,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
 
 /**
@@ -33,7 +33,7 @@ import { downloadFontFaceAssets } from './utils';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
-	name: __( 'All' ),
+	name: _x( 'All', 'font categories' ),
 };
 function FontCollection( { slug } ) {
 	const requiresPermission = slug === 'google-fonts';
@@ -199,9 +199,10 @@ function FontCollection( { slug } ) {
 			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
-				fontsToInstall.length > 0 && (
-					<Footer handleInstall={ handleInstall } />
-				)
+				<Footer
+					handleInstall={ handleInstall }
+					isDisabled={ fontsToInstall.length === 0 }
+				/>
 			}
 		>
 			{ renderConfirmDialog && (
@@ -290,16 +291,18 @@ function FontCollection( { slug } ) {
 	);
 }
 
-function Footer( { handleInstall } ) {
+function Footer( { handleInstall, isDisabled } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
 
 	return (
 		<Flex justify="flex-end">
 			<Button
 				variant="primary"
-				onClick={ handleInstall }
+				onClick={
+					isDisabled || isInstalling ? undefined : handleInstall
+				}
 				isBusy={ isInstalling }
-				disabled={ isInstalling }
+				aria-disabled={ isDisabled || isInstalling }
 			>
 				{ __( 'Install' ) }
 			</Button>
