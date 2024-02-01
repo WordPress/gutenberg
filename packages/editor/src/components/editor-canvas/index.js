@@ -379,6 +379,10 @@ function EditorCanvas( {
 							: localRef.current?.parentNode
 					}
 					renderAppender={ renderAppender }
+					__unstableDisableDropZone={
+						// In template preview mode, disable drop zones at the root of the template.
+						renderingMode === 'template-locked' ? true : false
+					}
 				/>
 				{ renderingMode === 'template-locked' && (
 					<EditTemplateBlocksNotification contentRef={ localRef } />
