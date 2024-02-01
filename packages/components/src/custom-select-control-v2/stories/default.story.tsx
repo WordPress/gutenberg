@@ -140,7 +140,6 @@ const renderControlledValue = ( gravatar: string | string[] ) => {
 export const Controlled = ControlledTemplate.bind( {} );
 Controlled.args = {
 	label: 'Default Gravatars',
-	defaultValue: 'wavatar',
 	renderSelectedValue: renderControlledValue,
 	children: (
 		<>

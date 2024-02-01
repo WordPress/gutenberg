@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo, useState } from '@wordpress/element';
+import {
+	createContext,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, chevronDown } from '@wordpress/icons';
 
@@ -104,7 +109,11 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 		...restProps
 	} = props;
 
-	const [ unmountOnHide, setUnmountOnHide ] = useState( true );
+	const [ unmountOnHide, setUnmountOnHide ] = useState( false );
+
+	useEffect( () => {
+		setUnmountOnHide( true );
+	}, [] );
 
 	return (
 		<>
