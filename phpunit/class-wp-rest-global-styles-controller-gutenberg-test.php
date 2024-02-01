@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * Unit tests covering WP_REST_Global_Styles_Controller functionality.
+ *
+ * @package Gutenberg
+ *
+ * @covers WP_REST_Global_Styles_Controller
+ */
 class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
@@ -45,18 +51,17 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		);
 
 		// This creates the global styles for the current theme.
-		self::$global_styles_id = wp_insert_post(
+		self::$global_styles_id = $factory->post->create(
 			array(
 				'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 				'post_status'  => 'publish',
-				'post_title'   => __( 'Custom Styles', 'default' ),
+				'post_title'   => 'Custom Styles',
 				'post_type'    => 'wp_global_styles',
 				'post_name'    => 'wp-global-styles-emptytheme',
 				'tax_input'    => array(
 					'wp_theme' => 'emptytheme',
 				),
-			),
-			true
+			)
 		);
 
 		self::$post_id = $factory->post->create();
@@ -111,6 +116,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 	public function test_get_theme_items() {
 		wp_set_current_user( self::$admin_id );
+		switch_theme( 'emptytheme' );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/themes/emptytheme/variations' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -142,7 +148,11 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 				'title'    => 'variation',
 			),
 		);
-		$this->assertSameSetsWithIndex( $data, $expected );
+
+		wp_recursive_ksort( $data );
+		wp_recursive_ksort( $expected );
+
+		$this->assertSameSets( $expected, $data );
 	}
 
 	/**
@@ -344,7 +354,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 	/**
 	 * @covers WP_REST_Global_Styles_Controller::get_item
-	 * @ticket 54516
 	 */
 	public function test_get_item_no_user_edit() {
 		wp_set_current_user( 0 );
@@ -375,7 +384,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$data     = $response->get_data();
 		$links    = $response->get_links();
 
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'id'       => self::$global_styles_id,
 				'title'    => array(
@@ -399,6 +408,9 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		// Controller does not implement create_item().
 	}
 
+	/**
+	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
@@ -409,7 +421,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEquals( 'My new global styles title', $data['title']['raw'] );
+		$this->assertSame( 'My new global styles title', $data['title']['raw'] );
 	}
 
 	/**
