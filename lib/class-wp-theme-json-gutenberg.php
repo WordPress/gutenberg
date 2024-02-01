@@ -2638,7 +2638,7 @@ class WP_Theme_JSON_Gutenberg {
 			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
 		}
 
-		$css .= '}';
+		$css .= ' }';
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
