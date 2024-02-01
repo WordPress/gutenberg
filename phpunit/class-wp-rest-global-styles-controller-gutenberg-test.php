@@ -1,10 +1,10 @@
 <?php
 /**
- * Unit tests covering WP_REST_Global_Styles_Controller functionality.
+ * Unit tests covering WP_REST_Global_Styles_Controller_Gutenberg functionality.
  *
  * @package Gutenberg
  *
- * @covers WP_REST_Global_Styles_Controller
+ * @covers WP_REST_Global_Styles_Controller_Gutenberg
  */
 class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Controller_Testcase {
 	/**
@@ -76,7 +76,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::register_routes
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -163,7 +163,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_theme_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 */
 	public function test_get_theme_item_no_user() {
 		wp_set_current_user( 0 );
@@ -173,7 +173,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_theme_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 */
 	public function test_get_theme_item_permission_check() {
 		wp_set_current_user( self::$subscriber_id );
@@ -183,7 +183,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_theme_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 */
 	public function test_get_theme_item_invalid() {
 		wp_set_current_user( self::$admin_id );
@@ -194,7 +194,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 	/**
 	 * @dataProvider data_get_theme_item_invalid_theme_dirname
-	 * @covers WP_REST_Global_Styles_Controller::get_theme_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 *
 	 * @param string $theme_dirname Theme directory to test.
 	 * @param string $expected      Expected error code.
@@ -253,7 +253,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 	/**
 	 * @dataProvider data_get_theme_item
-	 * @covers WP_REST_Global_Styles_Controller::get_theme_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 *
 	 * @param string $theme Theme directory to test.
 	 */
@@ -310,7 +310,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_theme_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 */
 	public function test_get_theme_item_fields() {
 		wp_set_current_user( self::$admin_id );
@@ -323,7 +323,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item
 	 */
 	public function test_get_item_no_user() {
 		wp_set_current_user( 0 );
@@ -333,7 +333,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item
 	 */
 	public function test_get_item_invalid_post() {
 		wp_set_current_user( self::$admin_id );
@@ -343,7 +343,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item
 	 */
 	public function test_get_item_permission_check() {
 		wp_set_current_user( self::$subscriber_id );
@@ -353,7 +353,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item
 	 */
 	public function test_get_item_no_user_edit() {
 		wp_set_current_user( 0 );
@@ -364,7 +364,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item
 	 */
 	public function test_get_item_permission_check_edit() {
 		wp_set_current_user( self::$subscriber_id );
@@ -375,7 +375,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item
 	 */
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
@@ -409,7 +409,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
@@ -425,7 +425,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
 	public function test_update_item_no_user() {
 		wp_set_current_user( 0 );
@@ -435,7 +435,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
 	public function test_update_item_invalid_post() {
 		wp_set_current_user( self::$admin_id );
@@ -445,7 +445,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
 	public function test_update_item_permission_check() {
 		wp_set_current_user( self::$subscriber_id );
@@ -455,7 +455,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
 	public function test_update_item_valid_styles_css() {
 		wp_set_current_user( self::$admin_id );
@@ -474,7 +474,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::update_item
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
 	 */
 	public function test_update_item_invalid_styles_css() {
 		wp_set_current_user( self::$admin_id );
@@ -506,7 +506,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_item_schema
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_item_schema
 	 */
 	public function test_get_item_schema() {
 		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/global-styles/' . self::$global_styles_id );
@@ -521,7 +521,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * @covers WP_REST_Global_Styles_Controller::get_available_actions
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_available_actions
 	 */
 	public function test_assign_edit_css_action_admin() {
 		wp_set_current_user( self::$admin_id );
