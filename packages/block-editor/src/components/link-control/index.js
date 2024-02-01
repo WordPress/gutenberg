@@ -404,6 +404,7 @@ function LinkControl( {
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
 									aria-disabled={ isDisabled }
+									size="compact"
 								/>
 							</div>
 						) }
