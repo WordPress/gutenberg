@@ -63,22 +63,19 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns whether or not a navigation has a submenu.
 	 *
-	 * @param string $inner_blocks_content_rendered A rendered inner block.
-	 * @return bool Returns whether or not a navigation has a submenu.
+	 * @param array $inner_blocks An array of inner blocks.
+	 * @return bool Returns whether or not a navigation has a submenu and also sets the member variable.
 	 */
-	private static function has_submenus( $inner_blocks_content_rendered ) {
+	private static function has_submenus( $inner_blocks ) {
 		if ( true === static::$has_submenus ) {
 			return static::$has_submenus;
 		}
 
-		$p = new WP_HTML_Tag_Processor( $inner_blocks_content_rendered );
-		if ( $p->next_tag(
-			array(
-				'name'       => 'LI',
-				'class_name' => 'has-child',
-			)
-		) ) {
-			static::$has_submenus = true;
+		foreach( $inner_blocks as $inner_block ) {
+			if ( "core/navigation-submenu" === $inner_block->name ) {
+				static::$has_submenus = true;
+				return static::$has_submenus;
+			}
 		}
 
 		return static::$has_submenus;
@@ -115,11 +112,6 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_markup_for_inner_block( $inner_block ) {
 		$inner_block_content = $inner_block->render();
-
-		// This sets the `has_submenus` member variable
-		// which is used by other functions in the class
-		// to determine whether or not a navigation has submenus.
-		static::has_submenus( $inner_block_content );
 
 		if ( ! empty( $inner_block_content ) ) {
 			if ( static::does_block_need_a_list_item_wrapper( $inner_block ) ) {
@@ -646,11 +638,12 @@ class WP_Navigation_Block_Renderer {
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 
-		// This function calls `get_markup_for_inner_block` which also
-		// sets the has_submenus member variable.
+		// This sets the `has_submenus` member variable
+		// which is used by other functions in the class
+		// to determine whether or not a navigation has submenus.
 		// This has to be called before any other code that relies
 		// on the has_submenus member variable.
-		$wrapper_markup = static::get_wrapper_markup( $attributes, $inner_blocks );
+		static::has_submenus( $inner_blocks );
 
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
@@ -662,7 +655,7 @@ class WP_Navigation_Block_Renderer {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			static::get_nav_wrapper_attributes( $attributes, $inner_blocks ),
-			$wrapper_markup
+			static::get_wrapper_markup( $attributes, $inner_blocks ),
 		);
 	}
 }
