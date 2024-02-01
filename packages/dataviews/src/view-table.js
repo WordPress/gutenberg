@@ -16,8 +16,6 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import {
-	Children,
-	Fragment,
 	forwardRef,
 	useEffect,
 	useId,
@@ -28,20 +26,18 @@ import {
 /**
  * Internal dependencies
  */
+import SingleSelectionCheckbox from './single-selection-checkbox';
+import WithSeparators from './with-separators';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
-import SingleSelectionCheckbox from './single-selection-checkbox';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 const sortArrows = { asc: '↑', desc: '↓' };
@@ -61,31 +57,21 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 	ref
 ) {
 	const isHidable = field.enableHiding !== false;
-
 	const isSortable = field.enableSorting !== false;
 	const isSorted = view.sort?.field === field.id;
-
-	let filter, filterInView, activeElement, activeOperator, otherFilters;
 	const operators = sanitizeOperators( field );
-	if ( field.type === ENUMERATION_TYPE && operators.length > 0 ) {
-		filter = {
-			field: field.id,
-			operators,
-			elements: field.elements || [],
-		};
-		filterInView = view.filters.find( ( f ) => f.field === filter.field );
-		otherFilters = view.filters.filter( ( f ) => f.field !== filter.field );
-		activeElement = filter.elements.find(
-			( element ) => element.value === filterInView?.value
-		);
-		activeOperator = filterInView?.operator || filter.operators[ 0 ];
-	}
-	const isFilterable = !! filter;
-
-	if ( ! isSortable && ! isHidable && ! isFilterable ) {
+	// Filter can be added:
+	// 1. If the field is not already part of a view's filters.
+	// 2. If the field meets the type and operator requirements.
+	// 3. If it's not primary. If it is, it should be already visible.
+	const canAddFilter =
+		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
+		field.type === ENUMERATION_TYPE &&
+		!! operators.length &&
+		! field.filterBy?.isPrimary;
+	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
 		return field.header;
 	}
-
 	return (
 		<DropdownMenu
 			align="start"
@@ -147,6 +133,30 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						) }
 					</DropdownMenuGroup>
 				) }
+				{ canAddFilter && (
+					<DropdownMenuGroup>
+						<DropdownMenuItem
+							prefix={ <Icon icon={ funnel } /> }
+							onClick={ () => {
+								onChangeView( {
+									...view,
+									page: 1,
+									filters: [
+										...( view.filters || [] ),
+										{
+											field: field.id,
+											value: undefined,
+										},
+									],
+								} );
+							} }
+						>
+							<DropdownMenuItemLabel>
+								{ __( 'Add filter' ) }
+							</DropdownMenuItemLabel>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				) }
 				{ isHidable && (
 					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
@@ -165,148 +175,10 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
-				{ isFilterable && (
-					<DropdownMenuGroup>
-						<DropdownMenu
-							key={ filter.field }
-							trigger={
-								<DropdownMenuItem
-									prefix={ <Icon icon={ funnel } /> }
-									suffix={
-										activeElement && (
-											<span aria-hidden="true">
-												{ activeOperator in OPERATORS &&
-													`${ OPERATORS[ activeOperator ].label } ` }
-												{ activeElement?.label }
-											</span>
-										)
-									}
-								>
-									<DropdownMenuItemLabel>
-										{ __( 'Filter by' ) }
-									</DropdownMenuItemLabel>
-								</DropdownMenuItem>
-							}
-						>
-							<WithSeparators>
-								<DropdownMenuGroup>
-									{ filter.elements.map( ( element ) => {
-										const isActive =
-											activeElement?.value ===
-											element.value;
-										return (
-											<DropdownMenuRadioItemCustom
-												key={ element.value }
-												name={ `view-table-${ filter.field }` }
-												value={ element.value }
-												checked={ isActive }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														page: 1,
-														filters: [
-															...otherFilters,
-															{
-																field: filter.field,
-																operator:
-																	activeOperator,
-																value: isActive
-																	? undefined
-																	: element.value,
-															},
-														],
-													} );
-												} }
-											>
-												<DropdownMenuItemLabel>
-													{ element.label }
-												</DropdownMenuItemLabel>
-												{ !! element.description && (
-													<DropdownMenuItemHelpText>
-														{ element.description }
-													</DropdownMenuItemHelpText>
-												) }
-											</DropdownMenuRadioItemCustom>
-										);
-									} ) }
-								</DropdownMenuGroup>
-								{ filter.operators.length > 1 && (
-									<DropdownMenu
-										trigger={
-											<DropdownMenuItem
-												suffix={
-													<span aria-hidden="true">
-														{
-															OPERATORS[
-																activeOperator
-															]?.label
-														}
-													</span>
-												}
-											>
-												<DropdownMenuItemLabel>
-													{ __( 'Conditions' ) }
-												</DropdownMenuItemLabel>
-											</DropdownMenuItem>
-										}
-									>
-										{ Object.entries( OPERATORS ).map(
-											( [
-												operator,
-												{ label, key },
-											] ) => (
-												<DropdownMenuRadioItem
-													key={ key }
-													name={ `view-table-${ filter.field }-conditions` }
-													value={ operator }
-													checked={
-														activeOperator ===
-														operator
-													}
-													onChange={ ( e ) =>
-														onChangeView( {
-															...view,
-															page: 1,
-															filters: [
-																...otherFilters,
-																{
-																	field: filter.field,
-																	operator:
-																		e.target
-																			.value,
-																	value: filterInView?.value,
-																},
-															],
-														} )
-													}
-												>
-													<DropdownMenuItemLabel>
-														{ label }
-													</DropdownMenuItemLabel>
-												</DropdownMenuRadioItem>
-											)
-										) }
-									</DropdownMenu>
-								) }
-							</WithSeparators>
-						</DropdownMenu>
-					</DropdownMenuGroup>
-				) }
 			</WithSeparators>
 		</DropdownMenu>
 	);
 } );
-
-function WithSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
 
 function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
 	const areAllSelected = selection.length === data.length;

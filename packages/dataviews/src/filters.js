@@ -9,22 +9,8 @@ import { memo } from '@wordpress/element';
 import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
-import {
-	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
-	LAYOUT_LIST,
-} from './constants';
-
-const sanitizeOperators = ( field ) => {
-	let operators = field.filterBy?.operators;
-	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
-	}
-	return operators.filter( ( operator ) =>
-		[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
-	);
-};
+import { sanitizeOperators } from './utils';
+import { ENUMERATION_TYPE, LAYOUT_LIST } from './constants';
 
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
@@ -53,11 +39,11 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					isVisible:
 						isPrimary ||
 						view.filters.some(
-							( f ) =>
-								f.field === field.id &&
-								[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
-									f.operator
-								)
+							( f ) => f.field === field.id
+							// &&
+							// [ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
+							// 	f.operator
+							// )
 						),
 					isPrimary,
 				} );
@@ -85,6 +71,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					filter={ filter }
 					view={ view }
 					onChangeView={ onChangeView }
+					filters={ filters }
 				/>
 			);
 		} ),

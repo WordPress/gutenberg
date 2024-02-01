@@ -27,6 +27,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@ariakit/react": "^0.3.12",
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
@@ -38,6 +39,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"classnames": "^2.3.1",
+		"match-sorter": "^6.3.3",
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {

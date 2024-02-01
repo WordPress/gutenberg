@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+
+/**
  * Helper util to sort data by text fields, when sorting is done client side.
  *
  * @param {Object}   params            Function params.
@@ -49,3 +54,13 @@ export function getPaginationResults( { data, view } ) {
 		},
 	};
 }
+
+export const sanitizeOperators = ( field ) => {
+	let operators = field.filterBy?.operators;
+	if ( ! operators || ! Array.isArray( operators ) ) {
+		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
+	}
+	return operators.filter( ( operator ) =>
+		[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+	);
+};
