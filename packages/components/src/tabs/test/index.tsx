@@ -1173,32 +1173,109 @@ describe( 'Tabs', () => {
 			} );
 		} );
 		describe( 'When `selectedId` is changed by the controlling component', () => {
-			it( 'should continue to handle arrow key navigation properly', async () => {
-				const { rerender } = render(
-					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
-				);
+			describe.each( [ true, false ] )(
+				'and `selectOnMove` is %s',
+				( selectOnMove ) => {
+					it( 'should continue to handle arrow key navigation properly', async () => {
+						const { rerender } = render(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="beta"
+								selectOnMove={ selectOnMove }
+							/>
+						);
 
-				// Tab key should focus the currently selected tab, which is Beta.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect( await getSelectedTab() ).toHaveFocus();
+						// Tab key should focus the currently selected tab, which is Beta.
+						await press.Tab();
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Beta'
+						);
+						expect( await getSelectedTab() ).toHaveFocus();
 
-				rerender(
-					<ControlledTabs tabs={ TABS } selectedTabId="gamma" />
-				);
+						rerender(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="gamma"
+								selectOnMove={ selectOnMove }
+							/>
+						);
 
-				// When the selected tab is changed, it should not automatically receive focus.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-				expect(
-					screen.getByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
+						// When the selected tab is changed, it should not automatically receive focus.
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Gamma'
+						);
+						expect(
+							screen.getByRole( 'tab', { name: 'Beta' } )
+						).toHaveFocus();
 
-				// Arrow keys should move focus to the next tab, which is Gamma
-				await press.ArrowRight();
-				expect(
-					screen.getByRole( 'tab', { name: 'Gamma' } )
-				).toHaveFocus();
-			} );
+						// Arrow keys should move focus to the next tab, which is Gamma
+						await press.ArrowRight();
+						expect(
+							screen.getByRole( 'tab', { name: 'Gamma' } )
+						).toHaveFocus();
+					} );
+
+					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
+						const { rerender } = render(
+							<>
+								<button>Focus me</button>
+								<ControlledTabs
+									tabs={ TABS }
+									selectedTabId="beta"
+									selectOnMove={ selectOnMove }
+								/>
+							</>
+						);
+
+						// Tab key should focus the currently selected tab, which is Beta.
+						await press.Tab();
+						await press.Tab();
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Beta'
+						);
+						expect( await getSelectedTab() ).toHaveFocus();
+
+						rerender(
+							<>
+								<button>Focus me</button>
+								<ControlledTabs
+									tabs={ TABS }
+									selectedTabId="gamma"
+									selectOnMove={ selectOnMove }
+								/>
+							</>
+						);
+
+						// When the selected tab is changed, it should not automatically receive focus.
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Gamma'
+						);
+						expect(
+							screen.getByRole( 'tab', { name: 'Beta' } )
+						).toHaveFocus();
+
+						// Press shift+tab, move focus to the button before Tabs
+						await press.ShiftTab();
+						expect(
+							screen.getByRole( 'button', { name: 'Focus me' } )
+						).toHaveFocus();
+
+						// Press tab, move focus back to the tablist
+						await press.Tab();
+
+						const betaTab = screen.getByRole( 'tab', {
+							name: 'Beta',
+						} );
+						const gammaTab = screen.getByRole( 'tab', {
+							name: 'Gamma',
+						} );
+
+						expect(
+							selectOnMove ? gammaTab : betaTab
+						).toHaveFocus();
+					} );
+				}
+			);
 		} );
 
 		describe( 'When `selectOnMove` is `true`', () => {
