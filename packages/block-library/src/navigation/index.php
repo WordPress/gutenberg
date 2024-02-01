@@ -130,6 +130,9 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the html for the inner blocks of the navigation block.
 	 */
 	private static function get_inner_blocks_html( $attributes, $inner_blocks ) {
+		$has_submenus   = static::has_submenus( $inner_blocks );
+		$is_interactive = static::is_interactive( $attributes, $inner_blocks );
+
 		$style                = static::get_styles( $attributes );
 		$class                = static::get_classes( $attributes );
 		$container_attributes = get_block_wrapper_attributes(
@@ -166,8 +169,6 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Add directives to the submenu if needed.
-		$has_submenus   = static::has_submenus( $inner_blocks );
-		$is_interactive = static::is_interactive( $attributes, $inner_blocks );
 		if ( $has_submenus && $is_interactive ) {
 			$tags              = new WP_HTML_Tag_Processor( $inner_blocks_html );
 			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $tags, $attributes );
