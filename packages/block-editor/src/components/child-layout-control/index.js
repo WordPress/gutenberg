@@ -5,6 +5,8 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
+	__experimentalInputControl as InputControl,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -38,8 +40,8 @@ export default function ChildLayoutControl( {
 	onChange,
 	parentLayout,
 } ) {
-	const { selfStretch, flexSize } = childLayout;
-
+	const { selfStretch, flexSize, columnSpan, rowSpan } = childLayout;
+	const { type: parentLayoutType } = parentLayout;
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
 			onChange( {
@@ -51,49 +53,82 @@ export default function ChildLayoutControl( {
 
 	return (
 		<>
-			<ToggleGroupControl
-				__nextHasNoMarginBottom
-				size={ '__unstable-large' }
-				label={ childLayoutOrientation( parentLayout ) }
-				value={ selfStretch || 'fit' }
-				help={ helpText( selfStretch, parentLayout ) }
-				onChange={ ( value ) => {
-					const newFlexSize = value !== 'fixed' ? null : flexSize;
-					onChange( {
-						...childLayout,
-						selfStretch: value,
-						flexSize: newFlexSize,
-					} );
-				} }
-				isBlock={ true }
-			>
-				<ToggleGroupControlOption
-					key={ 'fit' }
-					value={ 'fit' }
-					label={ __( 'Fit' ) }
-				/>
-				<ToggleGroupControlOption
-					key={ 'fill' }
-					value={ 'fill' }
-					label={ __( 'Fill' ) }
-				/>
-				<ToggleGroupControlOption
-					key={ 'fixed' }
-					value={ 'fixed' }
-					label={ __( 'Fixed' ) }
-				/>
-			</ToggleGroupControl>
-			{ selfStretch === 'fixed' && (
-				<UnitControl
-					size={ '__unstable-large' }
-					onChange={ ( value ) => {
-						onChange( {
-							...childLayout,
-							flexSize: value,
-						} );
-					} }
-					value={ flexSize }
-				/>
+			{ parentLayoutType === 'flex' && (
+				<>
+					<ToggleGroupControl
+						__nextHasNoMarginBottom
+						size={ '__unstable-large' }
+						label={ childLayoutOrientation( parentLayout ) }
+						value={ selfStretch || 'fit' }
+						help={ helpText( selfStretch, parentLayout ) }
+						onChange={ ( value ) => {
+							const newFlexSize =
+								value !== 'fixed' ? null : flexSize;
+							onChange( {
+								...childLayout,
+								selfStretch: value,
+								flexSize: newFlexSize,
+							} );
+						} }
+						isBlock={ true }
+					>
+						<ToggleGroupControlOption
+							key={ 'fit' }
+							value={ 'fit' }
+							label={ __( 'Fit' ) }
+						/>
+						<ToggleGroupControlOption
+							key={ 'fill' }
+							value={ 'fill' }
+							label={ __( 'Fill' ) }
+						/>
+						<ToggleGroupControlOption
+							key={ 'fixed' }
+							value={ 'fixed' }
+							label={ __( 'Fixed' ) }
+						/>
+					</ToggleGroupControl>
+					{ selfStretch === 'fixed' && (
+						<UnitControl
+							size={ '__unstable-large' }
+							onChange={ ( value ) => {
+								onChange( {
+									...childLayout,
+									flexSize: value,
+								} );
+							} }
+							value={ flexSize }
+						/>
+					) }
+				</>
+			) }
+			{ parentLayoutType === 'grid' && (
+				<HStack>
+					<InputControl
+						size={ '__unstable-large' }
+						label={ __( 'Column Span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							onChange( {
+								...childLayout,
+								columnSpan: value,
+							} );
+						} }
+						value={ columnSpan }
+					/>
+					<InputControl
+						size={ '__unstable-large' }
+						label={ __( 'Row Span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							onChange( {
+								...childLayout,
+								rowSpan: value,
+							} );
+						} }
+						value={ rowSpan }
+					/>
+				</HStack>
 			) }
 		</>
 	);

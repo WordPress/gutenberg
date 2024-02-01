@@ -557,46 +557,48 @@ function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	// If there is any value in style -> layout, the block has a child layout.
+	$layout_from_parent = $block['attrs']['style']['layout'] ?? null;
 
 	if ( ! $block_supports_layout && ! $layout_from_parent ) {
 		return $block_content;
 	}
 
-	$outer_class_names = array();
+	$outer_class_names         = array();
+	$container_content_class   = wp_unique_id( 'wp-container-content-' );
+	$child_layout_declarations = array();
 
-	if ( 'fixed' === $layout_from_parent || 'fill' === $layout_from_parent ) {
-		$container_content_class = wp_unique_id( 'wp-container-content-' );
+	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
 
-		$child_layout_styles = array();
-
-		if ( 'fixed' === $layout_from_parent && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-			$child_layout_styles[] = array(
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'flex-basis' => $block['attrs']['style']['layout']['flexSize'],
-					'box-sizing' => 'border-box',
-				),
-			);
-		} elseif ( 'fill' === $layout_from_parent ) {
-			$child_layout_styles[] = array(
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'flex-grow' => '1',
-				),
-			);
-		}
-
-		gutenberg_style_engine_get_stylesheet_from_css_rules(
-			$child_layout_styles,
-			array(
-				'context'  => 'block-supports',
-				'prettify' => false,
-			)
-		);
-
-		$outer_class_names[] = $container_content_class;
+	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
+		$child_layout_declarations['box-sizing'] = 'border-box';
+	} elseif ( 'fill' === $self_stretch ) {
+		$child_layout_declarations['flex-grow'] = '1';
 	}
+
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
+		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
+		$child_layout_declarations['grid-column'] = "span $column_span";
+	}
+	if ( isset( $block['attrs']['style']['layout']['rowSpan'] ) ) {
+		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
+		$child_layout_declarations['grid-row'] = "span $row_span";
+	}
+	$child_layout_styles[] = array(
+		'selector'     => ".$container_content_class",
+		'declarations' => $child_layout_declarations,
+	);
+
+	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
+		$child_layout_styles,
+		array(
+			'context'  => 'block-supports',
+			'prettify' => false,
+		)
+	);
+
+	$outer_class_names[] = $child_css ? $container_content_class : null;
 
 	// Prep the processor for modifying the block output.
 	$processor = new WP_HTML_Tag_Processor( $block_content );
