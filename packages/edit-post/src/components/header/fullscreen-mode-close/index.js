@@ -18,6 +18,7 @@ import { wordpress } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,14 +26,16 @@ import { useReducedMotion } from '@wordpress/compose';
 import { store as editPostStore } from '../../../store';
 
 function FullscreenModeClose( { showTooltip, icon, href } ) {
-	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
-		( select ) => {
-			const { getCurrentPostType } = select( editorStore );
+	const { isActive, isRequestingSiteIcon, postType, siteIconUrl, goBack } =
+		useSelect( ( select ) => {
+			const { getCurrentPostType, getEditorSettings } =
+				select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
 			const { getEntityRecord, getPostType, isResolving } =
 				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+			const _goBack = getEditorSettings()?.goBack;
 
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
@@ -43,12 +46,20 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 				] ),
 				postType: getPostType( getCurrentPostType() ),
 				siteIconUrl: siteData.site_icon_url,
+				goBack: typeof _goBack === 'function' ? _goBack : undefined,
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const disableMotion = useReducedMotion();
+	const onClick = useCallback(
+		( event ) => {
+			if ( goBack ) {
+				event.preventDefault();
+				goBack();
+			}
+		},
+		[ goBack ]
+	);
 
 	if ( ! isActive || ! postType ) {
 		return null;
@@ -88,18 +99,25 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		'has-icon': siteIconUrl,
 	} );
 
+	const buttonHref =
+		href ??
+		addQueryArgs( 'edit.php', {
+			post_type: postType.slug,
+		} );
+
+	const buttonLabel =
+		! goBack && postType?.labels?.view_items
+			? postType?.labels?.view_items
+			: __( 'Back' );
+
 	return (
 		<motion.div whileHover="expand">
 			<Button
 				className={ classes }
-				href={
-					href ??
-					addQueryArgs( 'edit.php', {
-						post_type: postType.slug,
-					} )
-				}
-				label={ postType?.labels?.view_items ?? __( 'Back' ) }
+				href={ ! goBack ? buttonHref : undefined }
+				label={ buttonLabel }
 				showTooltip={ showTooltip }
+				onClick={ onClick }
 			>
 				{ buttonIcon }
 			</Button>

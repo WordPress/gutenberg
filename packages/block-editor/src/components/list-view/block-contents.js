@@ -33,7 +33,7 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const { clientId } = block;
+		const clientId = block?.clientId;
 
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
@@ -49,6 +49,10 @@ const ListViewBlockContents = forwardRef(
 
 		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
 			useListViewContext();
+
+		if ( ! clientId ) {
+			return null;
+		}
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
