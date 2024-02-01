@@ -18,6 +18,8 @@ import {
 	createInterpolateElement,
 	useMemo,
 	useState,
+	useRef,
+	useEffect,
 } from '@wordpress/element';
 import {
 	store as coreStore,
@@ -136,6 +138,7 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 
 export function LinkUI( props ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
+	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const pagesPermissions = useResourcePermissions( 'pages' );
 	const postsPermissions = useResourcePermissions( 'posts' );
@@ -256,7 +259,11 @@ export function LinkUI( props ) {
 						renderControlBottom={ () =>
 							! link?.url?.length && (
 								<LinkUITools
-									setAddingBlock={ setAddingBlock }
+									focusAddBlockButton={ focusAddBlockButton }
+									setAddingBlock={ () => {
+										setAddingBlock( true );
+										setFocusAddBlockButton( false );
+									} }
 								/>
 							)
 						}
@@ -267,19 +274,32 @@ export function LinkUI( props ) {
 			{ addingBlock && (
 				<LinkUIBlockInserter
 					clientId={ props.clientId }
-					onBack={ setAddingBlock }
+					onBack={ () => {
+						setAddingBlock( false );
+						setFocusAddBlockButton( true );
+					} }
 				/>
 			) }
 		</Popover>
 	);
 }
 
-function LinkUITools( { setAddingBlock } ) {
+const LinkUITools = ( props ) => {
+	const { setAddingBlock, focusAddBlockButton } = props;
 	const blockInserterAriaRole = 'listbox';
+	const addBlockButtonRef = useRef();
+
+	// Focus the add block button when the popover is opened.
+	useEffect( () => {
+		if ( focusAddBlockButton ) {
+			addBlockButtonRef.current?.focus();
+		}
+	}, [ focusAddBlockButton ] );
 
 	return (
 		<VStack className="link-ui-tools">
 			<Button
+				ref={ addBlockButtonRef }
 				icon={ plus }
 				onClick={ ( e ) => {
 					e.preventDefault();
@@ -291,4 +311,6 @@ function LinkUITools( { setAddingBlock } ) {
 			</Button>
 		</VStack>
 	);
-}
+};
+
+export default LinkUITools;
