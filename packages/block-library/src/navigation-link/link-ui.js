@@ -26,7 +26,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronLeftSmall, plus } from '@wordpress/icons';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -78,6 +78,8 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 		[ clientId ]
 	);
 
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+
 	const dialogTitleId = useInstanceId(
 		LinkControl,
 		`link-ui-block-inserter__title`
@@ -97,6 +99,7 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 			role="dialog"
 			aria-labelledby={ dialogTitleId }
 			aria-describedby={ dialogDescritionId }
+			ref={ focusOnMountRef }
 		>
 			<VisuallyHidden>
 				<h2 id={ dialogTitleId }>{ __( 'Add block' ) }</h2>
