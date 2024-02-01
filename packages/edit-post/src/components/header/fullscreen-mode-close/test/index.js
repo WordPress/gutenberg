@@ -33,11 +33,13 @@ describe( 'FullscreenModeClose', () => {
 					getEntityRecord: () => ( {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
+					getEditorSettings: () => ( {
+						goBack: undefined,
+					} ),
 				} ) );
 			} );
 
 			render( <FullscreenModeClose /> );
-
 			const siteIcon = screen.getByAltText( 'Site Icon' );
 
 			expect( siteIcon ).toBeVisible();
@@ -53,6 +55,9 @@ describe( 'FullscreenModeClose', () => {
 					getEntityRecord: () => ( {
 						site_icon_url: '',
 					} ),
+					getEditorSettings: () => ( {
+						goBack: undefined,
+					} ),
 				} ) );
 			} );
 
@@ -63,6 +68,69 @@ describe( 'FullscreenModeClose', () => {
 			).not.toBeInTheDocument();
 
 			expect( container ).toMatchSnapshot();
+		} );
+
+		it( 'should add correct href where post type exists', () => {
+			useSelect.mockImplementation( ( cb ) => {
+				return cb( () => ( {
+					isResolving: () => false,
+					isFeatureActive: () => true,
+					getCurrentPostType: () => {},
+					getPostType: () => {
+						return {
+							slug: 'post',
+							labels: {
+								view_items: 'View Posts',
+							},
+						};
+					},
+					getEntityRecord: () => ( {
+						site_icon_url: '',
+					} ),
+					getEditorSettings: () => ( {
+						goBack: undefined,
+					} ),
+				} ) );
+			} );
+
+			render( <FullscreenModeClose /> );
+
+			const button = screen.getByLabelText( 'View Posts' );
+			expect( button.href ).toBe(
+				'http://localhost/edit.php?post_type=post'
+			);
+		} );
+
+		it( 'should add correct click handler where goBack function exists', () => {
+			const goBack = jest.fn();
+			useSelect.mockImplementation( ( cb ) => {
+				return cb( () => ( {
+					isResolving: () => false,
+					isFeatureActive: () => true,
+					getCurrentPostType: () => {},
+					getPostType: () => {
+						return {
+							slug: 'post',
+							labels: {
+								view_items: 'View Posts',
+							},
+						};
+					},
+					getEntityRecord: () => ( {
+						site_icon_url: '',
+					} ),
+					getEditorSettings: () => ( {
+						goBack,
+					} ),
+				} ) );
+			} );
+
+			render( <FullscreenModeClose /> );
+
+			const button = screen.getByLabelText( 'Back' );
+			expect( button.href ).toBeUndefined();
+			button.click();
+			expect( goBack ).toHaveBeenCalled();
 		} );
 	} );
 } );
