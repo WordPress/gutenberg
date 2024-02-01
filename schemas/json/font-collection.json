@@ -4,7 +4,7 @@
 	"type": "object",
 	"definitions": {
 		"fontFace": {
-			"description": "Font face theme.json settings, with added preview key.",
+			"description": "Font face theme.json settings, with added preview property.",
 			"type": "object",
 			"properties": {
 				"preview": {
@@ -119,7 +119,7 @@
 				"type": "object",
 				"properties": {
 					"font_family_settings": {
-						"description": "Font family theme.json settings, with added preview key.",
+						"description": "Font family theme.json settings, with added preview property.",
 						"type": "object",
 						"properties": {
 							"name": {
@@ -139,7 +139,7 @@
 								"description": "URL to a preview image of the font family."
 							},
 							"fontFace": {
-								"description": "Array of font-face declarations.",
+								"description": "Array of font-face definitions.",
 								"type": "array",
 								"items": {
 									"allOf": [
