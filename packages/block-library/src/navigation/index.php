@@ -85,10 +85,11 @@ class WP_Navigation_Block_Renderer {
 	 * Determine whether the navigation blocks is interactive.
 	 *
 	 * @param array         $attributes   The block attributes.
+	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return bool Returns whether or not to load the view script.
 	 */
-	private static function is_interactive( $attributes ) {
-		$has_submenus       = static::$has_submenus;
+	private static function is_interactive( $attributes, $inner_blocks ) {
+		$has_submenus       = static::has_submenus( $inner_blocks);
 		$is_responsive_menu = static::is_responsive( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
@@ -165,7 +166,7 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Add directives to the submenu if needed.
-		$has_submenus   = static::$has_submenus;
+		$has_submenus   = static::has_submenus( $inner_blocks );
 		$is_interactive = static::is_interactive( $attributes, $inner_blocks );
 		if ( $has_submenus && $is_interactive ) {
 			$tags              = new WP_HTML_Tag_Processor( $inner_blocks_html );
@@ -636,13 +637,6 @@ class WP_Navigation_Block_Renderer {
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
-
-		// This sets the `has_submenus` member variable
-		// which is used by other functions in the class
-		// to determine whether or not a navigation has submenus.
-		// This has to be called before any other code that relies
-		// on the has_submenus member variable.
-		static::has_submenus( $inner_blocks );
 
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
