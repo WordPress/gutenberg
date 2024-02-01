@@ -217,6 +217,8 @@ export function LinkUI( props ) {
 }
 
 function LinkUITools( { setAddingBlock } ) {
+	const blockInserterAriaRole = 'listbox';
+
 	return (
 		<VStack className="link-ui-tools">
 			<Button
@@ -225,6 +227,7 @@ function LinkUITools( { setAddingBlock } ) {
 					e.preventDefault();
 					setAddingBlock( true );
 				} }
+				aria-haspopup={ blockInserterAriaRole }
 			>
 				{ __( 'Add block' ) }
 			</Button>
