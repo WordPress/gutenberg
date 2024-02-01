@@ -106,10 +106,9 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
-	$block_name   = $parsed_block['blockName'];
-	$block_object = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-
-	$client_navigation = (bool) ( $block_object->supports['interactivity']['clientNavigation'] ?? false );
+	$block_name        = $parsed_block['blockName'];
+	$block_object      = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+	$client_navigation = isset( $block_object->supports['interactivity']['clientNavigation'] ) && true === $block_object->supports['interactivity']['clientNavigation'];
 
 	if ( 'core/query' === $block_name && isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
