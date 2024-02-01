@@ -23,13 +23,13 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		options,
 		onChange,
 		size = 'default',
-		value: valueProp,
+		value,
 		...restProps
 	} = props;
 
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
-		async setValue( value ) {
+		async setValue( nextValue ) {
 			if ( ! onChange ) return;
 
 			// Executes the logic in a microtask after the popup is closed.
@@ -39,13 +39,13 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 
 			const changeObject = {
 				highlightedIndex: state.renderedItems.findIndex(
-					( item ) => item.value === value
+					( item ) => item.value === nextValue
 				),
 				inputValue: '',
 				isOpen: state.open,
 				selectedItem: {
-					name: value,
-					key: value,
+					name: nextValue as string,
+					key: nextValue as string,
 				},
 				type: '',
 			};
