@@ -163,7 +163,7 @@ function gutenberg_process_block_bindings( $block_content, $block, $block_instan
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
 		'core/image'     => array( 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text' ),
+		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
 	// If the block doesn't have the bindings property or isn't one of the allowed block types, return.
