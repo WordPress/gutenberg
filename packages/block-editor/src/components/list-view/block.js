@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	isReusableBlock,
+	isTemplatePart,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -37,8 +42,6 @@ import ListViewBlockContents from './block-contents';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription, focusListItem } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
-import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
@@ -66,8 +69,6 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
-	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
-
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
 	const isLastSelectedBlock =
@@ -76,28 +77,61 @@ function ListViewBlock( {
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle =
-		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
-
-	const { block, blockName, blockEditingMode } = useSelect(
+	const selected = useSelect(
 		( select ) => {
-			const { getBlock, getBlockName, getBlockEditingMode } =
-				select( blockEditorStore );
+			const {
+				getBlockName,
+				getBlockEditingMode,
+				getSettings,
+				getBlockAttributes,
+				__experimentalGetReusableBlockTitle,
+				getBlockRootClientId,
+				canEditBlock,
+				canMoveBlock,
+				canRemoveBlock,
+			} = select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
+			const attributes = getBlockAttributes( clientId );
+			const blockName = getBlockName( clientId );
+			const blockType = getBlockType( blockName );
+			const isReusable = isReusableBlock( blockType );
+			const resusableTitle = isReusable
+				? __experimentalGetReusableBlockTitle( attributes.ref )
+				: undefined;
+			const rootClientId = getBlockRootClientId( clientId );
+			const canEdit = canEditBlock( clientId );
+			const canMove = canMoveBlock( clientId, rootClientId );
+			const canRemove = canRemoveBlock( clientId, rootClientId );
 
 			return {
-				block: getBlock( clientId ),
-				blockName: getBlockName( clientId ),
+				blockName,
 				blockEditingMode: getBlockEditingMode( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+				blockTitle:
+					attributes?.metadata?.name ||
+					getActiveBlockVariation( blockName, attributes )?.title ||
+					resusableTitle ||
+					blockType.title,
+				isSynced: isReusable || isTemplatePart( blockType ),
+				isLocked: ! canEdit || ! canMove || ! canRemove,
+				canEdit,
+				canMove,
 			};
 		},
 		[ clientId ]
 	);
-	const allowRightClickOverrides = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().allowRightClickOverrides,
-		[]
-	);
+	const {
+		blockName,
+		blockEditingMode,
+		allowRightClickOverrides,
+		blockTitle = __( 'Untitled' ),
+		isSynced,
+		isLocked,
+		canEdit,
+		canMove,
+	} = selected;
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -288,7 +322,7 @@ function ListViewBlock( {
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-synced': blockInformation?.isSynced,
+		'is-synced': isSynced,
 		'is-draggable': canMove,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
@@ -336,7 +370,7 @@ function ListViewBlock( {
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
-							block={ block }
+							clientId={ clientId }
 							onClick={ selectEditorBlock }
 							onContextMenu={ onContextMenu }
 							onMouseDown={ onMouseDown }
@@ -403,7 +437,7 @@ function ListViewBlock( {
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu
 							clientIds={ dropdownClientIds }
-							block={ block }
+							currentClientId={ clientId }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							popoverProps={ {

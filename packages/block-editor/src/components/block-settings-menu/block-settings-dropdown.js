@@ -78,15 +78,13 @@ function ParentSelectorMenuItem( { parentClientId, parentBlockType } ) {
 }
 
 export function BlockSettingsDropdown( {
-	block,
+	currentClientId,
 	clientIds,
 	__experimentalSelectBlock,
 	children,
 	__unstableDisplayLocation,
 	...props
 } ) {
-	// Get the client id of the current block for this menu, if one is set.
-	const currentClientId = block?.clientId;
 	const blockClientIds = Array.isArray( clientIds )
 		? clientIds
 		: [ clientIds ];

@@ -36,7 +36,7 @@ import { useListViewContext } from './context';
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		clientId,
 		onClick,
 		onContextMenu,
 		onMouseDown,
