@@ -112,7 +112,6 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_markup_for_inner_block( $inner_block ) {
 		$inner_block_content = $inner_block->render();
-
 		if ( ! empty( $inner_block_content ) ) {
 			if ( static::does_block_need_a_list_item_wrapper( $inner_block ) ) {
 				return '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
@@ -638,7 +637,6 @@ class WP_Navigation_Block_Renderer {
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
-
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
@@ -649,7 +647,7 @@ class WP_Navigation_Block_Renderer {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			static::get_nav_wrapper_attributes( $attributes, $inner_blocks ),
-			static::get_wrapper_markup( $attributes, $inner_blocks ),
+			static::get_wrapper_markup( $attributes, $inner_blocks )
 		);
 	}
 }
