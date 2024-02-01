@@ -212,6 +212,7 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 
 	public function processRequireToken( File $phpcsFile, $stackPtr ) {
 		$tokens     = $phpcsFile->getTokens();
+		$token = $tokens[ $stackPtr ];
 	}
 
 	/**
