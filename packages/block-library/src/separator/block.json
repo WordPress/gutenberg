@@ -30,8 +30,7 @@
 			"margin": [ "top", "bottom" ]
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"styles": [

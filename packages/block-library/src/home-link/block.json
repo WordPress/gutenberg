@@ -38,8 +38,7 @@
 			}
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-home-link-editor",

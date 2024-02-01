@@ -52,8 +52,7 @@
 			"__experimentalDuotone": "img"
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"selectors": {

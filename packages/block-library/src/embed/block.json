@@ -46,8 +46,7 @@
 			"margin": true
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-embed-editor",

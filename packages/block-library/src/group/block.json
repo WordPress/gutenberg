@@ -89,8 +89,7 @@
 			"allowSizingOnChildren": true
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-group-editor",

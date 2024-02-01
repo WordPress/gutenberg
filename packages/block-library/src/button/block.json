@@ -121,8 +121,7 @@
 		},
 		"__experimentalSelector": ".wp-block-button .wp-block-button__link",
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"styles": [

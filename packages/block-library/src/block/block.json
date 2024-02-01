@@ -21,8 +21,7 @@
 		"inserter": false,
 		"renaming": false,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	}
 }

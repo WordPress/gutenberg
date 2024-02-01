@@ -13,8 +13,7 @@
 		"className": false,
 		"html": false,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-nextpage-editor"

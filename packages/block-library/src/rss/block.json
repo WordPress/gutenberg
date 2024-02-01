@@ -45,8 +45,7 @@
 		"align": true,
 		"html": false,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-rss-editor",

@@ -60,8 +60,7 @@
 			"blockGap": true
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"styles": [

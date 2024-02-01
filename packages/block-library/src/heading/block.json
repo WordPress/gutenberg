@@ -63,8 +63,7 @@
 		"__unstablePasteTextInline": true,
 		"__experimentalSlashInserter": true,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-heading-editor",

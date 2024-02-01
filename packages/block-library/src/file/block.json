@@ -72,8 +72,7 @@
 		},
 		"interactivity": true,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-file-editor",

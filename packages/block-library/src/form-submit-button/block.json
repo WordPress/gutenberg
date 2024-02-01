@@ -14,8 +14,7 @@
 	"style": [ "wp-block-form-submit-button" ],
 	"supports": {
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	}
 }

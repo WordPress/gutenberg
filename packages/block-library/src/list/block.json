@@ -73,8 +73,7 @@
 		"__experimentalOnMerge": true,
 		"__experimentalSlashInserter": true,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-list-editor",

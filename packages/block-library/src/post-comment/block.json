@@ -27,8 +27,7 @@
 		"html": false,
 		"inserter": false,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	}
 }

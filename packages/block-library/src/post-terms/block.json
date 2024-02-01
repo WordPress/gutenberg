@@ -56,8 +56,7 @@
 			}
 		},
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-post-terms"

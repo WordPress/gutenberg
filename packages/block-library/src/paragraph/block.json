@@ -66,8 +66,7 @@
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",

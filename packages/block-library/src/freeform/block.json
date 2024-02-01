@@ -17,8 +17,7 @@
 		"customClassName": false,
 		"reusable": false,
 		"interactivity": {
-			"clientNavigation": true,
-			"interactive": false
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-freeform-editor"
