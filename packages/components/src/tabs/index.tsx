@@ -164,9 +164,8 @@ function Tabs( {
 			return;
 		}
 
-		const currentItem = items.find( ( item ) => item.id === selectedId );
 		const focusedElement =
-			currentItem?.element?.ownerDocument.activeElement;
+			items?.[ 0 ]?.element?.ownerDocument.activeElement;
 
 		if (
 			! focusedElement ||
@@ -182,7 +181,7 @@ function Tabs( {
 		if ( activeId !== focusedElement.id ) {
 			setActiveId( focusedElement.id );
 		}
-	}, [ activeId, isControlled, items, selectedId, setActiveId ] );
+	}, [ activeId, isControlled, items, setActiveId ] );
 
 	const contextValue = useMemo(
 		() => ( {
