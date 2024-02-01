@@ -293,7 +293,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 			$font_face_response = rest_get_server()->dispatch( $font_face_request );
 			$font_face_data     = rest_get_server()->response_to_data( $font_face_response, true );
 
-			$this->assertSame( $font_face_data, $font_face, 'The embedded font_face data should match when the data from a single request' );
+			$this->assertSame( $font_face_data, $font_face, 'The embedded font_face data should match when the data from a single request.' );
 		}
 	}
 
@@ -834,7 +834,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		// Ensure the post still exists.
 		$post = get_post( $font_family_id );
-		$this->assertNotEmpty( $post, 'The post should still exists.' );
+		$this->assertNotEmpty( $post, 'The post should still exist.' );
 	}
 
 	/**
@@ -887,11 +887,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 4, $properties, 'There should be 4 properties in the schema::properties data' );
-		$this->assertArrayHasKey( 'id', $properties, 'The id property should exist in the schema::properties data' );
-		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The theme_json_version property should exist in the schema::properties data' );
-		$this->assertArrayHasKey( 'font_faces', $properties, 'The font_faces property should exist in the schema::properties data' );
-		$this->assertArrayHasKey( 'font_family_settings', $properties, 'The font_family_settings property should exist in the schema::properties data' );
+		$this->assertCount( 4, $properties, 'There should be 4 properties in the schema::properties data.' );
+		$this->assertArrayHasKey( 'id', $properties, 'The id property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The theme_json_version property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'font_faces', $properties, 'The font_faces property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'font_family_settings', $properties, 'The font_family_settings property should exist in the schema::properties data.' );
 	}
 
 	protected function check_font_family_data( $data, $post_id, $links ) {

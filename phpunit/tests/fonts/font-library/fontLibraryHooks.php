@@ -46,8 +46,8 @@ class Tests_Fonts_FontLibraryHooks extends WP_UnitTestCase {
 
 		wp_delete_post( $font_face_id, true );
 
-		$this->assertFalse( file_exists( $font_path ), 'The font file should have been deleted when the post was deleted' );
-		$this->assertTrue( file_exists( $other_font_path ), 'The other font file should exist' );
+		$this->assertFalse( file_exists( $font_path ), 'The font file should have been deleted when the post was deleted.' );
+		$this->assertTrue( file_exists( $other_font_path ), 'The other font file should exist.' );
 	}
 
 	protected function create_font_face_with_file( $filename ) {
