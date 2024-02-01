@@ -585,7 +585,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
 		$child_layout_declarations['grid-row'] = "span $row_span";
 	}
-	$child_layout_styles[] = array(
+	$child_layout_styles = array(
 		'selector'     => ".$container_content_class",
 		'declarations' => $child_layout_declarations,
 	);
