@@ -20,13 +20,14 @@ if ( ! function_exists( 'wp_script_modules' ) ) {
 	 * @return WP_Script_Modules The main WP_Script_Modules instance.
 	 */
 	function wp_script_modules(): WP_Script_Modules {
-		static $instance = null;
-		if ( is_null( $instance ) ) {
-			$instance = new WP_Script_Modules();
-			$instance->add_hooks();
+		global $wp_script_modules;
+
+		if ( ! ( $wp_script_modules instanceof WP_Script_Modules ) ) {
+			$wp_script_modules = new WP_Script_Modules();
 		}
-		return $instance;
+		return $wp_script_modules;
 	}
+	wp_script_modules()->add_hooks();
 }
 
 if ( ! function_exists( 'wp_register_script_module' ) ) {
