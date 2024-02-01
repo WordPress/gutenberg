@@ -283,7 +283,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				>
 					<FocalPointPicker
 						__nextHasNoMarginBottom
-            __next40pxDefaultSize
+						__next40pxDefaultSize
 						label={ __( 'Focal point' ) }
 						url={ mediaUrl }
 						value={ focalPoint }
