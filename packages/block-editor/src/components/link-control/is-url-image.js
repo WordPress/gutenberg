@@ -4,6 +4,7 @@
  * @return {boolean} true if the url is an image url.
  */
 export default function isImageUrl( url ) {
-	const pattern = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g;
+	const pattern =
+		/^(https?:\/\/)([\w-]+(?:\.[\w-]+)*\/)*[\w-]+\.(?:jpg|JPG|jpeg|gif|png|webp)$/i;
 	return pattern.test( url );
 }
