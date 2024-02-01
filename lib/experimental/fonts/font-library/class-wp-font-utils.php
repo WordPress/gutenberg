@@ -196,7 +196,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @return mixed The sanitized value.
 		 */
 		private static function apply_sanitizator( $value, $sanitizator ) {
-			if ( $sanitizator === null ) {
+			if ( null === $sanitizator ) {
 				return $value;
 
 			}
