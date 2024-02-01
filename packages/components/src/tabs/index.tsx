@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	useEffect,
 	useLayoutEffect,
@@ -49,8 +49,8 @@ function Tabs( {
 
 	const isControlled = selectedTabId !== undefined;
 
-	const { items, selectedId } = store.useState();
-	const { setSelectedId, setActiveId, move } = store;
+	const { items, selectedId, activeId } = store.useState();
+	const { setSelectedId, setActiveId } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
@@ -159,41 +159,30 @@ function Tabs( {
 		setSelectedId,
 	] );
 
-	const previousSelectedId = usePrevious( selectedId );
-
 	useEffect( () => {
 		if ( ! isControlled ) {
 			return;
 		}
+
 		const currentItem = items.find( ( item ) => item.id === selectedId );
-		const activeElement = currentItem?.element?.ownerDocument.activeElement;
+		const focusedElement =
+			currentItem?.element?.ownerDocument.activeElement;
 
 		if (
-			! activeElement ||
-			! items.some( ( item ) => activeElement === item.element )
+			! focusedElement ||
+			! items.some( ( item ) => focusedElement === item.element )
 		) {
 			return; // Return early if no tabs are focused.
 		}
 
-		const previousSelectedTabHadFocus =
-			typeof previousSelectedId === 'string' &&
-			previousSelectedId === activeElement?.id;
-
-		// If a tab other than the one previously selected had focus when the
-		// selection changed, update the activeId to the currently focused tab.
-		// The activeId controls how arrow key navigation behaves. Keeping them
-		// in sync avoids confusion when navigating tabs with the keyboard.
-		if ( ! previousSelectedTabHadFocus ) {
-			setActiveId( activeElement.id );
+		// If, after ariakit re-computes the active tab, that tab doesn't match
+		// the currently focused tab, then we force an update to ariakit to avoid
+		// any mismatches, especially when navigating to previous/next tab with
+		// arrow keys.
+		if ( activeId !== focusedElement.id ) {
+			setActiveId( focusedElement.id );
 		}
-	}, [
-		isControlled,
-		items,
-		move,
-		previousSelectedId,
-		selectedId,
-		setActiveId,
-	] );
+	}, [ activeId, isControlled, items, selectedId, setActiveId ] );
 
 	const contextValue = useMemo(
 		() => ( {
