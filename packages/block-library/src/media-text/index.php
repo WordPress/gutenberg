@@ -28,7 +28,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 
 	$image_tag = '<figure class="wp-block-media-text__media"><img>';
-	$content = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
+	$content   = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
