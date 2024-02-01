@@ -384,7 +384,7 @@ test.describe( 'Block bindings - Post/page context', () => {
 			.getAttribute( 'contenteditable' );
 		expect( isContentEditable ).toBe( 'true' );
 
-		// Link controls doesn't exist.
+		// Link controls don't exist.
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -428,7 +428,7 @@ test.describe( 'Block bindings - Post/page context', () => {
 			.getAttribute( 'contenteditable' );
 		expect( isContentEditable ).toBe( 'false' );
 
-		// Link controls doesn't exist.
+		// Link controls don't exist.
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -467,7 +467,7 @@ test.describe( 'Block bindings - Post/page context', () => {
 			.locator( 'img' );
 		await imageBlockImg.click();
 
-		// Replace controls doesn't exist.
+		// Replace controls don't exist.
 		await expect(
 			page.getByRole( 'button', {
 				name: imageReplaceName,
@@ -578,7 +578,7 @@ test.describe( 'Block bindings - Post/page context', () => {
 			.locator( 'img' );
 		await imageBlockImg.click();
 
-		// Replace controls doesn't exist.
+		// Replace controls don't exist.
 		await expect(
 			page.getByRole( 'button', {
 				name: imageReplaceName,
@@ -782,7 +782,7 @@ test.describe( 'Block bindings - Template context', () => {
 			.getAttribute( 'contenteditable' );
 		expect( isContentEditable ).toBe( 'true' );
 
-		// Link controls doesn't exist.
+		// Link controls don't exist.
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -826,7 +826,7 @@ test.describe( 'Block bindings - Template context', () => {
 			.getAttribute( 'contenteditable' );
 		expect( isContentEditable ).toBe( 'false' );
 
-		// Link controls doesn't exist.
+		// Link controls don't exist.
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -876,7 +876,7 @@ test.describe( 'Block bindings - Template context', () => {
 		} );
 		await imageBlock.click();
 
-		// Replace controls doesn't exist.
+		// Replace controls don't exist.
 		await expect(
 			page.getByRole( 'button', {
 				name: imageReplaceName,
@@ -974,7 +974,7 @@ test.describe( 'Block bindings - Template context', () => {
 		} );
 		await imageBlock.click();
 
-		// Replace controls doesn't exist.
+		// Replace controls don't exist.
 		await expect(
 			page.getByRole( 'button', {
 				name: imageReplaceName,
