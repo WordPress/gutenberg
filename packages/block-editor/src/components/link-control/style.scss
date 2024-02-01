@@ -364,6 +364,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.components-base-control__field {
 		display: flex; // don't allow label to wrap under checkbox.
+		align-items: center;
 
 		.components-checkbox-control__label {
 			color: $gray-900;
