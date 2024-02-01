@@ -64,8 +64,6 @@ function SidebarContent( {
 } ) {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	// currentArea, and isGeneralSidebarOpen are intentionally left out from the dependencies,
-	// because we want to run the effect when a block is selected/unselected and not when the sidebar state changes.
 	useEffect( () => {
 		if (
 			hasSelectedNonAreaBlock &&
@@ -87,6 +85,10 @@ function SidebarContent( {
 				WIDGET_AREAS_IDENTIFIER
 			);
 		}
+		// We're intentionally leaving `currentArea` and `isGeneralSidebarOpen`
+		// out of the dep array because we want this effect to run based on
+		// block selection changes, not sidebar state changes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
 
 	const tabsContextValue = useContext( Tabs.Context );
@@ -111,14 +113,20 @@ function SidebarContent( {
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel tabId={ WIDGET_AREAS_IDENTIFIER }>
+				<Tabs.TabPanel
+					tabId={ WIDGET_AREAS_IDENTIFIER }
+					focusable={ false }
+				>
 					<WidgetAreas
 						selectedWidgetAreaId={
 							selectedWidgetAreaBlock?.attributes.id
 						}
 					/>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
+				<Tabs.TabPanel
+					tabId={ BLOCK_INSPECTOR_IDENTIFIER }
+					focusable={ false }
+				>
 					{ hasSelectedNonAreaBlock ? (
 						<BlockInspector />
 					) : (
@@ -205,10 +213,10 @@ export default function Sidebar() {
 			// Due to how this component is controlled (via a value from the
 			// `interfaceStore`), when the sidebar closes the currently selected
 			// tab can't be found. This causes the component to continuously reset
-			// the selection to `null` in an infinite loop.Proactively setting
+			// the selection to `null` in an infinite loop. Proactively setting
 			// the selected tab to `null` avoids that.
-			onSelect={ onTabSelect }
 			selectedTabId={ isGeneralSidebarOpen ? currentArea : null }
+			onSelect={ onTabSelect }
 			selectOnMove={ false }
 			focusable={ false }
 		>
