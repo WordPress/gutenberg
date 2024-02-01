@@ -4,7 +4,7 @@
 	"type": "object",
 	"definitions": {
 		"fontFace": {
-			"description": "Font face settings. The same as theme.json but with the preview key",
+			"description": "Font face theme.json settings, with added preview key.",
 			"type": "object",
 			"properties": {
 				"preview": {
@@ -114,12 +114,12 @@
 		},
 		"font_families": {
 			"type": "array",
-			"description": "Array of font families ready to be installed",
+			"description": "Array of font families ready to be installed.",
 			"items": {
 				"type": "object",
 				"properties": {
 					"font_family_settings": {
-						"description": "Font family settings similar to theme.json but without fontFace key.",
+						"description": "Font family theme.json settings, with added preview key.",
 						"type": "object",
 						"properties": {
 							"name": {
@@ -154,7 +154,7 @@
 					},
 					"categories": {
 						"type": "array",
-						"description": "Array of category slugs",
+						"description": "Array of category slugs.",
 						"items": {
 							"type": "string"
 						}
@@ -166,7 +166,7 @@
 		},
 		"categories": {
 			"type": "array",
-			"description": "Array of category objects",
+			"description": "Array of category objects.",
 			"items": {
 				"type": "object",
 				"properties": {
