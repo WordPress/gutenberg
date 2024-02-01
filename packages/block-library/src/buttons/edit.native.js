@@ -21,10 +21,7 @@ import { alignmentHelpers } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
-
-const ALLOWED_BLOCKS = [ buttonBlockName ];
 
 const layoutProp = { type: 'default', alignments: [] };
 
@@ -76,7 +73,7 @@ export default function ButtonsEdit( {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
+		return preferredStyleVariations?.value?.[ 'core/button' ];
 	}, [] );
 
 	const { getBlockOrder } = useSelect( blockEditorStore );
@@ -147,10 +144,9 @@ export default function ButtonsEdit( {
 			) }
 			{ resizeObserver }
 			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ [
 					[
-						buttonBlockName,
+						'core/button',
 						{
 							className:
 								preferredStyle &&

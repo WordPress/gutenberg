@@ -33,6 +33,7 @@ const predefinedPluginTemplates = {
 			editorScript: null,
 			editorStyle: null,
 			style: null,
+			viewStyle: null,
 			viewScript: 'file:./view.js',
 			example: {},
 		},

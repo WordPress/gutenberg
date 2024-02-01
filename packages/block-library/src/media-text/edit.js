@@ -274,7 +274,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			) }
 			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<ToolsPanelItem
-					label={ __( 'Focal point picker' ) }
+					label={ __( 'Focal point' ) }
 					isShownByDefault={ true }
 					hasValue={ () => !! focalPoint }
 					onDeselect={ () =>
@@ -283,7 +283,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				>
 					<FocalPointPicker
 						__nextHasNoMarginBottom
-						label={ __( 'Focal point picker' ) }
+            __next40pxDefaultSize
+						label={ __( 'Focal point' ) }
 						url={ mediaUrl }
 						value={ focalPoint }
 						onChange={ ( value ) =>

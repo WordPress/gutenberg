@@ -38,22 +38,34 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { useLink } from '../../components/routes/link';
 
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, renderingMode } = useSelect( ( select ) => {
-		const { isPage: _isPage, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const { getRenderingMode } = select( editorStore );
-		return {
-			isPage: _isPage(),
-			canvasMode: getCanvasMode(),
-			renderingMode: getRenderingMode(),
-		};
-	}, [] );
+	const { isPage, canvasMode, templateId, currentPostType } = useSelect(
+		( select ) => {
+			const { isPage: _isPage, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const { getCurrentPostType, getCurrentTemplateId } =
+				select( editorStore );
+			return {
+				isPage: _isPage(),
+				canvasMode: getCanvasMode(),
+				templateId: getCurrentTemplateId(),
+				currentPostType: getCurrentPostType(),
+			};
+		},
+		[]
+	);
+
+	const { onClick: editTemplate } = useLink( {
+		postType: 'wp_template',
+		postId: templateId,
+	} );
+
 	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! isPage || canvasMode !== 'edit' ) {
@@ -62,7 +74,7 @@ function usePageContentFocusCommands() {
 
 	const commands = [];
 
-	if ( renderingMode !== 'template-only' ) {
+	if ( currentPostType !== 'wp_template' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
 			/* translators: %1$s: template title */
@@ -72,7 +84,7 @@ function usePageContentFocusCommands() {
 			),
 			icon: layout,
 			callback: ( { close } ) => {
-				setRenderingMode( 'template-only' );
+				editTemplate();
 				close();
 			},
 		} );
@@ -129,7 +141,7 @@ function useManipulateDocumentCommands() {
 	const isEditingPage = useSelect(
 		( select ) =>
 			select( editSiteStore ).isPage() &&
-			select( editorStore ).getRenderingMode() !== 'template-only',
+			select( editorStore ).getCurrentPostType() !== 'wp_template',
 		[]
 	);
 

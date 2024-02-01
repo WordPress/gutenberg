@@ -28,15 +28,9 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 			)
 		);
 		$mock_file       = wp_tempnam( 'my-collection-data-' );
-		file_put_contents( $mock_file, '{"font_families": [ "mock" ], "categories": [ "mock" ] }' );
+		file_put_contents( $mock_file, '{"slug": "mock-col-slug", "font_families": [ "mock" ], "categories": [ "mock" ] }' );
 
-		wp_register_font_collection(
-			array(
-				'name' => 'My Collection',
-				'slug' => 'mock-col-slug',
-				'src'  => $mock_file,
-			)
-		);
+		wp_register_font_collection_from_json( $mock_file );
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -154,10 +148,18 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		// Controller does not use test_prepare_item().
 	}
 
-	/**
-	 * @doesNotPerformAssertions
-	 */
 	public function test_get_item_schema() {
-		// Controller does not use test_get_item_schema().
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-collections' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$properties = $data['schema']['properties'];
+		$this->assertCount( 5, $properties );
+		$this->assertArrayHasKey( 'slug', $properties );
+		$this->assertArrayHasKey( 'name', $properties );
+		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'font_families', $properties );
+		$this->assertArrayHasKey( 'categories', $properties );
 	}
 }

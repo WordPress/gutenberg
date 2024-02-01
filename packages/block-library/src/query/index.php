@@ -99,9 +99,13 @@ function register_block_core_query() {
 		)
 	);
 
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$module_url = gutenberg_url( '/build/interactivity/query.min.js' );
+	}
+
 	wp_register_script_module(
 		'@wordpress/block-library/query',
-		gutenberg_url( '/build/interactivity/query.min.js' ),
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/query/view.min.js' ),
 		array(
 			array(
 				'id'     => '@wordpress/interactivity',

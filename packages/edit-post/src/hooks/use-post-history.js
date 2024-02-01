@@ -50,7 +50,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		return {
 			href: newUrl,
 			onClick: ( event ) => {
-				event.preventDefault();
+				event?.preventDefault();
 				dispatch( {
 					type: 'push',
 					post: { postId: params.postId, postType: params.postType },
