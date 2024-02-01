@@ -103,9 +103,10 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 									) }
 								</span>
 								<span>
-									<Ariakit.ComboboxItemValue className="dataviews-search-widget-filter-combobox-item-value">
-										{ element.label }
-									</Ariakit.ComboboxItemValue>
+									<Ariakit.ComboboxItemValue
+										className="dataviews-search-widget-filter-combobox-item-value"
+										value={ element.label }
+									/>
 									{ !! element.description && (
 										<span className="dataviews-search-widget-filter-combobox-item-description">
 											{ element.description }
