@@ -16,6 +16,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 */
+	#[AllowDynamicProperties]
 	class WP_Font_Collection {
 		/**
 		 * The unique slug for the font collection.
@@ -27,58 +28,41 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		public $slug;
 
 		/**
-		 * The name of the font collection.
+		 * Font collection configuration.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @var array
+		 */
+		private $config;
+
+		/**
+		 * Font collection JSON file path or url.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @var string
 		 */
-		public $name;
+		private $src;
 
 		/**
-		 * Description of the font collection.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @var string
-		 */
-		public $description;
-
-		/**
-		 * Array of font families in the collection.
+		 * Default font collection configuration.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @var array
 		 */
-		public $font_families;
-
-		/**
-		 * Categories associated with the font collection.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @var array
-		 */
-		public $categories;
-
-		/**
-		 * Font collection json cache.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @var array
-		 */
-		private static $collection_json_cache = array();
+		private $default_config;
 
 		/**
 		 * WP_Font_Collection constructor.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $slug Font collection slug.
-		 * @param array  $args {
-		 *     Optional. Font collection associative array of configuration options.
+		 * @param string        $slug Font collection slug.
+		 * @param array|string  $args_or_file {
+		 *     Optional. Font collection associative array of configuration options, or a file path or url
+		 *     to a JSON file containing the font collection configuration.
 		 *
 		 *     @type string $name           Name of the font collection.
 		 *     @type string $description    Description of the font collection.
@@ -86,12 +70,23 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *     @type array  $categories     Array of categories for the fonts that are in the collection.
 		 * }
 		 */
-		public function __construct( $slug, $args = array() ) {
-			$this->slug          = sanitize_title( $slug );
-			$this->name          = isset( $args['name'] ) ? $args['name'] : __( 'Unnamed Font Collection', 'gutenberg' );
-			$this->description   = isset( $args['description'] ) ? $args['description'] : '';
-			$this->font_families = isset( $args['font_families'] ) ? $args['font_families'] : array();
-			$this->categories    = isset( $args['categories'] ) ? $args['categories'] : array();
+		public function __construct( $slug, $args_or_file = array() ) {
+			$this->slug           = sanitize_title( $slug );
+			$this->default_config = array(
+				'name'          => __( 'Unnamed Font Collection', 'gutenberg' ),
+				'description'   => '',
+				'font_families' => array(),
+				'categories'    => array(),
+			);
+
+			if ( is_array( $args_or_file ) ) {
+				// If the $config is an array, validate and set it now.
+				$this->validate_config( $args_or_file );
+				$this->config = wp_parse_args( $args_or_file, $this->default_config );
+			} else {
+				// If the $config is a file path or url, we'll lazy load the config when accessed.
+				$this->src = $args_or_file;
+			}
 
 			if ( $this->slug !== $slug ) {
 				_doing_it_wrong(
@@ -101,87 +96,85 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 					'6.5.0'
 				);
 			}
-
-			if ( empty( $args['font_families'] ) ) {
-				_doing_it_wrong(
-					__METHOD__,
-					/* translators: %s: Font collection slug. */
-					sprintf( __( 'Font collection "%s" does not contain any font families.', 'gutenberg' ), $slug ),
-					'6.5.0'
-				);
-			}
-
-			return true;
 		}
 
 		/**
-		 * Loads the font collection data from a json file path or url.
+		 * Getter for font collection properties.
+		 *
+		 * Lazy loads properties when the font collection uses a JSON file for better performance.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $prop Property to get.
+		 * @return mixed
+		 */
+		public function __get( $prop ) {
+			// Only allow valid properties to be accessed.
+			if ( ! in_array( $prop, array( 'name', 'description', 'font_families', 'categories' ), true ) ) {
+				return null;
+			}
+
+			// If we have a JSON config, load it if needed.
+			if ( $this->src && empty( $this->config ) ) {
+				$this->config = wp_parse_args(
+					$this->load_from_json( $this->src ),
+					$this->default_config
+				);
+			}
+
+			return isset( $this->config[ $prop ] ) ? $this->config[ $prop ] : null;
+		}
+
+		/**
+		 * Loads the font collection data from a JSON file path or url.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @param string $file_or_url File path or url to a json file containing the font collection data.
-		 * @return array|WP_Error An array containing the font collection data on success,
-		 *                        else an instance of WP_Error on failure.
+		 * @return array An array containing the font collection data, empty array on failure.
 		 */
-		public static function load_from_json( $file_or_url ) {
+		private function load_from_json( $file_or_url ) {
 			$url  = wp_http_validate_url( $file_or_url );
 			$file = file_exists( $file_or_url ) ? wp_normalize_path( realpath( $file_or_url ) ) : false;
 
 			if ( ! $url && ! $file ) {
-				// translators: %s: File path or url to font collection json file.
+				// translators: %s: File path or url to font collection JSON file.
 				$message = sprintf( __( 'Font collection JSON file "%s" is invalid or does not exist.', 'gutenberg' ), $file_or_url );
 				_doing_it_wrong( __METHOD__, $message, '6.5.0' );
-				return new WP_Error( 'font_collection_json_missing', $message );
+				return array();
 			}
 
-			return $url ? self::load_from_url( $url ) : self::load_from_file( $file );
+			return $url ? $this->load_from_url( $url ) : $this->load_from_file( $file );
 		}
 
 		/**
-		 * Loads the font collection data from a json file path.
+		 * Loads the font collection data from a JSON file path.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $file File path to a json file containing the font collection data.
-		 * @return array|WP_Error An array containing the font collection data on success,
-		 *                        else an instance of WP_Error on failure.
+		 * @param string $file File path to a JSON file containing the font collection data.
+		 * @return array An array containing the font collection data on success, empty array on failure.
 		 */
-		private static function load_from_file( $file ) {
-			if ( array_key_exists( $file, static::$collection_json_cache ) ) {
-				return static::$collection_json_cache[ $file ];
-			}
-
+		private function load_from_file( $file ) {
 			$data = wp_json_file_decode( $file, array( 'associative' => true ) );
 			if ( empty( $data ) ) {
-				return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection JSON file contents.', 'gutenberg' ) );
+				wp_trigger_error( __METHOD__, __( 'Error decoding the font collection JSON file contents.', 'gutenberg' ) );
+				return array();
 			}
 
-			if ( empty( $data['slug'] ) ) {
-				// translators: %s: Font collection JSON URL.
-				$message = sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $file );
-				_doing_it_wrong( __METHOD__, $message, '6.5.0' );
-				return new WP_Error( 'font_collection_invalid_json', $message );
-			}
-
-			static::$collection_json_cache[ $file ] = $data;
-
-			return $data;
+			$this->validate_config( $data );
+			return (array) $data;
 		}
 
 		/**
-		 * Loads the font collection data from a json file url.
+		 * Loads the font collection data from a JSON file url.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $url Url to a json file containing the font collection data.
-		 * @return array|WP_Error An array containing the font collection data on success,
-		 *                        else an instance of WP_Error on failure.
+		 * @param string $url Url to a JSON file containing the font collection data.
+		 * @return array An array containing the font collection data on success, empty array on failure.
 		 */
-		private static function load_from_url( $url ) {
-			if ( array_key_exists( $url, static::$collection_json_cache ) ) {
-				return static::$collection_json_cache[ $url ];
-			}
-
+		private function load_from_url( $url ) {
 			// Limit key to 167 characters to avoid failure in the case of a long url.
 			$transient_key = substr( 'wp_font_collection_url_' . $url, 0, 167 );
 			$data          = get_site_transient( $transient_key );
@@ -190,27 +183,36 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				$response = wp_safe_remote_get( $url );
 				if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 					// translators: %s: Font collection url.
-					return new WP_Error( 'font_collection_request_error', sprintf( __( 'Error fetching the font collection data from "%s".', 'gutenberg' ), $url ) );
+					wp_trigger_error( __METHOD__, sprintf( __( 'Error fetching the font collection data from "%s".', 'gutenberg' ), $url ) );
+					return array();
 				}
 
 				$data = json_decode( wp_remote_retrieve_body( $response ), true );
 				if ( empty( $data ) ) {
-					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the REST response JSON.', 'gutenberg' ) );
+					wp_trigger_error( __METHOD__, __( 'Error decoding the font collection data from the response JSON.', 'gutenberg' ) );
+					return array();
 				}
 
-				if ( empty( $data['slug'] ) ) {
-					// translators: %s: Font collection JSON URL.
-					$message = sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $url );
-					_doing_it_wrong( __METHOD__, $message, '6.5.0' );
-					return new WP_Error( 'font_collection_invalid_json', $message );
+				if ( $this->validate_config( $data ) ) {
+					set_site_transient( $transient_key, $data, DAY_IN_SECONDS );
 				}
-
-				set_site_transient( $transient_key, $data, DAY_IN_SECONDS );
 			}
 
-			static::$collection_json_cache[ $url ] = $data;
+			return (array) $data;
+		}
 
-			return $data;
+		private function validate_config( $config ) {
+			if ( empty( $config['font_families'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					/* translators: %s: Font collection slug. */
+					sprintf( __( 'Font collection "%s" does not contain any font families.', 'gutenberg' ), $this->slug ),
+					'6.5.0'
+				);
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

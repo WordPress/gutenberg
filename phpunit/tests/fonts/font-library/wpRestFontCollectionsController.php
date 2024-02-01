@@ -30,9 +30,9 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 			)
 		);
 		$mock_file       = wp_tempnam( 'my-collection-data-' );
-		file_put_contents( $mock_file, '{"slug": "mock-col-slug", "font_families": [ "mock" ], "categories": [ "mock" ] }' );
+		file_put_contents( $mock_file, '{"name": "Mock Collection", "font_families": [ "mock" ], "categories": [ "mock" ] }' );
 
-		wp_register_font_collection_from_json( $mock_file );
+		wp_register_font_collection( 'mock-col-slug', $mock_file );
 	}
 
 	public static function wpTearDownAfterClass() {

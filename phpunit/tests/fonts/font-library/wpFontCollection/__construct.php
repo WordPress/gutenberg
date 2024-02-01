@@ -73,8 +73,9 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	}
 
 	public function test_should_do_it_wrong_missing_font_families() {
-		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::__construct' );
-		new WP_Font_Collection( 'my-collection' );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_config' );
+		$collection = new WP_Font_Collection( 'my-collection' );
+		$collection->font_families;
 	}
 
 	public function test_should_do_it_wrong_invalid_slug() {

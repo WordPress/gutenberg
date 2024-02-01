@@ -55,13 +55,14 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $slug Font collection slug.
-		 * @param array  $args Font collection config options.
-		 *                     See {@see wp_register_font_collection()} for the supported fields.
+		 * @param string $slug         Font collection slug.
+		 * @param array  $args_or_file Font collection config options or a file path or url to a JSON file
+		 *                             containing the font collection configuration.
+		 *                             See {@see wp_register_font_collection()} for the supported fields.
 		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
 		 */
-		public static function register_font_collection( $slug, $args = array() ) {
-			$new_collection = new WP_Font_Collection( $slug, $args );
+		public static function register_font_collection( $slug, $args_or_file = array() ) {
+			$new_collection = new WP_Font_Collection( $slug, $args_or_file );
 
 			if ( self::is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
@@ -78,23 +79,6 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 			}
 			self::$collections[ $new_collection->slug ] = $new_collection;
 			return $new_collection;
-		}
-
-		/**
-		 * Register a new font collection from a json file.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @param string $file_or_url File path or URL to a JSON file containing the font collection data.
-		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
-		 */
-		public static function register_font_collection_from_json( $file_or_url ) {
-			$args = WP_Font_Collection::load_from_json( $file_or_url );
-			if ( is_wp_error( $args ) ) {
-				return $args;
-			}
-
-			return self::register_font_collection( $args['slug'], $args );
 		}
 
 		/**
