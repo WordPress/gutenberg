@@ -378,11 +378,25 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color'      => array(
-						'text'    => 'value',
-						'palette' => array(
+						'text'      => 'value',
+						'palette'   => array(
 							array(
 								'slug'  => 'grey',
 								'color' => 'grey',
+							),
+						),
+						'gradients' => array(
+							array(
+								'gradient' => 'linear-gradient(135deg,rgba(0,0,0) 0%,rgb(0,0,0) 100%)',
+								'name'     => 'Custom gradient',
+								'slug'     => 'custom-gradient',
+							),
+						),
+						'duotone'   => array(
+							array(
+								'colors' => array( '#333333', '#aaaaaa' ),
+								'name'   => 'Custom Duotone',
+								'slug'   => 'custom-duotone',
 							),
 						),
 					),
@@ -425,15 +439,21 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'misc'     => 'value',
 					'elements' => array(
-						'link' => array(
+						'link'   => array(
 							'color' => array(
 								'text'       => '#111',
 								'background' => '#333',
 							),
 						),
+						'button' => array(
+							'shadow' => '10px 10px 5px 0px rgba(0,0,0,0.66)',
+						),
 					),
 					'blocks'   => array(
 						'core/group'        => array(
+							'color'      => array(
+								'gradient' => 'var:preset|gradient|custom-gradient',
+							),
 							'border'     => array(
 								'radius' => '10px',
 							),
@@ -497,7 +517,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									'bottom' => '30px',
 								),
 							),
+							'filter'  => array(
+								'duotone' => 'var:preset|duotone|custom-duotone',
+							),
 						),
+					),
+					'spacing'  => array(
+						'blockGap' => '24px',
 					),
 				),
 				'misc'     => 'value',
@@ -510,10 +536,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$all = $variables . $styles . $presets;
 
-		$this->assertEquals( $all, $theme_json->get_stylesheet() );
-		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
-		$this->assertEquals( $presets, $theme_json->get_stylesheet( array( 'presets' ) ) );
-		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
+		$this->assertSame( $all, $theme_json->get_stylesheet() );
+		$this->assertSame( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $presets, $theme_json->get_stylesheet( array( 'presets' ) ) );
+		$this->assertSame( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
 	public function test_get_stylesheet_support_for_shorthand_and_longhand_values() {
@@ -668,7 +694,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$styles    = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}.wp-block-group{color: red;}';
 		$presets   = '.wp-block-group.has-grey-color{color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.wp-block-group.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}';
 		$variables = '.wp-block-group{--wp--preset--color--grey: grey;}';
-		$all       = $variables . $styles . $presets;
+
+		$all = $variables . $styles . $presets;
+
 		$this->assertSame( $all, $theme_json->get_stylesheet() );
 		$this->assertSame( $styles, $theme_json->get_stylesheet( array( 'styles' ) ) );
 		$this->assertSame( $presets, $theme_json->get_stylesheet( array( 'presets' ) ) );
@@ -794,8 +822,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = $base_styles . $element_styles;
 
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
 	public function test_get_stylesheet_handles_only_pseudo_selector_rules_for_given_property() {
@@ -833,8 +861,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = $base_styles . $element_styles;
 
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
 	public function test_get_stylesheet_ignores_pseudo_selectors_on_non_whitelisted_elements() {
@@ -872,8 +900,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = $base_styles . $element_styles;
 
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
 	public function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
@@ -911,8 +939,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = $base_styles . $element_styles;
 
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 		$this->assertStringNotContainsString( 'a:levitate{', $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
@@ -959,8 +987,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = $base_styles . $element_styles;
 
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
 	public function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
@@ -1006,8 +1034,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = $base_styles . $element_styles;
 
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
 	/**
@@ -1152,7 +1180,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		// Results also include root site blocks styles.
-		$this->assertEquals(
+		$this->assertSame(
 			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.wp-site-blocks) > * { margin-block-start: 1em; margin-block-end: 0; }:where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }:where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }body { --wp--style--block-gap: 1em; }:where(body .is-layout-flow)  > :first-child:first-child{margin-block-start: 0;}:where(body .is-layout-flow)  > :last-child:last-child{margin-block-end: 0;}:where(body .is-layout-flow)  > *{margin-block-start: 1em;margin-block-end: 0;}:where(body .is-layout-constrained)  > :first-child:first-child{margin-block-start: 0;}:where(body .is-layout-constrained)  > :last-child:last-child{margin-block-end: 0;}:where(body .is-layout-constrained)  > *{margin-block-start: 1em;margin-block-end: 0;}:where(body .is-layout-flex) {gap: 1em;}:where(body .is-layout-grid) {gap: 1em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}',
 			$theme_json->get_stylesheet( array( 'styles' ) )
 		);
@@ -1177,7 +1205,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		// Results also include root site blocks styles.
-		$this->assertEquals(
+		$this->assertSame(
 			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.wp-site-blocks) > * { margin-block-start: var(--wp--preset--spacing--60); margin-block-end: 0; }:where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }:where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }body { --wp--style--block-gap: var(--wp--preset--spacing--60); }:where(body .is-layout-flow)  > :first-child:first-child{margin-block-start: 0;}:where(body .is-layout-flow)  > :last-child:last-child{margin-block-end: 0;}:where(body .is-layout-flow)  > *{margin-block-start: var(--wp--preset--spacing--60);margin-block-end: 0;}:where(body .is-layout-constrained)  > :first-child:first-child{margin-block-start: 0;}:where(body .is-layout-constrained)  > :last-child:last-child{margin-block-end: 0;}:where(body .is-layout-constrained)  > *{margin-block-start: var(--wp--preset--spacing--60);margin-block-end: 0;}:where(body .is-layout-flex) {gap: var(--wp--preset--spacing--60);}:where(body .is-layout-grid) {gap: var(--wp--preset--spacing--60);}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}',
 			$theme_json->get_stylesheet( array( 'styles' ) )
 		);
@@ -1203,7 +1231,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
 
 		// Results also include root site blocks styles.
-		$this->assertEquals(
+		$this->assertSame(
 			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}',
 			$stylesheet
 		);
@@ -1224,7 +1252,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'base-layout-styles' ) );
 
 		// Note the `base-layout-styles` includes a fallback gap for the Columns block for backwards compatibility.
-		$this->assertEquals(
+		$this->assertSame(
 			':where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}',
 			$stylesheet
 		);
@@ -1247,7 +1275,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		remove_theme_support( 'disable-layout-styles' );
 
 		// All Layout styles should be skipped.
-		$this->assertEquals(
+		$this->assertSame(
 			'',
 			$stylesheet
 		);
@@ -1293,7 +1321,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'default'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.wp-site-blocks) > * { margin-block-start: 1rem; margin-block-end: 0; }:where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }:where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }body { --wp--style--block-gap: 1rem; }:where(body .is-layout-flow)  > :first-child:first-child{margin-block-start: 0;}:where(body .is-layout-flow)  > :last-child:last-child{margin-block-end: 0;}:where(body .is-layout-flow)  > *{margin-block-start: 1rem;margin-block-end: 0;}:where(body .is-layout-constrained)  > :first-child:first-child{margin-block-start: 0;}:where(body .is-layout-constrained)  > :last-child:last-child{margin-block-end: 0;}:where(body .is-layout-constrained)  > *{margin-block-start: 1rem;margin-block-end: 0;}:where(body .is-layout-flex) {gap: 1rem;}:where(body .is-layout-grid) {gap: 1rem;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}' .
 			'.wp-block-post-content{color: gray;}.wp-block-social-links-is-layout-flow > :first-child:first-child{margin-block-start: 0;}.wp-block-social-links-is-layout-flow > :last-child:last-child{margin-block-end: 0;}.wp-block-social-links-is-layout-flow > *{margin-block-start: 0;margin-block-end: 0;}.wp-block-social-links-is-layout-constrained > :first-child:first-child{margin-block-start: 0;}.wp-block-social-links-is-layout-constrained > :last-child:last-child{margin-block-end: 0;}.wp-block-social-links-is-layout-constrained > *{margin-block-start: 0;margin-block-end: 0;}.wp-block-social-links-is-layout-flex{gap: 0;}.wp-block-social-links-is-layout-grid{gap: 0;}.wp-block-buttons-is-layout-flow > :first-child:first-child{margin-block-start: 0;}.wp-block-buttons-is-layout-flow > :last-child:last-child{margin-block-end: 0;}.wp-block-buttons-is-layout-flow > *{margin-block-start: 0;margin-block-end: 0;}.wp-block-buttons-is-layout-constrained > :first-child:first-child{margin-block-start: 0;}.wp-block-buttons-is-layout-constrained > :last-child:last-child{margin-block-end: 0;}.wp-block-buttons-is-layout-constrained > *{margin-block-start: 0;margin-block-end: 0;}.wp-block-buttons-is-layout-flex{gap: 0;}.wp-block-buttons-is-layout-grid{gap: 0;}',
 			$theme_json->get_stylesheet()
@@ -1353,7 +1381,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		// Results also include root site blocks styles which hard code
 		// `body { margin: 0;}`.
-		$this->assertEquals(
+		$this->assertSame(
 			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.custom{color: teal;}',
 			$actual
 		);
@@ -3388,19 +3416,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = 'wp-element-button';
 		$actual   = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
 
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	public function test_get_element_class_name_invalid() {
 		$expected = '';
 		$actual   = WP_Theme_JSON_Gutenberg::get_element_class_name( 'unknown-element' );
 
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Testing that dynamic properties in theme.json return the value they reference, e.g.
-	 * array( 'ref' => 'styles.color.background' ) => "#ffffff".
+	 * Testing that dynamic properties in theme.json return the value they reference,
+	 * e.g. array( 'ref' => 'styles.color.background' ) => "#ffffff".
 	 */
 	public function test_get_property_value_valid() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -3425,9 +3453,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles  = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
 		$color_styles = 'body{background-color: #ffffff;color: #000000;}.wp-element-button, .wp-block-button__link{background-color: #000000;color: #ffffff;}';
-
-		$expected = $base_styles . $color_styles;
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$expected     = $base_styles . $color_styles;
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
 	}
 
 	/**
@@ -3478,7 +3505,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * Testing that dynamic properties in theme.json that
 	 * refer to other dynamic properties in a loop
-	 * then they should be left untouched.
+	 * should be left untouched.
 	 *
 	 * @expectedIncorrectUsage get_property_value
 	 */
@@ -3505,14 +3532,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles  = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
 		$color_styles = 'body{background-color: #ffffff;}.wp-element-button, .wp-block-button__link{color: #ffffff;}';
-
-		$expected = $base_styles . $color_styles;
+		$expected     = $base_styles . $color_styles;
 		$this->assertSame( $expected, $theme_json->get_stylesheet() );
 	}
 
 	/**
 	 * Testing that dynamic properties in theme.json that
-	 * refer to other dynamic properties then they should be left unprocessed.
+	 * refer to other dynamic properties
+	 * should be left unprocessed.
 	 *
 	 * @expectedIncorrectUsage get_property_value
 	 */
@@ -3539,14 +3566,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles  = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
 		$color_styles = 'body{background-color: #ffffff;color: #ffffff;}.wp-element-button, .wp-block-button__link{color: #ffffff;}';
-
-		$expected = $base_styles . $color_styles;
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$expected     = $base_styles . $color_styles;
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
 	}
 
 	/**
 	 * Testing that dynamic properties in theme.json that
-	 * refer to themselves then they should be left unprocessed.
+	 * refer to themselves should be left unprocessed.
 	 *
 	 * @expectedIncorrectUsage get_property_value
 	 */
@@ -3565,73 +3591,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles  = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
 		$color_styles = 'body{background-color: #ffffff;}';
-
-		$expected = $base_styles . $color_styles;
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-	}
-
-	/**
-	 * Data provider for spacing scale tests.
-	 *
-	 * @return array
-	 */
-	public function data_set_spacing_sizes_when_invalid() {
-		return array(
-
-			'invalid_spacing_scale_values_missing_operator' => array(
-				'spacingScale'    => array(
-					'operator'   => '',
-					'increment'  => 1.5,
-					'steps'      => 1,
-					'mediumStep' => 4,
-					'unit'       => 'rem',
-				),
-				'expected_output' => null,
-			),
-
-			'invalid_spacing_scale_values_non_numeric_increment' => array(
-				'spacingScale'    => array(
-					'operator'   => '+',
-					'increment'  => 'add two to previous value',
-					'steps'      => 1,
-					'mediumStep' => 4,
-					'unit'       => 'rem',
-				),
-				'expected_output' => null,
-			),
-
-			'invalid_spacing_scale_values_non_numeric_steps' => array(
-				'spacingScale'    => array(
-					'operator'   => '+',
-					'increment'  => 1.5,
-					'steps'      => 'spiral staircase preferred',
-					'mediumStep' => 4,
-					'unit'       => 'rem',
-				),
-				'expected_output' => null,
-			),
-
-			'invalid_spacing_scale_values_non_numeric_medium_step' => array(
-				'spacingScale'    => array(
-					'operator'   => '+',
-					'increment'  => 1.5,
-					'steps'      => 5,
-					'mediumStep' => 'That which is just right',
-					'unit'       => 'rem',
-				),
-				'expected_output' => null,
-			),
-
-			'invalid_spacing_scale_values_missing_unit' => array(
-				'spacingScale'    => array(
-					'operator'   => '+',
-					'increment'  => 1.5,
-					'steps'      => 5,
-					'mediumStep' => 4,
-				),
-				'expected_output' => null,
-			),
-		);
+		$expected     = $base_styles . $color_styles;
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
 	}
 
 	public function test_get_styles_for_block_with_padding_aware_alignments() {
@@ -3655,16 +3616,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$metadata = array(
-			'path'     => array(
-				'0' => 'styles',
-			),
+			'path'     => array( 'styles' ),
 			'selector' => 'body',
 		);
 
 		$expected    = 'body { margin: 0;}.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON_Gutenberg::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
-		$this->assertEquals( $expected, $root_rules . $style_rules );
+		$this->assertSame( $expected, $root_rules . $style_rules );
 	}
 
 	public function test_get_styles_for_block_without_padding_aware_alignments() {
@@ -3685,16 +3644,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$metadata = array(
-			'path'     => array(
-				'0' => 'styles',
-			),
+			'path'     => array( 'styles' ),
 			'selector' => 'body',
 		);
 
 		$expected    = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{padding-top: 10px;padding-right: 12px;padding-bottom: 10px;padding-left: 12px;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON_Gutenberg::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
-		$this->assertEquals( $expected, $root_rules . $style_rules );
+		$this->assertSame( $expected, $root_rules . $style_rules );
 	}
 
 	public function test_get_styles_for_block_with_content_width() {
@@ -3711,16 +3668,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$metadata = array(
-			'path'     => array(
-				'0' => 'settings',
-			),
+			'path'     => array( 'settings' ),
 			'selector' => 'body',
 		);
 
 		$expected    = 'body { margin: 0;--wp--style--global--content-size: 800px;--wp--style--global--wide-size: 1000px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON_Gutenberg::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
-		$this->assertEquals( $expected, $root_rules . $style_rules );
+		$this->assertSame( $expected, $root_rules . $style_rules );
 	}
 
 	public function test_get_styles_with_appearance_tools() {
@@ -4557,117 +4512,153 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_output, _wp_array_get( $theme_json->get_raw_data(), array( 'settings', 'spacing', 'spacingSizes', 'default' ) ) );
 	}
 
-	public function test_update_separator_declarations() {
+	/**
+	 * Data provider for spacing scale tests.
+	 *
+	 * @return array
+	 */
+	public function data_set_spacing_sizes_when_invalid() {
+		return array(
+			'missing operator value'  => array(
+				'spacing_scale'   => array(
+					'operator'   => '',
+					'increment'  => 1.5,
+					'steps'      => 1,
+					'mediumStep' => 4,
+					'unit'       => 'rem',
+				),
+				'expected_output' => null,
+			),
+			'non numeric increment'   => array(
+				'spacing_scale'   => array(
+					'operator'   => '+',
+					'increment'  => 'add two to previous value',
+					'steps'      => 1,
+					'mediumStep' => 4,
+					'unit'       => 'rem',
+				),
+				'expected_output' => null,
+			),
+			'non numeric steps'       => array(
+				'spacing_scale'   => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 'spiral staircase preferred',
+					'mediumStep' => 4,
+					'unit'       => 'rem',
+				),
+				'expected_output' => null,
+			),
+			'non numeric medium step' => array(
+				'spacing_scale'   => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 5,
+					'mediumStep' => 'That which is just right',
+					'unit'       => 'rem',
+				),
+				'expected_output' => null,
+			),
+			'missing unit value'      => array(
+				'spacing_scale'   => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 5,
+					'mediumStep' => 4,
+				),
+				'expected_output' => null,
+			),
+		);
+	}
+
+	/**
+	 * Tests the core separator block outbut based on various provided settings.
+	 *
+	 * @dataProvider data_update_separator_declarations
+	 *
+	 * @param array $separator_block_settings Example separator block settings from the data provider.
+	 * @param array $expected_output          Expected output from data provider.
+	 */
+	public function test_update_separator_declarations( $separator_block_settings, $expected_output ) {
 		// If only background is defined, test that includes border-color to the style so it is applied on the front end.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'blocks' => array(
-						'core/separator' => array(
-							'color' => array(
-								'background' => 'blue',
-							),
-						),
+						'core/separator' => $separator_block_settings,
 					),
 				),
 			),
 			'default'
 		);
 
-		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
-		$expected    = $base_styles . '.wp-block-separator{background-color: blue;color: blue;}';
-		$stylesheet  = $theme_json->get_stylesheet( array( 'styles' ) );
-		$this->assertEquals( $expected, $stylesheet );
-
-		// If background and text are defined, do not include border-color, as text color is enough.
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/separator' => array(
-							'color' => array(
-								'background' => 'blue',
-								'text'       => 'red',
-							),
-						),
-					),
-				),
-			),
-			'default'
-		);
-
-		$expected   = $base_styles . '.wp-block-separator{background-color: blue;color: red;}';
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
-		$this->assertEquals( $expected, $stylesheet );
 
-		// If only text is defined, do not include border-color, as by itself is enough.
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/separator' => array(
-							'color' => array(
-								'text' => 'red',
-							),
-						),
+		$this->assertSame( $expected_output, $stylesheet );
+	}
+
+	/**
+	 * Data provider for separator declaration tests.
+	 *
+	 * @return array
+	 */
+	public function data_update_separator_declarations() {
+		return array(
+			// If only background is defined, test that includes border-color to the style so it is applied on the front end.
+			'only background'                      => array(
+				array(
+					'color' => array(
+						'background' => 'blue',
 					),
 				),
+				'expected_output' => 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}.wp-block-separator{background-color: blue;color: blue;}',
 			),
-			'default'
-		);
-		$expected   = $base_styles . '.wp-block-separator{color: red;}';
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
-		$this->assertEquals( $expected, $stylesheet );
-
-		// If background, text, and border-color are defined, include everything, CSS specificity will decide which to apply.
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/separator' => array(
-							'color'  => array(
-								'background' => 'blue',
-								'text'       => 'red',
-							),
-							'border' => array(
-								'color' => 'pink',
-							),
-						),
+			// If background and text are defined, do not include border-color, as text color is enough.
+			'background and text, no border-color' => array(
+				array(
+					'color' => array(
+						'background' => 'blue',
+						'text'       => 'red',
 					),
 				),
+				'expected_output' => 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}.wp-block-separator{background-color: blue;color: red;}',
 			),
-			'default'
-		);
-		$expected   = $base_styles . '.wp-block-separator{background-color: blue;border-color: pink;color: red;}';
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
-		$this->assertEquals( $expected, $stylesheet );
-
-		// If background and border color are defined, include everything, CSS specificity will decide which to apply.
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/separator' => array(
-							'color'  => array(
-								'background' => 'blue',
-							),
-							'border' => array(
-								'color' => 'pink',
-							),
-						),
+			// If only text is defined, do not include border-color, as by itself is enough.
+			'only text'                            => array(
+				array(
+					'color' => array(
+						'text' => 'red',
 					),
 				),
+				'expected_output' => 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}.wp-block-separator{color: red;}',
 			),
-			'default'
+			// If background, text, and border-color are defined, include everything, CSS specificity will decide which to apply.
+			'background, text, and border-color'   => array(
+				array(
+					'color'  => array(
+						'background' => 'blue',
+						'text'       => 'red',
+					),
+					'border' => array(
+						'color' => 'pink',
+					),
+				),
+				'expected_output' => 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}.wp-block-separator{background-color: blue;border-color: pink;color: red;}',
+			),
+			// If background and border color are defined, include everything, CSS specificity will decide which to apply.
+			'background, and border-color'         => array(
+				array(
+					'color'  => array(
+						'background' => 'blue',
+					),
+					'border' => array(
+						'color' => 'pink',
+					),
+				),
+				'expected_output' => 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}.wp-block-separator{background-color: blue;border-color: pink;}',
+			),
 		);
-		$expected   = $base_styles . '.wp-block-separator{background-color: blue;border-color: pink;}';
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
-		$this->assertEquals( $expected, $stylesheet );
 	}
 
 	public function test_shadow_preset_styles() {
@@ -4691,9 +4682,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$styles = 'body{--wp--preset--shadow--natural: 5px 5px 5px 0 black;--wp--preset--shadow--sharp: 5px 5px black;}';
-		$this->assertEquals( $styles, $theme_json->get_stylesheet() );
-		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'variables' ) ) );
+		$expected_styles = 'body{--wp--preset--shadow--natural: 5px 5px 5px 0 black;--wp--preset--shadow--sharp: 5px 5px black;}';
+		$this->assertSame( $expected_styles, $theme_json->get_stylesheet(), 'Styles returned from "::get_stylesheet()" does not match expectations' );
+		$this->assertSame( $expected_styles, $theme_json->get_stylesheet( array( 'variables' ) ), 'Styles returned from "::get_stylesheet()" when requiring "variables" type does not match expectations' );
 	}
 
 	public function test_get_shadow_styles_for_blocks() {
@@ -4728,11 +4719,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$global_styles  = 'body{--wp--preset--shadow--natural: 5px 5px 0 0 black;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
-		$element_styles = 'a:where(:not(.wp-element-button)){box-shadow: var(--wp--preset--shadow--natural);}.wp-element-button, .wp-block-button__link{box-shadow: var(--wp--preset--shadow--natural);}p{box-shadow: var(--wp--preset--shadow--natural);}';
-		$styles         = $global_styles . $element_styles;
-
-		$this->assertEquals( $styles, $theme_json->get_stylesheet() );
+		$global_styles   = 'body{--wp--preset--shadow--natural: 5px 5px 0 0 black;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}';
+		$element_styles  = 'a:where(:not(.wp-element-button)){box-shadow: var(--wp--preset--shadow--natural);}.wp-element-button, .wp-block-button__link{box-shadow: var(--wp--preset--shadow--natural);}p{box-shadow: var(--wp--preset--shadow--natural);}';
+		$expected_styles = $global_styles . $element_styles;
+		$this->assertSame( $expected_styles, $theme_json->get_stylesheet() );
 	}
 
 	public function test_get_custom_css_handles_global_custom_css() {
@@ -4751,10 +4741,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$custom_css = 'body {color:purple;}p{color:red;}';
-		$this->assertEquals( $custom_css, $theme_json->get_custom_css() );
+		$this->assertSame( $custom_css, $theme_json->get_custom_css() );
 	}
 
 	/**
+	 * Tests that custom CSS is kept for users with correct capabilities and removed for others.
+	 *
 	 * @dataProvider data_custom_css_for_user_caps
 	 *
 	 * @param string $user_property The property name for current user.
