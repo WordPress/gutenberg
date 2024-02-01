@@ -118,9 +118,53 @@ function gutenberg_render_variation_support_styles( $pre_render, $block ) {
 	wp_enqueue_style( 'variation-styles' );
 }
 
+/**
+ * Merges any shared block style variation definitions into their appropriate
+ * block type within theme json styles. Any custom user selections already made
+ * will take precedence over the shared style variation value.
+ *
+ * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
+ *
+ * @return WP_Theme_JSON_Data_Gutenberg
+ */
+function gutenberg_resolve_shared_block_style_variations( $theme_json ) {
+	// Return early if no shared block style variations.
+	// TODO: Should the theme with the theme style variation still have to register these block style variations so that they show for selection by the user?
+	$theme_json_data   = $theme_json->get_data();
+	$shared_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
+
+	if ( empty( $shared_variations ) ) {
+		return $theme_json;
+	}
+
+	$variations_data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
+
+	foreach ( $shared_variations as $variation_name => $variation ) {
+		$supported_blocks = $variation['supportedBlockTypes'] ?? null;
+
+		if ( ! $supported_blocks ) {
+			continue;
+		}
+
+		// TODO: Can we support deregistering block style variations for a
+		// theme style variation by setting it false/empty or something?
+
+		foreach ( $supported_blocks as $block_name ) {
+			$path = array( 'styles', 'blocks', $block_name, 'variations', $variation_name );
+			_wp_array_set( $variations_data, $path, $variation );
+		}
+	}
+
+	// Merge the current theme.json data over shared variation data so that
+	// any previous user selections in global styles are maintained.
+	$variations_theme_json = new WP_Theme_JSON_Data_Gutenberg( $variations_data, 'user' );
+
+	return $variations_theme_json->update_with( $theme_json_data );
+}
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register( 'variation', array() );
 
 add_filter( 'pre_render_block', 'gutenberg_render_variation_support_styles', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_variation_support', 10, 2 );
+add_filter( 'wp_theme_json_data_user', 'gutenberg_resolve_shared_block_style_variations', 10, 1 );

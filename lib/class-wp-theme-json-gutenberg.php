@@ -869,12 +869,12 @@ class WP_Theme_JSON_Gutenberg {
 		// entries for each individual block. This is compounded when multiple
 		// variations need to added to the schema. Would multiple passes for
 		// validation offer any improvements?
-		$unique_variations                      = array_unique(
+		$unique_variations                              = array_unique(
 			call_user_func_array( 'array_merge', array_values( $valid_variations ) )
 		);
-		$shared_variation_styles                = $block_style_variation_styles;
-		$shared_variation_styles['block_types'] = null;
-		$schema_shared_style_variations         = array_fill_keys( $unique_variations, $shared_variation_styles );
+		$shared_variation_styles                        = $block_style_variation_styles;
+		$shared_variation_styles['supportedBlockTypes'] = null;
+		$schema_shared_style_variations                 = array_fill_keys( $unique_variations, $shared_variation_styles );
 
 		// Allow refs only within the individual block type variations properties.
 		// Assigning it before `$schema_shared_style_variations` would mean

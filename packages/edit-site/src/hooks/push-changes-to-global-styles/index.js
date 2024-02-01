@@ -254,7 +254,7 @@ function useChangesToPush( name, attributes, userConfig ) {
  * @param {Array}  path   Path of the property to set.
  * @param {*}      value  Value to set.
  */
-function setNestedValue( object, path, value ) {
+export function setNestedValue( object, path, value ) {
 	if ( ! object || typeof object !== 'object' ) {
 		return object;
 	}

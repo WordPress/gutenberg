@@ -16,6 +16,8 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+//TODO: If this these updates actually stick around. Move this to utils.
+import { setNestedValue } from '../../hooks/push-changes-to-global-styles';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis
@@ -28,6 +30,37 @@ export function mergeBaseAndUserConfigs( base, user ) {
 		// to override the old array (no merging).
 		isMergeableObject: isPlainObject,
 	} );
+}
+
+function resolveBlockStyleVariations( userConfig ) {
+	const sharedVariations = userConfig.styles?.blocks?.variations;
+
+	if ( ! sharedVariations ) {
+		return userConfig;
+	}
+
+	const variationsConfig = JSON.parse( JSON.stringify( userConfig ) );
+
+	Object.entries( sharedVariations ).forEach(
+		( [ variationName, variation ] ) => {
+			if ( ! variation?.supportedBlockTypes ) {
+				return;
+			}
+
+			variation.supportedBlockTypes.forEach( ( blockName ) => {
+				const path = [
+					'styles',
+					'blocks',
+					blockName,
+					'variations',
+					variationName,
+				];
+				setNestedValue( variationsConfig, path, variation );
+			} );
+		}
+	);
+
+	return deepmerge( variationsConfig, userConfig );
 }
 
 function useGlobalStylesUserConfig() {
@@ -122,11 +155,21 @@ function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
 		}
-		return mergeBaseAndUserConfigs( baseConfig, userConfig );
+		// TODO: Where is the right place to resolve shared block style
+		// variations within the site editor when they are in a theme
+		// style variation's data that simply gets applied to the "user"
+		// origin styles?
+		const configWithResolvedVariations =
+			resolveBlockStyleVariations( userConfig );
+		return mergeBaseAndUserConfigs(
+			baseConfig,
+			configWithResolvedVariations
+		);
 	}, [ userConfig, baseConfig ] );
 	const context = useMemo( () => {
 		return {
