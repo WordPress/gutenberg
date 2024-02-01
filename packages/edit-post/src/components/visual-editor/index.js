@@ -31,11 +31,14 @@ export default function VisualEditor( { styles } ) {
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 		isEditingTemplate,
+		isEditingPattern,
 	} = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
-		const { getEditorSettings, getRenderingMode } = select( editorStore );
+		const { getEditorSettings, getRenderingMode, getCurrentPostType } =
+			select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const editorSettings = getEditorSettings();
+		const currentPostType = getCurrentPostType();
 
 		return {
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
@@ -44,8 +47,8 @@ export default function VisualEditor( { styles } ) {
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
 			} ),
-			isEditingTemplate:
-				select( editorStore ).getCurrentPostType() === 'wp_template',
+			isEditingPattern: currentPostType === 'wp_block',
+			isEditingTemplate: currentPostType === 'wp_template',
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
@@ -83,6 +86,7 @@ export default function VisualEditor( { styles } ) {
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
 				'has-inline-canvas': ! isToBeIframed,
+				'is-focus-mode': isEditingPattern || isEditingTemplate,
 			} ) }
 		>
 			<EditorCanvas
@@ -91,6 +95,13 @@ export default function VisualEditor( { styles } ) {
 				// We should auto-focus the canvas (title) on load.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus={ ! isWelcomeGuideVisible }
+				iframeProps={ {
+					style: {
+						background: isEditingPattern
+							? 'transparent'
+							: undefined,
+					},
+				} }
 			/>
 		</div>
 	);

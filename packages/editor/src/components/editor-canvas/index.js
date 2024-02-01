@@ -103,7 +103,6 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
-		showEditorPadding,
 		isDesignPostType,
 	} = useSelect( ( select ) => {
 		const {
@@ -152,8 +151,6 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			showEditorPadding:
-				!! editorSettings.onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -324,9 +321,7 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
-				className: classnames( 'editor-canvas__iframe', {
-					'has-editor-padding': showEditorPadding,
-				} ),
+				className: 'editor-canvas__iframe',
 				...iframeProps,
 				style: {
 					...iframeProps?.style,
