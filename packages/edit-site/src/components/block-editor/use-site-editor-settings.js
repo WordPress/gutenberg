@@ -120,7 +120,7 @@ export function useSpecificEditorSettings() {
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
 	const defaultEditorSettings = useMemo( () => {
-		return {
+		const defaultSettings = {
 			...settings,
 
 			richEditingEnabled: true,
@@ -135,6 +135,10 @@ export function useSpecificEditorSettings() {
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
+		if ( window.__experimentalStaticBlockPreviews === true ) {
+			defaultSettings.blockPreview = StaticBlockPreview;
+		}
+		return defaultSettings;
 	}, [
 		settings,
 		canvasMode,

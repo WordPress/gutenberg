@@ -33,7 +33,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'alignWide',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
-	'blockPreview',
 	'bodyPlaceholder',
 	'canLockBlocks',
 	'capabilities',
@@ -76,6 +75,10 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
 ];
+
+if ( window.__experimentalStaticBlockPreviews === true ) {
+	BLOCK_EDITOR_SETTINGS.push( 'blockPreview' );
+}
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
