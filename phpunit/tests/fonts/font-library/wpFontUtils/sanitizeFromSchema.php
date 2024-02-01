@@ -23,19 +23,16 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 				'data'     => array(
 					'slug'       => 'open      -       sans</style><script>alert("xss")</script>',
 					'fontFamily' => 'Open Sans, sans-serif</style><script>alert("xss")</script>',
-					'name'       => 'Open Sans</style><script>alert("xss")</script>',
 					'src'        => 'https://wordpress.org/example.json</style><script>alert("xss")</script>',
 				),
 				'schema'   => array(
 					'slug'       => 'sanitize_title',
-					'name'       => 'sanitize_text_field',
 					'fontFamily' => 'sanitize_text_field',
 					'src'        => 'sanitize_url',
 				),
 				'expected' => array(
 					'slug'       => 'open-sansalertxss',
 					'fontFamily' => 'Open Sans, sans-serif',
-					'name'       => 'Open Sans',
 					'src'        => 'https://wordpress.org/example.json/stylescriptalert(xss)/script',
 				),
 			),
@@ -43,7 +40,6 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 				'data'     => array(
 					'slug'       => 'open      -       sans</style><script>alert("xss")</script>',
 					'fontFamily' => 'Open Sans, sans-serif</style><script>alert("xss")</script>',
-					'name'       => 'Open Sans</style><script>alert("xss")</script>',
 					'src'        => 'https://wordpress.org/example.json</style><script>alert("xss")</script>',
 					'nested'     => array(
 						'key1'    => 'value1</style><script>alert("xss")</script>',
@@ -56,7 +52,6 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 				),
 				'schema'   => array(
 					'slug'       => 'sanitize_title',
-					'name'       => 'sanitize_text_field',
 					'fontFamily' => 'sanitize_text_field',
 					'src'        => 'sanitize_url',
 					'nested'     => array(
@@ -71,7 +66,6 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 				'expected' => array(
 					'slug'       => 'open-sansalertxss',
 					'fontFamily' => 'Open Sans, sans-serif',
-					'name'       => 'Open Sans',
 					'src'        => 'https://wordpress.org/example.json/stylescriptalert(xss)/script',
 					'nested'     => array(
 						'key1'    => 'value1',
