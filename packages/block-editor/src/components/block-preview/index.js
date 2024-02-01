@@ -41,7 +41,7 @@ export function BlockPreview( {
 	MemoizedBlockList = MemoizedBlockList || memo( BlockList );
 
 	return (
-		<DefaultBlockPreview
+		<BlockPreviewProvider
 			blocks={ blocks }
 			viewportWidth={ viewportWidth }
 			minHeight={ minHeight }
@@ -59,11 +59,11 @@ export function BlockPreview( {
 			) : (
 				<MemoizedBlockList renderAppender={ false } />
 			) }
-		</DefaultBlockPreview>
+		</BlockPreviewProvider>
 	);
 }
 
-function DefaultBlockPreview( {
+function BlockPreviewProvider( {
 	children,
 	blocks,
 	viewportWidth = 1200,
