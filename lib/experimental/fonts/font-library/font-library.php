@@ -31,20 +31,17 @@ function gutenberg_init_font_library_routes() {
 		'hierarchical'                   => false,
 		'capabilities'                   => array(
 			'read'                   => 'edit_theme_options',
-			'read_post'              => 'edit_theme_options',
 			'read_private_posts'     => 'edit_theme_options',
 			'create_posts'           => 'edit_theme_options',
 			'publish_posts'          => 'edit_theme_options',
-			'edit_post'              => 'edit_theme_options',
 			'edit_posts'             => 'edit_theme_options',
 			'edit_others_posts'      => 'edit_theme_options',
 			'edit_published_posts'   => 'edit_theme_options',
-			'delete_post'            => 'edit_theme_options',
 			'delete_posts'           => 'edit_theme_options',
 			'delete_others_posts'    => 'edit_theme_options',
 			'delete_published_posts' => 'edit_theme_options',
 		),
-		'map_meta_cap'                   => false,
+		'map_meta_cap'                   => true,
 		'query_var'                      => false,
 		'show_in_rest'                   => true,
 		'rest_base'                      => 'font-families',
@@ -66,20 +63,17 @@ function gutenberg_init_font_library_routes() {
 			'hierarchical'                   => false,
 			'capabilities'                   => array(
 				'read'                   => 'edit_theme_options',
-				'read_post'              => 'edit_theme_options',
 				'read_private_posts'     => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
 				'publish_posts'          => 'edit_theme_options',
-				'edit_post'              => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',
 				'edit_others_posts'      => 'edit_theme_options',
 				'edit_published_posts'   => 'edit_theme_options',
-				'delete_post'            => 'edit_theme_options',
 				'delete_posts'           => 'edit_theme_options',
 				'delete_others_posts'    => 'edit_theme_options',
 				'delete_published_posts' => 'edit_theme_options',
 			),
-			'map_meta_cap'                   => false,
+			'map_meta_cap'                   => true,
 			'query_var'                      => false,
 			'show_in_rest'                   => true,
 			'rest_base'                      => 'font-families/(?P<font_family_id>[\d]+)/font-faces',
@@ -103,18 +97,34 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string[] $config {
-	 *     Font collection associative array of configuration options.
+	 * @param string   $slug_or_file Font collection slug or path/url to a JSON file defining the font collection.
+	 * @param string[] $args {
+	 *     Optional. Font collection associative array of configuration options.
 	 *
-	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $src            The font collection's data as a JSON file path.
-	 *     @type array  $data           The font collection's data as a PHP array.
+	 *     @type string $name           Name of the font collection.
+	 *     @type string $description    Description of the font collection.
+	 *     @type array  $font_families  Array of font family definitions that are in the collection.
+	 *     @type array  $categories     Array of categories for the fonts that are in the collection.
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
 	 */
-	function wp_register_font_collection( $config ) {
-		return WP_Font_Library::register_font_collection( $config );
+	function wp_register_font_collection( $slug, $args = array() ) {
+		return WP_Font_Library::register_font_collection( $slug, $args );
+	}
+}
+
+if ( ! function_exists( 'wp_register_font_collection_from_json' ) ) {
+	/**
+	 * Registers a new Font Collection from a json file in the Font Library.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $file_or_url File path or URL to a JSON file containing the font collection data.
+	 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
+	 */
+	function wp_register_font_collection_from_json( $file_or_url ) {
+		return WP_Font_Library::register_font_collection_from_json( $file_or_url );
 	}
 }
 
@@ -129,17 +139,10 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	function wp_unregister_font_collection( $collection_id ) {
 		WP_Font_Library::unregister_font_collection( $collection_id );
 	}
-
 }
 
-$default_font_collection = array(
-	'slug'        => 'default-font-collection',
-	'name'        => 'Google Fonts',
-	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
-);
-
-wp_register_font_collection( $default_font_collection );
+// TODO: update to production font collection URL.
+wp_register_font_collection_from_json( 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/01aa57731575bd13f9db8d86ab80a2d74e28a1ac/releases/gutenberg-17.6/collections/google-fonts-with-preview.json' );
 
 // @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {
@@ -263,7 +266,6 @@ function gutenberg_convert_legacy_font_family_format() {
 			'post_type'              => 'wp_font_family',
 			// Set a maximum, but in reality there will be far less than this.
 			'posts_per_page'         => 999,
-			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 		)
 	);
@@ -289,7 +291,7 @@ function gutenberg_convert_legacy_font_family_format() {
 		foreach ( $font_faces as $font_face ) {
 			$args                 = array();
 			$args['post_type']    = 'wp_font_face';
-			$args['post_title']   = WP_Font_Family_Utils::get_font_face_slug( $font_face );
+			$args['post_title']   = WP_Font_Utils::get_font_face_slug( $font_face );
 			$args['post_name']    = sanitize_title( $args['post_title'] );
 			$args['post_status']  = 'publish';
 			$args['post_parent']  = $font_family->ID;

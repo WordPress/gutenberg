@@ -132,6 +132,10 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 	$query_params   = wp_parse_args( $query );
 
 	foreach ( $query_params as $query_param ) {
+		$can_query_param_be_encoded = is_string( $query_param ) && ! empty( $query_param );
+		if ( ! $can_query_param_be_encoded ) {
+			continue;
+		}
 		if ( rawurldecode( $query_param ) !== $query_param ) {
 			$is_url_encoded = true;
 			break;

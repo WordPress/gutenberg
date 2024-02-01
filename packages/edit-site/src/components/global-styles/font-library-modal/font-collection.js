@@ -12,10 +12,9 @@ import {
 	FlexItem,
 	Flex,
 	Button,
-	Notice,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
 
 /**
@@ -34,27 +33,26 @@ import { downloadFontFaceAssets } from './utils';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
-	name: __( 'All' ),
+	name: _x( 'All', 'font categories' ),
 };
 function FontCollection( { slug } ) {
-	const requiresPermission = slug === 'default-font-collection';
+	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
 		return (
 			window.localStorage.getItem(
-				'wp-font-library-default-font-collection-permission'
+				'wp-font-library-google-fonts-permission'
 			) === 'true'
 		);
 	};
 
-	const [ notice, setNotice ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFont } =
+	const { collections, getFontCollection, installFont, notice, setNotice } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.slug === slug
@@ -77,35 +75,26 @@ function FontCollection( { slug } ) {
 				await getFontCollection( slug );
 				resetFilters();
 			} catch ( e ) {
-				setNotice( {
-					type: 'error',
-					message: e?.message,
-					duration: 0, // Don't auto-hide.
-				} );
+				if ( ! notice ) {
+					setNotice( {
+						type: 'error',
+						message: e?.message,
+					} );
+				}
 			}
 		};
 		fetchFontCollection();
-	}, [ slug, getFontCollection ] );
+	}, [ slug, getFontCollection, setNotice, notice ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
 		setNotice( null );
-	}, [ slug ] );
+	}, [ slug, setNotice ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
 		setFontsToInstall( [] );
 	}, [ selectedFont ] );
-
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice && notice?.duration !== 0 ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, notice.duration ?? 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
 
 	const collectionFonts = useMemo(
 		() => selectedCollection?.font_families ?? [],
@@ -154,6 +143,8 @@ function FontCollection( { slug } ) {
 	};
 
 	const handleInstall = async () => {
+		setNotice( null );
+
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
@@ -205,33 +196,19 @@ function FontCollection( { slug } ) {
 					? selectedCollection.description
 					: __( 'Select font variants to install.' )
 			}
+			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
-				fontsToInstall.length > 0 && (
-					<Footer handleInstall={ handleInstall } />
-				)
+				<Footer
+					handleInstall={ handleInstall }
+					isDisabled={ fontsToInstall.length === 0 }
+				/>
 			}
 		>
 			{ renderConfirmDialog && (
 				<>
 					<Spacer margin={ 8 } />
 					<GoogleFontsConfirmDialog />
-				</>
-			) }
-
-			{ notice && (
-				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 2 } />
 				</>
 			) }
 
@@ -314,16 +291,18 @@ function FontCollection( { slug } ) {
 	);
 }
 
-function Footer( { handleInstall } ) {
+function Footer( { handleInstall, isDisabled } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
 
 	return (
 		<Flex justify="flex-end">
 			<Button
 				variant="primary"
-				onClick={ handleInstall }
+				onClick={
+					isDisabled || isInstalling ? undefined : handleInstall
+				}
 				isBusy={ isInstalling }
-				disabled={ isInstalling }
+				aria-disabled={ isDisabled || isInstalling }
 			>
 				{ __( 'Install' ) }
 			</Button>

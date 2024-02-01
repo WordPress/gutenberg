@@ -125,7 +125,6 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
 		templateLock: false,
 		templateInsertUpdatesSelection: true,

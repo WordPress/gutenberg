@@ -63,7 +63,7 @@ export async function fetchUninstallFontFamily( fontFamilyId ) {
 
 export async function fetchFontCollections() {
 	const config = {
-		path: FONT_COLLECTIONS_URL,
+		path: `${ FONT_COLLECTIONS_URL }?_fields=slug,name,description`,
 		method: 'GET',
 	};
 	return await apiFetch( config );

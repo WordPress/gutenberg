@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { memo, useCallback, RawHTML, useContext } from '@wordpress/element';
+import {
+	memo,
+	useCallback,
+	RawHTML,
+	useContext,
+	useMemo,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -497,7 +503,8 @@ function BlockListBlockProvider( props ) {
 				getBlockMode,
 				isSelectionEnabled,
 				getTemplateLock,
-				__unstableGetBlockWithoutInnerBlocks,
+				getBlockWithoutAttributes,
+				getBlockAttributes,
 				canRemoveBlock,
 				canMoveBlock,
 
@@ -517,20 +524,21 @@ function BlockListBlockProvider( props ) {
 				__unstableIsFullySelected,
 				__unstableSelectionHasUnmergeableBlock,
 				isBlockBeingDragged,
+				isDraggingBlocks,
 				hasBlockMovingClientId,
 				canInsertBlockType,
-				getBlockRootClientId,
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
-			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+			const blockWithoutAttributes =
+				getBlockWithoutAttributes( clientId );
 
 			// This is a temporary fix.
 			// This function should never be called when a block is not
 			// present in the state. It happens now because the order in
 			// withSelect rendering is not correct.
-			if ( ! block ) {
+			if ( ! blockWithoutAttributes ) {
 				return;
 			}
 
@@ -539,10 +547,10 @@ function BlockListBlockProvider( props ) {
 				getActiveBlockVariation,
 			} = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
-			const templateLock = getTemplateLock( rootClientId );
 			const canRemove = canRemoveBlock( clientId, rootClientId );
 			const canMove = canMoveBlock( clientId, rootClientId );
-			const { name: blockName, attributes, isValid } = block;
+			const attributes = getBlockAttributes( clientId );
+			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const { outlineMode, supportsLayout } = getSettings();
@@ -555,18 +563,16 @@ function BlockListBlockProvider( props ) {
 			const typing = isTyping();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
+			const blockEditingMode = getBlockEditingMode( clientId );
 
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
-				isLocked: !! templateLock,
+				isLocked: !! getTemplateLock( rootClientId ),
+				templateLock: getTemplateLock( clientId ),
 				canRemove,
 				canMove,
-				// Users of the editor.BlockListBlock filter used to be able to
-				// access the block prop.
-				// Ideally these blocks would rely on the clientId prop only.
-				// This is kept for backward compatibility reasons.
-				block,
+				blockWithoutAttributes,
 				name: blockName,
 				attributes,
 				isValid,
@@ -574,7 +580,7 @@ function BlockListBlockProvider( props ) {
 				themeSupportsLayout: supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
-				blockEditingMode: getBlockEditingMode( clientId ),
+				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
 					( isFirstMultiSelectedBlock( clientId ) &&
@@ -590,9 +596,13 @@ function BlockListBlockProvider( props ) {
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
+				isSubtreeDisabled:
+					blockEditingMode === 'disabled' &&
+					isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
-				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
+				hasOverlay:
+					__unstableHasActiveBlockOverlayActive( clientId ) &&
+					! isDraggingBlocks(),
 				initialPosition:
 					_isSelected && __unstableGetEditorMode() === 'edit'
 						? getSelectedBlocksInitialCaretPosition()
@@ -612,10 +622,12 @@ function BlockListBlockProvider( props ) {
 					movingClientId &&
 					canInsertBlockType(
 						getBlockName( movingClientId ),
-						getBlockRootClientId( clientId )
+						rootClientId
 					),
-				isEditingDisabled:
-					getBlockEditingMode( clientId ) === 'disabled',
+				isEditingDisabled: blockEditingMode === 'disabled',
+				hasEditableOutline:
+					blockEditingMode !== 'disabled' &&
+					getBlockEditingMode( rootClientId ) === 'disabled',
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
@@ -633,7 +645,7 @@ function BlockListBlockProvider( props ) {
 		isLocked,
 		canRemove,
 		canMove,
-		block,
+		blockWithoutAttributes,
 		name,
 		attributes,
 		isValid,
@@ -659,10 +671,21 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
+		hasEditableOutline,
 		className,
 		defaultClassName,
 	} = selectedProps;
+
+	// Users of the editor.BlockListBlock filter used to be able to
+	// access the block prop.
+	// Ideally these blocks would rely on the clientId prop only.
+	// This is kept for backward compatibility reasons.
+	const block = useMemo(
+		() => ( { ...blockWithoutAttributes, attributes } ),
+		[ blockWithoutAttributes, attributes ]
+	);
 
 	// Block is sometimes not mounted at the right time, causing it be
 	// undefined see issue for more info
@@ -694,7 +717,9 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
+		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
 		mayDisplayControls,

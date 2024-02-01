@@ -8,12 +8,16 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalHStack as HStack,
 	Button,
+	Notice,
+	FlexBlock,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 function TabPanelLayout( {
 	title,
 	description,
+	notice,
 	handleBack,
 	children,
 	footer,
@@ -30,6 +34,7 @@ function TabPanelLayout( {
 								onClick={ handleBack }
 								icon={ chevronLeft }
 								size="small"
+								label={ __( 'Back' ) }
 							/>
 						) }
 						{ title && (
@@ -43,6 +48,18 @@ function TabPanelLayout( {
 						) }
 					</HStack>
 					{ description && <Text>{ description }</Text> }
+					{ notice && (
+						<FlexBlock>
+							<Spacer margin={ 1 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ notice.onRemove }
+							>
+								{ notice.message }
+							</Notice>
+							<Spacer margin={ 1 } />
+						</FlexBlock>
+					) }
 				</VStack>
 				<div className="font-library-modal__tabpanel-layout__main">
 					{ children }

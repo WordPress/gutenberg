@@ -10,10 +10,6 @@
  * @since 5.9.0
  */
 
-if ( class_exists( 'WP_REST_Global_Styles_Controller_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Base Global Styles REST API Controller.
  */
