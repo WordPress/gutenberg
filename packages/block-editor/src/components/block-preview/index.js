@@ -18,7 +18,10 @@ import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
-import { BlockListItems } from '../block-list';
+import BlockList, { BlockListItems } from '../block-list';
+
+// This is used to avoid rendering the block list if the sizes change.
+let MemoizedBlockList;
 
 export function BlockPreview( {
 	blocks,
@@ -34,6 +37,9 @@ export function BlockPreview( {
 		[]
 	);
 
+	// Initialize on render instead of module top level, to avoid circular dependency issues.
+	MemoizedBlockList = MemoizedBlockList || memo( BlockList );
+
 	return (
 		<DefaultBlockPreview
 			blocks={ blocks }
@@ -43,13 +49,16 @@ export function BlockPreview( {
 			__experimentalMinHeight={ __experimentalMinHeight }
 			__experimentalPadding={ __experimentalPadding }
 		>
-			{ settings.blockPreview &&
+			{ settings.blockPreview ? (
 				settings.blockPreview( {
 					blocks,
 					viewportWidth,
 					minHeight,
 					additionalStyles,
-				} ) }
+				} )
+			) : (
+				<MemoizedBlockList renderAppender={ false } />
+			) }
 		</DefaultBlockPreview>
 	);
 }

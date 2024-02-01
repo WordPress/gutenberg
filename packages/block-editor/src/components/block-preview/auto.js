@@ -3,19 +3,16 @@
  */
 import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { memo, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../block-list';
+
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';
-
-// This is used to avoid rendering the block list if the sizes change.
-let MemoizedBlockList;
 
 const MAX_HEIGHT = 2000;
 const EMPTY_ADDITIONAL_STYLES = [];
@@ -55,9 +52,6 @@ function ScaledBlockPreview( {
 
 		return styles;
 	}, [ styles, additionalStyles ] );
-
-	// Initialize on render instead of module top level, to avoid circular dependency issues.
-	MemoizedBlockList = MemoizedBlockList || memo( BlockList );
 
 	const scale = containerWidth / viewportWidth;
 	const aspectRatio = contentHeight
@@ -112,11 +106,7 @@ function ScaledBlockPreview( {
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				{ children ? (
-					children
-				) : (
-					<MemoizedBlockList renderAppender={ false } />
-				) }
+				{ children }
 			</Iframe>
 		</Disabled>
 	);
