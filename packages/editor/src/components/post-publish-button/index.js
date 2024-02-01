@@ -203,6 +203,7 @@ export class PostPublishButton extends Component {
 							'has-changes-dot': hasNonPostEntityChanges,
 						}
 					) }
+					size="compact"
 				>
 					{ componentChildren }
 				</Button>

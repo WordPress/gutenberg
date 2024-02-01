@@ -27,6 +27,7 @@ function UndoButton( props, ref ) {
 			// See: https://github.com/WordPress/gutenberg/issues/3486
 			aria-disabled={ ! hasUndo }
 			onClick={ hasUndo ? undo : undefined }
+			size="compact"
 		/>
 	);
 }
