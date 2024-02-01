@@ -92,7 +92,10 @@ function useHasChildLayout( settings ) {
 	} = settings?.parentLayout ?? {};
 
 	const support =
-		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+		( defaultParentLayoutType === 'flex' ||
+			parentLayoutType === 'flex' ||
+			defaultParentLayoutType === 'grid' ||
+			parentLayoutType === 'grid' ) &&
 		allowSizingOnChildren;
 
 	return !! settings?.layout && support;
@@ -410,6 +413,8 @@ export default function DimensionsPanel( {
 		setChildLayout( {
 			selfStretch: undefined,
 			flexSize: undefined,
+			columnSpan: undefined,
+			rowSpan: undefined,
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;

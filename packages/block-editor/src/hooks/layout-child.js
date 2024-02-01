@@ -15,7 +15,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
 	} );
 	const layout = style?.layout ?? {};
-	const { selfStretch, flexSize } = layout;
+	const { selfStretch, flexSize, columnSpan, rowSpan } = layout;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
 
@@ -29,6 +29,16 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		} else if ( selfStretch === 'fill' ) {
 			css = `${ selector } {
 				flex-grow: 1;
+			}`;
+		}
+		if ( columnSpan ) {
+			css = `${ selector } {
+				grid-column: span ${ columnSpan };
+			}`;
+		}
+		if ( rowSpan ) {
+			css = `${ selector } {
+				grid-row: span ${ rowSpan };
 			}`;
 		}
 	}
