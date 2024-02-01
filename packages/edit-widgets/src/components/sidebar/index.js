@@ -184,6 +184,10 @@ export default function Sidebar() {
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
+	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
+	// the initial render) or when we don't want a tab displayed (i.e. the
+	// sidebar is closed). These cases should both be covered by the `!!` check
+	// below, so we shouldn't need any additional falsey handling.
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
 			if ( !! newSelectedTabId ) {
