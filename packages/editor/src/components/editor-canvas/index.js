@@ -331,6 +331,7 @@ function EditorCanvas( {
 				style: {
 					...iframeProps?.style,
 					...deviceStyles,
+					border: showEditorPadding ? undefined : 0,
 				},
 			} }
 		>
