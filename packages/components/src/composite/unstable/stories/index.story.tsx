@@ -21,8 +21,7 @@ CompositeGroup.displayName = 'CompositeGroup';
 CompositeItem.displayName = 'CompositeItem';
 
 const meta: Meta< typeof UseCompositeStatePlaceholder > = {
-	title: 'Components/Composite/Composite (Unstable)',
-	id: 'components-composite-unstable',
+	title: 'Components/Composite',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

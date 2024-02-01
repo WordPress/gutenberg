@@ -21,8 +21,7 @@ import {
 import { UseCompositeStorePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStorePlaceholder > = {
-	title: 'Components/Composite/Composite (Current)',
-	id: 'components-composite-current',
+	title: 'Components/Composite (V2)',
 	component: UseCompositeStorePlaceholder,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
