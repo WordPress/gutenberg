@@ -392,31 +392,34 @@ function ListViewBlock( {
 					aria-selected={ !! isSelected }
 					ref={ settingsRef }
 				>
-					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsMenu
-							clientIds={ dropdownClientIds }
-							block={ block }
-							icon={ moreVertical }
-							label={ settingsAriaLabel }
-							popoverProps={ {
-								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
-							} }
-							toggleProps={ {
-								ref,
-								className: 'block-editor-list-view-block__menu',
-								tabIndex,
-								onClick: clearSettingsAnchorRect,
-								onFocus,
-							} }
-							disableOpenOnArrowDown
-							expand={ expand }
-							expandedState={ expandedState }
-							setInsertedBlock={ setInsertedBlock }
-							__experimentalSelectBlock={
-								updateFocusAndSelection
-							}
-						/>
-					) }
+					{ isHovered || isFirstSelectedBlock
+						? ( { ref, tabIndex, onFocus } ) => (
+								<BlockSettingsMenu
+									clientIds={ dropdownClientIds }
+									block={ block }
+									icon={ moreVertical }
+									label={ settingsAriaLabel }
+									popoverProps={ {
+										anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+									} }
+									toggleProps={ {
+										ref,
+										className:
+											'block-editor-list-view-block__menu',
+										tabIndex,
+										onClick: clearSettingsAnchorRect,
+										onFocus,
+									} }
+									disableOpenOnArrowDown
+									expand={ expand }
+									expandedState={ expandedState }
+									setInsertedBlock={ setInsertedBlock }
+									__experimentalSelectBlock={
+										updateFocusAndSelection
+									}
+								/>
+						  )
+						: null }
 				</TreeGridCell>
 			) }
 		</ListViewLeaf>
