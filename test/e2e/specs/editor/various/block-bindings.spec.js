@@ -201,7 +201,7 @@ test.describe( 'Block bindings - Post/page context', () => {
 	} );
 
 	// Paragraph block tests.
-	test( 'Paragraph - should show the value of the custom field', async ( {
+	test( 'Paragraph - should show the value of the custom field when exists', async ( {
 		editor,
 	} ) => {
 		await editor.insertBlock( contentBindingParagraphBlock );
@@ -210,6 +210,30 @@ test.describe( 'Block bindings - Post/page context', () => {
 		} );
 		const paragraphContent = await paragraphBlock.textContent();
 		expect( paragraphContent ).toBe( textCustomFieldValue );
+	} );
+
+	test( "Paragraph - should show the value of the key when custom field doesn't exists", async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'p',
+				metadata: {
+					bindings: {
+						content: {
+							source: 'core/post-meta',
+							args: { key: 'non_existing_custom_field' },
+						},
+					},
+				},
+			},
+		} );
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const paragraphContent = await paragraphBlock.textContent();
+		expect( paragraphContent ).toBe( 'non_existing_custom_field' );
 	} );
 
 	test( 'Paragraph - should lock the appropriate controls', async ( {
