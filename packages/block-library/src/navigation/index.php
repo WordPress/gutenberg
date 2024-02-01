@@ -74,7 +74,7 @@ class WP_Navigation_Block_Renderer {
 		foreach ( $inner_blocks as $inner_block ) {
 			if ( 'core/navigation-submenu' === $inner_block->name ) {
 				static::$has_submenus = true;
-				return static::$has_submenus;
+				break;
 			}
 		}
 
