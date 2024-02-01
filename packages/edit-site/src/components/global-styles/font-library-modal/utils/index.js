@@ -161,7 +161,8 @@ export function makeFontFamilyFormData( fontFamily ) {
 
 export function makeFontFacesFormData( font ) {
 	if ( font?.fontFace ) {
-		const fontFacesFormData = font.fontFace.map( ( face, faceIndex ) => {
+		const fontFacesFormData = font.fontFace.map( ( item, faceIndex ) => {
+			const face = { ...item };
 			const formData = new FormData();
 			if ( face.file ) {
 				// Normalize to an array, since face.file may be a single file or an array of files.

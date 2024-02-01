@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+-   `SnackbarList`: Allow limiting the number of maximum visible Snackbars ([#58559](https://github.com/WordPress/gutenberg/pull/58559)).
 -   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304))
 
 ### Bug Fix

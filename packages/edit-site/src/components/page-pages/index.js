@@ -332,6 +332,7 @@ export default function PagePages() {
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
+					isPrimary: true,
 				},
 			},
 			{
