@@ -146,12 +146,8 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @return array The sanitized data.
 		 */
 		public static function sanitize_from_schema( $tree, $schema ) {
-			if ( ! is_array( $tree ) ) {
-				return $tree;
-			}
-
-			if ( ! is_array( $schema ) ) {
-				return array();
+			if ( ! is_array( $tree ) || ! is_array( $schema ) ) {
+				return is_array( $tree ) ? array() : $tree;
 			}
 
 			foreach ( $tree as $key => $value ) {
@@ -161,30 +157,30 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 					continue;
 				}
 
-				// Check if the value is an array and requires further processing.
-				if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+				$is_value_array  = is_array( $value );
+				$is_schema_array = is_array( $schema[ $key ] );
 
-					if ( ! wp_is_numeric_array( $value ) ) {
+				if ( $is_value_array && $is_schema_array ) {
+					if ( wp_is_numeric_array( $value ) ) {
+						// If indexed, process each item in the array.
+						foreach ( $value as $item_key => $item_value ) {
+							$tree[ $key ][ $item_key ] = isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] )
+								? self::sanitize_from_schema( $item_value, $schema[ $key ][0] )
+								: self::apply_sanitizator( $item_value, $schema[ $key ][0] );
+						}
+					} else {
 						// If it is an associative or indexed array., process as a single object.
 						$tree[ $key ] = self::sanitize_from_schema( $value, $schema[ $key ] );
-
 						if ( empty( $tree[ $key ] ) ) {
 							unset( $tree[ $key ] );
 						}
-					} else {
-						// If indexed, process each item in the array.
-						foreach ( $value as $item_key => $item_value ) {
-							if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
-								$tree[ $key ][ $item_key ] = self::sanitize_from_schema( $item_value, $schema[ $key ][0] );
-							} else {
-								$tree[ $key ][ $item_key ] = self::apply_sanitizator( $item_value, $schema[ $key ][0] );
-							}
-						}
 					}
-				} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
+				} elseif ( ! $is_value_array && $is_schema_array ) {
+					// If the value is not an array but the schema is, remove the key.
 					unset( $tree[ $key ] );
-				} else {
-					$tree[ $key ] = self::apply_sanitizator( $tree[ $key ], $schema[ $key ] );
+				} elseif ( ! $is_schema_array ) {
+					// If the schema is not an array, apply the sanitizator to the value.
+					$tree[ $key ] = self::apply_sanitizator( $value, $schema[ $key ] );
 				}
 			}
 
