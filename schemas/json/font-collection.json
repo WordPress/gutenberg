@@ -8,7 +8,7 @@
 			"type": "object",
 			"properties": {
 				"preview": {
-					"description": "URL to a preview image of the font",
+					"description": "URL to a preview image of the font.",
 					"type": "string"
 				},
 				"fontFamily": {
@@ -136,7 +136,7 @@
 							},
 							"preview": {
 								"type": "string",
-								"description": "URL to a preview image of the font family"
+								"description": "URL to a preview image of the font family."
 							},
 							"fontFace": {
 								"description": "Array of font-face declarations.",
