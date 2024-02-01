@@ -85,10 +85,9 @@ class WP_Navigation_Block_Renderer {
 	 * Determine whether the navigation blocks is interactive.
 	 *
 	 * @param array         $attributes   The block attributes.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return bool Returns whether or not to load the view script.
 	 */
-	private static function is_interactive( $attributes, $inner_blocks ) {
+	private static function is_interactive( $attributes ) {
 		$has_submenus       = static::$has_submenus;
 		$is_responsive_menu = static::is_responsive( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
