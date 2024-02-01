@@ -184,6 +184,15 @@ export function LinkUI( props ) {
 		[ label, opensInNewTab, url ]
 	);
 
+	const dialogTitleId = useInstanceId(
+		LinkUI,
+		`link-ui-link-control__title`
+	);
+	const dialogDescritionId = useInstanceId(
+		LinkUI,
+		`link-ui-link-control__description`
+	);
+
 	return (
 		<Popover
 			placement="bottom"
@@ -192,43 +201,64 @@ export function LinkUI( props ) {
 			shift
 		>
 			{ ! addingBlock && (
-				<LinkControl
-					hasTextControl
-					hasRichPreviews
-					value={ link }
-					showInitialSuggestions={ true }
-					withCreateSuggestion={ userCanCreate }
-					createSuggestion={ handleCreate }
-					createSuggestionButtonText={ ( searchTerm ) => {
-						let format;
+				<div
+					role="dialog"
+					aria-labelledby={ dialogTitleId }
+					aria-describedby={ dialogDescritionId }
+				>
+					<VisuallyHidden>
+						<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
 
-						if ( type === 'post' ) {
-							/* translators: %s: search term. */
-							format = __( 'Create draft post: <mark>%s</mark>' );
-						} else {
-							/* translators: %s: search term. */
-							format = __( 'Create draft page: <mark>%s</mark>' );
-						}
+						<p id={ dialogDescritionId }>
+							{ __(
+								'Search for and add a link to your Navigation.'
+							) }
+						</p>
+					</VisuallyHidden>
+					<LinkControl
+						hasTextControl
+						hasRichPreviews
+						value={ link }
+						showInitialSuggestions={ true }
+						withCreateSuggestion={ userCanCreate }
+						createSuggestion={ handleCreate }
+						createSuggestionButtonText={ ( searchTerm ) => {
+							let format;
 
-						return createInterpolateElement(
-							sprintf( format, searchTerm ),
-							{
-								mark: <mark />,
+							if ( type === 'post' ) {
+								/* translators: %s: search term. */
+								format = __(
+									'Create draft post: <mark>%s</mark>'
+								);
+							} else {
+								/* translators: %s: search term. */
+								format = __(
+									'Create draft page: <mark>%s</mark>'
+								);
 							}
-						);
-					} }
-					noDirectEntry={ !! type }
-					noURLSuggestion={ !! type }
-					suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-					onChange={ props.onChange }
-					onRemove={ props.onRemove }
-					onCancel={ props.onCancel }
-					renderControlBottom={ () =>
-						! link?.url?.length && (
-							<LinkUITools setAddingBlock={ setAddingBlock } />
-						)
-					}
-				/>
+
+							return createInterpolateElement(
+								sprintf( format, searchTerm ),
+								{
+									mark: <mark />,
+								}
+							);
+						} }
+						noDirectEntry={ !! type }
+						noURLSuggestion={ !! type }
+						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						onChange={ props.onChange }
+						onRemove={ props.onRemove }
+						onCancel={ props.onCancel }
+						renderControlBottom={ () =>
+							! link?.url?.length && (
+								<LinkUITools
+									setAddingBlock={ setAddingBlock }
+								/>
+							)
+						}
+					/>
+				</div>
 			) }
 
 			{ addingBlock && (
