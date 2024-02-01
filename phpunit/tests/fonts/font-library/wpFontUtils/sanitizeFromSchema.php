@@ -236,7 +236,7 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 		);
 	}
 
-	function test_sanitize_from_schema_with_invalid_data() {
+	public function test_sanitize_from_schema_with_invalid_data() {
 		$data   = 'invalid data';
 		$schema = array(
 			'key1' => 'sanitize_text_field',
@@ -249,7 +249,7 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 	}
 
 
-	function test_sanitize_from_schema_with_invalid_schema() {
+	public function test_sanitize_from_schema_with_invalid_schema() {
 		$data   = array(
 			'key1' => 'value1',
 			'key2' => 'value2',
