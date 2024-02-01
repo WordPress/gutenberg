@@ -155,6 +155,10 @@ function Items( {
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
+	// Avoid passing CustomAppender to useSelect because it could be a new
+	// function on every render.
+	const hasAppender = CustomAppender !== false;
+	const hasCustomAppender = !! CustomAppender;
 	const {
 		order,
 		selectedBlocks,
@@ -181,17 +185,16 @@ function Items( {
 				temporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks(),
 				shouldRenderAppender:
-					CustomAppender !== false &&
-					( CustomAppender
+					hasAppender &&
+					( hasCustomAppender
 						? ! getTemplateLock( rootClientId ) &&
-						  ! getBlockEditingMode( rootClientId ) ===
-								'disabled' &&
-						  ! __unstableGetEditorMode() === 'zoom-out'
+						  getBlockEditingMode( rootClientId ) !== 'disabled' &&
+						  __unstableGetEditorMode() !== 'zoom-out'
 						: rootClientId === selectedBlockClientId ||
 						  ( ! rootClientId && ! selectedBlockClientId ) ),
 			};
 		},
-		[ rootClientId, CustomAppender ]
+		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
 
 	return (
