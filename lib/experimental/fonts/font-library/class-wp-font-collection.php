@@ -72,6 +72,55 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		private static $collection_json_cache = array();
 
 		/**
+		 * Font collection data schema.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @var array
+		 */
+		public const SCHEMA = array(
+			'slug'          => 'sanitize_title',
+			'name'          => 'sanitize_text_field',
+			'description'   => 'sanitize_text_field',
+			'font_families' => array(
+				array(
+					'font_family_settings' => array(
+						'name'       => 'sanitize_text_field',
+						'slug'       => 'sanitize_text_field',
+						'fontFamily' => 'sanitize_text_field',
+						'fontFace'   => array(
+							array(
+								'fontFamily'            => 'sanitize_text_field',
+								'fontStyle'             => 'sanitize_text_field',
+								'fontWeight'            => 'sanitize_text_field',
+								'fontDisplay'           => 'sanitize_text_field',
+								'src'                   => 'sanitize_text_field',
+								'fontStretch'           => 'sanitize_text_field',
+								'ascentOverride'        => 'sanitize_text_field',
+								'descentOverride'       => 'sanitize_text_field',
+								'fontVariant'           => 'sanitize_text_field',
+								'fontFeatureSettings'   => 'sanitize_text_field',
+								'fontVariationSettings' => 'sanitize_text_field',
+								'lineGapOverride'       => 'sanitize_text_field',
+								'sizeAdjust'            => 'sanitize_text_field',
+								'unicodeRange'          => 'sanitize_text_field',
+							),
+						),
+					),
+					'categories'           => array(
+						'sanitize_text_field',
+					),
+				),
+			),
+			'categories'    => array(
+				array(
+					'slug' => 'sanitize_title',
+					'name' => 'sanitize_text_field',
+				),
+			),
+		);
+
+		/**
 		 * WP_Font_Collection constructor.
 		 *
 		 * @since 6.5.0
@@ -156,6 +205,8 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection JSON file contents.', 'gutenberg' ) );
 			}
 
+			$data = self::sanitize( $data );
+
 			if ( empty( $data['slug'] ) ) {
 				// translators: %s: Font collection JSON URL.
 				$message = sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $file );
@@ -177,7 +228,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @return array|WP_Error An array containing the font collection data on success,
 		 *                        else an instance of WP_Error on failure.
 		 */
-		private static function load_from_url( $url ) {
+		protected static function load_from_url( $url ) {
 			if ( array_key_exists( $url, static::$collection_json_cache ) ) {
 				return static::$collection_json_cache[ $url ];
 			}
@@ -198,6 +249,8 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the REST response JSON.', 'gutenberg' ) );
 				}
 
+				$data = self::sanitize( $data );
+
 				if ( empty( $data['slug'] ) ) {
 					// translators: %s: Font collection JSON URL.
 					$message = sprintf( __( 'Font collection JSON file "%s" requires a slug.', 'gutenberg' ), $url );
@@ -211,6 +264,92 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			static::$collection_json_cache[ $url ] = $data;
 
 			return $data;
+		}
+
+
+		/**
+		 * Sanitize the font collection data.
+		 *
+		 * It removes the keys not in the schema and applies the sanitizator to the values.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $tree The font collection data to sanitize.
+		 * @param array $schema The schema to use for sanitization.
+		 * @return array The sanitized font collection data.
+		 */
+		public static function sanitize( $tree, $schema = self::SCHEMA ) {
+			if ( ! is_array( $tree ) ) {
+				return $tree;
+			}
+
+			foreach ( $tree as $key => $value ) {
+				// Remove keys not in the schema or with null/empty values.
+				if ( ! array_key_exists( $key, $schema ) ) {
+					unset( $tree[ $key ] );
+					continue;
+				}
+
+				// Check if the value is an array and requires further processing.
+				if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+					// Determine if it is an associative or indexed array.
+					$schema_is_assoc = self::is_assoc( $value );
+
+					if ( $schema_is_assoc ) {
+						// If it is an associative or indexed array., process as a single object.
+						$tree[ $key ] = self::sanitize( $value, $schema[ $key ] );
+
+						if ( empty( $tree[ $key ] ) ) {
+							unset( $tree[ $key ] );
+						}
+					} else {
+						// If indexed, process each item in the array.
+						foreach ( $value as $item_key => $item_value ) {
+							if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
+								$tree[ $key ][ $item_key ] = self::sanitize( $item_value, $schema[ $key ][0] );
+							} else {
+								$tree[ $key ][ $item_key ] = self::apply_sanitizator( $item_value, $schema[ $key ][0] );
+							}
+						}
+					}
+				} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
+					unset( $tree[ $key ] );
+				} else {
+					$tree[ $key ] = self::apply_sanitizator( $tree[ $key ], $schema[ $key ] );
+				}
+			}
+
+			return $tree;
+		}
+
+		/**
+		 * Checks if the given array is associative.
+		 *
+		 * @since 6.5.0
+		 * @param array $data The array to check.
+		 * @return bool True if the array is associative, false otherwise.
+		 */
+		private static function is_assoc( $data ) {
+			if ( array() === $data ) {
+				return false;
+			}
+			return array_keys( $data ) !== range( 0, count( $data ) - 1 );
+		}
+
+		/**
+		 * Apply the sanitizator to the value.
+		 *
+		 * @since 6.5.0
+		 * @param mixed $value The value to sanitize.
+		 * @param mixed $sanitizator The sanitizator to apply.
+		 * @return mixed The sanitized value.
+		 */
+		private static function apply_sanitizator( $value, $sanitizator ) {
+			if ( $sanitizator === null ) {
+				return $value;
+
+			}
+			return call_user_func( $sanitizator, $value );
 		}
 	}
 }
