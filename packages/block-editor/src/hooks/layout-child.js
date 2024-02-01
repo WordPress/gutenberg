@@ -37,7 +37,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			}`;
 		}
 		if ( rowSpan ) {
-			css = `${ selector } {
+			css += `${ selector } {
 				grid-row: span ${ rowSpan };
 			}`;
 		}
