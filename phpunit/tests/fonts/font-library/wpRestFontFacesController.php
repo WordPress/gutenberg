@@ -7,6 +7,8 @@
  * @since 6.5.0
  *
  * @group restapi
+ * @group fonts
+ * @group font-library
  *
  * @coversDefaultClass WP_REST_Font_Faces_Controller
  */

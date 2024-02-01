@@ -4,7 +4,10 @@
  *
  * @package WordPress
  * @subpackage Font Library
- * *
+ *
+ * @group fonts
+ * @group font-library
+ *
  * @covers WP_Font_Utils::get_font_face_slug
  */
 class Tests_Fonts_WpFontUtils_GetFontFaceSlug extends WP_UnitTestCase {
