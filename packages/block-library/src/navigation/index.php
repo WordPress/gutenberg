@@ -89,7 +89,7 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function is_interactive( $attributes, $inner_blocks ) {
-		$has_submenus       = static::has_submenus( $inner_blocks);
+		$has_submenus       = static::has_submenus( $inner_blocks );
 		$is_responsive_menu = static::is_responsive( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
