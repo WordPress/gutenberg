@@ -49,7 +49,14 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	public function register() {
 		$this->onRegisterEvent();
 
-		return array( T_FUNCTION, T_CLASS );
+		return array(
+			T_FUNCTION,
+			T_CLASS,
+			T_REQUIRE,
+			T_REQUIRE_ONCE,
+			T_INCLUDE,
+			T_INCLUDE_ONCE
+		);
 	}
 
 	/**
@@ -65,13 +72,21 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		$tokens = $phpcsFile->getTokens();
 		$token  = $tokens[ $stackPtr ];
 
-		if ( 'T_FUNCTION' === $token['type'] ) {
-			$this->processFunctionToken( $phpcsFile, $stackPtr );
-			return;
-		}
+		switch ( $token['type'] ) {
+			case 'T_FUNCTION':
+				$this->processFunctionToken( $phpcsFile, $stackPtr );
+				break;
 
-		if ( 'T_CLASS' === $token['type'] ) {
-			$this->processClassToken( $phpcsFile, $stackPtr );
+			case 'T_CLASS':
+				$this->processClassToken( $phpcsFile, $stackPtr );
+				break;
+
+			case 'T_REQUIRE':
+			case 'T_REQUIRE_ONCE':
+			case 'T_INCLUDE':
+			case 'T_INCLUDE_ONCE':
+				$this->processRequireToken( $phpcsFile, $stackPtr );
+				break;
 		}
 	}
 
@@ -193,6 +208,10 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		}
 
 		$phpcsFile->addError( $errorMessage, $classToken, 'ClassNotGuardedAgainstRedeclaration' );
+	}
+
+	public function processRequireToken( File $phpcsFile, $stackPtr ) {
+		$tokens     = $phpcsFile->getTokens();
 	}
 
 	/**
