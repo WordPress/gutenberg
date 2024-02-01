@@ -166,6 +166,9 @@ export const { state, actions } = store( 'core/router', {
 				state.url = href;
 			} else {
 				window.location.assign( href );
+				// We await here a promise that won't resolve to prevent any
+				// potential feedback indicating that the navigation has
+				// finished while the new page is being loaded.
 				yield new Promise( () => {} );
 			}
 		},
