@@ -33,6 +33,7 @@ store( 'core/query', {
 					'@wordpress/interactivity-router'
 				);
 				yield actions.navigate( ref.href );
+				ctx.url = ref.href;
 
 				// Focus the first anchor of the Query block.
 				const firstAnchor = `.wp-block-post-template a[href]`;
