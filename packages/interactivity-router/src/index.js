@@ -83,7 +83,7 @@ let navigatingTo = '';
 
 export const { state, actions } = store( 'core/router', {
 	state: {
-		url: '',
+		url: window.location.href,
 		navigation: {
 			hasStarted: false,
 			hasFinished: false,
@@ -149,8 +149,18 @@ export const { state, actions } = store( 'core/router', {
 			if ( navigatingTo !== href ) return;
 
 			if ( page ) {
+				renderRegions( page );
+				window.history[
+					options.replace ? 'replaceState' : 'pushState'
+				]( {}, '', href );
+
+				state.url = href;
+
+				// Update the navigation status once the render of the new page
+				// has been completed.
 				navigation.hasStarted = false;
 				navigation.hasFinished = true;
+
 				// Announce that the page has been loaded. If the message is the
 				// same, we use a no-break space similar to the @wordpress/a11y
 				// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
@@ -159,16 +169,11 @@ export const { state, actions } = store( 'core/router', {
 					( navigation.message === navigation.texts.loaded
 						? '\u00A0'
 						: '' );
-				renderRegions( page );
-				window.history[
-					options.replace ? 'replaceState' : 'pushState'
-				]( {}, '', href );
-				state.url = href;
 			} else {
 				window.location.assign( href );
-				// We await here a promise that won't resolve to prevent any
-				// potential feedback indicating that the navigation has
-				// finished while the new page is being loaded.
+				// Await a promise that won't resolve to prevent any potential
+				// feedback indicating that the navigation has finished while
+				// the new page is being loaded.
 				yield new Promise( () => {} );
 			}
 		},
