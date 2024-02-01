@@ -14,7 +14,7 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import BulkActions from './bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
@@ -93,7 +93,8 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					{ view.type === LAYOUT_TABLE && (
+					{ ( view.type === LAYOUT_TABLE ||
+						view.type === LAYOUT_GRID ) && (
 						<BulkActions
 							actions={ actions }
 							data={ data }

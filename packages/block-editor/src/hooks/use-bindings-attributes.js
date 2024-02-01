@@ -44,7 +44,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 				Object.entries( updatedAttributes.metadata.bindings ).forEach(
 					( [ attributeName, settings ] ) => {
 						const source = getBlockBindingsSource(
-							settings.source.name
+							settings.source
 						);
 
 						if ( source ) {
@@ -52,10 +52,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 							const {
 								placeholder,
 								useValue: [ metaValue = null ] = [],
-							} = source.useSource(
-								props,
-								settings.source.attributes
-							);
+							} = source.useSource( props, settings.args );
 
 							if ( placeholder && ! metaValue ) {
 								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.

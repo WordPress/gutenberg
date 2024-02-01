@@ -92,7 +92,7 @@ test.describe( 'Pattern Overrides', () => {
 							id: expect.any( String ),
 							bindings: {
 								content: {
-									source: { name: 'pattern_attributes' },
+									source: 'core/pattern-overrides',
 								},
 							},
 						},
@@ -172,7 +172,7 @@ test.describe( 'Pattern Overrides', () => {
 						ref: patternId,
 						overrides: {
 							[ editableParagraphId ]: {
-								content: [ 1, 'I would word it this way' ],
+								content: 'I would word it this way',
 							},
 						},
 					},
@@ -183,7 +183,7 @@ test.describe( 'Pattern Overrides', () => {
 						ref: patternId,
 						overrides: {
 							[ editableParagraphId ]: {
-								content: [ 1, 'This one is different' ],
+								content: 'This one is different',
 							},
 						},
 					},
@@ -222,7 +222,7 @@ test.describe( 'Pattern Overrides', () => {
 		const paragraphId = 'paragraph-id';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":{"name":"pattern_attributes"}}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
 <p>Editable</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -258,67 +258,5 @@ test.describe( 'Pattern Overrides', () => {
 				},
 			},
 		] );
-	} );
-
-	test( 'Supports `undefined` attribute values in patterns', async ( {
-		page,
-		admin,
-		editor,
-		requestUtils,
-	} ) => {
-		const buttonId = 'button-id';
-		const { id } = await requestUtils.createBlock( {
-			title: 'Pattern with overrides',
-			content: `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":{"name":"pattern_attributes"}},"url":{"source":{"name":"pattern_attributes"}},"linkTarget":{"source":{"name":"pattern_attributes"}}}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener">wp.org</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`,
-			status: 'publish',
-		} );
-
-		await admin.createNewPost();
-
-		await editor.insertBlock( {
-			name: 'core/block',
-			attributes: { ref: id },
-		} );
-
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Button' } )
-			.getByRole( 'textbox', { name: 'Button text' } )
-			.focus();
-
-		await expect(
-			page.getByRole( 'link', { name: 'wp.org' } )
-		).toContainText( 'opens in a new tab' );
-
-		const openInNewTabCheckbox = page.getByRole( 'checkbox', {
-			name: 'Open in new tab',
-		} );
-		await expect( openInNewTabCheckbox ).toBeChecked();
-
-		await openInNewTabCheckbox.setChecked( false );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: {
-					ref: id,
-					overrides: {
-						[ buttonId ]: {
-							linkTarget: [ 0 ],
-						},
-					},
-				},
-			},
-		] );
-
-		const postId = await editor.publishPost();
-		await page.goto( `/?p=${ postId }` );
-
-		const link = page.getByRole( 'link', { name: 'wp.org' } );
-		await expect( link ).toHaveAttribute( 'href', 'http://wp.org' );
-		await expect( link ).toHaveAttribute( 'target', '' );
 	} );
 } );

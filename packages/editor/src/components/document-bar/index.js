@@ -48,27 +48,14 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const {
-		isEditingTemplate,
-		templateId,
-		postType,
-		postId,
-		goBack,
-		getEditorSettings,
-	} = useSelect( ( select ) => {
+	const { postType, postId, goBack } = useSelect( ( select ) => {
 		const {
-			getRenderingMode,
-			getCurrentTemplateId,
 			getCurrentPostId,
 			getCurrentPostType,
 			getEditorSettings: getSettings,
 		} = select( editorStore );
-		const _templateId = getCurrentTemplateId();
 		const back = getSettings().goBack;
 		return {
-			isEditingTemplate:
-				!! _templateId && getRenderingMode() === 'template-only',
-			templateId: _templateId,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			goBack: typeof back === 'function' ? back : undefined,
@@ -76,13 +63,7 @@ export default function DocumentBar() {
 		};
 	}, [] );
 
-	const { setRenderingMode } = useDispatch( editorStore );
-
 	const handleOnBack = () => {
-		if ( isEditingTemplate ) {
-			setRenderingMode( getEditorSettings().defaultRenderingMode );
-			return;
-		}
 		if ( goBack ) {
 			goBack();
 		}
@@ -90,9 +71,9 @@ export default function DocumentBar() {
 
 	return (
 		<BaseDocumentActions
-			postType={ isEditingTemplate ? 'wp_template' : postType }
-			postId={ isEditingTemplate ? templateId : postId }
-			onBack={ isEditingTemplate || goBack ? handleOnBack : undefined }
+			postType={ postType }
+			postId={ postId }
+			onBack={ goBack ? handleOnBack : undefined }
 		/>
 	);
 }

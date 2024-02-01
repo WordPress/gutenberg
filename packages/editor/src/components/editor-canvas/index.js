@@ -35,6 +35,7 @@ const {
 	useLayoutClasses,
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
+	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
 
 const noop = () => {};
@@ -91,7 +92,7 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
-		hasHistory,
+		showEditorPadding,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -138,7 +139,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			hasHistory: !! editorSettings.goBack,
+			showEditorPadding: !! editorSettings.goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -290,6 +291,9 @@ function EditorCanvas( {
 	const contentRef = useMergeRefs( [
 		localRef,
 		renderingMode === 'post-only' ? typewriterRef : noop,
+		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
 	] );
 
 	return (
@@ -302,7 +306,7 @@ function EditorCanvas( {
 			height="100%"
 			iframeProps={ {
 				className: classnames( 'editor-canvas__iframe', {
-					'has-history': hasHistory,
+					'has-editor-padding': showEditorPadding,
 				} ),
 				...iframeProps,
 				style: {
@@ -364,8 +368,7 @@ function EditorCanvas( {
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
-						renderingMode !== 'all' && 'is-' + renderingMode
+							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
 					layout={ blockListLayout }
 					dropZoneElement={
@@ -376,8 +379,14 @@ function EditorCanvas( {
 							: localRef.current?.parentNode
 					}
 					renderAppender={ renderAppender }
+					__unstableDisableDropZone={
+						// In template preview mode, disable drop zones at the root of the template.
+						renderingMode === 'template-locked' ? true : false
+					}
 				/>
-				<EditTemplateBlocksNotification contentRef={ localRef } />
+				{ renderingMode === 'template-locked' && (
+					<EditTemplateBlocksNotification contentRef={ localRef } />
+				) }
 			</RecursionProvider>
 			{ children }
 		</BlockCanvas>
