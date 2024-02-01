@@ -9,26 +9,46 @@ export interface User {
 }
 
 async function login( this: RequestUtils, user: User = this.user ) {
-	// Login to admin using request context.
-	let response = await this.request.post( 'wp-login.php', {
-		failOnStatusCode: true,
-		form: {
-			log: user.username,
-			pwd: user.password,
-		},
-	} );
-	await response.dispose();
+	// Get the client ID and secret from the environment.
+	const clientId = process.env.WP_CLIENT_ID;
+	const clientSecret = process.env.WP_CLIENT_SECRET;
+	if ( ! clientId || ! clientSecret ) {
+		throw new Error(
+			'WP_CLIENT_ID and WP_CLIENT_SECRET environment variables must be set.'
+		);
+	}
 
-	// Get the nonce.
-	response = await this.request.get(
-		'wp-admin/admin-ajax.php?action=rest-nonce',
+	const response = await this.request.post(
+		'https://wordpress.com/wp-login.php?action=login-endpoint',
 		{
-			failOnStatusCode: true,
+			// failOnStatusCode: true,
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			form: {
+				username: user.username,
+				password: user.password,
+				client_id: clientId,
+				client_secret: clientSecret,
+			},
 		}
 	);
-	const nonce = await response.text();
 
-	return nonce;
+	const payload = await response.json();
+
+	await response.dispose();
+
+	if ( ! payload.success ) {
+		if ( payload?.data?.errors?.length > 0 ) {
+			payload.data.errors.forEach( ( error: any ) => {
+				// eslint-disable-next-line no-console
+				console.error( error );
+			} );
+		}
+
+		throw new Error( 'Login failed.' );
+	}
 }
 
 export { login };

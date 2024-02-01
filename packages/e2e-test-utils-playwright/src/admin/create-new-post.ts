@@ -35,4 +35,6 @@ export async function createNewPost(
 		welcomeGuide: options.showWelcomeGuide ?? false,
 		fullscreenMode: false,
 	} );
+
+	await this.editor.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 }
