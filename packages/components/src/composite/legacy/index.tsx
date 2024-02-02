@@ -12,7 +12,6 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -99,14 +98,6 @@ type CompositeComponentProps = CompositeState &
 		| ComponentProps< typeof Current.CompositeRow >
 	);
 
-function showDeprecationMessage( previous?: string, next?: string ) {
-	if ( previous ) {
-		deprecated( `wp.components.__unstable${ previous }`, {
-			alternative: `wp.components.${ next || previous }`,
-		} );
-	}
-}
-
 function mapLegacyStatePropsToComponentProps(
 	legacyProps: CompositeStateProps
 ): CompositeComponentProps {
@@ -128,8 +119,6 @@ function proxyComposite< C extends Component >(
 ): CompositeComponent< C > {
 	const displayName = ProxiedComponent.displayName;
 	const Component = ( legacyProps: CompositeStateProps ) => {
-		showDeprecationMessage( displayName );
-
 		const { store, ...rest } =
 			mapLegacyStatePropsToComponentProps( legacyProps );
 		const props = rest as ComponentProps< C >;
@@ -175,8 +164,6 @@ export const CompositeItem = proxyComposite( Current.CompositeItem, {
 export function useCompositeState(
 	legacyStateOptions: LegacyStateOptions = {}
 ): CompositeState {
-	showDeprecationMessage( 'UseCompositeState', 'useCompositeStore' );
-
 	const {
 		baseId,
 		currentId: defaultActiveId,
