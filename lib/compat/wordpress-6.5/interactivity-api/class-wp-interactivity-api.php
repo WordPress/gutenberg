@@ -51,6 +51,21 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		private $config_data = array();
 
 		/**
+		 * Flag that indicates whether the `data-wp-router-region` directive has
+		 * been found in the HTML and processed.
+		 *
+		 * The value is saved in a private property of the WP_Interactivity_API
+		 * instance instead of using a static variable inside the processor
+		 * function, which would hold the same value for all instances
+		 * independently of whether they have processed any
+		 * `data-wp-router-region` directive or not.
+		 *
+		 * @since 6.5.0
+		 * @var bool
+		 */
+		private $has_processed_router_region = false;
+
+		/**
 		 * Gets and/or sets the initial state of an Interactivity API store for a
 		 * given namespace.
 		 *
@@ -688,10 +703,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @param WP_Interactivity_API_Directives_Processor $p The directives processor instance.
 		 */
 		private function data_wp_router_region_processor( WP_Interactivity_API_Directives_Processor $p ) {
-			static $has_added_markup = false;
-
-			if ( ! $p->is_tag_closer() && ! $has_added_markup ) {
-				$has_added_markup = true;
+			if ( ! $p->is_tag_closer() && ! $this->has_processed_router_region ) {
+				$this->has_processed_router_region = true;
 
 				// Initialize the `core/router` store.
 				$this->state(
