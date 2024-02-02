@@ -142,6 +142,8 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * It removes the keys not in the schema and applies the sanitizer to the values.
 		 *
 		 * @since 6.5.0
+		 * 
+		 * @access private  
 		 *
 		 * @param array $tree The data to sanitize.
 		 * @param array $schema The schema used for sanitization.
