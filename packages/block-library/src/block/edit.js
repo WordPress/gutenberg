@@ -38,25 +38,6 @@ import { unlock } from '../lock-unlock';
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
-function isPartiallySynced( block ) {
-	return (
-		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		)
-	);
-}
-function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
-}
-
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
 const useInferredLayout = ( blocks, parentLayout ) => {
@@ -88,28 +69,71 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
+function hasOverrides( block ) {
+	return (
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source === 'core/pattern-content'
+		)
+	);
+}
+function getOverrideAttributes( block ) {
+	return Object.entries( block.attributes.metadata.bindings )
+		.filter(
+			( [ , binding ] ) => binding.source === 'core/pattern-content'
+		)
+		.map( ( [ attributeKey ] ) => attributeKey );
+}
+
+function getHasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( hasOverrides( block ) ) return true;
+		return getHasOverridableBlocks( block.innerBlocks );
+	} );
+}
+
+/**
+ * Does the reverse of the `getContentValuesFromBlocks` function.
+ *
+ * Take the values from the pattern block's `content` attribute and applies them to the
+ * inner blocks.
+ *
+ * Used to set the initial content of the inner blocks.
+ *
+ * @param {Array}  blocks               The pattern block's inner blocks.
+ * @param {Object} content              The content values from the pattern block's `content` attribute.
+ * @param {Object} defaultContentValues The default values for the content. These are the values
+ *                                      stored in the unsaved wp_block post.
+ *
+ * @return {Array} The updated inner blocks.
+ */
+function applyInitialContentValues(
+	blocks,
+	content = {},
+	defaultContentValues
+) {
 	return blocks.map( ( block ) => {
-		const innerBlocks = applyInitialOverrides(
+		const innerBlocks = applyInitialContentValues(
 			block.innerBlocks,
-			overrides,
-			defaultValues
+			content,
+			defaultContentValues
 		);
 		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId )
+		if ( ! hasOverrides( block ) || ! blockId )
 			return { ...block, innerBlocks };
-		const attributes = getPartiallySyncedAttributes( block );
+		const attributes = getOverrideAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] ??= { values: {} };
-			defaultValues[ blockId ].values[ attributeKey ] =
+			defaultContentValues[ blockId ] ??= { values: {} };
+			defaultContentValues[ blockId ].values[ attributeKey ] =
 				block.attributes[ attributeKey ];
 
-			if (
-				overrides[ blockId ]?.values?.[ attributeKey ] !== undefined
-			) {
+			if ( content[ blockId ]?.values?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] =
-					overrides[ blockId ]?.values?.[ attributeKey ];
+					content[ blockId ]?.values?.[ attributeKey ];
 			}
 		}
 		return {
@@ -120,46 +144,55 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	} );
 }
 
-function getOverridesFromBlocks( blocks, defaultValues ) {
+/**
+ * Does the reverse of the `applyInitialContentValues` function.
+ *
+ * Recursively get the latest content values from the inner blocks.
+ *
+ * Used to set the `content` attribute of the pattern block.
+ *
+ * @param {Array}  blocks               The array of inner blocks.
+ * @param {Object} defaultContentValues The default values for the content. These are the values
+ *                                      stored in the unsaved wp_block post.
+ *
+ * @return {Object} The content values.
+ */
+function getContentValuesFromBlocks( blocks, defaultContentValues ) {
 	/** @type {Record<string, Record<string, unknown>>} */
-	const overrides = {};
+	const content = {};
 	for ( const block of blocks ) {
 		Object.assign(
-			overrides,
-			getOverridesFromBlocks( block.innerBlocks, defaultValues )
+			content,
+			getContentValuesFromBlocks(
+				block.innerBlocks,
+				defaultContentValues
+			)
 		);
 		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
-		const attributes = getPartiallySyncedAttributes( block );
+		if ( ! hasOverrides( block ) || ! blockId ) continue;
+		const attributes = getOverrideAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
 				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				defaultContentValues[ blockId ][ attributeKey ]
 			) {
-				overrides[ blockId ] ??= { values: {} };
-				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				content[ blockId ] ??= { values: {} };
+				// TODO: We need a way to represent `undefined` in the serialized content.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				overrides[ blockId ].values[ attributeKey ] =
+				content[ blockId ].values[ attributeKey ] =
 					block.attributes[ attributeKey ];
 			}
 		}
 	}
-	return Object.keys( overrides ).length > 0 ? overrides : undefined;
+	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
 		const editMode =
-			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
+			mode || ( hasOverrides( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 		setBlockEditMode( setEditMode, block.innerBlocks, mode );
-	} );
-}
-
-function getHasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( isPartiallySynced( block ) ) return true;
-		return getHasOverridableBlocks( block.innerBlocks );
 	} );
 }
 
@@ -178,7 +211,7 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialOverrides = useRef( content );
+	const initialContent = useRef( content );
 	const defaultValuesRef = useRef( {} );
 
 	const {
@@ -238,19 +271,19 @@ export default function ReusableBlockEdit( {
 		[ editedRecord.blocks, editedRecord.content ]
 	);
 
-	// Apply the initial overrides from the pattern block to the inner blocks.
+	// Apply the initial content from the pattern block to the inner blocks.
 	useEffect( () => {
 		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
-		// Replace the contents of the blocks with the overrides.
+
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
 			syncDerivedUpdates( () => {
 				replaceInnerBlocks(
 					patternClientId,
-					applyInitialOverrides(
+					applyInitialContentValues(
 						initialBlocks,
-						initialOverrides.current,
+						initialContent.current,
 						defaultValuesRef.current
 					)
 				);
@@ -290,7 +323,7 @@ export default function ReusableBlockEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `content` attribute from the updated blocks to the pattern block.
+	// Sync the overridden attributes from the inner blocks to the pattern block's `content` attribute.
 	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
 		const { getBlocks } = registry.select( blockEditorStore );
@@ -301,7 +334,7 @@ export default function ReusableBlockEdit( {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
 					setAttributes( {
-						content: getOverridesFromBlocks(
+						content: getContentValuesFromBlocks(
 							blocks,
 							defaultValuesRef.current
 						),
@@ -316,7 +349,7 @@ export default function ReusableBlockEdit( {
 		editOriginalProps.onClick( event );
 	};
 
-	const resetOverrides = () => {
+	const resetContent = () => {
 		if ( content ) {
 			replaceInnerBlocks( patternClientId, initialBlocks );
 		}
@@ -367,7 +400,7 @@ export default function ReusableBlockEdit( {
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
-							onClick={ resetOverrides }
+							onClick={ resetContent }
 							disabled={ ! content }
 							__experimentalIsFocusable
 						>
