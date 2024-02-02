@@ -72,6 +72,22 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		foreach ( $inner_blocks as $inner_block ) {
+			// If this is a page list then work out if any of the pages have children.
+			if ( 'core/page-list' === $inner_block->name ) {
+				$all_pages = get_pages(
+					array(
+						'sort_column' => 'menu_order,post_title',
+						'order'       => 'asc',
+					)
+				);
+				foreach ( (array) $all_pages as $page ) {
+					if ( $page->post_parent ) {
+						static::$has_submenus = true;
+						break;
+					}
+				}
+			}
+			// If this is a navigation submenu then we know we have submenus.
 			if ( 'core/navigation-submenu' === $inner_block->name ) {
 				static::$has_submenus = true;
 				break;
