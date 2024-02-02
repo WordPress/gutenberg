@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Collection::get_data
  */
-class Tests_Fonts_WpFontCollection_getData extends WP_UnitTestCase {
+class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 
 	private static $mock_collection_data;
 
@@ -30,8 +30,6 @@ class Tests_Fonts_WpFontCollection_getData extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test setting data via json file
-	 *
 	 * @dataProvider data_create_font_collection
 	 *
 	 * @param string $slug          Font collection slug.
