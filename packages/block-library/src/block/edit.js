@@ -117,9 +117,9 @@ function applyInitialContentValuesToInnerBlocks(
 			defaultValues[ blockId ].values[ attributeKey ] =
 				block.attributes[ attributeKey ];
 
-			if ( content[ blockId ]?.values?.[ attributeKey ] !== undefined ) {
-				newAttributes[ attributeKey ] =
-					content[ blockId ]?.values?.[ attributeKey ];
+			const contentValues = content[ blockId ]?.values;
+			if ( contentValues?.[ attributeKey ] !== undefined ) {
+				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
 			}
 		}
 		return {
