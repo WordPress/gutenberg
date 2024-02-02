@@ -32,8 +32,6 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 	},
 	argTypes: {
 		orientation: { control: 'select' },
-		rtl: { control: 'select', options: [ true, false ] },
-		shift: { control: 'select', options: [ true, false ] },
 		loop: {
 			control: 'select',
 			options: [ true, false, 'horizontal', 'vertical' ],
