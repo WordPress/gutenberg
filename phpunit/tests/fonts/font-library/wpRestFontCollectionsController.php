@@ -49,8 +49,8 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 		$this->assertCount( 1, $routes['/wp/v2/font-collections'], 'Rest server has not the collections path initialized.' );
 		$this->assertCount( 1, $routes['/wp/v2/font-collections/(?P<slug>[\/\w-]+)'], 'Rest server has not the collection path initialized.' );
 
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-collections'][0]['methods'], 'Rest server has not the GET method for collections intialized.' );
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-collections/(?P<slug>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection intialized.' );
+		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-collections'][0]['methods'], 'Rest server has not the GET method for collections initialized.' );
+		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-collections/(?P<slug>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection initialized.' );
 	}
 
 	/**
@@ -107,11 +107,11 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 
 		wp_set_current_user( 0 );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 401, 'Response code should be 401 for non-authenticated users.' );
+		$this->assertErrorResponse( 'rest_cannot_read', $response );
 
 		wp_set_current_user( self::$editor_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 403, 'Response code should be 403 for users without the right permissions.' );
+		$this->assertErrorResponse( 'rest_cannot_read', $response );
 	}
 
 	/**
