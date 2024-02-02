@@ -8,15 +8,16 @@ Adhering to the `create-block` tool's structure is not mandatory, but it serves 
 
 ## `<plugin-file>.php`
 
-A block is usually added to the Block Editor using a WordPress plugin. In the main PHP file of the plugin the block is usually registered on the server side.
+
+When creating a block in a WordPress plugin, you usually register the block on the server in the main PHP file of the plugin. This is done using the [`register_block_type()`](https://developer.wordpress.org/reference/functions/register_block_type/) function. 
 
 <div class="callout callout-info">
-    For more on creating a WordPress plugin, see <a href="https://developer.wordpress.org/plugins/plugin-basics/">Plugin Basics</a>, and <a href="https://developer.wordpress.org/plugins/plugin-basics/header-requirements/">Plugin Header requirements</a> for explanation and additional fields you can include in your plugin header.
+    For more on creating a WordPress plugin, refer to the documentation on <a href="https://developer.wordpress.org/plugins/plugin-basics/">Plugin Basics</a> and the <a href="https://developer.wordpress.org/plugins/plugin-basics/header-requirements/"> Header Requirements</a> for the main PHP file.
 </div>
 
 ## `package.json`
 
-[`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) is a configuration file for a Node.js project. In this file, you define the NPM dependencies of the block and the scripts used for local work.
+The `package.json` file is used to configure a Node.js project, which is technically what a block plugin is. In this file, you define the `npm` dependencies of the block and the scripts used for local development.
 
 ## `src` folder
 
@@ -48,15 +49,15 @@ The `index.js` file (or any other file defined in the `editorScript` property of
 
 ### `edit.js`
 
-The `edit.js` commonly gets used to contain the React component that gets used in the Block Editor for our block. It usually exports a single component that then gets passed to the [`edit`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit) property of the `registerBlockType` function in the `index.js` file.
+The `edit.js` file contains the React component responsible for rendering the block's editing user interface, allowing users to interact with and customize the block's content and settings in the Block Editor. This component gets passed to the [`edit`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit) property of the `registerBlockType` function in the `index.js` file.
 
 ### `save.js`
 
-The `save.js` exports the function that returns the static HTML markup that gets saved to the Database and that is passed to the [`save`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#save) property of the `registerBlockType` function in the `index.js` file.
+The `save.js` exports the function that returns the static HTML markup that gets saved to the WordPress database. This function gets passed to the [`save`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#save) property of the `registerBlockType` function in the `index.js` file.
 
 ### `style.(css|scss|sass)`
 
-A `style` file with any of the extensions `.css`, `.scss`, or `.sass` contains the styles of the block that will be loaded in both the Block Editor and the front end. In the build process, this file is converted into `style-index.css`, which is usually defined using the [`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) property in `block.json`
+A `style` file with extensions `.css`, `.scss`, or `.sass` contains the styles of the block that will be loaded in both the Block Editor and on the front end. In the build process, this file is converted into `style-index.css`, which is usually defined using the [`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) property in `block.json`
 
 <div class="callout callout-info">
     The webpack configuration used internally by <code>wp-scripts</code> includes a <a href="https://webpack.js.org/loaders/css-loader/">css-loader</a> chained with <a herf="https://webpack.js.org/loaders/postcss-loader/">postcss-loader</a> and <a href="https://webpack.js.org/loaders/sass-loader/">sass-loader</a> that allows it to process CSS, SASS or SCSS files. Check <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#default-webpack-config">Default webpack config</a> for more info
@@ -64,7 +65,7 @@ A `style` file with any of the extensions `.css`, `.scss`, or `.sass` contains t
 
 ### `editor.(css|scss|sass)`
 
-An `editor` file with any of the extensions `.css`, `.scss`, or `.sass` contains the additional styles applied to the block in the Block Editor. This file is converted to `index.css` during the build process, usually defined using the `editorStyle` property in `block.json`.
+An `editor` file with extensions `.css`, `.scss`, or `.sass` contains the additional styles applied to the block in the Block Editor. You will often use this file for styles specific to the block's user interface. This file is converted to `index.css` during the build process, usually defined using the `editorStyle` property in `block.json`.
 
 ### `render.php`
 
