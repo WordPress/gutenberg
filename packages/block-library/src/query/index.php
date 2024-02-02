@@ -107,10 +107,13 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	$block_name = $parsed_block['blockName'];
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
+	/*
+	 * Client side navigation can be true in two states:
+	 *  - supports.interactivity = true;
+	 *  - supports.interactivity.clientNavigation = true;
+	 */
 	$supports_client_navigation = ( isset( $block_type->supports['interactivity']['clientNavigation'] ) && true === $block_type->supports['interactivity']['clientNavigation'] )
-	// If block.supports.interactivity is a boolean with true value, it means that clientNavigation is also true.
 		|| ( isset( $block_type->supports['interactivity'] ) && true === $block_type->supports['interactivity'] );
-	// If block.supports.interactivity is a boolean true, it means that clientNavigation is also true.
 
 	if ( 'core/query' === $block_name && isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
