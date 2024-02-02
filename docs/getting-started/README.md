@@ -1,6 +1,6 @@
 # Getting Started
 
-Welcome! Let's get started building with blocks. Blocks are at the core of extending WordPress. You can create custom blocks, your own block patterns, or combine them together to build a block theme. 
+Let's get started building blocks and extending the WordPress Editor. Blocks are at the core of extending WordPress. You can create custom blocks, your own block patterns, or combine them to build a block theme. 
 
 ## Navigating this chapter
 
@@ -24,17 +24,16 @@ At a high level, here are a few ways to begin your journey but read on to explor
 - Expand your knowledge by reviewing more developer docs at the overall [developer.wordpress.org resource](https://developer.wordpress.org/).
 - Subscribe to [updates on Make Core](https://make.wordpress.org/core/), the main site where ongoing project updates happen.
 
-### Ways to Stay Informed
+## Ways to stay informed
 
-New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 
+New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalog of ways to keep up rather than a recommendation for how to do so. 
 
-- [Keeping up with Gutenberg](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/) - compilation of Gutenberg-related team posts of Core, Core-Editor, Core-js, Core-css, Design, Meta, and Themes, and other teams.
-- [“What’s New In Gutenberg?” release posts](https://make.wordpress.org/core/tag/gutenberg-new/). These updates are wrangled by the Core Editor team and focus on what’s been released in each biweekly Gutenberg release. They include the most relevant features released and a full changelog.
+- [Keeping up with Gutenberg](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/) is a compilation of Gutenberg-related posts from the Core, Design, Meta, Themes, and other Make teams.
+- [“What’s New In Gutenberg?”](https://make.wordpress.org/core/tag/gutenberg-new/) posts are published biweekly with each Gutenberg release. They are a great way to review the most relevant new features and the full changelog.
 - [Core Editor meetings](https://make.wordpress.org/core/tag/core-editor-summary/). These meetings are wrangled by volunteer members in the #core-editor Slack channel. [Agendas](https://make.wordpress.org/core/tag/core-editor-summary/) and [summaries](https://make.wordpress.org/core/tag/core-editor-summary/) are shared on the [Make Core blog](https://make.wordpress.org/core/). They focus on task coordination and relevant discussions around Gutenberg releases. There is an Open Floor period in each chat where people can suggest topics to discuss.
 - Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers. 
 
-
-## Additional Resources
+## Additional resources
 
 The [block-development-examples](https://github.com/wptrainingteam/block-development-examples) repo is the central hub of examples for block development referenced from this handbook.
 
