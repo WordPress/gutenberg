@@ -53,10 +53,10 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @param array|string  $data_or_file {
 		 *     Font collection data array or a file path or URL to a JSON file containing the font collection.
 		 *
-		 *     @type string $name           Name of the font collection.
-		 *     @type string $description    Description of the font collection.
-		 *     @type array  $font_families  Array of font family definitions that are in the collection.
-		 *     @type array  $categories     Array of categories for the fonts that are in the collection.
+		 *     @type string $name          Name of the font collection.
+		 *     @type string $description   Description of the font collection.
+		 *     @type array  $font_families Array of font family definitions included in the collection.
+		 *     @type array  $categories    Array of categories associated with the fonts in the collection.
 		 * }
 		 */
 		public function __construct( $slug, $data_or_file ) {
