@@ -70,10 +70,7 @@
 				"link": true
 			}
 		},
-		"interactivity": true,
-		"interactivity": {
-			"clientNavigation": true
-		}
+		"interactivity": true
 	},
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
