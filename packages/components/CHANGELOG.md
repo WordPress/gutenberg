@@ -31,6 +31,7 @@
 ### Internal
 
 -   `Composite`: Removing Reakit `Composite` implementation ([#58620](https://github.com/WordPress/gutenberg/pull/58620)).
+-   Removing Reakit as a dependency of the components package ([#58631](https://github.com/WordPress/gutenberg/pull/58631)).
 
 ## 25.16.0 (2024-01-24)
 
