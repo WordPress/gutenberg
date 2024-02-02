@@ -51,7 +51,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @var array
 		 */
-		private const COLLECTION_SANITIZATION_SCHEMA = array(
+		const COLLECTION_SANITIZATION_SCHEMA = array(
 			'name'          => 'sanitize_text_field',
 			'description'   => 'sanitize_text_field',
 			'font_families' => array(
