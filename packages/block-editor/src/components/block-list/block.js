@@ -143,7 +143,7 @@ function BlockListBlock( {
 		/>
 	);
 
-	const blockType = getBlockType( name );
+	const { blockType } = context;
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
@@ -530,6 +530,8 @@ function BlockListBlockProvider( props ) {
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
+				getBlockCount,
+				getBlockSettings,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId );
@@ -564,11 +566,17 @@ function BlockListBlockProvider( props ) {
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
+			const parentTemplateLock = getTemplateLock( rootClientId );
+			const __experimentalExposeControlsToChildren = _hasBlockSupport(
+				getBlockName( clientId ),
+				'__experimentalExposeControlsToChildren',
+				false
+			);
 
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
-				isLocked: !! getTemplateLock( rootClientId ),
+				parentTemplateLock,
 				templateLock: getTemplateLock( clientId ),
 				canRemove,
 				canMove,
@@ -588,11 +596,10 @@ function BlockListBlockProvider( props ) {
 							( id ) => getBlockName( id ) === blockName
 						) ),
 				mayDisplayParentControls:
-					_hasBlockSupport(
-						getBlockName( clientId ),
-						'__experimentalExposeControlsToChildren',
-						false
-					) && hasSelectedInnerBlock( clientId ),
+					__experimentalExposeControlsToChildren &&
+					hasSelectedInnerBlock( clientId ),
+				__experimentalExposeControlsToChildren,
+				blockType,
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
@@ -602,6 +609,12 @@ function BlockListBlockProvider( props ) {
 				isOutlineEnabled: outlineMode,
 				hasOverlay:
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
+					! isDraggingBlocks(),
+				hasInnerBlocksOverlay:
+					blockName !== 'core/template' &&
+					! _isSelected &&
+					! isAncestorOfSelectedBlock &&
+					__unstableGetEditorMode() === 'navigation' &&
 					! isDraggingBlocks(),
 				initialPosition:
 					_isSelected && __unstableGetEditorMode() === 'edit'
@@ -634,6 +647,9 @@ function BlockListBlockProvider( props ) {
 				defaultClassName: hasLightBlockWrapper
 					? getBlockDefaultClassName( blockName )
 					: undefined,
+				layout:
+					getBlockCount( clientId ) &&
+					getBlockSettings( clientId, 'layout' )[ 0 ],
 			};
 		},
 		[ clientId, rootClientId ]
@@ -642,7 +658,6 @@ function BlockListBlockProvider( props ) {
 	const {
 		mode,
 		isSelectionEnabled,
-		isLocked,
 		canRemove,
 		canMove,
 		blockWithoutAttributes,
@@ -671,11 +686,14 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		parentTemplateLock,
 		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
 		defaultClassName,
+		__experimentalExposeControlsToChildren,
+		blockType,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -717,6 +735,7 @@ function BlockListBlockProvider( props ) {
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
+		parentTemplateLock,
 		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
@@ -725,6 +744,8 @@ function BlockListBlockProvider( props ) {
 		mayDisplayControls,
 		mayDisplayParentControls,
 		themeSupportsLayout,
+		__experimentalExposeControlsToChildren,
+		blockType,
 	};
 
 	// Here we separate between the props passed to BlockListBlock and any other
@@ -746,7 +767,7 @@ function BlockListBlockProvider( props ) {
 				{ ...{
 					mode,
 					isSelectionEnabled,
-					isLocked,
+					isLocked: !! parentTemplateLock,
 					canRemove,
 					canMove,
 					// Users of the editor.BlockListBlock filter used to be able

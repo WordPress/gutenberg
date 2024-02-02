@@ -7,11 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { forwardRef, useMemo, useContext } from '@wordpress/element';
 import {
 	getBlockSupport,
-	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
 
@@ -27,9 +25,8 @@ import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
-import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 const EMPTY_OBJECT = {};
 
@@ -184,68 +181,22 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
-	const selected = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
-				return {};
-			}
-
-			const {
-				getBlockName,
-				isBlockSelected,
-				hasSelectedInnerBlock,
-				__unstableGetEditorMode,
-				getTemplateLock,
-				getBlockRootClientId,
-				getBlockEditingMode,
-				getBlockSettings,
-				isDraggingBlocks,
-			} = unlock( select( blockEditorStore ) );
-			const { hasBlockSupport, getBlockType } = select( blocksStore );
-			const blockName = getBlockName( clientId );
-			const enableClickThrough =
-				__unstableGetEditorMode() === 'navigation';
-			const blockEditingMode = getBlockEditingMode( clientId );
-			const parentClientId = getBlockRootClientId( clientId );
-			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
-			return {
-				__experimentalCaptureToolbars: hasBlockSupport(
-					blockName,
-					'__experimentalExposeControlsToChildren',
-					false
-				),
-				hasOverlay:
-					blockName !== 'core/template' &&
-					! isBlockSelected( clientId ) &&
-					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough &&
-					! isDraggingBlocks(),
-				name: blockName,
-				blockType: getBlockType( blockName ),
-				parentLock: getTemplateLock( parentClientId ),
-				parentClientId,
-				isDropZoneDisabled: blockEditingMode === 'disabled',
-				defaultLayout,
-			};
-		},
-		[ clientId ]
-	);
 	const {
-		__experimentalCaptureToolbars,
-		hasOverlay,
 		name,
+		blockEditingMode,
 		blockType,
-		parentLock,
-		parentClientId,
-		isDropZoneDisabled,
-		defaultLayout,
-	} = selected;
+		parentTemplateLock,
+		rootClientId,
+		__experimentalExposeControlsToChildren,
+		hasInnerBlocksOverlay: hasOverlay,
+		layout: defaultLayout,
+	} = useContext( PrivateBlockContext );
 
 	const blockDropZoneRef = useBlockDropZone( {
 		dropZoneElement,
 		rootClientId: clientId,
-		parentClientId,
-		isDisabled: isDropZoneDisabled,
+		parentClientId: rootClientId,
+		isDisabled: blockEditingMode === 'disabled',
 	} );
 
 	const ref = useMergeRefs( [
@@ -254,11 +205,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	] );
 
 	const innerBlocksProps = {
-		__experimentalCaptureToolbars,
+		__experimentalCaptureToolbars: __experimentalExposeControlsToChildren,
 		layout,
 		name,
 		blockType,
-		parentLock,
+		parentLock: parentTemplateLock,
 		defaultLayout,
 		...options,
 	};
