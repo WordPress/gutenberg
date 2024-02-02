@@ -8,6 +8,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
  */
 import {
 	Composite as CompositeV2,
+	CompositeExperienceHelper as CompositeExperienceHelperV2,
 	CompositeGroup as CompositeGroupV2,
 	CompositeItem as CompositeItemV2,
 	CompositeRow as CompositeRowV2,
@@ -36,6 +37,7 @@ import { lock } from './lock-unlock';
 export const privateApis = {};
 lock( privateApis, {
 	CompositeV2,
+	CompositeExperienceHelperV2,
 	CompositeGroupV2,
 	CompositeItemV2,
 	CompositeRowV2,
