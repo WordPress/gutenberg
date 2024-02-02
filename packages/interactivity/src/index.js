@@ -23,7 +23,7 @@ export { useContext, useState, useRef } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 
 const requiredConsent =
-	'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.';
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
 export const privateApis = ( lock ) => {
 	if ( lock === requiredConsent ) {
