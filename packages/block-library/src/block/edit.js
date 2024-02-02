@@ -38,25 +38,6 @@ import { unlock } from '../lock-unlock';
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
-function isPartiallySynced( block ) {
-	return (
-		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		)
-	);
-}
-function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
-}
-
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
 const useInferredLayout = ( blocks, parentLayout ) => {
@@ -88,28 +69,57 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
+function hasOverridableAttributes( block ) {
+	return (
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source === 'core/pattern-overrides'
+		)
+	);
+}
+
+function hasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( hasOverridableAttributes( block ) ) return true;
+		return hasOverridableBlocks( block.innerBlocks );
+	} );
+}
+
+function getOverridableAttributes( block ) {
+	return Object.entries( block.attributes.metadata.bindings )
+		.filter(
+			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
+		)
+		.map( ( [ attributeKey ] ) => attributeKey );
+}
+
+function applyInitialContentValuesToInnerBlocks(
+	blocks,
+	content = {},
+	defaultValues
+) {
 	return blocks.map( ( block ) => {
-		const innerBlocks = applyInitialOverrides(
+		const innerBlocks = applyInitialContentValuesToInnerBlocks(
 			block.innerBlocks,
-			overrides,
+			content,
 			defaultValues
 		);
 		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId )
+		if ( ! hasOverridableAttributes( block ) || ! blockId )
 			return { ...block, innerBlocks };
-		const attributes = getPartiallySyncedAttributes( block );
+		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
 			defaultValues[ blockId ] ??= { values: {} };
 			defaultValues[ blockId ].values[ attributeKey ] =
 				block.attributes[ attributeKey ];
 
-			if (
-				overrides[ blockId ]?.values?.[ attributeKey ] !== undefined
-			) {
+			if ( content[ blockId ]?.values?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] =
-					overrides[ blockId ]?.values?.[ attributeKey ];
+					content[ blockId ]?.values?.[ attributeKey ];
 			}
 		}
 		return {
@@ -120,46 +130,40 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	} );
 }
 
-function getOverridesFromBlocks( blocks, defaultValues ) {
+function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, Record<string, unknown>>} */
-	const overrides = {};
+	const content = {};
 	for ( const block of blocks ) {
 		Object.assign(
-			overrides,
-			getOverridesFromBlocks( block.innerBlocks, defaultValues )
+			content,
+			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
 		);
 		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
-		const attributes = getPartiallySyncedAttributes( block );
+		if ( ! hasOverridableAttributes( block ) || ! blockId ) continue;
+		const attributes = getOverridableAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
 				block.attributes[ attributeKey ] !==
 				defaultValues[ blockId ][ attributeKey ]
 			) {
-				overrides[ blockId ] ??= { values: {} };
+				content[ blockId ] ??= { values: {} };
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				overrides[ blockId ].values[ attributeKey ] =
+				content[ blockId ].values[ attributeKey ] =
 					block.attributes[ attributeKey ];
 			}
 		}
 	}
-	return Object.keys( overrides ).length > 0 ? overrides : undefined;
+	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
 		const editMode =
-			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
+			mode ||
+			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 		setBlockEditMode( setEditMode, block.innerBlocks, mode );
-	} );
-}
-
-function getHasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( isPartiallySynced( block ) ) return true;
-		return getHasOverridableBlocks( block.innerBlocks );
 	} );
 }
 
@@ -223,8 +227,8 @@ export default function ReusableBlockEdit( {
 		[ innerBlocks, setBlockEditingMode ]
 	);
 
-	const hasOverridableBlocks = useMemo(
-		() => getHasOverridableBlocks( innerBlocks ),
+	const canOverrideBlocks = useMemo(
+		() => hasOverridableBlocks( innerBlocks ),
 		[ innerBlocks ]
 	);
 
@@ -248,7 +252,7 @@ export default function ReusableBlockEdit( {
 			syncDerivedUpdates( () => {
 				replaceInnerBlocks(
 					patternClientId,
-					applyInitialOverrides(
+					applyInitialContentValuesToInnerBlocks(
 						initialBlocks,
 						initialOverrides.current,
 						defaultValuesRef.current
@@ -301,7 +305,7 @@ export default function ReusableBlockEdit( {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
 					setAttributes( {
-						content: getOverridesFromBlocks(
+						content: getContentValuesFromInnerBlocks(
 							blocks,
 							defaultValuesRef.current
 						),
@@ -363,7 +367,7 @@ export default function ReusableBlockEdit( {
 				</BlockControls>
 			) }
 
-			{ hasOverridableBlocks && (
+			{ canOverrideBlocks && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
