@@ -146,7 +146,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			}
 
 			// Validate required properties are not empty.
-			$data = $this->validate_data( $this->data );
+			$data = $this->validate_andd_sanitize( $this->data );
 			if ( is_wp_error( $data ) ) {
 				return $data;
 			}
@@ -229,7 +229,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				}
 
 				// Make sure the data is valid before caching it.
-				$data = $this->validate_data( $data );
+				$data = $this->validate_andd_sanitize( $data );
 				if ( is_wp_error( $data ) ) {
 					return $data;
 				}
@@ -248,7 +248,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @param array $data Font collection configuration to validate.
 		 * @return array|WP_Error Array of data if valid, otherwise a WP_Error instance.
 		 */
-		private function validate_data( $data ) {
+		private function validate_andd_sanitize( $data ) {
 			$data                = WP_Font_Utils::sanitize_from_schema( $data, self::COLLECTION_SANITIZATION_SCHEMA );
 			$required_properties = array( 'name', 'font_families' );
 			foreach ( $required_properties as $property ) {

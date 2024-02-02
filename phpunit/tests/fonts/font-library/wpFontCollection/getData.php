@@ -195,7 +195,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	 * @param array $config Font collection config.
 	 */
 	public function test_should_error_when_missing_properties( $config ) {
-		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_data' );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_andd_sanitize' );
 
 		$collection = new WP_Font_Collection( 'my-collection', $config );
 		$data       = $collection->get_data();
