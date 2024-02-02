@@ -164,23 +164,25 @@ function Tabs( {
 			return;
 		}
 
-		const focusedElement =
-			items?.[ 0 ]?.element?.ownerDocument.activeElement;
+		requestAnimationFrame( () => {
+			const focusedElement =
+				items?.[ 0 ]?.element?.ownerDocument.activeElement;
 
-		if (
-			! focusedElement ||
-			! items.some( ( item ) => focusedElement === item.element )
-		) {
-			return; // Return early if no tabs are focused.
-		}
+			if (
+				! focusedElement ||
+				! items.some( ( item ) => focusedElement === item.element )
+			) {
+				return; // Return early if no tabs are focused.
+			}
 
-		// If, after ariakit re-computes the active tab, that tab doesn't match
-		// the currently focused tab, then we force an update to ariakit to avoid
-		// any mismatches, especially when navigating to previous/next tab with
-		// arrow keys.
-		if ( activeId !== focusedElement.id ) {
-			setActiveId( focusedElement.id );
-		}
+			// If, after ariakit re-computes the active tab, that tab doesn't match
+			// the currently focused tab, then we force an update to ariakit to avoid
+			// any mismatches, especially when navigating to previous/next tab with
+			// arrow keys.
+			if ( activeId !== focusedElement.id ) {
+				setActiveId( focusedElement.id );
+			}
+		} );
 	}, [ activeId, isControlled, items, setActiveId ] );
 
 	const contextValue = useMemo(

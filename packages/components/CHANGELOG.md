@@ -22,6 +22,7 @@
 -   `Guide`, `Modal`: Restore accent color themability ([#58098](https://github.com/WordPress/gutenberg/pull/58098)).
 -   `DropdownMenuV2`: Restore accent color themability ([#58130](https://github.com/WordPress/gutenberg/pull/58130)).
 -   `Tabs`: improve controlled mode focus handling and keyboard navigation ([#57696](https://github.com/WordPress/gutenberg/pull/57696)).
+-   `Tabs`: prevent internal focus from updating too early ([#58625](https://github.com/WordPress/gutenberg/pull/58625)).
 -   Expand theming support in the `COLORS` variable object ([#58097](https://github.com/WordPress/gutenberg/pull/58097)).
 
 ### Enhancements
