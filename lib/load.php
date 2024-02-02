@@ -160,7 +160,7 @@ require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 // @core-merge: do not merge the BC layer files into WordPress Core.
-require __DIR__ . '/experimental/fon/font-face/bc-layer/class-wp-fonts-provider.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider.php';
 require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-utils.php';
 require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts.php';
 require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider-local.php';
