@@ -137,13 +137,13 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
 
 // Loads the Font Library.
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/class-wp-font-collection.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/class-wp-font-library.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/class-wp-font-utils.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/class-wp-rest-font-families-controller.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/class-wp-rest-font-faces-controller.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/class-wp-rest-font-collections-controller.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-library/font-library.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-font-collection.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-font-library.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-font-utils.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-families-controller.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-faces-controller.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-collections-controller.php';
+require __DIR__ . '/compat/wordpress-6.5/fonts/fonts.php';
 
 // Load the Font Face and Font Face Resolver, if not already loaded by WordPress Core.
 if ( ! class_exists( 'WP_Font_Face' ) ) {
