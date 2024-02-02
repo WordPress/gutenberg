@@ -124,7 +124,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::register_routes
+	 * @covers WP_REST_Font_Families_Controller::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -209,7 +209,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 * @covers WP_REST_Font_Families_Controller::get_items
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -226,7 +226,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 * @covers WP_REST_Font_Families_Controller::get_items
 	 */
 	public function test_get_items_by_slug() {
 		$font_family = get_post( self::$font_family_id2 );
@@ -244,7 +244,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 * @covers WP_REST_Font_Families_Controller::get_items
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
@@ -259,7 +259,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
@@ -272,7 +272,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::prepare_item_for_response
+	 * @covers WP_REST_Font_Families_Controller::prepare_item_for_response
 	 */
 	public function test_get_item_embedded_font_faces() {
 		wp_set_current_user( self::$admin_id );
@@ -344,7 +344,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item_invalid_font_family_id() {
 		wp_set_current_user( self::$admin_id );
@@ -354,7 +354,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -369,7 +369,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Families_Controller::create_item
 	 */
 	public function test_create_item() {
 		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
@@ -390,7 +390,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
+	 * @covers WP_REST_Font_Families_Controller::validate_create_font_face_request
 	 */
 	public function test_create_item_default_theme_json_version() {
 		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
@@ -411,7 +411,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	/**
 	 * @dataProvider data_create_item_invalid_theme_json_version
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Families_Controller::create_item
 	 *
 	 * @param int $theme_json_version Version to test.
 	 */
@@ -440,7 +440,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	/**
 	 * @dataProvider data_create_item_with_default_preview
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::sanitize_font_family_settings
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_family_settings
 	 *
 	 * @param array $settings Settings to test.
 	 */
@@ -484,7 +484,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	/**
 	 * @dataProvider data_create_item_invalid_settings
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_settings
+	 * @covers WP_REST_Font_Families_Controller::validate_create_font_face_settings
 	 *
 	 * @param array $settings Settings to test.
 	 */
@@ -570,7 +570,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Families_Controller::create_item
 	 */
 	public function test_create_item_no_permission() {
 		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
@@ -714,7 +714,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	/**
 	 * @dataProvider data_update_item_invalid_settings
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 *
 	 * @param array $settings Settings to test.
 	 */
@@ -752,7 +752,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_update_slug_not_allowed() {
 		wp_set_current_user( self::$admin_id );
@@ -770,7 +770,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_invalid_font_family_id() {
 		$settings = array_diff_key( self::$default_settings, array( 'slug' => '' ) );
@@ -783,7 +783,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_no_permission() {
 		$settings = array_diff_key( self::$default_settings, array( 'slug' => '' ) );
@@ -803,7 +803,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item() {
 		wp_set_current_user( self::$admin_id );
@@ -817,7 +817,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item_no_trash() {
 		wp_set_current_user( self::$admin_id );
@@ -838,7 +838,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item_invalid_font_family_id() {
 		wp_set_current_user( self::$admin_id );
@@ -848,7 +848,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item_no_permissions() {
 		$font_family_id = self::create_font_family_post();
@@ -865,7 +865,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::prepare_item_for_response
+	 * @covers WP_REST_Font_Families_Controller::prepare_item_for_response
 	 */
 	public function test_prepare_item() {
 		wp_set_current_user( self::$admin_id );
@@ -878,7 +878,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item_schema
+	 * @covers WP_REST_Font_Families_Controller::get_item_schema
 	 */
 	public function test_get_item_schema() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families' );
@@ -892,6 +892,40 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The theme_json_version property should exist in the schema::properties data.' );
 		$this->assertArrayHasKey( 'font_faces', $properties, 'The font_faces property should exist in the schema::properties data.' );
 		$this->assertArrayHasKey( 'font_family_settings', $properties, 'The font_family_settings property should exist in the schema::properties data.' );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Families_Controller::get_item_schema
+	 */
+	public function test_get_item_schema_font_family_settings_should_all_have_sanitize_callbacks() {
+		$schema                      = ( new WP_REST_Font_Families_Controller( 'wp_font_family' ) )->get_item_schema();
+		$font_family_settings_schema = $schema['properties']['font_family_settings'];
+
+		$this->assertArrayHasKey( 'properties', $font_family_settings_schema, 'font_family_settings schema is missing properties.' );
+		$this->assertIsArray( $font_family_settings_schema['properties'], 'font_family_settings properties should be an array.' );
+
+		// arg_options should be removed for each setting property.
+		foreach ( $font_family_settings_schema['properties'] as $property ) {
+			$this->assertArrayHasKey( 'arg_options', $property, 'Setting schema should have arg_options.' );
+			$this->assertArrayHasKey( 'sanitize_callback', $property['arg_options'], 'Setting schema should have a sanitize_callback.' );
+			$this->assertIsCallable( $property['arg_options']['sanitize_callback'], 'sanitize_callback should be callable.' );
+		}
+	}
+
+	/**
+	 * @covers WP_REST_Font_Families_Controller::get_public_item_schema
+	 */
+	public function test_get_public_item_schema_should_not_have_arg_options() {
+		$schema                      = ( new WP_REST_Font_Families_Controller( 'wp_font_family' ) )->get_public_item_schema();
+		$font_family_settings_schema = $schema['properties']['font_family_settings'];
+
+		$this->assertArrayHasKey( 'properties', $font_family_settings_schema, 'font_family_settings schema is missing properties.' );
+		$this->assertIsArray( $font_family_settings_schema['properties'], 'font_family_settings properties should be an array.' );
+
+		// arg_options should be removed for each setting property.
+		foreach ( $font_family_settings_schema['properties'] as $property ) {
+			$this->assertArrayNotHasKey( 'arg_options', $property, 'arg_options should be removed from the schema for each setting.' );
+		}
 	}
 
 	protected function check_font_family_data( $data, $post_id, $links ) {

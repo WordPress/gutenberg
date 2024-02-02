@@ -905,6 +905,40 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$this->assertArrayHasKey( 'font_face_settings', $properties, 'The id property should exist in the schema::properties data.' );
 	}
 
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::get_item_schema
+	 */
+	public function test_get_item_schema_font_face_settings_should_all_have_sanitize_callbacks() {
+		$schema                    = ( new WP_REST_Font_Faces_Controller( 'wp_font_face' ) )->get_item_schema();
+		$font_face_settings_schema = $schema['properties']['font_face_settings'];
+
+		$this->assertArrayHasKey( 'properties', $font_face_settings_schema, 'font_face_settings schema is missing properties.' );
+		$this->assertIsArray( $font_face_settings_schema['properties'], 'font_face_settings properties should be an array.' );
+
+		// arg_options should be removed for each setting property.
+		foreach ( $font_face_settings_schema['properties'] as $property ) {
+			$this->assertArrayHasKey( 'arg_options', $property, 'Setting schema should have arg_options.' );
+			$this->assertArrayHasKey( 'sanitize_callback', $property['arg_options'], 'Setting schema should have a sanitize_callback.' );
+			$this->assertIsCallable( $property['arg_options']['sanitize_callback'], 'sanitize_callback should be callable.' );
+		}
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::get_public_item_schema
+	 */
+	public function test_get_public_item_schema_should_not_have_arg_options() {
+		$schema                    = ( new WP_REST_Font_Faces_Controller( 'wp_font_face' ) )->get_public_item_schema();
+		$font_face_settings_schema = $schema['properties']['font_face_settings'];
+
+		$this->assertArrayHasKey( 'properties', $font_face_settings_schema, 'font_face_settings schema is missing properties.' );
+		$this->assertIsArray( $font_face_settings_schema['properties'], 'font_face_settings properties should be an array.' );
+
+		// arg_options should be removed for each setting property.
+		foreach ( $font_face_settings_schema['properties'] as $property ) {
+			$this->assertArrayNotHasKey( 'arg_options', $property, 'arg_options should be removed from the schema for each setting.' );
+		}
+	}
+
 	protected function check_font_face_data( $data, $post_id, $links ) {
 		self::$post_ids_for_cleanup[] = $post_id;
 		$post                         = get_post( $post_id );
