@@ -21,14 +21,15 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 	 */
 	class WP_Font_Utils {
 		/**
-		 * Format font family names with surrounding quotes when the name contains a space.
+		 * Format font family names.
+		 *
+		 * Adds surrounding quotes to font family names containing spaces and not already quoted.
 		 *
 		 * @since 6.5.0
 		 * @access private
 		 *
-		 * @param string $font_family Font family attribute.
-		 *
-		 * @return string The formatted font family attribute.
+		 * @param string $font_family Font family name(s), comma-separated.
+		 * @return string Formatted font family name(s).
 		 */
 		public static function format_font_family( $font_family ) {
 			if ( $font_family ) {
@@ -76,23 +77,18 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 *     @type string $fontStretch  Optional font stretch, defaults to '100%'.
 		 *     @type string $unicodeRange Optional unicode range, defaults to 'U+0-10FFFF'.
 		 * }
-		 *
 		 * @return string Font face slug.
 		 */
 		public static function get_font_face_slug( $settings ) {
-			$settings = wp_parse_args(
-				$settings,
-				array(
-					'fontFamily'   => '',
-					'fontStyle'    => 'normal',
-					'fontWeight'   => '400',
-					'fontStretch'  => '100%',
-					'unicodeRange' => 'U+0-10FFFF',
-				)
+			$defaults = array(
+				'fontFamily'   => '',
+				'fontStyle'    => 'normal',
+				'fontWeight'   => '400',
+				'fontStretch'  => '100%',
+				'unicodeRange' => 'U+0-10FFFF',
 			);
+			$settings = wp_parse_args( $settings, $defaults );
 
-			// Convert all values to lowercase for comparison.
-			// Font family names may use multibyte characters.
 			$font_family   = mb_strtolower( $settings['fontFamily'] );
 			$font_style    = strtolower( $settings['fontStyle'] );
 			$font_weight   = strtolower( $settings['fontWeight'] );
@@ -100,8 +96,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			$unicode_range = strtoupper( $settings['unicodeRange'] );
 
 			// Convert weight keywords to numeric strings.
-			$font_weight = str_replace( 'normal', '400', $font_weight );
-			$font_weight = str_replace( 'bold', '700', $font_weight );
+			$font_weight = str_replace( array( 'normal', 'bold' ), array( '400', '700' ), $font_weight );
 
 			// Convert stretch keywords to numeric strings.
 			$font_stretch_map = array(
