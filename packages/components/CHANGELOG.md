@@ -28,6 +28,10 @@
 
 -   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
 
+### Internal
+
+-   `Composite`: Removing Reakit `Composite` implementation ([#58620](https://github.com/WordPress/gutenberg/pull/58620)).
+
 ## 25.16.0 (2024-01-24)
 
 ### Enhancements
