@@ -37,7 +37,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					variant="secondary"
 					disabled={ ! inactiveFilters.length }
 				>
-					{ __( 'Add fiter' ) }
+					{ __( 'Add filter' ) }
 				</Button>
 			}
 			style={ {
