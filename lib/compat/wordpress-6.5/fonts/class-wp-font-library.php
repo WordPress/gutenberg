@@ -19,18 +19,27 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 	class WP_Font_Library {
 
 		/**
-		 * Provide the expected mime-type value for font files per-PHP release. Due to differences in the values returned these values differ between PHP versions.
+		 * Font collections storage.
 		 *
-		 * This is necessary until a collection of valid mime-types per-file extension can be provided to 'upload_mimes' filter.
+		 * Holds registered font collections.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $php_version_id The version of PHP to provide mime types for. The default is the current PHP version.
+		 * @var WP_Font_Collection[]
+		 */
+		private static $collections = array();
+
+		/**
+		 * Gets the expected mime types for font files based on PHP version.
 		 *
-		 * @return Array A collection of mime types keyed by file extension.
+		 * Provides the correct mime-type values for font files, which can vary between PHP versions.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param int $php_version_id The PHP version ID for which to provide mime types. Defaults to the current PHP version.
+		 * @return array Associative array of mime types keyed by file extension.
 		 */
 		public static function get_expected_font_mime_types_per_php_version( $php_version_id = PHP_VERSION_ID ) {
-
 			$php_7_ttf_mime_type = $php_version_id >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
 
 			return array(
@@ -42,27 +51,17 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		}
 
 		/**
-		 * Font collections.
+		 * Registers a new font collection.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @var array
+		 * @param string $slug Font collection slug.
+		 * @param array  $args Font collection config options.
+		 *                     See {@see wp_register_font_collection()} for the supported fields.
+		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, or WP_Error object on failure.
 		 */
-		private static $collections = array();
-
-		/**
-		 * Register a new font collection.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @param string $slug         Font collection slug.
-		 * @param array  $data_or_file Font collection data array or a file path or url to a JSON file
-		 *                             containing the font collection.
-		 *                             See {@see wp_register_font_collection()} for the supported fields.
-		 * @return WP_Font_Collection|WP_Error A font collection if registration was successful, else WP_Error.
-		 */
-		public static function register_font_collection( $slug, $data_or_file ) {
-			$new_collection = new WP_Font_Collection( $slug, $data_or_file );
+		public static function register_font_collection( $slug, $args = array() ) {
+			$new_collection = new WP_Font_Collection( $slug, $args );
 
 			if ( self::is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
@@ -82,24 +81,42 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		}
 
 		/**
+		 * Registers a new font collection from a JSON file.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $file_or_url Path or URL to the JSON file containing the font collection data.
+		 * @return WP_Font_Collection|WP_Error WP_Font_Collection object if successful, or WP_Error object on failure.
+		 */
+		public static function register_font_collection_from_json( $file_or_url ) {
+			$args = WP_Font_Collection::load_from_json( $file_or_url );
+			if ( is_wp_error( $args ) ) {
+				return $args;
+			}
+
+			return self::register_font_collection( $args['slug'], $args );
+		}
+
+		/**
 		 * Unregisters a previously registered font collection.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $collection_slug Font collection slug.
-		 * @return bool True if the font collection was unregistered successfully and false otherwise.
+		 * @param string $slug The slug of the font collection to unregister.
+		 * @return bool True on successful unregistration, false otherwise.
 		 */
 		public static function unregister_font_collection( $slug ) {
 			if ( ! self::is_collection_registered( $slug ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Font collection slug. */
-					sprintf( __( 'Font collection "%s" not found.', 'default' ), $slug ),
+					sprintf( __( 'Font collection "%s" not found.', 'gutenberg' ), $slug ),
 					'6.5.0'
 				);
 				return false;
 			}
 			unset( self::$collections[ $slug ] );
+
 			return true;
 		}
 
@@ -108,48 +125,49 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $slug Font collection slug.
-		 * @return bool True if the font collection is registered and false otherwise.
+		 * @param string $slug The slug of the font collection to check.
+		 * @return bool True if registered, false otherwise.
 		 */
 		private static function is_collection_registered( $slug ) {
 			return array_key_exists( $slug, self::$collections );
 		}
 
 		/**
-		 * Gets all the font collections available.
+		 * Retrieves all registered font collections.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @return array List of font collections.
+		 * @return WP_Font_Collection[] Array of WP_Font_Collection objects.
 		 */
 		public static function get_font_collections() {
 			return self::$collections;
 		}
 
 		/**
-		 * Gets a font collection.
+		 * Retrieves a specific font collection.
+		 *
+		 * Returns a font collection object based on its slug, if registered.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $slug Font collection slug.
-		 * @return WP_Font_Collection Font collection object.
+		 * @param string $slug The slug of the font collection to retrieve.
+		 * @return WP_Font_Collection|WP_Error WP_Font_Collection object if found, or WP_Error object on failure.
 		 */
 		public static function get_font_collection( $slug ) {
 			if ( array_key_exists( $slug, self::$collections ) ) {
 				return self::$collections[ $slug ];
 			}
+
 			return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
 		}
 
-
-
 		/**
-		 * Sets the allowed mime types for fonts.
+		 * Sets allowed mime types for font uploads.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $mime_types List of allowed mime types.
-		 * @return array Modified upload directory.
+		 * @param array $mime_types Current array of allowed mime types.
+		 * @return array Updated array of allowed mime types including font mime types.
 		 */
 		public static function set_allowed_mime_types( $mime_types ) {
 			return array_merge( $mime_types, self::get_expected_font_mime_types_per_php_version() );
