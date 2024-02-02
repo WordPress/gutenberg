@@ -98,39 +98,44 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string}  href              The page href.
-		 * @param {Object}  [options]         Options object.
-		 * @param {boolean} [options.force]   If true, it forces re-fetching the
-		 *                                    URL.
-		 * @param {string}  [options.html]    HTML string to be used instead of
-		 *                                    fetching the requested URL.
-		 * @param {boolean} [options.replace] If true, it replaces the current
-		 *                                    entry in the browser session
-		 *                                    history.
-		 * @param {number}  [options.timeout] Time until the navigation is
-		 *                                    aborted, in milliseconds. Default
-		 *                                    is 10000.
+		 * @param {string}  href                           The page href.
+		 * @param {Object}  [options]                      Options object.
+		 * @param {boolean} [options.force]                If true, it forces re-fetching the URL.
+		 * @param {string}  [options.html]                 HTML string to be used instead of fetching the requested URL.
+		 * @param {boolean} [options.replace]              If true, it replaces the current entry in the browser session history.
+		 * @param {number}  [options.timeout]              Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param {boolean} [options.topLoadingBar]        Whether the top loading bar should be shown while navigating. Default to `true`.
+		 * @param {boolean} [options.screenReaderAnnounce] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
-		 * @return {Promise} Promise that resolves once the navigation is
-		 *                   completed or aborted.
+		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href, options = {} ) {
 			const url = cleanUrl( href );
 			const { navigation } = state;
+			const {
+				topLoadingBar = true,
+				screenReaderAnnounce = true,
+				timeout = 10000,
+			} = options;
+
 			navigatingTo = href;
 			actions.prefetch( url, options );
 
 			// Create a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
 			const timeoutPromise = new Promise( ( resolve ) =>
-				setTimeout( resolve, options.timeout ?? 10000 )
+				setTimeout( resolve, timeout )
 			);
 
 			// Don't update the navigation status immediately, wait 400 ms.
-			const timeout = setTimeout( () => {
-				if ( navigatingTo === href ) {
+			const loadingTimeout = setTimeout( () => {
+				if ( navigatingTo !== href ) return;
+
+				if ( topLoadingBar ) {
 					navigation.hasStarted = true;
 					navigation.hasFinished = false;
+				}
+				if ( screenReaderAnnounce ) {
 					navigation.message = navigation.texts.loading;
 				}
 			}, 400 );
@@ -141,7 +146,7 @@ export const { state, actions } = store( 'core/router', {
 			] );
 
 			// Dismiss loading message if it hasn't been added yet.
-			clearTimeout( timeout );
+			clearTimeout( loadingTimeout );
 
 			// Once the page is fetched, the destination URL could have changed
 			// (e.g., by clicking another link in the meantime). If so, bail
@@ -156,19 +161,23 @@ export const { state, actions } = store( 'core/router', {
 
 				state.url = href;
 
-				// Update the navigation status once the render of the new page
+				// Update the navigation status once the the new page rendering
 				// has been completed.
-				navigation.hasStarted = false;
-				navigation.hasFinished = true;
+				if ( topLoadingBar ) {
+					navigation.hasStarted = false;
+					navigation.hasFinished = true;
+				}
 
-				// Announce that the page has been loaded. If the message is the
-				// same, we use a no-break space similar to the @wordpress/a11y
-				// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
-				navigation.message =
-					navigation.texts.loaded +
-					( navigation.message === navigation.texts.loaded
-						? '\u00A0'
-						: '' );
+				if ( screenReaderAnnounce ) {
+					// Announce that the page has been loaded. If the message is the
+					// same, we use a no-break space similar to the @wordpress/a11y
+					// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
+					navigation.message =
+						navigation.texts.loaded +
+						( navigation.message === navigation.texts.loaded
+							? '\u00A0'
+							: '' );
+				}
 			} else {
 				window.location.assign( href );
 				// Await a promise that won't resolve to prevent any potential
