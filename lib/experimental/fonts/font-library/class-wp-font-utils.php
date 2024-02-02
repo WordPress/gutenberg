@@ -27,6 +27,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @access private
 		 *
 		 * @param string $font_family Font family attribute.
+		 * 
 		 * @return string The formatted font family attribute.
 		 */
 		public static function format_font_family( $font_family ) {
@@ -75,6 +76,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 *     @type string $fontStretch  Optional font stretch, defaults to '100%'.
 		 *     @type string $unicodeRange Optional unicode range, defaults to 'U+0-10FFFF'.
 		 * }
+		 * 
 		 * @return string Font face slug.
 		 */
 		public static function get_font_face_slug( $settings ) {
@@ -143,6 +145,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 *
 		 * @param array $tree The data to sanitize.
 		 * @param array $schema The schema used for sanitization.
+		 * 
 		 * @return array The sanitized data.
 		 */
 		public static function sanitize_from_schema( $tree, $schema ) {
@@ -193,6 +196,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @since 6.5.0
 		 * @param mixed $value The value to sanitize.
 		 * @param mixed $sanitizer The sanitizer to apply.
+		 * 
 		 * @return mixed The sanitized value.
 		 */
 		private static function apply_sanitizer( $value, $sanitizer ) {
