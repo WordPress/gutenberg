@@ -242,7 +242,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 		}
 
 		return array(
-			'body'     => json_encode( self::$mock_collection_data ),
+			'body'     => wp_json_encode( self::$mock_collection_data ),
 			'response' => array(
 				'code' => 200,
 			),
