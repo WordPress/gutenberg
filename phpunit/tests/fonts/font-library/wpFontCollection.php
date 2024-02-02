@@ -121,7 +121,8 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 
 		$collection = new WP_Font_Collection('my-collection', $mock_file );
 
-		$data = $collection->get_data();
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Testing error response returned by `get_data()`, not the underlying error from `wp_json_file_decode`.
+		$data = @$collection->get_data();
 
 	 	$this->assertWPError( $data, 'Error is not returned when invalid json file contents.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_decode_error' );
