@@ -64,7 +64,8 @@ const SidebarContent = ( {
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
-	// selected tab and browser focus can become separated in an unexpected way.
+	// selected tab and browser focus can become separated in an unexpected way
+	// (e.g the "block" tab is focused, but the "post" tab is selected).
 	useEffect( () => {
 		const tabsElements = Array.from(
 			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
