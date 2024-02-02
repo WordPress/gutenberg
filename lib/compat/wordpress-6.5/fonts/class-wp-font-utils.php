@@ -2,7 +2,7 @@
 /**
  * Font Utils class.
  *
- * This file contains utils related to the Font Library.
+ * Provides utility functions for working with font families.
  *
  * @package    WordPress
  * @subpackage Font Library
