@@ -87,4 +87,4 @@ This transformation process includes minification, transpilation from modern Jav
 
 ## Additional resources
 
-- [The diagram featuring the file structure of a block](https://excalidraw.com/#json=YYpeR-kY1ZMhFKVZxGhMi,mVZewfwNAh_oL-7bj4gmdw)
+- [Diagram featuring the file structure of a block](https://excalidraw.com/#json=YYpeR-kY1ZMhFKVZxGhMi,mVZewfwNAh_oL-7bj4gmdw)
