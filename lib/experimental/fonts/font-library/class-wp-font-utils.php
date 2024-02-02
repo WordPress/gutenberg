@@ -150,7 +150,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 */
 		public static function sanitize_from_schema( $tree, $schema ) {
 			if ( ! is_array( $tree ) || ! is_array( $schema ) ) {
-				return is_array( $tree ) ? array() : $tree;
+				return array();
 			}
 
 			foreach ( $tree as $key => $value ) {
@@ -174,9 +174,6 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 					} else {
 						// If it is an associative or indexed array., process as a single object.
 						$tree[ $key ] = self::sanitize_from_schema( $value, $schema[ $key ] );
-						if ( empty( $tree[ $key ] ) ) {
-							unset( $tree[ $key ] );
-						}
 					}
 				} elseif ( ! $is_value_array && $is_schema_array ) {
 					// If the value is not an array but the schema is, remove the key.
@@ -184,6 +181,11 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				} elseif ( ! $is_schema_array ) {
 					// If the schema is not an array, apply the sanitizer to the value.
 					$tree[ $key ] = self::apply_sanitizer( $value, $schema[ $key ] );
+				}
+
+				// Remove keys with null/empty values.
+				if ( empty( $tree[ $key ] ) ) {
+					unset( $tree[ $key ] );
 				}
 			}
 

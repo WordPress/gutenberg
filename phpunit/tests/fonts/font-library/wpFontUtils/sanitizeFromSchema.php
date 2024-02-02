@@ -40,6 +40,7 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 					'src'        => 'https://wordpress.org/example.json/stylescriptalert(xss)/script',
 				),
 			),
+
 			'Nested associative arrays'    => array(
 				'data'     => array(
 					'slug'       => 'open      -       sans</style><script>alert("xss")</script>',
@@ -237,6 +238,46 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 					),
 				),
 			),
+
+			'With empty structure'  => array(
+				'data'     => array(
+					'slug'       => 'open-sans',
+					'nested'	=>	array(
+						'key1'    => 'value</style><script>alert("xss")</script>',
+						'nested2' => array(
+							'key2' => 'value</style><script>alert("xss")</script>',
+							'nested3' => array(
+								'nested4' => array(
+								),
+							),
+						),
+					),
+				),
+				'schema'   => array(
+					'slug'       => 'sanitize_title',
+					'nested'     => array(
+						'key1'    => 'sanitize_text_field',
+						'nested2' => array(
+							'key2' => 'sanitize_text_field',
+							'nested3' => array(
+								'key3' => 'sanitize_text_field',
+								'nested4' => array(
+									'key4' => 'sanitize_text_field',
+								),
+							),
+						),
+					),
+				),
+				'expected' => array(
+					'slug'       => 'open-sans',
+					'nested'	=>	array(
+						'key1'    => 'value',
+						'nested2' => array(
+							'key2' => 'value',
+						),
+					),
+				),
+			),
 		);
 	}
 
@@ -249,7 +290,7 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 
 		$result = WP_Font_Utils::sanitize_from_schema( $data, $schema );
 
-		$this->assertSame( $result, $data );
+		$this->assertSame( $result, array() );
 	}
 
 
