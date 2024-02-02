@@ -20,7 +20,6 @@ on:
     issue_comment:
         type:
             - created
-            - deleted
     # This event will run everytime a new PR review is initially submitted.
     pull_request_review:
         types:
@@ -29,7 +28,6 @@ on:
     pull_request_review_comment:
         types:
             - created
-            - deleted
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -56,17 +54,20 @@ jobs:
             pull-requests: write
             contents: read
         timeout-minutes: 20
-        # The job should only run if:
+        # The job will run when pull requests are open, ready for review and:
         #
-        # - A pull request review is created or commented on.
-        # - An issue comment is added to a pull request.
-        # - A pull request is opened, synchronized, or reopened.
+        # - A comment is added to the pull request.
+        # - A review is created or commented on.
+        # - The pull request is opened, synchronized, marked ready for review, or reopened.
         # - The `props-bot` label is added to the pull request.
         if: |
-            contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
-            ( github.event_name == 'issue_comment' && github.event.issue.pull_request ) ||
-            github.event_name == 'pull_request_target' && github.event.action != 'labeled' && ! github.pull_request.draft && github.pull_request.state == 'open' ||
-            'props-bot' == github.event.label.name
+            (
+              github.event_name == 'issue_comment' && github.event.issue.pull_request ||
+              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
+              github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
+              'props-bot' == github.event.label.name
+            ) &&
+            ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
         steps:
             - name: Gather a list of contributors
