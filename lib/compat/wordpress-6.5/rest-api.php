@@ -21,6 +21,16 @@ function gutenberg_register_global_styles_revisions_endpoints() {
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
 
 /**
+ * Registers the Hooked Blocks REST API routes.
+ */
+function gutenberg_register_hooked_blocks_endpoint() {
+	$hooked_blocks_controller = new Gutenberg_REST_Hooked_Blocks_Controller_6_5();
+	$hooked_blocks_controller->register_routes();
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_hooked_blocks_endpoint' );
+
+/**
  * Registers additional fields for wp_template and wp_template_part rest api.
  *
  * @access private

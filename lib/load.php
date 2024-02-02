@@ -43,6 +43,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.5 compat.
 	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-global-styles-revisions-controller-6-5.php';
+	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-hooked-blocks-controller-6-5.php';
 	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
 
 	// Plugin specific code.
