@@ -104,15 +104,13 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			}
 
 			// Set defaults for optional properties.
-			$data = wp_parse_args(
+			return wp_parse_args(
 				$data,
 				array(
 					'description' => '',
 					'categories'  => array(),
 				)
 			);
-
-			return $data;
 		}
 
 		/**
