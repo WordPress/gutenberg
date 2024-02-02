@@ -142,7 +142,7 @@ export type LegacyCustomSelectProps = {
 	/**
 	 * The size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | 'small' | '__unstable-large';
 	/**
@@ -157,7 +157,7 @@ export type LegacyCustomSelectProps = {
 	__experimentalShowSelectedHint?: boolean;
 	/**
 	 * Opt-in prop for an unconstrained width style which became the default in
-	 * WordPress 6.4. The prop is no longer needed and can be safely removed.
+	 * WordPress 6.5. The prop is no longer needed and can be safely removed.
 	 *
 	 * @deprecated
 	 */

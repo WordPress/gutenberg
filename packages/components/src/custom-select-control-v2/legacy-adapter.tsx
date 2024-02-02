@@ -11,10 +11,9 @@ function isLegacy( props: any ): props is LegacyCustomSelectProps {
 }
 
 export function DefaultExport(
-	props: WordPressComponentProps<
-		LegacyCustomSelectProps | CustomSelectProps,
-		'button'
-	>
+	props:
+		| LegacyCustomSelectProps
+		| WordPressComponentProps< CustomSelectProps, 'button' >
 ) {
 	if ( isLegacy( props ) ) {
 		return <_LegacyCustomSelect { ...props } />;
