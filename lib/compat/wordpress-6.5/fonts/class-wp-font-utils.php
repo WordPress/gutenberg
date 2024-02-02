@@ -137,7 +137,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		}
 
 		/**
-		 * Sanitize a tree of data using an schema that defines the sanitization to apply to each key.
+		 * Sanitize a tree of data using a schema that defines the sanitization to apply to each key.
 		 *
 		 * It removes the keys not in the schema and applies the sanitizer to the values.
 		 *
