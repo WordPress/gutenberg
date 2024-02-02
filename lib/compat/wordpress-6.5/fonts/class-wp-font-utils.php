@@ -74,7 +74,6 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @access private
 		 *
 		 * @link https://drafts.csswg.org/css-fonts/#font-style-matching
-		 * @uses sanitize_text_field()
 		 *
 		 * @param array $settings {
 		 *     Font face settings.
