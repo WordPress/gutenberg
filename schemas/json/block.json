@@ -680,7 +680,8 @@
 					"description": "Indicates if the block is using Interactivity API features.",
 					"oneOf": [
 						{
-							"type": "boolean"
+							"type": "boolean",
+							"default": false
 						},
 						{
 							"type": "object",
