@@ -756,24 +756,26 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	}
 
 	/**
-	 * @dataProvider data_create_item_sanitize_font_family
+	 * @dataProvider data_sanitize_font_face_settings
 	 *
 	 * @covers WP_REST_Font_Face_Controller::sanitize_font_face_settings
 	 *
-	 * @param string $font_family_setting Setting to test.
-	 * @param string $expected            Expected result.
+	 * @param string $settings Settings to test.
+	 * @param string $expected Expected settings result.
 	 */
-	public function test_create_item_sanitize_font_family( $font_family_setting, $expected ) {
-		$settings = array_merge( self::$default_settings, array( 'fontFamily' => $font_family_setting ) );
+	public function test_create_item_sanitize_font_face_settings( $settings, $expected ) {
+		$settings = array_merge( self::$default_settings, $settings );
+		$expected = array_merge( self::$default_settings, $expected );
 
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
 		$request->set_param( 'font_face_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		wp_delete_post( $data['id'], true );
 
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
-		$this->assertSame( $expected, $data['font_face_settings']['fontFamily'], 'The response fontFamily should match.' );
+		$this->assertSame( $expected, $data['font_face_settings'], 'The response font_face_settings should match.' );
 	}
 
 	/**
@@ -781,19 +783,65 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	 *
 	 * @return array
 	 */
-	public function data_create_item_sanitize_font_family() {
+	public function data_sanitize_font_face_settings() {
 		return array(
-			'multiword font with integer' => array(
-				'font_family_setting' => 'Libre Barcode 128 Text',
-				'expected'            => '"Libre Barcode 128 Text"',
+			'settings with tags, extra whitespace, new lines' => array(
+				'settings' => array(
+					'fontFamily'            => "   Open   Sans</style><script>alert('XSS');</script>\n    ",
+					'fontStyle'             => "   oblique 20deg 50deg</style><script>alert('XSS');</script>\n    ",
+					'fontWeight'            => "   200</style><script>alert('XSS');</script>\n    ",
+					'src'                   => "   https://example.com/</style><script>alert('XSS');</script>      ",
+					'fontStretch'           => "   expanded</style><script>alert('XSS');</script>\n    ",
+					'ascentOverride'        => "   70%</style><script>alert('XSS');</script>\n    ",
+					'descentOverride'       => "   30%</style><script>alert('XSS');</script>\n    ",
+					'fontVariant'           => "   normal</style><script>alert('XSS');</script>\n    ",
+					'fontFeatureSettings'   => "   \"swsh\" 2</style><script>alert('XSS');</script>\n    ",
+					'fontVariationSettings' => "   \"xhgt\" 0.7</style><script>alert('XSS');</script>\n    ",
+					'lineGapOverride'       => "   10%</style><script>alert('XSS');</script>\n    ",
+					'sizeAdjust'            => "   90%</style><script>alert('XSS');</script>\n    ",
+					'unicodeRange'          => "   U+0025-00FF, U+4??</style><script>alert('XSS');</script>\n    ",
+					'preview'               => "   https://example.com/</style><script>alert('XSS');</script>      ",
+				),
+				'expected' => array(
+					'fontFamily'            => '"Open Sans"',
+					'fontStyle'             => 'oblique 20deg 50deg',
+					'fontWeight'            => '200',
+					'src'                   => 'https://example.com//stylescriptalert(\'XSS\');/script%20%20%20%20%20%20',
+					'fontStretch'           => 'expanded',
+					'ascentOverride'        => '70%',
+					'descentOverride'       => '30%',
+					'fontVariant'           => 'normal',
+					'fontFeatureSettings'   => '"swsh" 2',
+					'fontVariationSettings' => '"xhgt" 0.7',
+					'lineGapOverride'       => '10%',
+					'sizeAdjust'            => '90%',
+					'unicodeRange'          => 'U+0025-00FF, U+4??',
+					'preview'               => 'https://example.com//stylescriptalert(\'XSS\');/script%20%20%20%20%20%20',
+				),
 			),
-			'multiword font'              => array(
-				'font_family_setting' => 'B612 Mono',
-				'expected'            => '"B612 Mono"',
+			'multiword font family name with integer' => array(
+				'settings' => array(
+					'fontFamily' => 'Libre Barcode 128 Text',
+				),
+				'expected' => array(
+					'fontFamily' => '"Libre Barcode 128 Text"',
+				),
 			),
-			'comma-separated fonts'       => array(
-				'font_family_setting' => 'Open Sans, Noto Sans, sans-serif',
-				'expected'            => '"Open Sans", "Noto Sans", sans-serif',
+			'multiword font family name'              => array(
+				'settings' => array(
+					'fontFamily' => 'B612 Mono',
+				),
+				'expected' => array(
+					'fontFamily' => '"B612 Mono"',
+				),
+			),
+			'comma-separated font family names'       => array(
+				'settings' => array(
+					'fontFamily' => 'Open Sans, Noto Sans, sans-serif',
+				),
+				'expected' => array(
+					'fontFamily' => '"Open Sans", "Noto Sans", sans-serif',
+				),
 			),
 		);
 	}

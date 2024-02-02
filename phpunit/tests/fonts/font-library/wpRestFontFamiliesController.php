@@ -482,6 +482,84 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
+	 * @dataProvider data_sanitize_font_family_settings
+	 *
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_family_settings
+	 *
+	 * @param string $settings Font family settings to test.
+	 * @param string $expected Expected settings result.
+	 */
+	public function test_create_item_santize_font_family_settings( $settings, $expected ) {
+		$settings = array_merge( self::$default_settings, $settings );
+		$expected = array_merge( self::$default_settings, $expected );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		static::$post_ids_to_cleanup[] = $data['id'];
+
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
+		$this->assertSame( $expected, $data['font_family_settings'], 'The response font_family_settings should match.' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_sanitize_font_family_settings() {
+		return array(
+			'settings with tags, extra whitespace, new lines' => array(
+				'settings' => array(
+					'name'       => "   Opening   Sans</style><script>alert('XSS');</script>\n    ",
+					'slug'       => "   OPENing SanS </style><script>alert('XSS');</script>\n    ",
+					'fontFamily' => "   Opening   Sans</style><script>alert('XSS');</script>\n    ",
+					'preview'    => "   https://example.com/</style><script>alert('XSS');</script>      ",
+				),
+				'expected' => array(
+					'name'       => 'Opening Sans',
+					'slug'       => 'opening-sans-alertxss',
+					'fontFamily' => '"Opening Sans"',
+					'preview'    => "https://example.com//stylescriptalert('XSS');/script%20%20%20%20%20%20",
+				),
+			),
+			'multiword font family name with integer' => array(
+				'settings' => array(
+					'slug'       => 'libre-barcode-128-text',
+					'fontFamily' => 'Libre Barcode 128 Text',
+				),
+				'expected' => array(
+					'slug'       => 'libre-barcode-128-text',
+					'fontFamily' => '"Libre Barcode 128 Text"',
+				),
+			),
+			'multiword font family name'              => array(
+				'settings' => array(
+					'slug'       => 'b612-mono',
+					'fontFamily' => 'B612 Mono',
+				),
+				'expected' => array(
+					'slug'       => 'b612-mono',
+					'fontFamily' => '"B612 Mono"',
+				),
+			),
+			'comma-separated font family names'       => array(
+				'settings' => array(
+					'slug'       => 'open-sans-noto-sans',
+					'fontFamily' => 'Open Sans, Noto Sans, sans-serif',
+				),
+				'expected' => array(
+					'slug'       => 'open-sans-noto-sans',
+					'fontFamily' => '"Open Sans", "Noto Sans", sans-serif',
+				),
+			),
+		);
+	}
+
+	/**
 	 * @dataProvider data_create_item_invalid_settings
 	 *
 	 * @covers WP_REST_Font_Families_Controller::validate_create_font_face_settings
@@ -669,46 +747,30 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @dataProvider data_update_item_santize_font_family
+	 * @dataProvider data_sanitize_font_family_settings
 	 *
-	 * @covers WP_REST_Font_Families_Controller::sanitize_font_face_settings
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_family_settings
 	 *
-	 * @param string $font_family_setting Font family setting to test.
-	 * @param string $expected            Expected result.
+	 * @param string $settings Font family settings to test.
+	 * @param string $expected Expected settings result.
 	 */
-	public function test_update_item_santize_font_family( $font_family_setting, $expected ) {
-		wp_set_current_user( self::$admin_id );
+	public function test_update_item_santize_font_family_settings( $settings, $expected ) {
+		// Unset/modify slug from the data provider, since we're updating rather than creating.
+		unset( $settings['slug'] );
+		$initial_settings = array( 'slug' => 'open-sans-update' );
+		$expected         = array_merge( self::$default_settings, $expected, $initial_settings );
 
-		$font_family_id = self::create_font_family_post();
-		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
-		$request->set_param( 'font_family_settings', wp_json_encode( array( 'fontFamily' => $font_family_setting ) ) );
+		wp_set_current_user( self::$admin_id );
+		$font_family_id                = self::create_font_family_post( $initial_settings );
+		static::$post_ids_to_cleanup[] = $font_family_id;
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
-		$this->assertSame( $expected, $data['font_family_settings']['fontFamily'], 'The font family should match.' );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_update_item_santize_font_family() {
-		return array(
-			'multiword font with integer' => array(
-				'font_family_setting' => 'Libre Barcode 128 Text',
-				'expected'            => '"Libre Barcode 128 Text"',
-			),
-			'multiword font'              => array(
-				'font_family_setting' => 'B612 Mono',
-				'expected'            => '"B612 Mono"',
-			),
-			'comma-separated fonts'       => array(
-				'font_family_setting' => 'Open Sans, Noto Sans, sans-serif',
-				'expected'            => '"Open Sans", "Noto Sans", sans-serif',
-			),
-		);
+		$this->assertSame( $expected, $data['font_family_settings'], 'The response font_family_settings should match.' );
 	}
 
 	/**

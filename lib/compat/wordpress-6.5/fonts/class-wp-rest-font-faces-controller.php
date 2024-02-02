@@ -192,6 +192,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 
 			foreach ( $srcs as $src ) {
 				// Check that each src is a non-empty string.
+				$src = ltrim( $src );
 				if ( empty( $src ) ) {
 					return new WP_Error(
 						'rest_invalid_param',
@@ -833,6 +834,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @return string Sanitized $src value.
 		 */
 		protected function sanitize_src( $value ) {
+			$value = ltrim( $value );
 			return false === wp_http_validate_url( $value ) ? (string) $value : sanitize_url( $value );
 		}
 
