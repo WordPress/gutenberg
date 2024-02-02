@@ -5,7 +5,7 @@ import { render, store, privateApis } from '@wordpress/interactivity';
 
 const { directivePrefix, getRegionRootFragment, initialVdom, toVdom } =
 	privateApis(
-		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.'
+		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 	);
 
 // The cache of visited and prefetched pages.
