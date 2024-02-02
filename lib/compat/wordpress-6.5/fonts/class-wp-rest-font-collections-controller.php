@@ -157,15 +157,15 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			return $item;
 		}
 
-		/*
-		* Prepare a single collection output for response.
-		*
-		* @since 6.5.0
-		*
-		* @param WP_Font_Collection $collection Collection object.
-		* @param WP_REST_Request    $request    Request object.
-		* @return array|WP_Error
-		*/
+		/**
+		 * Prepare a single collection output for response.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_Font_Collection $collection Collection object.
+		 * @param WP_REST_Request    $request    Request object.
+		 * @return array|WP_Error
+		 */
 		public function prepare_item_for_response( $collection, $request ) {
 			$fields = $this->get_fields_for_response( $request );
 			$item   = array();
