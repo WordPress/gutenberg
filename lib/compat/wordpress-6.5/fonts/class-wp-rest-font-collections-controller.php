@@ -84,7 +84,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			if ( $page > $max_pages && $total_items > 0 ) {
 				return new WP_Error(
 					'rest_post_invalid_page_number',
-					__( 'The page number requested is larger than the number of pages available.', 'default' ),
+					__( 'The page number requested is larger than the number of pages available.' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -148,24 +148,18 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 				return $collection;
 			}
 
-			$item = $this->prepare_item_for_response( $collection, $request );
-
-			if ( is_wp_error( $item ) ) {
-				return $item;
-			}
-
-			return $item;
+			return $this->prepare_item_for_response( $collection, $request );
 		}
 
 		/**
-		 * Prepare a single collection output for response.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @param WP_Font_Collection $collection Collection object.
-		 * @param WP_REST_Request    $request    Request object.
-		 * @return array|WP_Error
-		 */
+		* Prepare a single collection output for response.
+		*
+		* @since 6.5.0
+		*
+		* @param WP_Font_Collection $collection Collection object.
+		* @param WP_REST_Request    $request    Request object.
+		* @return WP_REST_Response Response object.
+		*/
 		public function prepare_item_for_response( $collection, $request ) {
 			$fields = $this->get_fields_for_response( $request );
 			$item   = array();
@@ -195,9 +189,9 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			 *
 			 * @since 6.5.0
 			 *
-			 * @param WP_REST_Response $response The response object.
+			 * @param WP_REST_Response   $response    The response object.
 			 * @param WP_Font_Collection $collection  The Font Collection object.
-			 * @param WP_REST_Request  $request  Request used to generate the response.
+			 * @param WP_REST_Request    $request     Request used to generate the response.
 			 */
 			return apply_filters( 'rest_prepare_font_collection', $response, $collection, $request );
 		}
@@ -262,7 +256,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		 * @return array Links for the given font collection.
 		 */
 		protected function prepare_links( $collection ) {
-			$links = array(
+			return array(
 				'self'       => array(
 					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $collection->slug ) ),
 				),
@@ -270,7 +264,6 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 					'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 				),
 			);
-			return $links;
 		}
 
 		/**
