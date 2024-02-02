@@ -681,6 +681,7 @@
 					"oneOf": [
 						{
 							"type": "boolean",
+							"description": "Indicates whether the block is using the Interactivity API directives.",
 							"default": false
 						},
 						{
@@ -693,7 +694,7 @@
 								},
 								"interactive": {
 									"type": "boolean",
-									"description": "Indicates if the block has directives and interactions.",
+									"description": "Indicates whether the block is using the Interactivity API directives.",
 									"default": false
 								}
 							}
