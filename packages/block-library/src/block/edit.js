@@ -144,7 +144,7 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 		for ( const attributeKey of attributes ) {
 			if (
 				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				defaultValues[ blockId ].values[ attributeKey ]
 			) {
 				content[ blockId ] ??= { values: {} };
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
