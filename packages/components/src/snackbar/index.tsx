@@ -106,7 +106,7 @@ function UnforwardedSnackbar(
 	if ( actions && actions.length > 1 ) {
 		// We need to inform developers that snackbar only accepts 1 action.
 		warning(
-			'Snackbar can only have 1 action, use Notice if your message require many messages'
+			'Snackbar can only have one action. Use Notice if your message requires many actions.'
 		);
 		// return first element only while keeping it inside an array
 		actions = [ actions[ 0 ] ];
