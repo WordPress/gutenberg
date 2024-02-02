@@ -1,8 +1,8 @@
 <?php
 /**
- * Fonts Family Utils class.
+ * Font Utils class.
  *
- * This file contains utils fot Font Family class.
+ * This file contains utils related to the Font Library.
  *
  * @package    WordPress
  * @subpackage Font Library
@@ -27,6 +27,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @access private
 		 *
 		 * @param string $font_family Font family attribute.
+		 *
 		 * @return string The formatted font family attribute.
 		 */
 		public static function format_font_family( $font_family ) {
@@ -75,6 +76,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 *     @type string $fontStretch  Optional font stretch, defaults to '100%'.
 		 *     @type string $unicodeRange Optional unicode range, defaults to 'U+0-10FFFF'.
 		 * }
+		 *
 		 * @return string Font face slug.
 		 */
 		public static function get_font_face_slug( $settings ) {
@@ -132,6 +134,81 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			);
 
 			return join( ';', $slug_elements );
+		}
+
+		/**
+		 * Sanitize a tree of data using an schema that defines the sanitization to apply to each key.
+		 *
+		 * It removes the keys not in the schema and applies the sanitizer to the values.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @access private
+		 *
+		 * @param array $tree The data to sanitize.
+		 * @param array $schema The schema used for sanitization.
+		 *
+		 * @return array The sanitized data.
+		 */
+		public static function sanitize_from_schema( $tree, $schema ) {
+			if ( ! is_array( $tree ) || ! is_array( $schema ) ) {
+				return array();
+			}
+
+			foreach ( $tree as $key => $value ) {
+				// Remove keys not in the schema or with null/empty values.
+				if ( ! array_key_exists( $key, $schema ) ) {
+					unset( $tree[ $key ] );
+					continue;
+				}
+
+				$is_value_array  = is_array( $value );
+				$is_schema_array = is_array( $schema[ $key ] );
+
+				if ( $is_value_array && $is_schema_array ) {
+					if ( wp_is_numeric_array( $value ) ) {
+						// If indexed, process each item in the array.
+						foreach ( $value as $item_key => $item_value ) {
+							$tree[ $key ][ $item_key ] = isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] )
+								? self::sanitize_from_schema( $item_value, $schema[ $key ][0] )
+								: self::apply_sanitizer( $item_value, $schema[ $key ][0] );
+						}
+					} else {
+						// If it is an associative or indexed array., process as a single object.
+						$tree[ $key ] = self::sanitize_from_schema( $value, $schema[ $key ] );
+					}
+				} elseif ( ! $is_value_array && $is_schema_array ) {
+					// If the value is not an array but the schema is, remove the key.
+					unset( $tree[ $key ] );
+				} elseif ( ! $is_schema_array ) {
+					// If the schema is not an array, apply the sanitizer to the value.
+					$tree[ $key ] = self::apply_sanitizer( $value, $schema[ $key ] );
+				}
+
+				// Remove keys with null/empty values.
+				if ( empty( $tree[ $key ] ) ) {
+					unset( $tree[ $key ] );
+				}
+			}
+
+			return $tree;
+		}
+
+		/**
+		 * Apply the sanitizer to the value.
+		 *
+		 * @since 6.5.0
+		 * @param mixed $value The value to sanitize.
+		 * @param mixed $sanitizer The sanitizer to apply.
+		 *
+		 * @return mixed The sanitized value.
+		 */
+		private static function apply_sanitizer( $value, $sanitizer ) {
+			if ( null === $sanitizer ) {
+				return $value;
+
+			}
+			return call_user_func( $sanitizer, $value );
 		}
 	}
 }
