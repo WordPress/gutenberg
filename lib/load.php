@@ -160,18 +160,18 @@ require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 // @core-merge: do not merge the BC layer files into WordPress Core.
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-fonts-provider.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-fonts-utils.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-fonts.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-fonts-provider-local.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-fonts-resolver.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/webfonts-deprecations.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-webfonts-utils.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-webfonts-provider.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-webfonts.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/bc-layer/class-wp-web-fonts.php';
+require __DIR__ . '/experimental/fon/font-face/bc-layer/class-wp-fonts-provider.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-utils.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider-local.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-resolver.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
+require __DIR__ . '/experimental/font-face/bc-layer/webfonts-deprecations.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts-utils.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts-provider.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts-provider-local.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts.php';
+require __DIR__ . '/experimental/font-face/bc-layer/class-wp-web-fonts.php';
 
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
