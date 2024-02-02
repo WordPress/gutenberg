@@ -61,7 +61,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filterComponents = [
 		addFilter,
 		...filters.map( ( filter ) => {
-			if ( ! filter.isVisible || view.type === LAYOUT_LIST ) {
+			if ( ! filter.isVisible ) {
 				return null;
 			}
 
