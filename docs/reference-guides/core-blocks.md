@@ -60,8 +60,8 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 -	**Name:** core/buttons
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, interactivity (clientNavigation, ~~interactive~~), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:**
+-	**Supports:** align (full, wide), anchor, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** 
 
 ## Calendar
 
@@ -171,8 +171,8 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Name:** core/comment-template
 -	**Category:** design
 -	**Parent:** core/comments
--	**Supports:** align, interactivity (clientNavigation, ~~interactive~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** 
 
 ## Comments
 
@@ -210,8 +210,8 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
 -	**Parent:** core/comments-pagination
--	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation, ~~interactive~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** 
 
 ## Comments Previous Page
 
@@ -274,8 +274,8 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/footnotes
 -	**Category:** text
--	**Supports:** color (background, link, text), interactivity (clientNavigation, ~~interactive~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
--	**Attributes:**
+-	**Supports:** color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
 
 ## Form
 
@@ -304,7 +304,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:**
+-	**Supports:** 
 -	**Attributes:** type
 
 ## Form Submit Button
@@ -314,8 +314,8 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** interactivity (clientNavigation, ~~interactive~~)
--	**Attributes:**
+-	**Supports:** 
+-	**Attributes:** 
 
 ## Classic
 
@@ -490,8 +490,8 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Name:** core/nextpage
 -	**Category:** design
 -	**Parent:** core/post-content
--	**Supports:** interactivity (clientNavigation, ~~interactive~~), ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:**
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
+-	**Attributes:** 
 
 ## Page List
 
@@ -603,7 +603,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Date
 
@@ -648,8 +648,8 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** core/post-template
 -	**Category:** theme
 -	**Parent:** core/query
--	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation, ~~interactive~~), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** 
 
 ## Post Terms
 
@@ -713,8 +713,8 @@ Contains the block elements used to render content when no query results are fou
 -	**Name:** core/query-no-results
 -	**Category:** theme
 -	**Parent:** core/query
--	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation, ~~interactive~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** 
 
 ## Pagination
 
@@ -722,7 +722,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow, showLabel
 
 ## Next Page
