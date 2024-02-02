@@ -18,6 +18,7 @@ import {
 	__experimentalVStack as VStack,
 	DropZone,
 	FlexItem,
+	FocalPointPicker,
 	MenuItem,
 	VisuallyHidden,
 	__experimentalItemGroup as ItemGroup,
@@ -367,6 +368,64 @@ function backgroundSizeHelpText( value ) {
 	return __( 'Set a fixed width.' );
 }
 
+const coordsToBackgroundPosition = ( value ) => {
+	if ( ! value ) {
+		return undefined;
+	}
+
+	if ( value.x === 0 && value.y === 0 ) {
+		return 'left top';
+	}
+
+	if ( value.x === 0 && value.y === 1 ) {
+		return 'left bottom';
+	}
+
+	if ( value.x === 1 && value.y === 0 ) {
+		return 'right top';
+	}
+
+	if ( value.x === 1 && value.y === 1 ) {
+		return 'right bottom';
+	}
+
+	if ( value.x === 0.5 && value.y === 0.5 ) {
+		return 'center';
+	}
+
+	return `${ value.x * 100 }% ${ value.y * 100 }%`;
+};
+
+const backgroundPositionToCoords = ( value ) => {
+	if ( ! value ) {
+		return { x: 0.5, y: 0.5 };
+	}
+
+	if ( value === 'left top' ) {
+		return { x: 0, y: 0 };
+	}
+
+	if ( value === 'left bottom' ) {
+		return { x: 0, y: 1 };
+	}
+
+	if ( value === 'right top' ) {
+		return { x: 1, y: 0 };
+	}
+
+	if ( value === 'right bottom' ) {
+		return { x: 1, y: 1 };
+	}
+
+	if ( value === 'center' ) {
+		return { x: 0.5, y: 0.5 };
+	}
+
+	const [ x, y ] = value.split( ' ' ).map( ( v ) => parseFloat( v ) / 100 );
+
+	return { x, y };
+};
+
 function BackgroundSizePanelItem( {
 	clientId,
 	isShownByDefault,
@@ -446,6 +505,18 @@ function BackgroundSizePanelItem( {
 		} );
 	};
 
+	const updateBackgroundPosition = ( next ) => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundPosition: coordsToBackgroundPosition( next ),
+				},
+			} ),
+		} );
+	};
+
 	const toggleIsRepeated = () => {
 		setAttributes( {
 			style: cleanEmptyObject( {
@@ -471,6 +542,16 @@ function BackgroundSizePanelItem( {
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
+			<FocalPointPicker
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				label={ __( 'Focal point' ) }
+				url={ style?.background?.backgroundImage?.url }
+				value={ backgroundPositionToCoords(
+					style?.background?.backgroundPosition
+				) }
+				onChange={ updateBackgroundPosition }
+			/>
 			<ToggleGroupControl
 				__nextHasNoMarginBottom
 				size={ '__unstable-large' }
