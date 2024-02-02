@@ -37,7 +37,7 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 				( isset( $block_type->supports['interactivity']['interactive'] ) && true === $block_type->supports['interactivity']['interactive'] ) )
 			) {
 				// Annotates the root interactive block for processing.
-				$root_interactive_block = array( $block_name, md5( serialize( $parsed_block ) ) );
+				$root_interactive_block = array( $block_name, $parsed_block );
 
 				/*
 				 * Adds a filter to process the root interactive block once it has
@@ -45,8 +45,8 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 				 */
 				$process_interactive_blocks = static function ( $content, $parsed_block ) use ( &$root_interactive_block, &$process_interactive_blocks ) {
 					// Checks whether the current block is the root interactive block.
-					list($root_block_name, $root_block_md5) = $root_interactive_block;
-					if ( $root_block_name === $parsed_block['blockName'] && md5( serialize( $parsed_block ) ) === $root_block_md5 ) {
+					list( $root_block_name, $root_parsed_block ) = $root_interactive_block;
+					if ( $root_block_name === $parsed_block['blockName'] && $parsed_block === $root_parsed_block ) {
 						// The root interactive blocks has finished rendering, process it.
 						$content = wp_interactivity_process_directives( $content );
 						// Removes the filter and reset the root interactive block.
