@@ -504,6 +504,43 @@ _Returns_
 
 -   `string?`: Name of the block for handling the grouping of blocks.
 
+### getHookedBlockNames
+
+Returns an array with the hooked blocks for a given anchor block.
+
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const hookedBlockNames = useSelect(
+		( select ) =>
+			select( blocksStore ).getHookedBlockNames( 'core/navigation' ),
+		[]
+	);
+
+	return (
+		<ul>
+			{ hookedBlockNames &&
+				hookedBlockNames.map( ( hookedBlock ) => (
+					<li key={ hookedBlock }>{ hookedBlock }</li>
+				) ) }
+		</ul>
+	);
+};
+```
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _blockName_ `string`: Anchor block type name.
+
+_Returns_
+
+-   `Array`: Array of hooked block names.
+
 ### getUnregisteredFallbackBlockName
 
 Returns the name of the block for handling unregistered blocks.

@@ -107,6 +107,47 @@ export function getBlockType( state, name ) {
 }
 
 /**
+ * Returns an array with the hooked blocks for a given anchor block.
+ *
+ * @param {Object} state     Data state.
+ * @param {string} blockName Anchor block type name.
+ *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const hookedBlockNames = useSelect( ( select ) =>
+ *         select( blocksStore ).getHookedBlockNames( 'core/navigation' ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         <ul>
+ *             { hookedBlockNames &&
+ *                 hookedBlockNames.map( ( hookedBlock ) => (
+ *                     <li key={ hookedBlock }>{ hookedBlock }</li>
+ *             ) ) }
+ *         </ul>
+ *     );
+ * };
+ * ```
+ *
+ * @return {Array} Array of hooked block names.
+ */
+export const getHookedBlockNames = createSelector(
+	( state, blockName ) => {
+		return getBlockTypes( state )
+			.filter(
+				( { blockHooks } ) => blockHooks && blockName in blockHooks
+			)
+			.map( ( { name } ) => name );
+	},
+	( state ) => [ state.blockTypes ]
+);
+
+/**
  * Returns block styles by block name.
  *
  * @param {Object} state Data state.
