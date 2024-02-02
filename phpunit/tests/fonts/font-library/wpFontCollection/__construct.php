@@ -11,11 +11,13 @@
  * @covers WP_Font_Collection::__construct
  */
 class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
+
 	/**
 	 * @dataProvider data_should_assign_properties_from_php_config
 	 *
-	 * @param array $config Font collection config options.
-	 * @param array $expected_data Expected output data.
+	 * @param string $slug          Font collection slug.
+	 * @param array  $config        Font collection config options.
+	 * @param array  $expected_data Expected output data.
 	 */
 	public function test_should_assign_properties_from_php_config( $slug, $config, $expected_data ) {
 		$collection = new WP_Font_Collection( $slug, $config );
@@ -32,7 +34,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array[]
+	 * @return array
 	 */
 	public function data_should_assign_properties_from_php_config() {
 		return array(
