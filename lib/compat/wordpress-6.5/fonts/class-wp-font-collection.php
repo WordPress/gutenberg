@@ -269,20 +269,20 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 
 		/**
 		 * Sanitizes a src property.
-		 * 
+		 *
 		 * Font faces can have a src property consisting on a string or an array of strings.
 		 * This method sanitizes the src property value.
-		 * 
+		 *
 		 * @since 6.5.0
-		 * 
+		 *
 		 * @param string|array $value src property value to sanitize.
-		 * 
+		 *
 		 * @return string|array Sanitized URL value.
 		 */
 		public static function sanitize_src_property( $value ) {
-			if( is_array( $value ) ) {
-				foreach( $value as $key => $val ) {
-					$value[$key] = sanitize_url( $val );
+			if ( is_array( $value ) ) {
+				foreach ( $value as $key => $val ) {
+					$value[ $key ] = sanitize_url( $val );
 				}
 				return $value;
 			}

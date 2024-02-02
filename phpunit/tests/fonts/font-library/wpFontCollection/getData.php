@@ -116,7 +116,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 								'fontFamily'        => 'Open Sans, sans-serif<script>alert("xss")</script>',
 								'slug'              => 'open-sans',
 								'name'              => 'Open Sans<script>alert("xss")</script>',
-								'fontFace'			=> array(
+								'fontFace'          => array(
 									array(
 										'fontFamily' => 'Open Sans',
 										'fontStyle'  => 'normal',
@@ -130,7 +130,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 										'src'        => array(
 											'https://example.com/src-as-array.woff2?a=<script>alert("xss")</script>',
 											'https://example.com/src-as-array.ttf',
-										)
+										),
 									),
 								),
 								'unwanted_property' => 'potentially evil value',
@@ -162,7 +162,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 								'fontFamily' => 'Open Sans, sans-serif',
 								'slug'       => 'open-sans',
 								'name'       => 'Open Sans',
-								'fontFace'			=> array(
+								'fontFace'   => array(
 									array(
 										'fontFamily' => 'Open Sans',
 										'fontStyle'  => 'normal',
@@ -176,9 +176,9 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 										'src'        => array(
 											'https://example.com/src-as-array.woff2?a=scriptalert(xss)/script',
 											'https://example.com/src-as-array.ttf',
-										)
+										),
 									),
-								)
+								),
 							),
 							'categories'           => array( 'sans-serifalertxss' ),
 						),
