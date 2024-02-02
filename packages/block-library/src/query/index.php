@@ -19,9 +19,7 @@
 function render_block_core_query( $attributes, $content, $block ) {
 	$is_interactive = isset( $attributes['enhancedPagination'] )
 		&& true === $attributes['enhancedPagination']
-		&& isset( $attributes['queryId'] )
-		&& isset( $block->block_type->supports['interactivity'] )
-		&& $block->block_type->supports['interactivity'];
+		&& isset( $attributes['queryId'] );
 
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
@@ -106,9 +104,13 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
-	$block_name        = $parsed_block['blockName'];
-	$block_object      = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-	$client_navigation = isset( $block_object->supports['interactivity']['clientNavigation'] ) && true === $block_object->supports['interactivity']['clientNavigation'];
+	$block_name = $parsed_block['blockName'];
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+
+	$supports_client_navigation = ( isset( $block_type->supports['interactivity']['clientNavigation'] ) && true === $block_type->supports['interactivity']['clientNavigation'] )
+	// If block.supports.interactivity is a boolean with true value, it means that clientNavigation is also true.
+		|| ( isset( $block_type->supports['interactivity'] ) && true === $block_type->supports['interactivity'] );
+	// If block.supports.interactivity is a boolean true, it means that clientNavigation is also true.
 
 	if ( 'core/query' === $block_name && isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
@@ -125,9 +127,9 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 * @return string Returns the modified output of the query block.
 			 */
 			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries, &$render_query_callback ) {
-				$is_interactive = isset( $block['attrs']['enhancedPagination'] ) && true === $block['attrs']['enhancedPagination'] && isset( $block['attrs']['queryId'] );
+				$has_enhanced_pagination = isset( $block['attrs']['enhancedPagination'] ) && true === $block['attrs']['enhancedPagination'] && isset( $block['attrs']['queryId'] );
 
-				if ( ! $is_interactive ) {
+				if ( ! $has_enhanced_pagination ) {
 					return $content;
 				}
 
@@ -155,7 +157,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
-		( ! $client_navigation )
+		( ! $supports_client_navigation )
 	) {
 		foreach ( $enhanced_query_stack as $query_id ) {
 			$dirty_enhanced_queries[ $query_id ] = true;
