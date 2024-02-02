@@ -117,9 +117,6 @@
 				"radius": true,
 				"width": true
 			}
-		},
-		"interactivity": {
-			"clientNavigation": true
 		}
 	},
 	"selectors": {

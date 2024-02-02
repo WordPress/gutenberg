@@ -134,7 +134,7 @@ Displays the contents of a comment. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/comment-content
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Comment Date
@@ -161,7 +161,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Comment Template
@@ -294,7 +294,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/form-input
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** anchor, interactivity (clientNavigation), spacing (margin), ~~reusable~~
+-	**Supports:** anchor, spacing (margin), ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
 
 ## Form Submission Notification
@@ -304,7 +304,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** interactivity (clientNavigation)
+-	**Supports:**
 -	**Attributes:** type
 
 ## Form Submit Button
@@ -323,7 +323,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~reusable~~
+-	**Supports:** ~~className~~, ~~customClassName~~, ~~reusable~~
 -	**Attributes:** content
 
 ## Gallery
@@ -378,7 +378,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation)
+-	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity
 -	**Attributes:** alt, aspectRatio, caption, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
@@ -815,7 +815,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 -	**Name:** core/shortcode
 -	**Category:** widgets
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
+-	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
 -	**Attributes:** text
 
 ## Site Logo

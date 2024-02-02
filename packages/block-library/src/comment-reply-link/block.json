@@ -40,9 +40,6 @@
 				"fontSize": true
 			}
 		},
-		"html": false,
-		"interactivity": {
-			"clientNavigation": true
-		}
+		"html": false
 	}
 }

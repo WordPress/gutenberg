@@ -15,10 +15,5 @@
 			"type": "string",
 			"default": "success"
 		}
-	},
-	"supports": {
-		"interactivity": {
-			"clientNavigation": true
-		}
 	}
 }
