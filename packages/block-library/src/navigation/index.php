@@ -396,6 +396,12 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not the navigation is collapsable.
 	 */
 	private static function is_collapsable( $attributes ) {
+
+		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+		if ( empty( $gutenberg_experiments ) || ! array_key_exists( 'gutenberg-navigation-overlay-auto', $gutenberg_experiments ) ) {
+			return;
+		}
+
 		return isset( $attributes['overlayMenu'] ) && in_array( $attributes['overlayMenu'], array( 'mobile', 'auto' ), true );
 	}
 
@@ -550,40 +556,68 @@ class WP_Navigation_Block_Renderer {
 		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
 		$is_experiment         = ( $gutenberg_experiments && array_key_exists( 'gutenberg-navigation-overlay-auto', $gutenberg_experiments ) ) ? true : false;
 
-		$overlay_menu = $is_experiment ? 'auto' : $attributes['overlayMenu'];
+		if( $is_experiment ) {
+			$overlay_menu = $is_experiment ? 'auto' : $attributes['overlayMenu'];
 
-		// When adding to this array be mindful of security concerns.
-		$nav_element_context    = wp_json_encode(
-			array(
-				'overlayOpenedBy' => array(),
-				'type'            => 'overlay',
-				'roleAttribute'   => '',
-				'ariaLabel'       => __( 'Menu' ),
-				'overlayMenu'     => $overlay_menu,
-			),
-			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
-		);
-		$nav_element_directives = '
-			data-wp-interactive=\'{"namespace":"core/navigation"}\'
-			data-wp-context=\'' . $nav_element_context . '\'
-		';
+			// When adding to this array be mindful of security concerns.
+			$nav_element_context    = wp_json_encode(
+				array(
+					'overlayOpenedBy' => array(),
+					'type'            => 'overlay',
+					'roleAttribute'   => '',
+					'ariaLabel'       => __( 'Menu' ),
+					'overlayMenu'     => $overlay_menu,
+				),
+				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
+			);
 
-		/*
-		* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
-		* is not needed for collapsing the menu because the class is set manually.
-		*/
-		if ( static::is_collapsable( $attributes ) ) {
-			$nav_element_directives .= ' '; // space separator
-			$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
-		}
+			$nav_element_directives = '
+				data-wp-interactive=\'{"namespace":"core/navigation"}\'
+				data-wp-context=\'' . $nav_element_context . '\'
+			';
 
-		if ( isset( $overlay_menu ) && 'mobile' === $overlay_menu ) {
-			$nav_element_directives .= ' '; // space separator
-			$nav_element_directives .= 'data-wp-init="callbacks.initMobileNav"';
-		}
-		if ( isset( $overlay_menu ) && 'auto' === $overlay_menu ) {
-			$nav_element_directives .= ' '; // space separator
-			$nav_element_directives .= 'data-wp-init="callbacks.initAutoNav"';
+			/*
+			* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
+			* is not needed for collapsing the menu because the class is set manually.
+			*/
+			if ( static::is_collapsable( $attributes ) ) {
+				$nav_element_directives .= ' '; // space separator
+				$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
+			}
+
+			if ( isset( $overlay_menu ) && 'mobile' === $overlay_menu ) {
+				$nav_element_directives .= ' '; // space separator
+				$nav_element_directives .= 'data-wp-init="callbacks.initMobileNav"';
+			}
+			if ( isset( $overlay_menu ) && 'auto' === $overlay_menu ) {
+				$nav_element_directives .= ' '; // space separator
+				$nav_element_directives .= 'data-wp-init="callbacks.initAutoNav"';
+			}
+		} else {
+			// When adding to this array be mindful of security concerns.
+			$nav_element_context    = wp_json_encode(
+				array(
+					'overlayOpenedBy' => array(),
+					'type'            => 'overlay',
+					'roleAttribute'   => '',
+					'ariaLabel'       => __( 'Menu' ),
+				),
+				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
+			);
+
+			$nav_element_directives = '
+				data-wp-interactive=\'{"namespace":"core/navigation"}\'
+				data-wp-context=\'' . $nav_element_context . '\'
+			';
+
+			/*
+			* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
+			* is not needed for collapsing the menu because the class is set manually.
+			*/
+			if ( ! static::is_always_overlay( $attributes ) ) {
+				$nav_element_directives .= ' '; // space separator
+				$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
+			}
 		}
 
 		return $nav_element_directives;
