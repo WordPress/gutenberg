@@ -100,10 +100,6 @@
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
-		"slug": {
-			"type": "string",
-			"description": "Slug of the font collection. Must be unique and URL friendly."
-		},
 		"name": {
 			"type": "string",
 			"description": "Name of the font collection."
