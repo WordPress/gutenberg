@@ -94,8 +94,10 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$items = array();
 			foreach ( $collections_page as $collection ) {
 				$item = $this->prepare_item_for_response( $collection, $request );
+
+				// If there's an error loading a collection, skip it and continue loading valid collections.
 				if ( is_wp_error( $item ) ) {
-					return $item;
+					continue;
 				}
 				$item    = $this->prepare_response_for_collection( $item );
 				$items[] = $item;
