@@ -33,7 +33,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
-			const { getEditPostTypeProps } = getEditorSettings();
+			const { editPostTypeProps } = getEditorSettings();
 
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
@@ -42,7 +42,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 					'__unstableBase',
 					undefined,
 				] ),
-				postType: getPostType( getEditPostTypeProps()?.postType ),
+				postType: getPostType( editPostTypeProps?.postType ),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},

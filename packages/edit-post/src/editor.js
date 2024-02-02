@@ -32,7 +32,7 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, getEditPostTypeProps, goBack } =
+	const { currentPost, getPostLinkProps, editPostTypeProps, goBack } =
 		usePostHistory( initialPostId, initialPostType );
 
 	const { hasInlineToolbar, post, preferredStyleVariations, template } =
@@ -82,7 +82,7 @@ function Editor( {
 		() => ( {
 			...settings,
 			getPostLinkProps,
-			getEditPostTypeProps,
+			editPostTypeProps,
 			goBack,
 			defaultRenderingMode,
 			__experimentalPreferredStyleVariations: {
@@ -97,7 +97,7 @@ function Editor( {
 			preferredStyleVariations,
 			updatePreferredStyleVariations,
 			getPostLinkProps,
-			getEditPostTypeProps,
+			editPostTypeProps,
 			goBack,
 			defaultRenderingMode,
 		]

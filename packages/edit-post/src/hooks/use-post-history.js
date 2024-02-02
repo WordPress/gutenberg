@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useReducer } from '@wordpress/element';
+import { useCallback, useReducer, useMemo } from '@wordpress/element';
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
@@ -35,7 +35,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const getEditPostTypeProps = useCallback( () => {
+	const editPostTypeProps = useMemo( () => {
 		return {
 			postType: initialPostType,
 			postId: initialPostId,
@@ -75,7 +75,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 	return {
 		currentPost,
 		getPostLinkProps,
-		getEditPostTypeProps,
+		editPostTypeProps,
 		goBack: postHistory.length > 1 ? goBack : undefined,
 	};
 }

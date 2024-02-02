@@ -32,9 +32,9 @@ describe( 'FullscreenModeClose', () => {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
 					getEditorSettings: () => ( {
-						getEditPostTypeProps: () => ( {
+						editPostTypeProps: {
 							postType: 'post',
-						} ),
+						},
 					} ),
 				} ) );
 			} );
@@ -55,9 +55,9 @@ describe( 'FullscreenModeClose', () => {
 						site_icon_url: '',
 					} ),
 					getEditorSettings: () => ( {
-						getEditPostTypeProps: () => ( {
+						editPostTypeProps: {
 							postType: 'post',
-						} ),
+						},
 					} ),
 				} ) );
 			} );
@@ -88,9 +88,9 @@ describe( 'FullscreenModeClose', () => {
 						site_icon_url: '',
 					} ),
 					getEditorSettings: () => ( {
-						getEditPostTypeProps: () => ( {
+						editPostTypeProps: {
 							postType: 'page',
-						} ),
+						},
 					} ),
 				} ) );
 			} );
