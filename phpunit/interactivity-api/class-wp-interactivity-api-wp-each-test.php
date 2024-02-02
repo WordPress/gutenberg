@@ -457,6 +457,49 @@ class Tests_WP_Interactivity_API_WP_Each extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that the `data-wp-each` directive works with nested template tags.
+	 *
+	 * @covers ::process_directives
+	 */
+	public function test_wp_each_nested_template_tags_XXXX() {
+		$this->interactivity->state( 'myPlugin', array( 'list2' => array( 3, 4 ) ) );
+		$original = '' .
+			'<template data-wp-each--item1="myPlugin::state.list">' .
+				'<template data-wp-each--item2="myPlugin::state.list2">' .
+					'<span data-wp-text="myPlugin::context.item1"></span>' .
+					'<span data-wp-text="myPlugin::context.item2"></span>' .
+				'</template>' .
+			'</template>' .
+			'<div data-wp-bind--id="myPlugin::state.after">Text</div>';
+		$expected = '' .
+			'<template data-wp-each--item1="myPlugin::state.list">' .
+				'<template data-wp-each--item2="myPlugin::state.list2">' .
+					'<span data-wp-text="myPlugin::context.item1"></span>' .
+					'<span data-wp-text="myPlugin::context.item2"></span>' .
+				'</template>' .
+			'</template>' .
+			'<template data-wp-each-child data-wp-each--item2="myPlugin::state.list2">' .
+				'<span data-wp-text="myPlugin::context.item1"></span>' .
+				'<span data-wp-text="myPlugin::context.item2"></span>' .
+			'</template>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item1">1</span>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item2">3</span>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item1">1</span>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item2">4</span>' .
+			'<template data-wp-each-child data-wp-each--item2="myPlugin::state.list2">' .
+				'<span data-wp-text="myPlugin::context.item1"></span>' .
+				'<span data-wp-text="myPlugin::context.item2"></span>' .
+			'</template>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item1">2</span>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item2">3</span>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item1">2</span>' .
+			'<span data-wp-each-child data-wp-text="myPlugin::context.item2">4</span>' .
+			'<div id="after-wp-each" data-wp-bind--id="myPlugin::state.after">Text</div>';
+		$new      = $this->interactivity->process_directives( $original );
+		$this->assertEquals( $expected, $new );
+	}
+
+	/**
 	 * Tests that the `data-wp-each` directive works with nestded template tags
 	 * that use a previous item as a list.
 	 *
