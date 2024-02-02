@@ -90,6 +90,11 @@ function gutenberg_create_initial_rest_routes() {
 	$font_collections_controller->register_routes();
 }
 
+/**
+ * Initializes REST routes and post types.
+ *
+ * @since 6.5
+ */
 function gutenberg_init_font_library() {
 	gutenberg_create_initial_post_types();
 	gutenberg_create_initial_rest_routes();
