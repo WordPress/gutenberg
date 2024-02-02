@@ -105,50 +105,50 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 				),
 			),
 
-			'font collection with risky data'      => array(
+			'font collection with risky data'    => array(
 				'slug'          => 'my-collection',
 				'config'        => array(
-					'name'          => 'My Collection<script>alert("xss")</script>',
-					'description'   => 'My collection description<script>alert("xss")</script>',
-					'font_families' => array( 
+					'name'              => 'My Collection<script>alert("xss")</script>',
+					'description'       => 'My collection description<script>alert("xss")</script>',
+					'font_families'     => array(
 						array(
 							'font_family_settings' => array(
-								'fontFamily' => 'Open Sans, sans-serif<script>alert("xss")</script>',
-								'slug' => 'open-sans',
-								'name' => 'Open Sans<script>alert("xss")</script>',
-								'unwanted_property'=> 'potentially evil value'
+								'fontFamily'        => 'Open Sans, sans-serif<script>alert("xss")</script>',
+								'slug'              => 'open-sans',
+								'name'              => 'Open Sans<script>alert("xss")</script>',
+								'unwanted_property' => 'potentially evil value',
 							),
-							'categories' => [ 'sans-serif<script>alert("xss")</script>' ]
-						)
-					 ),
-					'categories'    => array(
-						array (
-							'name' => 'Mock col<script>alert("xss")</script>',
-							'slug' => 'mock-col<script>alert("xss")</script>',
-							'unwanted_property'=> 'potentially evil value'
-						)
+							'categories'           => array( 'sans-serif<script>alert("xss")</script>' ),
+						),
 					),
-					'unwanted_property'=> 'potentially evil value'
+					'categories'        => array(
+						array(
+							'name'              => 'Mock col<script>alert("xss")</script>',
+							'slug'              => 'mock-col<script>alert("xss")</script>',
+							'unwanted_property' => 'potentially evil value',
+						),
+					),
+					'unwanted_property' => 'potentially evil value',
 				),
 				'expected_data' => array(
 					'description'   => 'My collection description',
 					'categories'    => array(
-						array (
+						array(
 							'name' => 'Mock col',
-							'slug' => 'mock-colalertxss'
-						)
+							'slug' => 'mock-colalertxss',
+						),
 					),
 					'name'          => 'My Collection',
-					'font_families' => array( 
+					'font_families' => array(
 						array(
 							'font_family_settings' => array(
 								'fontFamily' => 'Open Sans, sans-serif',
-								'slug' => 'open-sans',
-								'name' => 'Open Sans',
+								'slug'       => 'open-sans',
+								'name'       => 'Open Sans',
 							),
-							'categories' => [ 'sans-serifalertxss' ]
-						)
-					 ),
+							'categories'           => array( 'sans-serifalertxss' ),
+						),
+					),
 				),
 			),
 

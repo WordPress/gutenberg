@@ -81,7 +81,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 							),
 						),
 					),
-					'categories' => array( 'sanitize_title' )
+					'categories'           => array( 'sanitize_title' ),
 				),
 			),
 			'categories'    => array(
@@ -249,7 +249,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @return array|WP_Error Array of data if valid, otherwise a WP_Error instance.
 		 */
 		private function validate_data( $data ) {
-			$data = WP_Font_Utils::sanitize_from_schema( $data, self::COLLECTION_SANITIZATION_SCHEMA );
+			$data                = WP_Font_Utils::sanitize_from_schema( $data, self::COLLECTION_SANITIZATION_SCHEMA );
 			$required_properties = array( 'name', 'font_families' );
 			foreach ( $required_properties as $property ) {
 				if ( empty( $data[ $property ] ) ) {
