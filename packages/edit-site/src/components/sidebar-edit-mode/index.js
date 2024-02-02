@@ -48,6 +48,7 @@ const FillContents = ( {
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
 	// selected tab and browser focus can become separated in an unexpected way.
+	// (e.g the "block" tab is focused, but the "post" tab is selected).
 	useEffect( () => {
 		const tabsElements = Array.from(
 			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
@@ -163,9 +164,15 @@ export function SidebarComplementaryAreaFills() {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
 	}
 
+	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
+	// the initial render) or when we don't want a tab displayed (i.e. the
+	// sidebar is closed). These cases should both be covered by the `!!` check
+	// below, so we shouldn't need any additional falsey handling.
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
-			enableComplementaryArea( STORE_NAME, newSelectedTabId );
+			if ( !! newSelectedTabId ) {
+				enableComplementaryArea( STORE_NAME, newSelectedTabId );
+			}
 		},
 		[ enableComplementaryArea ]
 	);
