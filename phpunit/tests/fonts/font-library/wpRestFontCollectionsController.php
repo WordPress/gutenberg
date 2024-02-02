@@ -81,7 +81,7 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 		wp_unregister_font_collection( 'invalid-collection' );
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
-		$this->assertCount( 2, $content, 'The response should only contain valid collections.' );
+		$this->assertCount( 1, $content, 'The response should only contain valid collections.' );
 	}
 
 	/**
