@@ -17,6 +17,7 @@ function gutenberg_test_block_bindings_register_custom_fields() {
 		array(
 			'show_in_rest' => true,
 			'type'         => 'string',
+			'single'       => true,
 			'default'      => 'Value of the text_custom_field',
 		)
 	);
@@ -27,7 +28,8 @@ function gutenberg_test_block_bindings_register_custom_fields() {
 		array(
 			'show_in_rest' => true,
 			'type'         => 'string',
-			'default'      => 'https://wpmovies.dev/wp-content/uploads/2023/03/3bhkrj58Vtu7enYsRolD1fZdja1-683x1024.jpg',
+			'single'       => true,
+			'default'      => '',
 		)
 	);
 }
