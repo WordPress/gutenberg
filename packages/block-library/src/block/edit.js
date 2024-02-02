@@ -182,8 +182,13 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialOverrides = useRef( content );
-	const defaultValuesRef = useRef( {} );
+
+	// The initial value of the `content` attribute.
+	const initialContent = useRef( content );
+
+	// The default content values from the original pattern for overridable attributes.
+	// Set by the `applyInitialContentValuesToInnerBlocks` function.
+	const defaultContent = useRef( {} );
 
 	const {
 		replaceInnerBlocks,
@@ -244,9 +249,8 @@ export default function ReusableBlockEdit( {
 
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
-		defaultValuesRef.current = {};
+		defaultContent.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
-		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
 			syncDerivedUpdates( () => {
@@ -254,8 +258,8 @@ export default function ReusableBlockEdit( {
 					patternClientId,
 					applyInitialContentValuesToInnerBlocks(
 						initialBlocks,
-						initialOverrides.current,
-						defaultValuesRef.current
+						initialContent.current,
+						defaultContent.current
 					)
 				);
 			} );
@@ -307,7 +311,7 @@ export default function ReusableBlockEdit( {
 					setAttributes( {
 						content: getContentValuesFromInnerBlocks(
 							blocks,
-							defaultValuesRef.current
+							defaultContent.current
 						),
 					} );
 				} );
@@ -320,7 +324,7 @@ export default function ReusableBlockEdit( {
 		editOriginalProps.onClick( event );
 	};
 
-	const resetOverrides = () => {
+	const resetContent = () => {
 		if ( content ) {
 			replaceInnerBlocks( patternClientId, initialBlocks );
 		}
@@ -371,7 +375,7 @@ export default function ReusableBlockEdit( {
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
-							onClick={ resetOverrides }
+							onClick={ resetContent }
 							disabled={ ! content }
 							__experimentalIsFocusable
 						>
