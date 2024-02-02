@@ -107,11 +107,11 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 
 		wp_set_current_user( 0 );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 401, 'Response code should be 401 for non-authenticated users.' );
 
 		wp_set_current_user( self::$editor_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 403, 'Response code should be 403 for users without the right permissions.' );
 	}
 
 	/**
