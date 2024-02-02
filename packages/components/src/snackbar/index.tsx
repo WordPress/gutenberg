@@ -88,8 +88,8 @@ function UnforwardedSnackbar(
 
 	useSpokenMessage( spokenMessage, politeness );
 
-	// Only set up the timeout dismiss if we're not explicitly dismissing.
 	useEffect( () => {
+		// Only set up the timeout dismiss if we're not explicitly dismissing.
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
 				onDismiss?.();
@@ -98,7 +98,10 @@ function UnforwardedSnackbar(
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ onDismiss, onRemove, explicitDismiss ] );
+		// The `onDismiss/onRemove` can have unstable references,
+		// trigger side-effect cleanup, and reset timers.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ explicitDismiss ] );
 
 	const classes = classnames( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
