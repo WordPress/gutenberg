@@ -35,7 +35,7 @@ export const privateApis = ( lock ) => {
 		};
 	}
 
-	throw new Error( 'TODO: Add a more appropriate message.' );
+	throw new Error( 'Forbidden access.' );
 };
 
 document.addEventListener( 'DOMContentLoaded', async () => {
