@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { click, press, type } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -68,17 +68,15 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
-		const user = userEvent.setup();
-
 		render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await user.click( currentSelectedItem );
+		await click( currentSelectedItem );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'option', {
 				name: 'crimson clover',
 			} )
@@ -86,9 +84,9 @@ describe.each( [
 
 		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 
-		await user.click( currentSelectedItem );
+		await click( currentSelectedItem );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'option', {
 				name: 'poppy',
 			} )
@@ -98,23 +96,21 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
-		const user = userEvent.setup();
-
 		render( <CustomSelect { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await user.tab();
-		await user.keyboard( '{enter}' );
+		await press.Tab();
+		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
 				name: 'label!',
 			} )
 		).toBeVisible();
 
-		await user.keyboard( '{escape}' );
+		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
 				name: 'label!',
@@ -127,11 +123,9 @@ describe.each( [
 	} );
 
 	it( 'Should apply class only to options that have a className defined', async () => {
-		const user = userEvent.setup();
-
 		render( <CustomSelect { ...props } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
@@ -163,13 +157,12 @@ describe.each( [
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
-		const user = userEvent.setup();
 		const customStyles =
 			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
 		render( <CustomSelect { ...props } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
@@ -239,8 +232,6 @@ describe.each( [
 	} );
 
 	it( 'shows selected hint in list of options when added', async () => {
-		const user = userEvent.setup();
-
 		render(
 			<CustomSelect
 				{ ...props }
@@ -256,7 +247,7 @@ describe.each( [
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'combobox', { name: 'Custom select' } )
 		);
 
@@ -264,12 +255,11 @@ describe.each( [
 	} );
 
 	it( 'Should return object onChange', async () => {
-		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
 
 		render( <CustomSelect { ...props } onChange={ mockOnChange } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
@@ -285,7 +275,7 @@ describe.each( [
 			} )
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'option', {
 				name: 'aquamarine',
 			} )
@@ -305,88 +295,80 @@ describe.each( [
 	} );
 
 	it( 'Should return selectedItem object when specified onChange', async () => {
-		const user = userEvent.setup();
 		const mockOnChange = jest.fn(
 			( { selectedItem } ) => selectedItem.key
 		);
 
 		render( <CustomSelect { ...props } onChange={ mockOnChange } /> );
 
-		await user.tab();
+		await press.Tab();
 		expect(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
 		).toHaveFocus();
 
-		await user.keyboard( '{p}' );
-		await user.keyboard( '{enter}' );
+		await type( 'p' );
+		await press.Enter();
 
 		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Should be able to change selection using keyboard', async () => {
-			const user = userEvent.setup();
-
 			render( <CustomSelect { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await user.tab();
+			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
-			await user.keyboard( '{enter}' );
+			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
 					name: 'label!',
 				} )
 			).toHaveFocus();
 
-			await user.keyboard( '{arrowdown}' );
-			await user.keyboard( '{enter}' );
+			await press.ArrowDown();
+			await press.Enter();
 
 			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
-			const user = userEvent.setup();
-
 			render( <CustomSelect { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await user.tab();
-			await user.keyboard( '{enter}' );
+			await press.Tab();
+			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
 					name: 'label!',
 				} )
 			).toHaveFocus();
 
-			await user.keyboard( '{a}' );
-			await user.keyboard( '{enter}' );
+			await type( 'a' );
+			await press.Enter();
 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-			const user = userEvent.setup();
-
 			render( <CustomSelect { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await user.tab();
+			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
-			await user.keyboard( '{a}' );
-			await user.keyboard( '{q}' );
+			await type( 'aq' );
 
 			expect(
 				screen.queryByRole( 'listbox', {
@@ -395,20 +377,18 @@ describe.each( [
 				} )
 			).not.toBeInTheDocument();
 
-			await user.keyboard( '{enter}' );
+			await press.Enter();
 			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
-			const user = userEvent.setup();
-
 			render( <CustomSelect { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await user.click( currentSelectedItem );
+			await click( currentSelectedItem );
 
 			// get all items except for first option
 			const unselectedItems = props.options.filter(
@@ -431,10 +411,10 @@ describe.each( [
 			).toBeVisible();
 
 			// change the current selection
-			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
+			await click( screen.getByRole( 'option', { name: 'poppy' } ) );
 
 			// click combobox to mount listbox with options again
-			await user.click( currentSelectedItem );
+			await click( currentSelectedItem );
 
 			// check that first item is has aria-selected="false" after new selection
 			expect(
