@@ -54,24 +54,24 @@ jobs:
             pull-requests: write
             contents: read
         timeout-minutes: 20
+        # The job will run when pull requests are open, ready for review and:
+        #
+        # - A comment is added to the pull request.
+        # - A review is created or commented on.
+        # - The pull request is opened, synchronized, marked ready for review, or reopened.
+        # - The `props-bot` label is added to the pull request.
+        if: |
+            (
+              github.event_name == 'issue_comment' && github.event.issue.pull_request ||
+              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
+              github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
+              'props-bot' == github.event.label.name
+            ) &&
+            ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
         steps:
             - name: Gather a list of contributors
               uses: WordPress/props-bot-action@trunk
-              # The step will run when open pull requests are ready for review and:
-              #
-              # - A comment is added to the pull request.
-              # - A review is created or commented on.
-              # - The pull request is opened, synchronized, marked ready for review, or reopened.
-              # - The `props-bot` label is added to the pull request.
-              if: |
-                  (
-                    github.event_name == 'issue_comment' && github.event.issue.pull_request ||
-                    contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
-                    github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
-                    'props-bot' == github.event.label.name
-                  ) &&
-                  ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
             - name: Remove the props-bot label
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
