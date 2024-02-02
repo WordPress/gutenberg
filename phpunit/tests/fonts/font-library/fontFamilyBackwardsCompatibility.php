@@ -11,7 +11,7 @@
  * @group font-library
  */
 class Tests_Font_Family_Backwards_Compatibility extends WP_UnitTestCase {
-	private $post_ids_to_delete = array();
+	private $post_ids_to_delete;
 
 	public function set_up() {
 		parent::set_up();
