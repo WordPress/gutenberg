@@ -179,6 +179,7 @@ require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-editor-settings.php';
