@@ -100,14 +100,14 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string}  href                           The page href.
-		 * @param {Object}  [options]                      Options object.
-		 * @param {boolean} [options.force]                If true, it forces re-fetching the URL.
-		 * @param {string}  [options.html]                 HTML string to be used instead of fetching the requested URL.
-		 * @param {boolean} [options.replace]              If true, it replaces the current entry in the browser session history.
-		 * @param {number}  [options.timeout]              Time until the navigation is aborted, in milliseconds. Default is 10000.
-		 * @param {boolean} [options.loadingAnimation]     Whether an animation should be shown while navigating. Default to `true`.
-		 * @param {boolean} [options.screenReaderAnnounce] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param {string}  href                               The page href.
+		 * @param {Object}  [options]                          Options object.
+		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
+		 * @param {string}  [options.html]                     HTML string to be used instead of fetching the requested URL.
+		 * @param {boolean} [options.replace]                  If true, it replaces the current entry in the browser session history.
+		 * @param {number}  [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param {boolean} [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
+		 * @param {boolean} [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
@@ -116,7 +116,7 @@ export const { state, actions } = store( 'core/router', {
 			const { navigation } = state;
 			const {
 				loadingAnimation = true,
-				screenReaderAnnounce = true,
+				screenReaderAnnouncement = true,
 				timeout = 10000,
 			} = options;
 
@@ -137,7 +137,7 @@ export const { state, actions } = store( 'core/router', {
 					navigation.hasStarted = true;
 					navigation.hasFinished = false;
 				}
-				if ( screenReaderAnnounce ) {
+				if ( screenReaderAnnouncement ) {
 					navigation.message = navigation.texts.loading;
 				}
 			}, 400 );
@@ -171,7 +171,7 @@ export const { state, actions } = store( 'core/router', {
 					navigation.hasFinished = true;
 				}
 
-				if ( screenReaderAnnounce ) {
+				if ( screenReaderAnnouncement ) {
 					// Announce that the page has been loaded. If the message is the
 					// same, we use a no-break space similar to the @wordpress/a11y
 					// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
