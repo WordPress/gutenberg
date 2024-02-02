@@ -218,7 +218,6 @@ export default function Sidebar() {
 			selectedTabId={ isGeneralSidebarOpen ? currentArea : null }
 			onSelect={ onTabSelect }
 			selectOnMove={ false }
-			focusable={ false }
 		>
 			<SidebarContent
 				hasSelectedNonAreaBlock={ hasSelectedNonAreaBlock }
