@@ -1187,8 +1187,10 @@ describe( 'Tabs', () => {
 
 						// Tab key should focus the currently selected tab, which is Beta.
 						await press.Tab();
-						expect( await getSelectedTab() ).toHaveTextContent(
-							'Beta'
+						await waitFor( async () =>
+							expect( await getSelectedTab() ).toHaveTextContent(
+								'Beta'
+							)
 						);
 						expect( await getSelectedTab() ).toHaveFocus();
 
@@ -1247,8 +1249,10 @@ describe( 'Tabs', () => {
 						);
 
 						// When the selected tab is changed, it should not automatically receive focus.
-						expect( await getSelectedTab() ).toHaveTextContent(
-							'Gamma'
+						await waitFor( async () =>
+							expect( await getSelectedTab() ).toHaveTextContent(
+								'Gamma'
+							)
 						);
 						expect(
 							screen.getByRole( 'tab', { name: 'Beta' } )
