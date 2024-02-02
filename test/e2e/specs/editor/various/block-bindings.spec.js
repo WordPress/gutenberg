@@ -132,8 +132,8 @@ test.describe( 'Block bindings', () => {
 			name: 'core/image',
 			attributes: {
 				url: placeholderSrc,
-				alt: 'a',
-				title: 't',
+				alt: 'default alt value',
+				title: 'default title value',
 				metadata: {
 					bindings: {
 						url: {
@@ -148,8 +148,8 @@ test.describe( 'Block bindings', () => {
 			name: 'core/image',
 			attributes: {
 				url: placeholderSrc,
-				alt: 'a',
-				title: 't',
+				alt: 'default alt value',
+				title: 'default title value',
 				metadata: {
 					bindings: {
 						alt: {
@@ -164,8 +164,8 @@ test.describe( 'Block bindings', () => {
 			name: 'core/image',
 			attributes: {
 				url: placeholderSrc,
-				alt: 'a',
-				title: 't',
+				alt: 'default alt value',
+				title: 'default title value',
 				metadata: {
 					bindings: {
 						title: {
@@ -180,8 +180,8 @@ test.describe( 'Block bindings', () => {
 			name: 'core/image',
 			attributes: {
 				url: placeholderSrc,
-				alt: 'a',
-				title: 't',
+				alt: 'default alt value',
+				title: 'default title value',
 				metadata: {
 					bindings: {
 						url: {
@@ -492,7 +492,7 @@ test.describe( 'Block bindings', () => {
 				const altValue = await page
 					.getByLabel( imageAltLabel )
 					.inputValue();
-				expect( altValue ).toBe( 'a' );
+				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
@@ -502,7 +502,7 @@ test.describe( 'Block bindings', () => {
 				const titleValue = await page
 					.getByLabel( imageTitleLabel )
 					.inputValue();
-				expect( titleValue ).toBe( 't' );
+				expect( titleValue ).toBe( 'default title value' );
 			} );
 
 			test( 'Should disable alt textarea when alt is bound', async ( {
@@ -537,7 +537,7 @@ test.describe( 'Block bindings', () => {
 				const titleValue = await page
 					.getByLabel( imageTitleLabel )
 					.inputValue();
-				expect( titleValue ).toBe( 't' );
+				expect( titleValue ).toBe( 'default title value' );
 			} );
 
 			test( 'Should disable title input when title is bound', async ( {
@@ -562,7 +562,7 @@ test.describe( 'Block bindings', () => {
 				const altValue = await page
 					.getByLabel( imageAltLabel )
 					.inputValue();
-				expect( altValue ).toBe( 'a' );
+				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is disabled and with the custom field value.
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
@@ -612,7 +612,7 @@ test.describe( 'Block bindings', () => {
 				const titleValue = await page
 					.getByLabel( imageTitleLabel )
 					.inputValue();
-				expect( titleValue ).toBe( 't' );
+				expect( titleValue ).toBe( 'default title value' );
 			} );
 		} );
 	} );
@@ -820,7 +820,7 @@ test.describe( 'Block bindings', () => {
 				const titleValue = await page
 					.getByLabel( imageTitleLabel )
 					.inputValue();
-				expect( titleValue ).toBe( 't' );
+				expect( titleValue ).toBe( 'default title value' );
 			} );
 		} );
 	} );
