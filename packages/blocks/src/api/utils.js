@@ -8,7 +8,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { Component, isValidElement } from '@wordpress/element';
+import { Component, Suspense, lazy, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
@@ -351,4 +351,28 @@ export function omit( object, keys ) {
 	return Object.fromEntries(
 		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
 	);
+}
+
+export function lazyEdit( cb ) {
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const Load = lazy( cb );
+	return function Edit( props ) {
+		return (
+			<Suspense fallback={ null }>
+				<Load { ...props } />
+			</Suspense>
+		);
+	};
+}
+
+export function getBlockEdit( blockType ) {
+	if ( ! blockType ) {
+		return null;
+	}
+
+	if ( blockType.lazyEdit ) {
+		return lazyEdit( blockType.lazyEdit );
+	}
+
+	return blockType.edit || blockType.save || null;
 }

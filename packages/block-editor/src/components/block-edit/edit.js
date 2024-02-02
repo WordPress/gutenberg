@@ -11,6 +11,7 @@ import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 	getBlockType,
+	getBlockEdit,
 } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
 
@@ -33,14 +34,10 @@ const Edit = ( props ) => {
 	const { name } = props;
 	const blockType = getBlockType( name );
 
-	if ( ! blockType ) {
+	const Component = useMemo( () => getBlockEdit( blockType ), [ blockType ] );
+	if ( ! Component ) {
 		return null;
 	}
-
-	// `edit` and `save` are functions or components describing the markup
-	// with which a block is displayed. If `blockType` is valid, assign
-	// them preferentially as the render value for the block.
-	const Component = blockType.edit || blockType.save;
 
 	return <Component { ...props } />;
 };

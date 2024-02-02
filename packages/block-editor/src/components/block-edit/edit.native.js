@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { withFilters } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getBlockEdit } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -37,11 +37,10 @@ export const Edit = ( props ) => {
 			: DEFAULT_BLOCK_CONTEXT;
 	}, [ blockType, blockContext ] );
 
-	if ( ! blockType ) {
+	const Component = useMemo( () => getBlockEdit( blockType ), [ blockType ] );
+	if ( ! Component ) {
 		return null;
 	}
-
-	const Component = blockType.edit;
 
 	return <Component { ...props } context={ context } />;
 };

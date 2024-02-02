@@ -145,6 +145,7 @@ export {
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalSanitizeBlockAttributes,
 	__experimentalGetBlockAttributesNamesByRole,
+	getBlockEdit,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any
