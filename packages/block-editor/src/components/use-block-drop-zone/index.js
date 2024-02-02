@@ -332,6 +332,8 @@ export default function useBlockDropZone( {
 		useCallback(
 			( event, ownerDocument ) => {
 				if ( ! isDragging() ) {
+					// When dragging from the desktop, no drag start event is fired.
+					// So, ensure that the drag state is set when the user drags over a drop zone.
 					startDragging();
 				}
 				const allowedBlocks = getAllowedBlocks( targetRootClientId );
