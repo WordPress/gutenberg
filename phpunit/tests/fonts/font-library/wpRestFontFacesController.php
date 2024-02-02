@@ -810,11 +810,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		// Attempt trashing.
 		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501, 'The response should return an error for "rest_trash_not_supported" with 501 status.' );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
 
 		$request->set_param( 'force', 'false' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501, 'When "force" is false, the response should return an error for "rest_trash_not_supported" with 501 status.' );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
 
 		// Ensure the post still exists.
 		$post = get_post( $font_face_id );
