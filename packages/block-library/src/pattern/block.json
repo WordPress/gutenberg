@@ -16,9 +16,5 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "queryId", "query" ],
-	"providesContext": {
-		"query": "query",
-		"queryId": "queryId"
-	}
+	"usesContext": [ "queryId", "query" ]
 }
