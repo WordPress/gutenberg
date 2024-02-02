@@ -72,6 +72,18 @@
 	}
 }
 
+// Reverse on mobile: Reverse column order
+@media (max-width: #{ ($break-medium - 1) }) {
+	.wp-block-columns.is-reversed-on-mobile.is-not-stacked-on-mobile {
+		flex-direction: row-reverse;
+	}
+
+	.wp-block-columns.is-reversed-on-mobile:not(.is-not-stacked-on-mobile) {
+		flex-direction: column-reverse;
+	}
+}
+
+
 // Lower specificity of margin styles so they don't override the Layout block support.
 :where(.wp-block-columns) {
 	margin-bottom: 1.75em;
