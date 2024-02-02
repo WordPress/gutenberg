@@ -698,7 +698,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 */
 		protected function prepare_links( $post ) {
 			// Entity meta.
-			$links = array(
+			return array(
 				'self'       => array(
 					'href' => rest_url( $this->namespace . '/font-families/' . $post->post_parent . '/font-faces/' . $post->ID ),
 				),
@@ -709,8 +709,6 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					'href' => rest_url( $this->namespace . '/font-families/' . $post->post_parent ),
 				),
 			);
-
-			return $links;
 		}
 
 		/**
@@ -788,7 +786,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$status = 500;
 			$code   = 'rest_font_upload_unknown_error';
 
-			if ( __( 'Sorry, you are not allowed to upload this file type.', 'default' ) === $message ) {
+			if ( __( 'Sorry, you are not allowed to upload this file type.' ) === $message ) {
 				$status = 400;
 				$code   = 'rest_font_upload_invalid_file_type';
 			}
@@ -799,7 +797,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		/**
 		* Returns relative path to an uploaded font file.
 		*
-		* The path is relative to the current fonts dir.
+		* The path is relative to the current fonts directory.
 		*
 		* @since 6.5.0
 		* @access private
