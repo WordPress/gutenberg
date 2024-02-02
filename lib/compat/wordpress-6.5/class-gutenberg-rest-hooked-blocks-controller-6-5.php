@@ -208,6 +208,24 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		// TODO: Set context based on the request.
 		$context = null;
 
+		// Retrieve the list of registered collection query parameters.
+		$registered = $this->get_collection_params();
+		$entity     = '';
+		if ( isset( $registered['entity'] ) && ! empty( $request['entity'] ) ) {
+			$entity = $request['entity'];
+		}
+		if ( isset( $registered['id'] ) && ! empty( $request['id'] ) ) {
+			$id = $request['id'];
+		}
+
+		// TODO: Validate entity and ID.
+		if ( 'template' === $entity && is_string( $id ) ) {
+			$context = get_block_template( $id ); // TODO: How do we determine $template_type arg (template or part)?
+			if ( is_wp_error( $context ) ) {
+				return $context;
+			}
+		}
+
 		foreach( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
 			$hooked_block_types_for_anchor_block[ $relative_position ] = apply_filters( 'hooked_block_types', $hooked_block_types, $relative_position, $block_name, $context );
 		}
