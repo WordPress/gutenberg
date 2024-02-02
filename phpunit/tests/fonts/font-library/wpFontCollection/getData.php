@@ -116,6 +116,23 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 								'fontFamily'        => 'Open Sans, sans-serif<script>alert("xss")</script>',
 								'slug'              => 'open-sans',
 								'name'              => 'Open Sans<script>alert("xss")</script>',
+								'fontFace'			=> array(
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/src-as-string.ttf?a=<script>alert("xss")</script>',
+									),
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => array(
+											'https://example.com/src-as-array.woff2?a=<script>alert("xss")</script>',
+											'https://example.com/src-as-array.ttf',
+										)
+									),
+								),
 								'unwanted_property' => 'potentially evil value',
 							),
 							'categories'           => array( 'sans-serif<script>alert("xss")</script>' ),
@@ -145,6 +162,23 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 								'fontFamily' => 'Open Sans, sans-serif',
 								'slug'       => 'open-sans',
 								'name'       => 'Open Sans',
+								'fontFace'			=> array(
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/src-as-string.ttf?a=scriptalert(xss)/script',
+									),
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => array(
+											'https://example.com/src-as-array.woff2?a=scriptalert(xss)/script',
+											'https://example.com/src-as-array.ttf',
+										)
+									),
+								)
 							),
 							'categories'           => array( 'sans-serifalertxss' ),
 						),

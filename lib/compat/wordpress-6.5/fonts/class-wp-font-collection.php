@@ -66,7 +66,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 								'fontFamily'            => 'sanitize_text_field',
 								'fontStyle'             => 'sanitize_text_field',
 								'fontWeight'            => 'sanitize_text_field',
-								'src'                   => 'sanitize_url',
+								'src'                   => 'WP_Font_Collection::sanitize_src_property',
 								'preview'               => 'sanitize_url',
 								'fontDisplay'           => 'sanitize_text_field',
 								'fontStretch'           => 'sanitize_text_field',
@@ -265,6 +265,29 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			}
 
 			return $data;
+		}
+
+		/**
+		 * Sanitizes a src property.
+		 * 
+		 * Font faces can have a src property consisting on a string or an array of strings.
+		 * This method sanitizes the src property value.
+		 * 
+		 * @since 6.5.0
+		 * 
+		 * @param string|array $value src property value to sanitize.
+		 * 
+		 * @return string|array Sanitized URL value.
+		 */
+		public static function sanitize_src_property( $value ) {
+			if( is_array( $value ) ) {
+				foreach( $value as $key => $val ) {
+					$value[$key] = sanitize_url( $val );
+				}
+				return $value;
+			}
+
+			return sanitize_url( $value );
 		}
 	}
 }
