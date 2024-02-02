@@ -711,7 +711,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 
 				$callback = static function () {
 					echo <<<HTML
-<style>
+<style id="wp-interactivity-router_animations">
 .wp-interactivity-router_loading-bar {
 	position: fixed;
 	top: 0;
