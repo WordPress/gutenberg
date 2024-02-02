@@ -45,6 +45,54 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		private $src;
 
 		/**
+		 * Font collection sanitization schema.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @var array
+		 */
+		private const COLLECTION_SANITIZATION_SCHEMA = array(
+			'name'          => 'sanitize_text_field',
+			'description'   => 'sanitize_text_field',
+			'font_families' => array(
+				array(
+					'font_family_settings' => array(
+						'name'       => 'sanitize_text_field',
+						'slug'       => 'sanitize_title',
+						'fontFamily' => 'sanitize_text_field',
+						'preview'    => 'sanitize_url',
+						'fontFace'   => array(
+							array(
+								'fontFamily'            => 'sanitize_text_field',
+								'fontStyle'             => 'sanitize_text_field',
+								'fontWeight'            => 'sanitize_text_field',
+								'src'                   => 'sanitize_url',
+								'preview'               => 'sanitize_url',
+								'fontDisplay'           => 'sanitize_text_field',
+								'fontStretch'           => 'sanitize_text_field',
+								'ascentOverride'        => 'sanitize_text_field',
+								'descentOverride'       => 'sanitize_text_field',
+								'fontVariant'           => 'sanitize_text_field',
+								'fontFeatureSettings'   => 'sanitize_text_field',
+								'fontVariationSettings' => 'sanitize_text_field',
+								'lineGapOverride'       => 'sanitize_text_field',
+								'sizeAdjust'            => 'sanitize_text_field',
+								'unicodeRange'          => 'sanitize_text_field',
+							),
+						),
+					),
+					'categories' => array( 'sanitize_title' )
+				),
+			),
+			'categories'    => array(
+				array(
+					'name' => 'sanitize_text_field',
+					'slug' => 'sanitize_title',
+				),
+			),
+		);
+
+		/**
 		 * WP_Font_Collection constructor.
 		 *
 		 * @since 6.5.0
@@ -201,6 +249,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @return array|WP_Error Array of data if valid, otherwise a WP_Error instance.
 		 */
 		private function validate_data( $data ) {
+			$data = WP_Font_Utils::sanitize_from_schema( $data, self::COLLECTION_SANITIZATION_SCHEMA );
 			$required_properties = array( 'name', 'font_families' );
 			foreach ( $required_properties as $property ) {
 				if ( empty( $data[ $property ] ) ) {
