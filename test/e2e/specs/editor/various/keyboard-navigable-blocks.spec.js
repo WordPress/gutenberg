@@ -75,7 +75,7 @@ test.describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Block' );
+		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
 	} );
 
 	test( 'allows tabbing in navigation mode if no block is selected (reverse)', async ( {
