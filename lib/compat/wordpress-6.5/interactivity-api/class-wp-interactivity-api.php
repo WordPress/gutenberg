@@ -692,11 +692,9 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 
 			if ( ! $p->is_tag_closer() && ! $has_added_markup ) {
 				$has_added_markup = true;
-				/*
-				 * The state could be declared multiple times here but is
-				 * doesn't matter as the values are always the same.
-				 */
-				wp_interactivity_state(
+
+				// Initialize the `core/router` store.
+				$this->state(
 					'core/router',
 					array(
 						'navigation' => array(
