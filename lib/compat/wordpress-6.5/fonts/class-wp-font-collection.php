@@ -16,7 +16,6 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 */
-	#[AllowDynamicProperties]
 	final class WP_Font_Collection {
 		/**
 		 * The unique slug for the font collection.
@@ -28,7 +27,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		public $slug;
 
 		/**
-		 * Font collection configuration.
+		 * Font collection data.
 		 *
 		 * @since 6.5.0
 		 *
