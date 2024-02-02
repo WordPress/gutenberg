@@ -62,14 +62,12 @@ const SNACKBAR_VARIANTS = {
  */
 export function SnackbarList( {
 	notices,
-	maxVisible,
 	className,
 	children,
 	onRemove,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
-	const visibleNotices = maxVisible ? notices.slice( -maxVisible ) : notices;
 	className = classnames( 'components-snackbar-list', className );
 	const removeNotice =
 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
@@ -78,7 +76,7 @@ export function SnackbarList( {
 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
 			{ children }
 			<AnimatePresence>
-				{ visibleNotices.map( ( notice ) => {
+				{ notices.map( ( notice ) => {
 					const { content, ...restNotice } = notice;
 
 					return (
