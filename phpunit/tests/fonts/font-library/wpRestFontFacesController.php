@@ -386,12 +386,12 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$settings = $data['font_face_settings'];
 		unset( $settings['src'] );
 		$this->assertSame(
-			$settings,
 			array(
 				'fontFamily' => '"Open Sans"',
 				'fontWeight' => '200',
 				'fontStyle'  => 'normal',
 			),
+			$settings,
 			'The font_face_settings data should match the expected data.'
 		);
 
@@ -730,14 +730,14 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	}
 
 	/**
-	 * @dataProvider data_create_item_santize_font_family
+	 * @dataProvider data_create_item_sanitize_font_family
 	 *
 	 * @covers WP_REST_Font_Face_Controller::sanitize_font_face_settings
 	 *
 	 * @param string $font_family_setting Setting to test.
 	 * @param string $expected            Expected result.
 	 */
-	public function test_create_item_santize_font_family( $font_family_setting, $expected ) {
+	public function test_create_item_sanitize_font_family( $font_family_setting, $expected ) {
 		$settings = array_merge( self::$default_settings, array( 'fontFamily' => $font_family_setting ) );
 
 		wp_set_current_user( self::$admin_id );
@@ -755,7 +755,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	 *
 	 * @return array
 	 */
-	public function data_create_item_santize_font_family() {
+	public function data_create_item_sanitize_font_family() {
 		return array(
 			'multiword font with integer' => array(
 				'font_family_setting' => 'Libre Barcode 128 Text',
@@ -930,11 +930,11 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$this->assertSame( $expected, $links['parent'][0]['href'], 'The links for a parent URL from the response data should match the parent\'s REST endpoint.' );
 	}
 
-	protected function check_file_meta( $font_face_id, $srcs ) {
+	protected function check_file_meta( $font_face_id, $src_attributes ) {
 		$file_meta = get_post_meta( $font_face_id, '_wp_font_face_file' );
 
-		foreach ( $srcs as $src ) {
-			$file_name = basename( $src );
+		foreach ( $src_attributes as $src_attribute ) {
+			$file_name = basename( $src_attribute );
 			$this->assertContains( $file_name, $file_meta, 'The uploaded font file path should be saved in the post meta.' );
 		}
 	}

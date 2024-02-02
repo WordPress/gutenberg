@@ -33,7 +33,7 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_Font_Library
 	}
 
 	public function unregister_non_existing_collection() {
-		// Unregisters non existing font collection.
+		// Unregisters non-existing font collection.
 		WP_Font_Library::unregister_font_collection( 'non-existing-collection' );
 		$collections = WP_Font_Library::get_font_collections();
 		$this->assertEmpty( $collections, 'Should not be registered collections.' );

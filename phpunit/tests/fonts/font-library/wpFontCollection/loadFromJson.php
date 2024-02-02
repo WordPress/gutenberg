@@ -105,7 +105,7 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 		}
 
 		return array(
-			'body'     => json_encode( self::$mock_collection_data ),
+			'body'     => wp_json_encode( self::$mock_collection_data ),
 			'response' => array(
 				'code' => 200,
 			),
@@ -122,7 +122,7 @@ class Tests_Fonts_WpFontCollection_loadFromJson extends WP_UnitTestCase {
 		unset( $mock_collection_data['slug'] );
 
 		return array(
-			'body'     => json_encode( $mock_collection_data ),
+			'body'     => wp_json_encode( $mock_collection_data ),
 			'response' => array(
 				'code' => 200,
 			),
