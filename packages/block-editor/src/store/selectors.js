@@ -10,6 +10,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
+	getHookedBlockNames,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -1939,9 +1940,7 @@ const buildBlockTypeItem =
 
 		let initialAttributes = {};
 
-		const hookedBlocksForCurrentBlock = getBlockTypes()?.filter(
-			( { blockHooks } ) => blockHooks && id in blockHooks
-		);
+		const hookedBlocksForCurrentBlock = getHookedBlockNames( id );
 
 		if ( hookedBlocksForCurrentBlock?.length ) {
 			initialAttributes = {
