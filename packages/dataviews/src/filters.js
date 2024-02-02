@@ -71,7 +71,6 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					filter={ filter }
 					view={ view }
 					onChangeView={ onChangeView }
-					filters={ filters }
 				/>
 			);
 		} ),

@@ -66,52 +66,50 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 	return (
 		<HStack spacing={ 3 } justify="flex-start">
 			<FlexItem>{ filter.name }</FlexItem>
-			<SelectControl
-				disabled={ operatorOptions.length === 1 }
-				label={ __( 'Condition' ) }
-				value={ value }
-				options={ operatorOptions }
-				onChange={ ( newValue ) => {
-					const newFilters = currentFilter
-						? [
-								...view.filters.map( ( _filter ) => {
-									if ( _filter.field === filter.field ) {
-										return {
-											..._filter,
-											operator: newValue,
-										};
-									}
-									return _filter;
-								} ),
-						  ]
-						: [
-								...view.filters,
-								{
-									field: filter.field,
-									operator: newValue,
-								},
-						  ];
-					onChangeView( {
-						...view,
-						page: 1,
-						filters: newFilters,
-					} );
-				} }
-				size="compact"
-				__nextHasNoMarginBottom
-				hideLabelFromVision
-			/>
+			{ operatorOptions.length > 1 && (
+				<SelectControl
+					label={ __( 'Condition' ) }
+					value={ value }
+					options={ operatorOptions }
+					onChange={ ( newValue ) => {
+						const newFilters = currentFilter
+							? [
+									...view.filters.map( ( _filter ) => {
+										if ( _filter.field === filter.field ) {
+											return {
+												..._filter,
+												operator: newValue,
+											};
+										}
+										return _filter;
+									} ),
+							  ]
+							: [
+									...view.filters,
+									{
+										field: filter.field,
+										operator: newValue,
+									},
+							  ];
+						onChangeView( {
+							...view,
+							page: 1,
+							filters: newFilters,
+						} );
+					} }
+					size="compact"
+					__nextHasNoMarginBottom
+					hideLabelFromVision
+				/>
+			) }
 		</HStack>
 	);
 }
 
-function ResetFilter( { filter, view, onChangeView, filters } ) {
-	const isPrimary = ( field ) =>
-		filters.some( ( f ) => f.field === field && f.isPrimary );
-	const isDisabled = ! view.filters?.some(
-		( _filter ) =>
-			_filter.value !== undefined || ! isPrimary( _filter.field )
-	);
+function ResetFilter( { filter, view, onChangeView } ) {
+	const isDisabled =
+		view.filters.find( ( _filter ) => _filter.field === filter.field )
+			?.value === undefined && filter.isPrimary;
 	return (
 		<Button
 			disabled={ isDisabled }
@@ -129,7 +127,7 @@ function ResetFilter( { filter, view, onChangeView, filters } ) {
 				} );
 			} }
 		>
-			{ __( 'Reset' ) }
+			{ filter.isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
 		</Button>
 	);
 }
