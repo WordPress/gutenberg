@@ -9,6 +9,12 @@
  * Helper functions used to render the navigation block.
  */
 class WP_Navigation_Block_Renderer {
+
+	/**
+	 * Used to determine whether or not a navigation has submenus.
+	 */
+	private static $has_submenus = false;
+
 	/**
 	 * Used to determine which blocks are wrapped in an <li>.
 	 *
@@ -58,22 +64,37 @@ class WP_Navigation_Block_Renderer {
 	 * Returns whether or not a navigation has a submenu.
 	 *
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
-	 * @return bool Returns whether or not a navigation has a submenu.
+	 * @return bool Returns whether or not a navigation has a submenu and also sets the member variable.
 	 */
 	private static function has_submenus( $inner_blocks ) {
+		if ( true === static::$has_submenus ) {
+			return static::$has_submenus;
+		}
+
 		foreach ( $inner_blocks as $inner_block ) {
-			$inner_block_content = $inner_block->render();
-			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
-			if ( $p->next_tag(
-				array(
-					'name'       => 'LI',
-					'class_name' => 'has-child',
-				)
-			) ) {
-				return true;
+			// If this is a page list then work out if any of the pages have children.
+			if ( 'core/page-list' === $inner_block->name ) {
+				$all_pages = get_pages(
+					array(
+						'sort_column' => 'menu_order,post_title',
+						'order'       => 'asc',
+					)
+				);
+				foreach ( (array) $all_pages as $page ) {
+					if ( $page->post_parent ) {
+						static::$has_submenus = true;
+						break;
+					}
+				}
+			}
+			// If this is a navigation submenu then we know we have submenus.
+			if ( 'core/navigation-submenu' === $inner_block->name ) {
+				static::$has_submenus = true;
+				break;
 			}
 		}
-		return false;
+
+		return static::$has_submenus;
 	}
 
 	/**
