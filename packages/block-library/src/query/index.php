@@ -104,9 +104,9 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
-	$block_name = $parsed_block['blockName'];
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-
+	$block_name              = $parsed_block['blockName'];
+	$block_type              = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+	$has_enhanced_pagination = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] );
 	/*
 	 * Client side navigation can be true in two states:
 	 *  - supports.interactivity = true;
@@ -115,7 +115,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	$supports_client_navigation = ( isset( $block_type->supports['interactivity']['clientNavigation'] ) && true === $block_type->supports['interactivity']['clientNavigation'] )
 		|| ( isset( $block_type->supports['interactivity'] ) && true === $block_type->supports['interactivity'] );
 
-	if ( 'core/query' === $block_name && isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) ) {
+	if ( 'core/query' === $block_name && $has_enhanced_pagination ) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
 
 		if ( ! isset( $render_query_callback ) ) {
