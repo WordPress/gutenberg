@@ -10,7 +10,7 @@
 class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_sanitize_from_schema
-	 * 
+	 *
 	 * @param array $data     Data to sanitize.
 	 * @param array $schema   Schema to use for sanitization.
 	 * @param array $expected Expected result.
@@ -239,28 +239,27 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 				),
 			),
 
-			'With empty structure'  => array(
+			'With empty structure'         => array(
 				'data'     => array(
-					'slug'       => 'open-sans',
-					'nested'	=>	array(
+					'slug'   => 'open-sans',
+					'nested' => array(
 						'key1'    => 'value</style><script>alert("xss")</script>',
 						'nested2' => array(
-							'key2' => 'value</style><script>alert("xss")</script>',
+							'key2'    => 'value</style><script>alert("xss")</script>',
 							'nested3' => array(
-								'nested4' => array(
-								),
+								'nested4' => array(),
 							),
 						),
 					),
 				),
 				'schema'   => array(
-					'slug'       => 'sanitize_title',
-					'nested'     => array(
+					'slug'   => 'sanitize_title',
+					'nested' => array(
 						'key1'    => 'sanitize_text_field',
 						'nested2' => array(
-							'key2' => 'sanitize_text_field',
+							'key2'    => 'sanitize_text_field',
 							'nested3' => array(
-								'key3' => 'sanitize_text_field',
+								'key3'    => 'sanitize_text_field',
 								'nested4' => array(
 									'key4' => 'sanitize_text_field',
 								),
@@ -269,8 +268,8 @@ class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 					),
 				),
 				'expected' => array(
-					'slug'       => 'open-sans',
-					'nested'	=>	array(
+					'slug'   => 'open-sans',
+					'nested' => array(
 						'key1'    => 'value',
 						'nested2' => array(
 							'key2' => 'value',
