@@ -42,7 +42,6 @@ test.describe( 'data-wp-context', () => {
 		const childContext = await parseContent(
 			page.getByTestId( 'child context' )
 		);
-
 		expect( childContext ).toMatchObject( {
 			prop1: 'parent',
 			prop2: 'child',
@@ -188,5 +187,13 @@ test.describe( 'data-wp-context', () => {
 		await expect( element ).toHaveText( '' );
 		await page.getByTestId( 'async navigate' ).click();
 		await expect( element ).toHaveText( 'changed from async action' );
+	} );
+	test( 'should bail out if the context is not a default directive', async ( {
+		page,
+	} ) => {
+		// This test is to ensure that the context directive is only applied to the default directive
+		// and not to any other directive.
+		const element = page.getByTestId( 'non-default suffix context' );
+		await expect( element ).toHaveText( '' );
 	} );
 } );
