@@ -6,10 +6,6 @@
  * @since 5.8.0
  */
 
-if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Class that encapsulates the processing of structures that adhere to the theme.json spec.
  *
@@ -155,7 +151,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'              => array( 'typography', 'fontSizes' ),
-			'prevent_override'  => array( 'typography', 'defaultFontSizes' ),
+			'prevent_override'  => false,
 			'use_default_names' => true,
 			'value_func'        => 'gutenberg_get_typography_font_size_value',
 			'css_vars'          => '--wp--preset--font-size--$slug',
@@ -413,20 +409,19 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'typography'                    => array(
-			'fluid'            => null,
-			'customFontSize'   => null,
-			'defaultFontSizes' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'lineHeight'       => null,
-			'textColumns'      => null,
-			'textDecoration'   => null,
-			'textTransform'    => null,
-			'writingMode'      => null,
+			'fluid'          => null,
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textColumns'    => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 	);
 
@@ -435,7 +430,6 @@ class WP_Theme_JSON_Gutenberg {
 			'fontFamily' => null,
 			'name'       => null,
 			'slug'       => null,
-			'preview'    => null,
 			'fontFace'   => array(
 				array(
 					'ascentOverride'        => null,
@@ -451,7 +445,6 @@ class WP_Theme_JSON_Gutenberg {
 					'sizeAdjust'            => null,
 					'src'                   => null,
 					'unicodeRange'          => null,
-					'preview'               => null,
 				),
 			),
 		),
@@ -1026,7 +1019,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
-					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
@@ -3881,5 +3874,38 @@ class WP_Theme_JSON_Gutenberg {
 
 		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
 		return $theme_json;
+	}
+
+	/**
+	 * Generates a selector for a block style variation.
+	 *
+	 * @param string $variation_name Name of the block style variation.
+	 * @param string $block_selector CSS selector for the block.
+	 *
+	 * @return string Block selector with block style variation selector added to it.
+	 */
+	protected static function get_block_style_variation_selector( $variation_name, $block_selector ) {
+		$variation_class = ".is-style-$variation_name";
+
+		if ( ! $block_selector ) {
+			return $variation_class;
+		}
+
+		$limit          = 1;
+		$selector_parts = explode( ',', $block_selector );
+		$result         = array();
+
+		foreach ( $selector_parts as $part ) {
+			$result[] = preg_replace_callback(
+				'/((?::\([^)]+\))?\s*)([^\s:]+)/',
+				function ( $matches ) use ( $variation_class ) {
+					return $matches[1] . $matches[2] . $variation_class;
+				},
+				$part,
+				$limit
+			);
+		}
+
+		return implode( ',', $result );
 	}
 }

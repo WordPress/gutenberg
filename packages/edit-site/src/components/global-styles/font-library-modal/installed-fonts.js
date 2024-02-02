@@ -186,9 +186,10 @@ function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 				) }
 			</div>
 			<Button
-				disabled={ ! fontFamiliesHasChanges }
 				variant="primary"
 				onClick={ saveFontFamilies }
+				disabled={ ! fontFamiliesHasChanges }
+				__experimentalIsFocusable
 			>
 				{ __( 'Update' ) }
 			</Button>

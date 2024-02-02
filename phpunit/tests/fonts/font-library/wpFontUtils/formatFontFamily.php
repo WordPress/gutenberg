@@ -15,8 +15,8 @@ class Tests_Fonts_WpFontUtils_FormatFontFamily extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_should_format_font_family
 	 *
-	 * @param string $font_family   Font family.
-	 * @param string $expected      Expected family.
+	 * @param string $font_family Font family to test.
+	 * @param string $expected    Expected family.
 	 */
 	public function test_should_format_font_family( $font_family, $expected ) {
 		$this->assertSame(
@@ -30,7 +30,7 @@ class Tests_Fonts_WpFontUtils_FormatFontFamily extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array[]
+	 * @return array
 	 */
 	public function data_should_format_font_family() {
 		return array(

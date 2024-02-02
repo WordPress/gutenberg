@@ -7,10 +7,12 @@
  * @since 6.5.0
  *
  * @group restapi
+ * @group fonts
+ * @group font-library
  *
  * @coversDefaultClass WP_REST_Font_Collections_Controller
  */
-class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 	protected static $editor_id;
 	protected static $mock_file;
@@ -28,15 +30,9 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 			)
 		);
 		$mock_file       = wp_tempnam( 'my-collection-data-' );
-		file_put_contents( $mock_file, '{"font_families": [ "mock" ], "categories": [ "mock" ] }' );
+		file_put_contents( $mock_file, '{"slug": "mock-col-slug", "font_families": [ "mock" ], "categories": [ "mock" ] }' );
 
-		wp_register_font_collection(
-			array(
-				'name' => 'My Collection',
-				'slug' => 'mock-col-slug',
-				'src'  => $mock_file,
-			)
-		);
+		wp_register_font_collection_from_json( $mock_file );
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -44,7 +40,6 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		self::delete_user( self::$editor_id );
 		wp_unregister_font_collection( 'mock-col-slug' );
 	}
-
 
 	/**
 	 * @covers WP_REST_Font_Collections_Controller::register_routes
@@ -67,7 +62,7 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$content  = $response->get_data();
 		$this->assertIsArray( $content );
-		$this->assertEquals( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status() );
 	}
 
 	/**
@@ -77,7 +72,7 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status(), 'Response code is not 200' );
+		$this->assertSame( 200, $response->get_status(), 'Response code is not 200' );
 
 		$response_data = $response->get_data();
 		$this->assertArrayHasKey( 'name', $response_data, 'Response data does not have the name key.' );
@@ -159,13 +154,13 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 5, $properties );
-		$this->assertArrayHasKey( 'slug', $properties );
-		$this->assertArrayHasKey( 'name', $properties );
-		$this->assertArrayHasKey( 'description', $properties );
-		$this->assertArrayHasKey( 'font_families', $properties );
-		$this->assertArrayHasKey( 'categories', $properties );
+		$this->assertCount( 5, $properties, 'There should be 5 properties in the response data schema.' );
+		$this->assertArrayHasKey( 'slug', $properties, 'The slug property should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'name', $properties, 'The name property should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'description', $properties, 'The description property should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'font_families', $properties, 'The slug font_families should exist in the response data schema.' );
+		$this->assertArrayHasKey( 'categories', $properties, 'The categories property should exist in the response data schema.' );
 	}
 }

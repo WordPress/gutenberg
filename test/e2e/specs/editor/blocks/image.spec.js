@@ -670,10 +670,7 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await page
-			.getByLabel( 'Block tools' )
-			.getByLabel( 'Insert link' )
-			.click();
+		await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
 
 		// This form lacks distinguishing qualities other than the
 		// class name, so we use page.locator() instead of page.getByRole()

@@ -1,0 +1,86 @@
+name: Props Bot
+
+on:
+    # This event runs anytime a PR is (re)opened, updated, or labeled.
+    # GitHub does not allow filtering the `labeled` event by a specific label.
+    # However, the logic below will short-circuit the workflow when the `props-bot` label is not the one being added.
+    # Note: The pull_request_target event is uesed instead of pull_request because this workflow needs permission to comment
+    # on the pull request. Because this event grants extra permissions to `GITHUB_TOKEN`, any code changes within the PR
+    # should be considered untrusted. See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/.
+    pull_request_target:
+        types:
+            - opened
+            - synchronize
+            - reopened
+            - labeled
+    # This event runs anytime a comment is added or deleted.
+    # You cannot filter this event for PR comments only.
+    # However, the logic below does short-circuit the workflow for issues.
+    issue_comment:
+        type:
+            - created
+            - deleted
+    # This event will run everytime a new PR review is initially submitted.
+    pull_request_review:
+        types:
+            - submitted
+    # This event runs anytime a PR review comment is created or deleted.
+    pull_request_review_comment:
+        types:
+            - created
+            - deleted
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ contains( fromJSON( '["pull_request_target", "pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    # Compiles a list of props for a pull request.
+    #
+    # Performs the following steps:
+    # - Collects a list of contributor props and leaves a comment.
+    # - Removes the props-bot label, if necessary.
+    props-bot:
+        name: Generate a list of props
+        runs-on: ubuntu-latest
+        permissions:
+            # The action needs permission `write` permission for PRs in order to add a comment.
+            pull-requests: write
+            contents: read
+        timeout-minutes: 20
+        # The job should only run if:
+        #
+        # - A pull request review is created or commented on.
+        # - An issue comment is added to a pull request.
+        # - A pull request is opened, synchronized, or reopened.
+        # - The `props-bot` label is added to the pull request.
+        if: |
+            contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
+            ( github.event_name == 'issue_comment' && github.event.issue.pull_request ) ||
+            github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
+            'props-bot' == github.event.label.name
+
+        steps:
+            - name: Gather a list of contributors
+              uses: WordPress/props-bot-action@trunk
+
+            - name: Remove the props-bot label
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              if: ${{ github.event.action == 'labeled' && 'props-bot' == github.event.label.name }}
+              with:
+                  retries: 2
+                  retry-exempt-status-codes: 418
+                  script: |
+                      github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: '${{ github.event.number }}',
+                        name: 'props-bot'
+                      });
