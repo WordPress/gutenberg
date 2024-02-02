@@ -15,8 +15,7 @@ import FullscreenModeClose from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
+	return jest.fn();
 } );
 
 jest.mock( '@wordpress/core-data' );
@@ -28,13 +27,14 @@ describe( 'FullscreenModeClose', () => {
 				return cb( () => ( {
 					isResolving: () => false,
 					isFeatureActive: () => true,
-					getCurrentPostType: () => {},
 					getPostType: () => true,
 					getEntityRecord: () => ( {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
 					getEditorSettings: () => ( {
-						goBack: undefined,
+						getEditPostTypeProps: () => ( {
+							postType: 'post',
+						} ),
 					} ),
 				} ) );
 			} );
@@ -50,13 +50,14 @@ describe( 'FullscreenModeClose', () => {
 				return cb( () => ( {
 					isResolving: () => false,
 					isFeatureActive: () => true,
-					getCurrentPostType: () => {},
 					getPostType: () => true,
 					getEntityRecord: () => ( {
 						site_icon_url: '',
 					} ),
 					getEditorSettings: () => ( {
-						goBack: undefined,
+						getEditPostTypeProps: () => ( {
+							postType: 'post',
+						} ),
 					} ),
 				} ) );
 			} );
@@ -75,12 +76,11 @@ describe( 'FullscreenModeClose', () => {
 				return cb( () => ( {
 					isResolving: () => false,
 					isFeatureActive: () => true,
-					getCurrentPostType: () => {},
 					getPostType: () => {
 						return {
-							slug: 'post',
+							slug: 'page',
 							labels: {
-								view_items: 'View Posts',
+								view_items: 'View Pages',
 							},
 						};
 					},
@@ -88,49 +88,19 @@ describe( 'FullscreenModeClose', () => {
 						site_icon_url: '',
 					} ),
 					getEditorSettings: () => ( {
-						goBack: undefined,
+						getEditPostTypeProps: () => ( {
+							postType: 'page',
+						} ),
 					} ),
 				} ) );
 			} );
 
 			render( <FullscreenModeClose /> );
 
-			const button = screen.getByLabelText( 'View Posts' );
+			const button = screen.getByLabelText( 'View Pages' );
 			expect( button.href ).toBe(
-				'http://localhost/edit.php?post_type=post'
+				'http://localhost/edit.php?post_type=page'
 			);
-		} );
-
-		it( 'should add correct click handler where goBack function exists', () => {
-			const goBack = jest.fn();
-			useSelect.mockImplementation( ( cb ) => {
-				return cb( () => ( {
-					isResolving: () => false,
-					isFeatureActive: () => true,
-					getCurrentPostType: () => {},
-					getPostType: () => {
-						return {
-							slug: 'post',
-							labels: {
-								view_items: 'View Posts',
-							},
-						};
-					},
-					getEntityRecord: () => ( {
-						site_icon_url: '',
-					} ),
-					getEditorSettings: () => ( {
-						goBack,
-					} ),
-				} ) );
-			} );
-
-			render( <FullscreenModeClose /> );
-
-			const button = screen.getByLabelText( 'Back' );
-			expect( button.href ).toBeUndefined();
-			button.click();
-			expect( goBack ).toHaveBeenCalled();
 		} );
 	} );
 } );

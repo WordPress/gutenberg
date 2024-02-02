@@ -35,6 +35,13 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
+	const getEditPostTypeProps = useCallback( () => {
+		return {
+			postType: initialPostType,
+			postId: initialPostId,
+		};
+	}, [ initialPostType, initialPostId ] );
+
 	const getPostLinkProps = useCallback( ( params ) => {
 		const currentArgs = getQueryArgs( window.location.href );
 		const currentUrlWithoutArgs = removeQueryArgs(
@@ -68,6 +75,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 	return {
 		currentPost,
 		getPostLinkProps,
+		getEditPostTypeProps,
 		goBack: postHistory.length > 1 ? goBack : undefined,
 	};
 }
