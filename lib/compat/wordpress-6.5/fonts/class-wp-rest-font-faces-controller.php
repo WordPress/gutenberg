@@ -212,7 +212,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				}
 			}
 
-			// Check that each file in the request references a src in the settings
+			// Check that each file in the request references a src in the settings.
 			foreach ( array_keys( $files ) as $file ) {
 				if ( ! in_array( $file, $srcs, true ) ) {
 					return new WP_Error(
@@ -825,13 +825,13 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		}
 
 		/**
-		 * Sanitizes a single src value when creating a font face.
+		 * Sanitizes a single src value for a font face.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $value Font face src that is a url or a key for a $_FILES item.
+		 * @param string $value Font face src that is a URL or the key for a $_FILES array item.
 		 *
-		 * @return string Sanitized $src value.
+		 * @return string Sanitized value.
 		 */
 		protected function sanitize_src( $value ) {
 			$value = ltrim( $value );

@@ -54,6 +54,10 @@ class Tests_Fonts_WpFontUtils_SanitizeFontFamily extends WP_UnitTestCase {
 				'font_family' => ' ',
 				'expected'    => '',
 			),
+			'data_font_family_with_whitespace_tags_new_lines' => array(
+				'font_family' => "   Rock      3D</style><script>alert('XSS');</script>\n    ",
+				'expected'    => '"Rock 3D"',
+			),
 		);
 	}
 }
