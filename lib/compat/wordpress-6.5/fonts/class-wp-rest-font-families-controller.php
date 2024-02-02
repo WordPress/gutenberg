@@ -405,7 +405,6 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		 *
 		 * @param int $font_family_id Font family post ID.
 		 * @return int[] Array of child font face post IDs.
-		 * .
 		 */
 		protected function get_font_face_ids( $font_family_id ) {
 			$query = new WP_Query(
