@@ -68,7 +68,7 @@ window.addEventListener( 'popstate', async () => {
 	if ( page ) {
 		renderRegions( page );
 		// Update the URL in the state.
-		state.url = window.location;
+		state.url = window.location.href;
 	} else {
 		window.location.reload();
 	}
