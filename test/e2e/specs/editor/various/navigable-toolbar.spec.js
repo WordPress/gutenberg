@@ -272,6 +272,12 @@ test.describe( 'Block Toolbar', () => {
 			exact: true,
 		} );
 
+		// Make sure it's in an acvite state for now
+		await expect( blockToolbarMoveUpButton ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
