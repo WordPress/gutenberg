@@ -683,9 +683,6 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * top loading bar to visually inform that a navigation is in progress
 		 * and 2) an `aria-live` region for accessible navigation announcements.
 		 *
-		 * The same action is registered everytime the directive is processed to
-		 * prevent element duplication.
-		 *
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p The directives processor instance.
