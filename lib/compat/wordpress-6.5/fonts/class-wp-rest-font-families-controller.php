@@ -141,15 +141,14 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		 * @return array                   Decoded array font family settings.
 		 */
 		public function sanitize_font_family_settings( $value ) {
+			// Settings arrive as stringified JSON, since this is a multipart/form-data request.
 			$settings = json_decode( $value, true );
+			$schema   = $this->get_item_schema()['properties']['font_family_settings']['properties'];
 
-			if ( isset( $settings['fontFamily'] ) ) {
-				$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
-			}
-
-			// Provide default for preview, if not provided.
-			if ( ! isset( $settings['preview'] ) ) {
-				$settings['preview'] = '';
+			// Sanitize settings based on callbacks in the schema.
+			foreach ( $settings as $key => $value ) {
+				$sanitize_callback = $schema[ $key ]['sanitize_callback'];
+				$settings[ $key ]  = call_user_func( $sanitize_callback, $value );
 			}
 
 			return $settings;
@@ -307,25 +306,31 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 					// Font family settings come directly from theme.json schema
 					// See https://schemas.wp.org/trunk/theme.json
 					'font_family_settings' => array(
-						'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
+						'description'          => __( 'font-face definition in theme.json format.', 'gutenberg' ),
 						'type'                 => 'object',
 						'context'              => array( 'view', 'edit', 'embed' ),
 						'properties'           => array(
 							'name'       => array(
-								'description' => 'Name of the font family preset, translatable.',
-								'type'        => 'string',
+								'description'       => __( 'Name of the font family preset, translatable.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'slug'       => array(
-								'description' => 'Kebab-case unique identifier for the font family preset.',
-								'type'        => 'string',
+								'description'       => __( 'Kebab-case unique identifier for the font family preset.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_title',
 							),
 							'fontFamily' => array(
-								'description' => 'CSS font-family value.',
-								'type'        => 'string',
+								'description'       => __( 'CSS font-family value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => array( 'WP_Font_Utils', 'sanitize_font_family' ),
 							),
 							'preview'    => array(
-								'description' => 'URL to a preview image of the font family.',
-								'type'        => 'string',
+								'description'       => __( 'URL to a preview image of the font family.', 'gutenberg' ),
+								'type'              => 'string',
+								'format'            => 'uri',
+								'default'           => '',
+								'sanitize_callback' => 'sanitize_url',
 							),
 						),
 						'required'             => array( 'name', 'slug', 'fontFamily' ),

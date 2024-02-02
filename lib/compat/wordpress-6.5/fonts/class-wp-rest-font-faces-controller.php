@@ -227,9 +227,12 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		public function sanitize_font_face_settings( $value ) {
 			// Settings arrive as stringified JSON, since this is a multipart/form-data request.
 			$settings = json_decode( $value, true );
+			$schema   = $this->get_item_schema()['properties']['font_face_settings']['properties'];
 
-			if ( isset( $settings['fontFamily'] ) ) {
-				$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
+			// Sanitize settings based on callbacks in the schema.
+			foreach ( $settings as $key => $value ) {
+				$sanitize_callback = $schema[ $key ]['sanitize_callback'];
+				$settings[ $key ]  = call_user_func( $sanitize_callback, $value );
 			}
 
 			return $settings;
@@ -506,38 +509,43 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 						'context'              => array( 'view', 'edit', 'embed' ),
 						'properties'           => array(
 							'fontFamily'            => array(
-								'description' => __( 'CSS font-family value.', 'gutenberg' ),
-								'type'        => 'string',
-								'default'     => '',
+								'description'       => __( 'CSS font-family value.', 'gutenberg' ),
+								'type'              => 'string',
+								'default'           => '',
+								'sanitize_callback' => array( 'WP_Font_Utils', 'sanitize_font_family' ),
 							),
 							'fontStyle'             => array(
-								'description' => __( 'CSS font-style value.', 'gutenberg' ),
-								'type'        => 'string',
-								'default'     => 'normal',
+								'description'       => __( 'CSS font-style value.', 'gutenberg' ),
+								'type'              => 'string',
+								'default'           => 'normal',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'fontWeight'            => array(
-								'description' => __( 'List of available font weights, separated by a space.', 'gutenberg' ),
-								'default'     => '400',
+								'description'       => __( 'List of available font weights, separated by a space.', 'gutenberg' ),
+								'default'           => '400',
 								// Changed from `oneOf` to avoid errors from loose type checking.
 								// e.g. a fontWeight of "400" validates as both a string and an integer due to is_numeric check.
-								'type'        => array( 'string', 'integer' ),
+								'type'              => array( 'string', 'integer' ),
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'fontDisplay'           => array(
-								'description' => __( 'CSS font-display value.', 'gutenberg' ),
-								'type'        => 'string',
-								'default'     => 'fallback',
-								'enum'        => array(
+								'description'       => __( 'CSS font-display value.', 'gutenberg' ),
+								'type'              => 'string',
+								'default'           => 'fallback',
+								'enum'              => array(
 									'auto',
 									'block',
 									'fallback',
 									'swap',
 									'optional',
 								),
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'src'                   => array(
-								'description' => __( 'Paths or URLs to the font files.', 'gutenberg' ),
-								// Changed from `oneOf` to `anyOf` due to rest_sanitize_array converting a string into an array.
-								'anyOf'       => array(
+								'description'       => __( 'Paths or URLs to the font files.', 'gutenberg' ),
+								// Changed from `oneOf` to `anyOf` due to rest_sanitize_array converting a string into an array,
+								// and causing a "matches more than one of the expected formats" error.
+								'anyOf'             => array(
 									array(
 										'type' => 'string',
 									),
@@ -548,47 +556,63 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 										),
 									),
 								),
-								'default'     => array(),
+								'default'           => array(),
+								'sanitize_callback' => function ( $value ) {
+									if ( is_string( $value ) ) {
+										return sanitize_text_field( $value );
+									}
+									return array_map( 'sanitize_text_field', $value );
+								},
 							),
 							'fontStretch'           => array(
-								'description' => __( 'CSS font-stretch value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS font-stretch value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'ascentOverride'        => array(
-								'description' => __( 'CSS ascent-override value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS ascent-override value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'descentOverride'       => array(
-								'description' => __( 'CSS descent-override value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS descent-override value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'fontVariant'           => array(
-								'description' => __( 'CSS font-variant value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS font-variant value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'fontFeatureSettings'   => array(
-								'description' => __( 'CSS font-feature-settings value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS font-feature-settings value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'fontVariationSettings' => array(
-								'description' => __( 'CSS font-variation-settings value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS font-variation-settings value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'lineGapOverride'       => array(
-								'description' => __( 'CSS line-gap-override value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS line-gap-override value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'sizeAdjust'            => array(
-								'description' => __( 'CSS size-adjust value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS size-adjust value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'unicodeRange'          => array(
-								'description' => __( 'CSS unicode-range value.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'CSS unicode-range value.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_text_field',
 							),
 							'preview'               => array(
-								'description' => __( 'URL to a preview image of the font face.', 'gutenberg' ),
-								'type'        => 'string',
+								'description'       => __( 'URL to a preview image of the font face.', 'gutenberg' ),
+								'type'              => 'string',
+								'sanitize_callback' => 'sanitize_url',
 							),
 						),
 						'required'             => array( 'fontFamily', 'src' ),
