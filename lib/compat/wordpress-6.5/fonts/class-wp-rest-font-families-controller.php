@@ -77,7 +77,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		 *
 		 * @param string          $value   Encoded JSON string of font family settings.
 		 * @param WP_REST_Request $request Request object.
-		 * @return false|WP_Error True if the settings are valid, otherwise a WP_Error object.
+		 * @return true|WP_Error True if the settings are valid, otherwise a WP_Error object.
 		 */
 		public function validate_font_family_settings( $value, $request ) {
 			$settings = json_decode( $value, true );

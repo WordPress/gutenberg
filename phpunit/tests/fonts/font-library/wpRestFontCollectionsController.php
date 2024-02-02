@@ -30,9 +30,9 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 			)
 		);
 		$mock_file       = wp_tempnam( 'my-collection-data-' );
-		file_put_contents( $mock_file, '{"slug": "mock-col-slug", "font_families": [ "mock" ], "categories": [ "mock" ] }' );
+		file_put_contents( $mock_file, '{"name": "Mock Collection", "font_families": [ "mock" ], "categories": [ "mock" ] }' );
 
-		wp_register_font_collection_from_json( $mock_file );
+		wp_register_font_collection( 'mock-col-slug', $mock_file );
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -66,13 +66,32 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 	}
 
 	/**
+	 * @covers WP_REST_Font_Collections_Controller::get_items
+	 */
+	public function test_get_items_should_only_return_valid_collections() {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::load_from_json' );
+
+		wp_set_current_user( self::$admin_id );
+		wp_register_font_collection( 'invalid-collection', 'invalid-collection-file' );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections' );
+		$response = rest_get_server()->dispatch( $request );
+		$content  = $response->get_data();
+
+		wp_unregister_font_collection( 'invalid-collection' );
+
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
+		$this->assertCount( 1, $content, 'The response should only contain valid collections.' );
+	}
+
+	/**
 	 * @covers WP_REST_Font_Collections_Controller::get_item
 	 */
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 200, $response->get_status(), 'Response code is not 200' );
+		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
 
 		$response_data = $response->get_data();
 		$this->assertArrayHasKey( 'name', $response_data, 'Response data does not have the name key.' );
@@ -102,16 +121,34 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 	/**
 	 * @covers WP_REST_Font_Collections_Controller::get_item
 	 */
+	public function test_get_item_invalid_collection() {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::load_from_json' );
+
+		wp_set_current_user( self::$admin_id );
+		$slug = 'invalid-collection';
+		wp_register_font_collection( $slug, 'invalid-collection-file' );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/' . $slug );
+		$response = rest_get_server()->dispatch( $request );
+
+		wp_unregister_font_collection( $slug );
+
+		$this->assertErrorResponse( 'font_collection_json_missing', $response, 500, 'When the collection json file is invalid, the response should return an error for "font_collection_json_missing" with 500 status.' );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Collections_Controller::get_item
+	 */
 	public function test_get_item_invalid_id_permission() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
 
 		wp_set_current_user( 0 );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 401, 'Response code should be 401 for non-authenticated users.' );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 401, 'The response status should be 401 for non-authenticated users.' );
 
 		wp_set_current_user( self::$editor_id );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 403, 'Response code should be 403 for users without the right permissions.' );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 403, 'The response status should be 403 for users without the right permissions.' );
 	}
 
 	/**

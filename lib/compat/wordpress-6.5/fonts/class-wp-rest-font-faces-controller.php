@@ -151,7 +151,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 *
 		 * @param string          $value   Encoded JSON string of font face settings.
 		 * @param WP_REST_Request $request Request object.
-		 * @return false|WP_Error True if the settings are valid, otherwise a WP_Error object.
+		 * @return true|WP_Error True if the settings are valid, otherwise a WP_Error object.
 		 */
 		public function validate_create_font_face_settings( $value, $request ) {
 			$settings = json_decode( $value, true );

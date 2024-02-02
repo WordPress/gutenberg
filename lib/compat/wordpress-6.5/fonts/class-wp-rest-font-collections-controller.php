@@ -94,8 +94,10 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$items = array();
 			foreach ( $collections_page as $collection ) {
 				$item = $this->prepare_item_for_response( $collection, $request );
+
+				// If there's an error loading a collection, skip it and continue loading valid collections.
 				if ( is_wp_error( $item ) ) {
-					return $item;
+					continue;
 				}
 				$item    = $this->prepare_response_for_collection( $item );
 				$items[] = $item;
@@ -170,10 +172,23 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$fields = $this->get_fields_for_response( $request );
 			$item   = array();
 
-			$config_fields = array( 'slug', 'name', 'description', 'font_families', 'categories' );
-			foreach ( $config_fields as $field ) {
-				if ( in_array( $field, $fields, true ) ) {
-					$item[ $field ] = $collection->$field;
+			if ( rest_is_field_included( 'slug', $fields ) ) {
+				$item['slug'] = $collection->slug;
+			}
+
+			// If any data fields are requested, get the collection data.
+			$data_fields = array( 'name', 'description', 'font_families', 'categories' );
+			if ( ! empty( array_intersect( $fields, $data_fields ) ) ) {
+				$collection_data = $collection->get_data();
+				if ( is_wp_error( $collection_data ) ) {
+					$collection_data->add_data( array( 'status' => 500 ) );
+					return $collection_data;
+				}
+
+				foreach ( $data_fields as $field ) {
+					if ( rest_is_field_included( $field, $fields ) ) {
+						$item[ $field ] = $collection_data[ $field ];
+					}
 				}
 			}
 
