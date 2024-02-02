@@ -4,7 +4,10 @@
  *
  * @package WordPress
  * @subpackage Font Library
- * *
+ *
+ * @group fonts
+ * @group font-library
+ *
  * @covers WP_Font_Utils::sanitize_from_schema
  */
 class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
