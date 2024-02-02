@@ -101,12 +101,15 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 		const attributes = getPartiallySyncedAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] ??= {};
-			defaultValues[ blockId ][ attributeKey ] =
+			defaultValues[ blockId ] ??= { values: {} };
+			defaultValues[ blockId ].values[ attributeKey ] =
 				block.attributes[ attributeKey ];
-			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
+
+			if (
+				overrides[ blockId ]?.values?.[ attributeKey ] !== undefined
+			) {
 				newAttributes[ attributeKey ] =
-					overrides[ blockId ][ attributeKey ];
+					overrides[ blockId ]?.values?.[ attributeKey ];
 			}
 		}
 		return {
@@ -133,10 +136,10 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				block.attributes[ attributeKey ] !==
 				defaultValues[ blockId ][ attributeKey ]
 			) {
-				overrides[ blockId ] ??= {};
+				overrides[ blockId ] ??= { values: {} };
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				overrides[ blockId ][ attributeKey ] =
+				overrides[ blockId ].values[ attributeKey ] =
 					block.attributes[ attributeKey ];
 			}
 		}
@@ -162,7 +165,7 @@ function getHasOverridableBlocks( blocks ) {
 
 export default function ReusableBlockEdit( {
 	name,
-	attributes: { ref, overrides },
+	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 	setAttributes,
@@ -175,7 +178,7 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialOverrides = useRef( overrides );
+	const initialOverrides = useRef( content );
 	const defaultValuesRef = useRef( {} );
 
 	const {
@@ -287,7 +290,7 @@ export default function ReusableBlockEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `overrides` attribute from the updated blocks to the pattern block.
+	// Sync the `content` attribute from the updated blocks to the pattern block.
 	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
 		const { getBlocks } = registry.select( blockEditorStore );
@@ -298,7 +301,7 @@ export default function ReusableBlockEdit( {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
 					setAttributes( {
-						overrides: getOverridesFromBlocks(
+						content: getOverridesFromBlocks(
 							blocks,
 							defaultValuesRef.current
 						),
@@ -314,7 +317,7 @@ export default function ReusableBlockEdit( {
 	};
 
 	const resetOverrides = () => {
-		if ( overrides ) {
+		if ( content ) {
 			replaceInnerBlocks( patternClientId, initialBlocks );
 		}
 	};
@@ -365,7 +368,7 @@ export default function ReusableBlockEdit( {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ resetOverrides }
-							disabled={ ! overrides }
+							disabled={ ! content }
 							__experimentalIsFocusable
 						>
 							{ __( 'Reset' ) }
