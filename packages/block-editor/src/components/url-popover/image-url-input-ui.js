@@ -5,11 +5,11 @@ import { __ } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
 import {
 	ToolbarButton,
+	NavigableMenu,
 	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	MenuGroup,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
@@ -257,7 +257,7 @@ const ImageURLInputUI = ( {
 					}
 					additionalControls={
 						showLinkEditor && (
-							<MenuGroup>
+							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
@@ -295,7 +295,7 @@ const ImageURLInputUI = ( {
 										{ __( 'Expand on click' ) }
 									</MenuItem>
 								) }
-							</MenuGroup>
+							</NavigableMenu>
 						)
 					}
 				>
