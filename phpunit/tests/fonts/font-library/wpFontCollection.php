@@ -28,13 +28,13 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 	 */
 	public function test_should_do_it_wrong_missing_font_families() {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_data' );
-		$config = array(
-			'name'          => 'My Collection',
+		$config     = array(
+			'name' => 'My Collection',
 		);
 		$collection = new WP_Font_Collection( 'my-collection', $config );
-		$data = $collection->get_data();
+		$data       = $collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid font_families is provided.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid font_families is provided.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_missing_property' );
 	}
 
@@ -43,13 +43,13 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 	 */
 	public function test_should_do_it_wrong_missing_name() {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_data' );
-		$config = array(
-			'font_families'          => array( 'mock' ),
+		$config     = array(
+			'font_families' => array( 'mock' ),
 		);
 		$collection = new WP_Font_Collection( 'my-collection', $config );
-		$data = $collection->get_data();
+		$data       = $collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid name is provided.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid name is provided.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_missing_property' );
 	}
 
@@ -60,9 +60,9 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::load_from_json' );
 
 		$collection = new WP_Font_Collection( 'my-collection', 'non-existing.json' );
-		$data = $collection->get_data();
+		$data       = $collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid file path is provided.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid file path is provided.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_json_missing' );
 	}
 
@@ -73,58 +73,55 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::load_from_json' );
 
 		$collection = new WP_Font_Collection( 'my-collection', 'http://not-a-url.com / fonts.json' );
-		$data = $collection->get_data();
+		$data       = $collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid url is provided.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid url is provided.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_json_missing' );
 	}
 
 	/**
 	 * Test WP_Font_Collection invalid url response
 	 */
-	public function test_should_error_with_invalid_url_response()
-	{
-		add_filter('pre_http_request', array($this, 'mock_request_invalid_response'), 10, 3);
+	public function test_should_error_with_invalid_url_response() {
+		add_filter( 'pre_http_request', array( $this, 'mock_request_invalid_response' ), 10, 3 );
 
-		$collection = new WP_Font_Collection('my-collection', 'https://localhost/fonts/missing-collection.json');
-		$data = $collection->get_data();
+		$collection = new WP_Font_Collection( 'my-collection', 'https://localhost/fonts/missing-collection.json' );
+		$data       = $collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid url response results.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid url response results.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_request_error' );
 
-		remove_filter('pre_http_request', array($this, 'mock_request_invalid_response'));
+		remove_filter( 'pre_http_request', array( $this, 'mock_request_invalid_response' ) );
 	}
 
 	/**
 	 * Test WP_Font_Collection invalid url contents
 	 */
-	public function test_should_error_with_invalid_json_from_url()
-	{
-		add_filter('pre_http_request', array($this, 'mock_request_invalid_json'), 10, 3);
+	public function test_should_error_with_invalid_json_from_url() {
+		add_filter( 'pre_http_request', array( $this, 'mock_request_invalid_json' ), 10, 3 );
 
-		$collection = new WP_Font_Collection('my-collection', 'https://localhost/fonts/invalid-collection.json');
-		$data = $collection->get_data();
+		$collection = new WP_Font_Collection( 'my-collection', 'https://localhost/fonts/invalid-collection.json' );
+		$data       = $collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid json response results.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid json response results.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_decode_error' );
 
-		remove_filter('pre_http_request', array($this, 'mock_request_invalid_json'));
+		remove_filter( 'pre_http_request', array( $this, 'mock_request_invalid_json' ) );
 	}
 
 	/**
 	 * Test WP_Font_Collection invalid file contents
 	 */
-	public function test_should_error_with_invalid_json_from_file()
-	{
-		$mock_file = wp_tempnam('my-collection-data-');
-		file_put_contents($mock_file, 'invalid-json');
+	public function test_should_error_with_invalid_json_from_file() {
+		$mock_file = wp_tempnam( 'my-collection-data-' );
+		file_put_contents( $mock_file, 'invalid-json' );
 
-		$collection = new WP_Font_Collection('my-collection', $mock_file );
+		$collection = new WP_Font_Collection( 'my-collection', $mock_file );
 
 		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Testing error response returned by `get_data()`, not the underlying error from `wp_json_file_decode`.
 		$data = @$collection->get_data();
 
-	 	$this->assertWPError( $data, 'Error is not returned when invalid json file contents.' );
+		$this->assertWPError( $data, 'Error is not returned when invalid json file contents.' );
 		$this->assertSame( $data->get_error_code(), 'font_collection_decode_error' );
 	}
 
@@ -139,7 +136,7 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 	 */
 	public function test_should_assign_properties_from_config_array( $slug, $config, $expected_data ) {
 		$collection = new WP_Font_Collection( $slug, $config );
-		$data = $collection->get_data();
+		$data       = $collection->get_data();
 		$this->assertSame( $expected_data, $data );
 		$this->assertSame( $slug, $collection->slug );
 	}
@@ -157,7 +154,7 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 		$mock_file = wp_tempnam( 'my-collection-data-' );
 		file_put_contents( $mock_file, wp_json_encode( $config ) );
 		$collection = new WP_Font_Collection( $slug, $mock_file );
-		$data = $collection->get_data();
+		$data       = $collection->get_data();
 		$this->assertSame( $expected_data, $data );
 		$this->assertSame( $slug, $collection->slug );
 	}
@@ -174,10 +171,10 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 	public function test_should_assign_properties_from_url( $slug, $config, $expected_data ) {
 		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
 		self::$mock_collection_data = $config;
-		$collection = new WP_Font_Collection( $slug, 'https://localhost/fonts/mock-font-collection.json' );
-		$data = $collection->get_data();
+		$collection                 = new WP_Font_Collection( $slug, 'https://localhost/fonts/mock-font-collection.json' );
+		$data                       = $collection->get_data();
 		$this->assertSame( $expected_data, $data );
-	 	remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
+		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
 	}
 
 
@@ -231,7 +228,7 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 	public function data_should_create_font_families() {
 		return array(
 
-			'simple font collection' => array(
+			'simple font collection'          => array(
 				'slug'          => 'my-collection',
 				'config'        => array(
 					'name'          => 'My Collection',
@@ -245,7 +242,7 @@ class Tests_Fonts_WpFontCollection extends WP_UnitTestCase {
 				),
 			),
 
-			'font collection with everything'     => array(
+			'font collection with everything' => array(
 				'slug'          => 'my-collection',
 				'config'        => array(
 					'name'          => 'My Collection',
