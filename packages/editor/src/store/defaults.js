@@ -27,7 +27,9 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	richEditingEnabled: true,
 	codeEditingEnabled: true,
-	fontLibraryEnabled: true,
+	// Whilst the Font Library PHP code is the process of being merge to Core,
+	// we need to disable it for non-Plugin envionrments.
+	fontLibraryEnabled: process.env.IS_GUTENBERG_PLUGIN ? true : false,
 	enableCustomFields: undefined,
 	defaultRenderingMode: 'post-only',
 };
