@@ -10,9 +10,9 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	QuickInserter,
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	createInterpolateElement,
@@ -29,6 +29,15 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronLeftSmall, plus } from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { PrivateQuickInserter: QuickInserter } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Given the Link block's type attribute, return the query params to give to
