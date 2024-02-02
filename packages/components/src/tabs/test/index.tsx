@@ -1203,8 +1203,11 @@ describe( 'Tabs', () => {
 						);
 
 						// When the selected tab is changed, it should not automatically receive focus.
-						expect( await getSelectedTab() ).toHaveTextContent(
-							'Gamma'
+
+						await waitFor( async () =>
+							expect( await getSelectedTab() ).toHaveTextContent(
+								'Gamma'
+							)
 						);
 						expect(
 							screen.getByRole( 'tab', { name: 'Beta' } )
