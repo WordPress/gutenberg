@@ -137,7 +137,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		/**
 		 * Sanitize a tree of data using an schema that defines the sanitization to apply to each key.
 		 *
-		 * It removes the keys not in the schema and applies the sanitizator to the values.
+		 * It removes the keys not in the schema and applies the sanitizer to the values.
 		 *
 		 * @since 6.5.0
 		 *
@@ -166,7 +166,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 						foreach ( $value as $item_key => $item_value ) {
 							$tree[ $key ][ $item_key ] = isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] )
 								? self::sanitize_from_schema( $item_value, $schema[ $key ][0] )
-								: self::apply_sanitizator( $item_value, $schema[ $key ][0] );
+								: self::apply_sanitizer( $item_value, $schema[ $key ][0] );
 						}
 					} else {
 						// If it is an associative or indexed array., process as a single object.
@@ -179,8 +179,8 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 					// If the value is not an array but the schema is, remove the key.
 					unset( $tree[ $key ] );
 				} elseif ( ! $is_schema_array ) {
-					// If the schema is not an array, apply the sanitizator to the value.
-					$tree[ $key ] = self::apply_sanitizator( $value, $schema[ $key ] );
+					// If the schema is not an array, apply the sanitizer to the value.
+					$tree[ $key ] = self::apply_sanitizer( $value, $schema[ $key ] );
 				}
 			}
 
@@ -188,19 +188,19 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		}
 
 		/**
-		 * Apply the sanitizator to the value.
+		 * Apply the sanitizer to the value.
 		 *
 		 * @since 6.5.0
 		 * @param mixed $value The value to sanitize.
-		 * @param mixed $sanitizator The sanitizator to apply.
+		 * @param mixed $sanitizer The sanitizer to apply.
 		 * @return mixed The sanitized value.
 		 */
-		private static function apply_sanitizator( $value, $sanitizator ) {
-			if ( null === $sanitizator ) {
+		private static function apply_sanitizer( $value, $sanitizer ) {
+			if ( null === $sanitizer ) {
 				return $value;
 
 			}
-			return call_user_func( $sanitizator, $value );
+			return call_user_func( $sanitizer, $value );
 		}
 	}
 }
