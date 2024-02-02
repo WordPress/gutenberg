@@ -67,6 +67,8 @@ window.addEventListener( 'popstate', async () => {
 	const page = pages.has( url ) && ( await pages.get( url ) );
 	if ( page ) {
 		renderRegions( page );
+		// Update the URL in the state.
+		state.url = window.location;
 	} else {
 		window.location.reload();
 	}
@@ -159,6 +161,7 @@ export const { state, actions } = store( 'core/router', {
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
 
+				// Update the URL in the state.
 				state.url = href;
 
 				// Update the navigation status once the the new page rendering
