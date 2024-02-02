@@ -18,6 +18,7 @@ export default function EditorSnackbars() {
 	return (
 		<SnackbarList
 			notices={ snackbarNotices }
+			maxVisible={ 3 }
 			className="components-editor-notices__snackbar"
 			onRemove={ removeNotice }
 		/>

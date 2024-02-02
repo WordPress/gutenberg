@@ -45,14 +45,14 @@ function isPartiallySynced( block ) {
 		) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-attributes'
+			( binding ) => binding.source === 'core/pattern-overrides'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
 	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-attributes'
+			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }
@@ -88,26 +88,6 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-/**
- * Enum for patch operations.
- * We use integers here to minimize the size of the serialized data.
- * This has to be deserialized accordingly on the server side.
- * See block-bindings/sources/pattern.php
- */
-const PATCH_OPERATIONS = {
-	/** @type {0} */
-	Remove: 0,
-	/** @type {1} */
-	Replace: 1,
-	// Other operations are reserved for future use. (e.g. Add)
-};
-
-/**
- * @typedef {[typeof PATCH_OPERATIONS.Remove]} RemovePatch
- * @typedef {[typeof PATCH_OPERATIONS.Replace, unknown]} ReplacePatch
- * @typedef {RemovePatch | ReplacePatch} OverridePatch
- */
-
 function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	return blocks.map( ( block ) => {
 		const innerBlocks = applyInitialOverrides(
@@ -124,15 +104,9 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			defaultValues[ blockId ] ??= {};
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			/** @type {OverridePatch} */
-			const overrideAttribute = overrides[ blockId ]?.[ attributeKey ];
-			if ( ! overrideAttribute ) {
-				continue;
-			}
-			if ( overrideAttribute[ 0 ] === PATCH_OPERATIONS.Remove ) {
-				delete newAttributes[ attributeKey ];
-			} else if ( overrideAttribute[ 0 ] === PATCH_OPERATIONS.Replace ) {
-				newAttributes[ attributeKey ] = overrideAttribute[ 1 ];
+			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
+				newAttributes[ attributeKey ] =
+					overrides[ blockId ][ attributeKey ];
 			}
 		}
 		return {
@@ -144,14 +118,13 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 }
 
 function getOverridesFromBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, Record<string, OverridePatch>>} */
+	/** @type {Record<string, Record<string, unknown>>} */
 	const overrides = {};
 	for ( const block of blocks ) {
 		Object.assign(
 			overrides,
 			getOverridesFromBlocks( block.innerBlocks, defaultValues )
 		);
-		/** @type {string} */
 		const blockId = block.attributes.metadata?.id;
 		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
 		const attributes = getPartiallySyncedAttributes( block );
@@ -161,23 +134,10 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				defaultValues[ blockId ][ attributeKey ]
 			) {
 				overrides[ blockId ] ??= {};
-				/**
-				 * Create a patch operation for the binding attribute.
-				 * We use a tuple here to minimize the size of the serialized data.
-				 * The first item is the operation type, the second item is the value if any.
-				 */
-				if ( block.attributes[ attributeKey ] === undefined ) {
-					/** @type {RemovePatch} */
-					overrides[ blockId ][ attributeKey ] = [
-						PATCH_OPERATIONS.Remove,
-					];
-				} else {
-					/** @type {ReplacePatch} */
-					overrides[ blockId ][ attributeKey ] = [
-						PATCH_OPERATIONS.Replace,
-						block.attributes[ attributeKey ],
-					];
-				}
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
+				overrides[ blockId ][ attributeKey ] =
+					block.attributes[ attributeKey ];
 			}
 		}
 	}

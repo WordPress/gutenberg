@@ -2,26 +2,159 @@
 	"title": "JSON schema for WordPress Font Collections",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "object",
+	"definitions": {
+		"fontFace": {
+			"description": "Font face theme.json settings, with added preview property.",
+			"type": "object",
+			"properties": {
+				"preview": {
+					"description": "URL to a preview image of the font.",
+					"type": "string"
+				},
+				"fontFamily": {
+					"description": "CSS font-family value.",
+					"type": "string",
+					"default": ""
+				},
+				"fontStyle": {
+					"description": "CSS font-style value.",
+					"type": "string",
+					"default": "normal"
+				},
+				"fontWeight": {
+					"description": "List of available font weights, separated by a space.",
+					"default": "400",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "integer"
+						}
+					]
+				},
+				"fontDisplay": {
+					"description": "CSS font-display value.",
+					"type": "string",
+					"default": "fallback",
+					"enum": [ "auto", "block", "fallback", "swap", "optional" ]
+				},
+				"src": {
+					"description": "Paths or URLs to the font files.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					],
+					"default": []
+				},
+				"fontStretch": {
+					"description": "CSS font-stretch value.",
+					"type": "string"
+				},
+				"ascentOverride": {
+					"description": "CSS ascent-override value.",
+					"type": "string"
+				},
+				"descentOverride": {
+					"description": "CSS descent-override value.",
+					"type": "string"
+				},
+				"fontVariant": {
+					"description": "CSS font-variant value.",
+					"type": "string"
+				},
+				"fontFeatureSettings": {
+					"description": "CSS font-feature-settings value.",
+					"type": "string"
+				},
+				"fontVariationSettings": {
+					"description": "CSS font-variation-settings value.",
+					"type": "string"
+				},
+				"lineGapOverride": {
+					"description": "CSS line-gap-override value.",
+					"type": "string"
+				},
+				"sizeAdjust": {
+					"description": "CSS size-adjust value.",
+					"type": "string"
+				},
+				"unicodeRange": {
+					"description": "CSS unicode-range value.",
+					"type": "string"
+				}
+			},
+			"required": [ "fontFamily", "src" ],
+			"additionalProperties": false
+		}
+	},
 	"properties": {
 		"$schema": {
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
+		"slug": {
+			"type": "string",
+			"description": "Slug of the font collection. Must be unique and URL friendly."
+		},
+		"name": {
+			"type": "string",
+			"description": "Name of the font collection."
+		},
+		"description": {
+			"type": "string",
+			"description": "Description of the font collection."
+		},
 		"font_families": {
 			"type": "array",
-			"description": "Array of font families ready to be installed",
+			"description": "Array of font families ready to be installed.",
 			"items": {
 				"type": "object",
 				"properties": {
 					"font_family_settings": {
-						"description": "Font family settings as in theme.json",
-						"allOf": [
-							{ "$ref": "./theme.json#/definitions/fontFamily" }
-						]
+						"description": "Font family theme.json settings, with added preview property.",
+						"type": "object",
+						"properties": {
+							"name": {
+								"description": "Name of the font family preset, translatable.",
+								"type": "string"
+							},
+							"slug": {
+								"description": "Kebab-case unique identifier for the font family preset.",
+								"type": "string"
+							},
+							"fontFamily": {
+								"description": "CSS font-family value.",
+								"type": "string"
+							},
+							"preview": {
+								"type": "string",
+								"description": "URL to a preview image of the font family."
+							},
+							"fontFace": {
+								"description": "Array of font-face definitions.",
+								"type": "array",
+								"items": {
+									"allOf": [
+										{
+											"$ref": "#/definitions/fontFace"
+										}
+									]
+								}
+							}
+						},
+						"additionalProperties": false
 					},
 					"categories": {
 						"type": "array",
-						"description": "Array of category slugs",
+						"description": "Array of category slugs.",
 						"items": {
 							"type": "string"
 						}
@@ -33,7 +166,7 @@
 		},
 		"categories": {
 			"type": "array",
-			"description": "Array of category objects",
+			"description": "Array of category objects.",
 			"items": {
 				"type": "object",
 				"properties": {
@@ -50,5 +183,5 @@
 		}
 	},
 	"additionalProperties": false,
-	"required": [ "$schema", "font_families" ]
+	"required": [ "$schema", "slug", "name", "font_families" ]
 }

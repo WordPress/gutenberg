@@ -46,6 +46,10 @@ export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
 
+export function getBlockWithoutAttributes( state, clientId ) {
+	return state.blocks.byClientId.get( clientId );
+}
+
 /**
  * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
@@ -55,25 +59,17 @@ export function getLastInsertedBlocksClientIds( state ) {
  *
  * @return {boolean} Whether the block descendants are disabled.
  */
-export const isBlockSubtreeDisabled = createSelector(
-	( state, clientId ) => {
-		const isChildSubtreeDisabled = ( childClientId ) => {
-			return (
-				getBlockEditingMode( state, childClientId ) === 'disabled' &&
-				getBlockOrder( state, childClientId ).every(
-					isChildSubtreeDisabled
-				)
-			);
-		};
-		return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockEditingModes,
-		state.blockListSettings,
-	]
-);
+export const isBlockSubtreeDisabled = ( state, clientId ) => {
+	const isChildSubtreeDisabled = ( childClientId ) => {
+		return (
+			getBlockEditingMode( state, childClientId ) === 'disabled' &&
+			getBlockOrder( state, childClientId ).every(
+				isChildSubtreeDisabled
+			)
+		);
+	};
+	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
+};
 
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.
