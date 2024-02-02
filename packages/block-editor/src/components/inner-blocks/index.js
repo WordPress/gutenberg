@@ -199,7 +199,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockRootClientId,
 				getBlockEditingMode,
 				getBlockSettings,
-				isDraggingBlocks,
+				isDragging,
 			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -219,7 +219,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
 					enableClickThrough &&
-					! isDraggingBlocks(),
+					! isDragging(),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),

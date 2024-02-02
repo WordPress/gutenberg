@@ -344,3 +344,14 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+/**
+ * Returns true if the user is dragging, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging.
+ */
+export function isDragging( state ) {
+	return !! state.isDragging;
+}
