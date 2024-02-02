@@ -187,20 +187,31 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				}
 			}
 
-			$srcs = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
+			$srcs  = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
+			$files = $request->get_file_params();
 
-			// Check that srcs are non-empty strings.
-			$filtered_src = array_filter( array_filter( $srcs, 'is_string' ) );
-			if ( empty( $filtered_src ) ) {
-				return new WP_Error(
-					'rest_invalid_param',
-					__( 'font_face_settings[src] values must be non-empty strings.', 'gutenberg' ),
-					array( 'status' => 400 )
-				);
+			foreach ( $srcs as $src ) {
+				// Check that each src is a non-empty string.
+				if ( empty( $src ) ) {
+					return new WP_Error(
+						'rest_invalid_param',
+						__( 'font_face_settings[src] values must be non-empty strings.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+
+				// Check that srcs are valid URLs or file references.
+				if ( false === wp_http_validate_url( $src ) && ! isset( $files[ $src ] ) ) {
+					return new WP_Error(
+						'rest_invalid_param',
+						/* translators: %s: src value in the font face settings. */
+						sprintf( __( 'font_face_settings[src] value "%s" must be a valid URL or file reference.', 'gutenberg' ), $src ),
+						array( 'status' => 400 )
+					);
+				}
 			}
 
-			// Check that each file in the request references a src in the settings.
-			$files = $request->get_file_params();
+			// Check that each file in the request references a src in the settings
 			foreach ( array_keys( $files ) as $file ) {
 				if ( ! in_array( $file, $srcs, true ) ) {
 					return new WP_Error(
@@ -567,10 +578,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 								'default'     => array(),
 								'arg_options' => array(
 									'sanitize_callback' => function ( $value ) {
-										if ( is_string( $value ) ) {
-											return sanitize_text_field( $value );
-										}
-										return array_map( 'sanitize_text_field', $value );
+										return is_array( $value ) ? array_map( array( $this, 'sanitize_src' ), $value ) : $this->sanitize_src( $value );
 									},
 								),
 							),
@@ -640,6 +648,8 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 							'preview'               => array(
 								'description' => __( 'URL to a preview image of the font face.', 'gutenberg' ),
 								'type'        => 'string',
+								'format'      => 'uri',
+								'default'     => '',
 								'arg_options' => array(
 									'sanitize_callback' => 'sanitize_url',
 								),
@@ -811,6 +821,19 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$prepared_post->post_content = wp_json_encode( $settings );
 
 			return $prepared_post;
+		}
+
+		/**
+		 * Sanitizes a single src value when creating a font face.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $value Font face src that is a url or a key for a $_FILES item.
+		 *
+		 * @return string Sanitized $src value.
+		 */
+		protected function sanitize_src( $value ) {
+			return false === wp_http_validate_url( $value ) ? (string) $value : sanitize_url( $value );
 		}
 
 		/**
