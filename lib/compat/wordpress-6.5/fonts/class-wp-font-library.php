@@ -86,7 +86,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string $collection_slug Font collection slug.
+		 * @param string $slug Font collection slug.
 		 * @return bool True if the font collection was unregistered successfully and false otherwise.
 		 */
 		public static function unregister_font_collection( $slug ) {
@@ -94,7 +94,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Font collection slug. */
-					sprintf( __( 'Font collection "%s" not found.', 'default' ), $slug ),
+					sprintf( __( 'Font collection "%s" not found.' ), $slug ),
 					'6.5.0'
 				);
 				return false;
@@ -132,7 +132,8 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $slug Font collection slug.
-		 * @return WP_Font_Collection Font collection object.
+		 * @return WP_Font_Collection|WP_Error Font collection object,
+		 *                                     or WP_Error object if the font collection doesn't exist.
 		 */
 		public static function get_font_collection( $slug ) {
 			if ( array_key_exists( $slug, self::$collections ) ) {
@@ -140,8 +141,6 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 			}
 			return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
 		}
-
-
 
 		/**
 		 * Sets the allowed mime types for fonts.
