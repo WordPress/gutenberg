@@ -515,6 +515,17 @@ export function getBlockTypes() {
 }
 
 /**
+ * Returns all hooked blocks for a given anchor block.
+ *
+ * @param {string} name Anchor block name.
+ *
+ * @return {Array} List of blocks hooked to the anchor block.
+ */
+export function getHookedBlockNames( name ) {
+	return select( blocksStore ).getHookedBlockNames( name );
+}
+
+/**
  * Returns the block support value for a feature, if defined.
  *
  * @param {(string|Object)} nameOrType      Block name or type object

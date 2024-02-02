@@ -8,7 +8,7 @@ import { renderToString } from '@wordpress/element';
  */
 import { convertLegacyBlockNameAndAttributes } from './parser/convert-legacy-block';
 import { createBlock } from './factory';
-import { getBlockType, getBlockTypes } from './registration';
+import { getBlockType, getHookedBlockNames } from './registration';
 
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
@@ -115,11 +115,10 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 					normalizedAttributes
 				);
 
-			const hookedBlocksForCurrentBlock = getBlockTypes()?.filter(
-				( { blockHooks } ) => blockHooks && blockName in blockHooks
-			);
+			const hookedBlocksForCurrentBlock =
+				getHookedBlockNames( blockName );
 
-			if ( hookedBlocksForCurrentBlock?.length ) {
+			if ( getHookedBlockNames( blockName )?.length ) {
 				const { metadata, ...otherAttributes } = blockAttributes;
 				blockAttributes = {
 					metadata: {
