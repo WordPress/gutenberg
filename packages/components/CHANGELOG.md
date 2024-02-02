@@ -38,8 +38,8 @@
 -   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
 -   `Tooltip` and `Button`: tidy up unit tests ([#57975](https://github.com/WordPress/gutenberg/pull/57975)).
 -   `BorderControl`, `BorderBoxControl`: Replace style picker with ToggleGroupControl ([#57562](https://github.com/WordPress/gutenberg/pull/57562)).
--   `SlotFill`: fix typo in use-slot-fills return docs ([#57654](https://github.com/WordPress/gutenberg/pull/57654))
--   `Popover`: Adding `constrainTabbing` prop to `useDialog` hook ([#57962](https://github.com/WordPress/gutenberg/pull/57962))
+-	`SlotFill`: fix typo in use-slot-fills return docs ([#57654](https://github.com/WordPress/gutenberg/pull/57654))
+-	`Popover`: Adding `constrainTabbing` prop to `useDialog` hook ([#57962](https://github.com/WordPress/gutenberg/pull/57962))
 
 ### Bug Fix
 
