@@ -84,6 +84,11 @@ function gutenberg_create_initial_post_types() {
 	);
 }
 
+/**
+ * Initializes REST routes.
+ *
+ * @since 6.5
+ */
 function gutenberg_create_initial_rest_routes() {
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
 	$font_collections_controller = new WP_REST_Font_Collections_Controller();
