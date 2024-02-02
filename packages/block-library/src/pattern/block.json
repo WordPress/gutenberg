@@ -15,5 +15,10 @@
 		"slug": {
 			"type": "string"
 		}
+	},
+	"usesContext": [ "queryId", "query" ],
+	"providesContext": {
+		"query": "query",
+		"queryId": "queryId"
 	}
 }
