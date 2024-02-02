@@ -95,13 +95,6 @@ export default function VisualEditor( { styles } ) {
 				// We should auto-focus the canvas (title) on load.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus={ ! isWelcomeGuideVisible }
-				iframeProps={ {
-					style: {
-						background: isEditingPattern
-							? 'transparent'
-							: undefined,
-					},
-				} }
 			/>
 		</div>
 	);
