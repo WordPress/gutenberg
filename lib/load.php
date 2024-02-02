@@ -52,6 +52,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-media-search-handler-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	// Experimental.
