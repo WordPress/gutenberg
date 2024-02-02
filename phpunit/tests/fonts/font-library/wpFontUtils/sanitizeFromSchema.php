@@ -10,6 +10,10 @@
 class Tests_Fonts_WpFontUtils_SanitizeFromSchema extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_sanitize_from_schema
+	 * 
+	 * @param array $data     Data to sanitize.
+	 * @param array $schema   Schema to use for sanitization.
+	 * @param array $expected Expected result.
 	 */
 	public function test_sanitize_from_schema( $data, $schema, $expected ) {
 		$result = WP_Font_Utils::sanitize_from_schema( $data, $schema );
