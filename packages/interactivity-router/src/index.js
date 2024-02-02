@@ -106,7 +106,7 @@ export const { state, actions } = store( 'core/router', {
 		 * @param {string}  [options.html]                 HTML string to be used instead of fetching the requested URL.
 		 * @param {boolean} [options.replace]              If true, it replaces the current entry in the browser session history.
 		 * @param {number}  [options.timeout]              Time until the navigation is aborted, in milliseconds. Default is 10000.
-		 * @param {boolean} [options.loadingAnimation]     Whether the top loading bar should be shown while navigating. Default to `true`.
+		 * @param {boolean} [options.loadingAnimation]     Whether an animation should be shown while navigating. Default to `true`.
 		 * @param {boolean} [options.screenReaderAnnounce] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
