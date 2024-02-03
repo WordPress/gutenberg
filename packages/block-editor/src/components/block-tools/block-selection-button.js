@@ -23,8 +23,8 @@ import {
 	SPACE,
 } from '@wordpress/keycodes';
 import {
-	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
@@ -37,7 +37,6 @@ import BlockTitle from '../block-title';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
-import useBlockDisplayInformation from '../use-block-display-information';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockMover from '../block-mover';
 
@@ -52,7 +51,6 @@ import BlockMover from '../block-mover';
  * @return {Component} The component to be rendered.
  */
 function BlockSelectionButton( { clientId, rootClientId } ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -62,38 +60,32 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				getBlockListSettings,
 				__unstableGetEditorMode,
 			} = select( blockEditorStore );
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
 			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
-			const blockMovingMode = hasBlockMovingClientId();
+			const blockType = getBlockType( name );
+			const orientation =
+				getBlockListSettings( rootClientId )?.orientation;
+			const match = getActiveBlockVariation( name, attributes );
+
 			return {
-				index,
-				name,
-				attributes,
-				blockMovingMode,
-				orientation: getBlockListSettings( rootClientId )?.orientation,
+				blockMovingMode: hasBlockMovingClientId(),
 				editorMode: __unstableGetEditorMode(),
+				icon: match?.icon || blockType.icon,
+				label: getAccessibleBlockLabel(
+					blockType,
+					attributes,
+					index + 1,
+					orientation
+				),
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const {
-		index,
-		name,
-		attributes,
-		blockMovingMode,
-		orientation,
-		editorMode,
-	} = selected;
+	const { label, icon, blockMovingMode, editorMode } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
-
-	const blockType = getBlockType( name );
-	const label = getAccessibleBlockLabel(
-		blockType,
-		attributes,
-		index + 1,
-		orientation
-	);
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
@@ -251,7 +243,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				className="block-editor-block-list__block-selection-button__content"
 			>
 				<FlexItem>
-					<BlockIcon icon={ blockInformation?.icon } showColors />
+					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
 				<FlexItem>
 					{ editorMode === 'zoom-out' && (
