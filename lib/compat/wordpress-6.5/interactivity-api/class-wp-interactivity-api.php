@@ -806,7 +806,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				}
 
 				// Appends the processed content after the tag closer of the template.
-				$p->append_content_after_closing_tag_on_balanced_or_void_tags( $processed_content );
+				$p->append_content_after_closing_tag_on_balanced_template_tags( $processed_content );
 
 				// Moves the cursor to the end of the processed items.
 				do {

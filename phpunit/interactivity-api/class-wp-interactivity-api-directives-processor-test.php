@@ -368,60 +368,60 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method with a simple text.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_simple_text() {
-		$content_1 = '<div>Text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_simple_text() {
+		$content_1 = '<template>Text</template>';
 		$content_2 = 'New text';
 		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_2, $p );
 		$this->assertNull( $p->get_tag() ); // There are no more tags.
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method with simple tags.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_simple_tags() {
-		$content_1 = '<div>Text</div>';
-		$content_2 = '<div class="content-2">New text</div>';
-		$content_3 = '<div class="content-3">More new text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_simple_tags() {
+		$content_1 = '<template>Text</template>';
+		$content_2 = '<template class="content-2">New text</template>';
+		$content_3 = '<template class="content-3">More new text</template>';
 		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_2, $p );
 		// The processor in now positioned in the opening tag of the appended tag.
 		$this->assertEquals( 'content-2', $p->get_attribute( 'class' ) );
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_3 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_3 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_2 . $content_3, $p );
 		$this->assertEquals( 'content-3', $p->get_attribute( 'class' ) );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method in the middle of two tags.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_in_the_middle_of_tags() {
-		$content_1 = '<div>Text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_in_the_middle_of_tags() {
+		$content_1 = '<template>Text</template>';
 		$content_2 = 'New text';
-		$content_3 = '<div class="content-3">More new text</div>';
-		$content_4 = '<div class="content-4">Even more new text</div>';
+		$content_3 = '<template class="content-3">More new text</template>';
+		$content_4 = '<template class="content-4">Even more new text</template>';
 
 		$p = new WP_Interactivity_API_Directives_Processor( $content_1 . $content_3 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_2 . $content_3, $p );
 		// When appending text without tags, it jumps to the next tag in the content.
@@ -429,201 +429,192 @@ class Tests_WP_Interactivity_API_Directives_Processor extends WP_UnitTestCase {
 
 		$p = new WP_Interactivity_API_Directives_Processor( $content_1 . $content_3 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_4 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_4 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_4 . $content_3, $p );
 		$this->assertEquals( 'content-4', $p->get_attribute( 'class' ) );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method doesn't modify the content when called on a closing tag.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_on_closing_tag() {
-		$content = '<div>Text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_on_closing_tag() {
+		$content = '<template>Text</template>';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag( array( 'tag_closers' => 'visit' ) );
 		$p->next_tag( array( 'tag_closers' => 'visit' ) );
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( 'New text' );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( 'New text' );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content, $p );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method on multiple calls to the same tag.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_multiple_calls_in_same_tag() {
-		$content_1 = '<div class="content-1">Text</div>';
-		$content_2 = '<div class="content-2">New text</div>';
-		$content_3 = '<div class="content-3">More new text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_multiple_calls_in_same_tag() {
+		$content_1 = '<template class="content-1">Text</template>';
+		$content_2 = '<template class="content-2">New text</template>';
+		$content_3 = '<template class="content-3">More new text</template>';
 		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
-		$p->set_bookmark( 'first div' );
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$p->set_bookmark( 'first template' );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_2, $p );
 		$this->assertEquals( 'content-2', $p->get_attribute( 'class' ) );
-		$p->seek( 'first div' ); // Rewind to the first div.
+		$p->seek( 'first template' ); // Rewind to the first template.
 		$this->assertEquals( 'content-1', $p->get_attribute( 'class' ) );
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_3 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_3 );
 		$this->assertEquals( $content_1 . $content_3 . $content_2, $p );
 		$this->assertEquals( 'content-3', $p->get_attribute( 'class' ) );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method on combinations with set_attribute calls.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_with_set_attribute() {
-		$content_1 = '<div>Text</div>';
-		$content_2 = '<div>New text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_with_set_attribute() {
+		$content_1 = '<template>Text</template>';
+		$content_2 = '<template>New text</template>';
 
 		$p = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
 		$p->set_attribute( 'class', 'test' );
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
-		$this->assertEquals( '<div class="test">Text</div>' . $content_2, $p );
+		$this->assertEquals( '<template class="test">Text</template>' . $content_2, $p );
 
 		$p = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
 		$p->set_attribute( 'class', 'test' );
-		$this->assertEquals( $content_1 . '<div class="test">New text</div>', $p );
+		$this->assertEquals( $content_1 . '<template class="test">New text</template>', $p );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method where the existing content includes tags.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_with_existing_tags() {
-		$content_1 = '<div><span>Text</span></div>';
-		$content_2 = '<div class="content-2-div"><span class="content-2-span">New text</span></div>';
-		$content_3 = '<div><span>More new text</span></div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_with_existing_tags() {
+		$content_1 = '<template><span>Text</span></template>';
+		$content_2 = '<template class="content-2-template-1"><template class="content-2-template-2">New text</template></template>';
+		$content_3 = '<template><span>More new text</span></template>';
 		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content_1 . $content_2, $p );
-		$this->assertEquals( 'content-2-div', $p->get_attribute( 'class' ) );
+		$this->assertEquals( 'content-2-template-1', $p->get_attribute( 'class' ) );
 		$p->next_tag();
-		$this->assertEquals( 'content-2-span', $p->get_attribute( 'class' ) );
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_3 );
+		$this->assertEquals( 'content-2-template-2', $p->get_attribute( 'class' ) );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_3 );
 		$this->assertTrue( $result );
-		$this->assertEquals( $content_1 . '<div class="content-2-div"><span class="content-2-span">New text</span>' . $content_3 . '</div>', $p );
+		$this->assertEquals( $content_1 . '<template class="content-2-template-1"><template class="content-2-template-2">New text</template>' . $content_3 . '</template>', $p );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method fails with an empty string.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_empty() {
-		$content = '<div class="content">Text</div>';
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_empty() {
+		$content = '<template class="content">Text</template>';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( '' );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( '' );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content, $p );
 		$this->assertEquals( 'content', $p->get_attribute( 'class' ) ); // It didn't move.
 
-		$content = '<div class="content"><div>Text</div></div>';
+		$content = '<template class="content"><template>Text</template></template>';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( '' );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( '' );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content, $p );
 		$this->assertEquals( 'content', $p->get_attribute( 'class' ) ); // It didn't move.
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
-	 * method on self-closing tags.
-	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
-	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_self_closing_tag() {
-		$content_1 = '<img src="example.jpg">';
-		$content_2 = '<div class="content-2">Text</div>';
-		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
-		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
-		$this->assertTrue( $result );
-		$this->assertEquals( $content_1 . $content_2, $p );
-		$this->assertEquals( 'content-2', $p->get_attribute( 'class' ) ); // It didn't move.
-
-		$content_1 = '<img src="example.jpg" />';
-		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
-		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
-		$this->assertTrue( $result );
-		$this->assertEquals( $content_1 . $content_2, $p );
-		$this->assertEquals( 'content-2', $p->get_attribute( 'class' ) ); // It didn't move.
-	}
-
-	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method on a non-existent tag.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_non_existent_tag() {
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_non_existent_tag() {
 		$content_1 = 'Just a string with no tags.';
-		$content_2 = '<div>New text</div>';
+		$content_2 = '<template>New text</template>';
 		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $content_2 );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content_1, $p );
 	}
 
 	/**
-	 * Tests the `append_content_after_closing_tag_on_balanced_or_void_tags`
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
+	 * method on a non-template tags.
+	 *
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
+	 */
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_non_template_tags() {
+		$content_1 = '<div>Text</div>';
+		$content_2 = '<template>New text</template>';
+		$p         = new WP_Interactivity_API_Directives_Processor( $content_1 );
+		$p->next_tag();
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $content_2 );
+		$this->assertFalse( $result );
+		$this->assertEquals( $content_1, $p );
+	}
+
+	/**
+	 * Tests the `append_content_after_closing_tag_on_balanced_template_tags`
 	 * method with unbalanced tags.
 	 *
-	 * @covers ::append_content_after_closing_tag_on_balanced_or_void_tags
+	 * @covers ::append_content_after_closing_tag_on_balanced_template_tags
 	 */
-	public function test_append_content_after_closing_tag_on_balanced_or_void_tags_with_unbalanced_tags() {
+	public function test_append_content_after_closing_tag_on_balanced_template_tags_with_unbalanced_tags() {
 		$new_content = 'New text';
 
-		$content = '<div>Missing closing div';
+		$content = '<template>Missing closing template';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $new_content );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $new_content );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content, $p );
 
-		$content = '<div><div>Missing closing div</div>';
+		$content = '<template><template>Missing closing template</template>';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $new_content );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $new_content );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content, $p );
 
-		$content = '<div>Missing closing div</span>';
+		$content = '<template>Missing closing template</span>';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $new_content );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $new_content );
 		$this->assertFalse( $result );
 		$this->assertEquals( $content, $p );
 
 		// It supports unbalanced tags inside the content, as long as it finds a
 		// balanced closing tag.
-		$content = '<div>Missing opening span</span></div>';
+		$content = '<template>Missing opening span</span></template>';
 		$p       = new WP_Interactivity_API_Directives_Processor( $content );
 		$p->next_tag();
-		$result = $p->append_content_after_closing_tag_on_balanced_or_void_tags( $new_content );
+		$result = $p->append_content_after_closing_tag_on_balanced_template_tags( $new_content );
 		$this->assertTrue( $result );
 		$this->assertEquals( $content . $new_content, $p );
 	}
