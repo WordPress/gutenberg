@@ -13,7 +13,12 @@
 class Tests_Fonts_WpFontLibrary_GetFontCollection extends WP_Font_Library_UnitTestCase {
 
 	public function test_should_get_font_collection() {
-		wp_register_font_collection( 'my-font-collection', array( 'font_families' => array( 'mock' ) ) );
+		$mock_collection_data = array(
+			'name'          => 'Test Collection',
+			'font_families' => array( 'mock' ),
+		);
+
+		wp_register_font_collection( 'my-font-collection', $mock_collection_data );
 		$font_collection = WP_Font_Library::get_font_collection( 'my-font-collection' );
 		$this->assertInstanceOf( 'WP_Font_Collection', $font_collection );
 	}

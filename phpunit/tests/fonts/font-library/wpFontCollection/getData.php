@@ -167,14 +167,14 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 										'fontFamily' => 'Open Sans',
 										'fontStyle'  => 'normal',
 										'fontWeight' => '400',
-										'src'        => 'https://example.com/src-as-string.ttf?a=scriptalert(xss)/script',
+										'src'        => 'https://example.com/src-as-string.ttf?a=',
 									),
 									array(
 										'fontFamily' => 'Open Sans',
 										'fontStyle'  => 'normal',
 										'fontWeight' => '400',
 										'src'        => array(
-											'https://example.com/src-as-array.woff2?a=scriptalert(xss)/script',
+											'https://example.com/src-as-array.woff2?a=',
 											'https://example.com/src-as-array.ttf',
 										),
 									),
@@ -195,7 +195,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	 * @param array $config Font collection config.
 	 */
 	public function test_should_error_when_missing_properties( $config ) {
-		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_andd_sanitize' );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::sanitize_and_validate_data' );
 
 		$collection = new WP_Font_Collection( 'my-collection', $config );
 		$data       = $collection->get_data();
