@@ -28,7 +28,10 @@ test.describe( 'data-wp-on-window', () => {
 		await expect( counter ).toHaveText( '0' );
 
 		// Make sure the event listener is attached.
-		await page.getByTestId( 'isEventAttached' ).filter( { hasText: 'yes' } ).waitFor();
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'yes' } )
+			.waitFor();
 
 		// Change the viewport size.
 		await page.setViewportSize( { width: 600, height: 600 } );
@@ -38,7 +41,10 @@ test.describe( 'data-wp-on-window', () => {
 		await visibilityButton.click();
 
 		// Make sure the event listener is not attached.
-		await page.getByTestId( 'isEventAttached' ).filter( { hasText: 'no' } ).waitFor();
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'no' } )
+			.waitFor();
 
 		// This resize should not increase the counter.
 		await page.setViewportSize( { width: 300, height: 600 } );
@@ -50,7 +56,10 @@ test.describe( 'data-wp-on-window', () => {
 		await expect( counter ).toHaveText( '1' );
 
 		// Make sure the event listener is re-attached.
-		await page.getByTestId( 'isEventAttached' ).filter( { hasText: 'yes' } ).waitFor();
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'yes' } )
+			.waitFor();
 
 		// This resize should increase the counter.
 		await page.setViewportSize( { width: 200, height: 600 } );
