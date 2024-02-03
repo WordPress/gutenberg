@@ -68,6 +68,9 @@
 				"fontSize": true
 			}
 		},
-		"layout": true
+		"layout": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	}
 }

@@ -666,6 +666,10 @@ public class WPAndroidGlueCode {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
+        // Workaround to prevent saving large RN view hierarchies that lead to a `TransactionTooLargeException`
+        // Ref: https://github.com/wordpress-mobile/WordPress-Android/issues/9685#issuecomment-1908452392
+        mReactRootView.setSaveFromParentEnabled(false);
+
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
                                     .setApplication(application)

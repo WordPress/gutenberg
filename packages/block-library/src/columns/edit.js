@@ -40,17 +40,6 @@ import {
 	toWidthPrecision,
 } from './utils';
 
-/**
- * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
- * The contents of the array should never change.
- * The array should contain the name of each block that is allowed.
- * In columns block, the only block we allow is 'core/column'.
- *
- * @constant
- * @type {string[]}
- */
-const ALLOWED_BLOCKS = [ 'core/column' ];
-
 function ColumnsEditContainer( {
 	attributes,
 	setAttributes,
@@ -103,7 +92,6 @@ function ColumnsEditContainer( {
 		className: classes,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
 		templateLock,

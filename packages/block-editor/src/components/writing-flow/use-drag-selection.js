@@ -75,7 +75,13 @@ export default function useDragSelection() {
 				} );
 			}
 
-			function onMouseLeave( { buttons, target } ) {
+			function onMouseLeave( { buttons, target, relatedTarget } ) {
+				// If we're moving into a child element, ignore. We're tracking
+				// the mouse leaving the element to a parent, no a child.
+				if ( target.contains( relatedTarget ) ) {
+					return;
+				}
+
 				// Avoid triggering a multi-selection if the user is already
 				// dragging blocks.
 				if ( isDraggingBlocks() ) {

@@ -255,7 +255,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
 					__nextHasNoMarginBottom
-					label={ __( 'Focal point picker' ) }
+					__next40pxDefaultSize
+					label={ __( 'Focal point' ) }
 					url={ mediaUrl }
 					value={ focalPoint }
 					onChange={ ( value ) =>

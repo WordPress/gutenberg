@@ -87,10 +87,6 @@
 		padding: $grid-unit-15;
 		white-space: nowrap;
 
-		@include break-huge() {
-			min-width: 200px;
-		}
-
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
@@ -185,6 +181,10 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+
+			> * {
+				flex-grow: 1;
+			}
 		}
 	}
 	.dataviews-view-table-header-button {
@@ -256,6 +256,7 @@
 .dataviews-view-grid {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	grid-template-rows: max-content;
 	padding: 0 $grid-unit-40;
 
 	@include break-xlarge() {
@@ -273,11 +274,19 @@
 		justify-content: flex-start;
 
 		.dataviews-view-grid__title-actions {
-			padding: 0 $grid-unit-05;
+			padding: $grid-unit-05 $grid-unit 0 $grid-unit-05;
 		}
 
 		.dataviews-view-grid__primary-field {
 			min-height: $grid-unit-50;
+		}
+		&.is-selected {
+			border-color: var(--wp-admin-theme-color);
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
+			.dataviews-view-grid__fields .dataviews-view-grid__field .dataviews-view-grid__field-value {
+				color: $gray-900;
+			}
 		}
 	}
 
@@ -294,10 +303,6 @@
 			width: 100%;
 			height: 100%;
 		}
-	}
-
-	.dataviews-view-grid__primary-field {
-		padding: $grid-unit-10;
 	}
 
 	.dataviews-view-grid__fields {
@@ -386,16 +391,14 @@
 				border-radius: $grid-unit-05;
 			}
 		}
-		h3 {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+		.dataviews-view-list__primary-field {
+			min-height: $grid-unit-05 * 5;
 		}
 	}
 
 	.dataviews-view-list__media-wrapper {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: $grid-unit-50;
+		height: $grid-unit-50;
 		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
@@ -428,17 +431,13 @@
 
 	.dataviews-view-list__fields {
 		color: $gray-700;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		display: flex;
+		gap: $grid-unit-10;
+		flex-wrap: wrap;
+		font-size: 12px;
+		line-height: $grid-unit-20;
 
 		.dataviews-view-list__field {
-			margin-right: $grid-unit-15;
-
-			&:last-child {
-				margin-right: 0;
-			}
-
 			&:empty {
 				display: none;
 			}
@@ -499,4 +498,12 @@
 
 .dataviews-bulk-edit-button.components-button {
 	flex-shrink: 0;
+}
+
+.dataviews-view-grid__title-actions .dataviews-view-table-selection-checkbox {
+	margin-left: $grid-unit-10;
+}
+
+.dataviews-view-grid__card.has-no-pointer-events * {
+	pointer-events: none;
 }

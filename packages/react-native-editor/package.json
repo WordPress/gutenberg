@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.111.1",
+	"version": "1.112.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -57,7 +57,7 @@
 		"jed": "^1.1.1",
 		"jsdom-jscore-rn": "0.1.8",
 		"node-fetch": "^2.6.0",
-		"react-native": "0.71.11",
+		"react-native": "0.71.15",
 		"react-native-fast-image": "8.5.11",
 		"react-native-gesture-handler": "2.10.2",
 		"react-native-get-random-values": "1.4.0",

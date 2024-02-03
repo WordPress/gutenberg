@@ -9,7 +9,7 @@ import {
 	Button,
 	Tooltip,
 } from '@wordpress/components';
-import { typography } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -33,7 +33,7 @@ function FontFamilies() {
 			{ !! modalTabOpen && (
 				<FontLibraryModal
 					onRequestClose={ () => toggleModal() }
-					initialTabName={ modalTabOpen }
+					initialTabId={ modalTabOpen }
 				/>
 			) }
 
@@ -47,7 +47,7 @@ function FontFamilies() {
 									toggleModal( 'installed-fonts' )
 								}
 								aria-label={ __( 'Manage fonts' ) }
-								icon={ typography }
+								icon={ settings }
 								size={ 'small' }
 							/>
 						</Tooltip>
@@ -63,7 +63,16 @@ function FontFamilies() {
 						) ) }
 					</ItemGroup>
 				) : (
-					<>{ __( 'No fonts installed.' ) }</>
+					<>
+						{ __( 'No fonts installed.' ) }
+						<Button
+							className="edit-site-global-styles-font-families__add-fonts"
+							variant="secondary"
+							onClick={ () => toggleModal( 'upload-fonts' ) }
+						>
+							{ __( 'Add fonts' ) }
+						</Button>
+					</>
 				) }
 			</VStack>
 		</>

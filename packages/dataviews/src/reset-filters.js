@@ -4,10 +4,26 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function ResetFilter( { view, onChangeView } ) {
+export default function ResetFilter( { filters, view, onChangeView } ) {
+	const isPrimary = ( field ) =>
+		filters.some( ( f ) => f.field === field && f.isPrimary );
+	let isDisabled = true;
+	if ( view.search !== '' ) {
+		isDisabled = false;
+	} else if (
+		view.filters?.length > 0 &&
+		( view.filters.some( ( filter ) => filter.value !== undefined ) ||
+			view.filters.some(
+				( filter ) =>
+					filter.value === undefined && ! isPrimary( filter.field )
+			) )
+	) {
+		isDisabled = false;
+	}
+
 	return (
 		<Button
-			disabled={ view.search === '' && view.filters?.length === 0 }
+			disabled={ isDisabled }
 			__experimentalIsFocusable
 			size="compact"
 			variant="tertiary"

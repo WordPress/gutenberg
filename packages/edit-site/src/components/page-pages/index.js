@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -62,6 +67,9 @@ function useView( postType ) {
 			return {
 				...defaultView,
 				type: layout,
+				layout: {
+					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
+				},
 			};
 		}
 		return defaultView;
@@ -161,32 +169,32 @@ function FeaturedImage( { item, viewType } ) {
 		canvas: 'edit',
 	} );
 	const hasMedia = !! item.featured_media;
+	const size =
+		viewType === LAYOUT_GRID
+			? [ 'large', 'full', 'medium', 'thumbnail' ]
+			: [ 'thumbnail', 'medium', 'large', 'full' ];
+	const media = hasMedia ? (
+		<Media
+			className="edit-site-page-pages__featured-image"
+			id={ item.featured_media }
+			size={ size }
+		/>
+	) : null;
+	if ( viewType === LAYOUT_LIST ) {
+		return media;
+	}
 	return (
-		<span
-			className={ {
+		<button
+			className={ classNames( 'page-pages-preview-field__button', {
 				'edit-site-page-pages__media-wrapper':
 					viewType === LAYOUT_TABLE,
-			} }
+			} ) }
+			type="button"
+			onClick={ onClick }
+			aria-label={ item.title?.rendered || __( '(no title)' ) }
 		>
-			<button
-				className="page-pages-preview-field__button"
-				type="button"
-				onClick={ onClick }
-				aria-label={ item.title?.rendered || __( '(no title)' ) }
-			>
-				{ hasMedia && (
-					<Media
-						className="edit-site-page-pages__featured-image"
-						id={ item.featured_media }
-						size={
-							viewType === LAYOUT_GRID
-								? [ 'large', 'full', 'medium', 'thumbnail' ]
-								: [ 'thumbnail', 'medium', 'large', 'full' ]
-						}
-					/>
-				) }
-			</button>
-		</span>
+			{ media }
+		</button>
 	);
 }
 
@@ -274,6 +282,7 @@ export default function PagePages() {
 					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
+				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
@@ -298,7 +307,7 @@ export default function PagePages() {
 							__( '(no title)' )
 					);
 				},
-				maxWidth: 400,
+				maxWidth: 300,
 				enableHiding: false,
 			},
 			{
@@ -323,6 +332,7 @@ export default function PagePages() {
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
+					isPrimary: true,
 				},
 			},
 			{

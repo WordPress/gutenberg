@@ -39,77 +39,12 @@ function DefaultAppender( { rootClientId } ) {
 	);
 }
 
-function useAppender( rootClientId, CustomAppender ) {
-	const isVisible = useSelect(
-		( select ) => {
-			const {
-				getTemplateLock,
-				getSelectedBlockClientId,
-				__unstableGetEditorMode,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
-
-			if ( ! CustomAppender ) {
-				const selectedBlockClientId = getSelectedBlockClientId();
-				const isParentSelected =
-					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId );
-				if ( ! isParentSelected ) {
-					return false;
-				}
-			}
-
-			if (
-				getTemplateLock( rootClientId ) ||
-				getBlockEditingMode( rootClientId ) === 'disabled' ||
-				__unstableGetEditorMode() === 'zoom-out'
-			) {
-				return false;
-			}
-
-			return true;
-		},
-		[ rootClientId, CustomAppender ]
-	);
-
-	if ( ! isVisible ) {
-		return null;
-	}
-
-	return CustomAppender ? (
-		<CustomAppender />
-	) : (
-		<DefaultAppender rootClientId={ rootClientId } />
-	);
-}
-
-function BlockListAppender( {
+export default function BlockListAppender( {
 	rootClientId,
-	renderAppender,
+	CustomAppender,
 	className,
 	tagName: TagName = 'div',
 } ) {
-	if ( renderAppender === false ) {
-		return null;
-	}
-
-	return (
-		<BlockListAppenderInner
-			rootClientId={ rootClientId }
-			renderAppender={ renderAppender }
-			className={ className }
-			tagName={ TagName }
-		/>
-	);
-}
-
-function BlockListAppenderInner( {
-	rootClientId,
-	renderAppender,
-	className,
-	tagName: TagName,
-} ) {
-	const appender = useAppender( rootClientId, renderAppender );
 	const isDragOver = useSelect(
 		( select ) => {
 			const {
@@ -129,10 +64,6 @@ function BlockListAppenderInner( {
 		},
 		[ rootClientId ]
 	);
-
-	if ( ! appender ) {
-		return null;
-	}
 
 	return (
 		<TagName
@@ -162,9 +93,11 @@ function BlockListAppenderInner( {
 			// have commonly targeted that attribute for margins.
 			data-block
 		>
-			{ appender }
+			{ CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			) }
 		</TagName>
 	);
 }
-
-export default BlockListAppender;

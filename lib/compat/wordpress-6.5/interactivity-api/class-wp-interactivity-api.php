@@ -18,12 +18,13 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @var array
 		 */
 		private static $directive_processors = array(
-			'data-wp-interactive' => 'data_wp_interactive_processor',
-			'data-wp-context'     => 'data_wp_context_processor',
-			'data-wp-bind'        => 'data_wp_bind_processor',
-			'data-wp-class'       => 'data_wp_class_processor',
-			'data-wp-style'       => 'data_wp_style_processor',
-			'data-wp-text'        => 'data_wp_text_processor',
+			'data-wp-interactive'   => 'data_wp_interactive_processor',
+			'data-wp-router-region' => 'data_wp_router_region_processor',
+			'data-wp-context'       => 'data_wp_context_processor',
+			'data-wp-bind'          => 'data_wp_bind_processor',
+			'data-wp-class'         => 'data_wp_class_processor',
+			'data-wp-style'         => 'data_wp_style_processor',
+			'data-wp-text'          => 'data_wp_text_processor',
 		);
 
 		/**
@@ -48,6 +49,21 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @var array
 		 */
 		private $config_data = array();
+
+		/**
+		 * Flag that indicates whether the `data-wp-router-region` directive has
+		 * been found in the HTML and processed.
+		 *
+		 * The value is saved in a private property of the WP_Interactivity_API
+		 * instance instead of using a static variable inside the processor
+		 * function, which would hold the same value for all instances
+		 * independently of whether they have processed any
+		 * `data-wp-router-region` directive or not.
+		 *
+		 * @since 6.5.0
+		 * @var bool
+		 */
+		private $has_processed_router_region = false;
 
 		/**
 		 * Gets and/or sets the initial state of an Interactivity API store for a
@@ -671,6 +687,88 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				} else {
 					$p->set_content_between_balanced_tags( '' );
 				}
+			}
+		}
+
+		/**
+		 * Processes the `data-wp-router-region` directive.
+		 *
+		 * It renders in the footer a set of HTML elements to notify users about
+		 * client-side navigations. More concretely, the elements added are 1) a
+		 * top loading bar to visually inform that a navigation is in progress
+		 * and 2) an `aria-live` region for accessible navigation announcements.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_Interactivity_API_Directives_Processor $p The directives processor instance.
+		 */
+		private function data_wp_router_region_processor( WP_Interactivity_API_Directives_Processor $p ) {
+			if ( ! $p->is_tag_closer() && ! $this->has_processed_router_region ) {
+				$this->has_processed_router_region = true;
+
+				// Initialize the `core/router` store.
+				$this->state(
+					'core/router',
+					array(
+						'navigation' => array(
+							'message'     => '',
+							'hasStarted'  => false,
+							'hasFinished' => false,
+							'texts'       => array(
+								'loading' => __( 'Loading page, please wait.' ),
+								'loaded'  => __( 'Page Loaded.' ),
+							),
+						),
+					)
+				);
+
+				$callback = static function () {
+					echo <<<HTML
+<style id="wp-interactivity-router_animations">
+.wp-interactivity-router_loading-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	max-width: 100vw !important;
+	height: 4px;
+	background-color: var(--wp--preset--color--primary, #000);
+	opacity: 0
+}
+.wp-interactivity-router_loading-bar.start-animation {
+	animation: wp-interactivity-router_loading-bar-start-animation 30s cubic-bezier(0.03, 0.5, 0, 1) forwards
+}
+.wp-interactivity-router_loading-bar.finish-animation {
+	animation: wp-interactivity-router_loading-bar-finish-animation 300ms ease-in
+}
+
+@keyframes wp-interactivity-router_loading-bar-start-animation {
+	0% { transform: scaleX(0); transform-origin: 0% 0%; opacity: 1 }
+	100% { transform: scaleX(1); transform-origin: 0% 0%; opacity: 1 }
+}
+@keyframes wp-interactivity-router_loading-bar-finish-animation {
+	0% { opacity: 1 }
+	50% { opacity: 1 }
+	100% { opacity: 0 }
+}
+</style>
+<div
+	class="wp-interactivity-router_loading-bar"
+	data-wp-interactive='{"namespace":"core/router"}'
+	data-wp-class--start-animation="state.navigation.hasStarted"
+	data-wp-class--finish-animation="state.navigation.hasFinished"
+></div>
+<div
+	class="screen-reader-text"
+	aria-live="polite"
+	data-wp-interactive='{"namespace":"core/router"}'
+	data-wp-text="state.navigation.message"
+></div>
+HTML;
+				};
+				add_action( 'wp_footer', $callback );
 			}
 		}
 	}

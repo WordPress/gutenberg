@@ -9,7 +9,6 @@ import {
 	__experimentalSpacer as Spacer,
 	Button,
 	Spinner,
-	Notice,
 	FlexItem,
 } from '@wordpress/components';
 
@@ -34,6 +33,8 @@ function InstalledFonts() {
 		refreshLibrary,
 		uninstallFontFamily,
 		isResolvingLibrary,
+		notice,
+		setNotice,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
@@ -45,9 +46,9 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( font );
 	};
 
-	const [ notice, setNotice ] = useState( null );
-
 	const handleConfirmUninstall = async () => {
+		setNotice( null );
+
 		try {
 			await uninstallFontFamily( libraryFontSelected );
 			setNotice( {
@@ -91,20 +92,11 @@ function InstalledFonts() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
-
 	return (
 		<TabPanelLayout
 			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
+			notice={ notice }
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
 			footer={
 				<Footer
@@ -120,28 +112,17 @@ function InstalledFonts() {
 				handleCancelUninstall={ handleCancelUninstall }
 			/>
 
-			{ notice && (
-				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 4 } />
-				</>
-			) }
-
 			{ ! libraryFontSelected && (
 				<>
-					{ isResolvingLibrary && <Spinner /> }
+					{ isResolvingLibrary && (
+						<FlexItem>
+							<Spacer margin={ 2 } />
+							<Spinner />
+							<Spacer margin={ 2 } />
+						</FlexItem>
+					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
-							<Spacer margin={ 2 } />
 							<FontsGrid>
 								{ baseCustomFonts.map( ( font ) => (
 									<LibraryFontCard
@@ -191,19 +172,24 @@ function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
 		useContext( FontLibraryContext );
 	return (
-		<HStack justify="space-between">
+		<HStack justify="flex-end">
 			{ isInstalling && <ProgressBar /> }
 			<div>
 				{ shouldDisplayDeleteButton && (
-					<Button variant="tertiary" onClick={ handleUninstallClick }>
+					<Button
+						isDestructive
+						variant="tertiary"
+						onClick={ handleUninstallClick }
+					>
 						{ __( 'Delete' ) }
 					</Button>
 				) }
 			</div>
 			<Button
-				disabled={ ! fontFamiliesHasChanges }
 				variant="primary"
 				onClick={ saveFontFamilies }
+				disabled={ ! fontFamiliesHasChanges }
+				__experimentalIsFocusable
 			>
 				{ __( 'Update' ) }
 			</Button>

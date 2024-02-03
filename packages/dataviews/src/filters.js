@@ -43,18 +43,23 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 				if ( ! field.elements?.length ) {
 					return;
 				}
+
+				const isPrimary = !! field.filterBy?.isPrimary;
 				filters.push( {
 					field: field.id,
 					name: field.header,
 					elements: field.elements,
 					operators,
-					isVisible: view.filters.some(
-						( f ) =>
-							f.field === field.id &&
-							[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
-								f.operator
-							)
-					),
+					isVisible:
+						isPrimary ||
+						view.filters.some(
+							( f ) =>
+								f.field === field.id &&
+								[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
+									f.operator
+								)
+						),
+					isPrimary,
 				} );
 		}
 	} );
@@ -89,6 +94,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 		filterComponents.push(
 			<ResetFilters
 				key="reset-filters"
+				filters={ filters }
 				view={ view }
 				onChangeView={ onChangeView }
 			/>
