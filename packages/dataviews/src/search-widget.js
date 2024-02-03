@@ -10,11 +10,7 @@ import { matchSorter } from 'match-sorter';
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import {
-	BaseControl,
-	Icon,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { BaseControl, VisuallyHidden, Icon } from '@wordpress/components';
 import { check, search } from '@wordpress/icons';
 
 export default function SearchWidget( { filter, view, onChangeView } ) {
@@ -72,6 +68,9 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 				__nextHasNoMarginBottom
 			>
 				<div className="dataviews-search-widget-filter-combobox__input-wrapper">
+					<Ariakit.ComboboxLabel render={ <VisuallyHidden /> }>
+						{ __( 'Search items' ) }
+					</Ariakit.ComboboxLabel>
 					<Ariakit.Combobox
 						autoSelect
 						placeholder={ __( 'Search' ) }
@@ -82,42 +81,41 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 					</div>
 				</div>
 			</BaseControl>
+			<hr className="dataviews-default-separator" />
 			<Ariakit.ComboboxList
 				className="dataviews-search-widget-filter-combobox-list"
 				alwaysVisible
 			>
-				<VStack spacing={ 0 }>
-					{ matches.map( ( element ) => {
-						return (
-							<Ariakit.ComboboxItem
-								key={ element.value }
-								value={ element.value }
-								className="dataviews-search-widget-filter-combobox-item"
-								hideOnClick={ false }
-								setValueOnClick={ false }
-								focusOnHover
-							>
-								<span className="dataviews-search-widget-filter-combobox-item-check">
-									{ selectedValues === element.value && (
-										<Icon icon={ check } />
-									) }
-								</span>
-								<span>
-									<Ariakit.ComboboxItemValue
-										className="dataviews-search-widget-filter-combobox-item-value"
-										value={ element.label }
-									/>
-									{ !! element.description && (
-										<span className="dataviews-search-widget-filter-combobox-item-description">
-											{ element.description }
-										</span>
-									) }
-								</span>
-							</Ariakit.ComboboxItem>
-						);
-					} ) }
-					{ ! matches.length && <p>{ __( 'No results found' ) }</p> }
-				</VStack>
+				{ matches.map( ( element ) => {
+					return (
+						<Ariakit.ComboboxItem
+							key={ element.value }
+							value={ element.value }
+							className="dataviews-search-widget-filter-combobox-item"
+							hideOnClick={ false }
+							setValueOnClick={ false }
+							focusOnHover
+						>
+							<span className="dataviews-search-widget-filter-combobox-item-check">
+								{ selectedValues === element.value && (
+									<Icon icon={ check } />
+								) }
+							</span>
+							<span>
+								<Ariakit.ComboboxItemValue
+									className="dataviews-search-widget-filter-combobox-item-value"
+									value={ element.label }
+								/>
+								{ !! element.description && (
+									<span className="dataviews-search-widget-filter-combobox-item-description">
+										{ element.description }
+									</span>
+								) }
+							</span>
+						</Ariakit.ComboboxItem>
+					);
+				} ) }
+				{ ! matches.length && <p>{ __( 'No results found' ) }</p> }
 			</Ariakit.ComboboxList>
 		</Ariakit.ComboboxProvider>
 	);

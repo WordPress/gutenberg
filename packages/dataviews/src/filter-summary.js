@@ -14,7 +14,6 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import WithSeparators from './with-separators';
 import SearchWidget from './search-widget';
 import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 
@@ -64,7 +63,11 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 	);
 	const value = currentFilter?.operator || filter.operators[ 0 ];
 	return (
-		<HStack spacing={ 3 } justify="flex-start">
+		<HStack
+			spacing={ 3 }
+			justify="flex-start"
+			className="dataviews-filter-summary__operators-container"
+		>
 			<FlexItem>{ filter.name }</FlexItem>
 			{ operatorOptions.length > 1 && (
 				<SelectControl
@@ -158,11 +161,10 @@ export default function FilterSummary( props ) {
 			renderContent={ () => {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
-						<WithSeparators>
-							<OperatorSelector { ...props } />
-							<SearchWidget { ...props } />
-							<ResetFilter { ...props } />
-						</WithSeparators>
+						<OperatorSelector { ...props } />
+						<SearchWidget { ...props } />
+						<hr className="dataviews-default-separator" />
+						<ResetFilter { ...props } />
 					</VStack>
 				);
 			} }

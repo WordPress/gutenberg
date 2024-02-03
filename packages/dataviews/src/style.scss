@@ -501,7 +501,6 @@
 .dataviews-search-widget-filter-combobox-list {
 	height: 180px;
 	overflow: auto;
-	padding: 2px;
 
 	.dataviews-search-widget-filter-combobox-item {
 		display: flex;
@@ -616,4 +615,8 @@
 	margin-block: calc(4px * 2);
 	margin-inline: 0;
 	outline: 2px solid transparent;
+}
+
+.dataviews-filter-summary__operators-container {
+	margin-bottom: $grid-unit-10;
 }

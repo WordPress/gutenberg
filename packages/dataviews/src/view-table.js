@@ -21,13 +21,14 @@ import {
 	useId,
 	useRef,
 	useState,
+	Children,
+	Fragment,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import SingleSelectionCheckbox from './single-selection-checkbox';
-import WithSeparators from './with-separators';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
@@ -40,6 +41,17 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
+
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
 
 const sortArrows = { asc: '↑', desc: '↓' };
 
