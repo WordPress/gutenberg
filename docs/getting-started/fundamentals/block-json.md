@@ -17,7 +17,7 @@ At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/ref
 - Data Storage in the Block
 - Setting UI panels for the block
 
-## Basic metadata of the block
+## Basic metadata of a block
 
 Using `block.json` properties, you can define how the block will be uniquely identified and the info displayed in the Block Editor. These properties include:
 
@@ -42,14 +42,13 @@ All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScrip
 
 The [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
 
-## Using `attributes` to store block data
+## Using block `attributes` to store data
 
 Block [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) are settings or data assigned to blocks. They can determine various aspects of a block, such as its content, layout, style, and any other specific information you need to store along with your block's structure. If the user changes a block, such as modifying the font size, you need a way to persist these changes. Attributes are the solution. 
 
 When registering a new block type, the `attributes` property of `block.json` describes the custom data the block requires and how they're stored in the database. This allows the Editor to parse these values correctly and pass the `attributes` to the block's `Edit` and `save` functions.
 
-
-_Example: Attributes as defined in block.json_
+Here's an example of three attributes defined in `block.json`:
 
 ```json
 "attributes": {
@@ -65,14 +64,17 @@ _Example: Attributes as defined in block.json_
 },
 ```
 
-By default, attributes are serialized and stored in the block's delimiter, but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
+Blocks are "delimited" using HTML-style comment tags that contain specific JSON-like attributes. These delimiters make it possible to recognize block boundaries and parse block attributes when rendering post content or editing a post in the Block Editor. 
 
-_Example: Attributes stored in the Markup representation of the block_
+The code example below demonstrates the attributes defined in the block delimiter. 
+
 ```html
 <!-- wp:block-development-examples/copyright-date-block-09aac3 {"fallbackCurrentYear":"2023","showStartingYear":true,"startingYear":"2020"} -->
 <p class="wp-block-block-development-examples-copyright-date-block-09aac3">© 2020–2023</p>
 <!-- /wp:block-development-examples/copyright-date-block-09aac3 -->x
 ```
+ 
+All attributes are serialized and stored in the block's delimiter by default, but this can be configured to suit your needs. Check out the [Understanding Block Attributes](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/) article to learn more.
 
 ### Reading and updating attributes 
 
@@ -88,9 +90,9 @@ Check the <a href="https://developer.wordpress.org/block-editor/reference-guides
 
 [![Open Attributes diagram image](https://developer.wordpress.org/files/2023/11/attributes.png)](https://developer.wordpress.org/files/2023/11/attributes.png "Open Attributes diagram image")
 
-## Enable UI settings panels for the block with `supports`
+## Using block `supports` to enable settings and styles
 
-Many blocks, including core blocks, offer similar customization options, whether changing the background color, text color, or adding padding customization options.
+Many blocks, including Core blocks, offer similar customization options, whether changing the background color, text color, or adding padding customization options.
 
 The [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#supports) property in `block.json` allows a block to declare support for certain features, enabling users to customize specific settings (like colors or margins) from the Settings Sidebar.
 
