@@ -11,24 +11,6 @@
 class WP_Navigation_Block_Renderer {
 
 	/**
-	 * Used to determine whether or not a navigation has submenus.
-	 */
-	private static $has_submenus = false;
-
-	/**
-	 * Used to determine which blocks are wrapped in an <li>.
-	 *
-	 * @var array
-	 */
-	private static $nav_blocks_wrapped_in_list_item = array(
-		'core/navigation-link',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
-
-	/**
 	 * Used to determine which blocks need an <li> wrapper.
 	 *
 	 * @var array
@@ -161,7 +143,9 @@ class WP_Navigation_Block_Renderer {
 		$is_list_open      = false;
 
 		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, static::$nav_blocks_wrapped_in_list_item, true );
+			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
+ 			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
+ 			$is_list_item       = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -176,7 +160,7 @@ class WP_Navigation_Block_Renderer {
 				$inner_blocks_html .= '</ul>';
 			}
 
-			$inner_blocks_html .= static::get_markup_for_inner_block( $inner_block );
+			$inner_blocks_html .= $inner_block_markup;
 		}
 
 		if ( $is_list_open ) {
