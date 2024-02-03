@@ -8,11 +8,13 @@ The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dyna
 
 ## Static rendering 
 
+Blocks with "static rendering" produce front-end output that is fixed and stored in the database upon saving. These blocks rely solely on their `save` function to define the [HTML markup](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/), which remains unchanged unless manually edited in the Block Editor.
+
+If a block does not use a dynamic rendering method—meaning it doesn't generate content on the fly via PHP when the page loads—it's considered a "static block." 
+
+The diagram below illustrates how static block content is saved in the database and retrieved and rendered as HTML on the front end.
+
 ![Blocks with static rendering diagram](https://developer.wordpress.org/files/2024/01/static-rendering.png)
-
-Blocks are considered "static" when they have "static rendering", this is when their output for the front end is statically generated when saved to the database, as returned by their `save` functions.
-
-Blocks have static rendering **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is returned by its `save` function when the block is saved in the Block Editor. This type is block is often called a "static block".
 
 ### How to define static rendering for a block
 
