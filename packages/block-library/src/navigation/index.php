@@ -11,6 +11,11 @@
 class WP_Navigation_Block_Renderer {
 
 	/**
+	 * Used to determine whether or not a navigation has submenus.
+	 */
+	private static $has_submenus = false;
+
+	/**
 	 * Used to determine which blocks need an <li> wrapper.
 	 *
 	 * @var array
