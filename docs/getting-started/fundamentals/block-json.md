@@ -1,17 +1,16 @@
 # block.json
 
-The `block.json` file simplifies the processs of defining and registering a block by using the same block's definition in JSON format to register the block in both the server and the client.
+The `block.json` file simplifies the process of defining and registering a block by using the same block's definition in JSON format to register the block in both the server and the client.
 
 [![Open block.json diagram image](https://developer.wordpress.org/files/2023/11/block-json.png)](https://developer.wordpress.org/files/2023/11/block-json.png "Open block.json diagram image")
 
-
-<div class="callout callout-tip">
+<div class="callout callout-info">
 Click <a href="https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd">here</a> to see a full block example and check <a href="https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json">its <code>block.json</code></a>
 </div>
 
 Besides simplifying a block's registration, using a `block.json` has [several benefits](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file), including improved performance and development.
 
-At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. With these properties you can define things such as:
+At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. With these properties, you can define things such as:
 
 - Basic metadata of the block
 - Files for the block's behavior, style, or output
@@ -20,16 +19,16 @@ At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/ref
 
 ## Basic metadata of the block
 
-Through properties of the `block.json`, we can define how the block will be uniquely identified, how it can be found, and the info displayed for the block in the Block Editor. Some of these properties are:
+Using `block.json` properties, you can define how the block will be uniquely identified and the info displayed in the Block Editor. These properties include:
 
-- [`apiVersion`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#api-version): the version of [the API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/) used by the block (current version is 2).
-- [`name`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#name):  a unique identifier for a block, including a namespace.
-- [`title`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#title):  a display title for a block.
-- [`category`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#category):  a block category for the block in the Inserter panel.
-- [`icon`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#icon):  a [Dashicon](https://developer.wordpress.org/resource/dashicons) slug or a custom SVG icon.
-- [`description`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#description):  a short description visible in the block inspector.
-- [`keywords`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#keywords): to locate the block in the inserter.
-- [`textdomain`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#text-domain): the plugin text-domain (important for things such as translations).
+- [`apiVersion`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#api-version): Specifies the [API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/) version the block uses.
+- [`name`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#name):  The unique name of the block, including namespace (e.g., `my-plugin/my-custom-block`).
+- [`title`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#title):  The display title for the block, shown in the Inserter.
+- [`category`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#category): The category under which the block appears in the Inserter. Common categories include `text`, `media`, `design`, `widgets`, and `theme`.
+- [`icon`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#icon):  An icon representing the block in the Inserter. This can be a [Dashicon](https://developer.wordpress.org/resource/dashicons) slug or a custom SVG icon.
+- [`description`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#description):  A short description of the block, providing more context than the title.
+- [`keywords`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#keywords): An array of keywords to help users find the block when searching.
+- [`textdomain`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#text-domain): The text domain for the block, used for internationalization.
 
 ## Files for the block's behavior, output, or style 
 
@@ -41,7 +40,7 @@ The [`viewScript`](https://developer.wordpress.org/block-editor/reference-guides
 
 All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScript`) accept as a value a [path for the file](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#wpdefinedpath) (prefixed with `file:`), a [handle registered with `wp_register_script` or `wp_register_style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#wpdefinedasset), or an array with a mix of both.
 
-The [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This only method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
+The [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
 
 ## Using `attributes` to store block data
 
@@ -51,6 +50,7 @@ When registering a new block type, the `attributes` property of `block.json` des
 
 
 _Example: Attributes as defined in block.json_
+
 ```json
 "attributes": {
 	"fallbackCurrentYear": {
@@ -64,9 +64,10 @@ _Example: Attributes as defined in block.json_
 	}
 },
 ```
+
 By default, attributes are serialized and stored in the block's delimiter, but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
 
-_Example: Atributes stored in the Markup representation of the block_
+_Example: Attributes stored in the Markup representation of the block_
 ```html
 <!-- wp:block-development-examples/copyright-date-block-09aac3 {"fallbackCurrentYear":"2023","showStartingYear":true,"startingYear":"2020"} -->
 <p class="wp-block-block-development-examples-copyright-date-block-09aac3">© 2020–2023</p>
@@ -75,7 +76,7 @@ _Example: Atributes stored in the Markup representation of the block_
 
 ### Reading and updating attributes 
 
-These [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) are passed to the React component `Edit`(to display in the Block Editor) and the `save` function (to return the markup saved to the database) of the block, and to any server-side render definition for the block (see the `render` property above).
+These [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) are passed to the React component `Edit` (to display in the Block Editor) and the `save` function (to return the markup saved to the database) of the block and to any server-side render definition for the block (see the `render` property above).
 
 The `Edit` component receives exclusively the capability of updating the attributes via the [`setAttributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#setattributes) function.
 
@@ -86,7 +87,6 @@ Check the <a href="https://developer.wordpress.org/block-editor/reference-guides
 </div>
 
 [![Open Attributes diagram image](https://developer.wordpress.org/files/2023/11/attributes.png)](https://developer.wordpress.org/files/2023/11/attributes.png "Open Attributes diagram image")
-
 
 ## Enable UI settings panels for the block with `supports`
 
