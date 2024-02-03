@@ -144,8 +144,8 @@ class WP_Navigation_Block_Renderer {
 
 		foreach ( $inner_blocks as $inner_block ) {
 			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
- 			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
- 			$is_list_item       = $p->next_tag( 'LI' );
+			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item       = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
