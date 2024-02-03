@@ -47,7 +47,7 @@ jobs:
               run: npm run native test:e2e:setup
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@3b1b3b9a2104c2b47fbae53f3938079c00c9bb87 # v3.0.0
+              uses: gradle/actions/setup-gradle@3b1b3b9a2104c2b47fbae53f3938079c00c9bb87 # v3.0.0
 
             - name: AVD cache
               uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
