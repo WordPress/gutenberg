@@ -259,26 +259,27 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						}
 					}
 				} else {
-					$directives_prefixes = array();
+					if ( 0 === count( $p->get_attribute_names_with_prefix( 'data-wp-remove' ) ) ) {
+						$directives_prefixes = array();
 
-					foreach ( $p->get_attribute_names_with_prefix( 'data-wp-' ) as $attribute_name ) {
+						// Checks if there is is a server directive processor registered for each directive.
+						foreach ( $p->get_attribute_names_with_prefix( 'data-wp-' ) as $attribute_name ) {
+							list( $directive_prefix ) = $this->extract_prefix_and_suffix( $attribute_name );
+							if ( array_key_exists( $directive_prefix, self::$directive_processors ) ) {
+								$directives_prefixes[] = $directive_prefix;
+							}
+						}
 
 						/*
-						 * Extracts the directive prefix to see if there is a server directive
-						 * processor registered for that directive.
-						 */
-						list( $directive_prefix ) = $this->extract_prefix_and_suffix( $attribute_name );
-						if ( array_key_exists( $directive_prefix, self::$directive_processors ) ) {
-							$directives_prefixes[] = $directive_prefix;
+						* If this is not a void element, it adds it to the tag stack so it can
+						* process its closing tag and check for unbalanced tags.
+						*/
+						if ( ! $p->is_void() ) {
+							$tag_stack[] = array( $tag_name, $directives_prefixes );
 						}
-					}
-
-					/*
-					 * If this is not a void element, it adds it to the tag stack so it can
-					 * process its closing tag and check for unbalanced tags.
-					 */
-					if ( ! $p->is_void() ) {
-						$tag_stack[] = array( $tag_name, $directives_prefixes );
+					} else {
+						// Jumps to the tag closer if the tag has a `data-wp-remove` directive.
+						$p->next_balanced_tag_closer_tag();
 					}
 				}
 
@@ -836,38 +837,47 @@ HTML;
 				$item_name        = isset( $extracted_suffix[1] ) ? $this->kebab_to_camel_case( $extracted_suffix[1] ) : 'item';
 				$attribute_value  = $p->get_attribute( $attribute_name );
 				$result           = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
-				$inner_content    = $p->get_content_between_balanced_tags();
+
+				// Gets the content between the template tags and leaves the cursor in the closer tag.
+				$inner_content = $p->get_content_between_balanced_template_tags();
+
+				// Checks if there is a manual server-side directive processing.
+				$template_end = 'data-wp-each: template_end';
+				$p->set_bookmark( $template_end );
+				$p->next_tag();
+				$manual_sdp = $p->get_attribute( 'data-wp-remove--each-child' );
+				$p->seek( $template_end ); // Rewinds to the template closer tag.
+				$p->release_bookmark( $template_end );
 
 				/*
-				 * It doesn't process associative arrays because those will be
-				 * deserialized as objects in JS.
-				 *
-				 * It doesn't process empty or non-array values.
-				 *
-				 * It doesn't process templates that contain top-level texts because
-				 * those texts can't be identified to be removed in the client.  Note:
-				 * there might be top-level texts in between balanced tags, but those
-				 * cannot be identified at this moment.
+				 * It doesn't process in these situations:
+				 * - Manual server-side directive processing.
+				 * - Empty or non-array values.
+				 * - Associative arrays because those are deserialized as objects in JS.
+				 * - Templates that contain top-level texts because those texts can't be
+				 *   identified and removed in the client.
 				 */
 				if (
-				empty( $result ) ||
-				! is_array( $result ) ||
-				! array_is_list( $result ) ||
-				! str_starts_with( trim( $inner_content ), '<' ) ||
-				! str_ends_with( trim( $inner_content ), '>' )
-				) {
+					$manual_sdp ||
+					empty( $result ) ||
+					! is_array( $result ) ||
+					! array_is_list( $result ) ||
+					! str_starts_with( trim( $inner_content ), '<' ) ||
+					! str_ends_with( trim( $inner_content ), '>' )
+					) {
+					// Pops the last tag because it skipped the closing tag of the template tag.
+					array_pop( $tag_stack );
 					return;
 				}
 
 				// Extracts the namespace from the directive attribute value.
 				$namespace_value         = end( $namespace_stack );
 				list( $namespace_value ) = is_string( $attribute_value ) && ! empty( $attribute_value )
-					? $this->extract_directive_value( $attribute_value, $namespace_value )
-					: array( $namespace_value, null );
+				? $this->extract_directive_value( $attribute_value, $namespace_value )
+				: array( $namespace_value, null );
 
-				$processed_content        = '';
-				$number_of_top_level_tags = 0;
 				// Processes the inner content for each item of the array.
+				$processed_content = '';
 				foreach ( $result as $item ) {
 					// Creates a new context that includes the current item of the array.
 					array_push(
@@ -886,16 +896,10 @@ HTML;
 						return array_pop( $context_stack );
 					}
 
-					// Adds the `data-wp-each-child` to each top-level tag.
+					// Adds the `data-wp-remove--each-child` to each top-level tag.
 					$i = new WP_Interactivity_API_Directives_Processor( $processed_item );
 					while ( $i->next_tag() ) {
-						$number_of_top_level_tags += 1;
-						$i->set_attribute( 'data-wp-each-child', true );
-						/*
-						 * Moves to the tag closer of the current top-level tag so the next
-						 * call to `next_tag()` moves to the opener tag of the next
-						 * top-level tag.
-						 */
+						$i->set_attribute( 'data-wp-remove--each-child', true );
 						$i->next_balanced_tag_closer_tag();
 					}
 					$processed_content .= $i->get_updated_html();
@@ -905,17 +909,7 @@ HTML;
 				}
 
 				// Appends the processed content after the tag closer of the template.
-				$p->append_content_after_closing_tag_on_balanced_template_tags( $processed_content );
-
-				// Moves the cursor to the end of the processed items.
-				do {
-					$p->next_balanced_tag_closer_tag();
-					if ( $number_of_top_level_tags > 1 ) {
-						$number_of_top_level_tags -= 1;
-					} else {
-						break;
-					}
-				} while ( $p->next_tag() );
+				$p->append_content_after_template_tag_closer( $processed_content );
 
 				// Pops the last tag because it skipped the closing tag of the template tag.
 				array_pop( $tag_stack );
