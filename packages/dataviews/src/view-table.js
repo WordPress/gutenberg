@@ -38,6 +38,7 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 const sortArrows = { asc: '↑', desc: '↓' };
@@ -92,7 +93,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 			}
 			style={ { minWidth: '240px' } }
 		>
-			<WithSeparators>
+			<WithSeparators separator={ <DropdownMenuSeparator /> }>
 				{ isSortable && (
 					<DropdownMenuGroup>
 						{ Object.entries( SORTING_DIRECTIONS ).map(

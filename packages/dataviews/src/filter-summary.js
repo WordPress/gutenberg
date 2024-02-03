@@ -158,11 +158,7 @@ export default function FilterSummary( props ) {
 			renderContent={ () => {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
-						<WithSeparators
-							separator={
-								<hr className="dataviews-filter-summary__popover-separator" />
-							}
-						>
+						<WithSeparators>
 							<OperatorSelector { ...props } />
 							<SearchWidget { ...props } />
 							<ResetFilter { ...props } />

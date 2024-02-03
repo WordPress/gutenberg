@@ -496,15 +496,6 @@
 	.components-popover__content {
 		width: 230px;
 	}
-
-	.dataviews-filter-summary__popover-separator {
-		border: none;
-		height: 1px;
-		background-color: #e0e0e0;
-		margin-block: calc(4px * 2);
-		margin-inline: 0;
-		outline: 2px solid transparent;
-	}
 }
 
 .dataviews-search-widget-filter-combobox-list {
@@ -618,3 +609,11 @@
 	}
 }
 
+.dataviews-default-separator {
+	border: none;
+	height: 1px;
+	background-color: #e0e0e0;
+	margin-block: calc(4px * 2);
+	margin-inline: 0;
+	outline: 2px solid transparent;
+}
