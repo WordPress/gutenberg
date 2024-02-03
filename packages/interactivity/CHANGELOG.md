@@ -19,6 +19,7 @@
 -   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
 -   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([#57891](https://github.com/WordPress/gutenberg/pull/57891))
 -   Export `withScope()` and allow to use it with asynchronous operations. ([#58013](https://github.com/WordPress/gutenberg/pull/58013))
+-   Add `block supports` for `clientNavigation` and `interactive` properties on `block.json` schema.([#58132](https://github.com/WordPress/gutenberg/pull/58132))
 
 ### New Features
 

@@ -57,6 +57,7 @@ Starting in WordPress 5.8 release, we recommend using the `block.json` metadata 
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
 	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ],
 	"render": "file:./render.php"
 }
 ```
@@ -560,6 +561,24 @@ It's possible to pass a style handle registered with the [`wp_register_style`](h
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
+### View Style
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewStyle`
+-   Since: `WordPress 6.5.0`
+
+```json
+{ "viewStyle": [ "file:./view.css", "example-view-style" ] }
+```
+
+Block type frontend styles definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+Frontend-only styles are especially useful for interactive blocks, to style parts that will only be visible after a user performs some action and where those styles will never be needed in the editor. You can start with using the `style` property to put all your common styles in one stylesheet. Only when you need editor-specific styling or frontend-specific styling, you can expand to `editorStyle` and `viewStyle`, but still keep the common part of your styling in the main stylesheet.
+
 ### Render
 
 -   Type: `WPDefinedPath` ([learn more](#wpdefinedpath))
@@ -618,7 +637,8 @@ In `block.json`:
 	"script": "file:./script.js",
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./style.css", "example-shared-style" ]
+	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ]
 }
 ```
 
@@ -670,6 +690,7 @@ Starting in the WordPress 5.8 release, it is possible to instruct WordPress to e
 -   `script`
 -   `viewScript`
 -   `style`
+-   `viewStyle` (Added in WordPress 6.5.0)
 
 ## Internationalization
 

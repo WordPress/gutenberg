@@ -19,6 +19,9 @@
 		"customClassName": false,
 		"html": false,
 		"inserter": false,
-		"renaming": false
+		"renaming": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	}
 }

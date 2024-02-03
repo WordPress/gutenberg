@@ -14,7 +14,7 @@ const pages = new Map();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
-const cleanUrl = ( url ) => {
+const getPagePath = ( url ) => {
 	const u = new URL( url, window.location );
 	return u.pathname + u.search;
 };
@@ -60,16 +60,15 @@ const renderRegions = ( page ) => {
 	}
 };
 
-// Variable to store the current navigation.
-let navigatingTo = '';
-
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 window.addEventListener( 'popstate', async () => {
-	const url = cleanUrl( window.location ); // Remove hash.
-	const page = pages.has( url ) && ( await pages.get( url ) );
+	const pagePath = getPagePath( window.location ); // Remove hash.
+	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
 		renderRegions( page );
+		// Update the URL in the state.
+		state.url = window.location.href;
 	} else {
 		window.location.reload();
 	}
@@ -77,11 +76,22 @@ window.addEventListener( 'popstate', async () => {
 
 // Cache the current regions.
 pages.set(
-	cleanUrl( window.location ),
+	getPagePath( window.location ),
 	Promise.resolve( regionsToVdom( document ) )
 );
 
+// Variable to store the current navigation.
+let navigatingTo = '';
+
 export const { state, actions } = store( 'core/router', {
+	state: {
+		url: window.location.href,
+		navigation: {
+			hasStarted: false,
+			hasFinished: false,
+			texts: {},
+		},
+	},
 	actions: {
 		/**
 		 * Navigates to the specified page.
@@ -90,37 +100,55 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string}  href              The page href.
-		 * @param {Object}  [options]         Options object.
-		 * @param {boolean} [options.force]   If true, it forces re-fetching the
-		 *                                    URL.
-		 * @param {string}  [options.html]    HTML string to be used instead of
-		 *                                    fetching the requested URL.
-		 * @param {boolean} [options.replace] If true, it replaces the current
-		 *                                    entry in the browser session
-		 *                                    history.
-		 * @param {number}  [options.timeout] Time until the navigation is
-		 *                                    aborted, in milliseconds. Default
-		 *                                    is 10000.
+		 * @param {string}  href                               The page href.
+		 * @param {Object}  [options]                          Options object.
+		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
+		 * @param {string}  [options.html]                     HTML string to be used instead of fetching the requested URL.
+		 * @param {boolean} [options.replace]                  If true, it replaces the current entry in the browser session history.
+		 * @param {number}  [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param {boolean} [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
+		 * @param {boolean} [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
-		 * @return {Promise} Promise that resolves once the navigation is
-		 *                   completed or aborted.
+		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href, options = {} ) {
-			const url = cleanUrl( href );
+			const pagePath = getPagePath( href );
+			const { navigation } = state;
+			const {
+				loadingAnimation = true,
+				screenReaderAnnouncement = true,
+				timeout = 10000,
+			} = options;
+
 			navigatingTo = href;
-			actions.prefetch( url, options );
+			actions.prefetch( pagePath, options );
 
 			// Create a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
 			const timeoutPromise = new Promise( ( resolve ) =>
-				setTimeout( resolve, options.timeout ?? 10000 )
+				setTimeout( resolve, timeout )
 			);
 
+			// Don't update the navigation status immediately, wait 400 ms.
+			const loadingTimeout = setTimeout( () => {
+				if ( navigatingTo !== href ) return;
+
+				if ( loadingAnimation ) {
+					navigation.hasStarted = true;
+					navigation.hasFinished = false;
+				}
+				if ( screenReaderAnnouncement ) {
+					navigation.message = navigation.texts.loading;
+				}
+			}, 400 );
+
 			const page = yield Promise.race( [
-				pages.get( url ),
+				pages.get( pagePath ),
 				timeoutPromise,
 			] );
+
+			// Dismiss loading message if it hasn't been added yet.
+			clearTimeout( loadingTimeout );
 
 			// Once the page is fetched, the destination URL could have changed
 			// (e.g., by clicking another link in the meantime). If so, bail
@@ -132,8 +160,32 @@ export const { state, actions } = store( 'core/router', {
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
+
+				// Update the URL in the state.
+				state.url = href;
+
+				// Update the navigation status once the the new page rendering
+				// has been completed.
+				if ( loadingAnimation ) {
+					navigation.hasStarted = false;
+					navigation.hasFinished = true;
+				}
+
+				if ( screenReaderAnnouncement ) {
+					// Announce that the page has been loaded. If the message is the
+					// same, we use a no-break space similar to the @wordpress/a11y
+					// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
+					navigation.message =
+						navigation.texts.loaded +
+						( navigation.message === navigation.texts.loaded
+							? '\u00A0'
+							: '' );
+				}
 			} else {
 				window.location.assign( href );
+				// Await a promise that won't resolve to prevent any potential
+				// feedback indicating that the navigation has finished while
+				// the new page is being loaded.
 				yield new Promise( () => {} );
 			}
 		},
@@ -151,9 +203,9 @@ export const { state, actions } = store( 'core/router', {
 		 *                                  fetching the requested URL.
 		 */
 		prefetch( url, options = {} ) {
-			url = cleanUrl( url );
-			if ( options.force || ! pages.has( url ) ) {
-				pages.set( url, fetchPage( url, options ) );
+			const pagePath = getPagePath( url );
+			if ( options.force || ! pages.has( pagePath ) ) {
+				pages.set( pagePath, fetchPage( pagePath, options ) );
 			}
 		},
 	},

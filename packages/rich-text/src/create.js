@@ -98,15 +98,12 @@ function toFormat( { tagName, attributes } ) {
 	};
 }
 
-// Ideally we use a private property.
-const RichTextInternalData = Symbol( 'RichTextInternalData' );
-
 /**
  * The RichTextData class is used to instantiate a wrapper around rich text
  * values, with methods that can be used to transform or manipulate the data.
  *
- * - Create an emtpy instance: `new RichTextData()`.
- * - Create one from an html string: `RichTextData.fromHTMLString(
+ * - Create an empty instance: `new RichTextData()`.
+ * - Create one from an HTML string: `RichTextData.fromHTMLString(
  *   '<em>hello</em>' )`.
  * - Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
  *   document.querySelector( 'p' ) )`.
@@ -117,6 +114,8 @@ const RichTextInternalData = Symbol( 'RichTextInternalData' );
  * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
  */
 export class RichTextData {
+	#value;
+
 	static empty() {
 		return new RichTextData();
 	}
@@ -138,22 +137,15 @@ export class RichTextData {
 		return richTextData;
 	}
 	constructor( init = createEmptyValue() ) {
-		// Setting text, formats, and replacements as enumerable properties
-		// unfortunately visualises these in the e2e tests. As long as the class
-		// instance doesn't have any enumerable properties, it will be
-		// visualised as a string.
-		Object.defineProperty( this, RichTextInternalData, { value: init } );
+		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this[ RichTextInternalData ] );
+		return getTextContent( this.#value );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
 	toHTMLString() {
-		return (
-			this.originalHTML ||
-			toHTMLString( { value: this[ RichTextInternalData ] } )
-		);
+		return this.originalHTML || toHTMLString( { value: this.#value } );
 	}
 	valueOf() {
 		return this.toHTMLString();
@@ -168,13 +160,13 @@ export class RichTextData {
 		return this.text.length;
 	}
 	get formats() {
-		return this[ RichTextInternalData ].formats;
+		return this.#value.formats;
 	}
 	get replacements() {
-		return this[ RichTextInternalData ].replacements;
+		return this.#value.replacements;
 	}
 	get text() {
-		return this[ RichTextInternalData ].text;
+		return this.#value.text;
 	}
 }
 
