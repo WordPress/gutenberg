@@ -866,7 +866,6 @@ HTML;
 					! str_starts_with( trim( $inner_content ), '<' ) ||
 					! str_ends_with( trim( $inner_content ), '>' )
 					) {
-					// Pops the last tag because it skipped the closing tag of the template tag.
 					array_pop( $tag_stack );
 					return;
 				}
@@ -894,7 +893,8 @@ HTML;
 
 					if ( null === $processed_item ) {
 						// If the HTML is unbalanced, stop processing it.
-						return array_pop( $context_stack );
+						array_pop( $context_stack );
+						return;
 					}
 
 					// Adds the `data-wp-each-child` to each top-level tag.
