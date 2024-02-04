@@ -24,17 +24,16 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 import { store as editPostStore } from '../../../store';
 
-function FullscreenModeClose( { showTooltip, icon, href } ) {
+function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
-			const { getEditorSettings } = select( editorStore );
+			const { getCurrentPostType } = select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
 			const { getEntityRecord, getPostType, isResolving } =
 				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
-			const { editPostTypeProps } = getEditorSettings();
-
+			const _postType = initialPost?.type || getCurrentPostType();
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
 				isRequestingSiteIcon: isResolving( 'getEntityRecord', [
@@ -42,7 +41,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 					'__unstableBase',
 					undefined,
 				] ),
-				postType: getPostType( editPostTypeProps?.postType ),
+				postType: getPostType( _postType ),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},

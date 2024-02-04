@@ -35,10 +35,10 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const editPostTypeProps = useMemo( () => {
+	const initialPost = useMemo( () => {
 		return {
-			postType: initialPostType,
-			postId: initialPostId,
+			type: initialPostType,
+			id: initialPostId,
 		};
 	}, [ initialPostType, initialPostId ] );
 
@@ -75,7 +75,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 	return {
 		currentPost,
 		getPostLinkProps,
-		editPostTypeProps,
+		initialPost,
 		goBack: postHistory.length > 1 ? goBack : undefined,
 	};
 }

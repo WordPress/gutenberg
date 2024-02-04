@@ -31,11 +31,7 @@ describe( 'FullscreenModeClose', () => {
 					getEntityRecord: () => ( {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
-					getEditorSettings: () => ( {
-						editPostTypeProps: {
-							postType: 'post',
-						},
-					} ),
+					getCurrentPostType: () => 'post',
 				} ) );
 			} );
 
@@ -54,11 +50,7 @@ describe( 'FullscreenModeClose', () => {
 					getEntityRecord: () => ( {
 						site_icon_url: '',
 					} ),
-					getEditorSettings: () => ( {
-						editPostTypeProps: {
-							postType: 'post',
-						},
-					} ),
+					getCurrentPostType: () => 'post',
 				} ) );
 			} );
 
@@ -71,7 +63,7 @@ describe( 'FullscreenModeClose', () => {
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'should add correct href where post type exists', () => {
+		it( 'should add correct href using post type from initialPost props', () => {
 			useSelect.mockImplementation( ( cb ) => {
 				return cb( () => ( {
 					isResolving: () => false,
@@ -87,15 +79,11 @@ describe( 'FullscreenModeClose', () => {
 					getEntityRecord: () => ( {
 						site_icon_url: '',
 					} ),
-					getEditorSettings: () => ( {
-						editPostTypeProps: {
-							postType: 'page',
-						},
-					} ),
+					getCurrentPostType: () => 'post',
 				} ) );
 			} );
 
-			render( <FullscreenModeClose /> );
+			render( <FullscreenModeClose initialPost={ { type: 'page' } } /> );
 
 			const button = screen.getByLabelText( 'View Pages' );
 			expect( button.href ).toBe(
