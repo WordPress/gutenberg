@@ -67,7 +67,7 @@ export default function ResetOverridesControl( props ) {
 					disabled={ ! patternWithOverrides }
 					__experimentalIsFocusable
 				>
-					{ __( 'Reset to original' ) }
+					{ __( 'Reset' ) }
 				</ToolbarButton>
 			</ToolbarGroup>
 		</BlockControls>
