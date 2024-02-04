@@ -50,7 +50,7 @@ export type BlockExampleInnerBlock = Partial< BlockType > &
  * @public
  */
 export type BlockConfiguration<
-	Attributes extends Record< string, any > = {}
+	Attributes extends Record< string, any > = {},
 > = Partial< Omit< BlockType< Attributes >, 'icon' > > &
 	Pick< BlockType< Attributes >, 'attributes' | 'category' | 'title' > & {
 		icon?: BlockIcon;

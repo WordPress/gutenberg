@@ -16,7 +16,7 @@ export interface BlockDeprecation<
 	// The new block attribute types.
 	NewAttributes extends Record< string, any > = {},
 	// The old block attribute types.
-	OldAttributes extends Record< string, any > = {}
+	OldAttributes extends Record< string, any > = {},
 > extends Pick<
 		BlockType< OldAttributes >,
 		'attributes' | 'save' | 'supports'

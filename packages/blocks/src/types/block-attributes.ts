@@ -63,7 +63,7 @@ export type Attribute = {
 			type: 'string';
 			default?: string;
 	  }
- );
+);
 
 /**
  * Used in [get-block-attributes.js](../api/parser/get-block-attributes.js)
@@ -187,31 +187,30 @@ export interface Text {
 /**
  * @internal
  */
-export type None =
+export type None = {
+	source?: never;
+} & (
 	| {
-			source?: never;
-	  } & (
-			| {
-					type: 'array';
-					default?: any[];
-			  }
-			| {
-					type: 'object';
-					default?: object;
-			  }
-			| {
-					type: 'boolean';
-					default?: boolean;
-			  }
-			| {
-					type: 'number';
-					default?: number;
-			  }
-			| {
-					type: 'string';
-					default?: string;
-			  }
-	   );
+			type: 'array';
+			default?: any[];
+	  }
+	| {
+			type: 'object';
+			default?: object;
+	  }
+	| {
+			type: 'boolean';
+			default?: boolean;
+	  }
+	| {
+			type: 'number';
+			default?: number;
+	  }
+	| {
+			type: 'string';
+			default?: string;
+	  }
+);
 
 /**
  * @internal
@@ -235,7 +234,7 @@ export type BlockAttributeSchema< T > = (
 	| Query< T >
 	| Text
 	| None
- ) & {
+) & {
 	/**
 	 * Role of the block.
 	 *

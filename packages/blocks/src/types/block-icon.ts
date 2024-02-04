@@ -5,9 +5,9 @@
  */
 
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import type { WPElement, WPComponent } from '@wordpress/element';
+import type { Component } from 'react';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ import type { BlockType } from './block-type';
  * @see {@link https://developer.wordpress.org/resource/dashicons/ Dashicons} on developer.wordpress.org
  * @public
  */
-export type BlockIconRenderer = string | WPElement | WPComponent;
+export type BlockIconRenderer = string | JSX.Element | Component;
 
 /**
  * Describes a normalized block type icon.

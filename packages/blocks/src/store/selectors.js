@@ -9,6 +9,9 @@ import removeAccents from 'remove-accents';
  */
 import { pipe } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
 import { getValueFromObjectPath } from './utils';
 
 /**
@@ -38,8 +41,6 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
 	'string' === typeof nameOrType
 		? getBlockType( state, nameOrType )
 		: nameOrType;
-
-/**
 
 /**
  * Returns all the available block types.

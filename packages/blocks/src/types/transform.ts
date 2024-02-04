@@ -142,7 +142,7 @@ export type Transform< T extends Record< string, any > = {} > = (
 	| TransformPrefix< T >
 	| TransformRaw< T >
 	| TransformShortcode< T >
- ) & {
+) & {
 	priority?: number;
 
 	/**

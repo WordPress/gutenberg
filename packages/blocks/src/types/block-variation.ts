@@ -20,7 +20,7 @@ export type BlockVariationScope = 'block' | 'inserter' | 'transform';
 export type InnerBlockTemplate = [
 	string,
 	BlockAttributes?,
-	InnerBlockTemplate[]?
+	InnerBlockTemplate[]?,
 ];
 
 /**
@@ -34,7 +34,7 @@ export type InnerBlockTemplate = [
  * @public
  */
 export interface BlockVariation<
-	Attributes extends BlockAttributes = BlockAttributes
+	Attributes extends BlockAttributes = BlockAttributes,
 > {
 	/**
 	 * The unique and machine-readable name.
