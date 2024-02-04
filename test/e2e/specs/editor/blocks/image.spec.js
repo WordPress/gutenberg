@@ -823,7 +823,7 @@ test.describe( 'Image', () => {
 			} )
 		).toBeFocused();
 
-		// Select "Expand on click".
+		// Select "Expand on click", then remove it.
 		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'Tab', { times: 5 } );
@@ -836,6 +836,9 @@ test.describe( 'Image', () => {
 				name: 'Disable expand on click',
 			} )
 		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect( uriInput ).toBeFocused();
+		await expect( uriInput ).toBeEmpty();
 	} );
 } );
 
