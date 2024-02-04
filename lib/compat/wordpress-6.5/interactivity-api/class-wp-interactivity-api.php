@@ -259,7 +259,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						}
 					}
 				} else {
-					if ( 0 === count( $p->get_attribute_names_with_prefix( 'data-wp-remove' ) ) ) {
+					if ( 0 === count( $p->get_attribute_names_with_prefix( 'data-wp-each-child' ) ) ) {
 						$directives_prefixes = array();
 
 						// Checks if there is is a server directive processor registered for each directive.
@@ -278,7 +278,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 							$tag_stack[] = array( $tag_name, $directives_prefixes );
 						}
 					} else {
-						// Jumps to the tag closer if the tag has a `data-wp-remove` directive.
+						// Jumps to the tag closer if the tag has a `data-wp-each-child` directive.
 						$p->next_balanced_tag_closer_tag();
 					}
 				}
@@ -842,10 +842,10 @@ HTML;
 				$inner_content = $p->get_content_between_balanced_template_tags();
 
 				// Checks if there is a manual server-side directive processing.
-				$template_end = 'data-wp-each: template_end';
+				$template_end = 'data-wp-each: template end';
 				$p->set_bookmark( $template_end );
 				$p->next_tag();
-				$manual_sdp = $p->get_attribute( 'data-wp-remove--each-child' );
+				$manual_sdp = $p->get_attribute( 'data-wp-each-child' );
 				$p->seek( $template_end ); // Rewinds to the template closer tag.
 				$p->release_bookmark( $template_end );
 
@@ -896,10 +896,10 @@ HTML;
 						return array_pop( $context_stack );
 					}
 
-					// Adds the `data-wp-remove--each-child` to each top-level tag.
+					// Adds the `data-wp-each-child` to each top-level tag.
 					$i = new WP_Interactivity_API_Directives_Processor( $processed_item );
 					while ( $i->next_tag() ) {
-						$i->set_attribute( 'data-wp-remove--each-child', true );
+						$i->set_attribute( 'data-wp-each-child', true );
 						$i->next_balanced_tag_closer_tag();
 					}
 					$processed_content .= $i->get_updated_html();
