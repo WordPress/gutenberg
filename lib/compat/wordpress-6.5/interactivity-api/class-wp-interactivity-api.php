@@ -280,6 +280,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					} else {
 						// Jumps to the tag closer if the tag has a `data-wp-each-child` directive.
 						$p->next_balanced_tag_closer_tag();
+						continue;
 					}
 				}
 
