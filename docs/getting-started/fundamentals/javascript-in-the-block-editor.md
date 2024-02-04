@@ -16,11 +16,11 @@ Since browsers cannot directly execute ESNext and JSX, these syntaxes must be tr
 
 Configuring webpack and Babel can be challenging, so it's recommended that you use the [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) package. This tool simplifies development by preconfiguring both, so you rarely need to write custom webpack or Babel configurations. 
 
-For an introduction, refer to the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) guide.
+For an introduction, refer to the [Get started with wp-scripts](/docs/getting-started/devenv/get-started-with-wp-scripts.md) guide.
 
 ### An overview of `wp-scripts`
 
-The diagram below provides an overview of the build process when using the `wp-scripts` package. It's designed to work out of the box with [standard configurations](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) for development and production environments.
+The diagram below provides an overview of the build process when using the `wp-scripts` package. It's designed to work out of the box with [standard configurations](/docs/getting-started/devenv/get-started-with-wp-scripts.md#basic-usage) for development and production environments.
 
 [![Open Build Process diagram image](https://developer.wordpress.org/files/2023/11/build-process.png)](https://developer.wordpress.org/files/2023/11/build-process.png "Open Build Process diagram image")
 
@@ -75,7 +75,7 @@ wp.blocks.registerBlockVariation(
 
 For scripts that need to run in the Block Editor, make sure you use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) function.
 
-Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor/) for more information. You can also visit the [block-development-example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php) GitHub repository for more practical examples.
+Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md) for more information. You can also visit the [block-development-example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php) GitHub repository for more practical examples.
 
 <div class="callout callout-tip">
     Open your browser's dev tools and try running <code>wp.data.select('core/editor').getBlocks()</code> in the console when editing a post or when using the Site Editor. This command will return all available blocks.
@@ -83,10 +83,10 @@ Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets
 
 ## Additional resources
 
-- [Package reference](https://developer.wordpress.org/block-editor/reference-guides/packages/)
-- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
-- [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
-- [WordPress package handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
+- [Package reference](/docs/reference-guides/packages.md)
+- [Get started with wp-scripts](/docs/getting-started/devenv/get-started-with-wp-scripts.md) 
+- [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md) 
+- [WordPress package handles](/docs/contributors/code/scripts.md) 
 - [Javascript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
 - [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
