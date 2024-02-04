@@ -23,8 +23,8 @@ import { serializeRawBlock } from './parser/serialize-raw-block';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 
 /**
+ * @typedef {import('react').ReactElement} Element
  * @typedef {import('react').HTMLAttributes<any>} HTMLAttributes
- * @typedef {import('@wordpress/element').WPElement} WPElement
  * @typedef {import('../types').Block} Block
  * @typedef {import('../types').BlockType} BlockType
  * @typedef {import('../types').BlockAttributes} BlockAttributes
@@ -116,7 +116,7 @@ export function getInnerBlocksProps( props = {} ) {
  * Return type of {@link getSaveElement}.
  *
  * @typedef BlockSaveResult
- * @property {WPElement}       element    Block save result.
+ * @property {Element}         element    Block save result.
  * @property {Block}           blockType  Block type definition.
  * @property {BlockAttributes} attributes Block attributes.
  */
@@ -184,7 +184,7 @@ export function getSaveElement(
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement}       element    Block save result.
+	 * @param {Element}         element    Block save result.
 	 * @param {Block}           blockType  Block type definition.
 	 * @param {BlockAttributes} attributes Block attributes.
 	 */

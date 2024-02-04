@@ -10,15 +10,15 @@ import * as children from './children';
 
 /**
  * @typedef {import('react').ReactChild} ReactChild
- * @typedef {import('react').ReactElement} ReactElement
+ * @typedef {import('react').ReactElement} Element
  */
 
 /**
  * Given a single node and a node type (e.g. `'br'`), returns true if the node
  * corresponds to that type, false otherwise.
  *
- * @param {JSX.Element}          node Block node to test
- * @param {ReactElement['type']} type Node to type to test against.
+ * @param {Element}         node Block node to test
+ * @param {Element['type']} type Node to type to test against.
  *
  * @return {boolean} Whether node is of intended type.
  *
@@ -62,7 +62,7 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  *
  * @param {Node} domNode DOM node to convert.
  *
- * @return {JSX.Element} Block node equivalent to DOM node.
+ * @return {Element} Block node equivalent to DOM node.
  *
  * @deprecated since 11.17.0. Use the html source instead.
  */

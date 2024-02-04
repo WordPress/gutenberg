@@ -7,7 +7,7 @@
 /**
  * External dependencies
  */
-import type { Component } from 'react';
+import type { ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ import type { BlockType } from './block-type';
  * @see {@link https://developer.wordpress.org/resource/dashicons/ Dashicons} on developer.wordpress.org
  * @public
  */
-export type BlockIconRenderer = string | JSX.Element | Component;
+export type BlockIconRenderer< T = {} > = string | Element | ComponentType< T >;
 
 /**
  * Describes a normalized block type icon.

@@ -300,7 +300,7 @@ export type SourceReturnValue< T > = T extends Attribute & { type: 'boolean' }
 	: T extends Children
 	? ReactChild[]
 	: T extends Node
-	? JSX.Element | null
+	? Element | null
 	: T extends Tag
 	? keyof ( HTMLElementTagNameMap & SVGElementTagNameMap ) | undefined
 	: T extends Query< infer U >

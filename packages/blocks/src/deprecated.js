@@ -4,14 +4,13 @@
 import deprecated from '@wordpress/deprecated';
 
 /**
- * @typedef {import('@wordpress/element').WPComponent} WPComponent
- */
-
-/**
  * A Higher Order Component used to inject BlockContent using context to the
  * wrapped component.
  *
  * @deprecated
+ *
+ * @template T
+ * @typedef {import('react').ComponentType<T>} Component
  *
  * @param {Component} OriginalComponent The component to enhance.
  * @return {Component} The same component.

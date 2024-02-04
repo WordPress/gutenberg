@@ -298,7 +298,7 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * @param {string|Node}               innerHTML       Raw block content.
  * @param {Partial<BlockAttributes>=} attributes      Known block attributes (from delimiters).
  *
- * @return {T extends import('../../types').BlockType<infer U> ? U : Record<string, any>} All block attributes.
+ * @return {T extends import('../../types').BlockType<infer U extends  Record<string, any>> ? U : Record<string, any>} All block attributes.
  */
 export function getBlockAttributes(
 	blockTypeOrName,
