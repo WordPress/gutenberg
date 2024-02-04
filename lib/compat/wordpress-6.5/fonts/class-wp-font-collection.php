@@ -92,20 +92,16 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				$this->data = $this->load_from_json( $this->src );
 			}
 
-			$data_or_error = $this->data;
-
-			if ( ! is_wp_error( $data_or_error ) ) {
-				// Set defaults for optional properties.
-				$data_or_error = wp_parse_args(
-					$this->data,
-					array(
-						'description' => '',
-						'categories'  => array(),
-					)
-				);
+			if ( is_wp_error( $this->data ) ) {
+				return $this->data;
 			}
 
-			return $data_or_error;
+			// Set defaults for optional properties.
+			$defaults = array(
+				'description' => '',
+				'categories'  => array(),
+			);
+			return wp_parse_args( $this->data, $defaults );
 		}
 
 		/**
@@ -192,8 +188,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $data Font collection data.
-		 *
+		 * @param array $data Font collection data to sanitize and validate.
 		 * @return array|WP_Error Sanitized data if valid, otherwise a WP_Error instance.
 		 */
 		private function sanitize_and_validate_data( $data ) {
