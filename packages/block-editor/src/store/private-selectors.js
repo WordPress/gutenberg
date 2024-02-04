@@ -353,5 +353,5 @@ export function getBlockBindingsSource( state, sourceName ) {
  * @return {boolean} Whether user is dragging.
  */
 export function isDragging( state ) {
-	return !! state.isDragging;
+	return state.isDragging;
 }
