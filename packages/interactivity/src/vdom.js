@@ -35,7 +35,12 @@ const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
-// Recursive function that transforms a DOM tree into vDOM.
+/**
+ * Recursive function that transforms a DOM tree into vDOM.
+ *
+ * @param {Node} root The root element or node to start traversing on.
+ * @return {import('preact').VNode[]} The resulting vDOM tree.
+ */
 export function toVdom( root ) {
 	const treeWalker = document.createTreeWalker(
 		root,
