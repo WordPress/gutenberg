@@ -12,7 +12,7 @@ export type BlockSerializationOptions = {
 	isCommentDelimited?: boolean;
 
 	/**
-	 * TODO Undocumented
+	 * Whether the serialization process has descended into the inner blocks.
 	 */
 	isInnerBlocks?: boolean;
 

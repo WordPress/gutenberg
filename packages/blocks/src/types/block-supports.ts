@@ -194,7 +194,10 @@ export interface SpacingProps {
 	padding: boolean | CSSDirection[];
 
 	/**
-	 * TODO Undocumented
+	 * Whether to skip the serialization to HTML markup.
+	 * Provide `true` to skip serialization for all block supports.
+	 * Alternatively, provide an array of block supports for which skip
+	 * serialization to HTML markup.
 	 *
 	 * Used in [private-selectors.js]()./store/private-selectors.js)
 	 *
@@ -338,7 +341,7 @@ export interface BlockSupports {
 	typography?: Partial< TypographyProps >;
 
 	/**
-	 * TODO Undocumented
+	 * This value signals that a block supports some of the CSS style properties related to shadow.
 	 *
 	 * Used in [private-selector.js](./store/private-selector.js)
 	 */
@@ -364,7 +367,7 @@ export interface BlockSupports {
 	position: BlockPosition;
 
 	/**
-	 * TODO Undocumented
+	 * CSS selector to use instead of the default `.wp-block-<blockname>` selector.
 	 *
 	 * @internal
 	 */

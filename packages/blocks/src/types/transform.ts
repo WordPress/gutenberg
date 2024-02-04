@@ -146,14 +146,14 @@ export type Transform< T extends Record< string, any > = {} > = (
 	priority?: number;
 
 	/**
-	 * TODO Undocumented
+	 * Whether there are any mobile block transforms.
 	 *
 	 * Used in [factory.js](../api/factory.js)
 	 */
 	usingMobileTransformations?: boolean;
 
 	/**
-	 * TODO Undocumented
+	 * Function that defines how blocks are transformed from particular block types.
 	 *
 	 * @param blocks Block or Blocks to convert.
 	 * @internal
