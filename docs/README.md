@@ -22,7 +22,7 @@ The Block Editor is the result of the work done on the [**Gutenberg project**](h
 
 Besides offering an [enhanced editing experience](https://wordpress.org/gutenberg/) through visual content creation tools, the Block Editor is also a powerful developer platform with a [rich feature set of APIs](https://developer.wordpress.org/block-editor/reference-guides/) that allow it to be manipulated and extended in countless ways.
 
-## Navigating the handbook
+## Navigating this handbook
 
 This handbook is focused on block development and is divided into five major sections.
 
