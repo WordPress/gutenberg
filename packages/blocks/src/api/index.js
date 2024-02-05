@@ -124,6 +124,7 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
+	getHookedBlockNames,
 	getBlockVariations,
 	isReusableBlock,
 	isTemplatePart,

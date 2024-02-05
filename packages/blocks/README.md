@@ -234,6 +234,18 @@ _Returns_
 
 -   `?string`: Block name.
 
+### getHookedBlockNames
+
+Returns all hooked blocks for a given anchor block.
+
+_Parameters_
+
+-   _name_ `string`: Anchor block name.
+
+_Returns_
+
+-   `Array`: List of blocks hooked to the anchor block.
+
 ### getPhrasingContentSchema
 
 Undocumented declaration.
