@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -13,7 +13,14 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
 import BlockRenameModal from './modal';
+import { unlock } from '../../lock-unlock';
 
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+/* TODO: check if this used in other legacy dropdown menus */
 export default function BlockRenameControl( { clientId } ) {
 	const [ renamingBlock, setRenamingBlock ] = useState( false );
 
@@ -46,15 +53,18 @@ export default function BlockRenameControl( { clientId } ) {
 
 	return (
 		<>
-			<MenuItem
+			<DropdownMenuItem
 				onClick={ () => {
 					setRenamingBlock( true );
 				} }
+				hideOnClick={ false }
 				aria-expanded={ renamingBlock }
 				aria-haspopup="dialog"
 			>
-				{ __( 'Rename' ) }
-			</MenuItem>
+				<DropdownMenuItemLabel>
+					{ __( 'Rename' ) }
+				</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			{ renamingBlock && (
 				<BlockRenameModal
 					blockName={ customName || '' }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
@@ -12,7 +12,14 @@ import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
 import BlockGroupToolbar from './toolbar';
+import { unlock } from '../../lock-unlock';
 
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+/* TODO: check if this used in other legacy dropdown menus */
 function ConvertToGroupButton( {
 	clientIds,
 	isGroupable,
@@ -20,7 +27,6 @@ function ConvertToGroupButton( {
 	onUngroup,
 	blocksSelection,
 	groupingBlockName,
-	onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
@@ -55,27 +61,21 @@ function ConvertToGroupButton( {
 	return (
 		<>
 			{ isGroupable && (
-				<MenuItem
-					onClick={ () => {
-						onConvertToGroup();
-						onClose();
-					} }
-				>
-					{ _x( 'Group', 'verb' ) }
-				</MenuItem>
+				<DropdownMenuItem onClick={ onConvertToGroup }>
+					<DropdownMenuItemLabel>
+						{ _x( 'Group', 'verb' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			) }
 			{ isUngroupable && (
-				<MenuItem
-					onClick={ () => {
-						onConvertFromGroup();
-						onClose();
-					} }
-				>
-					{ _x(
-						'Ungroup',
-						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor '
-					) }
-				</MenuItem>
+				<DropdownMenuItem onClick={ onConvertFromGroup }>
+					<DropdownMenuItemLabel>
+						{ _x(
+							'Ungroup',
+							'Ungrouping blocks from within a grouping block back into individual blocks within the Editor '
+						) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			) }
 		</>
 	);

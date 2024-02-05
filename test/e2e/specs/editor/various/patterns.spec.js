@@ -52,6 +52,11 @@ test.describe( 'Unsynced pattern', () => {
 
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for modal to close
+		await expect(
+			page.getByRole( 'dialog', { name: 'Create pattern' } )
+		).toHaveCount( 0 );
+
 		// Check that the block content is still the same. If the pattern was added as synced
 		// the content would be wrapped by a pattern block.
 		await expect

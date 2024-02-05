@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -13,6 +13,12 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as reusableBlocksStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 function ReusableBlocksManageButton( { clientId } ) {
 	const { canRemove, isVisible, managePatternsUrl } = useSelect(
@@ -59,13 +65,25 @@ function ReusableBlocksManageButton( { clientId } ) {
 
 	return (
 		<>
-			<MenuItem href={ managePatternsUrl }>
-				{ __( 'Manage patterns' ) }
-			</MenuItem>
+			<DropdownMenuItem
+				render={
+					// Disable reason: the `children` are already passed to the menu item
+					// eslint-disable-next-line jsx-a11y/anchor-has-content
+					<a href={ managePatternsUrl } />
+				}
+				// TODO: should we change the `role` ?
+			>
+				<DropdownMenuItemLabel>
+					{ __( 'Manage patterns' ) }
+				</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			{ canRemove && (
-				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
+				<DropdownMenuItem
+					hideOnClick={ false }
+					onClick={ () => convertBlockToStatic( clientId ) }
+				>
 					{ __( 'Detach' ) }
-				</MenuItem>
+				</DropdownMenuItem>
 			) }
 		</>
 	);

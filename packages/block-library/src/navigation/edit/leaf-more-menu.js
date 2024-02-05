@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -8,28 +13,35 @@ import {
 	chevronDown,
 	moreVertical,
 } from '@wordpress/icons';
-import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
+import {
+	Button,
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
-const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover',
-	placement: 'bottom-start',
-};
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
 
 const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
 
-function AddSubmenuItem( {
-	block,
-	onClose,
-	expandedState,
-	expand,
-	setInsertedBlock,
-} ) {
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+function AddSubmenuItem( { block, expandedState, expand, setInsertedBlock } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -38,8 +50,8 @@ function AddSubmenuItem( {
 		block.name
 	);
 	return (
-		<MenuItem
-			icon={ addSubmenu }
+		<DropdownMenuItem
+			prefix={ <Icon size={ 24 } icon={ addSubmenu } /> }
 			disabled={ isDisabled }
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
@@ -83,16 +95,29 @@ function AddSubmenuItem( {
 				if ( ! expandedState[ block.clientId ] ) {
 					expand( block.clientId );
 				}
-				onClose();
 			} }
 		>
-			{ __( 'Add submenu link' ) }
-		</MenuItem>
+			<DropdownMenuItemLabel>
+				{ __( 'Add submenu link' ) }
+			</DropdownMenuItemLabel>
+		</DropdownMenuItem>
 	);
 }
 
-export default function LeafMoreMenu( props ) {
-	const { block } = props;
+// TODO: double check if props passed to it are correct
+export default function LeafMoreMenu( {
+	toggleProps,
+	label,
+	icon,
+	disableOpenOnArrowDown,
+	block,
+	// Unused (avoid forwarding with rest props)
+	expand,
+	expandedState,
+	setInsertedBlock,
+	// Rest props
+	...props
+} ) {
 	const { clientId } = block;
 
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
@@ -113,57 +138,92 @@ export default function LeafMoreMenu( props ) {
 		[ clientId ]
 	);
 
+	// Save the dropdownTriggerId in case it is enforced via toggleProps, so that
+	// it can be passed as the value for the `aria-labelledby` prop for the
+	// dropdown content. This would normally work out of the box for the
+	// `DropdownMenu` component, but in this case the toggle may receive an
+	// external id from the parent `ToolbarItem` that can't be ignored.
+	const dropdownMenuExtraProps = {};
+
+	if ( !! toggleProps?.id ) {
+		dropdownMenuExtraProps[ 'aria-labelledby' ] = toggleProps?.id;
+	}
+
+	const dropdownMenuRef = useRef( null );
+
 	return (
 		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Options' ) }
+			ref={ dropdownMenuRef }
+			trigger={
+				<Button
+					{ ...toggleProps }
+					className={ classnames(
+						'block-editor-block-settings-menu__trigger',
+						toggleProps?.className
+					) }
+					onKeyDown={ ( event ) => {
+						if (
+							disableOpenOnArrowDown &&
+							event.key === 'ArrowDown'
+						) {
+							event.preventDefault();
+						}
+						toggleProps?.onKeyDown?.( event );
+					} }
+					__next40pxDefaultSize
+					label={ label ?? __( 'Options' ) }
+					icon={ icon ?? moreVertical }
+				/>
+			}
 			className="block-editor-block-settings-menu"
-			popoverProps={ POPOVER_PROPS }
-			noIcons
+			placement="bottom-start"
+			gutter={ 12 }
+			{ ...dropdownMenuExtraProps }
 			{ ...props }
 		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
+			<>
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						prefix={ <Icon size={ 24 } icon={ chevronUp } /> }
+						onClick={ () => {
+							moveBlocksUp( [ clientId ], rootClientId );
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						prefix={ <Icon size={ 24 } icon={ chevronDown } /> }
+						onClick={ () => {
+							moveBlocksDown( [ clientId ], rootClientId );
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ __( 'Move down' ) }
-						</MenuItem>
-						<AddSubmenuItem
-							block={ block }
-							onClose={ onClose }
-							expanded
-							expandedState={ props.expandedState }
-							expand={ props.expand }
-							setInsertedBlock={ props.setInsertedBlock }
-						/>
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+					<AddSubmenuItem
+						block={ block }
+						expanded
+						expandedState={ props.expandedState }
+						expand={ props.expand }
+						setInsertedBlock={ props.setInsertedBlock }
+					/>
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						onClick={ () => {
+							removeBlocks( [ clientId ], false );
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
-				</>
-			) }
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+				</DropdownMenuGroup>
+			</>
 		</DropdownMenu>
 	);
 }

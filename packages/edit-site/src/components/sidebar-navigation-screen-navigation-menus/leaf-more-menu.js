@@ -1,19 +1,22 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 
 import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
-import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-const POPOVER_PROPS = {
-	className: 'block-editor-block-settings-menu__popover',
-	placement: 'bottom-start',
-};
 
 /**
  * Internal dependencies
@@ -27,10 +30,30 @@ import { getPathFromURL } from '../sync-state-with-url/use-sync-path-with-url';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
-export default function LeafMoreMenu( props ) {
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+// TODO: double check if props passed to it are correct
+export default function LeafMoreMenu( {
+	toggleProps,
+	label,
+	icon,
+	disableOpenOnArrowDown,
+	block,
+	// Unused (avoid forwarding with rest props)
+	expand,
+	expandedState,
+	setInsertedBlock,
+	// Rest props
+	...props
+} ) {
 	const location = useLocation();
 	const history = useHistory();
-	const { block } = props;
 	const { clientId } = block;
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
@@ -96,60 +119,97 @@ export default function LeafMoreMenu( props ) {
 		[ history ]
 	);
 
+	// Save the dropdownTriggerId in case it is enforced via toggleProps, so that
+	// it can be passed as the value for the `aria-labelledby` prop for the
+	// dropdown content. This would normally work out of the box for the
+	// `DropdownMenu` component, but in this case the toggle may receive an
+	// external id from the parent `ToolbarItem` that can't be ignored.
+	const dropdownMenuExtraProps = {};
+
+	if ( !! toggleProps?.id ) {
+		dropdownMenuExtraProps[ 'aria-labelledby' ] = toggleProps?.id;
+	}
+
+	const dropdownMenuRef = useRef( null );
+
 	return (
 		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Options' ) }
+			ref={ dropdownMenuRef }
+			trigger={
+				<Button
+					{ ...toggleProps }
+					className={ classnames(
+						'block-editor-block-settings-menu__trigger',
+						toggleProps?.className
+					) }
+					onKeyDown={ ( event ) => {
+						if (
+							disableOpenOnArrowDown &&
+							event.key === 'ArrowDown'
+						) {
+							event.preventDefault();
+						}
+						toggleProps?.onKeyDown?.( event );
+					} }
+					__next40pxDefaultSize
+					label={ label ?? __( 'Options' ) }
+					icon={ icon ?? moreVertical }
+				/>
+			}
 			className="block-editor-block-settings-menu"
-			popoverProps={ POPOVER_PROPS }
-			noIcons
+			placement="bottom-start"
+			gutter={ 12 }
+			{ ...dropdownMenuExtraProps }
 			{ ...props }
 		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
+			<>
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						icon={ chevronUp }
+						onClick={ () => {
+							moveBlocksUp( [ clientId ], rootClientId );
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						icon={ chevronDown }
+						onClick={ () => {
+							moveBlocksDown( [ clientId ], rootClientId );
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ __( 'Move down' ) }
-						</MenuItem>
-						{ block.attributes?.type === 'page' &&
-							block.attributes?.id && (
-								<MenuItem
-									onClick={ () => {
-										onGoToPage( block );
-										onClose();
-									} }
-								>
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+					{ block.attributes?.type === 'page' &&
+						block.attributes?.id && (
+							<DropdownMenuItem
+								onClick={ () => {
+									onGoToPage( block );
+								} }
+							>
+								<DropdownMenuItemLabel>
 									{ goToLabel }
-								</MenuItem>
-							) }
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
+						) }
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						onClick={ () => {
+							removeBlocks( [ clientId ], false );
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
-				</>
-			) }
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+				</DropdownMenuGroup>
+			</>
 		</DropdownMenu>
 	);
 }

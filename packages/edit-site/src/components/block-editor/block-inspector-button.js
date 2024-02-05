@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -15,7 +15,37 @@ import { store as editSiteStore } from '../../store';
 import { STORE_NAME } from '../../store/constants';
 import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 
-export default function BlockInspectorButton( { onClick = () => {} } ) {
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+const noop = () => {};
+
+const Shortcut = ( { shortcut } ) => {
+	if ( ! shortcut ) {
+		return null;
+	}
+
+	let displayText;
+	let ariaLabel;
+
+	if ( typeof shortcut === 'string' ) {
+		displayText = shortcut;
+	}
+
+	if ( shortcut !== null && typeof shortcut === 'object' ) {
+		displayText = shortcut.display;
+		ariaLabel = shortcut.ariaLabel;
+	}
+
+	return <span aria-label={ ariaLabel }>{ displayText }</span>;
+};
+
+// Is this dead code?
+export default function BlockInspectorButton( { onClick = noop } ) {
 	const { shortcut, isBlockInspectorOpen } = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -38,7 +68,8 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		: __( 'Show more settings' );
 
 	return (
-		<MenuItem
+		<DropdownMenuItem
+			hideOnClick={ false }
 			onClick={ () => {
 				if ( isBlockInspectorOpen ) {
 					disableComplementaryArea( STORE_NAME );
@@ -51,12 +82,11 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 						)
 					);
 				}
-				// Close dropdown menu.
 				onClick();
 			} }
-			shortcut={ shortcut }
+			suffix={ <Shortcut shortcut={ shortcut } /> }
 		>
-			{ label }
-		</MenuItem>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
+		</DropdownMenuItem>
 	);
 }

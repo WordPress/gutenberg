@@ -925,6 +925,7 @@ test.describe( 'List View', () => {
 			.getByRole( 'menu', { name: 'Options for Heading' } )
 			.getByRole( 'menuitem', { name: 'Duplicate' } )
 			.click();
+
 		await expect
 			.poll(
 				listViewUtils.getBlocksWithA11yAttributes,

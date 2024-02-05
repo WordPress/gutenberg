@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { rawHandler, getBlockContent } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -10,7 +10,14 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+// TODO: check if this used in other legacy dropdown menus
 function BlockHTMLConvertButton( { clientId } ) {
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
@@ -23,7 +30,8 @@ function BlockHTMLConvertButton( { clientId } ) {
 	}
 
 	return (
-		<MenuItem
+		<DropdownMenuItem
+			hideOnClick={ false }
 			onClick={ () =>
 				replaceBlocks(
 					clientId,
@@ -31,8 +39,10 @@ function BlockHTMLConvertButton( { clientId } ) {
 				)
 			}
 		>
-			{ __( 'Convert to Blocks' ) }
-		</MenuItem>
+			<DropdownMenuItemLabel>
+				{ __( 'Convert to Blocks' ) }
+			</DropdownMenuItemLabel>
+		</DropdownMenuItem>
 	);
 }
 

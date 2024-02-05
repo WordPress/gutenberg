@@ -168,7 +168,7 @@ describe( 'Pattern blocks', () => {
 		// Delete the block, leaving the reusable block empty.
 		await clickBlockToolbarButton( 'Options' );
 		const deleteButton = await page.waitForXPath(
-			'//button/span[text()="Delete"]'
+			`//*[@role='menuitem' and contains(.,'Delete')]`
 		);
 		deleteButton.click();
 

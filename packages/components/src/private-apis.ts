@@ -26,6 +26,7 @@ import {
 	DropdownMenuSeparator as DropdownMenuSeparatorV2,
 	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
 	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
+	DropdownMenuContext as DropdownMenuContextV2,
 } from './dropdown-menu-v2';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
@@ -55,5 +56,6 @@ lock( privateApis, {
 	DropdownMenuSeparatorV2,
 	DropdownMenuItemLabelV2,
 	DropdownMenuItemHelpTextV2,
+	DropdownMenuContextV2,
 	kebabCase,
 } );

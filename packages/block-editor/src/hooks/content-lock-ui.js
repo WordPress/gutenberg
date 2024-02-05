@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, MenuItem } from '@wordpress/components';
+import {
+	ToolbarButton,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
@@ -12,6 +15,11 @@ import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
 import { unlock } from '../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 // The implementation of content locking is mainly in this file, although the mechanism
 // to stop temporarily editing as blocks when an outside block is selected is on component StopEditingAsBlocksOnOutsideSelect
@@ -75,30 +83,29 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 			) }
 			{ showStartEditingAsBlocks && (
 				<BlockSettingsMenuControls>
-					{ ( { onClose } ) => (
-						<MenuItem
-							onClick={ () => {
-								__unstableMarkNextChangeAsNotPersistent();
-								updateBlockAttributes( clientId, {
-									templateLock: undefined,
-								} );
-								updateBlockListSettings( clientId, {
-									...getBlockListSettings( clientId ),
-									templateLock: false,
-								} );
-								const focusModeToRevert =
-									getSettings().focusMode;
-								updateSettings( { focusMode: true } );
-								__unstableSetTemporarilyEditingAsBlocks(
-									clientId,
-									focusModeToRevert
-								);
-								onClose();
-							} }
-						>
+					{ /* TODO: check if this used in other legacy dropdown menus */ }
+					<DropdownMenuItem
+						onClick={ () => {
+							__unstableMarkNextChangeAsNotPersistent();
+							updateBlockAttributes( clientId, {
+								templateLock: undefined,
+							} );
+							updateBlockListSettings( clientId, {
+								...getBlockListSettings( clientId ),
+								templateLock: false,
+							} );
+							const focusModeToRevert = getSettings().focusMode;
+							updateSettings( { focusMode: true } );
+							__unstableSetTemporarilyEditingAsBlocks(
+								clientId,
+								focusModeToRevert
+							);
+						} }
+					>
+						<DropdownMenuItemLabel>
 							{ __( 'Modify' ) }
-						</MenuItem>
-					) }
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
 				</BlockSettingsMenuControls>
 			) }
 		</>

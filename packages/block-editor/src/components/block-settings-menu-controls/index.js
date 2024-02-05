@@ -3,12 +3,10 @@
  */
 import {
 	createSlotFill,
-	MenuGroup,
-	MenuItem,
+	privateApis as componentsPrivateApis,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { pipe } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,8 +19,15 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
-
 import { BlockRenameControl, useBlockRename } from '../block-rename';
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -76,41 +81,43 @@ const BlockSettingsMenuControlsSlot = ( {
 				}
 
 				return (
-					<MenuGroup>
-						{ showConvertToGroupButton && (
-							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
-							/>
-						) }
-						{ showLockButton && (
-							<BlockLockMenuItem
-								clientId={ selectedClientIds[ 0 ] }
-							/>
-						) }
-						{ showRenameButton && (
-							<BlockRenameControl
-								clientId={ selectedClientIds[ 0 ] }
-							/>
-						) }
-						{ fills }
-						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
-							<MenuItem
-								onClick={ pipe(
-									fillProps?.onClose,
-									fillProps?.onMoveTo
-								) }
-							>
-								{ __( 'Move to' ) }
-							</MenuItem>
-						) }
-						{ fillProps?.count === 1 && (
-							<BlockModeToggle
-								clientId={ fillProps?.firstBlockClientId }
-								onToggle={ fillProps?.onClose }
-							/>
-						) }
-					</MenuGroup>
+					<>
+						{ /* TODO: check if this used in other legacy dropdown
+						menus */ }
+						<DropdownMenuSeparator />
+						<DropdownMenuGroup>
+							{ showConvertToGroupButton && (
+								<ConvertToGroupButton
+									{ ...convertToGroupButtonProps }
+								/>
+							) }
+							{ showLockButton && (
+								<BlockLockMenuItem
+									clientId={ selectedClientIds[ 0 ] }
+								/>
+							) }
+							{ showRenameButton && (
+								<BlockRenameControl
+									clientId={ selectedClientIds[ 0 ] }
+								/>
+							) }
+							{ fills }
+							{ fillProps?.canMove && ! fillProps?.onlyBlock && (
+								<DropdownMenuItem
+									onClick={ fillProps?.onMoveTo }
+								>
+									<DropdownMenuItemLabel>
+										{ __( 'Move to' ) }
+									</DropdownMenuItemLabel>
+								</DropdownMenuItem>
+							) }
+							{ fillProps?.count === 1 && (
+								<BlockModeToggle
+									clientId={ fillProps?.firstBlockClientId }
+								/>
+							) }
+						</DropdownMenuGroup>
+					</>
 				);
 			} }
 		</Slot>
@@ -124,6 +131,7 @@ const BlockSettingsMenuControlsSlot = ( {
  * @return {Element} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {
+	// TODO: forward dropdown menu context
 	return (
 		<StyleProvider document={ document }>
 			<Fill { ...props } />

@@ -69,6 +69,7 @@ const slideLeftAndFade = keyframes( {
 	'100%': { opacity: 1, transform: 'translateX(0)' },
 } );
 
+// Should we add some backup styles to better blend in the legacy menu item?
 export const DropdownMenu = styled( Ariakit.Menu )<
 	Pick< DropdownMenuContext, 'variant' >
 >`
@@ -119,6 +120,14 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	}
 	@media ( prefers-reduced-motion ) {
 		animation-duration: 0s;
+	}
+
+	/*
+	 * Minimum set of styles in case legacy menu items are rendered inside
+	 * the new dropdown menu, to make the legacy menu item align correctly.
+	 */
+	.components-menu-item__button {
+		grid-column: 1 / -1;
 	}
 `;
 

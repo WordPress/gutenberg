@@ -38,8 +38,8 @@ test.describe( 'Block Locking', () => {
 		await page.click( 'role=checkbox[name="Disable movement"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
-		// Hide options.
-		await editor.clickBlockToolbarButton( 'Options' );
+		// Hide options dropdown menu.
+		await page.keyboard.press( 'Escape' );
 
 		// Drag handle is hidden.
 		await expect( page.locator( 'role=button[name="Drag"]' ) ).toBeHidden();

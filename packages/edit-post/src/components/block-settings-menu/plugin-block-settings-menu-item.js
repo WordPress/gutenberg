@@ -2,8 +2,20 @@
  * WordPress dependencies
  */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-import { MenuItem } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import {
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	selected.filter( ( id ) => ! allowed.includes( id ) ).length === 0;
@@ -87,19 +99,23 @@ const PluginBlockSettingsMenuItem = ( {
 	role,
 } ) => (
 	<BlockSettingsMenuControls>
-		{ ( { selectedBlocks, onClose } ) => {
+		{ ( { selectedBlocks } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
 			return (
-				<MenuItem
-					onClick={ compose( onClick, onClose ) }
-					icon={ icon }
-					label={ small ? label : undefined }
+				<DropdownMenuItem
+					onClick={ onClick }
+					prefix={ <Icon size={ 24 } icon={ icon } /> }
+					aria-label={ small ? label : undefined }
 					role={ role }
 				>
-					{ ! small && label }
-				</MenuItem>
+					{ /* If small=true, we'd end up with an icon-only menu item,
+					   which is against the design spec. */ }
+					{ ! small && (
+						<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
+					) }
+				</DropdownMenuItem>
 			);
 		} }
 	</BlockSettingsMenuControls>
