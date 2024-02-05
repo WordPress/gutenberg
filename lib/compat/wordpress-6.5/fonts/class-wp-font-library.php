@@ -122,7 +122,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *                                     or WP_Error object if the font collection doesn't exist.
 		 */
 		public function get_font_collection( $slug ) {
-			if ( array_key_exists( $slug, $this->collections ) ) {
+			if ( $this->is_collection_registered( $slug ) ) {
 				return $this->collections[ $slug ];
 			}
 			return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
