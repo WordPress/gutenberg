@@ -184,7 +184,6 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 * }
 	 */
 	function wp_get_font_dir( $defaults = array() ) {
-		// Multi site path
 		$site_path = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
 			$site_path = '/sites/' . get_current_blog_id();
