@@ -35,7 +35,7 @@ export const MediaContainer = styled.div`
 		box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 );
 		content: '';
 		left: 0px;
-		position: absolute;
+		pointer-events: none;
 		position: absolute;
 		right: 0px;
 		top: 0px;
