@@ -742,6 +742,104 @@ test.describe( 'Image', () => {
 
 		expect( src ).toMatch( /\/wp-content\/uploads\// );
 	} );
+
+	test( 'should have keyboard navigable link UI popover', async ( {
+		editor,
+		page,
+		pageUtils,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
+
+		const uriInput = page.getByRole( 'combobox', {
+			name: 'URL',
+		} );
+
+		await expect( uriInput ).toBeFocused();
+
+		// Enter a link.
+		await uriInput.fill( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'link', {
+				name: 'example.com',
+			} )
+		).toBeFocused();
+
+		// Edit a link.
+		await pageUtils.pressKeys( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+		await expect( uriInput ).toBeFocused();
+		await uriInput.fill( 'https://example.com/updated/' );
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'link', {
+				name: 'example.com/updated/',
+			} )
+		).toBeFocused();
+
+		// Remove a link.
+		await pageUtils.pressKeys( 'Tab', { times: 2 } );
+		await expect(
+			page.getByRole( 'button', { name: 'Remove link' } )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect( uriInput ).toBeFocused();
+		await expect( uriInput ).toBeEmpty();
+
+		// Select "Link to image file".
+		await pageUtils.pressKeys( 'Tab', { times: 3 } );
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Link to image file' } )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'link', {
+				name: 'Link to image file',
+			} )
+		).toBeFocused();
+
+		// Select "Link to attachment page".
+		await pageUtils.pressKeys( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'Tab', { times: 4 } );
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Link to attachment page' } )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'link', {
+				name: 'Link to attachment page',
+			} )
+		).toBeFocused();
+
+		// Select "Expand on click", then remove it.
+		await pageUtils.pressKeys( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'Tab', { times: 5 } );
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Expand on click' } )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'button', {
+				name: 'Disable expand on click',
+			} )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect( uriInput ).toBeFocused();
+		await expect( uriInput ).toBeEmpty();
+	} );
 } );
 
 // Skipping these tests for now as we plan

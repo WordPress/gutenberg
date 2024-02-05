@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
 	Button,
@@ -57,6 +58,17 @@ const ImageURLInputUI = ( {
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
+	const wrapperRef = useRef();
+
+	useEffect( () => {
+		if ( ! wrapperRef.current ) {
+			return;
+		}
+		const nextFocusTarget =
+			focus.focusable.find( wrapperRef.current )[ 0 ] ||
+			wrapperRef.current;
+		nextFocusTarget.focus();
+	}, [ isEditingLink, url, lightboxEnabled ] );
 
 	const startEditLink = () => {
 		if (
@@ -249,6 +261,7 @@ const ImageURLInputUI = ( {
 			/>
 			{ isOpen && (
 				<URLPopover
+					ref={ wrapperRef }
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
