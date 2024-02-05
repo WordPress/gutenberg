@@ -27,6 +27,10 @@ describe( 'Gutenberg Editor Rotation tests', () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 
 		if ( isAndroid() ) {
+			// Waits until the keyboard is visible
+			await editorPage.driver.waitUntil(
+				editorPage.driver.isKeyboardShown
+			);
 			await editorPage.dismissKeyboard();
 		}
 

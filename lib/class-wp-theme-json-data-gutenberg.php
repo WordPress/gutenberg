@@ -6,10 +6,6 @@
  * @since 6.1.0
  */
 
-if ( class_exists( 'WP_Theme_JSON_Data_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Class to provide access to update a theme.json structure.
  */

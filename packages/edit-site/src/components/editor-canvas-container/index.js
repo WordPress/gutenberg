@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,7 +34,8 @@ function getEditorCanvasContainerTitle( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
-			return __( 'Global styles revisions' );
+		case 'global-styles-revisions:style-book':
+			return __( 'Style Revisions' );
 		default:
 			return '';
 	}
@@ -61,7 +63,7 @@ function EditorCanvasContainer( {
 			).getEditorCanvasContainerView();
 
 			const _showListViewByDefault = select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'showListViewByDefault'
 			);
 
@@ -76,6 +78,8 @@ function EditorCanvasContainer( {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { setIsListViewOpened } = useDispatch( editorStore );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
 	const title = useMemo(
@@ -83,15 +87,13 @@ function EditorCanvasContainer( {
 		[ editorCanvasContainerView ]
 	);
 
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
-
 	function onCloseContainer() {
-		if ( typeof onClose === 'function' ) {
-			onClose();
-		}
 		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 	}
 
 	function closeOnEscape( event ) {

@@ -9,7 +9,7 @@ import {
 	Button,
 	Tooltip,
 } from '@wordpress/components';
-import { typography } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -26,12 +26,14 @@ function FontFamilies() {
 	const { modalTabOpen, toggleModal, themeFonts, customFonts } =
 		useContext( FontLibraryContext );
 
+	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
+
 	return (
 		<>
 			{ !! modalTabOpen && (
 				<FontLibraryModal
 					onRequestClose={ () => toggleModal() }
-					initialTabName={ modalTabOpen }
+					initialTabId={ modalTabOpen }
 				/>
 			) }
 
@@ -45,20 +47,33 @@ function FontFamilies() {
 									toggleModal( 'installed-fonts' )
 								}
 								aria-label={ __( 'Manage fonts' ) }
-								icon={ typography }
+								icon={ settings }
 								size={ 'small' }
 							/>
 						</Tooltip>
 					</HStack>
 				</HStack>
-				<ItemGroup isBordered isSeparated>
-					{ customFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-					{ themeFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-				</ItemGroup>
+				{ hasFonts ? (
+					<ItemGroup isBordered isSeparated>
+						{ customFonts.map( ( font ) => (
+							<FontFamilyItem key={ font.slug } font={ font } />
+						) ) }
+						{ themeFonts.map( ( font ) => (
+							<FontFamilyItem key={ font.slug } font={ font } />
+						) ) }
+					</ItemGroup>
+				) : (
+					<>
+						{ __( 'No fonts installed.' ) }
+						<Button
+							className="edit-site-global-styles-font-families__add-fonts"
+							variant="secondary"
+							onClick={ () => toggleModal( 'upload-fonts' ) }
+						>
+							{ __( 'Add fonts' ) }
+						</Button>
+					</>
+				) }
 			</VStack>
 		</>
 	);

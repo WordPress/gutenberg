@@ -123,7 +123,7 @@ To help developers improve the quality of their code, `wp-scripts` comes pre-con
 
 Regularly linting and formatting your code ensures it's functional, clear, and maintainable for yourself and other developers.
 
-### Running Tests
+### Running tests
 
 Beyond just writing code, verifying its functionality is crucial. `wp-scripts` includes [Jest](https://jestjs.io/), a JavaScript testing framework, and both end-to-end and unit testing scripts:
 

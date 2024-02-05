@@ -26,7 +26,8 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { mergeOrigins } from '../../store/get-block-settings';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 
 export function useHasEffectsPanel( settings ) {
@@ -55,6 +56,7 @@ function EffectsToolsPanel( {
 			label={ __( 'Effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -80,8 +82,22 @@ export default function EffectsPanel( {
 	// Shadow
 	const hasShadowEnabled = useHasShadowControl( settings );
 	const shadow = decodeValue( inheritedValue?.shadow );
+	const shadowPresets = settings?.shadow?.presets;
+	const mergedShadowPresets = shadowPresets
+		? mergeOrigins( shadowPresets )
+		: [];
 	const setShadow = ( newValue ) => {
-		onChange( setImmutably( value, [ 'shadow' ], newValue ) );
+		const slug = mergedShadowPresets?.find(
+			( { shadow: shadowName } ) => shadowName === newValue
+		)?.slug;
+
+		onChange(
+			setImmutably(
+				value,
+				[ 'shadow' ],
+				slug ? `var:preset|shadow|${ slug }` : newValue || undefined
+			)
+		);
 	};
 	const hasShadow = () => !! value?.shadow;
 	const resetShadow = () => setShadow( undefined );

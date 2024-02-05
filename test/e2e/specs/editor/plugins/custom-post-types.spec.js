@@ -31,7 +31,7 @@ test.describe( 'Test Custom Post Types', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', {
+			.getByRole( 'tab', {
 				name: 'Hierarchical No Title',
 			} )
 			.click();

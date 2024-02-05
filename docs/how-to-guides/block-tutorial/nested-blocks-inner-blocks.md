@@ -36,15 +36,17 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-## Allowed Blocks
+## Allowed blocks
 
-Using the `allowedBlocks` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
+Using the `allowedBlocks` prop, you can further limit, in addition to the `allowedBlocks` field in `block.json`, which blocks can be inserted as direct descendants of this block. It is useful to determine the list of allowed blocks dynamically, individually for each block. For example, determined by a block attribute:
 
 ```js
-const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
+const { allowedBlocks } = attributes;
 //...
-<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />;
+<InnerBlocks allowedBlocks={ allowedBlocks } />;
 ```
+
+If the list of allowed blocks is always the same, prefer the [`allowedBlocks` block setting](#defining-a-children-block-relationship) instead.
 
 ## Orientation
 
@@ -56,7 +58,7 @@ By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A v
 
 Specifying this prop does not affect the layout of the inner blocks, but results in the block mover icons in the child blocks being displayed horizontally, and also ensures that drag and drop works correctly.
 
-## Default Block
+## Default block
 
 By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` when the block appender is clicked. You can modify the default block and its attributes that are inserted when the initial block appender is clicked by using the `defaultBlock` property. For example:
 
@@ -93,7 +95,7 @@ const MY_TEMPLATE = [
 
 Use the `templateLock` property to lock down the template. Using `all` locks the template completely so no changes can be made. Using `insert` prevents additional blocks from being inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
-### Post Template
+### Post template
 
 Unrelated to `InnerBlocks` but worth mentioning here, you can create a [post template](https://developer.wordpress.org/block-editor/developers/block-api/block-templates/) by post type, that preloads the block editor with a set of blocks.
 
@@ -109,16 +111,17 @@ add_action( 'init', function() {
 } );
 ```
 
-## Using Parent and Ancestor Relationships in Blocks
+## Using parent, ancestor and children relationships in blocks
 
-A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. Currently, there are two relationships builders can use: `parent` and `ancestor`. The differences are:
+A common pattern for using InnerBlocks is to create a custom block that will only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. There are three relationships that builders can use: `parent`, `ancestor` and `allowedBlocks`. The differences are:
 
 - If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a __direct descendant of the parent__.
 - If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a __descendent of the parent__.
+- If you assign the `allowedBlocks` then you’re stating a relationship in the opposite direction, i.e., which blocks can be used and inserted as __direct descendants of this block__.
 
 The key difference between `parent` and `ancestor` is `parent` has finer specificity, while an `ancestor` has greater flexibility in its nested hierarchy.
 
-### Defining Parent Block Relationship
+### Defining parent block relationship
 
 An example of this is the Column block, which is assigned the `parent` block setting. This allows the Column block to only be available as a nested direct descendant in its parent Columns block. Otherwise, the Column block will not be available as an option within the block inserter. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
 
@@ -133,7 +136,7 @@ When defining a direct descendent block, use the `parent` block setting to defin
 }
 ```
 
-### Defining Ancestor Block Relationship
+### Defining an ancestor block relationship
 
 An example of this is the Comment Author Name block, which is assigned the `ancestor` block setting. This allows the Comment Author Name block to only be available as a nested descendant in its ancestral Comment Template block. Otherwise, the Comment Author Name block will not be available as an option within the block inserter. See [Comment Author Name code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/comment-author-name).
 
@@ -150,7 +153,24 @@ When defining a descendent block, use the `ancestor` block setting. This prevent
 }
 ```
 
-## Using a React Hook
+### Defining a children block relationship
+
+An example of this is the Navigation block, which is assigned the `allowedBlocks` block setting. This makes only a certain subset of block types to be available as direct descendants of the Navigation block. See [Navigation code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/navigation).
+
+The `allowedBlocks` setting can be extended by builders of custom blocks. The custom block can hook into the `blocks.registerBlockType` filter and add itself to the available children of the Navigation.
+
+When defining a set of possible descendant blocks, use the `allowedBlocks` block setting. This limits what blocks are showing in the inserter when inserting a new child block.
+
+```json
+{
+	"title": "Navigation",
+	"name": "core/navigation",
+	"allowedBlocks": [ "core/navigation-link", "core/search", "core/social-links", "core/page-list", "core/spacer" ],
+	// ...
+}
+```
+
+## Using a React hook
 
 You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlocks` component. This hook allows you to take more control over the markup of inner blocks areas.
 

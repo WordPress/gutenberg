@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -32,6 +33,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	...props
 } ) {
 	const mediaPermissions = useResourcePermissions( 'media' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		reusableBlocks,
 		isFixedToolbarActive,
@@ -78,7 +80,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		return {
 			...blockEditorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
-			hasFixedToolbar: isFixedToolbarActive,
+			hasFixedToolbar: isFixedToolbarActive || ! isLargeViewport,
 			keepCaretInsideBlock,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
@@ -89,6 +91,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	}, [
 		blockEditorSettings,
 		isFixedToolbarActive,
+		isLargeViewport,
 		keepCaretInsideBlock,
 		mediaPermissions.canCreate,
 		reusableBlocks,

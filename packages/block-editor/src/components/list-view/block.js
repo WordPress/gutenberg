@@ -13,7 +13,13 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useCallback, memo } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	memo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -37,7 +43,10 @@ import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
 	block: { clientId },
+	displacement,
+	isAfterDraggedBlocks,
 	isDragged,
+	isNesting,
 	isSelected,
 	isBranchSelected,
 	selectBlock,
@@ -53,9 +62,11 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
+	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
-	const { isLocked, canEdit } = useBlockLock( clientId );
+	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -82,6 +93,11 @@ function ListViewBlock( {
 		},
 		[ clientId ]
 	);
+	const allowRightClickOverrides = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().allowRightClickOverrides,
+		[]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -92,25 +108,6 @@ function ListViewBlock( {
 		blockEditingMode === 'default';
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
-	const blockPositionDescription = getBlockPositionDescription(
-		position,
-		siblingBlockCount,
-		level
-	);
-
-	const blockAriaLabel = isLocked
-		? sprintf(
-				// translators: %s: The title of the block. This string indicates a link to select the locked block.
-				__( '%s (locked)' ),
-				blockTitle
-		  )
-		: blockTitle;
-
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s' ),
-		blockTitle
-	);
 
 	const {
 		expand,
@@ -121,18 +118,6 @@ function ListViewBlock( {
 		setInsertedBlock,
 		treeGridElementRef,
 	} = useListViewContext();
-
-	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const moverCellClassName = classnames(
-		'block-editor-list-view-block__mover-cell',
-		{ 'is-visible': isHovered || isSelected }
-	);
-
-	const listViewBlockSettingsClassName = classnames(
-		'block-editor-list-view-block__menu-cell',
-		{ 'is-visible': isHovered || isFirstSelectedBlock }
-	);
 
 	// If multiple blocks are selected, deselect all blocks when the user
 	// presses the escape key.
@@ -171,7 +156,7 @@ function ListViewBlock( {
 				selectBlock( undefined, focusClientId, null, null );
 			}
 
-			focusListItem( focusClientId, treeGridElementRef );
+			focusListItem( focusClientId, treeGridElementRef?.current );
 		},
 		[ selectBlock, treeGridElementRef ]
 	);
@@ -190,6 +175,104 @@ function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
+	// Allow right-clicking an item in the List View to open up the block settings dropdown.
+	const onContextMenu = useCallback(
+		( event ) => {
+			if ( showBlockActions && allowRightClickOverrides ) {
+				settingsRef.current?.click();
+				// Ensure the position of the settings dropdown is at the cursor.
+				setSettingsAnchorRect(
+					new window.DOMRect( event.clientX, event.clientY, 0, 0 )
+				);
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides, settingsRef, showBlockActions ]
+	);
+
+	const onMouseDown = useCallback(
+		( event ) => {
+			// Prevent right-click from focusing the block,
+			// because focus will be handled when opening the block settings dropdown.
+			if ( allowRightClickOverrides && event.button === 2 ) {
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides ]
+	);
+
+	const settingsPopoverAnchor = useMemo( () => {
+		const { ownerDocument } = rowRef?.current || {};
+
+		// If no custom position is set, the settings dropdown will be anchored to the
+		// DropdownMenu toggle button.
+		if ( ! settingsAnchorRect || ! ownerDocument ) {
+			return undefined;
+		}
+
+		// Position the settings dropdown at the cursor when right-clicking a block.
+		return {
+			ownerDocument,
+			getBoundingClientRect() {
+				return settingsAnchorRect;
+			},
+		};
+	}, [ settingsAnchorRect ] );
+
+	const clearSettingsAnchorRect = useCallback( () => {
+		// Clear the custom position for the settings dropdown so that it is restored back
+		// to being anchored to the DropdownMenu toggle button.
+		setSettingsAnchorRect( undefined );
+	}, [ setSettingsAnchorRect ] );
+
+	// Pass in a ref to the row, so that it can be scrolled
+	// into view when selected. For long lists, the placeholder for the
+	// selected block is also observed, within ListViewLeafPlaceholder.
+	useListViewScrollIntoView( {
+		isSelected,
+		rowItemRef: rowRef,
+		selectedClientIds,
+	} );
+
+	// When switching between rendering modes (such as template preview and content only),
+	// it is possible for a block to temporarily be unavailable. In this case, we should not
+	// render the leaf, to avoid errors further down the tree.
+	if ( ! block ) {
+		return null;
+	}
+
+	const blockPositionDescription = getBlockPositionDescription(
+		position,
+		siblingBlockCount,
+		level
+	);
+
+	const blockAriaLabel = isLocked
+		? sprintf(
+				// translators: %s: The title of the block. This string indicates a link to select the locked block.
+				__( '%s (locked)' ),
+				blockTitle
+		  )
+		: blockTitle;
+
+	const settingsAriaLabel = sprintf(
+		// translators: %s: The title of the block.
+		__( 'Options for %s' ),
+		blockTitle
+	);
+
+	const hasSiblings = siblingBlockCount > 0;
+	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const moverCellClassName = classnames(
+		'block-editor-list-view-block__mover-cell',
+		{ 'is-visible': isHovered || isSelected }
+	);
+
+	const listViewBlockSettingsClassName = classnames(
+		'block-editor-list-view-block__menu-cell',
+		{ 'is-visible': isHovered || isFirstSelectedBlock }
+	);
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -206,6 +289,12 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
+		'is-draggable': canMove,
+		'is-displacement-normal': displacement === 'normal',
+		'is-displacement-up': displacement === 'up',
+		'is-displacement-down': displacement === 'down',
+		'is-after-dragged-blocks': isAfterDraggedBlocks,
+		'is-nesting': isNesting,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -216,15 +305,6 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	// Pass in a ref to the row, so that it can be scrolled
-	// into view when selected. For long lists, the placeholder for the
-	// selected block is also observed, within ListViewLeafPlaceholder.
-	useListViewScrollIntoView( {
-		isSelected,
-		rowItemRef: rowRef,
-		selectedClientIds,
-	} );
-
 	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
 	const currentlyEditingBlockInCanvas =
 		isSelected && selectedClientIds.length === 1;
@@ -232,6 +312,7 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -257,6 +338,8 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
+							onContextMenu={ onContextMenu }
+							onMouseDown={ onMouseDown }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -315,6 +398,7 @@ function ListViewBlock( {
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }
+					ref={ settingsRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu
@@ -322,10 +406,14 @@ function ListViewBlock( {
 							block={ block }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
+							popoverProps={ {
+								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+							} }
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
 								tabIndex,
+								onClick: clearSettingsAnchorRect,
 								onFocus,
 							} }
 							disableOpenOnArrowDown

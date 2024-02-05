@@ -8,6 +8,7 @@ import { capitalCase, pascalCase } from 'change-case';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -18,10 +19,6 @@ import { getSyncProvider } from './sync';
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
-
-// A hardcoded list of post types that support revisions.
-// @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
-const POST_TYPES_WITH_REVISIONS_SUPPORT = [ 'post', 'page' ];
 
 export const rootEntitiesConfig = [
 	{
@@ -215,9 +212,6 @@ export const rootEntitiesConfig = [
 			`/wp/v2/global-styles/${ parentId }/revisions${
 				revisionId ? '/' + revisionId : ''
 			}`,
-		supports: {
-			revisions: true,
-		},
 		supportsPagination: true,
 	},
 	{
@@ -282,6 +276,29 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
+const serialisableBlocksCache = new WeakMap();
+
+function makeBlockAttributesSerializable( attributes ) {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks ) {
+	return blocks.map( ( block ) => {
+		const { innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
 /**
  * Returns the list of post type entities.
  *
@@ -307,11 +324,6 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
-			supports: {
-				revisions: POST_TYPES_WITH_REVISIONS_SUPPORT.includes(
-					postType?.slug
-				),
-			},
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
@@ -329,12 +341,23 @@ async function loadPostTypeEntities() {
 				},
 				applyChangesToDoc: ( doc, changes ) => {
 					const document = doc.getMap( 'document' );
+
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							document.get( key ) !== value &&
-							typeof value !== 'function'
-						) {
-							document.set( key, value );
+						if ( typeof value !== 'function' ) {
+							if ( key === 'blocks' ) {
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+
+								value = serialisableBlocksCache.get( value );
+							}
+
+							if ( document.get( key ) !== value ) {
+								document.set( key, value );
+							}
 						}
 					} );
 				},
@@ -351,6 +374,7 @@ async function loadPostTypeEntities() {
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }

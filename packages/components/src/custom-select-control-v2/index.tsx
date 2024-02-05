@@ -18,6 +18,7 @@ import type {
 	CustomSelectItemProps,
 	CustomSelectContext as CustomSelectContextType,
 } from './types';
+import type { WordPressComponentProps } from '../context';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -41,17 +42,16 @@ function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
 	return value;
 }
 
-export function CustomSelect( props: CustomSelectProps ) {
-	const {
-		children,
-		defaultValue,
-		label,
-		onChange,
-		size = 'default',
-		value,
-		renderSelectedValue = defaultRenderSelectedValue,
-	} = props;
-
+export function CustomSelect( {
+	children,
+	defaultValue,
+	label,
+	onChange,
+	size = 'default',
+	value,
+	renderSelectedValue,
+	...props
+}: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
 	const store = Ariakit.useSelectStore( {
 		setValue: ( nextValue ) => onChange?.( nextValue ),
 		defaultValue,
@@ -60,17 +60,21 @@ export function CustomSelect( props: CustomSelectProps ) {
 
 	const { value: currentValue } = store.useState();
 
+	const computedRenderSelectedValue =
+		renderSelectedValue ?? defaultRenderSelectedValue;
+
 	return (
 		<>
 			<Styled.CustomSelectLabel store={ store }>
 				{ label }
 			</Styled.CustomSelectLabel>
 			<Styled.CustomSelectButton
+				{ ...props }
 				size={ size }
 				hasCustomRenderProp={ !! renderSelectedValue }
 				store={ store }
 			>
-				{ renderSelectedValue( currentValue ) }
+				{ computedRenderSelectedValue( currentValue ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
 			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
@@ -85,7 +89,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 export function CustomSelectItem( {
 	children,
 	...props
-}: CustomSelectItemProps ) {
+}: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
 		<Styled.CustomSelectItem

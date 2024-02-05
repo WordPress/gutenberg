@@ -1,10 +1,11 @@
 .edit-site-patterns {
+	background: #1e1e1e;
 	border-left: 1px solid $gray-800;
-	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
 	padding: 0;
 	overflow-x: auto;
+	min-height: 100%;
 
 	.components-base-control {
 		width: 100%;
@@ -66,32 +67,6 @@
 	.edit-site-patterns__sync-status-filter-option:active {
 		background: $gray-700;
 		color: $gray-100;
-	}
-
-	.edit-site-patterns__grid-pagination {
-		border-top: 1px solid $gray-800;
-		background: $gray-900;
-		padding: $grid-unit-30 $grid-unit-40;
-		position: sticky;
-		bottom: 0;
-		z-index: z-index(".edit-site-patterns__grid-pagination");
-
-		.components-button.is-tertiary {
-			width: $button-size-compact;
-			height: $button-size-compact;
-			color: $gray-100;
-			background-color: $gray-800;
-			justify-content: center;
-
-			&:disabled {
-				color: $gray-600;
-				background: none;
-			}
-
-			&:hover:not(:disabled) {
-				background-color: $gray-700;
-			}
-		}
 	}
 }
 
@@ -225,4 +200,126 @@
 
 .edit-site-patterns__delete-modal {
 	width: $modal-width-small;
+}
+
+.edit-site-patterns__pagination {
+	padding: $grid-unit-30 $grid-unit-40;
+	border-top: 1px solid $gray-800;
+	background: $gray-900;
+	position: sticky;
+	bottom: 0;
+	color: $gray-100;
+	z-index: z-index(".edit-site-patterns__grid-pagination");
+	.components-button.is-tertiary {
+		background-color: $gray-800;
+		color: $gray-100;
+
+		&:disabled {
+			color: $gray-600;
+			background: none;
+		}
+
+		&:hover:not(:disabled) {
+			background-color: $gray-700;
+		}
+	}
+}
+
+/**
+ * DataViews patterns styles.
+ * TODO: when this becomes stable, consolidate styles with the above.
+ */
+.edit-site-page-patterns-dataviews {
+	.page-patterns-preview-field {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		border-radius: 3px 3px 0 0;
+
+		&.is-viewtype-grid {
+			.block-editor-block-preview__container {
+				height: 100%;
+				border-radius: 3px 3px 0 0;
+			}
+		}
+
+		.page-patterns-preview-field__button {
+			box-shadow: none;
+			border: none;
+			padding: 0;
+			background-color: unset;
+			box-sizing: border-box;
+			cursor: pointer;
+			overflow: hidden;
+			height: 100%;
+			border-radius: 3px 3px 0 0;
+
+			&:focus-visible {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
+
+	.edit-site-patterns__pattern-icon {
+		fill: var(--wp-block-synced-color);
+		flex-shrink: 0;
+	}
+
+	.edit-site-patterns__pattern-lock-icon {
+		min-width: min-content;
+	}
+
+	.edit-site-patterns__section-header {
+		border-bottom: 1px solid #f0f0f0;
+		min-height: 72px;
+		padding: $grid-unit-20 $grid-unit-40;
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+
+	.edit-site-patterns__pattern-title {
+		display: block;
+		width: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: inherit;
+	}
+}
+
+.dataviews-action-modal__duplicate-pattern {
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
+	.patterns-menu-items__convert-modal-categories {
+		position: relative;
+	}
+
+	.components-form-token-field__suggestions-list:not(:empty) {
+		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: $white;
+		width: calc(100% + 2px); // Account for the border width of the token field.
+		left: -1px;
+		min-width: initial;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
+}
+
+.dataviews-action-modal__duplicate-template-part {
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
+		}
+	}
 }

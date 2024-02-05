@@ -12,24 +12,6 @@
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
 	}
-
-	// Some browsers, most notably IE11, honor an older version of the flexbox spec
-	// which takes absolutely positioned items into account when calculating `space-between`.
-	// https://www.w3.org/TR/2012/WD-css3-flexbox-20120612/#abspos-flex-items
-	//
-	// This difference is causing our header layout to break when focused in IE11.
-	// Our focused region styles use an absolutely positioned :after pseudo element to draw an outline,
-	// and IE11 is adding space between it and our last real child, shifting righthand UI elements
-	// to the left. For a workaround, we change the flex order to move the undesired spacing to the middle
-	// where it is no longer noticeable.
-	> .edit-post-header__settings {
-		order: 1;
-
-		// Restore default order for all other browsers
-		@supports (position: sticky) {
-			order: initial;
-		}
-	}
 }
 
 .edit-post-header__toolbar {
@@ -52,12 +34,75 @@
 		}
 	}
 
-	.block-editor-block-contextual-toolbar.is-fixed {
-		border: none;
-	}
-
 	.selected-block-tools-wrapper {
-		overflow-x: hidden;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		height: $header-height;
+
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+			height: 100%;
+		}
+
+		// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
+		.block-editor-block-toolbar {
+			height: 100%;
+			// Push down so that buttons are centered vertically.
+			// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+			// but there is a -1px top-margin down the stack that affects this.
+			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
+
+			// Match the height of other buttons in the header toolbar.
+			.components-button:not(.block-editor-block-mover-button) {
+				height: $button-size-compact;
+			}
+		}
+
+		&::after {
+			content: "";
+			width: $border-width;
+			height: $grid-unit-30;
+			background-color: $gray-300;
+			margin-left: $grid-unit;
+		}
+
+		// Modified group borders.
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				height: $grid-unit-30;
+				background-color: $gray-300;
+				margin-top: $grid-unit-05;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
+
+		.block-editor-block-mover {
+			// Match the height of other buttons in the header toolbar.
+			&.is-horizontal .block-editor-block-mover-button {
+				height: $button-size-compact;
+				overflow: visible;
+			}
+
+			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+			@include break-small() {
+				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+					position: relative;
+					top: -10px;
+				}
+			}
+		}
 
 		&.is-collapsed {
 			display: none;
@@ -90,37 +135,10 @@
 	padding-right: $grid-unit-05;
 
 	@include break-small () {
-		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+		padding-right: $grid-unit-10;
 	}
 
-	gap: $grid-unit-05;
-
-	@include break-small() {
-		gap: $grid-unit-10;
-	}
-}
-
-.edit-post-header-preview__grouping-external {
-	display: flex;
-	position: relative;
-	padding-bottom: 0;
-}
-
-.edit-post-header-preview__button-external {
-	padding-left: $grid-unit-10;
-
-	margin-right: auto;
-	width: 100%;
-	display: flex;
-	justify-content: flex-start;
-
-	svg {
-		margin-left: auto;
-	}
-}
-
-.edit-post-post-preview-dropdown .components-popover__content {
-	padding-bottom: 0;
+	gap: $grid-unit-10;
 }
 
 /**
@@ -170,7 +188,7 @@
 	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
 		display: block;
 	}
-	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle,
+	.editor-document-tools__inserter-toggle.editor-document-tools__inserter-toggle,
 	.interface-pinned-items .components-button {
 		padding-left: $grid-unit;
 		padding-right: $grid-unit;
@@ -185,6 +203,31 @@
 	.editor-post-saved-state.editor-post-saved-state {
 		&::after {
 			content: none;
+		}
+	}
+}
+
+.show-icon-labels {
+	.edit-post-header__toolbar .block-editor-block-mover {
+		// Modified group borders.
+		border-left: none;
+
+		&::before {
+			content: "";
+			width: $border-width;
+			height: $grid-unit-30;
+			background-color: $gray-300;
+			margin-top: $grid-unit-05;
+			margin-left: $grid-unit;
+		}
+
+		// Modified block movers horizontal separator.
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
 		}
 	}
 }
@@ -231,6 +274,12 @@
 	}
 }
 
+.edit-post-header__post-preview-button {
+	@include break-small {
+		display: none;
+	}
+}
+
 .is-distraction-free {
 	.interface-interface-skeleton__header {
 		border-bottom: none;
@@ -245,13 +294,13 @@
 
 
 		// hide some parts
-		& > .edit-post-header__settings > .editor-post-preview {
+		& > .edit-post-header__settings > .edit-post-header__post-preview-button {
 			visibility: hidden;
 		}
 
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__document-overview-toggle,
-		& > .edit-post-header__settings > .block-editor-post-preview__dropdown,
+		& > .edit-post-header__toolbar .editor-document-tools__inserter-toggle,
+		& > .edit-post-header__toolbar .editor-document-tools__document-overview-toggle,
+		& > .edit-post-header__settings > .editor-preview-dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;
 		}

@@ -15,6 +15,7 @@ export * from './foursquare';
 export * from './goodreads';
 export * from './google';
 export * from './github';
+export * from './gravatar';
 export * from './instagram';
 export * from './lastfm';
 export * from './linkedin';

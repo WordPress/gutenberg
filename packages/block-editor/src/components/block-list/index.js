@@ -17,7 +17,12 @@ import {
 	useMergeRefs,
 	useDebounce,
 } from '@wordpress/compose';
-import { createContext, useMemo, useCallback } from '@wordpress/element';
+import {
+	createContext,
+	useMemo,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,6 +39,7 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
+import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -113,6 +119,27 @@ function Root( { className, ...settings } ) {
 	);
 }
 
+function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
+	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+	const isBlockOrDescendantSelected = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return (
+				isBlockSelected( clientId ) ||
+				hasSelectedInnerBlock( clientId, true )
+			);
+		},
+		[ clientId ]
+	);
+	useEffect( () => {
+		if ( ! isBlockOrDescendantSelected ) {
+			stopEditingAsBlocks( clientId );
+		}
+	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	return null;
+}
+
 export default function BlockList( settings ) {
 	return (
 		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
@@ -124,24 +151,50 @@ export default function BlockList( settings ) {
 function Items( {
 	placeholder,
 	rootClientId,
-	renderAppender,
+	renderAppender: CustomAppender,
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks, visibleBlocks } = useSelect(
+	// Avoid passing CustomAppender to useSelect because it could be a new
+	// function on every render.
+	const hasAppender = CustomAppender !== false;
+	const hasCustomAppender = !! CustomAppender;
+	const {
+		order,
+		selectedBlocks,
+		visibleBlocks,
+		temporarilyEditingAsBlocks,
+		shouldRenderAppender,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
+				getSelectedBlockClientId,
 				getSelectedBlockClientIds,
 				__unstableGetVisibleBlocks,
+				__unstableGetTemporarilyEditingAsBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
 			return {
 				order: getBlockOrder( rootClientId ),
 				selectedBlocks: getSelectedBlockClientIds(),
 				visibleBlocks: __unstableGetVisibleBlocks(),
+				temporarilyEditingAsBlocks:
+					__unstableGetTemporarilyEditingAsBlocks(),
+				shouldRenderAppender:
+					hasAppender &&
+					( hasCustomAppender
+						? ! getTemplateLock( rootClientId ) &&
+						  getBlockEditingMode( rootClientId ) !== 'disabled' &&
+						  __unstableGetEditorMode() !== 'zoom-out'
+						: rootClientId === selectedBlockClientId ||
+						  ( ! rootClientId && ! selectedBlockClientId ) ),
 			};
 		},
-		[ rootClientId ]
+		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
 
 	return (
@@ -163,11 +216,18 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			<BlockListAppender
-				tagName={ __experimentalAppenderTagName }
-				rootClientId={ rootClientId }
-				renderAppender={ renderAppender }
-			/>
+			{ !! temporarilyEditingAsBlocks && (
+				<StopEditingAsBlocksOnOutsideSelect
+					clientId={ temporarilyEditingAsBlocks }
+				/>
+			) }
+			{ shouldRenderAppender && (
+				<BlockListAppender
+					tagName={ __experimentalAppenderTagName }
+					rootClientId={ rootClientId }
+					CustomAppender={ CustomAppender }
+				/>
+			) }
 		</LayoutProvider>
 	);
 }

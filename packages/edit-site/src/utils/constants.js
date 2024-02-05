@@ -44,3 +44,11 @@ export const POST_TYPE_LABELS = {
 	[ PATTERN_TYPES.user ]: __( 'Pattern' ),
 	[ NAVIGATION_POST_TYPE ]: __( 'Navigation' ),
 };
+
+// DataViews constants
+export const LAYOUT_GRID = 'grid';
+export const LAYOUT_TABLE = 'table';
+export const LAYOUT_LIST = 'list';
+export const ENUMERATION_TYPE = 'enumeration';
+export const OPERATOR_IN = 'in';
+export const OPERATOR_NOT_IN = 'notIn';

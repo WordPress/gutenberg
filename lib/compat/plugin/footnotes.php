@@ -1,6 +1,6 @@
 <?php
 /**
- * Compatibility shim for the footnotes bloct to enable test passing while awaiting the tested code to be merged to core.
+ * Compatibility shim for the footnotes block to enable test passing while awaiting the tested code to be merged to core.
  *
  * See https://github.com/WordPress/gutenberg/pull/52988.
  *

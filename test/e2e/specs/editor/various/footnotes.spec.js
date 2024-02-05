@@ -362,7 +362,7 @@ test.describe( 'Footnotes', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Post' } )
+			.getByRole( 'tab', { name: 'Post' } )
 			.click();
 		await page.locator( 'a:text("2 Revisions")' ).click();
 		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
@@ -440,7 +440,7 @@ test.describe( 'Footnotes', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Post' } )
+			.getByRole( 'tab', { name: 'Post' } )
 			.click();
 
 		// Visit the published post.

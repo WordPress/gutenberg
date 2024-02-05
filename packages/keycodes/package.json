@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keycodes",
-	"version": "3.46.0",
+	"version": "3.50.0",
 	"description": "Keycodes utilities for WordPress. Used to check for keyboard events across browsers/operating systems.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,8 +28,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/i18n": "file:../i18n",
-		"change-case": "^4.1.2"
+		"@wordpress/i18n": "file:../i18n"
 	},
 	"publishConfig": {
 		"access": "public"

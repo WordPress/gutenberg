@@ -57,11 +57,12 @@ Starting in WordPress 5.8 release, we recommend using the `block.json` metadata 
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
 	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ],
 	"render": "file:./render.php"
 }
 ```
 
-## Benefits using the metadata file
+## Benefits of using the metadata file
 
 The block definition allows code sharing between JavaScript, PHP, and other languages when processing block types stored as JSON, and registering blocks with the `block.json` metadata file provides multiple benefits on top of it.
 
@@ -77,71 +78,15 @@ Development is improved by using a defined schema definition file. Supported edi
 "$schema": "https://schemas.wp.org/trunk/block.json"
 ```
 
-## Block registration
-
-### PHP (server-side)
-
-The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
-
-This function takes two params relevant in this context (`$block_type` accepts more types and variants):
-
--   `$block_type` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
--   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
-    -   `$render_callback` (`callable`) – callback used to render blocks of this block type, it's an alternative to the `render` field in `block.json`.
-
-It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
-
-**Example:**
-
-```php
-register_block_type(
-	__DIR__ . '/notice',
-	array(
-		'render_callback' => 'render_block_core_notice',
-	)
-);
-```
-
-### JavaScript (client-side)
-
-When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
-
-**Example:**
-
-```js
-registerBlockType( 'my-plugin/notice', {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
-
-Although registering the block also on the server with PHP is still recommended for the reasons above, if you want to register it only client-side you can now use `registerBlockType` method from `@wordpress/blocks` package to register a block type using the metadata loaded from `block.json` file.
-
-The function takes two params:
-
--   `$blockNameOrMetadata` (`string`|`Object`) – block type name (supported previously) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
--   `$settings` (`Object`) – client-side block settings.
-
-It returns the registered block type (`WPBlock`) on success or `undefined` on failure.
-
-**Example:**
-
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import Edit from './edit';
-import metadata from './block.json';
-
-registerBlockType( metadata, {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
+<div class="callout callout-info">
+Check <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals-block-development/registration-of-a-block">Registration of a block</a> to learn more about how to register a block using its metadata.
+</div>
 
 ## Block API
 
 This section describes all the properties that can be added to the `block.json` file to define the behavior and metadata of block types.
 
-### API Version
+### API version
 
 -   Type: `number`
 -   Optional
@@ -242,6 +187,20 @@ Setting `parent` lets a block require that it is only available when nested with
 
 The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
+### Allowed Blocks
+
+-   Type: `string[]`
+-   Optional
+-   Localized: No
+-   Property: `allowedBlocks`
+-   Since: `WordPress 6.5.0`
+
+```json
+{ "allowedBlocks": [ "my-block/product" ] }
+```
+
+The `allowedBlocks` specifies which block types can be the direct children of the block. For example, a ‘List’ block can allow only ‘List Item’ blocks as children.
+
 ### Icon
 
 -   Type: `string`
@@ -253,7 +212,7 @@ The `ancestor` property makes a block available inside the specified block types
 { "icon": "smile" }
 ```
 
-An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).
+An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/) (slug serving also as a fallback in non-js contexts).
 
 **Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
 
@@ -516,7 +475,7 @@ Block Hooks is an API that allows a block to automatically insert itself next to
 
 The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
 
-### Editor Script
+### Editor script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -550,7 +509,7 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
 
-### View Script
+### View script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -568,7 +527,7 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
-### Editor Style
+### Editor style
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -601,6 +560,24 @@ Block type frontend and editor styles definition. They will be enqueued both in 
 It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
+
+### View Style
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewStyle`
+-   Since: `WordPress 6.5.0`
+
+```json
+{ "viewStyle": [ "file:./view.css", "example-view-style" ] }
+```
+
+Block type frontend styles definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+Frontend-only styles are especially useful for interactive blocks, to style parts that will only be visible after a user performs some action and where those styles will never be needed in the editor. You can start with using the `style` property to put all your common styles in one stylesheet. Only when you need editor-specific styling or frontend-specific styling, you can expand to `editorStyle` and `viewStyle`, but still keep the common part of your styling in the main stylesheet.
 
 ### Render
 
@@ -660,7 +637,8 @@ In `block.json`:
 	"script": "file:./script.js",
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./style.css", "example-shared-style" ]
+	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ]
 }
 ```
 
@@ -705,13 +683,14 @@ return array(
 );
 ```
 
-### Frontend Enqueueing
+### Frontend enqueueing
 
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
 -   `script`
 -   `viewScript`
 -   `style`
+-   `viewStyle` (Added in WordPress 6.5.0)
 
 ## Internationalization
 
@@ -762,7 +741,7 @@ registerBlockType( metadata, {
 } );
 ```
 
-## Backward Compatibility
+## Backward compatibility
 
 The existing registration mechanism (both server side and frontend) will continue to work, it will serve as low-level implementation detail for the `block.json` based registration.
 

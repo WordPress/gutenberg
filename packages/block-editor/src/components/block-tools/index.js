@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
@@ -16,9 +15,9 @@ import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import SelectedBlockTools from './selected-block-tools';
+import BlockToolbarPopover from './block-toolbar-popover';
+import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
-import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
@@ -28,6 +27,7 @@ function selector( select ) {
 		getFirstMultiSelectedBlockClientId,
 		getBlock,
 		getSettings,
+		hasMultiSelection,
 		__unstableGetEditorMode,
 		isTyping,
 	} = select( blockEditorStore );
@@ -36,18 +36,35 @@ function selector( select ) {
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
 	const { name = '', attributes = {} } = getBlock( clientId ) || {};
+	const editorMode = __unstableGetEditorMode();
+	const hasSelectedBlock = clientId && name;
+	const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( {
+		name,
+		attributes,
+	} );
+	const _showEmptyBlockSideInserter =
+		clientId &&
+		! isTyping() &&
+		editorMode === 'edit' &&
+		isUnmodifiedDefaultBlock( { name, attributes } );
+	const maybeShowBreadcrumb =
+		hasSelectedBlock &&
+		! hasMultiSelection() &&
+		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
-		hasSelectedBlock: clientId && name,
 		isTyping: isTyping(),
-		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-		showEmptyBlockSideInserter:
-			clientId &&
-			! isTyping() &&
-			__unstableGetEditorMode() === 'edit' &&
-			isUnmodifiedDefaultBlock( { name, attributes } ),
+		isZoomOutMode: editorMode === 'zoom-out',
+		showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
+		showBreadcrumb: ! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
+		showBlockToolbar:
+			! getSettings().hasFixedToolbar &&
+			! _showEmptyBlockSideInserter &&
+			hasSelectedBlock &&
+			! isEmptyDefaultBlock &&
+			! maybeShowBreadcrumb,
 	};
 }
 
@@ -65,14 +82,14 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		clientId,
 		hasFixedToolbar,
-		hasSelectedBlock,
 		isTyping,
 		isZoomOutMode,
 		showEmptyBlockSideInserter,
+		showBreadcrumb,
+		showBlockToolbar,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
@@ -162,12 +179,6 @@ export default function BlockTools( {
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
-	// Conditions for fixed toolbar
-	// 1. Not zoom out mode
-	// 2. It's a large viewport. If it's a smaller viewport, let the floating toolbar handle it as it already has styles attached to make it render that way.
-	// 3. Fixed toolbar is enabled
-	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
-
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
@@ -177,11 +188,6 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-
-				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
-					<BlockContextualToolbar isFixed />
-				) }
 
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
@@ -189,17 +195,24 @@ export default function BlockTools( {
 						clientId={ clientId }
 					/>
 				) }
-				{ /* Even if the toolbar is fixed, the block popover is still
-					needed for navigation and zoom-out mode. */ }
-				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
-					<SelectedBlockTools
+
+				{ showBlockToolbar && (
+					<BlockToolbarPopover
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+						isTyping={ isTyping }
+					/>
+				) }
+
+				{ showBreadcrumb && (
+					<BlockToolbarBreadcrumb
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
 				) }
 
-				{ /* Used for the inline rich text toolbar. */ }
-				{ ! isTopToolbar && (
+				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
+				{ ! isZoomOutMode && ! hasFixedToolbar && (
 					<Popover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }

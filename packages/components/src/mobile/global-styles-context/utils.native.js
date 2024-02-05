@@ -9,7 +9,6 @@ import { colord } from 'colord';
  * WordPress dependencies
  */
 import {
-	getPxFromCssUnit,
 	useSettings,
 	useMultipleOriginColorsAndGradients,
 	SETTINGS_DEFAULTS,
@@ -19,6 +18,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { default as getPxFromCssUnit } from '../utils/get-px-from-css-unit';
 import { useGlobalStyles } from './index.native';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
@@ -248,6 +248,20 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
+
+				// Supports cases for variables like var(--wp--custom--color--background)
+				if ( path[ 0 ] === 'color' ) {
+					const colorKey = path[ path.length - 1 ];
+					if ( mappedValues?.color ) {
+						const matchedValue = mappedValues.color?.values?.find(
+							( { slug } ) => slug === colorKey
+						);
+						if ( matchedValue ) {
+							return `${ matchedValue?.color }`;
+						}
+					}
+				}
+
 				if (
 					path.reduce(
 						( prev, curr ) => prev && prev[ curr ],
@@ -328,29 +342,38 @@ export function getMappedValues( features, palette ) {
  * @return {Object} normalized sizes.
  */
 function normalizeFontSizes( fontSizes ) {
-	// Adds normalized PX values for each of the different keys.
 	if ( ! fontSizes ) {
 		return fontSizes;
 	}
-	const normalizedFontSizes = {};
-	const dimensions = Dimensions.get( 'window' );
 
-	[ 'default', 'theme', 'custom' ].forEach( ( key ) => {
-		if ( fontSizes[ key ] ) {
-			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
-				( fontSizeObject ) => {
-					fontSizeObject.sizePx = getPxFromCssUnit(
-						fontSizeObject.size,
-						{
-							width: dimensions.width,
-							height: dimensions.height,
-							fontSize: DEFAULT_FONT_SIZE,
-						}
-					);
-					return fontSizeObject;
-				}
-			);
-		}
+	const dimensions = Dimensions.get( 'window' );
+	const normalizedFontSizes = {};
+	const keysToProcess = [];
+
+	// Check if 'theme' or 'custom' keys exist and add them to keysToProcess array
+	if ( fontSizes?.theme ) {
+		keysToProcess.push( 'theme' );
+	}
+	if ( fontSizes?.custom ) {
+		keysToProcess.push( 'custom' );
+	}
+
+	// If neither 'theme' nor 'custom' exist, add 'default' if it exists
+	if ( keysToProcess.length === 0 && fontSizes?.default ) {
+		keysToProcess.push( 'default' );
+	}
+
+	keysToProcess.forEach( ( key ) => {
+		normalizedFontSizes[ key ] = fontSizes[ key ].map(
+			( fontSizeObject ) => {
+				fontSizeObject.sizePx = getPxFromCssUnit( fontSizeObject.size, {
+					width: dimensions.width,
+					height: dimensions.height,
+					fontSize: DEFAULT_FONT_SIZE,
+				} );
+				return fontSizeObject;
+			}
+		);
 	} );
 
 	return normalizedFontSizes;

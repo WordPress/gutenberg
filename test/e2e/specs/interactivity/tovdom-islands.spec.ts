@@ -44,7 +44,7 @@ test.describe( 'toVdom - islands', () => {
 	} ) => {
 		const el = page.getByTestId( 'island inside another island' );
 		const templates = el.locator( 'template' );
-		expect( await templates.count() ).toEqual( 1 );
+		await expect( templates ).toHaveCount( 1 );
 	} );
 
 	test( 'islands inside inner blocks of isolated islands should be hydrated', async ( {
@@ -53,6 +53,13 @@ test.describe( 'toVdom - islands', () => {
 		const el = page.getByTestId(
 			'island inside inner block of isolated island'
 		);
+		await expect( el ).toBeHidden();
+	} );
+
+	test( 'islands should recover their namespace if an inner island has changed it', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'directive after different namespace' );
 		await expect( el ).toBeHidden();
 	} );
 } );

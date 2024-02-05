@@ -91,7 +91,11 @@ function _gutenberg_get_wp_templates_author_text_field( $template_object ) {
 		case 'site':
 			return get_bloginfo( 'name' );
 		case 'user':
-			return get_user_by( 'id', $template_object['author'] )->get( 'display_name' );
+			$author = get_user_by( 'id', $template_object['author'] );
+			if ( ! $author ) {
+				return __( 'Unknown author', 'gutenberg' );
+			}
+			return $author->get( 'display_name' );
 	}
 }
 

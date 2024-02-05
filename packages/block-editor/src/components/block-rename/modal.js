@@ -88,6 +88,7 @@ export default function BlockRenameModal( {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }
@@ -96,11 +97,16 @@ export default function BlockRenameModal( {
 						onFocus={ autoSelectInputText }
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							aria-disabled={ ! isNameValid }
 							variant="primary"
 							type="submit"

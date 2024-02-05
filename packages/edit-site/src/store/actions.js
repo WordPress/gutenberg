@@ -5,14 +5,14 @@ import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { addQueryArgs } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -24,6 +24,8 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
+import { removeTemplates } from './private-actions';
+
 /**
  * Dispatches an action that toggles a feature flag.
  *
@@ -49,16 +51,25 @@ export function toggleFeature( featureName ) {
 /**
  * Action that changes the width of the editing canvas.
  *
+ * @deprecated
+ *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-site' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Action that sets a template, optionally fetching it from REST API.
@@ -123,54 +134,9 @@ export const addTemplate =
  *
  * @param {Object} template The template object.
  */
-export const removeTemplate =
-	( template ) =>
-	async ( { registry } ) => {
-		try {
-			await registry
-				.dispatch( coreStore )
-				.deleteEntityRecord( 'postType', template.type, template.id, {
-					force: true,
-				} );
-
-			const lastError = registry
-				.select( coreStore )
-				.getLastEntityDeleteError(
-					'postType',
-					template.type,
-					template.id
-				);
-
-			if ( lastError ) {
-				throw lastError;
-			}
-
-			// Depending on how the entity was retrieved it's title might be
-			// an object or simple string.
-			const templateTitle =
-				typeof template.title === 'string'
-					? template.title
-					: template.title?.rendered;
-
-			registry.dispatch( noticesStore ).createSuccessNotice(
-				sprintf(
-					/* translators: The template/part's name. */
-					__( '"%s" deleted.' ),
-					decodeEntities( templateTitle )
-				),
-				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
-			);
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while deleting the template.' );
-
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice( errorMessage, { type: 'snackbar' } );
-		}
-	};
+export const removeTemplate = ( template ) => {
+	return removeTemplates( [ template ] );
+};
 
 /**
  * Action that sets a template part.
@@ -311,23 +277,38 @@ export function setIsNavigationPanelOpened() {
 }
 
 /**
- * Opens or closes the inserter.
+ * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @deprecated
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ */
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
+		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
+	};
 
 /**
  * Returns an action object used to update the settings.
@@ -342,27 +323,6 @@ export function updateSettings( settings ) {
 		settings,
 	};
 }
-
-/**
- * Sets whether the list view panel should be open.
- *
- * @param {boolean} isOpen If true, opens the list view. If false, closes it.
- *                         It does not toggle the state, but sets it directly.
- */
-export const setIsListViewOpened =
-	( isOpen ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
-		if ( isDistractionFree && isOpen ) {
-			dispatch.toggleDistractionFree();
-		}
-		dispatch( {
-			type: 'SET_IS_LIST_VIEW_OPENED',
-			isOpen,
-		} );
-	};
 
 /**
  * Sets whether the save view panel should be open.
@@ -520,7 +480,7 @@ export const openGeneralSidebar =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( isDistractionFree ) {
 			dispatch.toggleDistractionFree();
 		}
@@ -545,7 +505,7 @@ export const switchEditorMode =
 	( { dispatch, registry } ) => {
 		registry
 			.dispatch( 'core/preferences' )
-			.set( 'core/edit-site', 'editorMode', mode );
+			.set( 'core', 'editorMode', mode );
 
 		// Unselect blocks when we switch to a non visual mode.
 		if ( mode !== 'visual' ) {
@@ -557,7 +517,7 @@ export const switchEditorMode =
 		} else if ( mode === 'text' ) {
 			const isDistractionFree = registry
 				.select( preferencesStore )
-				.get( 'core/edit-site', 'distractionFree' );
+				.get( 'core', 'distractionFree' );
 			if ( isDistractionFree ) {
 				dispatch.toggleDistractionFree();
 			}
@@ -598,25 +558,21 @@ export const toggleDistractionFree =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-site', 'fixedToolbar', true );
-				dispatch.setIsInserterOpened( false );
-				dispatch.setIsListViewOpened( false );
+					.set( 'core', 'fixedToolbar', true );
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
 			} );
 		}
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
-				.set(
-					'core/edit-site',
-					'distractionFree',
-					! isDistractionFree
-				);
+				.set( 'core', 'distractionFree', ! isDistractionFree );
 			registry
 				.dispatch( noticesStore )
 				.createInfoNotice(
@@ -626,6 +582,16 @@ export const toggleDistractionFree =
 					{
 						id: 'core/edit-site/distraction-free-mode/notice',
 						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry
+										.dispatch( preferencesStore )
+										.toggle( 'core', 'distractionFree' );
+								},
+							},
+						],
 					}
 				);
 		} );

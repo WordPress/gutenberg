@@ -2,14 +2,9 @@
  * WordPress dependencies
  */
 import {
-	InspectorControls,
-	useMultipleOriginColorsAndGradients,
-} from '@wordpress/block-editor';
-import {
 	BottomSheet,
 	ColorSettings,
 	FocalPointSettingsPanel,
-	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -18,6 +13,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './container.native.scss';
+import InspectorControls from '../inspector-controls';
+import ImageLinkDestinationsScreen from '../image-link-destinations';
+import useMultipleOriginColorsAndGradients from '../colors-gradients/use-multiple-origin-colors-and-gradients';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',

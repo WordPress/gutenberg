@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 12.18.0 (2024-01-24)
+
+- Deprecated `__experimentalRecursionProvider` and `__experimentalUseHasRecursion` in favor of their new stable counterparts `RecursionProvider` and `useHasRecursion`.
+
+## 12.17.0 (2024-01-10)
+
+## 12.16.0 (2023-12-13)
+
+## 12.15.0 (2023-11-29)
+
 ## 12.14.0 (2023-11-16)
 
 ## 12.13.0 (2023-11-02)
