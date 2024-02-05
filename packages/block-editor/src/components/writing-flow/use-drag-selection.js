@@ -63,13 +63,16 @@ export default function useDragSelection() {
 					const selection = defaultView.getSelection();
 
 					if ( selection.rangeCount ) {
-						const { commonAncestorContainer } =
-							selection.getRangeAt( 0 );
+						const range = selection.getRangeAt( 0 );
+						const { commonAncestorContainer } = range;
+						const clonedRange = range.cloneRange();
 
 						if (
 							anchorElement.contains( commonAncestorContainer )
 						) {
 							anchorElement.focus();
+							selection.removeAllRanges();
+							selection.addRange( clonedRange );
 						}
 					}
 				} );
