@@ -188,15 +188,17 @@ export class MediaUploadProgress extends Component {
 				] }
 				pointerEvents="box-none"
 			>
-				<View style={ progressBarStyle }>
-					{ showSpinner && (
-						<Spinner
-							progress={ progress }
-							style={ this.props.spinnerStyle }
-							testID="spinner"
-						/>
-					) }
-				</View>
+				{ ! this.props.hideProgressBar && (
+					<View style={ progressBarStyle }>
+						{ showSpinner && (
+							<Spinner
+								progress={ progress }
+								style={ this.props.spinnerStyle }
+								testID="spinner"
+							/>
+						) }
+					</View>
+				) }
 				{ renderContent( {
 					isUploadPaused:
 						uploadState === MEDIA_UPLOAD_STATE_PAUSED &&
