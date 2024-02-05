@@ -859,8 +859,10 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Image',
 					} )
 					.locator( 'img' );
-				const imageSrc = await imageBlockImg.getAttribute( 'src' );
-				expect( imageSrc ).toBe( customFieldSrc );
+				await expect( imageBlockImg ).toHaveAttribute(
+					'src',
+					customFieldSrc
+				);
 
 				// Check the frontend uses the value of the custom field.
 				await setId( page, 'image-url-binding' );
@@ -895,8 +897,10 @@ test.describe( 'Block bindings', () => {
 				await imageBlockImg.click();
 
 				// Image src is the placeholder.
-				const imageSrc = await imageBlockImg.getAttribute( 'src' );
-				expect( imageSrc ).toBe( variables.placeholderSrc );
+				await expect( imageBlockImg ).toHaveAttribute(
+					'src',
+					variables.placeholderSrc
+				);
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
@@ -940,8 +944,10 @@ test.describe( 'Block bindings', () => {
 				await imageBlockImg.click();
 
 				// Image src is the placeholder.
-				const imageSrc = await imageBlockImg.getAttribute( 'src' );
-				expect( imageSrc ).toBe( variables.placeholderSrc );
+				await expect( imageBlockImg ).toHaveAttribute(
+					'src',
+					variables.placeholderSrc
+				);
 
 				// Title input is disabled and with the custom field value.
 				const advancedButton = page.getByRole( 'button', {
@@ -995,8 +1001,10 @@ test.describe( 'Block bindings', () => {
 				await imageBlockImg.click();
 
 				// Image src is the custom field value.
-				const imageSrc = await imageBlockImg.getAttribute( 'src' );
-				expect( imageSrc ).toBe( customFieldSrc );
+				await expect( imageBlockImg ).toHaveAttribute(
+					'src',
+					customFieldSrc
+				);
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
