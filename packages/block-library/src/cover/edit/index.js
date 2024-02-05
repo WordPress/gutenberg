@@ -17,7 +17,6 @@ import {
 	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
-	__experimentalUseShadowProps as useShadowProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -290,9 +289,7 @@ function CoverEdit( {
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
-	const shadowProps = useShadowProps( attributes );
 	const style = {
-		...shadowProps.style,
 		minHeight: minHeightWithUnit || undefined,
 	};
 

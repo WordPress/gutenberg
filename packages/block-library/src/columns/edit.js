@@ -20,7 +20,6 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseShadowProps as useShadowProps,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -89,10 +88,8 @@ function ColumnsEditContainer( {
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );
 
-	const shadowProps = useShadowProps( attributes );
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: shadowProps.style,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		orientation: 'horizontal',
@@ -253,7 +250,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 	} )
 )( ColumnsEditContainer );
 
-function Placeholder( { attributes, clientId, name, setAttributes } ) {
+function Placeholder( { clientId, name, setAttributes } ) {
 	const { blockType, defaultVariation, variations } = useSelect(
 		( select ) => {
 			const {
@@ -271,10 +268,7 @@ function Placeholder( { attributes, clientId, name, setAttributes } ) {
 		[ name ]
 	);
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	const shadowProps = useShadowProps( attributes );
-	const blockProps = useBlockProps( {
-		style: shadowProps.style,
-	} );
+	const blockProps = useBlockProps();
 
 	return (
 		<div { ...blockProps }>

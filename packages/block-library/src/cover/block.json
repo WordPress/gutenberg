@@ -135,8 +135,7 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		},
-		"shadow": true
+		}
 	},
 	"editorStyle": "wp-block-cover-editor",
 	"style": "wp-block-cover"

@@ -10,7 +10,6 @@ import {
 	useInnerBlocksProps,
 	getColorClassName,
 	__experimentalGetGradientClass,
-	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockProps,
 } from '@wordpress/block-editor';
 
@@ -62,9 +61,7 @@ export default function save( { attributes } ) {
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
-	const shadowProps = getShadowClassesAndStyles( attributes );
 	const style = {
-		...shadowProps.style,
 		minHeight: minHeight || undefined,
 	};
 
@@ -127,48 +124,42 @@ export default function save( { attributes } ) {
 				style={ bgStyle }
 			/>
 
-			{ /* @todo: added background wrapper in order to avoid repeating shared props between background types, test compatibility */ }
-			<div
-				className="wp-block-cover__background-wrapper"
-				style={ shadowProps.style }
-			>
-				{ ! useFeaturedImage &&
-					isImageBackground &&
-					url &&
-					( isImgElement ? (
-						<img
-							className={ imgClasses }
-							alt={ alt }
-							src={ url }
-							style={ { objectPosition } }
-							data-object-fit="cover"
-							data-object-position={ objectPosition }
-						/>
-					) : (
-						<div
-							role={ alt ? 'img' : undefined }
-							aria-label={ alt ? alt : undefined }
-							className={ imgClasses }
-							style={ { backgroundPosition, backgroundImage } }
-						/>
-					) ) }
-				{ isVideoBackground && url && (
-					<video
-						className={ classnames(
-							'wp-block-cover__video-background',
-							'intrinsic-ignore'
-						) }
-						autoPlay
-						muted
-						loop
-						playsInline
+			{ ! useFeaturedImage &&
+				isImageBackground &&
+				url &&
+				( isImgElement ? (
+					<img
+						className={ imgClasses }
+						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
 						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
-				) }
-			</div>
+				) : (
+					<div
+						role={ alt ? 'img' : undefined }
+						aria-label={ alt ? alt : undefined }
+						className={ imgClasses }
+						style={ { backgroundPosition, backgroundImage } }
+					/>
+				) ) }
+			{ isVideoBackground && url && (
+				<video
+					className={ classnames(
+						'wp-block-cover__video-background',
+						'intrinsic-ignore'
+					) }
+					autoPlay
+					muted
+					loop
+					playsInline
+					src={ url }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
+				/>
+			) }
 			<div
 				{ ...useInnerBlocksProps.save( {
 					className: 'wp-block-cover__inner-container',
