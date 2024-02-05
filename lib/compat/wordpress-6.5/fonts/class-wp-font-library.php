@@ -22,7 +22,6 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * Font collections.
 		 *
 		 * @since 6.5.0
-		 *
 		 * @var array
 		 */
 		private $collections = array();
