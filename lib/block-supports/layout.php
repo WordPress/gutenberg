@@ -590,8 +590,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'selector'     => ".$container_content_class",
 		'declarations' => $child_layout_declarations,
 	);
-	echo 'WTF IS WTFWTF';
-	print( '<pre style="position:relative;z-index:100000;background-color:seagreen;padding:1em;width: fit-content;">' . print_r( $child_layout_styles, true ) . '</pre>' );
+
 	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
 		$child_layout_styles,
 		array(
