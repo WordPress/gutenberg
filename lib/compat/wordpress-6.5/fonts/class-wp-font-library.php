@@ -22,7 +22,6 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * Font collections.
 		 *
 		 * @since 6.5.0
-		 *
 		 * @var array
 		 */
 		private $collections = array();
@@ -52,8 +51,8 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 
 			if ( $this->is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
-				/* translators: %s: Font collection slug. */
-					__( 'Font collection with slug: "%s" is already registered.', 'gutenberg' ),
+					/* translators: %s: Font collection slug. */
+					__( 'Font collection with slug "%s" is already registered.', 'gutenberg' ),
 					$new_collection->slug
 				);
 				_doing_it_wrong(
@@ -122,7 +121,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *                                     or WP_Error object if the font collection doesn't exist.
 		 */
 		public function get_font_collection( $slug ) {
-			if ( array_key_exists( $slug, $this->collections ) ) {
+			if ( $this->is_collection_registered( $slug ) ) {
 				return $this->collections[ $slug ];
 			}
 			return new WP_Error( 'font_collection_not_found', __( 'Font collection not found.', 'gutenberg' ) );
