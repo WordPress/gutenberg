@@ -298,6 +298,7 @@ const ImageURLInputUI = ( {
 							</MenuGroup>
 						)
 					}
+					offset={ 13 }
 				>
 					{ ( ! url || isEditingLink ) && ! lightboxEnabled && (
 						<>
