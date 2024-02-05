@@ -218,7 +218,7 @@ describe( 'MediaUploadProgress component', () => {
 		expect( onMediaUploadStateReset ).toHaveBeenCalledWith( payloadReset );
 	} );
 
-	it( 'does not display the spinner when hideProgresBar is true', () => {
+	it( 'does not display the spinner when hideProgressBar is true', () => {
 		const renderContentMock = jest.fn();
 		const progress = 0.1;
 		const payload = {
