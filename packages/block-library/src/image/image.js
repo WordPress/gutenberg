@@ -439,24 +439,39 @@ export default function Image( {
 		[ isSingleSelected ]
 	);
 
+	const hasParentPattern = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			return (
+				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0
+			);
+		},
+		[ clientId ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-					<ImageURLInputUI
-						url={ href || '' }
-						onChangeUrl={ onSetHref }
-						linkDestination={ linkDestination }
-						mediaUrl={ ( image && image.source_url ) || url }
-						mediaLink={ image && image.link }
-						linkTarget={ linkTarget }
-						linkClass={ linkClass }
-						rel={ rel }
-						showLightboxSetting={ showLightboxSetting }
-						lightboxEnabled={ lightboxChecked }
-						onSetLightbox={ onSetLightbox }
-					/>
-				) }
+				{ isSingleSelected &&
+					! isEditingImage &&
+					! lockUrlControls &&
+					// Disable editing the link of the URL if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the link on the frontend.
+					! hasParentPattern && (
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ ( image && image.source_url ) || url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+							showLightboxSetting={ showLightboxSetting }
+							lightboxEnabled={ lightboxChecked }
+							onSetLightbox={ onSetLightbox }
+						/>
+					) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
