@@ -62,7 +62,7 @@ The store also keeps track of a "pointer" to the current "undo/redo" step. By de
 
 The undo/redo core behavior also supports what we call "cached modifications". These are modifications that are not stored in the undo/redo stack right away. For instance, when a user starts typing in a text field, the value of the field is modified in the store, but this modification is not stored in the undo/redo stack until after the user moves to the next word or after a few milliseconds. This is done to avoid creating a new undo/redo step for each character typed by the user.
 
-Cached changes are kept outside the undo/redo stack in what is called a "cache" of modifications, and these modifications are only stored in the undo/redo stack when we explicitly call `_`_unstableCreateUndoLevel` or when the next modification is not a cached one.
+Cached changes are kept outside the undo/redo stack in what is called a "cache" of modifications, and these modifications are only stored in the undo/redo stack when we explicitly call `__unstableCreateUndoLevel` or when the next modification is not a cached one.
 
 By default, all calls to `editEntityRecord` are considered "non-cached" unless the `isCached` option is passed as true. Example:
 
