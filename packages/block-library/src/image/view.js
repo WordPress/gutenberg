@@ -77,269 +77,278 @@ function handleScroll( ctx ) {
 	}
 }
 
-const { state, actions, callbacks } = store( 'core/image', {
-	state: {
-		windowWidth: window.innerWidth,
-		windowHeight: window.innerHeight,
-		get roleAttribute() {
-			const ctx = getContext();
-			return ctx.lightboxEnabled ? 'dialog' : null;
+const { state, actions, callbacks } = store(
+	'core/image',
+	{
+		state: {
+			windowWidth: window.innerWidth,
+			windowHeight: window.innerHeight,
+			get roleAttribute() {
+				const ctx = getContext();
+				return ctx.lightboxEnabled ? 'dialog' : null;
+			},
+			get ariaModal() {
+				const ctx = getContext();
+				return ctx.lightboxEnabled ? 'true' : null;
+			},
+			get dialogLabel() {
+				const ctx = getContext();
+				return ctx.lightboxEnabled ? ctx.dialogLabel : null;
+			},
+			get lightboxObjectFit() {
+				const ctx = getContext();
+				if ( ctx.initialized ) {
+					return 'cover';
+				}
+			},
+			get enlargedImgSrc() {
+				const ctx = getContext();
+				return ctx.initialized
+					? ctx.imageUploadedSrc
+					: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+			},
 		},
-		get ariaModal() {
-			const ctx = getContext();
-			return ctx.lightboxEnabled ? 'true' : null;
-		},
-		get dialogLabel() {
-			const ctx = getContext();
-			return ctx.lightboxEnabled ? ctx.dialogLabel : null;
-		},
-		get lightboxObjectFit() {
-			const ctx = getContext();
-			if ( ctx.initialized ) {
-				return 'cover';
-			}
-		},
-		get enlargedImgSrc() {
-			const ctx = getContext();
-			return ctx.initialized
-				? ctx.imageUploadedSrc
-				: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-		},
-	},
-	actions: {
-		showLightbox( event ) {
-			const ctx = getContext();
-			// We can't initialize the lightbox until the reference
-			// image is loaded, otherwise the UX is broken.
-			if ( ! ctx.imageLoaded ) {
-				return;
-			}
-			ctx.initialized = true;
-			ctx.lastFocusedElement = window.document.activeElement;
-			ctx.scrollDelta = 0;
-			ctx.pointerType = event.pointerType;
+		actions: {
+			showLightbox( event ) {
+				const ctx = getContext();
+				// We can't initialize the lightbox until the reference
+				// image is loaded, otherwise the UX is broken.
+				if ( ! ctx.imageLoaded ) {
+					return;
+				}
+				ctx.initialized = true;
+				ctx.lastFocusedElement = window.document.activeElement;
+				ctx.scrollDelta = 0;
+				ctx.pointerType = event.pointerType;
 
-			ctx.lightboxEnabled = true;
-			setStyles( ctx, ctx.imageRef );
+				ctx.lightboxEnabled = true;
+				setStyles( ctx, ctx.imageRef );
 
-			ctx.scrollTopReset =
-				window.pageYOffset || document.documentElement.scrollTop;
+				ctx.scrollTopReset =
+					window.pageYOffset || document.documentElement.scrollTop;
 
-			// In most cases, this value will be 0, but this is included
-			// in case a user has created a page with horizontal scrolling.
-			ctx.scrollLeftReset =
-				window.pageXOffset || document.documentElement.scrollLeft;
+				// In most cases, this value will be 0, but this is included
+				// in case a user has created a page with horizontal scrolling.
+				ctx.scrollLeftReset =
+					window.pageXOffset || document.documentElement.scrollLeft;
 
-			// We define and bind the scroll callback here so
-			// that we can pass the context and as an argument.
-			// We may be able to change this in the future if we
-			// define the scroll callback in the store instead, but
-			// this approach seems to tbe clearest for now.
-			scrollCallback = handleScroll.bind( null, ctx );
+				// We define and bind the scroll callback here so
+				// that we can pass the context and as an argument.
+				// We may be able to change this in the future if we
+				// define the scroll callback in the store instead, but
+				// this approach seems to tbe clearest for now.
+				scrollCallback = handleScroll.bind( null, ctx );
 
-			// We need to add a scroll event listener to the window
-			// here because we are unable to otherwise access it via
-			// the Interactivity API directives. If we add a native way
-			// to access the window, we can remove this.
-			window.addEventListener( 'scroll', scrollCallback, false );
+				// We need to add a scroll event listener to the window
+				// here because we are unable to otherwise access it via
+				// the Interactivity API directives. If we add a native way
+				// to access the window, we can remove this.
+				window.addEventListener( 'scroll', scrollCallback, false );
+			},
+			hideLightbox() {
+				const ctx = getContext();
+				ctx.hideAnimationEnabled = true;
+				if ( ctx.lightboxEnabled ) {
+					// We want to wait until the close animation is completed
+					// before allowing a user to scroll again. The duration of this
+					// animation is defined in the styles.scss and depends on if the
+					// animation is 'zoom' or 'fade', but in any case we should wait
+					// a few milliseconds longer than the duration, otherwise a user
+					// may scroll too soon and cause the animation to look sloppy.
+					setTimeout( function () {
+						window.removeEventListener( 'scroll', scrollCallback );
+						// If we don't delay before changing the focus,
+						// the focus ring will appear on Firefox before
+						// the image has finished animating, which looks broken.
+						ctx.lightboxTriggerRef.focus( {
+							preventScroll: true,
+						} );
+					}, 450 );
+
+					ctx.lightboxEnabled = false;
+				}
+			},
+			handleKeydown( event ) {
+				const ctx = getContext();
+				if ( ctx.lightboxEnabled ) {
+					if ( event.key === 'Tab' || event.keyCode === 9 ) {
+						// If shift + tab it change the direction
+						if (
+							event.shiftKey &&
+							window.document.activeElement ===
+								ctx.firstFocusableElement
+						) {
+							event.preventDefault();
+							ctx.lastFocusableElement.focus();
+						} else if (
+							! event.shiftKey &&
+							window.document.activeElement ===
+								ctx.lastFocusableElement
+						) {
+							event.preventDefault();
+							ctx.firstFocusableElement.focus();
+						}
+					}
+
+					if ( event.key === 'Escape' || event.keyCode === 27 ) {
+						actions.hideLightbox( event );
+					}
+				}
+			},
+			// This is fired just by lazily loaded
+			// images on the page, not all images.
+			handleLoad() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				ctx.imageLoaded = true;
+				ctx.imageCurrentSrc = ref.currentSrc;
+				callbacks.setButtonStyles();
+			},
+			handleTouchStart() {
+				isTouching = true;
+			},
+			handleTouchMove( event ) {
+				const ctx = getContext();
+				// On mobile devices, we want to prevent triggering the
+				// scroll event because otherwise the page jumps around as
+				// we reset the scroll position. This also means that closing
+				// the lightbox requires that a user perform a simple tap. This
+				// may be changed in the future if we find a better alternative
+				// to override or reset the scroll position during swipe actions.
+				if ( ctx.lightboxEnabled ) {
+					event.preventDefault();
+				}
+			},
+			handleTouchEnd() {
+				// We need to wait a few milliseconds before resetting
+				// to ensure that pinch to zoom works consistently
+				// on mobile devices when the lightbox is open.
+				lastTouchTime = Date.now();
+				isTouching = false;
+			},
 		},
-		hideLightbox() {
-			const ctx = getContext();
-			ctx.hideAnimationEnabled = true;
-			if ( ctx.lightboxEnabled ) {
-				// We want to wait until the close animation is completed
-				// before allowing a user to scroll again. The duration of this
-				// animation is defined in the styles.scss and depends on if the
-				// animation is 'zoom' or 'fade', but in any case we should wait
-				// a few milliseconds longer than the duration, otherwise a user
-				// may scroll too soon and cause the animation to look sloppy.
-				setTimeout( function () {
-					window.removeEventListener( 'scroll', scrollCallback );
-					// If we don't delay before changing the focus,
-					// the focus ring will appear on Firefox before
-					// the image has finished animating, which looks broken.
-					ctx.lightboxTriggerRef.focus( {
-						preventScroll: true,
-					} );
-				}, 450 );
+		callbacks: {
+			initOriginImage() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				ctx.imageRef = ref;
+				if ( ref.complete ) {
+					ctx.imageLoaded = true;
+					ctx.imageCurrentSrc = ref.currentSrc;
+				}
+			},
+			initTriggerButton() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				ctx.lightboxTriggerRef = ref;
+			},
+			initLightbox() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				if ( ctx.lightboxEnabled ) {
+					const focusableElements =
+						ref.querySelectorAll( focusableSelectors );
+					ctx.firstFocusableElement = focusableElements[ 0 ];
+					ctx.lastFocusableElement =
+						focusableElements[ focusableElements.length - 1 ];
 
-				ctx.lightboxEnabled = false;
-			}
-		},
-		handleKeydown( event ) {
-			const ctx = getContext();
-			if ( ctx.lightboxEnabled ) {
-				if ( event.key === 'Tab' || event.keyCode === 9 ) {
-					// If shift + tab it change the direction
+					// Move focus to the dialog when opening it.
+					ref.focus();
+				}
+			},
+			setButtonStyles() {
+				const { ref } = getElement();
+				const {
+					naturalWidth,
+					naturalHeight,
+					offsetWidth,
+					offsetHeight,
+				} = ref;
+
+				// If the image isn't loaded yet, we can't
+				// calculate where the button should be.
+				if ( naturalWidth === 0 || naturalHeight === 0 ) {
+					return;
+				}
+
+				const figure = ref.parentElement;
+				const figureWidth = ref.parentElement.clientWidth;
+
+				// We need special handling for the height because
+				// a caption will cause the figure to be taller than
+				// the image, which means we need to account for that
+				// when calculating the placement of the button in the
+				// top right corner of the image.
+				let figureHeight = ref.parentElement.clientHeight;
+				const caption = figure.querySelector( 'figcaption' );
+				if ( caption ) {
+					const captionComputedStyle =
+						window.getComputedStyle( caption );
 					if (
-						event.shiftKey &&
-						window.document.activeElement ===
-							ctx.firstFocusableElement
+						! [ 'absolute', 'fixed' ].includes(
+							captionComputedStyle.position
+						)
 					) {
-						event.preventDefault();
-						ctx.lastFocusableElement.focus();
-					} else if (
-						! event.shiftKey &&
-						window.document.activeElement ===
-							ctx.lastFocusableElement
-					) {
-						event.preventDefault();
-						ctx.firstFocusableElement.focus();
+						figureHeight =
+							figureHeight -
+							caption.offsetHeight -
+							parseFloat( captionComputedStyle.marginTop ) -
+							parseFloat( captionComputedStyle.marginBottom );
 					}
 				}
 
-				if ( event.key === 'Escape' || event.keyCode === 27 ) {
-					actions.hideLightbox( event );
-				}
-			}
-		},
-		// This is fired just by lazily loaded
-		// images on the page, not all images.
-		handleLoad() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.imageLoaded = true;
-			ctx.imageCurrentSrc = ref.currentSrc;
-			callbacks.setButtonStyles();
-		},
-		handleTouchStart() {
-			isTouching = true;
-		},
-		handleTouchMove( event ) {
-			const ctx = getContext();
-			// On mobile devices, we want to prevent triggering the
-			// scroll event because otherwise the page jumps around as
-			// we reset the scroll position. This also means that closing
-			// the lightbox requires that a user perform a simple tap. This
-			// may be changed in the future if we find a better alternative
-			// to override or reset the scroll position during swipe actions.
-			if ( ctx.lightboxEnabled ) {
-				event.preventDefault();
-			}
-		},
-		handleTouchEnd() {
-			// We need to wait a few milliseconds before resetting
-			// to ensure that pinch to zoom works consistently
-			// on mobile devices when the lightbox is open.
-			lastTouchTime = Date.now();
-			isTouching = false;
-		},
-	},
-	callbacks: {
-		initOriginImage() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.imageRef = ref;
-			if ( ref.complete ) {
-				ctx.imageLoaded = true;
-				ctx.imageCurrentSrc = ref.currentSrc;
-			}
-		},
-		initTriggerButton() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.lightboxTriggerRef = ref;
-		},
-		initLightbox() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			if ( ctx.lightboxEnabled ) {
-				const focusableElements =
-					ref.querySelectorAll( focusableSelectors );
-				ctx.firstFocusableElement = focusableElements[ 0 ];
-				ctx.lastFocusableElement =
-					focusableElements[ focusableElements.length - 1 ];
+				const buttonOffsetTop = figureHeight - offsetHeight;
+				const buttonOffsetRight = figureWidth - offsetWidth;
 
-				// Move focus to the dialog when opening it.
-				ref.focus();
-			}
-		},
-		setButtonStyles() {
-			const { ref } = getElement();
-			const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
-				ref;
+				const ctx = getContext();
 
-			// If the image isn't loaded yet, we can't
-			// calculate where the button should be.
-			if ( naturalWidth === 0 || naturalHeight === 0 ) {
-				return;
-			}
+				// In the case of an image with object-fit: contain, the
+				// size of the <img> element can be larger than the image itself,
+				// so we need to calculate where to place the button.
+				if ( ctx.scaleAttr === 'contain' ) {
+					// Natural ratio of the image.
+					const naturalRatio = naturalWidth / naturalHeight;
+					// Offset ratio of the image.
+					const offsetRatio = offsetWidth / offsetHeight;
 
-			const figure = ref.parentElement;
-			const figureWidth = ref.parentElement.clientWidth;
-
-			// We need special handling for the height because
-			// a caption will cause the figure to be taller than
-			// the image, which means we need to account for that
-			// when calculating the placement of the button in the
-			// top right corner of the image.
-			let figureHeight = ref.parentElement.clientHeight;
-			const caption = figure.querySelector( 'figcaption' );
-			if ( caption ) {
-				const captionComputedStyle = window.getComputedStyle( caption );
-				if (
-					! [ 'absolute', 'fixed' ].includes(
-						captionComputedStyle.position
-					)
-				) {
-					figureHeight =
-						figureHeight -
-						caption.offsetHeight -
-						parseFloat( captionComputedStyle.marginTop ) -
-						parseFloat( captionComputedStyle.marginBottom );
-				}
-			}
-
-			const buttonOffsetTop = figureHeight - offsetHeight;
-			const buttonOffsetRight = figureWidth - offsetWidth;
-
-			const ctx = getContext();
-
-			// In the case of an image with object-fit: contain, the
-			// size of the <img> element can be larger than the image itself,
-			// so we need to calculate where to place the button.
-			if ( ctx.scaleAttr === 'contain' ) {
-				// Natural ratio of the image.
-				const naturalRatio = naturalWidth / naturalHeight;
-				// Offset ratio of the image.
-				const offsetRatio = offsetWidth / offsetHeight;
-
-				if ( naturalRatio >= offsetRatio ) {
-					// If it reaches the width first, keep
-					// the width and compute the height.
-					const referenceHeight = offsetWidth / naturalRatio;
-					ctx.imageButtonTop =
-						( offsetHeight - referenceHeight ) / 2 +
-						buttonOffsetTop +
-						16;
-					ctx.imageButtonRight = buttonOffsetRight + 16;
+					if ( naturalRatio >= offsetRatio ) {
+						// If it reaches the width first, keep
+						// the width and compute the height.
+						const referenceHeight = offsetWidth / naturalRatio;
+						ctx.imageButtonTop =
+							( offsetHeight - referenceHeight ) / 2 +
+							buttonOffsetTop +
+							16;
+						ctx.imageButtonRight = buttonOffsetRight + 16;
+					} else {
+						// If it reaches the height first, keep
+						// the height and compute the width.
+						const referenceWidth = offsetHeight * naturalRatio;
+						ctx.imageButtonTop = buttonOffsetTop + 16;
+						ctx.imageButtonRight =
+							( offsetWidth - referenceWidth ) / 2 +
+							buttonOffsetRight +
+							16;
+					}
 				} else {
-					// If it reaches the height first, keep
-					// the height and compute the width.
-					const referenceWidth = offsetHeight * naturalRatio;
 					ctx.imageButtonTop = buttonOffsetTop + 16;
-					ctx.imageButtonRight =
-						( offsetWidth - referenceWidth ) / 2 +
-						buttonOffsetRight +
-						16;
+					ctx.imageButtonRight = buttonOffsetRight + 16;
 				}
-			} else {
-				ctx.imageButtonTop = buttonOffsetTop + 16;
-				ctx.imageButtonRight = buttonOffsetRight + 16;
-			}
-		},
-		setStylesOnResize() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			if (
-				ctx.lightboxEnabled &&
-				( state.windowWidth || state.windowHeight )
-			) {
-				setStyles( ctx, ref );
-			}
+			},
+			setStylesOnResize() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				if (
+					ctx.lightboxEnabled &&
+					( state.windowWidth || state.windowHeight )
+				) {
+					setStyles( ctx, ref );
+				}
+			},
 		},
 	},
-} );
+	{ lock: true }
+);
 
 window.addEventListener(
 	'resize',
