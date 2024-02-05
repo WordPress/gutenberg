@@ -85,11 +85,11 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const { isResolved, hasInnerBlocks, isMissing, area } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+			const { getBlockCount } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -108,7 +108,7 @@ export default function TemplatePartEdit( {
 				: false;
 
 			return {
-				innerBlocks: getBlocks( clientId ),
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
 				isResolved: hasResolvedEntity,
 				isMissing:
 					hasResolvedEntity &&
@@ -129,7 +129,7 @@ export default function TemplatePartEdit( {
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
 	if (
-		innerBlocks.length === 0 &&
+		! hasInnerBlocks &&
 		( ( slug && ! theme ) || ( slug && isMissing ) )
 	) {
 		return (
@@ -167,7 +167,7 @@ export default function TemplatePartEdit( {
 						isEntityAvailable={ isEntityAvailable }
 						templatePartId={ templatePartId }
 						defaultWrapper={ areaObject.tagName }
-						hasInnerBlocks={ innerBlocks.length > 0 }
+						hasInnerBlocks={ hasInnerBlocks }
 					/>
 				</InspectorControls>
 				{ isPlaceholder && (
@@ -215,7 +215,7 @@ export default function TemplatePartEdit( {
 						tagName={ TagName }
 						blockProps={ blockProps }
 						postId={ templatePartId }
-						hasInnerBlocks={ innerBlocks.length > 0 }
+						hasInnerBlocks={ hasInnerBlocks }
 						layout={ layout }
 					/>
 				) }
