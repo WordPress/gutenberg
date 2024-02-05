@@ -10,7 +10,6 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Block bindings', () => {
 	// Helper to add an anchor/id to be able to locate the block in the frontend.
 	const setId = async ( page, testId ) => {
-		await page.pause();
 		const isAdvancedPanelOpen = await page
 			.getByRole( 'tabpanel', { name: 'Block' } )
 			.getByRole( 'button', { name: 'Advanced' } )
@@ -124,9 +123,10 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 
 				// Paragraph is not editable.
-				const isContentEditable =
-					await paragraphBlock.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 			} );
 		} );
 
@@ -194,9 +194,10 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 
 				// Heading is not editable.
-				const isContentEditable =
-					await headingBlock.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( headingBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 			} );
 		} );
 
@@ -256,10 +257,12 @@ test.describe( 'Block bindings', () => {
 						},
 					],
 				} );
-				const buttonBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Button',
-					exact: true,
-				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.locator( 'div' );
 				await buttonBlock.click();
 
 				// Alignment controls exist.
@@ -279,10 +282,10 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 
 				// Button is not editable.
-				const isContentEditable = await buttonBlock
-					.locator( 'div' )
-					.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 
 				// Link controls exist.
 				await expect(
@@ -316,10 +319,12 @@ test.describe( 'Block bindings', () => {
 						},
 					],
 				} );
-				const buttonBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Button',
-					exact: true,
-				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.locator( 'div' );
 				await buttonBlock.click();
 
 				// Format controls exist.
@@ -332,10 +337,10 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 
 				// Button is editable.
-				const isContentEditable = await buttonBlock
-					.locator( 'div' )
-					.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'true' );
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'true'
+				);
 
 				// Link controls don't exist.
 				await expect(
@@ -378,10 +383,12 @@ test.describe( 'Block bindings', () => {
 						},
 					],
 				} );
-				const buttonBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Button',
-					exact: true,
-				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.locator( 'div' );
 				await buttonBlock.click();
 
 				// Alignment controls are visible.
@@ -401,10 +408,10 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 
 				// Button is not editable.
-				const isContentEditable = await buttonBlock
-					.locator( 'div' )
-					.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 
 				// Link controls don't exist.
 				await expect(
@@ -514,7 +521,6 @@ test.describe( 'Block bindings', () => {
 				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is enabled and with the original value.
-				await page.pause();
 				await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', { name: 'Advanced' } )
@@ -762,9 +768,10 @@ test.describe( 'Block bindings', () => {
 					'Value of the text_custom_field'
 				);
 				// Paragraph is not editable.
-				const isContentEditable =
-					await paragraphBlock.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 
 				// Check the frontend shows the value of the custom field.
 				await setId( page, 'paragraph-binding' );
@@ -803,9 +810,10 @@ test.describe( 'Block bindings', () => {
 					'non_existing_custom_field'
 				);
 				// Paragraph is not editable.
-				const isContentEditable =
-					await paragraphBlock.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 
 				// Check the frontend doesn't show the content.
 				await setId( page, 'paragraph-binding' );
@@ -842,9 +850,10 @@ test.describe( 'Block bindings', () => {
 				'Value of the text_custom_field'
 			);
 			// Heading is not editable.
-			const isContentEditable =
-				await headingBlock.getAttribute( 'contenteditable' );
-			expect( isContentEditable ).toBe( 'false' );
+			await expect( headingBlock ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
 
 			// Check the frontend shows the value of the custom field.
 			await setId( page, 'heading-binding' );
@@ -881,19 +890,21 @@ test.describe( 'Block bindings', () => {
 						},
 					],
 				} );
-				const buttonBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Button',
-					exact: true,
-				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.locator( 'div' );
 				await buttonBlock.click();
 				const buttonText = await buttonBlock.textContent();
 				expect( buttonText ).toBe( 'Value of the text_custom_field' );
 
 				// Button is not editable.
-				const isContentEditable = await buttonBlock
-					.locator( 'div' )
-					.getAttribute( 'contenteditable' );
-				expect( isContentEditable ).toBe( 'false' );
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 
 				// Check the frontend shows the value of the custom field.
 				await setId( page, 'button-text-binding' );
