@@ -187,20 +187,32 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				}
 			}
 
-			$srcs = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
+			$srcs  = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
+			$files = $request->get_file_params();
 
-			// Check that srcs are non-empty strings.
-			$filtered_src = array_filter( array_filter( $srcs, 'is_string' ) );
-			if ( empty( $filtered_src ) ) {
-				return new WP_Error(
-					'rest_invalid_param',
-					__( 'font_face_settings[src] values must be non-empty strings.', 'gutenberg' ),
-					array( 'status' => 400 )
-				);
+			foreach ( $srcs as $src ) {
+				// Check that each src is a non-empty string.
+				$src = ltrim( $src );
+				if ( empty( $src ) ) {
+					return new WP_Error(
+						'rest_invalid_param',
+						__( 'font_face_settings[src] values must be non-empty strings.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+
+				// Check that srcs are valid URLs or file references.
+				if ( false === wp_http_validate_url( $src ) && ! isset( $files[ $src ] ) ) {
+					return new WP_Error(
+						'rest_invalid_param',
+						/* translators: %s: src value in the font face settings. */
+						sprintf( __( 'font_face_settings[src] value "%s" must be a valid URL or file reference.', 'gutenberg' ), $src ),
+						array( 'status' => 400 )
+					);
+				}
 			}
 
 			// Check that each file in the request references a src in the settings.
-			$files = $request->get_file_params();
 			foreach ( array_keys( $files ) as $file ) {
 				if ( ! in_array( $file, $srcs, true ) ) {
 					return new WP_Error(
@@ -227,9 +239,12 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		public function sanitize_font_face_settings( $value ) {
 			// Settings arrive as stringified JSON, since this is a multipart/form-data request.
 			$settings = json_decode( $value, true );
+			$schema   = $this->get_item_schema()['properties']['font_face_settings']['properties'];
 
-			if ( isset( $settings['fontFamily'] ) ) {
-				$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
+			// Sanitize settings based on callbacks in the schema.
+			foreach ( $settings as $key => $value ) {
+				$sanitize_callback = $schema[ $key ]['arg_options']['sanitize_callback'];
+				$settings[ $key ]  = call_user_func( $sanitize_callback, $value );
 			}
 
 			return $settings;
@@ -509,11 +524,17 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 								'description' => __( 'CSS font-family value.', 'gutenberg' ),
 								'type'        => 'string',
 								'default'     => '',
+								'arg_options' => array(
+									'sanitize_callback' => array( 'WP_Font_Utils', 'sanitize_font_family' ),
+								),
 							),
 							'fontStyle'             => array(
 								'description' => __( 'CSS font-style value.', 'gutenberg' ),
 								'type'        => 'string',
 								'default'     => 'normal',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'fontWeight'            => array(
 								'description' => __( 'List of available font weights, separated by a space.', 'gutenberg' ),
@@ -521,6 +542,9 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 								// Changed from `oneOf` to avoid errors from loose type checking.
 								// e.g. a fontWeight of "400" validates as both a string and an integer due to is_numeric check.
 								'type'        => array( 'string', 'integer' ),
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'fontDisplay'           => array(
 								'description' => __( 'CSS font-display value.', 'gutenberg' ),
@@ -533,10 +557,14 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 									'swap',
 									'optional',
 								),
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'src'                   => array(
 								'description' => __( 'Paths or URLs to the font files.', 'gutenberg' ),
-								// Changed from `oneOf` to `anyOf` due to rest_sanitize_array converting a string into an array.
+								// Changed from `oneOf` to `anyOf` due to rest_sanitize_array converting a string into an array,
+								// and causing a "matches more than one of the expected formats" error.
 								'anyOf'       => array(
 									array(
 										'type' => 'string',
@@ -549,46 +577,83 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 									),
 								),
 								'default'     => array(),
+								'arg_options' => array(
+									'sanitize_callback' => function ( $value ) {
+										return is_array( $value ) ? array_map( array( $this, 'sanitize_src' ), $value ) : $this->sanitize_src( $value );
+									},
+								),
 							),
 							'fontStretch'           => array(
 								'description' => __( 'CSS font-stretch value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'ascentOverride'        => array(
 								'description' => __( 'CSS ascent-override value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'descentOverride'       => array(
 								'description' => __( 'CSS descent-override value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'fontVariant'           => array(
 								'description' => __( 'CSS font-variant value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'fontFeatureSettings'   => array(
 								'description' => __( 'CSS font-feature-settings value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'fontVariationSettings' => array(
 								'description' => __( 'CSS font-variation-settings value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'lineGapOverride'       => array(
 								'description' => __( 'CSS line-gap-override value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'sizeAdjust'            => array(
 								'description' => __( 'CSS size-adjust value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'unicodeRange'          => array(
 								'description' => __( 'CSS unicode-range value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'preview'               => array(
 								'description' => __( 'URL to a preview image of the font face.', 'gutenberg' ),
 								'type'        => 'string',
+								'format'      => 'uri',
+								'default'     => '',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_url',
+								),
 							),
 						),
 						'required'             => array( 'fontFamily', 'src' ),
@@ -600,6 +665,26 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$this->schema = $schema;
 
 			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		/**
+		 * Retrieves the item's schema for display / public consumption purposes.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return array Public item schema data.
+		 */
+		public function get_public_item_schema() {
+
+			$schema = parent::get_public_item_schema();
+
+			// Also remove `arg_options' from child font_family_settings properties, since the parent
+			// controller only handles the top level properties.
+			foreach ( $schema['properties']['font_face_settings']['properties'] as &$property ) {
+				unset( $property['arg_options'] );
+			}
+
+			return $schema;
 		}
 
 		/**
@@ -737,6 +822,20 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$prepared_post->post_content = wp_json_encode( $settings );
 
 			return $prepared_post;
+		}
+
+		/**
+		 * Sanitizes a single src value for a font face.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $value Font face src that is a URL or the key for a $_FILES array item.
+		 *
+		 * @return string Sanitized value.
+		 */
+		protected function sanitize_src( $value ) {
+			$value = ltrim( $value );
+			return false === wp_http_validate_url( $value ) ? (string) $value : sanitize_url( $value );
 		}
 
 		/**

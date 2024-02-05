@@ -21,35 +21,41 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 	 */
 	class WP_Font_Utils {
 		/**
-		 * Format font family names.
+		 * Sanitizes and formats font family names.
 		 *
-		 * Adds surrounding quotes to font family names containing spaces and not already quoted.
+		 * - Applies `sanitize_text_field`
+		 * - Adds surrounding quotes to names that contain spaces and are not already quoted
 		 *
 		 * @since 6.5.0
 		 * @access private
 		 *
+		 * @see sanitize_text_field()
+		 *
 		 * @param string $font_family Font family name(s), comma-separated.
-		 * @return string Formatted font family name(s).
+		 * @return string Sanitized and formatted font family name(s).
 		 */
-		public static function format_font_family( $font_family ) {
-			if ( $font_family ) {
-				$font_families         = explode( ',', $font_family );
-				$wrapped_font_families = array_map(
-					function ( $family ) {
-						$trimmed = trim( $family );
-						if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
-								return '"' . $trimmed . '"';
-						}
-						return $trimmed;
-					},
-					$font_families
-				);
+		public static function sanitize_font_family( $font_family ) {
+			if ( ! $font_family ) {
+				return '';
+			}
 
-				if ( count( $wrapped_font_families ) === 1 ) {
-					$font_family = $wrapped_font_families[0];
-				} else {
-					$font_family = implode( ', ', $wrapped_font_families );
-				}
+			$font_family           = sanitize_text_field( $font_family );
+			$font_families         = explode( ',', $font_family );
+			$wrapped_font_families = array_map(
+				function ( $family ) {
+					$trimmed = trim( $family );
+					if ( ! empty( $trimmed ) && false !== strpos( $trimmed, ' ' ) && false === strpos( $trimmed, "'" ) && false === strpos( $trimmed, '"' ) ) {
+							return '"' . $trimmed . '"';
+					}
+					return $trimmed;
+				},
+				$font_families
+			);
+
+			if ( count( $wrapped_font_families ) === 1 ) {
+				$font_family = $wrapped_font_families[0];
+			} else {
+				$font_family = implode( ', ', $wrapped_font_families );
 			}
 
 			return $font_family;
@@ -128,7 +134,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				$slug_elements
 			);
 
-			return join( ';', $slug_elements );
+			return sanitize_text_field( join( ';', $slug_elements ) );
 		}
 
 		/**
