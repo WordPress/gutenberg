@@ -21,7 +21,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 	 */
 	class WP_Font_Utils {
 		/**
-		 * Sanitize and formats font family names.
+		 * Sanitizes and formats font family names.
 		 *
 		 * - Applies `sanitize_text_field`
 		 * - Adds surrounding quotes to names that contain spaces and are not already quoted
