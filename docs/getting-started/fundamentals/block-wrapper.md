@@ -66,9 +66,9 @@ Any additional classes and attributes for the `Edit` component of the block shou
 
 ## The Save component's markup
 
-When saving the markup in the DB, it’s important to add the block props returned by `useBlockProps.save()` to the wrapper element of your block. `useBlockProps.save()` ensures that the block class name is rendered properly in addition to any HTML attribute injected by the block supports API.
+When saving the markup in the database, it’s important to add the props returned by `useBlockProps.save()` to the wrapper element of your block. `useBlockProps.save()` ensures that the block class name is rendered correctly in addition to any HTML attributes injected by the block supports API.
 
-For example, for the following piece of code of a block's registration in the client that defines the markup desired for the DB (and returned to the front end by default)...
+Consider the following code that registers a block in the client. Notice how it defines the markup that should be used when editing the block and when the block is saved in the database. (See [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js))
 
 ```js
 const Edit = () => <p { ...useBlockProps() }>Hello World - Block Editor</p>;
@@ -80,17 +80,15 @@ registerBlockType( ..., {
 } );
 ```
 
-_(see the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))_
+The markup of the block on the front end could look like this, where the class is applied automatically:
 
-
-...the markup of the block in the front end could look like this:
 ```html
 <p class="wp-block-block-development-examples-minimal-block-ca6eda">Hello World – Frontend</p>
 ```
 
-Any additional classes and attributes for the `save` function of the block should be passed as an argument of `useBlockProps.save()` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js)).
+If you want to add any additional classes or attributes to the `save` function of the block, they should be passed as an argument of `useBlockProps.save()`. (See [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js))
 
-When you add `supports` for any feature, the proper classes get added to the object returned by the `useBlockProps.save()` hook.
+When you add `supports` for any feature, the proper classes get added to the object returned by the `useBlockProps.save()` hook. Text and background color classes have been added to the Paragraph block in the example below.
 
 ```html
 <p class="
@@ -102,11 +100,11 @@ When you add `supports` for any feature, the proper classes get added to the obj
 ">Hello World</p>
 ```
 
-_(check the [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) that generated the HTML above in the front end)_
+The [example block](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) that generated this HTML is available in the [Block Development Examples](https://github.com/WordPress/block-development-examples) repository.
 
 ## The server-side render markup
 
-Any markup in the server-side render definition for the block can use the [`get_block_wrapper_attributes()`](https://developer.wordpress.org/reference/functions/get_block_wrapper_attributes/) function to generate the string of attributes required to reflect the block settings (see [example](https://github.com/WordPress/block-development-examples/blob/f68640f42d993f0866d1879f67c73910285ca114/plugins/block-dynamic-rendering-64756b/src/render.php#L11)).
+In dynamic blocks, where the font-end markup is rendered server-side, you can utilize the [`get_block_wrapper_attributes()`](https://developer.wordpress.org/reference/functions/get_block_wrapper_attributes/) function to output the necessary classes and attributes just like you would use `useBlockProps.save()` in the `save` function. (See [example](https://github.com/WordPress/block-development-examples/blob/f68640f42d993f0866d1879f67c73910285ca114/plugins/block-dynamic-rendering-64756b/src/render.php#L11))
 
 ```php
 <p <?php echo get_block_wrapper_attributes(); ?>>
