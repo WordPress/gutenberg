@@ -53,7 +53,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 			if ( $this->is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
 					/* translators: %s: Font collection slug. */
-					__( 'Font collection with slug: "%s" is already registered.', 'gutenberg' ),
+					__( 'Font collection with slug "%s" is already registered.', 'gutenberg' ),
 					$new_collection->slug
 				);
 				_doing_it_wrong(
