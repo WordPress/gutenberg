@@ -7,23 +7,20 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { space } from '../utils/space';
-import type { SearchControlProps } from './types';
 import InputControl from '../input-control';
 
-const inlinePadding = ( {
-	size,
-}: Required< Pick< SearchControlProps, 'size' > > ) => {
-	return space( size === 'compact' ? 1 : 2 );
-};
+const INLINE_PADDING_SPACE = 1;
 
 export const SearchIconWrapper = styled.div`
 	display: flex;
-	padding-inline-start: ${ inlinePadding };
+	margin-inline-end: ${ space( INLINE_PADDING_SPACE * -1 ) };
+	padding-inline-start: ${ space( INLINE_PADDING_SPACE ) };
 `;
 
 export const CloseIconWrapper = styled.div`
 	display: flex;
-	padding-inline-end: ${ inlinePadding };
+	margin-inline-start: ${ space( INLINE_PADDING_SPACE * -1 ) };
+	padding-inline-end: ${ space( INLINE_PADDING_SPACE ) };
 `;
 
 export const InputControlWithoutWebkitStyles = styled( InputControl )`

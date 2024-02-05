@@ -26,7 +26,6 @@ import {
 } from './styles';
 
 function SuffixItem( {
-	size,
 	searchRef,
 	value,
 	onChange,
@@ -42,7 +41,7 @@ function SuffixItem( {
 	};
 
 	return (
-		<CloseIconWrapper size={ size }>
+		<CloseIconWrapper>
 			<Button
 				size="small"
 				icon={ closeSmall }
@@ -103,13 +102,12 @@ function UnforwardedSearchControl(
 				placeholder={ placeholder }
 				value={ value || '' }
 				prefix={
-					<SearchIconWrapper size={ size }>
+					<SearchIconWrapper>
 						<Icon icon={ search } />
 					</SearchIconWrapper>
 				}
 				suffix={
 					<SuffixItem
-						size={ size }
 						searchRef={ searchRef }
 						value={ value }
 						onChange={ onChange }
