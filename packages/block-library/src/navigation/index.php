@@ -588,6 +588,16 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/navigation',
+				isset( $module_url ) ? $module_url : includes_url( 'blocks/navigation/view.min.js' ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
 			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
 		}
 	}
@@ -1098,16 +1108,6 @@ function register_block_core_navigation() {
 		)
 	);
 
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
-	}
-
-	wp_register_script_module(
-		'@wordpress/block-library/navigation',
-		isset( $module_url ) ? $module_url : includes_url( 'blocks/navigation/view.min.js' ),
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-	);
 }
 
 add_action( 'init', 'register_block_core_navigation' );
