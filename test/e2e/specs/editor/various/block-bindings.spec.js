@@ -18,111 +18,8 @@ test.describe( 'Block bindings', () => {
 		}
 		await page.getByLabel( 'HTML anchor' ).fill( testId );
 	};
-	const variables = {
-		blocks: {
-			paragraph: {
-				name: 'core/paragraph',
-				attributes: {
-					content: 'paragraph default content',
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/post-meta',
-								args: { key: 'text_custom_field' },
-							},
-						},
-					},
-				},
-			},
-			heading: {
-				name: 'core/heading',
-				attributes: {
-					content: 'heading default content',
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/post-meta',
-								args: { key: 'text_custom_field' },
-							},
-						},
-					},
-				},
-			},
-			buttons: {
-				textOnly: {
-					name: 'core/buttons',
-					innerBlocks: [
-						{
-							name: 'core/button',
-							attributes: {
-								text: 'button default text',
-								url: '#default-url',
-								metadata: {
-									bindings: {
-										text: {
-											source: 'core/post-meta',
-											args: { key: 'text_custom_field' },
-										},
-									},
-								},
-							},
-						},
-					],
-				},
-				urlOnly: {
-					name: 'core/buttons',
-					innerBlocks: [
-						{
-							name: 'core/button',
-							attributes: {
-								text: 'button default text',
-								url: '#default-url',
-								metadata: {
-									bindings: {
-										url: {
-											source: 'core/post-meta',
-											args: { key: 'url_custom_field' },
-										},
-									},
-								},
-							},
-						},
-					],
-				},
-				multipleAttrs: {
-					name: 'core/buttons',
-					innerBlocks: [
-						{
-							name: 'core/button',
-							attributes: {
-								text: 'button default text',
-								url: '#default-url',
-								metadata: {
-									bindings: {
-										text: {
-											source: 'core/post-meta',
-											args: { key: 'text_custom_field' },
-										},
-										url: {
-											source: 'core/post-meta',
-											args: { key: 'url_custom_field' },
-										},
-									},
-								},
-							},
-						},
-					],
-				},
-			},
-			images: {
-				urlOnly: {},
-				altOnly: {},
-				titleOnly: {},
-				multipleAttrs: {},
-			},
-		},
-		placeholderSrc: '',
-	};
+	let imagePlaceholderSrc;
+	let imageCustomFieldSrc;
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
@@ -130,76 +27,7 @@ test.describe( 'Block bindings', () => {
 		const placeholderMedia = await requestUtils.uploadMedia(
 			path.join( './test/e2e/assets', '10x10_e2e_test_image_z9T8jK.png' )
 		);
-		variables.placeholderSrc = placeholderMedia.source_url;
-		// Init image blocks.
-		variables.blocks.images.urlOnly = {
-			name: 'core/image',
-			attributes: {
-				url: variables.placeholderSrc,
-				alt: 'default alt value',
-				title: 'default title value',
-				metadata: {
-					bindings: {
-						url: {
-							source: 'core/post-meta',
-							args: { key: 'url_custom_field' },
-						},
-					},
-				},
-			},
-		};
-		variables.blocks.images.altOnly = {
-			name: 'core/image',
-			attributes: {
-				url: variables.placeholderSrc,
-				alt: 'default alt value',
-				title: 'default title value',
-				metadata: {
-					bindings: {
-						alt: {
-							source: 'core/post-meta',
-							args: { key: 'text_custom_field' },
-						},
-					},
-				},
-			},
-		};
-		variables.blocks.images.titleOnly = {
-			name: 'core/image',
-			attributes: {
-				url: variables.placeholderSrc,
-				alt: 'default alt value',
-				title: 'default title value',
-				metadata: {
-					bindings: {
-						title: {
-							source: 'core/post-meta',
-							args: { key: 'text_custom_field' },
-						},
-					},
-				},
-			},
-		};
-		variables.blocks.images.multipleAttrs = {
-			name: 'core/image',
-			attributes: {
-				url: variables.placeholderSrc,
-				alt: 'default alt value',
-				title: 'default title value',
-				metadata: {
-					bindings: {
-						url: {
-							source: 'core/post-meta',
-							args: { key: 'url_custom_field' },
-						},
-						alt: {
-							source: 'core/post-meta',
-							args: { key: 'text_custom_field' },
-						},
-					},
-				},
-			},
-		};
+		imagePlaceholderSrc = placeholderMedia.source_url;
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -226,7 +54,20 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the value of the custom field', async ( {
 				editor,
 			} ) => {
-				await editor.insertBlock( variables.blocks.paragraph );
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
@@ -239,7 +80,20 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.paragraph );
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
@@ -270,7 +124,20 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the key of the custom field', async ( {
 				editor,
 			} ) => {
-				await editor.insertBlock( variables.blocks.heading );
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'heading default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const headingBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Heading',
 				} );
@@ -281,7 +148,20 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.heading );
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'heading default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const headingBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Heading',
 				} );
@@ -312,7 +192,26 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the key of the custom field when text is bound', async ( {
 				editor,
 			} ) => {
-				await editor.insertBlock( variables.blocks.buttons.textOnly );
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'core/post-meta',
+											args: { key: 'text_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 				const buttonBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Button',
 					exact: true,
@@ -325,7 +224,26 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.buttons.textOnly );
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'core/post-meta',
+											args: { key: 'text_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 				const buttonBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Button',
 					exact: true,
@@ -364,7 +282,26 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.buttons.urlOnly );
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										url: {
+											source: 'core/post-meta',
+											args: { key: 'url_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 				const buttonBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Button',
 					exact: true,
@@ -401,9 +338,30 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock(
-					variables.blocks.buttons.multipleAttrs
-				);
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'core/post-meta',
+											args: { key: 'text_custom_field' },
+										},
+										url: {
+											source: 'core/post-meta',
+											args: { key: 'url_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 				const buttonBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Button',
 					exact: true,
@@ -461,7 +419,22 @@ test.describe( 'Block bindings', () => {
 			test( 'Should NOT show the upload form when url is bound', async ( {
 				editor,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.urlOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'core/post-meta',
+									args: { key: 'url_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Image',
 				} );
@@ -475,7 +448,22 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.urlOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'core/post-meta',
+									args: { key: 'url_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Image',
 				} );
@@ -517,7 +505,22 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.altOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								alt: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Image',
 				} );
@@ -554,7 +557,22 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.titleOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								title: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Image',
 				} );
@@ -591,9 +609,26 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock(
-					variables.blocks.images.multipleAttrs
-				);
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'core/post-meta',
+									args: { key: 'url_custom_field' },
+								},
+								alt: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Image',
 				} );
@@ -642,7 +677,20 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.paragraph );
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
@@ -709,7 +757,20 @@ test.describe( 'Block bindings', () => {
 			editor,
 			page,
 		} ) => {
-			await editor.insertBlock( variables.blocks.heading );
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'heading default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+						},
+					},
+				},
+			} );
 			const headingBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Heading',
 			} );
@@ -736,7 +797,26 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.buttons.textOnly );
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'core/post-meta',
+											args: { key: 'text_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 				const buttonBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Button',
 					exact: true,
@@ -770,7 +850,26 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.buttons.urlOnly );
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										url: {
+											source: 'core/post-meta',
+											args: { key: 'url_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 
 				// Check the frontend shows the original value of the custom field.
 				await setId( page, 'button-url-binding' );
@@ -789,9 +888,30 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock(
-					variables.blocks.buttons.multipleAttrs
-				);
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'core/post-meta',
+											args: { key: 'text_custom_field' },
+										},
+										url: {
+											source: 'core/post-meta',
+											args: { key: 'url_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
 
 				// Check the frontend uses the values of the custom fields.
 				await setId( page, 'button-multiple-bindings' );
@@ -810,7 +930,6 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Image', () => {
-			let customFieldSrc;
 			test.beforeAll( async ( { requestUtils } ) => {
 				const customFieldMedia = await requestUtils.uploadMedia(
 					path.join(
@@ -818,7 +937,7 @@ test.describe( 'Block bindings', () => {
 						'1024x768_e2e_test_image_size.jpeg'
 					)
 				);
-				customFieldSrc = customFieldMedia.source_url;
+				imageCustomFieldSrc = customFieldMedia.source_url;
 			} );
 
 			test.beforeEach( async ( { editor, page, requestUtils } ) => {
@@ -828,7 +947,7 @@ test.describe( 'Block bindings', () => {
 					path: '/wp/v2/posts/' + postId,
 					data: {
 						meta: {
-							url_custom_field: customFieldSrc,
+							url_custom_field: imageCustomFieldSrc,
 						},
 					},
 				} );
@@ -838,7 +957,22 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.urlOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'core/post-meta',
+									args: { key: 'url_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlockImg = editor.canvas
 					.getByRole( 'document', {
 						name: 'Block: Image',
@@ -846,7 +980,7 @@ test.describe( 'Block bindings', () => {
 					.locator( 'img' );
 				await expect( imageBlockImg ).toHaveAttribute(
 					'src',
-					customFieldSrc
+					imageCustomFieldSrc
 				);
 
 				// Check the frontend uses the value of the custom field.
@@ -857,7 +991,7 @@ test.describe( 'Block bindings', () => {
 				await expect( imageDom ).toBeVisible();
 				await expect( imageDom ).toHaveAttribute(
 					'src',
-					customFieldSrc
+					imageCustomFieldSrc
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
@@ -873,7 +1007,22 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.altOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								alt: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlockImg = editor.canvas
 					.getByRole( 'document', {
 						name: 'Block: Image',
@@ -884,7 +1033,7 @@ test.describe( 'Block bindings', () => {
 				// Image src is the placeholder.
 				await expect( imageBlockImg ).toHaveAttribute(
 					'src',
-					variables.placeholderSrc
+					imagePlaceholderSrc
 				);
 
 				// Alt textarea is disabled and with the custom field value.
@@ -904,7 +1053,7 @@ test.describe( 'Block bindings', () => {
 				await expect( imageDom ).toBeVisible();
 				await expect( imageDom ).toHaveAttribute(
 					'src',
-					variables.placeholderSrc
+					imagePlaceholderSrc
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
@@ -920,7 +1069,22 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock( variables.blocks.images.titleOnly );
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								title: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlockImg = editor.canvas
 					.getByRole( 'document', {
 						name: 'Block: Image',
@@ -931,7 +1095,7 @@ test.describe( 'Block bindings', () => {
 				// Image src is the placeholder.
 				await expect( imageBlockImg ).toHaveAttribute(
 					'src',
-					variables.placeholderSrc
+					imagePlaceholderSrc
 				);
 
 				// Title input is disabled and with the custom field value.
@@ -959,7 +1123,7 @@ test.describe( 'Block bindings', () => {
 				await expect( imageDom ).toBeVisible();
 				await expect( imageDom ).toHaveAttribute(
 					'src',
-					variables.placeholderSrc
+					imagePlaceholderSrc
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
@@ -975,9 +1139,26 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				await editor.insertBlock(
-					variables.blocks.images.multipleAttrs
-				);
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'core/post-meta',
+									args: { key: 'url_custom_field' },
+								},
+								alt: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
 				const imageBlockImg = editor.canvas
 					.getByRole( 'document', {
 						name: 'Block: Image',
@@ -988,7 +1169,7 @@ test.describe( 'Block bindings', () => {
 				// Image src is the custom field value.
 				await expect( imageBlockImg ).toHaveAttribute(
 					'src',
-					customFieldSrc
+					imageCustomFieldSrc
 				);
 
 				// Alt textarea is disabled and with the custom field value.
@@ -1025,7 +1206,7 @@ test.describe( 'Block bindings', () => {
 				await expect( imageDom ).toBeVisible();
 				await expect( imageDom ).toHaveAttribute(
 					'src',
-					customFieldSrc
+					imageCustomFieldSrc
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
