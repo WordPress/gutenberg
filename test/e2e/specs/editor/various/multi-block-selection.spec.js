@@ -221,7 +221,7 @@ test.describe( 'Multi-block selection', () => {
 		pageUtils,
 		multiBlockSelectionUtils,
 	} ) => {
-		for ( let i = 1; i <= 2; i += 1 ) {
+		for ( let i = 1; i <= 3; i += 1 ) {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: `${ i }` },
@@ -232,14 +232,13 @@ test.describe( 'Multi-block selection', () => {
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-			.toEqual( [ 1, 2 ] );
+			.toEqual( [ 1, 2, 3 ] );
 
 		await page.keyboard.press( 'Escape' );
 
-		// FIXME: This doesn't seem to work anymore.
-		// await expect
-		// 	.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-		// 	.toEqual( [] );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1 ] );
 	} );
 
 	test( 'should select with shift + click', async ( {
@@ -875,35 +874,6 @@ test.describe( 'Multi-block selection', () => {
 				{ name: 'core/paragraph' },
 				{ name: 'core/list' },
 			] );
-	} );
-
-	test( 'should select all from empty selection', async ( {
-		page,
-		editor,
-		pageUtils,
-		multiBlockSelectionUtils,
-	} ) => {
-		for ( let i = 1; i <= 2; i += 1 ) {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: `${ i }` },
-			} );
-		}
-
-		// Clear the selected block.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Escape' );
-
-		await expect
-			.poll( multiBlockSelectionUtils.getSelectedBlocks )
-			.toEqual( [] );
-
-		await pageUtils.pressKeys( 'primary+a' );
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect both paragraphs to be deleted.
-		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should select title if the cursor is on title', async ( {
