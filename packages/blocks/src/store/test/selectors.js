@@ -12,6 +12,7 @@ import {
 	getBlockVariations,
 	getDefaultBlockVariation,
 	getGroupingBlockName,
+	getHookedBlockNames,
 	isMatchingSearchTerm,
 	getCategories,
 	getActiveBlockVariation,
@@ -224,6 +225,80 @@ describe( 'selectors', () => {
 			] );
 			expect( getChildBlockNames( state, 'parent2' ) ).toEqual( [
 				'child2',
+			] );
+		} );
+	} );
+
+	describe( 'getHookedBlockNames', () => {
+		it( 'should return an empty array if state is empty', () => {
+			const state = {
+				blockTypes: {},
+			};
+
+			expect( getHookedBlockNames( state, 'anchor' ) ).toHaveLength( 0 );
+		} );
+
+		it( 'should return an empty array if the anchor block is not found', () => {
+			const state = {
+				blockTypes: {
+					anchor: {
+						name: 'anchor',
+					},
+					hookedBlock: {
+						name: 'hookedBlock',
+						blockHooks: {
+							anchor: 'after',
+						},
+					},
+				},
+			};
+
+			expect( getChildBlockNames( state, 'otherAnchor' ) ).toHaveLength(
+				0
+			);
+		} );
+
+		it( "should return the anchor block name even if the anchor block doesn't exist", () => {
+			const state = {
+				blockTypes: {
+					hookedBlock: {
+						name: 'hookedBlock',
+						blockHooks: {
+							anchor: 'after',
+						},
+					},
+				},
+			};
+
+			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( [
+				'hookedBlock',
+			] );
+		} );
+
+		it( 'should return an array with the hooked block names', () => {
+			const state = {
+				blockTypes: {
+					anchor: {
+						name: 'anchor',
+					},
+					hookedBlock1: {
+						name: 'hookedBlock1',
+						blockHooks: {
+							anchor: 'after',
+						},
+					},
+					hookedBlock2: {
+						name: 'hookedBlock2',
+						blockHooks: {
+							anchor: 'before',
+						},
+					},
+				},
+			};
+
+			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( [
+				'hookedBlock1',
+				'hookedBlock2',
 			] );
 		} );
 	} );
