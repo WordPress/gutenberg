@@ -3,8 +3,8 @@
 ## Unreleased
 
 ### Enhancements
-
 -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+-   `FocalPointPicker`: Apply modern styling ([#58459](https://github.com/WordPress/gutenberg/pull/58459)).
 
 ### Bug Fix
 
