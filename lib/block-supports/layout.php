@@ -567,6 +567,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$outer_class_names         = array();
 	$container_content_class   = wp_unique_id( 'wp-container-content-' );
 	$child_layout_declarations = array();
+	$child_layout_styles       = array();
 
 	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
 
@@ -585,11 +586,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
 		$child_layout_declarations['grid-row'] = "span $row_span";
 	}
-	$child_layout_styles = array(
+	$child_layout_styles[] = array(
 		'selector'     => ".$container_content_class",
 		'declarations' => $child_layout_declarations,
 	);
-
+	echo 'WTF IS WTFWTF';
+	print( '<pre style="position:relative;z-index:100000;background-color:seagreen;padding:1em;width: fit-content;">' . print_r( $child_layout_styles, true ) . '</pre>' );
 	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
 		$child_layout_styles,
 		array(
