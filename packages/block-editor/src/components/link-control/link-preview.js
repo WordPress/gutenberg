@@ -34,6 +34,7 @@ export default function LinkPreview( {
 	hasUnlinkControl = false,
 	onRemove,
 	additionalControls,
+	isEditing,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -131,7 +132,9 @@ export default function LinkPreview( {
 					className="block-editor-link-control__search-item-action"
 					onClick={ onEditClick }
 					size="compact"
+					disabled={ isEditing }
 				/>
+
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
