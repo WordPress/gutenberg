@@ -541,7 +541,6 @@ export default function DimensionsPanel( {
 						value={ inheritedValue }
 						onChange={ setChildLayout }
 						parentLayout={ settings?.parentLayout }
-						align={ settings?.align }
 						clientId={ clientId }
 					/>
 				</VStack>

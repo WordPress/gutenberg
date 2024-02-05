@@ -25,7 +25,6 @@ import { store as blockEditorStore } from '../../store';
  * @param {Function} props.onChange     Function to update the child layout value.
  * @param {Object}   props.parentLayout The parent layout value.
  *
- * @param {string}   props.align
  * @param {string}   props.clientId
  * @return {Element} child layout edit element.
  */
@@ -34,7 +33,6 @@ export default function ChildLayoutControl( {
 	value = {},
 	onChange,
 	parentLayout,
-	align,
 	clientId,
 } ) {
 	const {
@@ -51,6 +49,13 @@ export default function ChildLayoutControl( {
 		[ clientId ]
 	);
 	const blockSupportsAlign = getBlockSupport( blockName, 'align' );
+
+	const blockAttributes = useSelect(
+		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
+		[ clientId ]
+	);
+
+	const { align = null } = blockAttributes ?? {};
 
 	const supportsWideAlign =
 		blockSupportsAlign === true ||
