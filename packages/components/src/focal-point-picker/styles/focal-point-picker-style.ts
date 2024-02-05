@@ -31,6 +31,7 @@ export const MediaContainer = styled.div`
 
 	&:after {
 		bottom: 0px;
+		border-radius: inherit;
 		box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 );
 		content: '';
 		left: 0px;
@@ -42,7 +43,7 @@ export const MediaContainer = styled.div`
 
 	img,
 	video {
-		border-radius: ${ CONFIG.radiusBlockUi };
+		border-radius: inherit;
 		box-sizing: border-box;
 		display: block;
 		height: auto;
