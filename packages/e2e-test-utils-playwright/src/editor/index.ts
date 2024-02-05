@@ -28,6 +28,7 @@ import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
 import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
+import { updatePost } from './update-post';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -89,4 +90,6 @@ export class Editor {
 		switchToLegacyCanvas.bind( this );
 	/** @borrows transformBlockTo as this.transformBlockTo */
 	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
+	/** @borrows updatePost as this.updatePost */
+	updatePost: typeof updatePost = updatePost.bind( this );
 }
