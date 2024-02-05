@@ -12,8 +12,6 @@ import {
 	Button,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import {
@@ -24,16 +22,16 @@ import {
 	symbol,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
-import { useRef, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-const TYPE_LABELS = {
+const typeLabels = {
 	// translators: 1: Pattern title.
 	wp_pattern: __( 'Editing pattern: %s' ),
 	// translators: 1: Navigation menu title.
@@ -44,142 +42,122 @@ const TYPE_LABELS = {
 	wp_template_part: __( 'Editing template part: %s' ),
 };
 
-const ICONS = {
+const icons = {
 	wp_block: symbol,
 	wp_navigation: navigationIcon,
 };
 
-const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
-
-const GLOBAL_POST_TYPES = [
-	...TEMPLATE_POST_TYPES,
-	'wp_block',
-	'wp_navigation',
-];
-
-const MotionButton = motion( Button );
-
 export default function DocumentBar() {
-	const {
-		postType,
-		goBack,
-		document,
-		isResolving,
-		templateIcon,
-		templateTitle,
-	} = useSelect( ( select ) => {
+	const { postType, postId, goBack } = useSelect( ( select ) => {
 		const {
-			getCurrentPostType,
 			getCurrentPostId,
-			getEditorSettings,
-			__experimentalGetTemplateInfo: getTemplateInfo,
+			getCurrentPostType,
+			getEditorSettings: getSettings,
 		} = select( editorStore );
-		const { getEditedEntityRecord, getIsResolving } = select( coreStore );
-		const _postType = getCurrentPostType();
-		const _postId = getCurrentPostId();
-		const { goBack: _goBack } = getEditorSettings();
-		const _document = getEditedEntityRecord(
-			'postType',
-			_postType,
-			_postId
-		);
-		const _templateInfo = getTemplateInfo( _document );
+		const back = getSettings().goBack;
 		return {
-			postType: _postType,
-			goBack: typeof _goBack === 'function' ? _goBack : undefined,
-			document: _document,
-			isResolving: getIsResolving(
-				'getEditedEntityRecord',
-				'postType',
-				_postType,
-				_postId
-			),
-			templateIcon: _templateInfo.icon,
-			templateTitle: _templateInfo.title,
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			goBack: typeof back === 'function' ? back : undefined,
+			getEditorSettings: getSettings,
 		};
 	}, [] );
 
+	const handleOnBack = () => {
+		if ( goBack ) {
+			goBack();
+		}
+	};
+
+	return (
+		<BaseDocumentActions
+			postType={ postType }
+			postId={ postId }
+			onBack={ goBack ? handleOnBack : undefined }
+		/>
+	);
+}
+
+function BaseDocumentActions( { postType, postId, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
+	const { editedRecord: doc, isResolving } = useEntityRecord(
+		'postType',
+		postType,
+		postId
+	);
+	const { templateIcon, templateTitle } = useSelect( ( select ) => {
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select( editorStore );
+		const templateInfo = getTemplateInfo( doc );
+		return {
+			templateIcon: templateInfo.icon,
+			templateTitle: templateInfo.title,
+		};
+	} );
+	const isNotFound = ! doc && ! isResolving;
+	const icon = icons[ postType ] ?? pageIcon;
+	const [ isAnimated, setIsAnimated ] = useState( false );
+	const isMounting = useRef( true );
+	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+		postType
+	);
+	const isGlobalEntity = [
+		'wp_template',
+		'wp_navigation',
+		'wp_template_part',
+		'wp_block',
+	].includes( postType );
 
-	const isNotFound = ! document && ! isResolving;
-	const icon = ICONS[ postType ] ?? pageIcon;
-	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
-	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
-	const hasBackButton = !! goBack;
-	const title = isTemplate ? templateTitle : document.title;
-
-	const mounted = useRef( false );
 	useEffect( () => {
-		mounted.current = true;
-	}, [] );
+		if ( ! isMounting.current ) {
+			setIsAnimated( true );
+		}
+		isMounting.current = false;
+	}, [ postType, postId ] );
+
+	const title = isTemplate ? templateTitle : doc.title;
 
 	return (
 		<div
 			className={ classnames( 'editor-document-bar', {
-				'has-back-button': hasBackButton,
+				'has-back-button': !! onBack,
+				'is-animated': isAnimated,
 				'is-global': isGlobalEntity,
 			} ) }
 		>
-			<AnimatePresence>
-				{ hasBackButton && (
-					<MotionButton
-						className="editor-document-bar__back"
-						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							goBack();
-						} }
-						size="compact"
-						initial={
-							mounted.current
-								? { opacity: 0, transform: 'translateX(15%)' }
-								: false // Don't show entry animation when DocumentBar mounts.
-						}
-						animate={ { opacity: 1, transform: 'translateX(0%)' } }
-						exit={ { opacity: 0, transform: 'translateX(15%)' } }
-					>
-						{ __( 'Back' ) }
-					</MotionButton>
-				) }
-			</AnimatePresence>
-			{ isNotFound ? (
-				<Text>{ __( 'Document not found' ) }</Text>
-			) : (
+			{ onBack && (
+				<Button
+					className="editor-document-bar__back"
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						onBack();
+					} }
+					size="compact"
+				>
+					{ __( 'Back' ) }
+				</Button>
+			) }
+			{ isNotFound && <Text>{ __( 'Document not found' ) }</Text> }
+			{ ! isNotFound && (
 				<Button
 					className="editor-document-bar__command"
 					onClick={ () => openCommandCenter() }
 					size="compact"
 				>
 					<HStack
-						as={ motion.div }
 						className="editor-document-bar__title"
 						spacing={ 1 }
 						justify="center"
-						// Force entry animation when the back button is added or removed.
-						key={ hasBackButton }
-						initial={
-							mounted.current
-								? {
-										opacity: 0,
-										transform: hasBackButton
-											? 'translateX(15%)'
-											: 'translateX(-15%)',
-								  }
-								: false // Don't show entry animation when DocumentBar mounts.
-						}
-						animate={ {
-							opacity: 1,
-							transform: 'translateX(0%)',
-						} }
 					>
 						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
 						<Text
 							size="body"
 							as="h1"
 							aria-label={
-								TYPE_LABELS[ postType ]
+								typeLabels[ postType ]
 									? // eslint-disable-next-line @wordpress/valid-sprintf
-									  sprintf( TYPE_LABELS[ postType ], title )
+									  sprintf( typeLabels[ postType ], title )
 									: undefined
 							}
 						>
