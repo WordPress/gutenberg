@@ -131,7 +131,7 @@ function applyInitialContentValuesToInnerBlocks(
 }
 
 function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, { values: Record<string, unknown>> }} */
+	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
 	for ( const block of blocks ) {
 		Object.assign(
