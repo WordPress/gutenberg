@@ -19,7 +19,7 @@
  *
  * @since 6.5.0
  */
-function gutenberg_init_font_library_routes() {
+function gutenberg_create_initial_post_types() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
 		'labels'                         => array(
@@ -82,13 +82,30 @@ function gutenberg_init_font_library_routes() {
 			'autosave_rest_controller_class' => 'stdClass',
 		)
 	);
+}
 
+/**
+ * Initializes REST routes.
+ *
+ * @since 6.5
+ */
+function gutenberg_create_initial_rest_routes() {
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
 	$font_collections_controller = new WP_REST_Font_Collections_Controller();
 	$font_collections_controller->register_routes();
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
+/**
+ * Initializes REST routes and post types.
+ *
+ * @since 6.5
+ */
+function gutenberg_init_font_library() {
+	gutenberg_create_initial_post_types();
+	gutenberg_create_initial_rest_routes();
+}
+
+add_action( 'rest_api_init', 'gutenberg_init_font_library' );
 
 
 if ( ! function_exists( 'wp_register_font_collection' ) ) {
@@ -97,18 +114,24 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string[] $config {
-	 *     Font collection associative array of configuration options.
+	 * @param string       $slug Font collection slug. May only contain alphanumeric characters, dashes,
+	 *                     and underscores. See sanitize_title().
+	 * @param array|string $data_or_file {
+	 *     Font collection data array or a path/URL to a JSON file containing the font collection.
 	 *
-	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $src            The font collection's data as a JSON file path.
-	 *     @type array  $data           The font collection's data as a PHP array.
+	 *     @link https://schemas.wp.org/trunk/font-collection.json
+	 *
+	 *     @type string $name           Required. Name of the font collection shown in the Font Library.
+	 *     @type string $description    Optional. A short descriptive summary of the font collection. Default empty.
+	 *     @type array  $font_families  Required. Array of font family definitions that are in the collection.
+	 *     @type array  $categories     Optional. Array of categories, each with a name and slug, that are used by the
+	 *                                  fonts in the collection. Default empty.
 	 * }
-	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
-	 *                                     successfully, else WP_Error.
+	 * @return WP_Font_Collection|WP_Error A font collection if it was registered
+	 *                                     successfully, or WP_Error object on failure.
 	 */
-	function wp_register_font_collection( $config ) {
-		return WP_Font_Library::register_font_collection( $config );
+	function wp_register_font_collection( $slug, $data_or_file ) {
+		return WP_Font_Library::get_instance()->register_font_collection( $slug, $data_or_file );
 	}
 }
 
@@ -118,22 +141,19 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string $collection_id The font collection ID.
+	 * @param string $slug Font collection slug.
+	 * @return bool True if the font collection was unregistered successfully, else false.
 	 */
-	function wp_unregister_font_collection( $collection_id ) {
-		WP_Font_Library::unregister_font_collection( $collection_id );
+	function wp_unregister_font_collection( $slug ) {
+		return WP_Font_Library::get_instance()->unregister_font_collection( $slug );
 	}
-
 }
 
-$google_fonts = array(
-	'slug'        => 'google-fonts',
-	'name'        => 'Google Fonts',
-	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'src'         => 'https://s.w.org/images/fonts/17.6/collections/google-fonts-with-preview.json',
-);
-
-wp_register_font_collection( $google_fonts );
+function gutenberg_register_font_collections() {
+	// TODO: update to production font collection URL.
+	wp_register_font_collection( 'google-fonts', 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/01aa57731575bd13f9db8d86ab80a2d74e28a1ac/releases/gutenberg-17.6/collections/google-fonts-with-preview.json' );
+}
+add_action( 'init', 'gutenberg_register_font_collections' );
 
 // @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {
@@ -152,7 +172,6 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *     @type string       $baseurl URL path without subdir.
 	 *     @type string|false $error   False or error message.
 	 * }
-	 *
 	 * @return array $defaults {
 	 *     Array of information about the upload directory.
 	 *
@@ -179,7 +198,15 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 		$defaults['baseurl'] = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
 		$defaults['error']   = false;
 
-		// Filters the fonts directory data.
+		/**
+		 * Filters the fonts directory data.
+		 *
+		 * This filter allows developers to modify the fonts directory data.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $defaults The original fonts directory data.
+		 */
 		return apply_filters( 'font_dir', $defaults );
 	}
 }
@@ -195,7 +222,6 @@ if ( ! function_exists( '_wp_after_delete_font_family' ) ) {
 	 *
 	 * @param int     $post_id Post ID.
 	 * @param WP_Post $post    Post object.
-	 * @return void
 	 */
 	function _wp_after_delete_font_family( $post_id, $post ) {
 		if ( 'wp_font_family' !== $post->post_type ) {
@@ -225,7 +251,6 @@ if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 	 *
 	 * @param int     $post_id Post ID.
 	 * @param WP_Post $post    Post object.
-	 * @return void
 	 */
 	function _wp_before_delete_font_face( $post_id, $post ) {
 		if ( 'wp_font_face' !== $post->post_type ) {
@@ -275,7 +300,7 @@ function gutenberg_convert_legacy_font_family_format() {
 			continue;
 		}
 
-		$font_faces = $font_family_json['fontFace'] ?? array();
+		$font_faces = isset( $font_family_json['fontFace'] ) ? $font_family_json['fontFace'] : array();
 		unset( $font_family_json['fontFace'] );
 
 		// Save wp_font_face posts within the family.
@@ -290,7 +315,7 @@ function gutenberg_convert_legacy_font_family_format() {
 
 			$font_face_id = wp_insert_post( wp_slash( $args ) );
 
-			$file_urls = (array) $font_face['src'] ?? array();
+			$file_urls = (array) ( isset( $font_face['src'] ) ? $font_face['src'] : array() );
 
 			foreach ( $file_urls as $file_url ) {
 				// continue if the file is not local.
@@ -306,7 +331,7 @@ function gutenberg_convert_legacy_font_family_format() {
 		// Update the font family post to remove the font face data.
 		$args               = array();
 		$args['ID']         = $font_family->ID;
-		$args['post_title'] = $font_family_json['name'] ?? '';
+		$args['post_title'] = isset( $font_family_json['name'] ) ? $font_family_json['name'] : '';
 		$args['post_name']  = sanitize_title( $font_family_json['slug'] );
 
 		unset( $font_family_json['name'] );
