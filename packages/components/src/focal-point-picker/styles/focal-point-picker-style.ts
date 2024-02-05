@@ -15,6 +15,7 @@ import { INITIAL_BOUNDS } from '../utils';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
+	display: flex;
 	text-align: center;
 	width: 100%;
 `;
@@ -23,7 +24,7 @@ export const MediaContainer = styled.div`
 	align-items: center;
 	border-radius: ${ CONFIG.radiusBlockUi };
 	cursor: pointer;
-	display: flex;
+	display: inline-flex;
 	justify-content: center;
 	margin: auto;
 	position: relative;
