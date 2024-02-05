@@ -243,8 +243,7 @@ test.describe( 'Block bindings', () => {
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
-				const paragraphContent = await paragraphBlock.textContent();
-				expect( paragraphContent ).toBe(
+				await expect( paragraphBlock ).toHaveText(
 					variables.customFields.textKey
 				);
 			} );
@@ -288,8 +287,9 @@ test.describe( 'Block bindings', () => {
 				const headingBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Heading',
 				} );
-				const headingContent = await headingBlock.textContent();
-				expect( headingContent ).toBe( variables.customFields.textKey );
+				await expect( headingBlock ).toHaveText(
+					variables.customFields.textKey
+				);
 			} );
 
 			test( 'Should lock the appropriate controls', async ( {
@@ -661,8 +661,7 @@ test.describe( 'Block bindings', () => {
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
-				const paragraphContent = await paragraphBlock.textContent();
-				expect( paragraphContent ).toBe(
+				await expect( paragraphBlock ).toHaveText(
 					variables.customFields.textValue
 				);
 				// Paragraph is not editable.
@@ -703,8 +702,9 @@ test.describe( 'Block bindings', () => {
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
-				const paragraphContent = await paragraphBlock.textContent();
-				expect( paragraphContent ).toBe( 'non_existing_custom_field' );
+				await expect( paragraphBlock ).toHaveText(
+					'non_existing_custom_field'
+				);
 				// Paragraph is not editable.
 				const isContentEditable =
 					await paragraphBlock.getAttribute( 'contenteditable' );
@@ -728,8 +728,9 @@ test.describe( 'Block bindings', () => {
 			const headingBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Heading',
 			} );
-			const headingContent = await headingBlock.textContent();
-			expect( headingContent ).toBe( variables.customFields.textValue );
+			await expect( headingBlock ).toHaveText(
+				variables.customFields.textValue
+			);
 			// Heading is not editable.
 			const isContentEditable =
 				await headingBlock.getAttribute( 'contenteditable' );
