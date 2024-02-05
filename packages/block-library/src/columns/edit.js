@@ -106,7 +106,7 @@ function ColumnsEditContainer( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ canInsertColumnBlock && (
 						<>
 							<RangeControl
