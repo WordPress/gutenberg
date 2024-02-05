@@ -847,7 +847,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @return array Array containing uploaded file attributes on success, or error on failure.
 		 */
 		protected function handle_font_file_upload( $file ) {
-			add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+			add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 			add_filter( 'upload_dir', 'wp_get_font_dir' );
 
 			$overrides = array(
@@ -861,13 +861,13 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				// See wp_check_filetype_and_ext().
 				'test_type'            => true,
 				// Only allow uploading font files for this request.
-				'mimes'                => WP_Font_Library::get_expected_font_mime_types_per_php_version(),
+				'mimes'                => WP_Font_Utils::get_allowed_font_mime_types(),
 			);
 
 			$uploaded_file = wp_handle_upload( $file, $overrides );
 
 			remove_filter( 'upload_dir', 'wp_get_font_dir' );
-			remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+			remove_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 
 			return $uploaded_file;
 		}

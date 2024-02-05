@@ -73,7 +73,7 @@ class Tests_Fonts_FontLibraryHooks extends WP_UnitTestCase {
 		// @core-merge Use `DIR_TESTDATA` instead of `GUTENBERG_DIR_TESTDATA`.
 		$font_file_path = GUTENBERG_DIR_TESTDATA . 'fonts/' . $font_filename;
 
-		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+		add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 		add_filter( 'upload_dir', 'wp_get_font_dir' );
 		$font_file = wp_upload_bits(
 			$font_filename,
@@ -81,7 +81,7 @@ class Tests_Fonts_FontLibraryHooks extends WP_UnitTestCase {
 			file_get_contents( $font_file_path )
 		);
 		remove_filter( 'upload_dir', 'wp_get_font_dir' );
-		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+		remove_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 
 		return $font_file;
 	}

@@ -19,29 +19,6 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 	class WP_Font_Library {
 
 		/**
-		 * Provide the expected mime-type value for font files per-PHP release. Due to differences in the values returned these values differ between PHP versions.
-		 *
-		 * This is necessary until a collection of valid mime-types per-file extension can be provided to 'upload_mimes' filter.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @param array $php_version_id The version of PHP to provide mime types for. The default is the current PHP version.
-		 *
-		 * @return Array A collection of mime types keyed by file extension.
-		 */
-		public static function get_expected_font_mime_types_per_php_version( $php_version_id = PHP_VERSION_ID ) {
-
-			$php_7_ttf_mime_type = $php_version_id >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
-
-			return array(
-				'otf'   => 'application/vnd.ms-opentype',
-				'ttf'   => $php_version_id >= 70400 ? 'font/sfnt' : $php_7_ttf_mime_type,
-				'woff'  => $php_version_id >= 80100 ? 'font/woff' : 'application/font-woff',
-				'woff2' => $php_version_id >= 80100 ? 'font/woff2' : 'application/font-woff2',
-			);
-		}
-
-		/**
 		 * Font collections.
 		 *
 		 * @since 6.5.0
@@ -141,18 +118,6 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 				return self::$collections[ $slug ];
 			}
 			return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
-		}
-
-		/**
-		 * Sets the allowed mime types for fonts.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @param array $mime_types List of allowed mime types.
-		 * @return array Modified upload directory.
-		 */
-		public static function set_allowed_mime_types( $mime_types ) {
-			return array_merge( $mime_types, self::get_expected_font_mime_types_per_php_version() );
 		}
 	}
 }
