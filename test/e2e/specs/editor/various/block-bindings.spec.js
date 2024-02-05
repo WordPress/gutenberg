@@ -229,8 +229,7 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Button',
 					exact: true,
 				} );
-				const buttonText = await buttonBlock.textContent();
-				expect( buttonText ).toBe( 'text_custom_field' );
+				await expect( buttonBlock ).toHaveText( 'text_custom_field' );
 			} );
 
 			test( 'Should lock text controls when text is bound', async ( {
@@ -897,8 +896,9 @@ test.describe( 'Block bindings', () => {
 					} )
 					.locator( 'div' );
 				await buttonBlock.click();
-				const buttonText = await buttonBlock.textContent();
-				expect( buttonText ).toBe( 'Value of the text_custom_field' );
+				await expect( buttonBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
 
 				// Button is not editable.
 				await expect( buttonBlock ).toHaveAttribute(
