@@ -86,7 +86,8 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 			if ( null === $settings ) {
 				return new WP_Error(
 					'rest_invalid_param',
-					__( 'font_family_settings parameter must be a valid JSON string.', 'gutenberg' ),
+					/* translators: %s: Parameter name: "font_family_settings". */
+					sprintf( __( '%s parameter must be a valid JSON string.', 'gutenberg' ), 'font_family_settings' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -102,7 +103,8 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 				if ( isset( $settings['slug'] ) ) {
 					return new WP_Error(
 						'rest_invalid_param',
-						__( 'font_family_settings[slug] cannot be updated.', 'gutenberg' ),
+						/* translators: %s: Name of parameter being updated: font_family_settings[slug]". */
+						sprintf( __( '%s cannot be updated.', 'gutenberg' ), 'font_family_settings[slug]' ),
 						array( 'status' => 400 )
 					);
 				}
@@ -121,8 +123,8 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 				if ( isset( $settings[ $key ] ) && ! $settings[ $key ] ) {
 					return new WP_Error(
 						'rest_invalid_param',
-						/* translators: %s: Font family setting key. */
-						sprintf( __( 'font_family_settings[%s] cannot be empty.', 'gutenberg' ), $key ),
+						/* translators: %s: Name of the empty font family setting parameter, e.g. "font_family_settings[slug]". */
+						sprintf( __( '%s cannot be empty.', 'gutenberg' ), "font_family_settings[ $key ]" ),
 						array( 'status' => 400 )
 					);
 				}

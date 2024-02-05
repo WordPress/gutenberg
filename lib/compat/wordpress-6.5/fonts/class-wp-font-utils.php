@@ -44,7 +44,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			$wrapped_font_families = array_map(
 				function ( $family ) {
 					$trimmed = trim( $family );
-					if ( ! empty( $trimmed ) && false !== strpos( $trimmed, ' ' ) && false === strpos( $trimmed, "'" ) && false === strpos( $trimmed, '"' ) ) {
+					if ( ! empty( $trimmed ) && str_contains( $trimmed, ' ' ) && ! str_contains( $trimmed, "'" ) && ! str_contains( $trimmed, '"' ) ) {
 							return '"' . $trimmed . '"';
 					}
 					return $trimmed;
@@ -215,13 +215,17 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		}
 
 		/**
-		 * Provide the expected mime-type value for font files per-PHP release. Due to differences in the values returned these values differ between PHP versions.
+		 * Returns the expected mime-type values for font files, depending on PHP version.
 		 *
-		 * This is necessary until a collection of valid mime-types per-file extension can be provided to 'upload_mimes' filter.
+		 * This is needed because font mime types vary by PHP version, so checking the PHP version
+		 * is necessary until a list of valid mime-types for each file extension can be provided to
+		 * the 'upload_mimes' filter.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @return Array A collection of mime types keyed by file extension.
+		 * @access private
+		 *
+		 * @return array A collection of mime types keyed by file extension.
 		 */
 		public static function get_allowed_font_mime_types() {
 			$php_7_ttf_mime_type = PHP_VERSION_ID >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';

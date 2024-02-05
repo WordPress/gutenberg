@@ -350,7 +350,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_font_face_parent_id_mismatch', $response, 404 );
 
-		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '"';
+		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '".';
 		$this->assertSame( $expected_message, $response->as_error()->get_error_messages()[0], 'The message must contain the correct parent ID.' );
 	}
 
@@ -928,7 +928,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_font_face_parent_id_mismatch', $response, 404, 'The response should return an error for "rest_font_face_parent_id_mismatch" with 404 status.' );
 
-		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '"';
+		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '".';
 		$this->assertSame( $expected_message, $response->as_error()->get_error_messages()[0], 'The message must contain the correct parent ID.' );
 	}
 
