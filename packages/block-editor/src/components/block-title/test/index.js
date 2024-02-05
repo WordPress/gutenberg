@@ -27,6 +27,7 @@ const blockLabelMap = {
 	'Block With Long Label':
 		'This is a longer label than typical for blocks to have.',
 	'Block With Custom Label': 'A Custom Label like a Block Variation Label',
+	'Reusable Block': 'Reuse me!',
 };
 
 jest.mock( '@wordpress/blocks', () => {
@@ -102,7 +103,6 @@ describe( 'BlockTitle', () => {
 				getBlockName: () => 'reusable-block',
 				getBlockType: ( name ) => blockTypeMap[ name ],
 				getBlockAttributes: () => ( { ref: 1 } ),
-				__experimentalGetReusableBlockTitle: () => 'Reuse me!',
 			} ) )
 		);
 
