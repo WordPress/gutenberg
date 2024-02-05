@@ -1107,7 +1107,6 @@ function register_block_core_navigation() {
 			'render_callback' => 'render_block_core_navigation',
 		)
 	);
-
 }
 
 add_action( 'init', 'register_block_core_navigation' );
