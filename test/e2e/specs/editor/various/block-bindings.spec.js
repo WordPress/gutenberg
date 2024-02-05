@@ -10,13 +10,21 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Block bindings', () => {
 	// Helper to add an anchor/id to be able to locate the block in the frontend.
 	const setId = async ( page, testId ) => {
+		await page.pause();
 		const isAdvancedPanelOpen = await page
+			.getByRole( 'tabpanel', { name: 'Block' } )
 			.getByRole( 'button', { name: 'Advanced' } )
 			.getAttribute( 'aria-expanded' );
 		if ( isAdvancedPanelOpen === 'false' ) {
-			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			await page
+				.getByRole( 'tabpanel', { name: 'Block' } )
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
 		}
-		await page.getByLabel( 'HTML anchor' ).fill( testId );
+		await page
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByLabel( 'HTML anchor' )
+			.fill( testId );
 	};
 	let imagePlaceholderSrc;
 	let imageCustomFieldSrc;
@@ -101,16 +109,18 @@ test.describe( 'Block bindings', () => {
 
 				// Alignment controls exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Align text',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Bold',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
 				).toBeHidden();
 
 				// Paragraph is not editable.
@@ -169,16 +179,18 @@ test.describe( 'Block bindings', () => {
 
 				// Alignment controls exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Align text',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Bold',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
 				).toBeHidden();
 
 				// Heading is not editable.
@@ -252,16 +264,18 @@ test.describe( 'Block bindings', () => {
 
 				// Alignment controls exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Align text',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Bold',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
 				).toBeHidden();
 
 				// Button is not editable.
@@ -310,9 +324,11 @@ test.describe( 'Block bindings', () => {
 
 				// Format controls exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Bold',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
 				).toBeVisible();
 
 				// Button is editable.
@@ -370,16 +386,18 @@ test.describe( 'Block bindings', () => {
 
 				// Alignment controls are visible.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Align text',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Bold',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
 				).toBeHidden();
 
 				// Button is not editable.
@@ -471,9 +489,11 @@ test.describe( 'Block bindings', () => {
 
 				// Replace controls don't exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Replace',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
 				).toBeHidden();
 
 				// Image placeholder doesn't show the upload button.
@@ -483,19 +503,30 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is enabled and with the original value.
 				await expect(
-					page.getByLabel( 'Alternative text' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is enabled and with the original value.
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await page.pause();
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
+
 				await expect(
-					page.getByLabel( 'Title attribute' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -528,26 +559,37 @@ test.describe( 'Block bindings', () => {
 
 				// Replace controls exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Replace',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
 				).toBeVisible();
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( 'Alternative text' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'text_custom_field' );
 
 				// Title input is enabled and with the original value.
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
 				await expect(
-					page.getByLabel( 'Title attribute' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -580,26 +622,37 @@ test.describe( 'Block bindings', () => {
 
 				// Replace controls exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Replace',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
 				).toBeVisible();
 
 				// Alt textarea is enabled and with the original value.
 				await expect(
-					page.getByLabel( 'Alternative text' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is disabled and with the custom field value.
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
 				await expect(
-					page.getByLabel( 'Title attribute' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Title attribute' )
 				).toBeDisabled();
 				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'text_custom_field' );
@@ -636,9 +689,11 @@ test.describe( 'Block bindings', () => {
 
 				// Replace controls don't exist.
 				await expect(
-					page.getByRole( 'button', {
-						name: 'Replace',
-					} )
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
 				).toBeHidden();
 
 				// Image placeholder doesn't show the upload button.
@@ -648,19 +703,28 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( 'Alternative text' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'text_custom_field' );
 
 				// Title input is enabled and with the original value.
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
 				await expect(
-					page.getByLabel( 'Title attribute' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -1038,9 +1102,12 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( 'Alternative text' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
@@ -1099,18 +1166,23 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Title input is disabled and with the custom field value.
-				const advancedButton = page.getByRole( 'button', {
-					name: 'Advanced',
-				} );
+				const advancedButton = page
+					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'button', {
+						name: 'Advanced',
+					} );
 				const isAdvancedPanelOpen =
 					await advancedButton.getAttribute( 'aria-expanded' );
 				if ( isAdvancedPanelOpen === 'false' ) {
 					await advancedButton.click();
 				}
 				await expect(
-					page.getByLabel( 'Title attribute' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Title attribute' )
 				).toBeDisabled();
 				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'Value of the text_custom_field' );
@@ -1174,26 +1246,34 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( 'Alternative text' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Title input is enabled and with the original value.
-				const advancedButton = page.getByRole( 'button', {
-					name: 'Advanced',
-				} );
+				const advancedButton = page
+					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'button', {
+						name: 'Advanced',
+					} );
 				const isAdvancedPanelOpen =
 					await advancedButton.getAttribute( 'aria-expanded' );
 				if ( isAdvancedPanelOpen === 'false' ) {
 					await advancedButton.click();
 				}
 				await expect(
-					page.getByLabel( 'Title attribute' )
+					page
+						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Block' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
