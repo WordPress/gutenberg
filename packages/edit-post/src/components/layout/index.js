@@ -131,7 +131,7 @@ function useEditorStyles() {
 	] );
 }
 
-function Layout() {
+function Layout( { initialPost } ) {
 	useCommands();
 	useCommonCommands();
 	useBlockCommands();
@@ -304,6 +304,7 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						initialPost={ initialPost }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }

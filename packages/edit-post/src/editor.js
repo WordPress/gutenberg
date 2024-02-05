@@ -32,10 +32,8 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
-		initialPostId,
-		initialPostType
-	);
+	const { currentPost, getPostLinkProps, initialPost, goBack } =
+		usePostHistory( initialPostId, initialPostType );
 
 	const { hasInlineToolbar, post, preferredStyleVariations, template } =
 		useSelect(
@@ -80,8 +78,8 @@ function Editor( {
 	const defaultRenderingMode =
 		currentPost.postType === 'wp_template' ? 'all' : 'post-only';
 
-	const editorSettings = useMemo( () => {
-		const result = {
+	const editorSettings = useMemo(
+		() => ( {
 			...settings,
 			getPostLinkProps,
 			goBack,
@@ -91,17 +89,17 @@ function Editor( {
 				onChange: updatePreferredStyleVariations,
 			},
 			hasInlineToolbar,
-		};
-		return result;
-	}, [
-		settings,
-		hasInlineToolbar,
-		preferredStyleVariations,
-		updatePreferredStyleVariations,
-		getPostLinkProps,
-		goBack,
-		defaultRenderingMode,
-	] );
+		} ),
+		[
+			settings,
+			hasInlineToolbar,
+			preferredStyleVariations,
+			updatePreferredStyleVariations,
+			getPostLinkProps,
+			goBack,
+			defaultRenderingMode,
+		]
+	);
 
 	if ( ! post ) {
 		return null;
@@ -120,7 +118,7 @@ function Editor( {
 				<ErrorBoundary>
 					<CommandMenu />
 					<EditorInitialization postId={ currentPost.postId } />
-					<Layout />
+					<Layout initialPost={ initialPost } />
 				</ErrorBoundary>
 				<PostLockedModal />
 			</ExperimentalEditorProvider>

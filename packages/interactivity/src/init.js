@@ -28,6 +28,9 @@ function yieldToMain() {
 	} );
 }
 
+// Initial vDOM regions associated with its DOM element.
+export const initialVdom = new WeakMap();
+
 // Initialize the router with the initial DOM.
 export const init = async () => {
 	const nodes = document.querySelectorAll(
@@ -39,6 +42,7 @@ export const init = async () => {
 			await yieldToMain();
 			const fragment = getRegionRootFragment( node );
 			const vdom = toVdom( node );
+			initialVdom.set( node, vdom );
 			await yieldToMain();
 			hydrate( vdom, fragment );
 		}

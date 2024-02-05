@@ -12,7 +12,7 @@
  */
 class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_Font_Library_UnitTestCase {
 	public function test_should_get_an_empty_list() {
-		$font_collections = WP_Font_Library::get_font_collections();
+		$font_collections = WP_Font_Library::get_instance()->get_font_collections();
 		$this->assertEmpty( $font_collections, 'Should return an empty array.' );
 	}
 
@@ -23,9 +23,9 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_Font_Library_UnitT
 			'font_families' => array( 'mock' ),
 		);
 
-		WP_Font_Library::register_font_collection( 'my-font-collection', $my_font_collection_config );
+		WP_Font_Library::get_instance()->register_font_collection( 'my-font-collection', $my_font_collection_config );
 
-		$font_collections = WP_Font_Library::get_font_collections();
+		$font_collections = WP_Font_Library::get_instance()->get_font_collections();
 		$this->assertNotEmpty( $font_collections, 'Should return an array of font collections.' );
 		$this->assertCount( 1, $font_collections, 'Should return an array with one font collection.' );
 		$this->assertArrayHasKey( 'my-font-collection', $font_collections, 'The array should have the key of the registered font collection id.' );

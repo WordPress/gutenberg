@@ -74,7 +74,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
 		public function get_items( $request ) {
-			$collections_all = WP_Font_Library::get_font_collections();
+			$collections_all = WP_Font_Library::get_instance()->get_font_collections();
 
 			$page        = $request['page'];
 			$per_page    = $request['per_page'];
@@ -142,7 +142,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		 */
 		public function get_item( $request ) {
 			$slug       = $request->get_param( 'slug' );
-			$collection = WP_Font_Library::get_font_collection( $slug );
+			$collection = WP_Font_Library::get_instance()->get_font_collection( $slug );
 
 			// If the collection doesn't exist returns a 404.
 			if ( is_wp_error( $collection ) ) {

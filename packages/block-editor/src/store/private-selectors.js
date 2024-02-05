@@ -351,3 +351,16 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+/**
+ * Returns true if the user is dragging anything, or false otherwise. It is possible for a
+ * user to be dragging data from outside of the editor, so this selector is separate from
+ * the `isDraggingBlocks` selector which only returns true if the user is dragging blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging.
+ */
+export function isDragging( state ) {
+	return state.isDragging;
+}

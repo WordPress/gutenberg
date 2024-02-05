@@ -124,7 +124,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::register_routes
+	 * @covers WP_REST_Font_Families_Controller::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -209,7 +209,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 * @covers WP_REST_Font_Families_Controller::get_items
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -226,7 +226,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 * @covers WP_REST_Font_Families_Controller::get_items
 	 */
 	public function test_get_items_by_slug() {
 		$font_family = get_post( self::$font_family_id2 );
@@ -244,7 +244,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 * @covers WP_REST_Font_Families_Controller::get_items
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
@@ -259,7 +259,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
@@ -272,7 +272,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::prepare_item_for_response
+	 * @covers WP_REST_Font_Families_Controller::prepare_item_for_response
 	 */
 	public function test_get_item_embedded_font_faces() {
 		wp_set_current_user( self::$admin_id );
@@ -344,7 +344,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item_invalid_font_family_id() {
 		wp_set_current_user( self::$admin_id );
@@ -354,7 +354,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -369,7 +369,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Families_Controller::create_item
 	 */
 	public function test_create_item() {
 		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
@@ -390,7 +390,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
+	 * @covers WP_REST_Font_Families_Controller::validate_create_font_face_request
 	 */
 	public function test_create_item_default_theme_json_version() {
 		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
@@ -411,7 +411,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	/**
 	 * @dataProvider data_create_item_invalid_theme_json_version
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Families_Controller::create_item
 	 *
 	 * @param int $theme_json_version Version to test.
 	 */
@@ -440,7 +440,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	/**
 	 * @dataProvider data_create_item_with_default_preview
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::sanitize_font_family_settings
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_family_settings
 	 *
 	 * @param array $settings Settings to test.
 	 */
@@ -482,9 +482,87 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
+	 * @dataProvider data_sanitize_font_family_settings
+	 *
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_family_settings
+	 *
+	 * @param string $settings Font family settings to test.
+	 * @param string $expected Expected settings result.
+	 */
+	public function test_create_item_santize_font_family_settings( $settings, $expected ) {
+		$settings = array_merge( self::$default_settings, $settings );
+		$expected = array_merge( self::$default_settings, $expected );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		static::$post_ids_to_cleanup[] = $data['id'];
+
+		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
+		$this->assertSame( $expected, $data['font_family_settings'], 'The response font_family_settings should match.' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_sanitize_font_family_settings() {
+		return array(
+			'settings with tags, extra whitespace, new lines' => array(
+				'settings' => array(
+					'name'       => "   Opening   Sans</style><script>alert('XSS');</script>\n    ",
+					'slug'       => "   OPENing SanS </style><script>alert('XSS');</script>\n    ",
+					'fontFamily' => "   Opening   Sans</style><script>alert('XSS');</script>\n    ",
+					'preview'    => "   https://example.com/</style><script>alert('XSS');</script>      ",
+				),
+				'expected' => array(
+					'name'       => 'Opening Sans',
+					'slug'       => 'opening-sans-alertxss',
+					'fontFamily' => '"Opening Sans"',
+					'preview'    => "https://example.com//stylescriptalert('XSS');/script%20%20%20%20%20%20",
+				),
+			),
+			'multiword font family name with integer' => array(
+				'settings' => array(
+					'slug'       => 'libre-barcode-128-text',
+					'fontFamily' => 'Libre Barcode 128 Text',
+				),
+				'expected' => array(
+					'slug'       => 'libre-barcode-128-text',
+					'fontFamily' => '"Libre Barcode 128 Text"',
+				),
+			),
+			'multiword font family name'              => array(
+				'settings' => array(
+					'slug'       => 'b612-mono',
+					'fontFamily' => 'B612 Mono',
+				),
+				'expected' => array(
+					'slug'       => 'b612-mono',
+					'fontFamily' => '"B612 Mono"',
+				),
+			),
+			'comma-separated font family names'       => array(
+				'settings' => array(
+					'slug'       => 'open-sans-noto-sans',
+					'fontFamily' => 'Open Sans, Noto Sans, sans-serif',
+				),
+				'expected' => array(
+					'slug'       => 'open-sans-noto-sans',
+					'fontFamily' => '"Open Sans", "Noto Sans", sans-serif',
+				),
+			),
+		);
+	}
+
+	/**
 	 * @dataProvider data_create_item_invalid_settings
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_settings
+	 * @covers WP_REST_Font_Families_Controller::validate_create_font_face_settings
 	 *
 	 * @param array $settings Settings to test.
 	 */
@@ -570,7 +648,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Families_Controller::create_item
 	 */
 	public function test_create_item_no_permission() {
 		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
@@ -669,52 +747,36 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @dataProvider data_update_item_santize_font_family
+	 * @dataProvider data_sanitize_font_family_settings
 	 *
-	 * @covers WP_REST_Font_Families_Controller::sanitize_font_face_settings
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_family_settings
 	 *
-	 * @param string $font_family_setting Font family setting to test.
-	 * @param string $expected            Expected result.
+	 * @param string $settings Font family settings to test.
+	 * @param string $expected Expected settings result.
 	 */
-	public function test_update_item_santize_font_family( $font_family_setting, $expected ) {
-		wp_set_current_user( self::$admin_id );
+	public function test_update_item_santize_font_family_settings( $settings, $expected ) {
+		// Unset/modify slug from the data provider, since we're updating rather than creating.
+		unset( $settings['slug'] );
+		$initial_settings = array( 'slug' => 'open-sans-update' );
+		$expected         = array_merge( self::$default_settings, $expected, $initial_settings );
 
-		$font_family_id = self::create_font_family_post();
-		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
-		$request->set_param( 'font_family_settings', wp_json_encode( array( 'fontFamily' => $font_family_setting ) ) );
+		wp_set_current_user( self::$admin_id );
+		$font_family_id                = self::create_font_family_post( $initial_settings );
+		static::$post_ids_to_cleanup[] = $font_family_id;
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status(), 'The response status should be 200.' );
-		$this->assertSame( $expected, $data['font_family_settings']['fontFamily'], 'The font family should match.' );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_update_item_santize_font_family() {
-		return array(
-			'multiword font with integer' => array(
-				'font_family_setting' => 'Libre Barcode 128 Text',
-				'expected'            => '"Libre Barcode 128 Text"',
-			),
-			'multiword font'              => array(
-				'font_family_setting' => 'B612 Mono',
-				'expected'            => '"B612 Mono"',
-			),
-			'comma-separated fonts'       => array(
-				'font_family_setting' => 'Open Sans, Noto Sans, sans-serif',
-				'expected'            => '"Open Sans", "Noto Sans", sans-serif',
-			),
-		);
+		$this->assertSame( $expected, $data['font_family_settings'], 'The response font_family_settings should match.' );
 	}
 
 	/**
 	 * @dataProvider data_update_item_invalid_settings
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 *
 	 * @param array $settings Settings to test.
 	 */
@@ -752,7 +814,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_update_slug_not_allowed() {
 		wp_set_current_user( self::$admin_id );
@@ -770,7 +832,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_invalid_font_family_id() {
 		$settings = array_diff_key( self::$default_settings, array( 'slug' => '' ) );
@@ -783,7 +845,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_no_permission() {
 		$settings = array_diff_key( self::$default_settings, array( 'slug' => '' ) );
@@ -803,7 +865,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item() {
 		wp_set_current_user( self::$admin_id );
@@ -817,7 +879,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item_no_trash() {
 		wp_set_current_user( self::$admin_id );
@@ -838,7 +900,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item_invalid_font_family_id() {
 		wp_set_current_user( self::$admin_id );
@@ -848,7 +910,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::delete_item
+	 * @covers WP_REST_Font_Families_Controller::delete_item
 	 */
 	public function test_delete_item_no_permissions() {
 		$font_family_id = self::create_font_family_post();
@@ -865,7 +927,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::prepare_item_for_response
+	 * @covers WP_REST_Font_Families_Controller::prepare_item_for_response
 	 */
 	public function test_prepare_item() {
 		wp_set_current_user( self::$admin_id );
@@ -878,7 +940,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item_schema
+	 * @covers WP_REST_Font_Families_Controller::get_item_schema
 	 */
 	public function test_get_item_schema() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families' );
@@ -892,6 +954,40 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The theme_json_version property should exist in the schema::properties data.' );
 		$this->assertArrayHasKey( 'font_faces', $properties, 'The font_faces property should exist in the schema::properties data.' );
 		$this->assertArrayHasKey( 'font_family_settings', $properties, 'The font_family_settings property should exist in the schema::properties data.' );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Families_Controller::get_item_schema
+	 */
+	public function test_get_item_schema_font_family_settings_should_all_have_sanitize_callbacks() {
+		$schema                      = ( new WP_REST_Font_Families_Controller( 'wp_font_family' ) )->get_item_schema();
+		$font_family_settings_schema = $schema['properties']['font_family_settings'];
+
+		$this->assertArrayHasKey( 'properties', $font_family_settings_schema, 'font_family_settings schema is missing properties.' );
+		$this->assertIsArray( $font_family_settings_schema['properties'], 'font_family_settings properties should be an array.' );
+
+		// arg_options should be removed for each setting property.
+		foreach ( $font_family_settings_schema['properties'] as $property ) {
+			$this->assertArrayHasKey( 'arg_options', $property, 'Setting schema should have arg_options.' );
+			$this->assertArrayHasKey( 'sanitize_callback', $property['arg_options'], 'Setting schema should have a sanitize_callback.' );
+			$this->assertIsCallable( $property['arg_options']['sanitize_callback'], 'That sanitize_callback value should be callable.' );
+		}
+	}
+
+	/**
+	 * @covers WP_REST_Font_Families_Controller::get_public_item_schema
+	 */
+	public function test_get_public_item_schema_should_not_have_arg_options() {
+		$schema                      = ( new WP_REST_Font_Families_Controller( 'wp_font_family' ) )->get_public_item_schema();
+		$font_family_settings_schema = $schema['properties']['font_family_settings'];
+
+		$this->assertArrayHasKey( 'properties', $font_family_settings_schema, 'font_family_settings schema is missing properties.' );
+		$this->assertIsArray( $font_family_settings_schema['properties'], 'font_family_settings properties should be an array.' );
+
+		// arg_options should be removed for each setting property.
+		foreach ( $font_family_settings_schema['properties'] as $property ) {
+			$this->assertArrayNotHasKey( 'arg_options', $property, 'arg_options should be removed from the schema for each setting.' );
+		}
 	}
 
 	protected function check_font_family_data( $data, $post_id, $links ) {

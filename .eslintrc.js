@@ -47,11 +47,6 @@ const restrictedImports = [
 		message: 'Please use native functionality instead.',
 	},
 	{
-		name: 'reakit',
-		message:
-			'Please use Reakit API through `@wordpress/components` instead.',
-	},
-	{
 		name: '@ariakit/react',
 		message:
 			'Please use Ariakit API through `@wordpress/components` instead.',

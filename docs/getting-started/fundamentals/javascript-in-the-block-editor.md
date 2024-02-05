@@ -35,7 +35,7 @@ Without a build process, you access the methods directly from the `wp` global ob
 So, for example if a script wants to register a block variation using the `registerBlockVariation` method out of the ["blocks" package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/), the `wp-blocks` handle would need to get added to the dependency array to ensure that `wp.blocks.registerBlockVariation` is defined when the script tries to access it (see [example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php)). 
 
 <div class="callout callout-tip">
-    Try running <code>wp.data.select('core/editor').getBlocks())</code> in your browser's dev tools while editing a post or a site. The entire editor is available from the console.
+    Try running <code>wp.data.select('core/editor').getBlocks()</code> in your browser's dev tools while editing a post or a site. The entire editor is available from the console.
 </div>
 
 Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) (and [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/)) to enqueue javascript assets for the Editor with access to these packages via `wp` (see [example](https://github.com/wptrainingteam/block-theme-examples/tree/master/example-block-variation)). Refer to [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) for more info.

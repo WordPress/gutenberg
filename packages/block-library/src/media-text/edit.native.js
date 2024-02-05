@@ -182,7 +182,7 @@ class MediaTextEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
-						label={ __( 'Crop image to fill entire column' ) }
+						label={ __( 'Crop image to fill' ) }
 						checked={ imageFill }
 						onChange={ this.onSetImageFill }
 					/>

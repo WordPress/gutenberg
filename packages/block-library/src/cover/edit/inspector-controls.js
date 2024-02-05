@@ -167,7 +167,7 @@ export default function CoverInspectorControls( {
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ isImageBackground && (
 							<>
 								<ToggleControl

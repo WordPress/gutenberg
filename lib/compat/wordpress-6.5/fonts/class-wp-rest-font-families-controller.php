@@ -141,15 +141,14 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		 * @return array                   Decoded array font family settings.
 		 */
 		public function sanitize_font_family_settings( $value ) {
+			// Settings arrive as stringified JSON, since this is a multipart/form-data request.
 			$settings = json_decode( $value, true );
+			$schema   = $this->get_item_schema()['properties']['font_family_settings']['properties'];
 
-			if ( isset( $settings['fontFamily'] ) ) {
-				$settings['fontFamily'] = WP_Font_Utils::format_font_family( $settings['fontFamily'] );
-			}
-
-			// Provide default for preview, if not provided.
-			if ( ! isset( $settings['preview'] ) ) {
-				$settings['preview'] = '';
+			// Sanitize settings based on callbacks in the schema.
+			foreach ( $settings as $key => $value ) {
+				$sanitize_callback = $schema[ $key ]['arg_options']['sanitize_callback'];
+				$settings[ $key ]  = call_user_func( $sanitize_callback, $value );
 			}
 
 			return $settings;
@@ -307,25 +306,39 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 					// Font family settings come directly from theme.json schema
 					// See https://schemas.wp.org/trunk/theme.json
 					'font_family_settings' => array(
-						'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
+						'description'          => __( 'font-face definition in theme.json format.', 'gutenberg' ),
 						'type'                 => 'object',
 						'context'              => array( 'view', 'edit', 'embed' ),
 						'properties'           => array(
 							'name'       => array(
-								'description' => 'Name of the font family preset, translatable.',
+								'description' => __( 'Name of the font family preset, translatable.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_text_field',
+								),
 							),
 							'slug'       => array(
-								'description' => 'Kebab-case unique identifier for the font family preset.',
+								'description' => __( 'Kebab-case unique identifier for the font family preset.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_title',
+								),
 							),
 							'fontFamily' => array(
-								'description' => 'CSS font-family value.',
+								'description' => __( 'CSS font-family value.', 'gutenberg' ),
 								'type'        => 'string',
+								'arg_options' => array(
+									'sanitize_callback' => array( 'WP_Font_Utils', 'sanitize_font_family' ),
+								),
 							),
 							'preview'    => array(
-								'description' => 'URL to a preview image of the font family.',
+								'description' => __( 'URL to a preview image of the font family.', 'gutenberg' ),
 								'type'        => 'string',
+								'format'      => 'uri',
+								'default'     => '',
+								'arg_options' => array(
+									'sanitize_callback' => 'sanitize_url',
+								),
 							),
 						),
 						'required'             => array( 'name', 'slug', 'fontFamily' ),
@@ -337,6 +350,26 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 			$this->schema = $schema;
 
 			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		/**
+		 * Retrieves the item's schema for display / public consumption purposes.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return array Public item schema data.
+		 */
+		public function get_public_item_schema() {
+
+			$schema = parent::get_public_item_schema();
+
+			// Also remove `arg_options' from child font_family_settings properties, since the parent
+			// controller only handles the top level properties.
+			foreach ( $schema['properties']['font_family_settings']['properties'] as &$property ) {
+				unset( $property['arg_options'] );
+			}
+
+			return $schema;
 		}
 
 		/**

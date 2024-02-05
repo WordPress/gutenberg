@@ -2,7 +2,7 @@
 /**
  * Font Utils class.
  *
- * This file contains utils related to the Font Library.
+ * Provides utility functions for working with font families.
  *
  * @package    WordPress
  * @subpackage Font Library
@@ -21,34 +21,41 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 	 */
 	class WP_Font_Utils {
 		/**
-		 * Format font family names with surrounding quotes when the name contains a space.
+		 * Sanitizes and formats font family names.
+		 *
+		 * - Applies `sanitize_text_field`
+		 * - Adds surrounding quotes to names that contain spaces and are not already quoted
 		 *
 		 * @since 6.5.0
 		 * @access private
 		 *
-		 * @param string $font_family Font family attribute.
+		 * @see sanitize_text_field()
 		 *
-		 * @return string The formatted font family attribute.
+		 * @param string $font_family Font family name(s), comma-separated.
+		 * @return string Sanitized and formatted font family name(s).
 		 */
-		public static function format_font_family( $font_family ) {
-			if ( $font_family ) {
-				$font_families         = explode( ',', $font_family );
-				$wrapped_font_families = array_map(
-					function ( $family ) {
-						$trimmed = trim( $family );
-						if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
-								return '"' . $trimmed . '"';
-						}
-						return $trimmed;
-					},
-					$font_families
-				);
+		public static function sanitize_font_family( $font_family ) {
+			if ( ! $font_family ) {
+				return '';
+			}
 
-				if ( count( $wrapped_font_families ) === 1 ) {
-					$font_family = $wrapped_font_families[0];
-				} else {
-					$font_family = implode( ', ', $wrapped_font_families );
-				}
+			$font_family           = sanitize_text_field( $font_family );
+			$font_families         = explode( ',', $font_family );
+			$wrapped_font_families = array_map(
+				function ( $family ) {
+					$trimmed = trim( $family );
+					if ( ! empty( $trimmed ) && false !== strpos( $trimmed, ' ' ) && false === strpos( $trimmed, "'" ) && false === strpos( $trimmed, '"' ) ) {
+							return '"' . $trimmed . '"';
+					}
+					return $trimmed;
+				},
+				$font_families
+			);
+
+			if ( count( $wrapped_font_families ) === 1 ) {
+				$font_family = $wrapped_font_families[0];
+			} else {
+				$font_family = implode( ', ', $wrapped_font_families );
 			}
 
 			return $font_family;
@@ -76,23 +83,18 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 *     @type string $fontStretch  Optional font stretch, defaults to '100%'.
 		 *     @type string $unicodeRange Optional unicode range, defaults to 'U+0-10FFFF'.
 		 * }
-		 *
 		 * @return string Font face slug.
 		 */
 		public static function get_font_face_slug( $settings ) {
-			$settings = wp_parse_args(
-				$settings,
-				array(
-					'fontFamily'   => '',
-					'fontStyle'    => 'normal',
-					'fontWeight'   => '400',
-					'fontStretch'  => '100%',
-					'unicodeRange' => 'U+0-10FFFF',
-				)
+			$defaults = array(
+				'fontFamily'   => '',
+				'fontStyle'    => 'normal',
+				'fontWeight'   => '400',
+				'fontStretch'  => '100%',
+				'unicodeRange' => 'U+0-10FFFF',
 			);
+			$settings = wp_parse_args( $settings, $defaults );
 
-			// Convert all values to lowercase for comparison.
-			// Font family names may use multibyte characters.
 			$font_family   = mb_strtolower( $settings['fontFamily'] );
 			$font_style    = strtolower( $settings['fontStyle'] );
 			$font_weight   = strtolower( $settings['fontWeight'] );
@@ -100,8 +102,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			$unicode_range = strtoupper( $settings['unicodeRange'] );
 
 			// Convert weight keywords to numeric strings.
-			$font_weight = str_replace( 'normal', '400', $font_weight );
-			$font_weight = str_replace( 'bold', '700', $font_weight );
+			$font_weight = str_replace( array( 'normal', 'bold' ), array( '400', '700' ), $font_weight );
 
 			// Convert stretch keywords to numeric strings.
 			$font_stretch_map = array(
@@ -133,21 +134,23 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				$slug_elements
 			);
 
-			return join( ';', $slug_elements );
+			return sanitize_text_field( join( ';', $slug_elements ) );
 		}
 
 		/**
-		 * Sanitize a tree of data using an schema that defines the sanitization to apply to each key.
+		 * Sanitizes a tree of data using a schema.
 		 *
-		 * It removes the keys not in the schema and applies the sanitizer to the values.
+		 * The schema structure should mirror the data tree. Each value provided in the
+		 * schema should be a callable that will be applied to sanitize the corresponding
+		 * value in the data tree. Keys that are in the data tree, but not present in the
+		 * schema, will be removed in the santized data. Nested arrays are traversed recursively.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @access private
 		 *
-		 * @param array $tree The data to sanitize.
+		 * @param array $tree   The data to sanitize.
 		 * @param array $schema The schema used for sanitization.
-		 *
 		 * @return array The sanitized data.
 		 */
 		public static function sanitize_from_schema( $tree, $schema ) {
@@ -163,7 +166,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				}
 
 				$is_value_array  = is_array( $value );
-				$is_schema_array = is_array( $schema[ $key ] );
+				$is_schema_array = is_array( $schema[ $key ] ) && ! is_callable( $schema[ $key ] );
 
 				if ( $is_value_array && $is_schema_array ) {
 					if ( wp_is_numeric_array( $value ) ) {
@@ -174,7 +177,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 								: self::apply_sanitizer( $item_value, $schema[ $key ][0] );
 						}
 					} else {
-						// If it is an associative or indexed array., process as a single object.
+						// If it is an associative or indexed array, process as a single object.
 						$tree[ $key ] = self::sanitize_from_schema( $value, $schema[ $key ] );
 					}
 				} elseif ( ! $is_value_array && $is_schema_array ) {
@@ -195,12 +198,12 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		}
 
 		/**
-		 * Apply the sanitizer to the value.
+		 * Applies a sanitizer function to a value.
 		 *
 		 * @since 6.5.0
-		 * @param mixed $value The value to sanitize.
-		 * @param mixed $sanitizer The sanitizer to apply.
 		 *
+		 * @param mixed $value     The value to sanitize.
+		 * @param mixed $sanitizer The sanitizer function to apply.
 		 * @return mixed The sanitized value.
 		 */
 		private static function apply_sanitizer( $value, $sanitizer ) {
@@ -209,6 +212,26 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 
 			}
 			return call_user_func( $sanitizer, $value );
+		}
+
+		/**
+		 * Provide the expected mime-type value for font files per-PHP release. Due to differences in the values returned these values differ between PHP versions.
+		 *
+		 * This is necessary until a collection of valid mime-types per-file extension can be provided to 'upload_mimes' filter.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return Array A collection of mime types keyed by file extension.
+		 */
+		public static function get_allowed_font_mime_types() {
+			$php_7_ttf_mime_type = PHP_VERSION_ID >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
+
+			return array(
+				'otf'   => 'application/vnd.ms-opentype',
+				'ttf'   => PHP_VERSION_ID >= 70400 ? 'font/sfnt' : $php_7_ttf_mime_type,
+				'woff'  => PHP_VERSION_ID >= 80100 ? 'font/woff' : 'application/font-woff',
+				'woff2' => PHP_VERSION_ID >= 80100 ? 'font/woff2' : 'application/font-woff2',
+			);
 		}
 	}
 }

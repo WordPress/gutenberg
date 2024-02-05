@@ -21,6 +21,7 @@ import {
 	blocks,
 	isBlockInterfaceHidden,
 	isTyping,
+	isDragging,
 	draggedBlocks,
 	selection,
 	initialPosition,
@@ -2439,6 +2440,24 @@ describe( 'state', () => {
 		it( 'should set the typing flag to false', () => {
 			const state = isTyping( false, {
 				type: 'STOP_TYPING',
+			} );
+
+			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'isDragging', () => {
+		it( 'should set the dragging flag to true', () => {
+			const state = isDragging( false, {
+				type: 'START_DRAGGING',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the dragging flag to false', () => {
+			const state = isDragging( true, {
+				type: 'STOP_DRAGGING',
 			} );
 
 			expect( state ).toBe( false );

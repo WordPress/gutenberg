@@ -11,7 +11,7 @@
 		"ref": {
 			"type": "number"
 		},
-		"overrides": {
+		"content": {
 			"type": "object"
 		}
 	},

@@ -3,7 +3,6 @@
  */
 import { useSelect } from '@wordpress/data';
 import {
-	isReusableBlock,
 	__experimentalGetBlockLabel as getBlockLabel,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -40,11 +39,8 @@ export default function useBlockDisplayTitle( {
 				return null;
 			}
 
-			const {
-				getBlockName,
-				getBlockAttributes,
-				__experimentalGetReusableBlockTitle,
-			} = select( blockEditorStore );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 
@@ -55,15 +51,6 @@ export default function useBlockDisplayTitle( {
 			}
 
 			const attributes = getBlockAttributes( clientId );
-			const isReusable = isReusableBlock( blockType );
-			const reusableBlockTitle = isReusable
-				? __experimentalGetReusableBlockTitle( attributes.ref )
-				: null;
-
-			if ( reusableBlockTitle ) {
-				return reusableBlockTitle;
-			}
-
 			const label = getBlockLabel( blockType, attributes, context );
 			// If the label is defined we prioritize it over a possible block variation title match.
 			if ( label !== blockType.title ) {

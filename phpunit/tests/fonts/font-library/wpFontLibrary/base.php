@@ -7,11 +7,10 @@
  */
 abstract class WP_Font_Library_UnitTestCase extends WP_UnitTestCase {
 	public function reset_font_collections() {
-		// Resets the private static property WP_Font_Library::$collections to empty array.
-		$reflection = new ReflectionClass( 'WP_Font_Library' );
-		$property   = $reflection->getProperty( 'collections' );
-		$property->setAccessible( true );
-		$property->setValue( array() );
+		$collections = WP_Font_Library::get_instance()->get_font_collections();
+		foreach ( $collections as $slug => $collection ) {
+			WP_Font_Library::get_instance()->unregister_font_collection( $slug );
+		}
 	}
 
 	public function set_up() {

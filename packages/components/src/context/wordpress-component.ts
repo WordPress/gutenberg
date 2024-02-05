@@ -3,7 +3,7 @@
  */
 import type * as React from 'react';
 
-// Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
+// Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
 export type WordPressComponentProps<
 	/** Prop types. */
 	P,
