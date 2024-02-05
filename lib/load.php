@@ -104,6 +104,7 @@ require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
+require __DIR__ . '/compat/wordpress-6.5/compat.php';
 require __DIR__ . '/compat/wordpress-6.5/blocks.php';
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
@@ -128,6 +129,7 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
+require __DIR__ . '/experimental/interactivity-api.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';

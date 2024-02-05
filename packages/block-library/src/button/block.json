@@ -98,7 +98,9 @@
 			}
 		},
 		"reusable": false,
-		"shadow": true,
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],

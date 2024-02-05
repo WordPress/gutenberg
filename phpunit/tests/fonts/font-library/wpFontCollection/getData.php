@@ -79,13 +79,13 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 				'slug'          => 'my-collection',
 				'config'        => array(
 					'name'          => 'My Collection',
-					'font_families' => array( 'mock' ),
+					'font_families' => array( array() ),
 				),
 				'expected_data' => array(
 					'description'   => '',
 					'categories'    => array(),
 					'name'          => 'My Collection',
-					'font_families' => array( 'mock' ),
+					'font_families' => array( array() ),
 				),
 			),
 
@@ -94,14 +94,95 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 				'config'        => array(
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
-					'font_families' => array( 'mock' ),
-					'categories'    => array( 'mock' ),
+					'font_families' => array( array() ),
+					'categories'    => array(),
 				),
 				'expected_data' => array(
 					'description'   => 'My collection description',
-					'categories'    => array( 'mock' ),
+					'categories'    => array(),
 					'name'          => 'My Collection',
-					'font_families' => array( 'mock' ),
+					'font_families' => array( array() ),
+				),
+			),
+
+			'font collection with risky data'    => array(
+				'slug'          => 'my-collection',
+				'config'        => array(
+					'name'              => 'My Collection<script>alert("xss")</script>',
+					'description'       => 'My collection description<script>alert("xss")</script>',
+					'font_families'     => array(
+						array(
+							'font_family_settings' => array(
+								'fontFamily'        => 'Open Sans, sans-serif<script>alert("xss")</script>',
+								'slug'              => 'open-sans',
+								'name'              => 'Open Sans<script>alert("xss")</script>',
+								'fontFace'          => array(
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/src-as-string.ttf?a=<script>alert("xss")</script>',
+									),
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => array(
+											'https://example.com/src-as-array.woff2?a=<script>alert("xss")</script>',
+											'https://example.com/src-as-array.ttf',
+										),
+									),
+								),
+								'unwanted_property' => 'potentially evil value',
+							),
+							'categories'           => array( 'sans-serif<script>alert("xss")</script>' ),
+						),
+					),
+					'categories'        => array(
+						array(
+							'name'              => 'Mock col<script>alert("xss")</script>',
+							'slug'              => 'mock-col<script>alert("xss")</script>',
+							'unwanted_property' => 'potentially evil value',
+						),
+					),
+					'unwanted_property' => 'potentially evil value',
+				),
+				'expected_data' => array(
+					'description'   => 'My collection description',
+					'categories'    => array(
+						array(
+							'name' => 'Mock col',
+							'slug' => 'mock-colalertxss',
+						),
+					),
+					'name'          => 'My Collection',
+					'font_families' => array(
+						array(
+							'font_family_settings' => array(
+								'fontFamily' => 'Open Sans, sans-serif',
+								'slug'       => 'open-sans',
+								'name'       => 'Open Sans',
+								'fontFace'   => array(
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/src-as-string.ttf?a=',
+									),
+									array(
+										'fontFamily' => 'Open Sans',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => array(
+											'https://example.com/src-as-array.woff2?a=',
+											'https://example.com/src-as-array.ttf',
+										),
+									),
+								),
+							),
+							'categories'           => array( 'sans-serifalertxss' ),
+						),
+					),
 				),
 			),
 
@@ -114,7 +195,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	 * @param array $config Font collection config.
 	 */
 	public function test_should_error_when_missing_properties( $config ) {
-		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::validate_data' );
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::sanitize_and_validate_data' );
 
 		$collection = new WP_Font_Collection( 'my-collection', $config );
 		$data       = $collection->get_data();

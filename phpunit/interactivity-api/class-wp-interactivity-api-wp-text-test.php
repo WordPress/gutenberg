@@ -27,6 +27,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 
 	/**
 	 * Tests that the `data-wp-text` directive sets inner text content.
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_sets_inner_content() {
 		$html     = '<div data-wp-text="myPlugin::state.text">Text</div>';
@@ -36,6 +38,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 
 	/**
 	 * Tests that the `data-wp-text` directive works with numerical values.
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_sets_inner_content_numbers() {
 		$this->interactivity->state( 'myPlugin', array( 'number' => 100 ) );
@@ -47,6 +51,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 	/**
 	 * Tests that the `data-wp-text` directive removes inner text content when the
 	 * state is not a string or number.
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_removes_inner_content_on_types_that_are_not_strings_or_numbers() {
 		$this->interactivity->state(
@@ -83,6 +89,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 	/**
 	 * Tests that the `data-wp-text` directive overwrites entire inner content,
 	 * including nested tags.
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_sets_inner_content_with_nested_tags() {
 		$html     = '<div data-wp-text="myPlugin::state.text"><div><div>Text</div><div>Another text</div></div></div>';
@@ -93,6 +101,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 	/**
 	 * Tests that the `data-wp-text` directive works even with unbalanced tags
 	 * when they are different tags (div -> unbalanced span).
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_sets_inner_content_even_with_unbalanced_but_different_tags_inside_content() {
 		$html     = '<div data-wp-text="myPlugin::state.text"><span>Text</div>';
@@ -103,6 +113,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 	/**
 	 * Tests that the `data-wp-text` fails to overwrite inner content if there are
 	 * unbalanced when they are the same tags (div -> unbalanced div).
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_fails_with_unbalanced_and_same_tags_inside_content() {
 		$html     = '<div data-wp-text="myPlugin::state.text">Text<div></div>';
@@ -113,6 +125,8 @@ class Tests_WP_Interactivity_API_WP_Text extends WP_UnitTestCase {
 	/**
 	 * Tests that the `data-wp-text` directive cannot set inner HTML content and
 	 * it will be encoded as text.
+	 *
+	 * @covers ::process_directives
 	 */
 	public function test_wp_text_cant_set_inner_html_in_the_content() {
 		$this->interactivity->state( 'myPlugin', array( 'text' => '<span>Updated</span>' ) );
