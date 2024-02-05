@@ -1924,3 +1924,13 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+export function registerBlockBindingsSource( source ) {
+	return {
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		useSource: source.useSource,
+		lockAttributesEditing: source.lockAttributesEditing,
+	};
+}

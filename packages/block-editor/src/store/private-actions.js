@@ -361,15 +361,15 @@ export function stopEditingAsBlocks( clientId ) {
 	};
 }
 
-export function registerBlockBindingsSource( source ) {
-	return {
-		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
-		sourceName: source.name,
-		sourceLabel: source.label,
-		useSource: source.useSource,
-		lockAttributesEditing: source.lockAttributesEditing,
-	};
-}
+// export function registerBlockBindingsSource( source ) {
+// 	return {
+// 		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+// 		sourceName: source.name,
+// 		sourceLabel: source.label,
+// 		useSource: source.useSource,
+// 		lockAttributesEditing: source.lockAttributesEditing,
+// 	};
+// }
 
 /**
  * Returns an action object used in signalling that the user has begun to drag.
@@ -392,3 +392,4 @@ export function stopDragging() {
 		type: 'STOP_DRAGGING',
 	};
 }
+
