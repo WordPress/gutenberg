@@ -40,18 +40,6 @@ const backgroundImage = {
 	},
 };
 
-const backgroundRepeat = {
-	name: 'backgroundRepeat',
-	generate: ( style: Style, options: StyleOptions ) => {
-		return generateRule(
-			style,
-			options,
-			[ 'background', 'backgroundRepeat' ],
-			'backgroundRepeat'
-		);
-	},
-};
-
 const backgroundPosition = {
 	name: 'backgroundRepeat',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -60,6 +48,18 @@ const backgroundPosition = {
 			options,
 			[ 'background', 'backgroundPosition' ],
 			'backgroundPosition'
+		);
+	},
+};
+
+const backgroundRepeat = {
+	name: 'backgroundRepeat',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundRepeat' ],
+			'backgroundRepeat'
 		);
 	},
 };
@@ -103,7 +103,7 @@ const backgroundSize = {
 
 export default [
 	backgroundImage,
-	backgroundRepeat,
 	backgroundPosition,
+	backgroundRepeat,
 	backgroundSize,
 ];

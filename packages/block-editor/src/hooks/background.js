@@ -60,13 +60,17 @@ export function hasBackgroundImageValue( style ) {
 
 /**
  * Checks if there is a current value in the background size block support
- * attributes.
+ * attributes. Background size values include background size as well
+ * as background position.
  *
  * @param {Object} style Style attribute.
  * @return {boolean}     Whether or not the block has a background size value set.
  */
 export function hasBackgroundSizeValue( style ) {
-	return style?.background?.backgroundSize !== undefined;
+	return (
+		style?.background?.backgroundPosition !== undefined ||
+		style?.background?.backgroundSize !== undefined
+	);
 }
 
 /**
@@ -131,6 +135,7 @@ function resetBackgroundSize( style = {}, setAttributes ) {
 			...style,
 			background: {
 				...style?.background,
+				backgroundPosition: undefined,
 				backgroundRepeat: undefined,
 				backgroundSize: undefined,
 			},
@@ -368,60 +373,22 @@ function backgroundSizeHelpText( value ) {
 	return __( 'Set a fixed width.' );
 }
 
-const coordsToBackgroundPosition = ( value ) => {
-	if ( ! value ) {
+export const coordsToBackgroundPosition = ( value ) => {
+	if ( ! value || isNaN( value.x ) || isNaN( value.y ) ) {
 		return undefined;
-	}
-
-	if ( value.x === 0 && value.y === 0 ) {
-		return 'left top';
-	}
-
-	if ( value.x === 0 && value.y === 1 ) {
-		return 'left bottom';
-	}
-
-	if ( value.x === 1 && value.y === 0 ) {
-		return 'right top';
-	}
-
-	if ( value.x === 1 && value.y === 1 ) {
-		return 'right bottom';
-	}
-
-	if ( value.x === 0.5 && value.y === 0.5 ) {
-		return 'center';
 	}
 
 	return `${ value.x * 100 }% ${ value.y * 100 }%`;
 };
 
-const backgroundPositionToCoords = ( value ) => {
+export const backgroundPositionToCoords = ( value ) => {
 	if ( ! value ) {
-		return { x: 0.5, y: 0.5 };
+		return { x: undefined, y: undefined };
 	}
 
-	if ( value === 'left top' ) {
-		return { x: 0, y: 0 };
-	}
-
-	if ( value === 'left bottom' ) {
-		return { x: 0, y: 1 };
-	}
-
-	if ( value === 'right top' ) {
-		return { x: 1, y: 0 };
-	}
-
-	if ( value === 'right bottom' ) {
-		return { x: 1, y: 1 };
-	}
-
-	if ( value === 'center' ) {
-		return { x: 0.5, y: 0.5 };
-	}
-
-	const [ x, y ] = value.split( ' ' ).map( ( v ) => parseFloat( v ) / 100 );
+	let [ x, y ] = value.split( ' ' ).map( ( v ) => parseFloat( v ) / 100 );
+	x = isNaN( x ) ? undefined : x;
+	y = isNaN( y ) ? x : y;
 
 	return { x, y };
 };
@@ -545,7 +512,7 @@ function BackgroundSizePanelItem( {
 			<FocalPointPicker
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
-				label={ __( 'Focal point' ) }
+				label={ __( 'Position' ) }
 				url={ style?.background?.backgroundImage?.url }
 				value={ backgroundPositionToCoords(
 					style?.background?.backgroundPosition
