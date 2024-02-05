@@ -257,9 +257,10 @@ if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 		}
 
 		$font_files = get_post_meta( $post_id, '_wp_font_face_file', false );
+		$font_dir   = wp_get_font_dir()['path'];
 
 		foreach ( $font_files as $font_file ) {
-			wp_delete_file( wp_get_font_dir()['path'] . '/' . $font_file );
+			wp_delete_file( $font_dir . '/' . $font_file );
 		}
 	}
 	add_action( 'before_delete_post', '_wp_before_delete_font_face', 10, 2 );
