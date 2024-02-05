@@ -118,7 +118,9 @@
 				"width": true
 			}
 		},
-		"shadow": true
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		}
 	},
 	"selectors": {
 		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",
