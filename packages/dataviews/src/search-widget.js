@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-import { matchSorter } from 'match-sorter';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,10 @@ import { useState, useMemo, useDeferredValue } from '@wordpress/element';
 import { BaseControl, VisuallyHidden, Icon } from '@wordpress/components';
 import { check, search } from '@wordpress/icons';
 
+function normalizeSearchInput( input = '' ) {
+	return removeAccents( input.trim().toLowerCase() );
+}
+
 export default function SearchWidget( { filter, view, onChangeView } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const deferredSearchValue = useDeferredValue( searchValue );
@@ -21,9 +25,10 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 	);
 	const selectedValues = selectedFilter?.value;
 	const matches = useMemo( () => {
-		return matchSorter( filter.elements, deferredSearchValue ?? '', {
-			keys: [ 'label' ],
-		} );
+		const normalizedSearch = normalizeSearchInput( deferredSearchValue );
+		return filter.elements.filter( ( item ) =>
+			normalizeSearchInput( item.label ).includes( normalizedSearch )
+		);
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider

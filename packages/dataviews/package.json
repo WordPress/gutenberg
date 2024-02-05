@@ -39,7 +39,6 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"classnames": "^2.3.1",
-		"match-sorter": "^6.3.3",
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
