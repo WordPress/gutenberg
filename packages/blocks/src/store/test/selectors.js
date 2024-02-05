@@ -253,7 +253,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getChildBlockNames( state, 'otherAnchor' ) ).toHaveLength(
+			expect( getHookedBlockNames( state, 'otherAnchor' ) ).toHaveLength(
 				0
 			);
 		} );
