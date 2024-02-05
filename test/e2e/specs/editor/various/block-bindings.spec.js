@@ -1336,7 +1336,10 @@ class BlockBindingsUtils {
 
 	// Helper to update the post.
 	async updatePost() {
-		await this.page.click( 'role=button[name="Update"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 		await this.page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'updated' } )
