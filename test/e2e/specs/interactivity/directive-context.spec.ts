@@ -42,6 +42,7 @@ test.describe( 'data-wp-context', () => {
 		const childContext = await parseContent(
 			page.getByTestId( 'child context' )
 		);
+
 		expect( childContext ).toMatchObject( {
 			prop1: 'parent',
 			prop2: 'child',
