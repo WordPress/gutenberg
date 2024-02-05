@@ -16,7 +16,7 @@ import { forwardRef, useMemo, useRef } from '@wordpress/element';
  */
 import Button from '../button';
 import type { WordPressComponentProps } from '../context/wordpress-component';
-import type { SearchControlProps } from './types';
+import type { SearchControlProps, SuffixItemProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
 import {
@@ -24,6 +24,34 @@ import {
 	InputControlWithoutWebkitStyles,
 	CloseIconWrapper,
 } from './styles';
+
+function SuffixItem( {
+	size,
+	searchRef,
+	value,
+	onChange,
+	onClose,
+}: SuffixItemProps ) {
+	if ( ! onClose && ! value ) {
+		return null;
+	}
+
+	const onReset = () => {
+		onChange( '' );
+		searchRef.current?.focus();
+	};
+
+	return (
+		<CloseIconWrapper size={ size }>
+			<Button
+				size="small"
+				icon={ closeSmall }
+				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+				onClick={ onClose ?? onReset }
+			/>
+		</CloseIconWrapper>
+	);
+}
 
 function UnforwardedSearchControl(
 	{
@@ -40,35 +68,11 @@ function UnforwardedSearchControl(
 	}: WordPressComponentProps< SearchControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
-	const searchRef = useRef< HTMLInputElement >();
+	const searchRef = useRef< HTMLInputElement >( null );
 	const instanceId = useInstanceId(
 		SearchControl,
 		'components-search-control'
 	);
-
-	const SuffixItem = () => {
-		if ( ! onClose && ! value ) {
-			return null;
-		}
-
-		const onReset = () => {
-			onChange( '' );
-			searchRef.current?.focus();
-		};
-
-		return (
-			<CloseIconWrapper size={ size }>
-				<Button
-					size="small"
-					icon={ closeSmall }
-					label={
-						onClose ? __( 'Close search' ) : __( 'Reset search' )
-					}
-					onClick={ onClose ?? onReset }
-				/>
-			</CloseIconWrapper>
-		);
-	};
 
 	// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
 	// to provide backwards compatibile margin for SearchControl.
@@ -103,7 +107,15 @@ function UnforwardedSearchControl(
 						<Icon icon={ search } />
 					</SearchIconWrapper>
 				}
-				suffix={ <SuffixItem /> }
+				suffix={
+					<SuffixItem
+						size={ size }
+						searchRef={ searchRef }
+						value={ value }
+						onChange={ onChange }
+						onClose={ onClose }
+					/>
+				}
 				{ ...restProps }
 			/>
 		</ContextSystemProvider>
