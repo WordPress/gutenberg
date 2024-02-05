@@ -60,7 +60,6 @@ const GradientAnglePicker = ( {
 	};
 	return (
 		<AnglePickerControl
-			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
 			value={ hasGradient ? angle : '' }
 		/>
