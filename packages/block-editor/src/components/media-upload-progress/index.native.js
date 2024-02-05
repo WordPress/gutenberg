@@ -187,6 +187,7 @@ export class MediaUploadProgress extends Component {
 					this.props.containerStyle,
 				] }
 				pointerEvents="box-none"
+				testID="progress-container"
 			>
 				{ ! this.props.hideProgressBar && (
 					<View style={ progressBarStyle }>

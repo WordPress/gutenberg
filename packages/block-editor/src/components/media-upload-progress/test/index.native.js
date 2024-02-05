@@ -217,4 +217,32 @@ describe( 'MediaUploadProgress component', () => {
 		expect( onMediaUploadStateReset ).toHaveBeenCalledTimes( 1 );
 		expect( onMediaUploadStateReset ).toHaveBeenCalledWith( payloadReset );
 	} );
+
+	it( 'does not display the spinner when hideProgresBar is true', () => {
+		const renderContentMock = jest.fn();
+		const progress = 0.1;
+		const payload = {
+			state: MEDIA_UPLOAD_STATE_UPLOADING,
+			mediaId: MEDIA_ID,
+			progress,
+		};
+
+		const wrapper = render(
+			<MediaUploadProgress
+				hideProgressBar
+				mediaId={ MEDIA_ID }
+				renderContent={ renderContentMock }
+			/>
+		);
+
+		sendMediaUpload( payload );
+
+		expect( wrapper.queryByTestId( 'spinner' ) ).toBeNull();
+		expect( renderContentMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				isUploadInProgress: true,
+				isUploadFailed: false,
+			} )
+		);
+	} );
 } );

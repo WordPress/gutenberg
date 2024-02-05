@@ -202,13 +202,17 @@ describe( 'Gallery block', () => {
 		await notifyUploadingState( media[ 0 ] );
 		await notifyUploadingState( media[ 1 ] );
 
-		// Check that images are showing a loading state
+		// Check that images do not display the progress bar
 		expect(
-			within( getGalleryItem( galleryBlock, 1 ) ).getByTestId( 'spinner' )
-		).toBeVisible();
+			within( getGalleryItem( galleryBlock, 1 ) ).queryByTestId(
+				'spinner'
+			)
+		).toBeNull();
 		expect(
-			within( getGalleryItem( galleryBlock, 2 ) ).getByTestId( 'spinner' )
-		).toBeVisible();
+			within( getGalleryItem( galleryBlock, 2 ) ).queryByTestId(
+				'spinner'
+			)
+		).toBeNull();
 
 		// Notify that the media items upload succeeded
 		await notifySucceedState( media[ 0 ] );
@@ -295,11 +299,11 @@ describe( 'Gallery block', () => {
 		expect( galleryItem1 ).toBeVisible();
 		expect( galleryItem2 ).toBeVisible();
 
-		// Check that images are showing a loading state
+		// Check that images do not display the progress bar
 		await notifyUploadingState( media[ 0 ] );
 		await notifyUploadingState( media[ 1 ] );
-		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
-		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem1 ).queryByTestId( 'spinner' ) ).toBeNull();
+		expect( within( galleryItem2 ).queryByTestId( 'spinner' ) ).toBeNull();
 
 		// Notify that the media items upload succeeded
 		await notifySucceedState( media[ 0 ] );
@@ -333,11 +337,11 @@ describe( 'Gallery block', () => {
 		expect( galleryItem1 ).toBeVisible();
 		expect( galleryItem2 ).toBeVisible();
 
-		// Check that images are showing a loading state
+		// Check that images do not display the progress bar
 		await notifyUploadingState( media[ 0 ] );
 		await notifyUploadingState( media[ 1 ] );
-		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
-		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem1 ).queryByTestId( 'spinner' ) ).toBeNull();
+		expect( within( galleryItem2 ).queryByTestId( 'spinner' ) ).toBeNull();
 
 		// Notify that the media items uploads failed
 		await notifyFailedState( media[ 0 ] );
@@ -385,9 +389,9 @@ describe( 'Gallery block', () => {
 		const galleryItem = getGalleryItem( galleryBlock, 1 );
 		expect( galleryItem ).toBeVisible();
 
-		// Check image is showing a loading state
+		// Check that the image does not display the progress bar
 		await notifyUploadingState( media[ 0 ] );
-		expect( within( galleryItem ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem ).queryByTestId( 'spinner' ) ).toBeNull();
 
 		// Notify that the media item upload succeeded
 		await notifySucceedState( media[ 0 ] );
@@ -443,11 +447,11 @@ describe( 'Gallery block', () => {
 		expect( galleryItem1 ).toBeVisible();
 		expect( galleryItem2 ).toBeVisible();
 
-		// Check that images are showing a loading state
+		// Check that images do not display the progress bar
 		await notifyUploadingState( freePhotoMedia[ 0 ] );
 		await notifyUploadingState( freePhotoMedia[ 1 ] );
-		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
-		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem1 ).queryByTestId( 'spinner' ) ).toBeNull();
+		expect( within( galleryItem2 ).queryByTestId( 'spinner' ) ).toBeNull();
 
 		// Notify that the media items upload succeeded
 		await notifySucceedState( freePhotoMedia[ 0 ] );
@@ -481,22 +485,26 @@ describe( 'Gallery block', () => {
 		expect( galleryItem1 ).toBeVisible();
 		expect( galleryItem2 ).toBeVisible();
 
-		// Check that images are showing a loading state
+		// Check that images do not display the progress bar
 		await notifyUploadingState( media[ 0 ] );
 		await notifyUploadingState( media[ 1 ] );
-		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
-		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem1 ).queryByTestId( 'spinner' ) ).toBeNull();
+		expect( within( galleryItem2 ).queryByTestId( 'spinner' ) ).toBeNull();
 
 		// Cancel uploads
 		fireEvent.press( galleryItem1 );
-		fireEvent.press( within( galleryItem1 ).getByTestId( 'spinner' ) );
+		fireEvent.press(
+			within( galleryItem1 ).getByTestId( 'progress-container' )
+		);
 		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
 			media[ 0 ].localId
 		);
 		await notifyResetState( media[ 0 ] );
 
 		fireEvent.press( galleryItem2 );
-		fireEvent.press( within( galleryItem2 ).getByTestId( 'spinner' ) );
+		fireEvent.press(
+			within( galleryItem2 ).getByTestId( 'progress-container' )
+		);
 		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
 			media[ 1 ].localId
 		);
@@ -581,11 +589,11 @@ describe( 'Gallery block', () => {
 		expect( galleryItem1 ).toBeVisible();
 		expect( galleryItem2 ).toBeVisible();
 
-		// Check that images are showing a loading state
+		// Check that images do not diplay the progress bar
 		await notifyUploadingState( otherAppsMedia[ 0 ] );
 		await notifyUploadingState( otherAppsMedia[ 1 ] );
-		expect( within( galleryItem1 ).getByTestId( 'spinner' ) ).toBeVisible();
-		expect( within( galleryItem2 ).getByTestId( 'spinner' ) ).toBeVisible();
+		expect( within( galleryItem1 ).queryByTestId( 'spinner' ) ).toBeNull();
+		expect( within( galleryItem2 ).queryByTestId( 'spinner' ) ).toBeNull();
 
 		// Notify that the media items upload succeeded
 		await notifySucceedState( otherAppsMedia[ 0 ] );
