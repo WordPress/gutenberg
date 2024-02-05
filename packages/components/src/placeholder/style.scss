@@ -3,11 +3,12 @@
 	font-size: $default-font-size;
 	box-sizing: border-box;
 	position: relative;
-	padding: 1em;
+	padding: $grid-unit-30;
 	width: 100%;
 	text-align: left;
 	margin: 0;
 	color: $gray-900;
+	gap: $grid-unit-10;
 
 	// Some editor styles unset this.
 	-moz-font-smoothing: subpixel-antialiased;
@@ -43,8 +44,7 @@
 
 .components-placeholder__label {
 	display: flex;
-	font-weight: 600;
-	margin-bottom: $grid-unit-20;
+	font-weight: 500;
 	align-items: center;
 
 	> svg,
@@ -71,6 +71,8 @@
 	flex-direction: row;
 	width: 100%;
 	flex-wrap: wrap;
+	gap: $grid-unit-10;
+	margin: $grid-unit-20 0 0;
 
 	p {
 		font-family: $default-font;
@@ -89,23 +91,9 @@
 	flex: 1 1 auto;
 }
 
-.components-placeholder__instructions {
-	margin-bottom: 1em;
-}
-
 .components-placeholder__error {
-	margin-top: 1em;
+	margin-top: $grid-unit-20;
 	width: 100%;
-}
-
-.components-placeholder__fieldset .components-button {
-	margin-right: $grid-unit-15;
-	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
-
-	&:last-child {
-		margin-bottom: 0;
-		margin-right: 0;
-	}
 }
 
 // Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
@@ -126,8 +114,8 @@
 	// Medium and large sizes.
 	&.is-large {
 		.components-placeholder__label {
-			font-size: 18pt;
-			font-weight: normal;
+			font-size: $default-font-size;
+			font-weight: 500;
 		}
 	}
 

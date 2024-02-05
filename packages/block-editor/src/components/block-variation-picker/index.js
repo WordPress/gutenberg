@@ -17,6 +17,7 @@ function BlockVariationPicker( {
 	variations,
 	onSelect,
 	allowSkip,
+	hasVariationLabels = true,
 } ) {
 	const classes = classnames( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
@@ -42,7 +43,7 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							variant="secondary"
+							variant="tertiary"
 							icon={
 								variation.icon && variation.icon.src
 									? variation.icon.src
@@ -53,9 +54,11 @@ function BlockVariationPicker( {
 							className="block-editor-block-variation-picker__variation"
 							label={ variation.description || variation.title }
 						/>
-						<span className="block-editor-block-variation-picker__variation-label">
-							{ variation.title }
-						</span>
+						{ hasVariationLabels && (
+							<span className="block-editor-block-variation-picker__variation-label">
+								{ variation.title }
+							</span>
+						) }
 					</li>
 				) ) }
 			</ul>

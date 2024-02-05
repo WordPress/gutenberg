@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { Path, SVG, Button, Placeholder } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
+import { group } from '@wordpress/icons';
 
 /**
  * Returns a custom variation icon.
@@ -142,9 +143,7 @@ function GroupPlaceHolder( { name, onSelect } ) {
 	} );
 	return (
 		<div { ...blockProps }>
-			<Placeholder
-				instructions={ __( 'Group blocks together. Select a layout:' ) }
-			>
+			<Placeholder icon={ group } label={ __( 'Group' ) }>
 				{ /*
 				 * Taken from BlockVariationPicker component.
 				 * Disable reason: The `list` ARIA role is redundant but

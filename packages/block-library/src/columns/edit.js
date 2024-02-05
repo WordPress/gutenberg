@@ -275,7 +275,9 @@ function Placeholder( { clientId, name, setAttributes } ) {
 			<__experimentalBlockVariationPicker
 				icon={ blockType?.icon?.src }
 				label={ blockType?.title }
+				instructions={ __( 'Choose a layout to start with.' ) }
 				variations={ variations }
+				hasVariationLabels={ false }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( nextVariation.attributes );
@@ -290,7 +292,6 @@ function Placeholder( { clientId, name, setAttributes } ) {
 						);
 					}
 				} }
-				allowSkip
 			/>
 		</div>
 	);
