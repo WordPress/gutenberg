@@ -703,7 +703,7 @@ test.describe( 'Image', () => {
 			},
 		} );
 
-		await editor.clickBlockToolbarButton( 'Upload image to media library' );
+		await editor.clickBlockToolbarButton( 'Upload to Media Library' );
 
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
