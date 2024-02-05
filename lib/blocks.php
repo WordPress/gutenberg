@@ -530,9 +530,11 @@ add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
 add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );
 
 /**
- * Filters the arguments for registering a post type adding the footnotes support by default.
+ * Filters the arguments for registering a post type adding the footnotes
+ * support by default.
  *
  * @access private
+ * @internal
  *
  * @param array  $args      Array of arguments for registering a post type.
  *                          See the register_post_type() function for accepted arguments.
@@ -540,7 +542,12 @@ add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtere
 function _gutenberg_add_footnotes_post_type_support( $args ) {
 	if ( ! empty( $args['supports'] ) ) {
 		$supports = &$args['supports'];
-		if ( in_array( 'editor', $supports, true ) && in_array( 'custom-fields', $supports, true ) && in_array( 'revisions', $supports, true ) && ! in_array( 'footnotes', $supports, true ) ) {
+		if (
+			in_array( 'editor', $supports, true ) &&
+			in_array( 'custom-fields', $supports, true ) &&
+			in_array( 'revisions', $supports, true ) &&
+			! in_array( 'footnotes', $supports, true )
+		) {
 			$supports[] = 'footnotes';
 		}
 	}
@@ -548,9 +555,7 @@ function _gutenberg_add_footnotes_post_type_support( $args ) {
 	return $args;
 }
 
-/**
- * Adds the footnotes support to the post type by default.
- */
+// Adds the footnotes support to the post type by default.
 add_filter(
 	'register_post_type_args',
 	'_gutenberg_add_footnotes_post_type_support'
@@ -559,15 +564,21 @@ add_filter(
 /**
  * Registers the footnotes meta field for post types that support it.
  *
+ * @access private
  * @internal
- *
  */
 function _gutenberg_register_footnotes_meta_field() {
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
 	$post_types = array_filter( $post_types, 'is_post_type_viewable' );
 	foreach ( $post_types as $post_type ) {
-		// Only register the meta field if the post type supports the editor, custom fields, and revisions.
-		if ( post_type_supports( $post_type, 'editor' ) && post_type_supports( $post_type, 'custom-fields' ) && post_type_supports( $post_type, 'revisions' ) && post_type_supports( $post_type, 'footnotes' ) ) {
+		// Only register the meta field if the post type supports the editor,
+		// custom fields, and revisions.
+		if (
+			post_type_supports( $post_type, 'editor' ) &&
+			post_type_supports( $post_type, 'custom-fields' ) &&
+			post_type_supports( $post_type, 'revisions' ) &&
+			post_type_supports( $post_type, 'footnotes' )
+		) {
 			$post_type_meta_keys = get_registered_meta_keys( 'post', $post_type );
 			if ( ! isset( $post_type_meta_keys['footnotes'] ) ) {
 				register_post_meta(
