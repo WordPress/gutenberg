@@ -44,7 +44,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			$wrapped_font_families = array_map(
 				function ( $family ) {
 					$trimmed = trim( $family );
-					if ( ! empty( $trimmed ) && false !== strpos( $trimmed, ' ' ) && false === strpos( $trimmed, "'" ) && false === strpos( $trimmed, '"' ) ) {
+					if ( ! empty( $trimmed ) && str_contains( $trimmed, ' ' ) && ! str_contains( $trimmed, "'" ) && ! str_contains( $trimmed, '"' ) ) {
 							return '"' . $trimmed . '"';
 					}
 					return $trimmed;
