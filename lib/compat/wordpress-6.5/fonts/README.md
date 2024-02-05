@@ -12,6 +12,7 @@ The Font Library is available globally, independently of the theme activated, si
 - **Activate font family**: Is to make it ready to use in the site or post editor. All the active fonts will appear in the font pickers so the user can use them in the site elements.
 - **Deactivate font family**: Is to make a font family unusable. If a font family is inactive, it won't appear in the font pickers but will continue being listed in the font library.
 - **Uninstall font family**: Is to remove the font family from the font library permanently.
+- **Font Collection**: A font collection is a list of font family definitions ready to be installed by the user. The font family definition is a fontFamily item in `theme.json` like format.
 
 ### Different types of installations
 
