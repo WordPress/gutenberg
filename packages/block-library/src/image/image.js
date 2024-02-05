@@ -413,19 +413,23 @@ export default function Image( {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const { getBlockBindingsSource, getBlockParentsByBlockName } =
+				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
+			const hasParentPattern =
+				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
 			return {
 				lockUrlControls:
-					!! urlBinding &&
-					getBlockBindingsSource( urlBinding?.source )
-						?.lockAttributesEditing === true,
+					( !! urlBinding &&
+						getBlockBindingsSource( urlBinding?.source )
+							?.lockAttributesEditing === true ) ||
+					// Disable editing the link of the URL if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
 					getBlockBindingsSource( altBinding?.source )
@@ -436,42 +440,27 @@ export default function Image( {
 						?.lockAttributesEditing === true,
 			};
 		},
-		[ isSingleSelected ]
-	);
-
-	const hasParentPattern = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0
-			);
-		},
-		[ clientId ]
+		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ isSingleSelected &&
-					! isEditingImage &&
-					! lockUrlControls &&
-					// Disable editing the link of the URL if the image is inside a pattern instance.
-					// This is a temporary solution until we support overriding the link on the frontend.
-					! hasParentPattern && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-							showLightboxSetting={ showLightboxSetting }
-							lightboxEnabled={ lightboxChecked }
-							onSetLightbox={ onSetLightbox }
-						/>
-					) }
+				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+						showLightboxSetting={ showLightboxSetting }
+						lightboxEnabled={ lightboxChecked }
+						onSetLightbox={ onSetLightbox }
+					/>
+				) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
