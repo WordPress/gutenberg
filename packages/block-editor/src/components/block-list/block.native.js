@@ -7,7 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	memo,
+} from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
@@ -29,7 +35,7 @@ import {
 	withDispatch,
 	withSelect,
 } from '@wordpress/data';
-import { compose, ifCondition, pure } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,6 +48,7 @@ import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_ARRAY = [];
 
@@ -412,11 +419,13 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getBlockMode,
 		isSelectionEnabled,
 		getTemplateLock,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlockWithoutAttributes,
+		getBlockAttributes,
 		canRemoveBlock,
 		canMoveBlock,
-	} = select( blockEditorStore );
-	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+	} = unlock( select( blockEditorStore ) );
+	const block = getBlockWithoutAttributes( clientId );
+	const attributes = getBlockAttributes( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
 	const canRemove = canRemoveBlock( clientId, rootClientId );
@@ -426,7 +435,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
 	// is not correct.
-	const { name, attributes, isValid } = block || {};
+	const { name, isValid } = block || {};
 
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -682,7 +691,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 } );
 
 export default compose(
-	pure,
+	memo,
 	applyWithSelect,
 	applyWithDispatch,
 	// Block is sometimes not mounted at the right time, causing it be undefined

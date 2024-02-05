@@ -132,6 +132,10 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 	$query_params   = wp_parse_args( $query );
 
 	foreach ( $query_params as $query_param ) {
+		$can_query_param_be_encoded = is_string( $query_param ) && ! empty( $query_param );
+		if ( ! $can_query_param_be_encoded ) {
+			continue;
+		}
 		if ( rawurldecode( $query_param ) !== $query_param ) {
 			$is_url_encoded = true;
 			break;
@@ -338,7 +342,10 @@ function block_core_navigation_link_register_variation( $variation ) {
 		return;
 	}
 
-	$navigation_block_type->variations[] = $variation;
+	$navigation_block_type->variations = array_merge(
+		$navigation_block_type->variations,
+		array( $variation )
+	);
 }
 
 /**
@@ -355,24 +362,24 @@ function block_core_navigation_link_unregister_variation( $name ) {
 	if ( ! $navigation_block_type || empty( $navigation_block_type->variations ) ) {
 		return;
 	}
+	$variations = $navigation_block_type->variations;
 	// Search for the variation and remove it from the array.
-	foreach ( $navigation_block_type->variations as $i => $variation ) {
+	foreach ( $variations as $i => $variation ) {
 		if ( $variation['name'] === $name ) {
-			unset( $navigation_block_type->variations[ $i ] );
+			unset( $variations[ $i ] );
 			break;
 		}
 	}
 	// Reindex array after removing one variation.
-	$navigation_block_type->variations = array_values( $navigation_block_type->variations );
+	$navigation_block_type->variations = array_values( $variations );
 }
 
 /**
- * Register the navigation link block.
  * Returns an array of variations for the navigation link block.
  *
  * @return array
  */
-function build_navigation_link_block_variations() {
+function block_core_navigation_link_build_variations() {
 	// This will only handle post types and taxonomies registered until this point (init on priority 9).
 	// See action hooks below for other post types and taxonomies.
 	// See https://github.com/WordPress/gutenberg/issues/53826 for details.
@@ -421,7 +428,7 @@ function register_block_core_navigation_link() {
 		__DIR__ . '/navigation-link',
 		array(
 			'render_callback'    => 'render_block_core_navigation_link',
-			'variation_callback' => 'build_navigation_link_block_variations',
+			'variation_callback' => 'block_core_navigation_link_build_variations',
 		)
 	);
 }

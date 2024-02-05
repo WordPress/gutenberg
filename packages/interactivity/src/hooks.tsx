@@ -1,7 +1,14 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement } from 'preact';
+import {
+	h as createElement,
+	options,
+	createContext,
+	cloneElement,
+} from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
 
@@ -59,7 +66,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	attributes: h.JSX.HTMLAttributes;
+	attributes: createElement.JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -155,6 +162,8 @@ export const setScope = ( scope: Scope ) => {
 export const resetScope = () => {
 	scopeStack.pop();
 };
+
+export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
 
 export const setNamespace = ( namespace: string ) => {
 	namespaceStack.push( namespace );
@@ -259,7 +268,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-const getEvaluate: GetEvaluate =
+export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
@@ -370,7 +379,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type as any, props ),
+				element: createElement( vnode.type as any, props ),
 				top: true,
 			};
 			vnode.type = Directives;

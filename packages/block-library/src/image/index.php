@@ -37,10 +37,6 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
-	$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
-	$view_js_file_handle = 'wp-block-image-view';
-	$script_handles      = $block->block_type->view_script_handles;
-
 	/*
 	 * If the lightbox is enabled and the image is not linked, add the filter
 	 * and the JavaScript view file.
@@ -51,34 +47,22 @@ function render_block_core_image( $attributes, $content, $block ) {
 		isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled']
 	) {
-		if ( $is_gutenberg_plugin ) {
-			gutenberg_enqueue_module( '@wordpress/block-library/image' );
-			// Remove the view script because we are using the module.
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
-		} elseif ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file_handle ) );
-		}
+		wp_enqueue_script_module( '@wordpress/block-library/image' );
 
 		/*
-		 * This render needs to happen in a filter with priority 15 to ensure
-		 * that it runs after the duotone filter and that duotone styles are
-		 * applied to the image in the lightbox. We also need to ensure that the
-		 * lightbox works with any plugins that might use filters as well. We
-		 * can consider removing this in the future if the way the blocks are
-		 * rendered changes, or if a new kind of filter is introduced.
+		 * This render needs to happen in a filter with priority 15 to ensure that
+		 * it runs after the duotone filter and that duotone styles are applied to
+		 * the image in the lightbox. Lightbox has to work with any plugins that
+		 * might use filters as well. Removing this can be considered in the
+		 * future if the way the blocks are rendered changes, or if a
+		 * new kind of filter is introduced.
 		 */
 		add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 	} else {
 		/*
-		 * Remove the filter and the JavaScript view file if previously added by
-		 * other Image blocks.
+		 * Remove the filter if previously added by other Image blocks.
 		 */
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
-
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( in_array( $view_js_file_handle, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
-		}
 	}
 
 	return $processor->get_updated_html();
@@ -329,25 +313,6 @@ HTML;
 }
 
 /**
- * Ensures that the view script has the `wp-interactivity` dependency.
- *
- * @since 6.4.0
- *
- * @global WP_Scripts $wp_scripts
- */
-function block_core_image_ensure_interactivity_dependency() {
-	global $wp_scripts;
-	if (
-		isset( $wp_scripts->registered['wp-block-image-view'] ) &&
-		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-image-view']->deps, true )
-	) {
-		$wp_scripts->registered['wp-block-image-view']->deps[] = 'wp-interactivity';
-	}
-}
-
-add_action( 'wp_print_scripts', 'block_core_image_ensure_interactivity_dependency' );
-
-/**
  * Registers the `core/image` block on server.
  */
 function register_block_core_image() {
@@ -359,12 +324,14 @@ function register_block_core_image() {
 	);
 
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		gutenberg_register_module(
-			'@wordpress/block-library/image',
-			gutenberg_url( '/build/interactivity/image.min.js' ),
-			array( '@wordpress/interactivity' ),
-			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-		);
+		$module_url = gutenberg_url( '/build/interactivity/image.min.js' );
 	}
+
+	wp_register_script_module(
+		'@wordpress/block-library/image',
+		isset( $module_url ) ? $module_url : includes_url( 'blocks/image/view.min.js' ),
+		array( '@wordpress/interactivity' ),
+		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+	);
 }
 add_action( 'init', 'register_block_core_image' );

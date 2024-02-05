@@ -86,16 +86,15 @@ Or for classes:
  * @package WordPress
  * @since 6.3.0
  */
-if ( class_exists( 'WP_A_Stable_Class' ) ) {
-	return;
+if ( ! class_exists( 'WP_A_Stable_Class' ) ) {
+	/**
+	 * A very stable class that does something.
+	 *
+	 * @since 6.3.0
+	 */
+	class WP_A_Stable_Class { ... }
 }
 
-/**
- * A very stable class that does something.
- *
- * @since 6.3.0
- */
-class WP_A_Stable_Class { ... }
 ```
 
 Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.

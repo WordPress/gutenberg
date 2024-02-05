@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "13.26.0",
+	"version": "13.27.2",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
+		"{src,build,build-module}/{index.js,store/index.js,hooks/**,bindings/**}"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",

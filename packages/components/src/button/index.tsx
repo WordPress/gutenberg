@@ -195,9 +195,9 @@ export function UnforwardedButton(
 	const shouldShowTooltip =
 		! trulyDisabled &&
 		// An explicit tooltip is passed or...
-		( ( showTooltip && label ) ||
+		( ( showTooltip && !! label ) ||
 			// There's a shortcut or...
-			shortcut ||
+			!! shortcut ||
 			// There's a label and...
 			( !! label &&
 				// The children are empty and...
@@ -249,40 +249,28 @@ export function UnforwardedButton(
 			</button>
 		);
 
-	// Convert legacy `position` values to be used with the new `placement` prop
-	let computedPlacement;
-	// if `tooltipPosition` is defined, compute value to `placement`
-	if ( tooltipPosition !== undefined ) {
-		computedPlacement = positionToPlacement( tooltipPosition );
-	}
-
-	if ( ! shouldShowTooltip ) {
-		return (
-			<>
-				{ element }
-				{ describedBy && (
-					<VisuallyHidden>
-						<span id={ descriptionId }>{ describedBy }</span>
-					</VisuallyHidden>
-				) }
-			</>
-		);
-	}
-
-	return (
-		<>
-			<Tooltip
-				text={
+	// In order to avoid some React reconciliation issues, we are always rendering
+	// the `Tooltip` component even when `shouldShowTooltip` is `false`.
+	// In order to make sure that the tooltip doesn't show when it shouldn't,
+	// we don't pass the props to the `Tooltip` component.
+	const tooltipProps = shouldShowTooltip
+		? {
+				text:
 					( children as string | ReactElement[] )?.length &&
 					describedBy
 						? describedBy
-						: label
-				}
-				shortcut={ shortcut }
-				placement={ computedPlacement }
-			>
-				{ element }
-			</Tooltip>
+						: label,
+				shortcut,
+				placement:
+					tooltipPosition &&
+					// Convert legacy `position` values to be used with the new `placement` prop
+					positionToPlacement( tooltipPosition ),
+		  }
+		: {};
+
+	return (
+		<>
+			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
 			{ describedBy && (
 				<VisuallyHidden>
 					<span id={ descriptionId }>{ describedBy }</span>

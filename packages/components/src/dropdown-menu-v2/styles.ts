@@ -180,7 +180,7 @@ const baseItem = css`
 
 	/* Keyboard focus (focus-visible) */
 	&[data-focus-visible] {
-		box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
 
 		/* Only visible in Windows High Contrast mode */
 		outline: 2px solid transparent;

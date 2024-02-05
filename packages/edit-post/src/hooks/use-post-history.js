@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useReducer } from '@wordpress/element';
+import { useCallback, useReducer, useMemo } from '@wordpress/element';
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
@@ -35,6 +35,13 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
+	const initialPost = useMemo( () => {
+		return {
+			type: initialPostType,
+			id: initialPostId,
+		};
+	}, [ initialPostType, initialPostId ] );
+
 	const getPostLinkProps = useCallback( ( params ) => {
 		const currentArgs = getQueryArgs( window.location.href );
 		const currentUrlWithoutArgs = removeQueryArgs(
@@ -50,7 +57,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		return {
 			href: newUrl,
 			onClick: ( event ) => {
-				event.preventDefault();
+				event?.preventDefault();
 				dispatch( {
 					type: 'push',
 					post: { postId: params.postId, postType: params.postType },
@@ -68,6 +75,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 	return {
 		currentPost,
 		getPostLinkProps,
+		initialPost,
 		goBack: postHistory.length > 1 ? goBack : undefined,
 	};
 }

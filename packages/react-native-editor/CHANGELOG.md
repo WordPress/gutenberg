@@ -11,10 +11,25 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.112.0
+-   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]
+-   [**] Prevent images from temporarily disappearing when uploading media [#57869]
+-   [**] Fix crash occurring on large post on Android [#58266]
+
+## 1.111.2
+-   [*] [internal] Remove `mediaFilesCollectionBlock` initial prop [#58140]
+
+## 1.111.1
+-   [**] Video block: Fix logic for displaying empty state based on source presence [#58015]
+-   [**] Fix crash when RichText values are not defined [#58088]
+
 ## 1.111.0
 -   [**] Image block media uploads display a custom error message when there is no internet connection [#56937]
 -   [*] Fix missing custom color indicator for custom gradients [#57605]
 -   [**] Display a notice when a network connection unavailable [#56934]
+
+## 1.110.1
+-   [**] Fix crash when RichText values are not defined [#58088]
 
 ## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]

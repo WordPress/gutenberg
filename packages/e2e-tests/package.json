@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "7.20.0",
+	"version": "7.21.1",
 	"description": "End-To-End (E2E) tests for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,6 +25,7 @@
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
 		"@wordpress/interactivity": "file:../interactivity",
+		"@wordpress/interactivity-router": "file:../interactivity-router",
 		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/jest-puppeteer-axe": "file:../jest-puppeteer-axe",
 		"@wordpress/scripts": "file:../scripts",

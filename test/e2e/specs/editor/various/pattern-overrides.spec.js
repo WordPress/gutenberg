@@ -7,9 +7,6 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.setGutenbergExperiments( [
-				'gutenberg-pattern-partial-syncing',
-			] ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -20,7 +17,6 @@ test.describe( 'Pattern Overrides', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.setGutenbergExperiments( [] ),
 			requestUtils.activateTheme( 'twentytwentyone' ),
 		] );
 	} );
@@ -96,7 +92,7 @@ test.describe( 'Pattern Overrides', () => {
 							id: expect.any( String ),
 							bindings: {
 								content: {
-									source: { name: 'pattern_attributes' },
+									source: 'core/pattern-overrides',
 								},
 							},
 						},
@@ -174,9 +170,11 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'core/block',
 					attributes: {
 						ref: patternId,
-						overrides: {
+						content: {
 							[ editableParagraphId ]: {
-								content: 'I would word it this way',
+								values: {
+									content: 'I would word it this way',
+								},
 							},
 						},
 					},
@@ -185,9 +183,11 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'core/block',
 					attributes: {
 						ref: patternId,
-						overrides: {
+						content: {
 							[ editableParagraphId ]: {
-								content: 'This one is different',
+								values: {
+									content: 'This one is different',
+								},
 							},
 						},
 					},
@@ -215,5 +215,52 @@ test.describe( 'Pattern Overrides', () => {
 				'This one can’t',
 			] );
 		} );
+	} );
+
+	test( 'retains override values when converting a pattern block to regular blocks', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphId = 'paragraph-id';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Editable</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Make an edit to the pattern.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.focus();
+		await page.keyboard.type( 'edited ' );
+
+		// Convert back to regular blocks.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.showBlockToolbar();
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		// Check that the overrides remain.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'edited Editable',
+					metadata: undefined,
+				},
+			},
+		] );
 	} );
 } );

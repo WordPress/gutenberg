@@ -1,6 +1,9 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
+import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
@@ -9,7 +12,8 @@ import { deepSignal, peek } from 'deepsignal';
  */
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
-import { directive } from './hooks';
+import { directive, getScope, getEvaluate } from './hooks';
+import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -132,6 +136,7 @@ export default () => {
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
+			// TODO: Replace with useEffect to prevent unneeded scopes.
 			useInit( () => evaluate( entry ) );
 		} );
 	} );
@@ -176,9 +181,11 @@ export default () => {
 							: name;
 
 					useInit( () => {
-						// This seems necessary because Preact doesn't change the class
-						// names on the hydration, so we have to do it manually. It doesn't
-						// need deps because it only needs to do it the first time.
+						/*
+						 * This seems necessary because Preact doesn't change the class
+						 * names on the hydration, so we have to do it manually. It doesn't
+						 * need deps because it only needs to do it the first time.
+						 */
 						if ( ! result ) {
 							element.ref.current.classList.remove( name );
 						} else {
@@ -205,9 +212,11 @@ export default () => {
 				else element.props.style[ key ] = result;
 
 				useInit( () => {
-					// This seems necessary because Preact doesn't change the styles on
-					// the hydration, so we have to do it manually. It doesn't need deps
-					// because it only needs to do it the first time.
+					/*
+					 * This seems necessary because Preact doesn't change the styles on
+					 * the hydration, so we have to do it manually. It doesn't need deps
+					 * because it only needs to do it the first time.
+					 */
 					if ( ! result ) {
 						element.ref.current.style.removeProperty( key );
 					} else {
@@ -225,24 +234,36 @@ export default () => {
 				const result = evaluate( entry );
 				element.props[ attribute ] = result;
 
-				// This seems necessary because Preact doesn't change the attributes
-				// on the hydration, so we have to do it manually. It doesn't need
-				// deps because it only needs to do it the first time.
+				/*
+				 * This is necessary because Preact doesn't change the attributes on the
+				 * hydration, so we have to do it manually. It only needs to do it the
+				 * first time. After that, Preact will handle the changes.
+				 */
 				useInit( () => {
 					const el = element.ref.current;
 
-					// We set the value directly to the corresponding
-					// HTMLElement instance property excluding the following
-					// special cases.
-					// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+					/*
+					 * We set the value directly to the corresponding HTMLElement instance
+					 * property excluding the following special cases. We follow Preact's
+					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+					 */
 					if (
 						attribute !== 'width' &&
 						attribute !== 'height' &&
 						attribute !== 'href' &&
 						attribute !== 'list' &&
 						attribute !== 'form' &&
-						// Default value in browsers is `-1` and an empty string is
-						// cast to `0` instead
+						/*
+						 * The value for `tabindex` follows the parsing rules for an
+						 * integer. If that fails, or if the attribute isn't present, then
+						 * the browsers should "follow platform conventions to determine if
+						 * the element should be considered as a focusable area",
+						 * practically meaning that most elements get a default of `-1` (not
+						 * focusable), but several also get a default of `0` (focusable in
+						 * order after all elements with a positive `tabindex` value).
+						 *
+						 * @see https://html.spec.whatwg.org/#tabindex-value
+						 */
 						attribute !== 'tabIndex' &&
 						attribute !== 'download' &&
 						attribute !== 'rowSpan' &&
@@ -258,10 +279,12 @@ export default () => {
 							return;
 						} catch ( err ) {}
 					}
-					// aria- and data- attributes have no boolean representation.
-					// A `false` value is different from the attribute not being
-					// present, so we can't remove it.
-					// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+					/*
+					 * aria- and data- attributes have no boolean representation.
+					 * A `false` value is different from the attribute not being
+					 * present, so we can't remove it.
+					 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+					 */
 					if (
 						result !== null &&
 						result !== undefined &&
@@ -312,4 +335,50 @@ export default () => {
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
 		run.forEach( ( entry ) => evaluate( entry ) );
 	} );
+
+	// data-wp-each--[item]
+	directive(
+		'each',
+		( {
+			directives: { each, 'each-key': eachKey },
+			context: inheritedContext,
+			element,
+			evaluate,
+		} ) => {
+			if ( element.type !== 'template' ) return;
+
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+
+			const [ entry ] = each;
+			const { namespace, suffix } = entry;
+
+			const list = evaluate( entry );
+			return list.map( ( item ) => {
+				const mergedContext = deepSignal( {} );
+
+				const itemProp =
+					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
+				const newValue = deepSignal( {
+					[ namespace ]: { [ itemProp ]: item },
+				} );
+				mergeDeepSignals( newValue, inheritedValue );
+				mergeDeepSignals( mergedContext, newValue, true );
+
+				const scope = { ...getScope(), context: mergedContext };
+				const key = eachKey
+					? getEvaluate( { scope } )( eachKey[ 0 ] )
+					: item;
+
+				return (
+					<Provider value={ mergedContext } key={ key }>
+						{ element.props.content }
+					</Provider>
+				);
+			} );
+		},
+		{ priority: 20 }
+	);
+
+	directive( 'each-child', () => null );
 };

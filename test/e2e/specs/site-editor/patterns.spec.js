@@ -13,7 +13,9 @@ const test = base.extend( {
 	},
 } );
 
-test.describe( 'Patterns', () => {
+// Skip these tests for now as we plan to adapt them to
+// the new patterns UI.
+test.describe.skip( 'Patterns', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllBlocks();

@@ -12,10 +12,9 @@ import {
 	FlexItem,
 	Flex,
 	Button,
-	Notice,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
 
 /**
@@ -30,35 +29,33 @@ import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
-import { downloadFontFaceAsset } from './utils';
+import { downloadFontFaceAssets } from './utils';
 
 const DEFAULT_CATEGORY = {
-	id: 'all',
-	name: __( 'All' ),
+	slug: 'all',
+	name: _x( 'All', 'font categories' ),
 };
-function FontCollection( { id } ) {
-	const requiresPermission = id === 'default-font-collection';
+function FontCollection( { slug } ) {
+	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
 		return (
 			window.localStorage.getItem(
-				'wp-font-library-default-font-collection-permission'
+				'wp-font-library-google-fonts-permission'
 			) === 'true'
 		);
 	};
 
-	const [ notice, setNotice ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFont } =
+	const { collections, getFontCollection, installFont, notice, setNotice } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
-		( collection ) => collection.id === id
+		( collection ) => collection.slug === slug
 	);
 
 	useEffect( () => {
@@ -70,49 +67,40 @@ function FontCollection( { id } ) {
 		handleStorage();
 		window.addEventListener( 'storage', handleStorage );
 		return () => window.removeEventListener( 'storage', handleStorage );
-	}, [ id, requiresPermission ] );
+	}, [ slug, requiresPermission ] );
 
 	useEffect( () => {
 		const fetchFontCollection = async () => {
 			try {
-				await getFontCollection( id );
+				await getFontCollection( slug );
 				resetFilters();
 			} catch ( e ) {
-				setNotice( {
-					type: 'error',
-					message: e?.message,
-					duration: 0, // Don't auto-hide.
-				} );
+				if ( ! notice ) {
+					setNotice( {
+						type: 'error',
+						message: e?.message,
+					} );
+				}
 			}
 		};
 		fetchFontCollection();
-	}, [ id, getFontCollection ] );
+	}, [ slug, getFontCollection, setNotice, notice ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
 		setNotice( null );
-	}, [ id ] );
+	}, [ slug, setNotice ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
 		setFontsToInstall( [] );
 	}, [ selectedFont ] );
 
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice && notice?.duration !== 0 ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, notice.duration ?? 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
-
 	const collectionFonts = useMemo(
-		() => selectedCollection?.data?.fontFamilies ?? [],
+		() => selectedCollection?.font_families ?? [],
 		[ selectedCollection ]
 	);
-	const collectionCategories = selectedCollection?.data?.categories ?? [];
+	const collectionCategories = selectedCollection?.categories ?? [];
 
 	const categories = [ DEFAULT_CATEGORY, ...collectionCategories ];
 
@@ -155,17 +143,18 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
+		setNotice( null );
+
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
 			if ( fontFamily?.fontFace ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
-						if ( fontFace.downloadFromUrl ) {
-							fontFace.file = await downloadFontFaceAsset(
-								fontFace.downloadFromUrl
+						if ( fontFace.src ) {
+							fontFace.file = await downloadFontFaceAssets(
+								fontFace.src
 							);
-							delete fontFace.downloadFromUrl;
 						}
 					} )
 				);
@@ -182,9 +171,18 @@ function FontCollection( { id } ) {
 			return;
 		}
 
-		const response = await installFont( fontFamily );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
+		try {
+			await installFont( fontFamily );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error.message,
+			} );
+		}
 		resetFontsToInstall();
 	};
 
@@ -198,33 +196,19 @@ function FontCollection( { id } ) {
 					? selectedCollection.description
 					: __( 'Select font variants to install.' )
 			}
+			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
-				fontsToInstall.length > 0 && (
-					<Footer handleInstall={ handleInstall } />
-				)
+				<Footer
+					handleInstall={ handleInstall }
+					isDisabled={ fontsToInstall.length === 0 }
+				/>
 			}
 		>
 			{ renderConfirmDialog && (
 				<>
 					<Spacer margin={ 8 } />
 					<GoogleFontsConfirmDialog />
-				</>
-			) }
-
-			{ notice && (
-				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 2 } />
 				</>
 			) }
 
@@ -256,8 +240,8 @@ function FontCollection( { id } ) {
 							{ categories &&
 								categories.map( ( category ) => (
 									<option
-										value={ category.id }
-										key={ category.id }
+										value={ category.slug }
+										key={ category.slug }
 									>
 										{ category.name }
 									</option>
@@ -269,11 +253,11 @@ function FontCollection( { id } ) {
 
 			<Spacer margin={ 4 } />
 			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies &&
+				! selectedCollection?.font_families &&
 				! notice && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
-				!! selectedCollection?.data?.fontFamilies?.length &&
+				!! selectedCollection?.font_families?.length &&
 				! fonts.length && (
 					<Text>
 						{ __(
@@ -294,10 +278,10 @@ function FontCollection( { id } ) {
 				<FontsGrid>
 					{ fonts.map( ( font ) => (
 						<FontCard
-							key={ font.slug }
-							font={ font }
+							key={ font.font_family_settings.slug }
+							font={ font.font_family_settings }
 							onClick={ () => {
-								setSelectedFont( font );
+								setSelectedFont( font.font_family_settings );
 							} }
 						/>
 					) ) }
@@ -307,7 +291,7 @@ function FontCollection( { id } ) {
 	);
 }
 
-function Footer( { handleInstall } ) {
+function Footer( { handleInstall, isDisabled } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
 
 	return (
@@ -316,7 +300,8 @@ function Footer( { handleInstall } ) {
 				variant="primary"
 				onClick={ handleInstall }
 				isBusy={ isInstalling }
-				disabled={ isInstalling }
+				disabled={ isDisabled || isInstalling }
+				__experimentalIsFocusable
 			>
 				{ __( 'Install' ) }
 			</Button>

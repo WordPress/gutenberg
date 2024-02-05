@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Collection::__construct().
+ * Test WP_Font_Collection constructor.
  *
  * @package WordPress
  * @subpackage Font Library
@@ -12,81 +12,15 @@
  */
 class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 
-	public function test_should_initialize_data() {
-		$property = new ReflectionProperty( WP_Font_Collection::class, 'config' );
-		$property->setAccessible( true );
-
-		$config          = array(
-			'slug'        => 'my-collection',
-			'name'        => 'My Collection',
-			'description' => 'My collection description',
-			'src'         => 'my-collection-data.json',
+	public function test_should_do_it_wrong_with_invalid_slug() {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::__construct' );
+		$mock_collection_data = array(
+			'name'          => 'Test Collection',
+			'font_families' => array( 'mock ' ),
 		);
-		$font_collection = new WP_Font_Collection( $config );
 
-		$actual = $property->getValue( $font_collection );
-		$property->setAccessible( false );
+		$collection = new WP_Font_Collection( 'slug with spaces', $mock_collection_data );
 
-		$this->assertSame( $config, $actual );
-	}
-
-	/**
-	 * @dataProvider data_should_throw_exception
-	 *
-	 * @param mixed  $config Config of the font collection.
-	 * @param string $expected_exception_message Expected exception message.
-	 */
-	public function test_should_throw_exception( $config, $expected_exception_message ) {
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( $expected_exception_message );
-		new WP_Font_Collection( $config );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_should_throw_exception() {
-		return array(
-			'no id'                           => array(
-				array(
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-					'src'         => 'my-collection-data.json',
-				),
-				'Font Collection config slug is required as a non-empty string.',
-			),
-
-			'no config'                       => array(
-				'',
-				'Font Collection config options is required as a non-empty array.',
-			),
-
-			'empty array'                     => array(
-				array(),
-				'Font Collection config options is required as a non-empty array.',
-			),
-
-			'boolean instead of config array' => array(
-				false,
-				'Font Collection config options is required as a non-empty array.',
-			),
-
-			'null instead of config array'    => array(
-				null,
-				'Font Collection config options is required as a non-empty array.',
-			),
-
-			'missing src'                     => array(
-				array(
-					'slug'        => 'my-collection',
-					'name'        => 'My Collection',
-					'description' => 'My collection description',
-				),
-				'Font Collection config "src" option OR "data" option is required.',
-			),
-
-		);
+		$this->assertSame( 'slug-with-spaces', $collection->slug, 'Slug is not sanitized.' );
 	}
 }
