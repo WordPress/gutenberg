@@ -10,10 +10,12 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as dataviewsStore } from './store';
 import SearchWidget from './search-widget';
 import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 
@@ -137,12 +139,17 @@ function ResetFilter( { filter, view, onChangeView } ) {
 
 export default function FilterSummary( props ) {
 	const { filter, view } = props;
+	const filterToOpenOnMount = useSelect(
+		( select ) => select( dataviewsStore ).getOpenFilterOnMount(),
+		[]
+	);
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
 	);
 	return (
 		<Dropdown
+			defaultOpen={ filterToOpenOnMount === filter.field }
 			contentClassName="dataviews-filter-summary__popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
 			renderToggle={ ( { onToggle } ) => (

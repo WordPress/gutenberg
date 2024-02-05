@@ -24,10 +24,12 @@ import {
 	Children,
 	Fragment,
 } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as dataviewsStore } from './store';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
@@ -69,6 +71,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 	{ field, view, onChangeView, onHide },
 	ref
 ) {
+	const { setOpenFilterOnMount } = useDispatch( dataviewsStore );
 	const isHidable = field.enableHiding !== false;
 	const isSortable = field.enableSorting !== false;
 	const isSorted = view.sort?.field === field.id;
@@ -151,6 +154,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						<DropdownMenuItem
 							prefix={ <Icon icon={ funnel } /> }
 							onClick={ () => {
+								setOpenFilterOnMount( field.id );
 								onChangeView( {
 									...view,
 									page: 1,

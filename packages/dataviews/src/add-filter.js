@@ -7,10 +7,12 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as dataviewsStore } from './store';
 import { unlock } from './lock-unlock';
 
 const {
@@ -20,6 +22,7 @@ const {
 } = unlock( componentsPrivateApis );
 
 export default function AddFilter( { filters, view, onChangeView } ) {
+	const { setOpenFilterOnMount } = useDispatch( dataviewsStore );
 	if ( filters.length === 0 ) {
 		return null;
 	}
@@ -47,6 +50,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					<DropdownMenuItem
 						key={ filter.field }
 						onClick={ () => {
+							setOpenFilterOnMount( filter.field );
 							onChangeView( {
 								...view,
 								page: 1,
