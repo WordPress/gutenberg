@@ -4,8 +4,8 @@ Blocks are stored in the database or within HTML templates using a unique [HTML-
 
 Here are a few guidelines for the markup that defines a block:
 
-- The comments for all Core blocks start with the `wp` prefix (namespace) followed by the block name (e.g., `wp:image`)
-- For custom blocks, the comment should begin with a unique `namespace`, typically associated with the plugin or the block's creator, followed by the `blockname` (e.g., `namespace:blockname`). 
+- Core blocks begin with the `wp:` prefix, followed by the block name (e.g., `wp:image`). Notably, the `core` namespace is omitted.
+- Custom blocks begin with the `wp:` prefix, followed by the block namespace and name (e.g., `wp:namespace/name`).
 - The comment can be a single line, self-closing, or wrapper for HTML content.
 - Block settings and attributes are stored as a JSON object inside the block comment.
 
