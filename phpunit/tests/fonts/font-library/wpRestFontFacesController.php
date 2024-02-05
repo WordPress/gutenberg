@@ -993,7 +993,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		foreach ( $font_face_settings_schema['properties'] as $property ) {
 			$this->assertArrayHasKey( 'arg_options', $property, 'Setting schema should have arg_options.' );
 			$this->assertArrayHasKey( 'sanitize_callback', $property['arg_options'], 'Setting schema should have a sanitize_callback.' );
-			$this->assertIsCallable( $property['arg_options']['sanitize_callback'], 'sanitize_callback should be callable.' );
+			$this->assertIsCallable( $property['arg_options']['sanitize_callback'], 'The sanitize_callback value should be callable.' );
 		}
 	}
 
