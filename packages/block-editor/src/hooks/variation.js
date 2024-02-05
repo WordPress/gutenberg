@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 
@@ -20,60 +19,104 @@ import { store as blockEditorStore } from '../store';
 export default {
 	hasSupport: () => true, // TODO: Work out what the eligibility here should be.
 	attributeKeys: [ 'style' ],
+	passChildren: true,
 	useBlockProps,
 };
 
-function useBlockSyleVariation( name, variation, id ) {
-	const { user: userStyles } = useContext( GlobalStylesContext );
-	const globalStyles = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return {
-			settings: getSettings().__experimentalFeatures,
-			styles: getSettings().__experimentalStyles,
-		};
-	}, [] );
-
-	if ( ! variation ) {
-		return {};
-	}
-
-	const settings = userStyles?.settings ?? globalStyles?.settings;
-	const styles = userStyles?.styles ?? globalStyles?.styles;
-
-	// The variation style data is all that is needed to generate
-	// the styles for the current application to a block. The variation
-	// name is updated to match the instance specific class name.
-	const variationStyles = styles?.blocks?.[ name ]?.variations?.[ variation ];
-	const variationOnlyStyles = {
-		blocks: {
-			[ name ]: {
-				variations: {
-					[ `${ variation }-${ id }` ]: variationStyles,
-				},
-			},
-		},
-	};
-
-	return {
-		settings,
-		styles: variationOnlyStyles,
-	};
+function hasVariationClass( className ) {
+	return /\bis-style-(?!default)\b/.test( className );
 }
 
-function useBlockProps( { name, style } ) {
+function findInnerVariations( innerBlocks ) {
+	const variations = [];
+
+	innerBlocks.forEach( ( innerBlock ) => {
+		if ( ! innerBlock ) {
+			return;
+		}
+
+		const { innerBlocks: nestedBlocks, clientId } = innerBlock;
+
+		if ( hasVariationClass( innerBlock.attributes?.className ) ) {
+			variations.push( `variation-${ clientId }` );
+		}
+
+		// Recursively check children of current child for variations.
+		if ( nestedBlocks ) {
+			variations.push( ...findInnerVariations( nestedBlocks ) );
+		}
+	} );
+
+	return variations;
+}
+
+function useBlockSyleVariation( name, variation, clientId ) {
+	const { user: userStyles } = useContext( GlobalStylesContext );
+	const { globalSettings, globalStyles, block } = useSelect(
+		( select ) => {
+			const { getSettings, getBlock } = select( blockEditorStore );
+			return {
+				globalSettings: getSettings().__experimentalFeatures,
+				globalStyles: getSettings().__experimentalStyles,
+				block: getBlock( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	return useMemo( () => {
+		const styles = userStyles?.styles ?? globalStyles;
+		const variationStyles =
+			styles?.blocks?.[ name ]?.variations?.[ variation ];
+
+		return {
+			settings: userStyles?.settings ?? globalSettings,
+			// The variation style data is all that is needed to generate
+			// the styles for the current application to a block. The variation
+			// name is updated to match the instance specific class name.
+			styles: {
+				blocks: {
+					[ name ]: {
+						variations: {
+							[ `${ variation }-${ clientId }` ]: variationStyles,
+						},
+					},
+				},
+			},
+			// Collect any inner blocks that have variations applied as their style
+			// overrides need to be moved to after this block so the CSS cascade is
+			// in the correct order.
+			childVariationIds: block?.innerBlocks?.length
+				? findInnerVariations( block.innerBlocks )
+				: [],
+		};
+	}, [
+		userStyles,
+		globalSettings,
+		globalStyles,
+		block,
+		variation,
+		clientId,
+		name,
+	] );
+}
+
+// Rather than leveraging `useInstanceId` here, the `clientId` is used.
+// This is so that the variation style override's ID is predictable when
+// searching for inner blocks that have a variation applied and need those
+// styles to come after the parent's.
+function useBlockProps( { name, style, clientId } ) {
 	const variation = style?.variation;
-	const id = useInstanceId( useBlockProps );
-	const className = `is-style-${ variation }-${ id }`;
+	const className = `is-style-${ variation }-${ clientId }`;
 
 	const getBlockStyles = useSelect( ( select ) => {
 		return select( blocksStore ).getBlockStyles;
 	}, [] );
 
-	const { settings, styles } = useBlockSyleVariation(
+	const { settings, styles, childVariationIds } = useBlockSyleVariation(
 		name,
 		variation,
-		id,
-		getBlockStyles()
+		clientId
 	);
 
 	const variationStyles = useMemo( () => {
@@ -85,7 +128,7 @@ function useBlockProps( { name, style } ) {
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
 			getBlockStyles,
-			id
+			clientId
 		);
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
@@ -108,9 +151,14 @@ function useBlockProps( { name, style } ) {
 				rootPadding: false,
 			}
 		);
-	}, [ variation, settings, styles, getBlockStyles, id ] );
+	}, [ variation, settings, styles, getBlockStyles, clientId ] );
 
-	useStyleOverride( { css: variationStyles } );
+	useStyleOverride( {
+		id: `variation-${ clientId }`,
+		css: variationStyles,
+		__unstableType: 'variation',
+		childOverrideIds: childVariationIds,
+	} );
 
 	return variation ? { className } : {};
 }

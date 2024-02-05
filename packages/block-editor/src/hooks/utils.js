@@ -3,7 +3,7 @@
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
@@ -133,21 +133,58 @@ export function shouldSkipSerialization(
 	return skipSerialization;
 }
 
-export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
+export function useStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	childOverrideIds,
+} = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
+
+	const getStyleOverrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides,
+		[]
+	);
+
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets && __unstableType !== 'variation' ) return;
+
 		const _id = id || fallbackId;
+
 		setStyleOverride( _id, {
 			id,
 			css,
 			assets,
 			__unstableType,
 		} );
+
+		// To maintain style order for block style variations such that parent
+		// block style overrides are loaded before children. Remove the child
+		// overrides specified in `childOverrideIds` and re-add them so they are
+		// stored in the underlying Map after the parent in the insertion order.
+		//
+		// If this hook only prevented the cleanup of a variation's style
+		// overrides, when a new application of a block style variation was made
+		// to a block containing inner blocks with their own variations applied,
+		// the parent's would be loaded after which isn't desired.
+		if ( __unstableType === 'variation' && childOverrideIds?.length ) {
+			const overrides = getStyleOverrides();
+
+			childOverrideIds.forEach( ( childOverrideId ) => {
+				const override = overrides.get( childOverrideId );
+
+				if ( override ) {
+					deleteStyleOverride( childOverrideId );
+					setStyleOverride( childOverrideId, override );
+				}
+			} );
+		}
+
 		return () => {
 			deleteStyleOverride( _id );
 		};
@@ -157,8 +194,10 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 		assets,
 		__unstableType,
 		fallbackId,
+		getStyleOverrides,
 		setStyleOverride,
 		deleteStyleOverride,
+		childOverrideIds,
 	] );
 }
 
@@ -500,7 +539,7 @@ export function createBlockListBlockFilter( features ) {
 						useBlockProps,
 					} = feature;
 
-					const neededProps = {};
+					const neededProps = { clientId: props.clientId };
 					for ( const key of attributeKeys ) {
 						if ( props.attributes[ key ] ) {
 							neededProps[ key ] = props.attributes[ key ];
