@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `GradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58701](https://github.com/WordPress/gutenberg/pull/58701)).
 
 ### Enhancements
 
