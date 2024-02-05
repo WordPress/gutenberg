@@ -8,14 +8,15 @@
  * @group fonts
  * @group font-library
  *
- * @covers wp_get_font_dir
+ * @covers ::wp_get_font_dir
  */
 class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
-	private $dir_defaults;
+	private static $dir_defaults;
 
-	public function __construct() {
-		parent::__construct();
-		$this->dir_defaults = array(
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		static::$dir_defaults = array(
 			'path'    => path_join( WP_CONTENT_DIR, 'fonts' ),
 			'url'     => content_url( 'fonts' ),
 			'subdir'  => '',
@@ -27,7 +28,8 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 
 	public function test_fonts_dir() {
 		$font_dir = wp_get_font_dir();
-		$this->assertEquals( $font_dir, $this->dir_defaults );
+
+		$this->assertSame( $font_dir, static::$dir_defaults );
 	}
 
 	public function test_fonts_dir_with_filter() {
@@ -57,14 +59,14 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 			'error'   => false,
 		);
 
-		$this->assertEquals( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
-
 		// Remove the filter.
 		remove_filter( 'font_dir', 'set_new_values' );
+
+		$this->assertSame( $expected, $font_dir, 'The wp_get_font_dir() method should return the expected values.' );
 
 		// Gets the fonts dir.
 		$font_dir = wp_get_font_dir();
 
-		$this->assertEquals( $font_dir, $this->dir_defaults, 'The wp_get_font_dir() method should return the default values.' );
+		$this->assertSame( static::$dir_defaults, $font_dir, 'The wp_get_font_dir() method should return the default values.' );
 	}
 }
