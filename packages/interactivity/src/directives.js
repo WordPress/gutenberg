@@ -102,17 +102,24 @@ export default () => {
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
 			const passedValues = context.map( ( { value } ) => value );
-
-			currentValue.current = useMemo( () => {
-				const newValue = context
-					.map( ( c ) => deepSignal( { [ c.namespace ]: c.value } ) )
-					.reduceRight( mergeDeepSignals );
-
-				mergeDeepSignals( newValue, inheritedValue );
-				mergeDeepSignals( currentValue.current, newValue, true );
-				return currentValue.current;
-			}, [ inheritedValue, ...passedValues ] );
-
+			try {
+				const { namespace, value } = context.find(
+					( { suffix } ) => suffix === 'default'
+				);
+				currentValue.current = useMemo( () => {
+					const newValue = deepSignal( {
+						[ namespace ]: value,
+					} );
+					mergeDeepSignals( newValue, inheritedValue );
+					mergeDeepSignals( currentValue.current, newValue, true );
+					return currentValue.current;
+				}, [ inheritedValue, ...passedValues ] );
+			} catch ( e ) {
+				// If there's an error, we'll just return the inherited context.
+				return (
+					<Provider value={ inheritedValue }>{ children }</Provider>
+				);
+			}
 			return (
 				<Provider value={ currentValue.current }>{ children }</Provider>
 			);
