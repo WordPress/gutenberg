@@ -229,7 +229,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 									'fontFamily'          => 'sanitize_text_field',
 									'fontStyle'           => 'sanitize_text_field',
 									'fontWeight'          => 'sanitize_text_field',
-									'src'                 => function ( $value ) {
+									'src'                 => static function ( $value ) {
 										return is_array( $value )
 											? array_map( 'sanitize_text_field', $value )
 											: sanitize_text_field( $value );
