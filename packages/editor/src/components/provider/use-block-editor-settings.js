@@ -20,6 +20,9 @@ import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 
+const __experimentalSelectBlockPatterns = ( select ) =>
+	select( coreStore ).getBlockPatterns();
+
 const EMPTY_BLOCKS_LIST = [];
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -86,7 +89,6 @@ const BLOCK_EDITOR_SETTINGS = [
  */
 function useBlockEditorSettings( settings, postType, postId ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { getBlockPatterns } = useSelect( coreStore );
 	const {
 		allowRightClickOverrides,
 		blockTypes,
@@ -247,7 +249,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			__experimentalSelectBlockPatterns: getBlockPatterns,
+			__experimentalSelectBlockPatterns,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
@@ -290,7 +292,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			reusableBlocks,
 			userPatternCategories,
 			blockPatterns,
-			getBlockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
