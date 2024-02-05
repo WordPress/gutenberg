@@ -1,7 +1,8 @@
 .edit-site-site-icon__icon {
 	fill: currentColor;
 	// Matches SiteIcon motion, smoothing out the transition.
-	transition: padding	0.3s ease-out;
+	transition: padding 0.3s ease-out;
+	@include reduce-motion("transition");
 
 	.edit-site-layout.is-full-canvas & {
 		// Make the WordPress icon not so big in full canvas.
