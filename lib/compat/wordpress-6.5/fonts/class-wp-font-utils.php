@@ -138,17 +138,19 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		}
 
 		/**
-		 * Sanitize a tree of data using a schema that defines the sanitization to apply to each key.
+		 * Sanitizes a tree of data using a schema.
 		 *
-		 * It removes the keys not in the schema and applies the sanitizer to the values.
+		 * The schema structure should mirror the data tree. Each value provided in the
+		 * schema should be a callable that will be applied to sanitize the corresponding
+		 * value in the data tree. Keys that are in the data tree, but not present in the
+		 * schema, will be removed in the santized data. Nested arrays are traversed recursively.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @access private
 		 *
-		 * @param array $tree The data to sanitize.
+		 * @param array $tree   The data to sanitize.
 		 * @param array $schema The schema used for sanitization.
-		 *
 		 * @return array The sanitized data.
 		 */
 		public static function sanitize_from_schema( $tree, $schema ) {
@@ -175,7 +177,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 								: self::apply_sanitizer( $item_value, $schema[ $key ][0] );
 						}
 					} else {
-						// If it is an associative or indexed array., process as a single object.
+						// If it is an associative or indexed array, process as a single object.
 						$tree[ $key ] = self::sanitize_from_schema( $value, $schema[ $key ] );
 					}
 				} elseif ( ! $is_value_array && $is_schema_array ) {
@@ -196,13 +198,12 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		}
 
 		/**
-		 * Apply the sanitizer to the value.
+		 * Applies a sanitizer function to a value.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param mixed $value The value to sanitize.
-		 * @param mixed $sanitizer The sanitizer to apply.
-		 *
+		 * @param mixed $value     The value to sanitize.
+		 * @param mixed $sanitizer The sanitizer function to apply.
 		 * @return mixed The sanitized value.
 		 */
 		private static function apply_sanitizer( $value, $sanitizer ) {

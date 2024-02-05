@@ -15,13 +15,14 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 	 * Font Collection class.
 	 *
 	 * @since 6.5.0
+	 *
+	 * @see wp_register_font_collection()
 	 */
 	final class WP_Font_Collection {
 		/**
 		 * The unique slug for the font collection.
 		 *
 		 * @since 6.5.0
-		 *
 		 * @var string
 		 */
 		public $slug;
@@ -30,7 +31,6 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * Font collection data.
 		 *
 		 * @since 6.5.0
-		 *
 		 * @var array|WP_Error|null
 		 */
 		private $data;
@@ -39,7 +39,6 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * Font collection JSON file path or URL.
 		 *
 		 * @since 6.5.0
-		 *
 		 * @var string|null
 		 */
 		private $src;
@@ -49,15 +48,10 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string        $slug Font collection slug.
-		 * @param array|string  $data_or_file {
-		 *     Font collection data array or a file path or URL to a JSON file containing the font collection.
-		 *
-		 *     @type string $name          Name of the font collection.
-		 *     @type string $description   Description of the font collection.
-		 *     @type array  $font_families Array of font family definitions included in the collection.
-		 *     @type array  $categories    Array of categories associated with the fonts in the collection.
-		 * }
+		 * @param string        $slug         Font collection slug.
+		 * @param array|string  $data_or_file Font collection data array or a path/URL to a JSON file
+		 *                                    containing the font collection.
+		 *                                    See {@see wp_register_font_collection()} for the supported fields.
 		 */
 		public function __construct( $slug, $data_or_file ) {
 			$this->slug = sanitize_title( $slug );
