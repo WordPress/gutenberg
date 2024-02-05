@@ -115,7 +115,6 @@ export const GridLine = styled.div`
 	background: rgba( 255, 255, 255, 0.4 );
 	backdrop-filter: blur( 16px ) saturate( 200% );
 	position: absolute;
-	opacity: 1;
 	transform: translateZ( 0 );
 `;
 
