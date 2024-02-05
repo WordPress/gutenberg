@@ -495,22 +495,25 @@
 .dataviews-filter-summary__popover {
 	.components-popover__content {
 		width: 230px;
+		padding: 0;
+		border-radius: $grid-unit-05;
 	}
 }
 
 .dataviews-search-widget-filter-combobox-list {
-	height: 180px;
+	max-height: $grid-unit * 20;
+	padding: $grid-unit-05;
 	overflow: auto;
+	border-top: 1px solid $gray-200;
 
 	.dataviews-search-widget-filter-combobox-item {
 		display: flex;
 		align-items: center;
 		gap: $grid-unit-05;
 		border-radius: $radius-block-ui;
-		transition: all 0.05s ease-in-out;
-		@include reduce-motion("transition");
 		box-sizing: border-box;
-		padding: 6px;
+		padding: $grid-unit-10 $grid-unit-15;
+		cursor: default;
 
 		&[data-active-item] {
 			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
@@ -555,6 +558,7 @@
 
 .dataviews-search-widget-filter-combobox__wrapper {
 	position: relative;
+	padding: $grid-unit-10;
 
 	.dataviews-search-widget-filter-combobox__input-wrapper {
 		position: relative;
@@ -608,15 +612,16 @@
 	}
 }
 
-.dataviews-default-separator {
-	border: none;
-	height: 1px;
-	background-color: #e0e0e0;
-	margin-block: calc(4px * 2);
-	margin-inline: 0;
-	outline: 2px solid transparent;
+.dataviews-filter-summary__operators-container {
+	padding: $grid-unit-10;
+	padding-bottom: 0;
+
+	&:empty {
+		display: none;
+	}
 }
 
-.dataviews-filter-summary__operators-container {
-	margin-bottom: $grid-unit-10;
+.dataviews-filter-summary__reset {
+	padding: $grid-unit-05;
+	border-top: 1px solid $gray-200;
 }

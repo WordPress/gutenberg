@@ -93,7 +93,6 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 					</div>
 				</div>
 			</BaseControl>
-			<hr className="dataviews-default-separator" />
 			<Ariakit.ComboboxList
 				className="dataviews-search-widget-filter-combobox-list"
 				alwaysVisible

@@ -115,24 +115,26 @@ function ResetFilter( { filter, view, onChangeView } ) {
 		view.filters.find( ( _filter ) => _filter.field === filter.field )
 			?.value === undefined && filter.isPrimary;
 	return (
-		<Button
-			disabled={ isDisabled }
-			__experimentalIsFocusable
-			size="compact"
-			variant="tertiary"
-			style={ { justifyContent: 'center' } }
-			onClick={ () => {
-				onChangeView( {
-					...view,
-					page: 1,
-					filters: view.filters.filter(
-						( _filter ) => _filter.field !== filter.field
-					),
-				} );
-			} }
-		>
-			{ filter.isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
-		</Button>
+		<div className="dataviews-filter-summary__reset">
+			<Button
+				disabled={ isDisabled }
+				__experimentalIsFocusable
+				__next40pxDefaultSize
+				variant="tertiary"
+				style={ { justifyContent: 'center', width: '100%' } }
+				onClick={ () => {
+					onChangeView( {
+						...view,
+						page: 1,
+						filters: view.filters.filter(
+							( _filter ) => _filter.field !== filter.field
+						),
+					} );
+				} }
+			>
+				{ filter.isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
+			</Button>
+		</div>
 	);
 }
 
@@ -169,7 +171,6 @@ export default function FilterSummary( props ) {
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...props } />
 						<SearchWidget { ...props } />
-						<hr className="dataviews-default-separator" />
 						<ResetFilter { ...props } />
 					</VStack>
 				);
