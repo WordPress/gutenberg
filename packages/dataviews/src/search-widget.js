@@ -11,7 +11,14 @@ import removeAccents from 'remove-accents';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
 import { BaseControl, VisuallyHidden, Icon } from '@wordpress/components';
-import { check, search } from '@wordpress/icons';
+import { search } from '@wordpress/icons';
+import { SVG, Circle } from '@wordpress/primitives';
+
+const radioCheck = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Circle cx={ 12 } cy={ 12 } r={ 3 }></Circle>
+	</SVG>
+);
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
@@ -103,7 +110,7 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 						>
 							<span className="dataviews-search-widget-filter-combobox-item-check">
 								{ selectedValues === element.value && (
-									<Icon icon={ check } />
+									<Icon icon={ radioCheck } />
 								) }
 							</span>
 							<span>
