@@ -31,7 +31,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @var array
+		 * @var array|WP_Error|null
 		 */
 		private $data;
 
@@ -40,7 +40,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @var string
+		 * @var string|null
 		 */
 		private $src;
 
@@ -62,10 +62,10 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		public function __construct( $slug, $data_or_file ) {
 			$this->slug = sanitize_title( $slug );
 
-			// Data or json are lazy loaded and validated in get_data().
 			if ( is_array( $data_or_file ) ) {
-				$this->data = $data_or_file;
+				$this->data = $this->sanitize_and_validate_data( $data_or_file );
 			} else {
+				// JSON data is lazy loaded by ::get_data().
 				$this->src = $data_or_file;
 			}
 
@@ -87,30 +87,21 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @return array|WP_Error An array containing the font collection data, or a WP_Error on failure.
 		 */
 		public function get_data() {
-			// If we have a JSON config, load it and cache the data if it's valid.
+			// If the collection uses JSON data, load it and cache the data/error.
 			if ( $this->src && empty( $this->data ) ) {
-				$data = $this->load_from_json( $this->src );
-				if ( is_wp_error( $data ) ) {
-					return $data;
-				}
-
-				$this->data = $data;
+				$this->data = $this->load_from_json( $this->src );
 			}
 
-			// Validate required properties are not empty.
-			$data = $this->validate_data( $this->data );
-			if ( is_wp_error( $data ) ) {
-				return $data;
+			if ( is_wp_error( $this->data ) ) {
+				return $this->data;
 			}
 
 			// Set defaults for optional properties.
-			return wp_parse_args(
-				$data,
-				array(
-					'description' => '',
-					'categories'  => array(),
-				)
+			$defaults = array(
+				'description' => '',
+				'categories'  => array(),
 			);
+			return wp_parse_args( $this->data, $defaults );
 		}
 
 		/**
@@ -151,7 +142,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection JSON file contents.', 'gutenberg' ) );
 			}
 
-			return $data;
+			return $this->sanitize_and_validate_data( $data );
 		}
 
 		/**
@@ -180,8 +171,8 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the REST response JSON.', 'gutenberg' ) );
 				}
 
-				// Make sure the data is valid before caching it.
-				$data = $this->validate_data( $data );
+				// Make sure the data is valid before storing it in a transient.
+				$data = $this->sanitize_and_validate_data( $data );
 				if ( is_wp_error( $data ) ) {
 					return $data;
 				}
@@ -193,14 +184,17 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		}
 
 		/**
-		 * Validates the font collection configuration.
+		 * Sanitizes and validates the font collection data.
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $data Font collection configuration to validate.
-		 * @return array|WP_Error Array of data if valid, otherwise a WP_Error instance.
+		 * @param array $data Font collection data to sanitize and validate.
+		 * @return array|WP_Error Sanitized data if valid, otherwise a WP_Error instance.
 		 */
-		private function validate_data( $data ) {
+		private function sanitize_and_validate_data( $data ) {
+			$schema = self::get_sanitization_schema();
+			$data   = WP_Font_Utils::sanitize_from_schema( $data, $schema );
+
 			$required_properties = array( 'name', 'font_families' );
 			foreach ( $required_properties as $property ) {
 				if ( empty( $data[ $property ] ) ) {
@@ -216,6 +210,60 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			}
 
 			return $data;
+		}
+
+		/**
+		 * Retrieves the font collection sanitization schema.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return array Font collection sanitization schema.
+		 */
+		private static function get_sanitization_schema() {
+			return array(
+				'name'          => 'sanitize_text_field',
+				'description'   => 'sanitize_text_field',
+				'font_families' => array(
+					array(
+						'font_family_settings' => array(
+							'name'       => 'sanitize_text_field',
+							'slug'       => 'sanitize_title',
+							'fontFamily' => 'sanitize_text_field',
+							'preview'    => 'sanitize_url',
+							'fontFace'   => array(
+								array(
+									'fontFamily'          => 'sanitize_text_field',
+									'fontStyle'           => 'sanitize_text_field',
+									'fontWeight'          => 'sanitize_text_field',
+									'src'                 => function ( $value ) {
+										return is_array( $value )
+											? array_map( 'sanitize_text_field', $value )
+											: sanitize_text_field( $value );
+									},
+									'preview'             => 'sanitize_url',
+									'fontDisplay'         => 'sanitize_text_field',
+									'fontStretch'         => 'sanitize_text_field',
+									'ascentOverride'      => 'sanitize_text_field',
+									'descentOverride'     => 'sanitize_text_field',
+									'fontVariant'         => 'sanitize_text_field',
+									'fontFeatureSettings' => 'sanitize_text_field',
+									'fontVariationSettings' => 'sanitize_text_field',
+									'lineGapOverride'     => 'sanitize_text_field',
+									'sizeAdjust'          => 'sanitize_text_field',
+									'unicodeRange'        => 'sanitize_text_field',
+								),
+							),
+						),
+						'categories'           => array( 'sanitize_title' ),
+					),
+				),
+				'categories'    => array(
+					array(
+						'name' => 'sanitize_text_field',
+						'slug' => 'sanitize_title',
+					),
+				),
+			);
 		}
 	}
 }

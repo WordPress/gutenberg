@@ -158,7 +158,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				}
 
 				$is_value_array  = is_array( $value );
-				$is_schema_array = is_array( $schema[ $key ] );
+				$is_schema_array = is_array( $schema[ $key ] ) && ! is_callable( $schema[ $key ] );
 
 				if ( $is_value_array && $is_schema_array ) {
 					if ( wp_is_numeric_array( $value ) ) {
@@ -193,6 +193,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * Apply the sanitizer to the value.
 		 *
 		 * @since 6.5.0
+		 *
 		 * @param mixed $value The value to sanitize.
 		 * @param mixed $sanitizer The sanitizer to apply.
 		 *
