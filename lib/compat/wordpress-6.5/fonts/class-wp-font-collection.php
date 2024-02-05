@@ -55,14 +55,6 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 */
 		public function __construct( $slug, $data_or_file ) {
 			$this->slug = sanitize_title( $slug );
-
-			if ( is_array( $data_or_file ) ) {
-				$this->data = $this->sanitize_and_validate_data( $data_or_file );
-			} else {
-				// JSON data is lazy loaded by ::get_data().
-				$this->src = $data_or_file;
-			}
-
 			if ( $this->slug !== $slug ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -70,6 +62,13 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 					sprintf( __( 'Font collection slug "%s" is not valid. Slugs must use only alphanumeric characters, dashes, and underscores.', 'gutenberg' ), $slug ),
 					'6.5.0'
 				);
+			}
+
+			if ( is_array( $data_or_file ) ) {
+				$this->data = $this->sanitize_and_validate_data( $data_or_file );
+			} else {
+				// JSON data is lazy loaded by ::get_data().
+				$this->src = $data_or_file;
 			}
 		}
 
