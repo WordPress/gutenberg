@@ -70,10 +70,9 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 			justify="flex-start"
 			className="dataviews-filter-summary__operators-container"
 		>
-			<FlexItem>{ filter.name }</FlexItem>
 			{ operatorOptions.length > 1 && (
 				<SelectControl
-					label={ __( 'Condition' ) }
+					label={ filter.name }
 					value={ value }
 					options={ operatorOptions }
 					onChange={ ( newValue ) => {
@@ -102,9 +101,9 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 							filters: newFilters,
 						} );
 					} }
-					size="compact"
+					size="small"
 					__nextHasNoMarginBottom
-					hideLabelFromVision
+					labelPosition="side"
 				/>
 			) }
 		</HStack>
