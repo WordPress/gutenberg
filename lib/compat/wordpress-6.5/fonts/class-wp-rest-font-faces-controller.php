@@ -180,7 +180,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				if ( isset( $settings[ $key ] ) && ! $settings[ $key ] ) {
 					return new WP_Error(
 						'rest_invalid_param',
-						/* translators: %s: Name of the missing font face setting parameter, e.g. "font_face_settings[src]". */
+						/* translators: %s: Name of the missing font face settings parameter, e.g. "font_face_settings[src]". */
 						sprintf( __( '%s cannot be empty.', 'gutenberg' ), "font_face_setting[ $key ]" ),
 						array( 'status' => 400 )
 					);

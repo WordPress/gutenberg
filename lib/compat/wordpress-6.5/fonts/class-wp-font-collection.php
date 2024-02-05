@@ -162,7 +162,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 
 				$data = json_decode( wp_remote_retrieve_body( $response ), true );
 				if ( empty( $data ) ) {
-					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the http response JSON.', 'gutenberg' ) );
+					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the HTTP response JSON.', 'gutenberg' ) );
 				}
 
 				// Make sure the data is valid before storing it in a transient.
