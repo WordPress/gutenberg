@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	PanelBody,
@@ -20,9 +20,17 @@ import { store as blockEditorStore } from '../store';
 const EMPTY_OBJECT = {};
 
 function BlockHooksControlPure( { name, clientId } ) {
-	const hookedBlocksForCurrentBlock = useSelect(
-		( select ) => select( blocksStore ).getHookedBlockNames( name ),
-		[ name ]
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
+
+	const hookedBlocksForCurrentBlock = useMemo(
+		() =>
+			blockTypes?.filter(
+				( { blockHooks } ) => blockHooks && name in blockHooks
+			),
+		[ blockTypes, name ]
 	);
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
