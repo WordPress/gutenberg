@@ -1,60 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
-/**
- * Set of available mode options.
- *
- * @type {Array}
- */
-const MODES = [
-	{
-		value: 'visual',
-		label: __( 'Visual editor' ),
-	},
-	{
-		value: 'text',
-		label: __( 'Code editor' ),
-	},
-];
+const { ModeSwitcher: EditorModeSwitcher } = unlock( editorPrivateApis );
 
 function ModeSwitcher() {
-	const { shortcut, mode } = useSelect(
-		( select ) => ( {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
-			mode: select( editSiteStore ).getEditorMode(),
-		} ),
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
+				'core/edit-site/toggle-mode'
+			),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( editSiteStore );
 
-	const choices = MODES.map( ( choice ) => {
-		if ( choice.value !== mode ) {
-			return { ...choice, shortcut };
-		}
-		return choice;
-	} );
-
-	return (
-		<MenuGroup label={ __( 'Editor' ) }>
-			<MenuItemsChoice
-				choices={ choices }
-				value={ mode }
-				onSelect={ switchEditorMode }
-			/>
-		</MenuGroup>
-	);
+	return <EditorModeSwitcher shortcut={ shortcut } />;
 }
 
 export default ModeSwitcher;

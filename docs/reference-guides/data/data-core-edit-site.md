@@ -395,7 +395,11 @@ _Returns_
 
 ### switchEditorMode
 
-Undocumented declaration.
+Sets the editor mode (for text editing or visual editing).
+
+_Parameters_
+
+-   _mode_ `'visual'|'text'`: The mode, either 'visual' or 'text'.
 
 ### toggleDistractionFree
 

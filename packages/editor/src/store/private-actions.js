@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -108,4 +110,34 @@ export const hideBlockTypes =
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core', 'hiddenBlockTypes', [ ...mergedBlockNames ] );
+	};
+
+/**
+ * Sets the editor mode (for text editing or visual editing).
+ *
+ * @param {'visual'|'text'} mode The mode, either 'visual' or 'text'.
+ */
+export const setEditorMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry
+			.dispatch( 'core/preferences' )
+			.set( 'core', 'editorMode', mode );
+
+		// Unselect blocks when we switch to a non visual mode.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if ( mode === 'visual' ) {
+			speak( __( 'Visual editor selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
+			speak( __( 'Code editor selected' ), 'assertive' );
+		}
 	};
