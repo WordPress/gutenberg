@@ -85,7 +85,12 @@ export const getVariationsByProperty = ( user, variations, property ) => {
 	);
 
 	const variationsWithOnlyProperty = variations.map( ( variation ) => {
-		return filterObjectByProperty( variation, property );
+		return {
+			...filterObjectByProperty( variation, property ),
+			// Add variation title and description to every variation item.
+			title: variation?.title,
+			description: variation?.description,
+		};
 	} );
 
 	return variationsWithOnlyProperty.map( ( variation ) =>

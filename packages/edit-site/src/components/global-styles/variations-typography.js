@@ -119,10 +119,12 @@ function TypographyVariation( { variation } ) {
 	const [ bodyFontFamilies, headingFontFamilies ] = getFontFamilies(
 		mergeBaseAndUserConfigs( base, variation )
 	);
-
-	const bodyPreviewStyle = getFamilyPreviewStyle( bodyFontFamilies );
+	const bodyPreviewStyle = bodyFontFamilies
+		? getFamilyPreviewStyle( bodyFontFamilies )
+		: {};
 	const headingPreviewStyle = {
-		...getFamilyPreviewStyle( headingFontFamilies ),
+		...( headingFontFamilies &&
+			getFamilyPreviewStyle( headingFontFamilies ) ),
 		fontSize: '1.2rem',
 	};
 
@@ -154,10 +156,10 @@ function TypographyVariation( { variation } ) {
 					} }
 				>
 					<div style={ headingPreviewStyle }>
-						{ headingFontFamilies.name }
+						{ headingFontFamilies?.name || variation?.title }
 					</div>
 					<div style={ bodyPreviewStyle }>
-						{ bodyFontFamilies.name }
+						{ bodyFontFamilies?.name || __( 'Typeset' ) }
 					</div>
 				</VStack>
 			</div>
@@ -173,10 +175,8 @@ export default function TypographyVariations() {
 	}, [] );
 
 	const { base, user } = useContext( GlobalStylesContext );
-
 	const typographyVariations =
 		variations && getVariationsByProperty( user, variations, 'typography' );
-
 	const uniqueTypographyVariations = [];
 	const uniqueTypographyNames = [];
 	const isDup = ( x, y ) => {
@@ -204,15 +204,16 @@ export default function TypographyVariations() {
 				columns={ 2 }
 				className="edit-site-global-styles-style-variations-container"
 			>
-				{ uniqueTypographyVariations &&
-					uniqueTypographyVariations.map( ( variation, index ) => {
-						return (
-							<TypographyVariation
-								key={ index }
-								variation={ variation }
-							/>
-						);
-					} ) }
+				{ typographyVariations && typographyVariations.length
+					? uniqueTypographyVariations.map( ( variation, index ) => {
+							return (
+								<TypographyVariation
+									key={ index }
+									variation={ variation }
+								/>
+							);
+					  } )
+					: null }
 			</Grid>
 		</VStack>
 	);
