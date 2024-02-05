@@ -150,10 +150,10 @@ export default function Edit( { attributes, setAttributes } ) {
 ```
 _See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/settings-sidebar-82c525) of the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/settings-sidebar-82c525/src/edit.js)._
 
-Block controls rendered in both the toolbar and sidebar will also be used when multiple blocks of the same type are selected.
+Block controls rendered in both the toolbar and sidebar will also be available when multiple blocks of the same type are selected.
 
 <div class="callout callout-note">
-	For common customization settings, including color, border, spacing customization, and more, you can rely on <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#enable-ui-settings-panels-for-the-block-with-supports">block supports</a> to provide the same functionality in a more efficient way.
+	For common customization settings, including color, border, spacing, and more, you can rely on <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#enable-ui-settings-panels-for-the-block-with-supports">block supports</a> instead of a custom solution. Block supports provide a consistent UI with the same functionality as other Core blocks.
 </div>
 
 ## Additional resources
