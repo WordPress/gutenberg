@@ -248,6 +248,8 @@ export default function BorderPanel( {
 						value={ border }
 						__experimentalIsRenderedInSidebar={ true }
 						size={ '__unstable-large' }
+						hideLabelFromVision={ ! hasShadowControl }
+						label={ __( 'Border' ) }
 					/>
 				</ToolsPanelItem>
 			) }
