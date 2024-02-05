@@ -94,6 +94,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				'description' => '',
 				'categories'  => array(),
 			);
+
 			return wp_parse_args( $this->data, $defaults );
 		}
 
