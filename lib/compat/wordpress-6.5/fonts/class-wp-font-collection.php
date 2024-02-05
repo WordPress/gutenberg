@@ -193,7 +193,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			foreach ( $required_properties as $property ) {
 				if ( empty( $data[ $property ] ) ) {
 					$message = sprintf(
-					// translators: 1: Font collection slug, 2: Missing property name.
+					// translators: 1: Font collection slug, 2: Missing property name, e.g. "font_families".
 						__( 'Font collection "%1$s" has missing or empty property: "%2$s".', 'gutenberg' ),
 						$this->slug,
 						$property

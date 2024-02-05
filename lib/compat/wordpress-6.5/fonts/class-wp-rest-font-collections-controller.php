@@ -319,7 +319,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 
 			return new WP_Error(
 				'rest_cannot_read',
-				__( 'Sorry, you are not allowed to use the Font Library on this site.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to access font collections.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
