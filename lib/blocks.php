@@ -563,12 +563,8 @@ add_filter(
  *
  */
 function _gutenberg_register_footnotes_meta_field() {
-	$post_types = get_post_types(
-		array(
-			'show_in_rest' => true,
-			'public'       => true,
-		)
-	);
+	$post_types = get_post_types( array( 'show_in_rest' => true ) );
+	$post_types = array_filter( $post_types, 'is_post_type_viewable' );
 	foreach ( $post_types as $post_type ) {
 		// Only register the meta field if the post type supports the editor, custom fields, and revisions.
 		if ( post_type_supports( $post_type, 'editor' ) && post_type_supports( $post_type, 'custom-fields' ) && post_type_supports( $post_type, 'revisions' ) && post_type_supports( $post_type, 'footnotes' ) ) {
