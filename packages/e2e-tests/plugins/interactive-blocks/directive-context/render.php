@@ -138,6 +138,8 @@ wp_enqueue_script_module( 'directive-context-view' );
 <div
 	data-wp-interactive='{"namespace": "directive-context-non-default"}'
 	data-wp-context--non-default='{ "text": "non default" }'
+	data-wp-context='{ "defaultText": "default" }'
 >
 	<span data-testid="non-default suffix context" data-wp-text="context.text"></span>
+	<span data-testid="default suffix context" data-wp-text="context.defaultText"></span>
 </div>
