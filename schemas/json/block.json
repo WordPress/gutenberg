@@ -739,7 +739,7 @@
 				},
 				"innerBlocks": {
 					"type": "array",
-					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this:\\n\\n[ { \"name\": \"core/heading\", \"innerBlocks\": [ { \"name\": \"core/heading\", \"attributes\": { \"content\": \"This is an Example\" } } ] } ]\\n\\nWhere each block itself is an object that contains the block name, the block attributes, and the blocks inner blocks."
+					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this:\n\n[ { \"name\": \"core/heading\", \"attributes\": { \"content\": \"This is an Example\" } } ]\n\nWhere each block itself is an object that contains the block name, the block attributes, and the blocks inner blocks."
 				}
 			}
 		},
