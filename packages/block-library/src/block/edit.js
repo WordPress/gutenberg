@@ -113,8 +113,8 @@ function applyInitialContentValuesToInnerBlocks(
 		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] ??= { values: {} };
-			defaultValues[ blockId ].values[ attributeKey ] =
+			defaultValues[ blockId ] ??= {};
+			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
 
 			const contentValues = content[ blockId ]?.values;
@@ -144,7 +144,7 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 		for ( const attributeKey of attributes ) {
 			if (
 				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ].values[ attributeKey ]
+				defaultValues[ blockId ][ attributeKey ]
 			) {
 				content[ blockId ] ??= { values: {} };
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
