@@ -230,15 +230,15 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getHookedBlockNames', () => {
-		it( 'should return an empty array if state is empty', () => {
+		it( 'should return an empty object if state is empty', () => {
 			const state = {
 				blockTypes: {},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toHaveLength( 0 );
+			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {} );
 		} );
 
-		it( 'should return an empty array if the anchor block is not found', () => {
+		it( 'should return an empty object if the anchor block is not found', () => {
 			const state = {
 				blockTypes: {
 					anchor: {
@@ -253,9 +253,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'otherAnchor' ) ).toHaveLength(
-				0
-			);
+			expect( getHookedBlockNames( state, 'otherAnchor' ) ).toEqual( {} );
 		} );
 
 		it( "should return the anchor block name even if the anchor block doesn't exist", () => {
@@ -270,9 +268,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( [
-				'hookedBlock',
-			] );
+			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {
+				after: [ 'hookedBlock' ],
+			} );
 		} );
 
 		it( 'should return an array with the hooked block names', () => {
@@ -296,10 +294,43 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( [
-				'hookedBlock1',
-				'hookedBlock2',
-			] );
+			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {
+				after: [ 'hookedBlock1' ],
+				before: [ 'hookedBlock2' ],
+			} );
+		} );
+
+		it( 'should return an array with the hooked block names, even if multiple blocks are in the same relative position', () => {
+			const state = {
+				blockTypes: {
+					anchor: {
+						name: 'anchor',
+					},
+					hookedBlock1: {
+						name: 'hookedBlock1',
+						blockHooks: {
+							anchor: 'after',
+						},
+					},
+					hookedBlock2: {
+						name: 'hookedBlock2',
+						blockHooks: {
+							anchor: 'before',
+						},
+					},
+					hookedBlock3: {
+						name: 'hookedBlock3',
+						blockHooks: {
+							anchor: 'after',
+						},
+					},
+				},
+			};
+
+			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {
+				after: [ 'hookedBlock1', 'hookedBlock3' ],
+				before: [ 'hookedBlock2' ],
+			} );
 		} );
 	} );
 

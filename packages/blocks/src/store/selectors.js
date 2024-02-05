@@ -138,11 +138,22 @@ export function getBlockType( state, name ) {
  */
 export const getHookedBlockNames = createSelector(
 	( state, blockName ) => {
-		return getBlockTypes( state )
-			.filter(
-				( { blockHooks } ) => blockHooks && blockName in blockHooks
-			)
-			.map( ( { name } ) => name );
+		const hookedBlockTypes = getBlockTypes( state ).filter(
+			( { blockHooks } ) => blockHooks && blockName in blockHooks
+		);
+
+		let hookedBlocks = {};
+		for ( const blockType of hookedBlockTypes ) {
+			const relativePosition = blockType.blockHooks[ blockName ];
+			hookedBlocks = {
+				...hookedBlocks,
+				[ relativePosition ]: [
+					...( hookedBlocks[ relativePosition ] ?? [] ),
+					blockType.name,
+				],
+			};
+		}
+		return hookedBlocks;
 	},
 	( state ) => [ state.blockTypes ]
 );
