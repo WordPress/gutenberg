@@ -355,6 +355,7 @@ export function RichTextWrapper(
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
+				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
