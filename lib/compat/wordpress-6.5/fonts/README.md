@@ -10,16 +10,16 @@ The Font Library is available globally, independently of the theme activated, si
 - **Font face**: Is a typographic variant of a font family. Each font family may include one or more font faces. Each font face has some unique characteristics as font weight (light, regular, bold, etc.) and font style (italic, normal, etc.). Typical examples are `Helvetica bold italic`, `Inter light normal`.
 - **Install font family**: Is to make a font family available to the user in the Font Library. The user will be able to activate and use the installed font families.
 - **Activate font family**: Is to make it ready to use in the site or post editor. All the active fonts will appear in the font pickers so the user can use them in the site elements.
-- **Deactivate font family**: Is to make a font family unusable. If a font family is not active, it won't appear in the font pickers.
-- **Uninstall font family**: Is to remove the font family from the Font Library permanently.
+- **Deactivate font family**: Is to make a font family unusable. If a font family is inactive, it won't appear in the font pickers but will continue being listed in the font library.
+- **Uninstall font family**: Is to remove the font family from the font library permanently.
 
 ### Different types of installations
 
-The library allows extenders to define how WordPress will install fonts. When users install a font family, its definition will always be saved to the database. What can vary is where are the font face file assets stored.
+The library allows extenders to define how WordPress installs fonts. When users install a font family, its definition will always be saved to the database. What can vary is where the font face file assets are stored.
 
 Review the following different types of installations to find what works best for your use case:
-#### Install a font with no font file assets (system fonts)
-In a situation where you want to install a font family that doesn't need any font assets to work, these fonts are usually called system fonts. You can define these font families like this:
+#### Install a system font ( a font with no font file assets)
+When you want to install a font family that doesn't need any font assets to work, these fonts are usually called system fonts. You can define these font families like this:
 ```json
 {
     "name": "Humanist",
