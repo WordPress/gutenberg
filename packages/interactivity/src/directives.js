@@ -101,21 +101,26 @@ export default () => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
-			const passedValues = context.map( ( { value } ) => value );
+			const defaultEntry = context.find(
+				( { suffix } ) => suffix === 'default'
+			);
+
 			currentValue.current = useMemo( () => {
-				const { namespace, value } = context.find(
-					( { suffix } ) => suffix === 'default'
-				);
-				const newValue = deepSignal( {
-					[ namespace ]: value,
-				} );
+				if ( ! defaultEntry ) return null;
+				const { namespace, value } = defaultEntry;
+				const newValue = deepSignal( { [ namespace ]: value } );
 				mergeDeepSignals( newValue, inheritedValue );
 				mergeDeepSignals( currentValue.current, newValue, true );
 				return currentValue.current;
-			}, [ inheritedValue, ...passedValues ] );
-			return (
-				<Provider value={ currentValue.current }>{ children }</Provider>
-			);
+			}, [ inheritedValue, defaultEntry ] );
+
+			if ( currentValue.current ) {
+				return (
+					<Provider value={ currentValue.current }>
+						{ children }
+					</Provider>
+				);
+			}
 		},
 		{ priority: 5 }
 	);
