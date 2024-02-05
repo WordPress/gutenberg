@@ -59,7 +59,6 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 		/>
 	);
 	const filterComponents = [
-		addFilter,
 		...filters.map( ( filter ) => {
 			if ( ! filter.isVisible ) {
 				return null;
@@ -74,6 +73,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 				/>
 			);
 		} ),
+		addFilter,
 	];
 
 	if ( filterComponents.length > 1 && view.type !== LAYOUT_LIST ) {

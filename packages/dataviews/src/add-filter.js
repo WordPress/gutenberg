@@ -35,15 +35,12 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					size="compact"
 					icon={ plus }
 					className="dataviews-filters-button"
-					variant="secondary"
+					variant="tertiary"
 					disabled={ ! inactiveFilters.length }
 				>
 					{ __( 'Add filter' ) }
 				</Button>
 			}
-			style={ {
-				minWidth: '230px',
-			} }
 		>
 			{ inactiveFilters.map( ( filter ) => {
 				return (
