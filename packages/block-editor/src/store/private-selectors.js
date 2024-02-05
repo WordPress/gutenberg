@@ -250,10 +250,6 @@ export const getInserterMediaCategories = createSelector(
 	]
 );
 
-export function getFetchedPatterns( state ) {
-	return state.blockPatterns;
-}
-
 /**
  * Returns whether there is at least one allowed pattern for inner blocks children.
  * This is useful for deferring the parsing of all patterns until needed.
@@ -285,7 +281,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 			} );
 		},
 		( state, rootClientId ) => [
-			getAllPatternsDependants( state ),
+			getAllPatternsDependants( select )( state ),
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
 			state.blockListSettings[ rootClientId ],
@@ -301,6 +297,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 			__experimentalBlockPatterns = [],
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
+			__experimentalSelectBlockPatterns,
 		} = state.settings;
 		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
 			( userPattern ) => {
@@ -325,12 +322,12 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...unlock( select( STORE_NAME ) ).getFetchedPatterns(),
+			...( __experimentalSelectBlockPatterns( select ) ?? [] ),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
 		);
-	}, getAllPatternsDependants )
+	}, getAllPatternsDependants( select ) )
 );
 
 /**

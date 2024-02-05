@@ -7,7 +7,6 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
-	fetchBlockPatterns,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -87,6 +86,7 @@ const BLOCK_EDITOR_SETTINGS = [
  */
 function useBlockEditorSettings( settings, postType, postId ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const { getBlockPatterns } = useSelect( coreStore );
 	const {
 		allowRightClickOverrides,
 		blockTypes,
@@ -247,17 +247,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			__experimentalFetchBlockPatterns: async () => {
-				return ( await fetchBlockPatterns() ).filter(
-					( { postTypes } ) => {
-						return (
-							! postTypes ||
-							( Array.isArray( postTypes ) &&
-								postTypes.includes( postType ) )
-						);
-					}
-				);
-			},
+			__experimentalSelectBlockPatterns: getBlockPatterns,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
@@ -300,6 +290,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			reusableBlocks,
 			userPatternCategories,
 			blockPatterns,
+			getBlockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
