@@ -97,7 +97,7 @@ class Gutenberg_REST_Templates_Controller_6_4 extends WP_REST_Templates_Controll
 
 		return true;
 	}
-	
+
 	/**
 	 * Checks if a given request has access to read templates.
 	 *
