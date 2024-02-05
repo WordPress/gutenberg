@@ -228,13 +228,10 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		} ) );
 	}, [ activeView ] );
 
-	const { records, isResolving: isLoadingData } = useEntityRecords(
-		'postType',
-		postType,
-		{
-			per_page: -1,
-		}
-	);
+	const { records, hasResolved } = useEntityRecords( 'postType', postType, {
+		per_page: -1,
+	} );
+
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -452,7 +449,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ data }
-				isLoading={ isLoadingData }
+				isLoading={ ! hasResolved }
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
