@@ -131,7 +131,7 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *                                     successfully, or WP_Error object on failure.
 	 */
 	function wp_register_font_collection( $slug, $data_or_file ) {
-		return WP_Font_Library::register_font_collection( $slug, $data_or_file );
+		return WP_Font_Library::get_instance()->register_font_collection( $slug, $data_or_file );
 	}
 }
 
@@ -145,7 +145,7 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	 * @return bool True if the font collection was unregistered successfully, else false.
 	 */
 	function wp_unregister_font_collection( $slug ) {
-		return WP_Font_Library::unregister_font_collection( $slug );
+		return WP_Font_Library::get_instance()->unregister_font_collection( $slug );
 	}
 }
 

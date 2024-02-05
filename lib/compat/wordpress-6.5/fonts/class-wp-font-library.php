@@ -25,7 +25,15 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @var array
 		 */
-		private static $collections = array();
+		private $collections = array();
+
+		/**
+		 * Container for the main instance of the class.
+		 *
+		 * @since 6.5.0
+		 * @var WP_Font_Library|null
+		 */
+		private static $instance = null;
 
 		/**
 		 * Register a new font collection.
@@ -39,10 +47,10 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @return WP_Font_Collection|WP_Error A font collection if it was registered successfully,
 		 *                                     or WP_Error object on failure.
 		 */
-		public static function register_font_collection( $slug, $data_or_file ) {
+		public function register_font_collection( $slug, $data_or_file ) {
 			$new_collection = new WP_Font_Collection( $slug, $data_or_file );
 
-			if ( self::is_collection_registered( $new_collection->slug ) ) {
+			if ( $this->is_collection_registered( $new_collection->slug ) ) {
 				$error_message = sprintf(
 				/* translators: %s: Font collection slug. */
 					__( 'Font collection with slug: "%s" is already registered.', 'gutenberg' ),
@@ -55,7 +63,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 				);
 				return new WP_Error( 'font_collection_registration_error', $error_message );
 			}
-			self::$collections[ $new_collection->slug ] = $new_collection;
+			$this->collections[ $new_collection->slug ] = $new_collection;
 			return $new_collection;
 		}
 
@@ -67,8 +75,8 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @param string $slug Font collection slug.
 		 * @return bool True if the font collection was unregistered successfully and false otherwise.
 		 */
-		public static function unregister_font_collection( $slug ) {
-			if ( ! self::is_collection_registered( $slug ) ) {
+		public function unregister_font_collection( $slug ) {
+			if ( ! $this->is_collection_registered( $slug ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Font collection slug. */
@@ -77,7 +85,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 				);
 				return false;
 			}
-			unset( self::$collections[ $slug ] );
+			unset( $this->collections[ $slug ] );
 			return true;
 		}
 
@@ -89,8 +97,8 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @param string $slug Font collection slug.
 		 * @return bool True if the font collection is registered and false otherwise.
 		 */
-		private static function is_collection_registered( $slug ) {
-			return array_key_exists( $slug, self::$collections );
+		private function is_collection_registered( $slug ) {
+			return array_key_exists( $slug, $this->collections );
 		}
 
 		/**
@@ -100,8 +108,8 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @return array List of font collections.
 		 */
-		public static function get_font_collections() {
-			return self::$collections;
+		public function get_font_collections() {
+			return $this->collections;
 		}
 
 		/**
@@ -113,11 +121,28 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 * @return WP_Font_Collection|WP_Error Font collection object,
 		 *                                     or WP_Error object if the font collection doesn't exist.
 		 */
-		public static function get_font_collection( $slug ) {
-			if ( array_key_exists( $slug, self::$collections ) ) {
-				return self::$collections[ $slug ];
+		public function get_font_collection( $slug ) {
+			if ( array_key_exists( $slug, $this->collections ) ) {
+				return $this->collections[ $slug ];
 			}
 			return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
+		}
+
+		/**
+		 * Utility method to retrieve the main instance of the class.
+		 *
+		 * The instance will be created if it does not exist yet.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return WP_Font_Library The main instance.
+		 */
+		public static function get_instance() {
+			if ( null === self::$instance ) {
+				self::$instance = new self();
+			}
+
+			return self::$instance;
 		}
 	}
 }
