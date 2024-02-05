@@ -228,7 +228,11 @@ describe.each( [
 			/>
 		);
 
-		expect( screen.getByText( /hint/i ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		).toHaveTextContent( /hint/i );
 	} );
 
 	it( 'shows selected hint in list of options when added', async () => {

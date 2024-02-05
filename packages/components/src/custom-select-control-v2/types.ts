@@ -40,10 +40,6 @@ export type CustomSelectButtonProps = {
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: string | string[];
-	/**
-	 * To control mounting and unmounting the popover.
-	 */
-	setUnmountOnHide?: React.Dispatch< React.SetStateAction< boolean > >;
 };
 
 export type _CustomSelectProps = {
@@ -64,10 +60,7 @@ export type _CustomSelectProps = {
 };
 
 export type CustomSelectProps = _CustomSelectProps &
-	Exclude<
-		CustomSelectButtonProps,
-		{ size: 'small' } | 'setUnmountOnHide'
-	> & {
+	Exclude< CustomSelectButtonProps, { size: 'small' } > & {
 		options?: never;
 	};
 
