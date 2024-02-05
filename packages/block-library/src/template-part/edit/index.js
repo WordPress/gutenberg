@@ -82,9 +82,6 @@ export default function TemplatePartEdit( {
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
 		useState( false );
 
-	// Set the postId block attribute if it did not exist,
-	// but wait until the inner blocks have loaded to allow
-	// new edits to trigger this.
 	const { isResolved, hasInnerBlocks, isMissing, area } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
