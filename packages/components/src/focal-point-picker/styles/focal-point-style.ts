@@ -3,6 +3,11 @@
  */
 import styled from '@emotion/styled';
 
+/**
+ * Internal dependencies
+ */
+import { reduceMotion } from '../../utils';
+
 export const PointerCircle = styled.div`
 	background-color: transparent;
 	cursor: grab;
@@ -19,6 +24,7 @@ export const PointerCircle = styled.div`
 	backdrop-filter: blur( 16px ) saturate( 180% );
 	box-shadow: rgb( 0 0 0 / 8% ) 0px 0px 8px;
 	transition: transform 100ms linear;
+	${ reduceMotion( 'transition' ) }
 
 	${ ( { isDragging }: { isDragging: boolean } ) =>
 		isDragging &&
