@@ -19,19 +19,6 @@ test.describe( 'Block bindings', () => {
 		await page.getByLabel( 'HTML anchor' ).fill( testId );
 	};
 	const variables = {
-		customFields: {
-			textValue: 'Value of the text_custom_field',
-			textKey: 'text_custom_field',
-			urlValue: '#url-custom-field',
-			urlKey: 'url_custom_field',
-		},
-		labels: {
-			align: 'Align text',
-			bold: 'Bold',
-			imageReplace: 'Replace',
-			imageAlt: 'Alternative text',
-			imageTitle: 'Title attribute',
-		},
 		blocks: {
 			paragraph: {
 				name: 'core/paragraph',
@@ -244,7 +231,7 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					variables.customFields.textKey
+					'text_custom_field'
 				);
 			} );
 
@@ -261,14 +248,14 @@ test.describe( 'Block bindings', () => {
 				// Alignment controls exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.align,
+						name: 'Align text',
 					} )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.bold,
+						name: 'Bold',
 					} )
 				).toBeHidden();
 
@@ -287,9 +274,7 @@ test.describe( 'Block bindings', () => {
 				const headingBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Heading',
 				} );
-				await expect( headingBlock ).toHaveText(
-					variables.customFields.textKey
-				);
+				await expect( headingBlock ).toHaveText( 'text_custom_field' );
 			} );
 
 			test( 'Should lock the appropriate controls', async ( {
@@ -305,14 +290,14 @@ test.describe( 'Block bindings', () => {
 				// Alignment controls exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.align,
+						name: 'Align text',
 					} )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.bold,
+						name: 'Bold',
 					} )
 				).toBeHidden();
 
@@ -333,7 +318,7 @@ test.describe( 'Block bindings', () => {
 					exact: true,
 				} );
 				const buttonText = await buttonBlock.textContent();
-				expect( buttonText ).toBe( variables.customFields.textKey );
+				expect( buttonText ).toBe( 'text_custom_field' );
 			} );
 
 			test( 'Should lock text controls when text is bound', async ( {
@@ -350,14 +335,14 @@ test.describe( 'Block bindings', () => {
 				// Alignment controls exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.align,
+						name: 'Align text',
 					} )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.bold,
+						name: 'Bold',
 					} )
 				).toBeHidden();
 
@@ -389,7 +374,7 @@ test.describe( 'Block bindings', () => {
 				// Format controls exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.bold,
+						name: 'Bold',
 					} )
 				).toBeVisible();
 
@@ -428,14 +413,14 @@ test.describe( 'Block bindings', () => {
 				// Alignment controls are visible.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.align,
+						name: 'Align text',
 					} )
 				).toBeVisible();
 
 				// Format controls don't exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.bold,
+						name: 'Bold',
 					} )
 				).toBeHidden();
 
@@ -499,7 +484,7 @@ test.describe( 'Block bindings', () => {
 				// Replace controls don't exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.imageReplace,
+						name: 'Replace',
 					} )
 				).toBeHidden();
 
@@ -510,20 +495,20 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is enabled and with the original value.
 				await expect(
-					page.getByLabel( variables.labels.imageAlt )
+					page.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
-					.getByLabel( variables.labels.imageAlt )
+					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				await expect(
-					page.getByLabel( variables.labels.imageTitle )
+					page.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByLabel( variables.labels.imageTitle )
+					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 			} );
@@ -541,26 +526,26 @@ test.describe( 'Block bindings', () => {
 				// Replace controls exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.imageReplace,
+						name: 'Replace',
 					} )
 				).toBeVisible();
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( variables.labels.imageAlt )
+					page.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByLabel( variables.labels.imageAlt )
+					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( variables.customFields.textKey );
+				expect( altValue ).toBe( 'text_custom_field' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				await expect(
-					page.getByLabel( variables.labels.imageTitle )
+					page.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByLabel( variables.labels.imageTitle )
+					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 			} );
@@ -578,28 +563,28 @@ test.describe( 'Block bindings', () => {
 				// Replace controls exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.imageReplace,
+						name: 'Replace',
 					} )
 				).toBeVisible();
 
 				// Alt textarea is enabled and with the original value.
 				await expect(
-					page.getByLabel( variables.labels.imageAlt )
+					page.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
-					.getByLabel( variables.labels.imageAlt )
+					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
 
 				// Title input is disabled and with the custom field value.
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				await expect(
-					page.getByLabel( variables.labels.imageTitle )
+					page.getByLabel( 'Title attribute' )
 				).toBeDisabled();
 				const titleValue = await page
-					.getByLabel( variables.labels.imageTitle )
+					.getByLabel( 'Title attribute' )
 					.inputValue();
-				expect( titleValue ).toBe( variables.customFields.textKey );
+				expect( titleValue ).toBe( 'text_custom_field' );
 			} );
 
 			test( 'Multiple bindings should lock the appropriate controls', async ( {
@@ -617,7 +602,7 @@ test.describe( 'Block bindings', () => {
 				// Replace controls don't exist.
 				await expect(
 					page.getByRole( 'button', {
-						name: variables.labels.imageReplace,
+						name: 'Replace',
 					} )
 				).toBeHidden();
 
@@ -628,20 +613,20 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( variables.labels.imageAlt )
+					page.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByLabel( variables.labels.imageAlt )
+					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( variables.customFields.textKey );
+				expect( altValue ).toBe( 'text_custom_field' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				await expect(
-					page.getByLabel( variables.labels.imageTitle )
+					page.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByLabel( variables.labels.imageTitle )
+					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 			} );
@@ -662,7 +647,7 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 				// Paragraph is not editable.
 				const isContentEditable =
@@ -677,7 +662,7 @@ test.describe( 'Block bindings', () => {
 					page.locator( '#paragraph-binding' )
 				).toBeVisible();
 				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 			} );
 
@@ -729,7 +714,7 @@ test.describe( 'Block bindings', () => {
 				name: 'Block: Heading',
 			} );
 			await expect( headingBlock ).toHaveText(
-				variables.customFields.textValue
+				'Value of the text_custom_field'
 			);
 			// Heading is not editable.
 			const isContentEditable =
@@ -742,7 +727,7 @@ test.describe( 'Block bindings', () => {
 			await page.goto( `/?p=${ postId }` );
 			await expect( page.locator( '#heading-binding' ) ).toBeVisible();
 			await expect( page.locator( '#heading-binding' ) ).toHaveText(
-				variables.customFields.textValue
+				'Value of the text_custom_field'
 			);
 		} );
 
@@ -758,7 +743,7 @@ test.describe( 'Block bindings', () => {
 				} );
 				await buttonBlock.click();
 				const buttonText = await buttonBlock.textContent();
-				expect( buttonText ).toBe( variables.customFields.textValue );
+				expect( buttonText ).toBe( 'Value of the text_custom_field' );
 
 				// Button is not editable.
 				const isContentEditable = await buttonBlock
@@ -773,7 +758,7 @@ test.describe( 'Block bindings', () => {
 				const buttonDom = page.locator( '#button-text-binding a' );
 				await expect( buttonDom ).toBeVisible();
 				await expect( buttonDom ).toHaveText(
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 				await expect( buttonDom ).toHaveAttribute(
 					'href',
@@ -796,7 +781,7 @@ test.describe( 'Block bindings', () => {
 				await expect( buttonDom ).toHaveText( 'button default text' );
 				await expect( buttonDom ).toHaveAttribute(
 					'href',
-					variables.customFields.urlValue
+					'#url-custom-field'
 				);
 			} );
 
@@ -815,11 +800,11 @@ test.describe( 'Block bindings', () => {
 				const buttonDom = page.locator( '#button-multiple-bindings a' );
 				await expect( buttonDom ).toBeVisible();
 				await expect( buttonDom ).toHaveText(
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 				await expect( buttonDom ).toHaveAttribute(
 					'href',
-					variables.customFields.urlValue
+					'#url-custom-field'
 				);
 			} );
 		} );
@@ -904,12 +889,12 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( variables.labels.imageAlt )
+					page.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByLabel( variables.labels.imageAlt )
+					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( variables.customFields.textValue );
+				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
 				await setId( page, 'image-alt-binding' );
@@ -923,7 +908,7 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'title',
@@ -959,12 +944,12 @@ test.describe( 'Block bindings', () => {
 					await advancedButton.click();
 				}
 				await expect(
-					page.getByLabel( variables.labels.imageTitle )
+					page.getByLabel( 'Title attribute' )
 				).toBeDisabled();
 				const titleValue = await page
-					.getByLabel( variables.labels.imageTitle )
+					.getByLabel( 'Title attribute' )
 					.inputValue();
-				expect( titleValue ).toBe( variables.customFields.textValue );
+				expect( titleValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
 				await setId( page, 'image-title-binding' );
@@ -982,7 +967,7 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'title',
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 			} );
 
@@ -1008,12 +993,12 @@ test.describe( 'Block bindings', () => {
 
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
-					page.getByLabel( variables.labels.imageAlt )
+					page.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByLabel( variables.labels.imageAlt )
+					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( variables.customFields.textValue );
+				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Title input is enabled and with the original value.
 				const advancedButton = page.getByRole( 'button', {
@@ -1025,10 +1010,10 @@ test.describe( 'Block bindings', () => {
 					await advancedButton.click();
 				}
 				await expect(
-					page.getByLabel( variables.labels.imageTitle )
+					page.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByLabel( variables.labels.imageTitle )
+					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 
@@ -1044,7 +1029,7 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
-					variables.customFields.textValue
+					'Value of the text_custom_field'
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'title',
