@@ -213,5 +213,25 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			}
 			return call_user_func( $sanitizer, $value );
 		}
+
+		/**
+		 * Provide the expected mime-type value for font files per-PHP release. Due to differences in the values returned these values differ between PHP versions.
+		 *
+		 * This is necessary until a collection of valid mime-types per-file extension can be provided to 'upload_mimes' filter.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return Array A collection of mime types keyed by file extension.
+		 */
+		public static function get_allowed_font_mime_types() {
+			$php_7_ttf_mime_type = PHP_VERSION_ID >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
+
+			return array(
+				'otf'   => 'application/vnd.ms-opentype',
+				'ttf'   => PHP_VERSION_ID >= 70400 ? 'font/sfnt' : $php_7_ttf_mime_type,
+				'woff'  => PHP_VERSION_ID >= 80100 ? 'font/woff' : 'application/font-woff',
+				'woff2' => PHP_VERSION_ID >= 80100 ? 'font/woff2' : 'application/font-woff2',
+			);
+		}
 	}
 }
