@@ -1,6 +1,9 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
+import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
@@ -10,6 +13,7 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
+import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -353,7 +357,8 @@ export default () => {
 			return list.map( ( item ) => {
 				const mergedContext = deepSignal( {} );
 
-				const itemProp = suffix === 'default' ? 'item' : suffix;
+				const itemProp =
+					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const newValue = deepSignal( {
 					[ namespace ]: { [ itemProp ]: item },
 				} );

@@ -132,6 +132,8 @@ export function useEntityProp( kind, name, prop, _id ) {
 	return [ value, setValue, fullValue ];
 }
 
+const parsedBlocksCache = new WeakMap();
+
 /**
  * Hook that returns block content getters and setters for
  * the nearest provided entity of the specified type.
@@ -153,6 +155,7 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
+	const { getEntityRecord } = useSelect( STORE_NAME );
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
@@ -180,10 +183,20 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return editedBlocks;
 		}
 
-		return content && typeof content !== 'function'
-			? parse( content )
-			: EMPTY_ARRAY;
-	}, [ id, editedBlocks, content ] );
+		if ( ! content || typeof content === 'function' ) {
+			return EMPTY_ARRAY;
+		}
+
+		const entityRecord = getEntityRecord( kind, name, id );
+		let _blocks = parsedBlocksCache.get( entityRecord );
+
+		if ( ! _blocks ) {
+			_blocks = parse( content );
+			parsedBlocksCache.set( entityRecord, _blocks );
+		}
+
+		return _blocks;
+	}, [ kind, name, id, editedBlocks, content, getEntityRecord ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),

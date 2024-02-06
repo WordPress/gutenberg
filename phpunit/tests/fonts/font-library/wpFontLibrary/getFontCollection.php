@@ -13,19 +13,18 @@
 class Tests_Fonts_WpFontLibrary_GetFontCollection extends WP_Font_Library_UnitTestCase {
 
 	public function test_should_get_font_collection() {
-		$my_font_collection_config = array(
-			'slug'        => 'my-font-collection',
-			'name'        => 'My Font Collection',
-			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
-			'src'         => path_join( __DIR__, 'my-font-collection-data.json' ),
+		$mock_collection_data = array(
+			'name'          => 'Test Collection',
+			'font_families' => array( 'mock' ),
 		);
-		wp_register_font_collection( $my_font_collection_config );
-		$font_collection = WP_Font_Library::get_font_collection( 'my-font-collection' );
+
+		wp_register_font_collection( 'my-font-collection', $mock_collection_data );
+		$font_collection = WP_Font_Library::get_instance()->get_font_collection( 'my-font-collection' );
 		$this->assertInstanceOf( 'WP_Font_Collection', $font_collection );
 	}
 
 	public function test_should_get_no_font_collection_if_the_slug_is_not_registered() {
-		$font_collection = WP_Font_Library::get_font_collection( 'not-registered-font-collection' );
+		$font_collection = WP_Font_Library::get_instance()->get_font_collection( 'not-registered-font-collection' );
 		$this->assertWPError( $font_collection );
 	}
 }

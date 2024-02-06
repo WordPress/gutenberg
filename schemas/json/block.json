@@ -73,6 +73,13 @@
 				"type": "string"
 			}
 		},
+		"allowedBlocks": {
+			"type": "array",
+			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
+			"items": {
+				"type": "string"
+			}
+		},
 		"icon": {
 			"type": "string",
 			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts)."
@@ -549,9 +556,15 @@
 					}
 				},
 				"shadow": {
-					"type": "boolean",
 					"description": "Allow blocks to define a box shadow.",
-					"default": false
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "object"
+						}
+					]
 				},
 				"typography": {
 					"type": "object",
@@ -668,6 +681,31 @@
 							}
 						}
 					]
+				},
+				"interactivity": {
+					"description": "Indicates if the block is using Interactivity API features.",
+					"oneOf": [
+						{
+							"type": "boolean",
+							"description": "Indicates whether the block is using the Interactivity API directives.",
+							"default": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"clientNavigation": {
+									"type": "boolean",
+									"description": "Indicates whether a block is compatible with the Interactivity API client-side navigation.\n\nSet it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.",
+									"default": false
+								},
+								"interactive": {
+									"type": "boolean",
+									"description": "Indicates whether the block is using the Interactivity API directives.",
+									"default": false
+								}
+							}
+						}
+					]
 				}
 			}
 		},
@@ -779,6 +817,20 @@
 		},
 		"style": {
 			"description": "Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"viewStyle": {
+			"description": "Block type frontend style definition. It will be enqueued only when viewing the content on the front of the site.",
 			"oneOf": [
 				{
 					"type": "string"

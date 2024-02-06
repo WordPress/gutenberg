@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external } from '@wordpress/icons';
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
@@ -16,6 +16,7 @@ import {
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -43,6 +44,9 @@ export default function MoreMenu( { showIconLabels } ) {
 		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme().is_block_theme;
+	}, [] );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
@@ -120,7 +124,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							fillProps={ { onClick: onClose } }
 						/>
 						<MenuGroup label={ __( 'Tools' ) }>
-							<SiteExport />
+							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
 								onClick={ () =>
 									openModal(

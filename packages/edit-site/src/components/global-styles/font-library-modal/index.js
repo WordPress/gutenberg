@@ -34,7 +34,7 @@ const tabsFromCollections = ( collections ) =>
 	collections.map( ( { slug, name } ) => ( {
 		id: slug,
 		title:
-			collections.length === 1 && slug === 'default-font-collection'
+			collections.length === 1 && slug === 'google-fonts'
 				? __( 'Install Fonts' )
 				: name,
 	} ) );

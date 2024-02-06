@@ -20,8 +20,10 @@ import {
 } from './selectors';
 import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-import { store } from './';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+
+export { getBlockSettings } from './get-block-settings';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -44,37 +46,49 @@ export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
 
+export function getBlockWithoutAttributes( state, clientId ) {
+	return state.blocks.byClientId.get( clientId );
+}
+
 /**
- * Returns true if the block with the given client ID and all of its descendants
+ * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID.
  *
- * @return {boolean} Whether the block and its descendants are disabled.
+ * @return {boolean} Whether the block descendants are disabled.
  */
-export const isBlockSubtreeDisabled = createSelector(
-	( state, clientId ) => {
-		const isChildSubtreeDisabled = ( childClientId ) => {
-			return (
-				getBlockEditingMode( state, childClientId ) === 'disabled' &&
-				getBlockOrder( state, childClientId ).every(
-					isChildSubtreeDisabled
-				)
-			);
-		};
+export const isBlockSubtreeDisabled = ( state, clientId ) => {
+	const isChildSubtreeDisabled = ( childClientId ) => {
 		return (
-			getBlockEditingMode( state, clientId ) === 'disabled' &&
-			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
+			getBlockEditingMode( state, childClientId ) === 'disabled' &&
+			getBlockOrder( state, childClientId ).every(
+				isChildSubtreeDisabled
+			)
 		);
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockEditingModes,
-		state.blockListSettings,
-	]
-);
+	};
+	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
+};
+
+function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
+	const blockOrder = getBlockOrder( state, rootClientId );
+	const result = [];
+
+	for ( const clientId of blockOrder ) {
+		const innerBlocks = getEnabledClientIdsTreeUnmemoized(
+			state,
+			clientId
+		);
+		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+			result.push( { clientId, innerBlocks } );
+		} else {
+			result.push( ...innerBlocks );
+		}
+	}
+
+	return result;
+}
 
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.
@@ -86,19 +100,7 @@ export const isBlockSubtreeDisabled = createSelector(
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
 export const getEnabledClientIdsTree = createSelector(
-	( state, rootClientId = '' ) => {
-		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
-			if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
-				return [
-					{
-						clientId,
-						innerBlocks: getEnabledClientIdsTree( state, clientId ),
-					},
-				];
-			}
-			return getEnabledClientIdsTree( state, clientId );
-		} );
-	},
+	getEnabledClientIdsTreeUnmemoized,
 	( state ) => [
 		state.blocks.order,
 		state.blockEditingModes,
@@ -265,7 +267,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
 			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( store )
+				select( STORE_NAME )
 			);
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
@@ -323,7 +325,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...unlock( select( store ) ).getFetchedPatterns(),
+			...unlock( select( STORE_NAME ) ).getFetchedPatterns(),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
@@ -348,4 +350,17 @@ export function getAllBlockBindingsSources( state ) {
 
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
+}
+
+/**
+ * Returns true if the user is dragging anything, or false otherwise. It is possible for a
+ * user to be dragging data from outside of the editor, so this selector is separate from
+ * the `isDraggingBlocks` selector which only returns true if the user is dragging blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging.
+ */
+export function isDragging( state ) {
+	return state.isDragging;
 }

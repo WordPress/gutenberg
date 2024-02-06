@@ -177,7 +177,6 @@ Settings related to typography.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultFontSizes | boolean | true |  |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
@@ -190,7 +189,7 @@ Settings related to typography.
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, preview, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---
 

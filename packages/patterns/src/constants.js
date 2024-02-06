@@ -27,7 +27,6 @@ export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/button': {
 		text: __( 'Text' ),
 		url: __( 'URL' ),
-		linkTarget: __( 'Link Target' ),
 	},
 	'core/image': {
 		url: __( 'URL' ),

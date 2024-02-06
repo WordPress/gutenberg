@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _n } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalText as Text,
 	Button,
@@ -58,9 +58,15 @@ function FontCard( { font, onClick, variantsText } ) {
 					<FlexItem>
 						<Text className="font-library-modal__font-card__count">
 							{ variantsText ||
-								variantsCount +
-									' ' +
-									_n( 'variant', 'variants', variantsCount ) }
+								sprintf(
+									/* translators: %d: Number of font variants. */
+									_n(
+										'%d variant',
+										'%d variants',
+										variantsCount
+									),
+									variantsCount
+								) }
 						</Text>
 					</FlexItem>
 					<FlexItem>

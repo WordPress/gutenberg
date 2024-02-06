@@ -131,6 +131,11 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		const isEnter = keyCode === ENTER;
 		const isSpace = keyCode === SPACE;
 		const isShift = event.shiftKey;
+		if ( isEscape && editorMode === 'navigation' ) {
+			setNavigationMode( false );
+			event.preventDefault();
+			return;
+		}
 
 		if ( keyCode === BACKSPACE || keyCode === DELETE ) {
 			removeBlock( clientId );

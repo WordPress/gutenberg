@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -94,7 +95,7 @@ function hasSize( image, size ) {
 export function ImageEdit( {
 	attributes,
 	setAttributes,
-	isSelected,
+	isSelected: isSingleSelected,
 	className,
 	insertBlocksAfter,
 	onReplace,
@@ -142,14 +143,7 @@ export function ImageEdit( {
 	}, [ align ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			imageDefaultSize: settings.imageDefaultSize,
-			mediaUpload: settings.mediaUpload,
-		};
-	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -182,6 +176,8 @@ export function ImageEdit( {
 		}
 
 		setTemporaryURL();
+
+		const { imageDefaultSize } = getSettings();
 
 		// Try to use the previous selected image size if its available
 		// otherwise try the default image size or fallback to "full"
@@ -265,7 +261,7 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				sizeSlug: imageDefaultSize,
+				sizeSlug: getSettings().imageDefaultSize,
 			} );
 		}
 	}
@@ -281,6 +277,10 @@ export function ImageEdit( {
 		const file = getBlobByURL( url );
 
 		if ( file ) {
+			const { mediaUpload } = getSettings();
+			if ( ! mediaUpload ) {
+				return;
+			}
 			mediaUpload( {
 				filesList: [ file ],
 				onFileChange: ( [ img ] ) => {
@@ -317,6 +317,7 @@ export function ImageEdit( {
 	);
 
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
@@ -336,7 +337,7 @@ export function ImageEdit( {
 	// Much of this description is duplicated from MediaPlaceholder.
 	const { lockUrlControls = false } = useSelect(
 		( select ) => {
-			if ( ! isSelected ) {
+			if ( ! isSingleSelected ) {
 				return {};
 			}
 
@@ -347,19 +348,18 @@ export function ImageEdit( {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource(
-						metadata?.bindings?.url?.source?.name
-					)?.lockAttributesEditing === true,
+					getBlockBindingsSource( metadata?.bindings?.url?.source )
+						?.lockAttributesEditing === true,
 			};
 		},
-		[ isSelected ]
+		[ isSingleSelected ]
 	);
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
 				className={ classnames( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
-						!! borderProps.className && ! isSelected,
+						!! borderProps.className && ! isSingleSelected,
 				} ) }
 				withIllustration={ true }
 				icon={ lockUrlControls ? pluginsIcon : icon }
@@ -379,6 +379,7 @@ export function ImageEdit( {
 					height: width && aspectRatio ? '100%' : height,
 					objectFit: scale,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ lockUrlControls ? (
@@ -400,7 +401,7 @@ export function ImageEdit( {
 				temporaryURL={ temporaryURL }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				isSelected={ isSelected }
+				isSingleSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				onReplace={ onReplace }
 				onSelectImage={ onSelectImage }

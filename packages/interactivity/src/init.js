@@ -28,6 +28,9 @@ function yieldToMain() {
 	} );
 }
 
+// Initial vDOM regions associated with its DOM element.
+export const initialVdom = new WeakMap();
+
 // Initialize the router with the initial DOM.
 export const init = async () => {
 	const pendingNodes = new Set();

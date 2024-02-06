@@ -31,7 +31,11 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 			$block_name = $parsed_block['blockName'];
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
-			if ( isset( $block_name ) && isset( $block_type->supports['interactivity'] ) && $block_type->supports['interactivity'] ) {
+			if (
+				isset( $block_name ) &&
+				( ( isset( $block_type->supports['interactivity'] ) && true === $block_type->supports['interactivity'] ) ||
+				( isset( $block_type->supports['interactivity']['interactive'] ) && true === $block_type->supports['interactivity']['interactive'] ) )
+			) {
 				// Annotates the root interactive block for processing.
 				$root_interactive_block = array( $block_name, md5( serialize( $parsed_block ) ) );
 
