@@ -12,13 +12,16 @@ import { parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 function recursivelyFindBlockWithId( blocks, id ) {
-	return blocks.find( ( block ) => {
+	for ( const block of blocks ) {
 		if ( block.attributes.metadata?.id === id ) {
 			return block;
 		}
 
-		return recursivelyFindBlockWithId( block.innerBlocks, id );
-	} );
+		const found = recursivelyFindBlockWithId( block.innerBlocks, id );
+		if ( found ) {
+			return found;
+		}
+	}
 }
 
 export default function ResetOverridesControl( props ) {
