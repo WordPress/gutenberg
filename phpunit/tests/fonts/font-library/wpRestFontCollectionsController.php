@@ -19,6 +19,12 @@ class Tests_REST_WpRestFontCollectionsController extends WP_Test_REST_Controller
 
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		// Clear the font collections.
+		$collections = WP_Font_Library::get_instance()->get_font_collections();
+		foreach ( $collections as $slug => $collection ) {
+			WP_Font_Library::get_instance()->unregister_font_collection( $slug );
+		}
+
 		self::$admin_id  = $factory->user->create(
 			array(
 				'role' => 'administrator',
