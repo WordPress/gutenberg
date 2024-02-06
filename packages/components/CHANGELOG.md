@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `FontSizePicker`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58702](https://github.com/WordPress/gutenberg/pull/58702)).
 -   `GradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58701](https://github.com/WordPress/gutenberg/pull/58701)).
 -   `CustomGradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58699](https://github.com/WordPress/gutenberg/pull/58699)).
 -   `AnglePickerControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58700](https://github.com/WordPress/gutenberg/pull/58700)).
