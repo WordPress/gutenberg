@@ -178,7 +178,7 @@ function MediaTextEdit( {
 	const toggleUseFeaturedImage = () => {
 		setAttributes( {
 			imageFill: false,
-			mediaType: undefined,
+			mediaType: 'image',
 			mediaId: undefined,
 			mediaUrl: undefined,
 			mediaAlt: undefined,
