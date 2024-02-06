@@ -70,16 +70,6 @@
 	min-width: $modal-min-width;
 	white-space: nowrap;
 
-	.fullscreen-icon {
-		display: flex;
-		align-items: center;
-
-		> svg {
-			width: $icon-size;
-			height: $icon-size;
-		}
-	}
-
 	.text {
 		flex-grow: 1;
 
@@ -88,11 +78,12 @@
 			// This ensures the text and help text is 32px, which with
 			// padding makes the popover same height as the block toolbar.
 			line-height: $grid-unit-20;
-		}
-	}
 
-	.description {
-		color: $gray-600;
-		font-size: $helptext-font-size;
+			&.description {
+				margin-top: $grid-unit-05;
+				color: $gray-700;
+				font-size: $helptext-font-size;
+			}
+		}
 	}
 }
