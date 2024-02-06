@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Utils::format_font_family().
+ * Test WP_Font_Utils::sanitize_font_family().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,20 +8,20 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Utils::format_font_family
+ * @covers WP_Font_Utils::sanitize_font_family
  */
-class Tests_Fonts_WpFontUtils_FormatFontFamily extends WP_UnitTestCase {
+class Tests_Fonts_WpFontUtils_SanitizeFontFamily extends WP_UnitTestCase {
 
 	/**
-	 * @dataProvider data_should_format_font_family
+	 * @dataProvider data_should_sanitize_font_family
 	 *
-	 * @param string $font_family   Font family.
-	 * @param string $expected      Expected family.
+	 * @param string $font_family Font family to test.
+	 * @param string $expected    Expected family.
 	 */
-	public function test_should_format_font_family( $font_family, $expected ) {
+	public function test_should_sanitize_font_family( $font_family, $expected ) {
 		$this->assertSame(
 			$expected,
-			WP_Font_Utils::format_font_family(
+			WP_Font_Utils::sanitize_font_family(
 				$font_family
 			)
 		);
@@ -30,9 +30,9 @@ class Tests_Fonts_WpFontUtils_FormatFontFamily extends WP_UnitTestCase {
 	/**
 	 * Data provider.
 	 *
-	 * @return array[]
+	 * @return array
 	 */
-	public function data_should_format_font_family() {
+	public function data_should_sanitize_font_family() {
 		return array(
 			'data_families_with_spaces_and_numbers' => array(
 				'font_family' => 'Rock 3D , Open Sans,serif',
@@ -53,6 +53,10 @@ class Tests_Fonts_WpFontUtils_FormatFontFamily extends WP_UnitTestCase {
 			'data_empty_family'                     => array(
 				'font_family' => ' ',
 				'expected'    => '',
+			),
+			'data_font_family_with_whitespace_tags_new_lines' => array(
+				'font_family' => "   Rock      3D</style><script>alert('XSS');</script>\n    ",
+				'expected'    => '"Rock 3D"',
 			),
 		);
 	}

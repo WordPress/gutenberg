@@ -1,5 +1,43 @@
 == Changelog ==
 
+= 17.6.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- Writing flow: Maintain correct selection after drag-selecting outside block. ([58684](https://github.com/WordPress/gutenberg/pull/58684))
+- useOnBlockDrop: Fix TypeError via array coercion. ([58686](https://github.com/WordPress/gutenberg/pull/58686))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix @mcsf
+
+
+= 17.6.1 =
+
+
+## Changelog
+
+### Font Library
+
+- Make the API compatible with the upcoming Core patch. ([58671](https://github.com/WordPress/gutenberg/pull/58671))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad
+
+
 = 17.6.0 =
 
 ## Changelog

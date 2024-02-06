@@ -252,6 +252,8 @@ export default function useOnBlockDrop(
 			initialPosition = 0,
 			clientIdsToReplace = []
 		) => {
+			if ( ! Array.isArray( blocks ) ) blocks = [ blocks ];
+
 			const clientIds = getBlockOrder( targetRootClientId );
 			const clientId = clientIds[ targetBlockIndex ];
 			const blocksClientIds = blocks.map( ( block ) => block.clientId );

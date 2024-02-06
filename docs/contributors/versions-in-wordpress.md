@@ -6,6 +6,7 @@ If anything looks incorrect here, please bring it up in #core-editor in [WordPre
 
 | Gutenberg Versions | WordPress Version |
 | ------------------ | ----------------- |
+| 16.2-16.7          | 6.4.3             |
 | 16.2-16.7          | 6.4.2             |
 | 16.2-16.7          | 6.4.1             |
 | 16.2-16.7          | 6.4               |
