@@ -107,7 +107,11 @@ export function getBlockType( state, name ) {
 }
 
 /**
- * Returns an array with the hooked blocks for a given anchor block.
+ * Returns the hooked blocks for a given anchor block.
+ *
+ * Given an anchor block name, returns an object whose keys are relative positions,
+ * and whose values are arrays of block names that are hooked to the anchor block
+ * at that relative position.
  *
  * @param {Object} state     Data state.
  * @param {string} blockName Anchor block type name.
@@ -125,16 +129,22 @@ export function getBlockType( state, name ) {
  *
  *     return (
  *         <ul>
- *             { hookedBlockNames &&
- *                 hookedBlockNames.map( ( hookedBlock ) => (
- *                     <li key={ hookedBlock }>{ hookedBlock }</li>
+ *             { Object.keys( hookedBlockNames ).length &&
+ *                 Object.keys( hookedBlockNames ).map( ( relativePosition ) => (
+ *                     <li key={ relativePosition }>{ relativePosition }>
+ *                         <ul>
+ *                             { hookedBlockNames[ relativePosition ].map( ( hookedBlock ) => (
+ *                                 <li key={ hookedBlock }>{ hookedBlock }</li>
+ *                             ) ) }
+ *                         </ul>
+ *                     </li>
  *             ) ) }
  *         </ul>
  *     );
  * };
  * ```
  *
- * @return {Array} Array of hooked block names.
+ * @return {Object} Lists of hooked block names for each relative position.
  */
 export const getHookedBlocks = createSelector(
 	( state, blockName ) => {
