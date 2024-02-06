@@ -41,7 +41,8 @@ export default function ChildLayoutControl( {
 	parentLayout,
 } ) {
 	const { selfStretch, flexSize, columnSpan, rowSpan } = childLayout;
-	const { type: parentLayoutType } = parentLayout;
+	const { type: parentLayoutType, minimumColumnWidth = '' } = parentLayout;
+
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
 			onChange( {
@@ -112,6 +113,7 @@ export default function ChildLayoutControl( {
 							onChange( {
 								...childLayout,
 								columnSpan: value,
+								parentColumnWidth: minimumColumnWidth || null,
 							} );
 						} }
 						value={ columnSpan }
