@@ -50,7 +50,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 				);
 			}
 
-			const attributesWithSourcedAttributes = useMemo( () => {
+			const attributesWithBindings = useMemo( () => {
 				return {
 					...attributes,
 					...Object.fromEntries(
@@ -60,13 +60,13 @@ const createEditFunctionWithBindingsAttribute = () =>
 								if ( boundAttributes[ attributeName ] ) {
 									const {
 										placeholder,
-										useValue: [ metaValue = null ] = [],
+										useValue: [ sourceValue = null ] = [],
 									} = boundAttributes[ attributeName ];
 
 									const blockTypeAttribute =
 										blockType.attributes[ attributeName ];
 
-									if ( placeholder && ! metaValue ) {
+									if ( placeholder && ! sourceValue ) {
 										// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
 										// Adding this workaround until attributes and metadata fields types are improved and include `url`.
 
@@ -81,9 +81,9 @@ const createEditFunctionWithBindingsAttribute = () =>
 										return [ attributeName, placeholder ];
 									}
 
-									if ( metaValue ) {
+									if ( sourceValue ) {
 										// TODO: If it is rich-text, I think we can't edit it this way.
-										return [ attributeName, metaValue ];
+										return [ attributeName, sourceValue ];
 									}
 								}
 								return [
@@ -104,26 +104,22 @@ const createEditFunctionWithBindingsAttribute = () =>
 						)
 						.forEach( ( [ attribute, value ] ) => {
 							const {
-								useValue: [ , updateMetaValue = null ] = [],
+								useValue: [ , setSourceValue = null ] = [],
 							} = boundAttributes[ attribute ];
-							if ( updateMetaValue ) {
-								updateMetaValue( value );
+							if ( setSourceValue ) {
+								setSourceValue( value );
 							}
 						} );
 					setAttributes( nextAttributes );
 				},
-				[
-					setAttributes,
-					attributesWithSourcedAttributes,
-					boundAttributes,
-				]
+				[ setAttributes, attributesWithBindings, boundAttributes ]
 			);
 
 			const registry = useRegistry();
 
 			return (
 				<BlockEdit
-					attributes={ attributesWithSourcedAttributes }
+					attributes={ attributesWithBindings }
 					setAttributes={ ( newAttributes ) => {
 						registry.batch( () =>
 							updatedSetAttributes( newAttributes )
