@@ -176,6 +176,12 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
 	label?: ReactNode;
+	/**
+	 * Whether to hide the border when not focused.
+	 *
+	 * @default false
+	 */
+	isBorderless?: boolean;
 }
 
 export interface InputControlProps
