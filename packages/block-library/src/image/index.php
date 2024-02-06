@@ -144,9 +144,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
 	}
 
-	// Currently, we are only enabling the zoom animation.
-	$lightbox_animation = 'zoom';
-
 	// Note: We want to store the `src` in the context so we
 	// can set it dynamically when the lightbox is opened.
 	if ( isset( $block['attrs']['id'] ) ) {
@@ -177,17 +174,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			'{  "imageLoaded": false,
 				"initialized": false,
 				"lightboxEnabled": false,
-				"hideAnimationEnabled": false,
 				"preloadInitialized": false,
-				"lightboxAnimation": "%s",
 				"imageUploadedSrc": "%s",
-				"imageCurrentSrc": "",
 				"targetWidth": "%s",
 				"targetHeight": "%s",
 				"scaleAttr": "%s",
 				"dialogLabel": "%s"
 			}',
-			$lightbox_animation,
 			$img_uploaded_src,
 			$img_width,
 			$img_height,
@@ -198,7 +191,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->next_tag( 'img' );
 	$w->set_attribute( 'data-wp-init', 'callbacks.initOriginImage' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.handleLoad' );
-	$w->set_attribute( 'data-wp-watch', 'callbacks.setButtonStyles' );
+	$w->set_attribute( 'data-wp-init--set-button-styles', 'callbacks.setButtonStyles' );
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
@@ -246,7 +239,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// use the exact same image as in the content when the lightbox is first opened while
 	// we wait for the larger image to load.
 	$m->set_attribute( 'src', '' );
-	$m->set_attribute( 'data-wp-bind--src', 'context.imageCurrentSrc' );
+	$m->set_attribute( 'data-wp-bind--src', 'state.imageCurrentSrc' );
 	$m->set_attribute( 'data-wp-style--object-fit', 'state.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
@@ -285,12 +278,14 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$close_button_label = esc_attr__( 'Close' );
 
 	$lightbox_html = <<<HTML
-        <div data-wp-body="" class="wp-lightbox-overlay $lightbox_animation"
+        <div 
+						data-wp-interactive='{"namespace":"core/image"}'
+						data-wp-context='{}'
+						class="wp-lightbox-overlay zoom"
             data-wp-bind--role="state.roleAttribute"
             data-wp-bind--aria-label="state.dialogLabel"
-            data-wp-class--initialized="context.initialized"
-            data-wp-class--active="context.lightboxEnabled"
-            data-wp-class--hideAnimationEnabled="context.hideAnimationEnabled"
+            data-wp-class--active="state.lightboxEnabled"
+            data-wp-class--hideAnimationEnabled="state.hideAnimationEnabled"
             data-wp-bind--aria-modal="state.ariaModal"
             data-wp-watch="callbacks.initLightbox"
             data-wp-on--keydown="actions.handleKeydown"
@@ -309,7 +304,14 @@ function block_core_image_render_lightbox( $block_content, $block ) {
         </div>
 HTML;
 
-	return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
+	add_action(
+		'wp_footer',
+		function () use ( $lightbox_html ) {
+			echo $lightbox_html;
+		}
+	);
+
+	return $body_content;
 }
 
 /**

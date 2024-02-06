@@ -79,31 +79,33 @@ function handleScroll( ctx ) {
 
 const { state, actions, callbacks } = store( 'core/image', {
 	state: {
+		lightboxEnabled: false,
+		hideAnimationEnabled: false,
+		imageCurrentSrc: false,
 		windowWidth: window.innerWidth,
 		windowHeight: window.innerHeight,
 		get roleAttribute() {
-			const ctx = getContext();
-			return ctx.lightboxEnabled ? 'dialog' : null;
+			return state.lightboxEnabled ? 'dialog' : null;
 		},
 		get ariaModal() {
-			const ctx = getContext();
-			return ctx.lightboxEnabled ? 'true' : null;
+			return state.lightboxEnabled ? 'true' : null;
 		},
 		get dialogLabel() {
 			const ctx = getContext();
-			return ctx.lightboxEnabled ? ctx.dialogLabel : null;
+			return state.lightboxEnabled ? state.currentDialogLabel : null;
 		},
 		get lightboxObjectFit() {
 			const ctx = getContext();
-			if ( ctx.initialized ) {
-				return 'cover';
-			}
+			// if ( ctx.initialized ) {
+			// 	return 'cover';
+			// }
 		},
 		get enlargedImgSrc() {
 			const ctx = getContext();
-			return ctx.initialized
-				? ctx.imageUploadedSrc
-				: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+			return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+			// return ctx.initialized
+			// 	? ctx.imageUploadedSrc
+			// 	: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 		},
 	},
 	actions: {
@@ -119,7 +121,9 @@ const { state, actions, callbacks } = store( 'core/image', {
 			ctx.scrollDelta = 0;
 			ctx.pointerType = event.pointerType;
 
-			ctx.lightboxEnabled = true;
+			state.lightboxEnabled = true;
+			state.currentDialogLabel = ctx.dialogLabel;
+			state.imageCurrentSrc = ctx.imageCurrentSrc;
 			setStyles( ctx, ctx.imageRef );
 
 			ctx.scrollTopReset =
@@ -145,8 +149,8 @@ const { state, actions, callbacks } = store( 'core/image', {
 		},
 		hideLightbox() {
 			const ctx = getContext();
-			ctx.hideAnimationEnabled = true;
-			if ( ctx.lightboxEnabled ) {
+			state.hideAnimationEnabled = true;
+			if ( state.lightboxEnabled ) {
 				// We want to wait until the close animation is completed
 				// before allowing a user to scroll again. The duration of this
 				// animation is defined in the styles.scss and depends on if the
@@ -163,12 +167,12 @@ const { state, actions, callbacks } = store( 'core/image', {
 					} );
 				}, 450 );
 
-				ctx.lightboxEnabled = false;
+				state.lightboxEnabled = false;
 			}
 		},
 		handleKeydown( event ) {
 			const ctx = getContext();
-			if ( ctx.lightboxEnabled ) {
+			if ( state.lightboxEnabled ) {
 				if ( event.key === 'Tab' || event.keyCode === 9 ) {
 					// If shift + tab it change the direction
 					if (
@@ -206,14 +210,13 @@ const { state, actions, callbacks } = store( 'core/image', {
 			isTouching = true;
 		},
 		handleTouchMove( event ) {
-			const ctx = getContext();
 			// On mobile devices, we want to prevent triggering the
 			// scroll event because otherwise the page jumps around as
 			// we reset the scroll position. This also means that closing
 			// the lightbox requires that a user perform a simple tap. This
 			// may be changed in the future if we find a better alternative
 			// to override or reset the scroll position during swipe actions.
-			if ( ctx.lightboxEnabled ) {
+			if ( state.lightboxEnabled ) {
 				event.preventDefault();
 			}
 		},
@@ -243,7 +246,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 		initLightbox() {
 			const ctx = getContext();
 			const { ref } = getElement();
-			if ( ctx.lightboxEnabled ) {
+			if ( state.lightboxEnabled ) {
 				const focusableElements =
 					ref.querySelectorAll( focusableSelectors );
 				ctx.firstFocusableElement = focusableElements[ 0 ];
@@ -332,7 +335,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 			const ctx = getContext();
 			const { ref } = getElement();
 			if (
-				ctx.lightboxEnabled &&
+				state.lightboxEnabled &&
 				( state.windowWidth || state.windowHeight )
 			) {
 				setStyles( ctx, ref );
@@ -341,6 +344,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 	},
 } );
 
+// TODO: Move to `data-wp-window--resize` directive.
 window.addEventListener(
 	'resize',
 	debounce( () => {
