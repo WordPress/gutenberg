@@ -16,6 +16,7 @@ import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 import { useListViewContext } from './context';
+import useDragChip from './use-drag-chip';
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -49,10 +50,19 @@ const ListViewBlockContents = forwardRef(
 
 		const {
 			AdditionalBlockContent,
+			blockDropTarget,
 			insertedBlock,
 			listViewInstanceId,
 			setInsertedBlock,
+			treeGridElementRef,
 		} = useListViewContext();
+
+		const { dragChipOnDragStart, dragChipOnDragEnd } = useDragChip( {
+			blockDropTarget,
+			cloneClassname: 'block-editor-list-view-draggable-chip',
+			listViewRef: treeGridElementRef,
+			elementId: `list-view-${ listViewInstanceId }-block-${ clientId }`,
+		} );
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -81,9 +91,9 @@ const ListViewBlockContents = forwardRef(
 				<BlockDraggable
 					appendToOwnerDocument
 					clientIds={ draggableClientIds }
-					cloneClassname={ 'block-editor-list-view-draggable-chip' }
-					dragComponent={ null }
-					elementId={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
+					cloneClassname={
+						'block-editor-list-view-default-draggable-chip'
+					}
 				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
@@ -97,8 +107,14 @@ const ListViewBlockContents = forwardRef(
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							draggable={ draggable }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
+							onDragStart={ ( event ) => {
+								onDragStart( event );
+								dragChipOnDragStart( event );
+							} }
+							onDragEnd={ ( event ) => {
+								onDragEnd( event );
+								dragChipOnDragEnd( event );
+							} }
 							isExpanded={ isExpanded }
 							{ ...props }
 						/>

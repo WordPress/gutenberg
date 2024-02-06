@@ -437,6 +437,11 @@
 // Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
 $block-navigation-max-indent: 8;
 
+.block-editor-list-view-default-draggable-chip {
+	// Hide the default draggable chip
+	display: none;
+}
+
 .block-editor-list-view-draggable-chip {
 	.block-editor-list-view-leaf {
 		background-color: $white;
