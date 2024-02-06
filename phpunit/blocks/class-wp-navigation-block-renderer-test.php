@@ -73,11 +73,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_markup_for_inner_block_heading() {
 
 		// We are testing the site title block because we manually add list items around it.
-		$parsed_blocks    = parse_blocks(
+		$parsed_blocks = parse_blocks(
 			'<!-- wp:heading --><h2 class="wp-block-heading">Hello World</h2><!-- /wp:heading -->'
 		);
-		$parsed_block     = $parsed_blocks[0];
-		$context          = array();
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array();
 		$heading_block = new WP_Block( $parsed_block, $context );
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
@@ -113,11 +113,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 
 		// We are testing the site title block because we manually add list items around it.
-		$parsed_blocks    = parse_blocks(
+		$parsed_blocks = parse_blocks(
 			'<!-- wp:heading --><h2 class="wp-block-heading">Hello Filtered World</h2><!-- /wp:heading -->'
 		);
-		$parsed_block     = $parsed_blocks[0];
-		$context          = array();
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array();
 		$heading_block = new WP_Block( $parsed_block, $context );
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
