@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))
+-   Support setting the namespace using a string in `data-wp-interactive`, like `data-wp-interactive="myPlugin"`. ([#](https://github.com/WordPress/gutenberg/pull/))
 
 ## 4.0.1 (2024-01-31)
 
