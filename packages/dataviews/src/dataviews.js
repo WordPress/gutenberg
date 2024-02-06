@@ -42,25 +42,27 @@ export default function DataViews( {
 		if (
 			selection.length > 0 &&
 			selection.some(
-				( id ) => ! data.some( ( item ) => item.id === id )
+				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
 			)
 		) {
 			const newSelection = selection.filter( ( id ) =>
-				data.some( ( item ) => item.id === id )
+				data.some( ( item ) => getItemId( item ) === id )
 			);
 			setSelection( newSelection );
 			onSelectionChange(
-				data.filter( ( item ) => newSelection.includes( item.id ) )
+				data.filter( ( item ) =>
+					newSelection.includes( getItemId( item ) )
+				)
 			);
 		}
-	}, [ selection, data, onSelectionChange ] );
+	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
-			setSelection( items.map( ( item ) => item.id ) );
+			setSelection( items.map( ( item ) => getItemId( item ) ) );
 			onSelectionChange( items );
 		},
-		[ setSelection, onSelectionChange ]
+		[ setSelection, getItemId, onSelectionChange ]
 	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
