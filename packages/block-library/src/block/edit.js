@@ -33,6 +33,7 @@ import { parse, cloneBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
@@ -134,6 +135,7 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
 	for ( const block of blocks ) {
+		if ( block.name === patternBlockName ) continue;
 		Object.assign(
 			content,
 			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
@@ -147,10 +149,13 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 				defaultValues[ blockId ][ attributeKey ]
 			) {
 				content[ blockId ] ??= { values: {} };
-				// TODO: We need a way to represent `undefined` in the serialized overrides.
-				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				content[ blockId ].values[ attributeKey ] =
-					block.attributes[ attributeKey ];
+					block.attributes[ attributeKey ] === undefined
+						? // TODO: We use an empty string to represent undefined for now until
+						  // we support a richer format for overrides and the block binding API.
+						  // Currently only the `linkTarget` attribute of `core/button` is affected.
+						  ''
+						: block.attributes[ attributeKey ];
 			}
 		}
 	}
@@ -163,7 +168,13 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 			mode ||
 			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
-		setBlockEditMode( setEditMode, block.innerBlocks, mode );
+
+		setBlockEditMode(
+			setEditMode,
+			block.innerBlocks,
+			// Disable editing for nested patterns.
+			block.name === patternBlockName ? 'disabled' : mode
+		);
 	} );
 }
 
@@ -197,28 +208,34 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const {
-					getBlocks,
-					getBlockEditingMode: editingMode,
-					getSettings,
-				} = select( blockEditorStore );
-				const blocks = getBlocks( patternClientId );
-				const canEdit = canUser( 'update', 'blocks', ref );
+	const {
+		innerBlocks,
+		userCanEdit,
+		getBlockEditingMode,
+		getPostLinkProps,
+		editingMode,
+	} = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const {
+				getBlocks,
+				getSettings,
+				getBlockEditingMode: _getBlockEditingMode,
+			} = select( blockEditorStore );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					userCanEdit: canEdit,
-					getBlockEditingMode: editingMode,
-					getPostLinkProps: getSettings().getPostLinkProps,
-				};
-			},
-			[ patternClientId, ref ]
-		);
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: _getBlockEditingMode,
+				getPostLinkProps: getSettings().getPostLinkProps,
+				editingMode: _getBlockEditingMode( patternClientId ),
+			};
+		},
+		[ patternClientId, ref ]
+	);
 
 	const editOriginalProps = getPostLinkProps
 		? getPostLinkProps( {
@@ -227,10 +244,15 @@ export default function ReusableBlockEdit( {
 		  } )
 		: {};
 
-	useEffect(
-		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
-		[ innerBlocks, setBlockEditingMode ]
-	);
+	// Sync the editing mode of the pattern block with the inner blocks.
+	useEffect( () => {
+		setBlockEditMode(
+			setBlockEditingMode,
+			innerBlocks,
+			// Disable editing if the pattern itself is disabled.
+			editingMode === 'disabled' ? 'disabled' : undefined
+		);
+	}, [ editingMode, innerBlocks, setBlockEditingMode ] );
 
 	const canOverrideBlocks = useMemo(
 		() => hasOverridableBlocks( innerBlocks ),
@@ -250,7 +272,8 @@ export default function ReusableBlockEdit( {
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
 		defaultContent.current = {};
-		const editingMode = getBlockEditingMode( patternClientId );
+		const originalEditingMode = getBlockEditingMode( patternClientId );
+		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
 			syncDerivedUpdates( () => {
@@ -263,7 +286,7 @@ export default function ReusableBlockEdit( {
 					)
 				);
 			} );
-			setBlockEditingMode( patternClientId, editingMode );
+			setBlockEditingMode( patternClientId, originalEditingMode );
 		} );
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
@@ -320,7 +343,6 @@ export default function ReusableBlockEdit( {
 	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
 	const handleEditOriginal = ( event ) => {
-		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
 		editOriginalProps.onClick( event );
 	};
 

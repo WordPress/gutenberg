@@ -6,11 +6,11 @@ import { useRef, useEffect, useState } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
+	NavigableMenu,
 	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	MenuGroup,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
@@ -270,7 +270,7 @@ const ImageURLInputUI = ( {
 					}
 					additionalControls={
 						showLinkEditor && (
-							<MenuGroup>
+							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
@@ -308,7 +308,7 @@ const ImageURLInputUI = ( {
 										{ __( 'Expand on click' ) }
 									</MenuItem>
 								) }
-							</MenuGroup>
+							</NavigableMenu>
 						)
 					}
 					offset={ 13 }

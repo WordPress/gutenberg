@@ -227,7 +227,6 @@ export function GradientPicker( {
 		<VStack spacing={ gradients.length ? 4 : 0 }>
 			{ ! disableCustomGradients && (
 				<CustomGradientPicker
-					__nextHasNoMargin
 					__experimentalIsRenderedInSidebar={
 						__experimentalIsRenderedInSidebar
 					}
