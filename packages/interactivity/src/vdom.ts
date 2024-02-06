@@ -31,7 +31,7 @@ const directiveParser = new RegExp(
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
+const nsPathRegExp = /^(.+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
@@ -85,7 +85,11 @@ export function toVdom( root ) {
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
-						namespaces.push( value?.namespace ?? null );
+						namespaces.push(
+							typeof value === 'string'
+								? value
+								: value?.namespace ?? null
+						);
 					} else {
 						directives.push( [ n, ns, value ] );
 					}
