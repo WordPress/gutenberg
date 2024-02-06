@@ -406,7 +406,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		).toBeVisible();
 	} );
 
-	// // Check for regression of https://github.com/WordPress/gutenberg/issues/24262.
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/24262.
 	test( 'inserts a block in proper place after having clicked `Browse All` from inline inserter', async ( {
 		admin,
 		editor,
