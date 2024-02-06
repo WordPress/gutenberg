@@ -6,7 +6,6 @@ import { separator as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 
 import metadata from './block.json';
@@ -27,9 +26,8 @@ export const settings = {
 		},
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "separator/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "separator/editor" */ './edit' ),
 	save,
 	deprecated,
 };

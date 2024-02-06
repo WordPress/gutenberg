@@ -7,7 +7,6 @@ import { search as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 
@@ -24,9 +23,7 @@ export const settings = {
 		viewportWidth: 400,
 	},
 	variations,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "search/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "search/editor" */ './edit' ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

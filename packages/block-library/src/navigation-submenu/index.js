@@ -6,7 +6,6 @@ import { page, addSubmenu } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import save from './save';
@@ -36,9 +35,8 @@ export const settings = {
 
 		return label;
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "navigation-submenu/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "navigation-submenu/editor" */ './edit' ),
 	save,
 	transforms,
 };

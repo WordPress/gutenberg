@@ -7,9 +7,7 @@ import { code as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
-
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -36,9 +34,7 @@ export const settings = {
 		};
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "code/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "code/editor" */ './edit' ),
 	save,
 };
 

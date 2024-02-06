@@ -6,7 +6,6 @@ import { gallery as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import metadata from './block.json';
@@ -39,9 +38,8 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "gallery/editor" */ './edit-wrapper' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "gallery/editor" */ './edit-wrapper' ),
 	save,
 	deprecated,
 };

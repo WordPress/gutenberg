@@ -7,7 +7,6 @@ import { button as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -26,9 +25,7 @@ export const settings = {
 			text: __( 'Call to Action' ),
 		},
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "button/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "button/editor" */ './edit' ),
 	save,
 	deprecated,
 	merge: ( a, { text = '' } ) => ( {

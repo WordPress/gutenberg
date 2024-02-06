@@ -6,7 +6,6 @@ import { tableOfContents as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import save from './save';
@@ -17,9 +16,8 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "table-of-contents/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "table-of-contents/editor" */ './edit' ),
 	save,
 };
 

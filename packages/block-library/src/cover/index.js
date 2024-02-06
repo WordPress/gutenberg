@@ -7,7 +7,6 @@ import { cover as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import metadata from './block.json';
@@ -47,9 +46,7 @@ export const settings = {
 	},
 	transforms,
 	save,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "cover/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "cover/editor" */ './edit' ),
 	deprecated,
 	variations,
 };

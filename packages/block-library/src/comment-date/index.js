@@ -6,7 +6,6 @@ import { postDate as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 
@@ -17,9 +16,8 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "comment-date/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "comment-date/editor" */ './edit' ),
 	deprecated,
 };
 

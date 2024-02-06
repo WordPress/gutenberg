@@ -7,7 +7,6 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 
@@ -18,9 +17,8 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "post-terms/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "post-terms/editor" */ './edit' ),
 };
 
 export const init = () => {

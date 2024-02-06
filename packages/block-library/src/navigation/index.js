@@ -7,7 +7,6 @@ import { navigation as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import save from './save';
@@ -50,9 +49,7 @@ export const settings = {
 			},
 		],
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "cover/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "cover/editor" */ './edit' ),
 	save,
 	deprecated,
 };

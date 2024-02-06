@@ -7,10 +7,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-
 import save from './save';
 
 const { name } = metadata;
@@ -35,9 +33,7 @@ export const settings = {
 		],
 	},
 	save,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "details/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "details/editor" */ './edit' ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

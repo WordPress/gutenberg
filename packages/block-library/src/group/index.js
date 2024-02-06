@@ -7,7 +7,6 @@ import { group as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -83,9 +82,7 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "group/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "group/editor" */ './edit' ),
 	save,
 	deprecated,
 	variations,

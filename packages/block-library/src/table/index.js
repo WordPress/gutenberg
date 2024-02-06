@@ -7,7 +7,6 @@ import { blockTable as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import metadata from './block.json';
@@ -94,9 +93,7 @@ export const settings = {
 		viewportWidth: 450,
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "table/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "table/editor" */ './edit' ),
 	save,
 	deprecated,
 };

@@ -6,7 +6,6 @@ import { column as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -19,9 +18,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "column/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "column/editor" */ './edit' ),
 	save,
 	deprecated,
 };

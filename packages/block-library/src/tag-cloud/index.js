@@ -6,7 +6,6 @@ import { tag as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import transforms from './transforms';
 import metadata from './block.json';
@@ -18,9 +17,8 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "tag-cloud/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "tag-cloud/editor" */ './edit' ),
 	transforms,
 };
 

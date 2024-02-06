@@ -6,7 +6,6 @@ import { audio as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -28,9 +27,7 @@ export const settings = {
 	},
 	transforms,
 	deprecated,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "audio/editor" */ './edit' )
-	),
+	lazyEdit: () => import( /* webpackChunkName: "audio/editor" */ './edit' ),
 	save,
 };
 

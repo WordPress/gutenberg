@@ -6,7 +6,6 @@ import { siteLogo as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import transforms from './transforms';
@@ -17,9 +16,8 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "site-logo/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "site-logo/editor" */ './edit' ),
 	transforms,
 };
 

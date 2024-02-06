@@ -7,10 +7,10 @@ import { paragraph as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import metadata from './block.json';
+import edit from './edit';
 import save from './save';
 import transforms from './transforms';
 
@@ -52,9 +52,9 @@ export const settings = {
 				( attributesToMerge.content || '' ),
 		};
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "paragraph/editor" */ './edit' )
-	),
+	edit,
+	// lazyEdit: () =>
+	// 	import( /* webpackChunkName: "paragraph/editor" */ './edit' ),
 	save,
 };
 

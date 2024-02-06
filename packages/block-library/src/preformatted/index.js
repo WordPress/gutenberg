@@ -7,7 +7,6 @@ import { preformatted as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 
 import metadata from './block.json';
@@ -31,9 +30,8 @@ export const settings = {
 		},
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "preformatted/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "preformatted/editor" */ './edit' ),
 	save,
 	merge( attributes, attributesToMerge ) {
 		return {

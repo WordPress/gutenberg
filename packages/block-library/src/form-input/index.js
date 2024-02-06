@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import metadata from './block.json';
@@ -14,9 +13,8 @@ export { metadata, name };
 
 export const settings = {
 	deprecated,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "form-input/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "form-input/editor" */ './edit' ),
 	save,
 	variations,
 };

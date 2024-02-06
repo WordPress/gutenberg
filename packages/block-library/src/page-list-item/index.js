@@ -6,7 +6,6 @@ import { page as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 
@@ -18,9 +17,8 @@ export const settings = {
 	__experimentalLabel: ( { label } ) => label,
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "page-list-item/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "page-list-item/editor" */ './edit' ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

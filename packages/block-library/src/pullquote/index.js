@@ -7,7 +7,6 @@ import { pullquote as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -32,9 +31,8 @@ export const settings = {
 		},
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "pullquote/editor" */ './edit' )
-	),
+	lazyEdit: () =>
+		import( /* webpackChunkName: "pullquote/editor" */ './edit' ),
 	save,
 	deprecated,
 };
