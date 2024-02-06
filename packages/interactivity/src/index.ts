@@ -6,7 +6,7 @@ import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 
-export { store } from './store';
+export { store, getConfig } from './store';
 export { directive, getContext, getElement, getNamespace } from './hooks';
 export {
 	withScope,
