@@ -10,7 +10,9 @@
  */
 function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
 	$module_fields = array(
-		'viewModule' => 'view_module_ids',
+		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
+		'viewModule' => 'view_script_module_ids',
+		'viewScriptModule' => 'view_script_module_ids',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
 		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
@@ -49,11 +51,11 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
  * @param array    $parsed_block   The full block, including name and attributes.
  * @param WP_Block $block_instance The block instance.
  */
-function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
+function gutenberg_filter_render_block_enqueue_view_script_modules( $block_content, $parsed_block, $block_instance ) {
 	$block_type = $block_instance->block_type;
 
-	if ( ! empty( $block_type->view_module_ids ) ) {
-		foreach ( $block_type->view_module_ids as $module_id ) {
+	if ( ! empty( $block_type->view_script_module_ids ) ) {
+		foreach ( $block_type->view_script_module_ids as $module_id ) {
 			wp_enqueue_script_module( $module_id );
 		}
 	}
@@ -61,7 +63,7 @@ function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $pa
 	return $block_content;
 }
 
-add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_modules', 10, 3 );
+add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_script_modules', 10, 3 );
 
 /**
  * Finds a module ID for the selected block metadata field. It detects
@@ -159,7 +161,9 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 	}
 
 	$field_mappings = array(
-		'viewModule' => 'view-module',
+		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
+		'viewModule' => 'view-script-module',
+		'viewScriptModule' => 'view-script-module',
 	);
 	$asset_handle   = str_replace( '/', '-', $block_name ) .
 		'-' . $field_mappings[ $field_name ];
@@ -172,21 +176,34 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 /**
  * Registers a REST field for block types to provide view module IDs.
  *
- * Adds the `view_module_ids` field to block type objects in the REST API, which
+ * Adds the `view_script_module_ids` and `view_module_ids` (deprecated) field to block type objects in the REST API, which
  * lists the script module IDs for any script modules associated with the
- * block's viewModule(s) key.
- *
- * @since 6.5.0
+ * block's viewScriptModule key.
  */
-function gutenberg_register_view_module_ids_rest_field() {
+function gutenberg_register_view_script_module_ids_rest_field() {
+	// @todo remove view_module_ids support in Gutenberg >= 17.8 (replaced by view_script_module_ids).
 	register_rest_field(
 		'block-type',
 		'view_module_ids',
 		array(
 			'get_callback' => function ( $item ) {
 				$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
-				if ( isset( $block_type->view_module_ids ) ) {
-					return $block_type->view_module_ids;
+				if ( isset( $block_type->view_script_module_ids ) ) {
+					return $block_type->view_script_module_ids;
+				}
+				return array();
+			},
+		)
+	);
+
+	register_rest_field(
+		'block-type',
+		'view_script_module_ids',
+		array(
+			'get_callback' => function ( $item ) {
+				$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
+				if ( isset( $block_type->view_script_module_ids ) ) {
+					return $block_type->view_script_module_ids;
 				}
 				return array();
 			},
@@ -194,7 +211,7 @@ function gutenberg_register_view_module_ids_rest_field() {
 	);
 }
 
-add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
+add_action( 'rest_api_init', 'gutenberg_register_view_script_module_ids_rest_field' );
 
 /**
  * Registers the module if no module with that module identifier has already
