@@ -263,4 +263,115 @@ test.describe( 'Pattern Overrides', () => {
 			},
 		] );
 	} );
+
+	test( "handles button's link settings", async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+		context,
+	} ) => {
+		const buttonId = 'button-id';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Button with target',
+			content: `<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"linkTarget":{"source":"core/pattern-overrides"},"rel":{"source":"core/pattern-overrides"}}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Focus the button, open the link popup.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button' } )
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.focus();
+		await expect(
+			page.getByRole( 'link', { name: 'wp.org' } )
+		).toContainText( 'opens in a new tab' );
+
+		// The link popup doesn't have a role which is a bit unfortunate.
+		// These are the buttons in the link popup.
+		const advancedPanel = page.getByRole( 'button', {
+			name: 'Advanced',
+			exact: true,
+		} );
+		const editLinkButton = page.getByRole( 'button', {
+			name: 'Edit',
+			exact: true,
+		} );
+		const saveLinkButton = page.getByRole( 'button', {
+			name: 'Save',
+			exact: true,
+		} );
+
+		await editLinkButton.click();
+		if (
+			( await advancedPanel.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await advancedPanel.click();
+		}
+
+		const openInNewTabCheckbox = page.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+		const markAsNoFollowCheckbox = page.getByRole( 'checkbox', {
+			name: 'Mark as nofollow',
+		} );
+		// Both checkboxes are checked.
+		await expect( openInNewTabCheckbox ).toBeChecked();
+		await expect( markAsNoFollowCheckbox ).toBeChecked();
+
+		// Check only the "open in new tab" checkbox.
+		await markAsNoFollowCheckbox.setChecked( false );
+		await saveLinkButton.click();
+
+		const postId = await editor.publishPost();
+		const previewPage = await context.newPage();
+		await previewPage.goto( `/?p=${ postId }` );
+		const buttonLink = previewPage.getByRole( 'link', { name: 'Button' } );
+
+		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
+		await expect( buttonLink ).toHaveAttribute(
+			'rel',
+			'noreferrer noopener'
+		);
+
+		// Uncheck both checkboxes.
+		await editLinkButton.click();
+		await openInNewTabCheckbox.setChecked( false );
+		await saveLinkButton.click();
+
+		// Update the post.
+		const updateButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Update' } );
+		await updateButton.click();
+		await expect( updateButton ).toBeDisabled();
+
+		await previewPage.reload();
+		await expect( buttonLink ).toHaveAttribute( 'target', '' );
+		await expect( buttonLink ).toHaveAttribute( 'rel', '' );
+
+		// Check only the "mark as nofollow" checkbox.
+		await editLinkButton.click();
+		await markAsNoFollowCheckbox.setChecked( true );
+		await saveLinkButton.click();
+
+		// Update the post.
+		await updateButton.click();
+		await expect( updateButton ).toBeDisabled();
+
+		await previewPage.reload();
+		await expect( buttonLink ).toHaveAttribute( 'target', '' );
+		await expect( buttonLink ).toHaveAttribute( 'rel', /^\s*nofollow\s*$/ );
+	} );
 } );
