@@ -51,12 +51,14 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			);
 		}
 
-		// No breaks so all migrations will run in order starting with the current.
-		switch( $theme_json['version'] ) {
+		// Migrate each version in order starting with the current version.
+		switch ( $theme_json['version'] ) {
 			case 1:
 				$theme_json = self::migrate_v1_to_v2( $theme_json );
+				// no break
 			case 2:
 				$theme_json = self::migrate_v2_to_v3( $theme_json );
+				// no break
 		}
 
 		return $theme_json;
