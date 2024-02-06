@@ -443,7 +443,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				$data['id'] = $item->ID;
 			}
 			if ( rest_is_field_included( 'theme_json_version', $fields ) ) {
-				$data['theme_json_version'] = 2;
+				$data['theme_json_version'] = WP_Theme_JSON::LATEST_SCHEMA;
 			}
 
 			if ( rest_is_field_included( 'parent', $fields ) ) {
@@ -504,9 +504,9 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					'theme_json_version' => array(
 						'description' => __( 'Version of the theme.json schema used for the typography settings.', 'gutenberg' ),
 						'type'        => 'integer',
-						'default'     => 2,
+						'default'     => WP_Theme_JSON::LATEST_SCHEMA,
 						'minimum'     => 2,
-						'maximum'     => 2,
+						'maximum'     => WP_Theme_JSON::LATEST_SCHEMA,
 						'context'     => array( 'view', 'edit', 'embed' ),
 					),
 					'parent'             => array(
