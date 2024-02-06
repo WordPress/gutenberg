@@ -1940,14 +1940,14 @@ const buildBlockTypeItem =
 
 		let initialAttributes = {};
 
-		const hookedBlocksForCurrentBlock = getHookedBlockNames( id );
+		const ignoredHookedBlocks = Object.values(
+			getHookedBlockNames( id )
+		).flat();
 
-		if ( hookedBlocksForCurrentBlock?.length ) {
+		if ( ignoredHookedBlocks.length ) {
 			initialAttributes = {
 				metadata: {
-					ignoredHookedBlocks: hookedBlocksForCurrentBlock.map(
-						( { name } ) => name
-					),
+					ignoredHookedBlocks,
 				},
 			};
 		}
