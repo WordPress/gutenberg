@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useCallback } from '@wordpress/element';
+import { bulkSelect } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -130,20 +131,27 @@ export default function BulkActions( {
 					<Button
 						className="dataviews-bulk-edit-button"
 						__next40pxDefaultSize
-						variant="tertiary"
 						size="compact"
-					>
-						{ selection.length
-							? sprintf(
-									/* translators: %d: Number of items. */
-									_n(
-										'Edit %d item',
-										'Edit %d items',
+						label={
+							selection.length
+								? sprintf(
+										/* translators: %d: Number of items. */
+										_n(
+											'Edit %d item',
+											'Edit %d items',
+											selection.length
+										),
 										selection.length
-									),
-									selection.length
-							  )
-							: __( 'Bulk edit' ) }
+								  )
+								: __( 'Bulk edit' )
+						}
+						icon={ bulkSelect }
+					>
+						{ selection.length > 0 && (
+							<div className="dataviews-bulk-edit-button__selection-count">
+								{ selection.length }
+							</div>
+						) }
 					</Button>
 				}
 			>

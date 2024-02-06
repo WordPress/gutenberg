@@ -498,6 +498,37 @@
 
 .dataviews-bulk-edit-button.components-button {
 	flex-shrink: 0;
+	position: relative;
+
+	svg {
+		flex-shrink: 0;
+	}
+
+	.dataviews-bulk-edit-button__selection-count {
+		position: absolute;
+		top: - math.div($grid-unit-20, 2);
+		right: 0;
+		transform: translateX(50%);
+		padding: 0 $grid-unit-05;
+		height: $grid-unit-20;
+		background: $gray-900;
+		color: $white;
+		border-radius: $grid-unit;
+		font-size: 11px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		speak: none;
+		min-width: $grid-unit-20;
+	}
+
+	&:hover,
+	&:focus,
+	&[aria-expanded="true"] {
+		.dataviews-bulk-edit-button__selection-count {
+			background: var(--wp-admin-theme-color);
+		}
+	}
 }
 
 .dataviews-view-grid__title-actions .dataviews-view-table-selection-checkbox {
