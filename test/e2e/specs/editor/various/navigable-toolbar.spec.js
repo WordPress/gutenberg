@@ -273,7 +273,7 @@ test.describe( 'Block Toolbar', () => {
 		} );
 
 		// Make sure it's in an acvite state for now
-		await expect( blockToolbarMoveUpButton ).not.toBeDisabled();
+		await expect( blockToolbarMoveUpButton ).toBeEnabled();
 
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
