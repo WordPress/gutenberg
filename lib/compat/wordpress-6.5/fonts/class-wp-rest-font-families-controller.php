@@ -177,7 +177,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 					'update_post_term_cache' => false,
 				)
 			);
-			if ( ! empty( $query->get_posts() ) ) {
+			if ( ! empty( $query->posts ) ) {
 				return new WP_Error(
 					'rest_duplicate_font_family',
 					/* translators: %s: Font family slug. */
@@ -457,7 +457,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 				)
 			);
 
-			return $query->get_posts();
+			return $query->posts;
 		}
 
 		/**

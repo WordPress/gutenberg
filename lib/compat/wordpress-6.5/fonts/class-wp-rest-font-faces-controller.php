@@ -328,7 +328,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					'update_post_term_cache' => false,
 				)
 			);
-			if ( ! empty( $query->get_posts() ) ) {
+			if ( ! empty( $query->posts ) ) {
 				return new WP_Error(
 					'rest_duplicate_font_face',
 					__( 'A font face matching those settings already exists.', 'gutenberg' ),
