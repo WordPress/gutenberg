@@ -234,7 +234,7 @@ export default function useOnBlockDrop(
 		getBlock,
 		isGroupable,
 	} = useSelect( blockEditorStore );
-	const { getBlockType, getGroupingBlockName } = useSelect( blocksStore );
+	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,
@@ -283,7 +283,10 @@ export default function useOnBlockDrop(
 					return block.name === 'core/image';
 				} );
 
-				const galleryBlock = !! getBlockType( 'core/gallery' );
+				const galleryBlock = canInsertBlockType(
+					'core/gallery',
+					targetRootClientId
+				);
 
 				const wrappedBlocks = createBlock(
 					areAllImages && galleryBlock
@@ -292,7 +295,8 @@ export default function useOnBlockDrop(
 					{
 						layout: {
 							type: 'flex',
-							flexWrap: areAllImages ? null : 'nowrap',
+							flexWrap:
+								areAllImages && galleryBlock ? null : 'nowrap',
 						},
 					},
 					groupInnerBlocks
@@ -319,11 +323,12 @@ export default function useOnBlockDrop(
 			getBlockOrder,
 			targetRootClientId,
 			targetBlockIndex,
+			isGroupable,
 			operation,
 			replaceBlocks,
 			getBlock,
 			nearestSide,
-			getBlockType,
+			canInsertBlockType,
 			getGroupingBlockName,
 			insertBlocks,
 		]
