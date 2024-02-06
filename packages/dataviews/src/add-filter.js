@@ -24,7 +24,7 @@ function AddFilter(
 	{ filters, view, onChangeView, setOpenFilterOnMount },
 	ref
 ) {
-	if ( filters.length === 0 ) {
+	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
 		return null;
 	}
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
