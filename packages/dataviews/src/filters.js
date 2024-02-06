@@ -10,7 +10,7 @@ import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
-import { ENUMERATION_TYPE } from './constants';
+import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const addFilterRef = useRef();
@@ -40,11 +40,11 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					isVisible:
 						isPrimary ||
 						view.filters.some(
-							( f ) => f.field === field.id
-							// &&
-							// [ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
-							// 	f.operator
-							// )
+							( f ) =>
+								f.field === field.id &&
+								[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
+									f.operator
+								)
 						),
 					isPrimary,
 				} );

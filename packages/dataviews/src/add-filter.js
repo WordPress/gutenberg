@@ -58,6 +58,7 @@ function AddFilter( { filters, view, onChangeView }, ref ) {
 									{
 										field: filter.field,
 										value: undefined,
+										operator: filter.operators[ 0 ],
 									},
 								],
 							} );

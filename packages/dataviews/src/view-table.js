@@ -163,6 +163,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 										{
 											field: field.id,
 											value: undefined,
+											operator: operators[ 0 ],
 										},
 									],
 								} );
