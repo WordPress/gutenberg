@@ -374,4 +374,123 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( buttonLink ).toHaveAttribute( 'target', '' );
 		await expect( buttonLink ).toHaveAttribute( 'rel', /^\s*nofollow\s*$/ );
 	} );
+
+	test( 'disables editing of nested patterns', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphId = 'paragraph-id';
+		const headingId = 'heading-id';
+		const innerPattern = await requestUtils.createBlock( {
+			title: 'Inner Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Inner paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+		const outerPattern = await requestUtils.createBlock( {
+			title: 'Outer Pattern',
+			content: `<!-- wp:heading {"metadata":{"id":"${ headingId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<h2 class="wp-block-heading">Outer heading</h2>
+<!-- /wp:heading -->
+<!-- wp:block {"ref":${ innerPattern.id },"overrides":{"${ paragraphId }":{"content":"Inner paragraph (edited)"}}} /-->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: outerPattern.id },
+		} );
+
+		// Make an edit to the outer pattern heading.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.fill( 'Outer heading (edited)' );
+
+		const postId = await editor.publishPost();
+
+		// Check it renders correctly.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/block',
+				attributes: {
+					ref: outerPattern.id,
+					content: {
+						[ headingId ]: {
+							values: { content: 'Outer heading (edited)' },
+						},
+					},
+				},
+				innerBlocks: [
+					{
+						name: 'core/heading',
+						attributes: { content: 'Outer heading (edited)' },
+					},
+					{
+						name: 'core/block',
+						attributes: {
+							ref: innerPattern.id,
+							content: {
+								[ paragraphId ]: {
+									values: {
+										content: 'Inner paragraph (edited)',
+									},
+								},
+							},
+						},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: {
+									content: 'Inner paragraph (edited)',
+								},
+							},
+						],
+					},
+				],
+			},
+		] );
+
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} ),
+			'The inner paragraph should not be editable'
+		).toHaveAttribute( 'inert', 'true' );
+
+		// Edit the outer pattern.
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.first()
+		);
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'link', { name: 'Edit original' } )
+			.click();
+
+		// The inner paragraph should be editable in the pattern focus mode.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} ),
+			'The inner paragraph should not be editable'
+		).not.toHaveAttribute( 'inert', 'true' );
+
+		// Visit the post on the frontend.
+		await page.goto( `/?p=${ postId }` );
+
+		await expect( page.getByRole( 'heading', { level: 2 } ) ).toHaveText(
+			'Outer heading (edited)'
+		);
+		await expect(
+			page.getByText( 'Inner paragraph (edited)' )
+		).toBeVisible();
+	} );
 } );
