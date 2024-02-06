@@ -33,7 +33,7 @@ export type CustomSelectButtonProps = {
 	/**
 	 * The size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'compact' | 'default' | 'small';
 	/**

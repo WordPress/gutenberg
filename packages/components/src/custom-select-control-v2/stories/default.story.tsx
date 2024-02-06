@@ -23,6 +23,7 @@ const meta: Meta< typeof NewCustomSelect > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		options: { table: { disable: true } },
 		renderSelectedValue: { control: { type: null } },
 		value: { control: { type: null } },
 	},
