@@ -179,12 +179,7 @@ describe.each( [
 		const user = userEvent.setup();
 
 		const renderValue = ( value: string | string[] ) => {
-			return (
-				<>
-					<img src={ `${ value }.jpg` } alt={ value as string } />
-					<span>{ value }</span>
-				</>
-			);
+			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
 
 		render(
@@ -217,5 +212,8 @@ describe.each( [
 
 		// expect that the other image is only visible after opening popover with options
 		expect( screen.getByRole( 'img', { name: 'july-9' } ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'option', { name: 'july-9' } )
+		).toBeVisible();
 	} );
 } );
