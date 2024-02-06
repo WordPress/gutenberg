@@ -138,7 +138,7 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 			) ) {
 				return $block_content;
 			}
-			$amended_content->set_attribute( $block_type->attributes[ $attribute_name ]['attribute'], esc_attr( $source_value ) );
+			$amended_content->set_attribute( $block_type->attributes[ $attribute_name ]['attribute'], $source_value );
 			return $amended_content->get_updated_html();
 		break;
 
