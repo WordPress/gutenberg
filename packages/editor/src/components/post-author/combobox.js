@@ -89,10 +89,6 @@ function PostAuthorCombobox() {
 		setFieldValue( inputValue );
 	};
 
-	if ( ! postAuthor ) {
-		return null;
-	}
-
 	return (
 		<ComboboxControl
 			__nextHasNoMarginBottom
