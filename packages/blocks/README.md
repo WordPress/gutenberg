@@ -236,7 +236,9 @@ _Returns_
 
 ### getHookedBlocks
 
-Returns all hooked blocks for a given anchor block.
+Returns the hooked blocks for a given anchor block.
+
+Given an anchor block name, returns an object whose keys are relative positions, and whose values are arrays of block names that are hooked to the anchor block at that relative position.
 
 _Parameters_
 
@@ -244,7 +246,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: List of blocks hooked to the anchor block.
+-   `Object`: Lists of hooked block names for each relative position.
 
 ### getPhrasingContentSchema
 

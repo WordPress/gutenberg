@@ -551,11 +551,15 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 }
 
 /**
- * Returns all hooked blocks for a given anchor block.
+ * Returns the hooked blocks for a given anchor block.
+ *
+ * Given an anchor block name, returns an object whose keys are relative positions,
+ * and whose values are arrays of block names that are hooked to the anchor block
+ * at that relative position.
  *
  * @param {string} name Anchor block name.
  *
- * @return {Array} List of blocks hooked to the anchor block.
+ * @return {Object} Lists of hooked block names for each relative position.
  */
 export function getHookedBlocks( name ) {
 	return select( blocksStore ).getHookedBlocks( name );
