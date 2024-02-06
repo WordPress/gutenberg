@@ -10,86 +10,20 @@ import {
 	cloneElement,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context, RefObject } from 'preact';
+import type { VNode } from 'preact';
 
 /**
  * Internal dependencies
  */
 import { stores } from './store';
-interface DirectiveEntry {
-	value: string | Object;
-	namespace: string;
-	suffix: string;
-}
-
-type DirectiveEntries = Record< string, DirectiveEntry[] >;
-
-interface DirectiveArgs {
-	/**
-	 * Object map with the defined directives of the element being evaluated.
-	 */
-	directives: DirectiveEntries;
-	/**
-	 * Props present in the current element.
-	 */
-	props: Object;
-	/**
-	 * Virtual node representing the element.
-	 */
-	element: VNode;
-	/**
-	 * The inherited context.
-	 */
-	context: Context< any >;
-	/**
-	 * Function that resolves a given path to a value either in the store or the
-	 * context.
-	 */
-	evaluate: Evaluate;
-}
-
-interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | void;
-}
-
-interface DirectiveOptions {
-	/**
-	 * Value that specifies the priority to evaluate directives of this type.
-	 * Lower numbers correspond with earlier execution.
-	 *
-	 * @default 10
-	 */
-	priority?: number;
-}
-
-interface Scope {
-	evaluate: Evaluate;
-	context: Context< any >;
-	ref: RefObject< HTMLElement >;
-	attributes: createElement.JSX.HTMLAttributes;
-}
-
-interface Evaluate {
-	( entry: DirectiveEntry, ...args: any[] ): any;
-}
-
-interface GetEvaluate {
-	( args: { scope: Scope } ): Evaluate;
-}
-
-type PriorityLevel = string[];
-
-interface GetPriorityLevels {
-	( directives: DirectiveEntries ): PriorityLevel[];
-}
-
-interface DirectivesProps {
-	directives: DirectiveEntries;
-	priorityLevels: PriorityLevel[];
-	element: VNode;
-	originalProps: any;
-	previousScope?: Scope;
-}
+import type {
+	DirectiveCallback,
+	DirectiveOptions,
+	DirectivesProps,
+	GetEvaluate,
+	GetPriorityLevels,
+	Scope,
+} from '../types';
 
 // Main context.
 const context = createContext< any >( {} );

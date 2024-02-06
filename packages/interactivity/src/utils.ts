@@ -20,8 +20,10 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
+import type { Scope, EffectFunction } from '../types';
+import type { ContainerNode } from 'preact';
 
-const afterNextFrame = ( callback ) => {
+const afterNextFrame = ( callback: () => void ): Promise< void > => {
 	return new Promise( ( resolve ) => {
 		const done = () => {
 			clearTimeout( timeout );
@@ -42,9 +44,13 @@ const afterNextFrame = ( callback ) => {
  * this.x: this._compute
  * https://github.com/preactjs/signals/blob/main/mangle.json
  */
-function createFlusher( compute, notify ) {
-	let flush;
-	const dispose = effect( function () {
+
+function createFlusher(
+	compute: () => void,
+	notify: () => void
+): { flush: () => void; dispose: () => void } {
+	let flush: () => void;
+	const dispose = effect( function ( this: EffectFunction ) {
 		flush = this.c.bind( this );
 		this.x = compute;
 		this.c = notify;
@@ -58,9 +64,9 @@ function createFlusher( compute, notify ) {
  * implementation comes from this PR, but short-cirtuiting was added to avoid
  * infinite loops: https://github.com/preactjs/signals/pull/290
  */
-export function useSignalEffect( callback ) {
+export function useSignalEffect( callback: () => void ): void {
 	_useEffect( () => {
-		let eff = null;
+		let eff: { flush: () => void; dispose: () => void } | null = null;
 		let isExecuting = false;
 		const notify = async () => {
 			if ( eff && ! isExecuting ) {
@@ -78,18 +84,16 @@ export function useSignalEffect( callback ) {
  * Returns the passed function wrapped with the current scope so it is
  * accessible whenever the function runs. This is primarily to make the scope
  * available inside hook callbacks.
- *
- * @param {Function} func The passed function.
- * @return {Function} The wrapped function.
  */
-export const withScope = ( func ) => {
-	const scope = getScope();
-	const ns = getNamespace();
+
+export const withScope = ( func: any ): any => {
+	const scope: Scope = getScope();
+	const ns: string | undefined = getNamespace();
 	if ( func?.constructor?.name === 'GeneratorFunction' ) {
-		return async ( ...args ) => {
+		return async ( ...args: any[] ) => {
 			const gen = func( ...args );
-			let value;
-			let it;
+			let value: any;
+			let it: IteratorResult< any >;
 			while ( true ) {
 				setNamespace( ns );
 				setScope( scope );
@@ -109,7 +113,7 @@ export const withScope = ( func ) => {
 			return value;
 		};
 	}
-	return ( ...args ) => {
+	return ( ...args: unknown[] ) => {
 		setNamespace( ns );
 		setScope( scope );
 		try {
@@ -128,10 +132,9 @@ export const withScope = ( func ) => {
  *
  * This hook makes the element's scope available so functions like
  * `getElement()` and `getContext()` can be used inside the passed callback.
- *
- * @param {Function} callback The hook callback.
+ * @param callback
  */
-export function useWatch( callback ) {
+export function useWatch( callback: Function ): void {
 	useSignalEffect( withScope( callback ) );
 }
 
@@ -141,10 +144,9 @@ export function useWatch( callback ) {
  *
  * This hook makes the element's scope available so functions like
  * `getElement()` and `getContext()` can be used inside the passed callback.
- *
- * @param {Function} callback The hook callback.
+ * @param callback
  */
-export function useInit( callback ) {
+export function useInit( callback: Function ): void {
 	_useEffect( withScope( callback ), [] );
 }
 
@@ -156,12 +158,12 @@ export function useInit( callback ) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
-export function useEffect( callback, inputs ) {
+export function useEffect( callback: Function, inputs: any[] ): void {
 	_useEffect( withScope( callback ), inputs );
 }
 
@@ -173,12 +175,12 @@ export function useEffect( callback, inputs ) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
-export function useLayoutEffect( callback, inputs ) {
+export function useLayoutEffect( callback: Function, inputs: any[] ): void {
 	_useLayoutEffect( withScope( callback ), inputs );
 }
 
@@ -190,12 +192,12 @@ export function useLayoutEffect( callback, inputs ) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
-export function useCallback( callback, inputs ) {
+export function useCallback( callback: Function, inputs: any[] ): void {
 	_useCallback( withScope( callback ), inputs );
 }
 
@@ -212,7 +214,7 @@ export function useCallback( callback, inputs ) {
  * @param {any[]}    inputs  If present, effect will only activate if the
  *                           values in the list change (using `===`).
  */
-export function useMemo( factory, inputs ) {
+export function useMemo( factory: Function, inputs: any[] ) {
 	_useMemo( withScope( factory ), inputs );
 }
 
@@ -220,21 +222,28 @@ export function useMemo( factory, inputs ) {
  * For wrapperless hydration.
  * See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
  */
-export const createRootFragment = ( parent, replaceNode ) => {
+export const createRootFragment = (
+	parent: Node,
+	replaceNode: Node | Node[]
+): ContainerNode => {
 	replaceNode = [].concat( replaceNode );
 	const s = replaceNode[ replaceNode.length - 1 ].nextSibling;
-	function insert( c, r ) {
-		parent.insertBefore( c, r || s );
-	}
-	return ( parent.__k = {
+	return ( ( parent as any ).__k = {
 		nodeType: 1,
-		parentNode: parent,
-		firstChild: replaceNode[ 0 ],
+		parentNode: parent as ParentNode,
+		firstChild: replaceNode[ 0 ] as ChildNode,
 		childNodes: replaceNode,
-		insertBefore: insert,
-		appendChild: insert,
+		insertBefore: ( c, r ) => {
+			parent.insertBefore( c, r || s );
+			return c;
+		},
+		appendChild: ( c ) => {
+			parent.insertBefore( c, s );
+			return c;
+		},
 		removeChild( c ) {
 			parent.removeChild( c );
+			return c;
 		},
 	} );
 };

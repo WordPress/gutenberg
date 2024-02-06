@@ -15,6 +15,7 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
+import type { StoreOptions } from '../types';
 
 const isObject = ( item: unknown ): boolean =>
 	!! item && typeof item === 'object' && ! Array.isArray( item );
