@@ -6,8 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
@@ -23,7 +21,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
-import { getVariationsByProperty } from './utils';
+import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
 import Subtitle from './subtitle';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
@@ -168,15 +166,10 @@ function TypographyVariation( { variation } ) {
 }
 
 export default function TypographyVariations() {
-	const variations = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeGlobalStylesVariations();
-	}, [] );
-
-	const { base, user } = useContext( GlobalStylesContext );
-	const typographyVariations =
-		variations && getVariationsByProperty( user, variations, 'typography' );
+	const typographyVariations = useThemeStyleVariationsByProperty( {
+		styleProperty: 'typography',
+	} );
+	const { base } = useContext( GlobalStylesContext );
 	const uniqueTypographyVariations = [];
 	const uniqueTypographyNames = [];
 	const isDup = ( x, y ) => {

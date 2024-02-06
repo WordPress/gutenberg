@@ -20,6 +20,7 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
+import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -27,7 +28,9 @@ function ScreenTypography() {
 			select( editorStore ).getEditorSettings().fontLibraryEnabled,
 		[]
 	);
-
+	const typographyVariations = useThemeStyleVariationsByProperty( {
+		styleProperty: 'typography',
+	} );
 	return (
 		<>
 			<ScreenHeader
@@ -41,25 +44,28 @@ function ScreenTypography() {
 					{ ! window.__experimentalDisableFontLibrary && (
 						<VStack spacing={ 3 }>
 							{ fontLibraryEnabled && <FontFamilies /> }
-							<ItemGroup isBordered>
-								<NavigationButtonAsItem
-									path="/typography/typesets"
-									aria-label={ __( 'Typesets' ) }
-								>
-									<HStack justify="space-between">
-										<FlexItem>
-											{ __( 'Typesets' ) }
-										</FlexItem>
-										<IconWithCurrentColor
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</HStack>
-								</NavigationButtonAsItem>
-							</ItemGroup>
+							{ /* @TODO: abstract into component */ }
+							{ !! typographyVariations.length && (
+								<ItemGroup isBordered>
+									<NavigationButtonAsItem
+										path="/typography/typesets"
+										aria-label={ __( 'Typesets' ) }
+									>
+										<HStack justify="space-between">
+											<FlexItem>
+												{ __( 'Typesets' ) }
+											</FlexItem>
+											<IconWithCurrentColor
+												icon={
+													isRTL()
+														? chevronLeft
+														: chevronRight
+												}
+											/>
+										</HStack>
+									</NavigationButtonAsItem>
+								</ItemGroup>
+							) }
 						</VStack>
 					) }
 					<TypographyElements />

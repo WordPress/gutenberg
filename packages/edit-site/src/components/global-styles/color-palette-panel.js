@@ -14,6 +14,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 import ColorVariations from './variations-color';
+import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
@@ -46,7 +47,9 @@ export default function ColorPalettePanel( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-
+	const colorVariations = useThemeStyleVariationsByProperty( {
+		styleProperty: 'color',
+	} );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 
@@ -90,7 +93,8 @@ export default function ColorPalettePanel( { name } ) {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			<ColorVariations />
+			{ /* @TODO: pass down variations to component? */ }
+			{ !! colorVariations.length && <ColorVariations /> }
 		</VStack>
 	);
 }

@@ -6,8 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { useMemo, useContext } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
@@ -26,7 +24,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
-import { getVariationsByProperty } from './utils';
+import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
 import Subtitle from './subtitle';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
@@ -121,14 +119,9 @@ function ColorVariation( { variation } ) {
 }
 
 export default function ColorVariations() {
-	const { user } = useContext( GlobalStylesContext );
-	const variations = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeGlobalStylesVariations();
-	}, [] );
-	const colorVariations =
-		variations && getVariationsByProperty( user, variations, 'color' ); // should also get filter?
+	const colorVariations = useThemeStyleVariationsByProperty( {
+		styleProperty: 'color',
+	} );
 
 	return (
 		<VStack spacing={ 3 }>
