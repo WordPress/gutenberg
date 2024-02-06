@@ -7,13 +7,11 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as dataviewsStore } from './store';
 import { unlock } from './lock-unlock';
 
 const {
@@ -22,8 +20,10 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-function AddFilter( { filters, view, onChangeView }, ref ) {
-	const { setOpenFilterOnMount } = useDispatch( dataviewsStore );
+function AddFilter(
+	{ filters, view, onChangeView, setOpenFilterOnMount },
+	ref
+) {
 	if ( filters.length === 0 ) {
 		return null;
 	}

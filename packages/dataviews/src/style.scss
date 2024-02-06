@@ -514,11 +514,6 @@
 		box-sizing: border-box;
 		padding: $grid-unit-10 $grid-unit-15;
 		cursor: default;
-		margin-block-end: 2px;
-
-		&:last-child {
-			margin-block-end: 0;
-		}
 
 		&[data-active-item] {
 			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));

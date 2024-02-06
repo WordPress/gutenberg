@@ -37,6 +37,7 @@ export default function DataViews( {
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+	const [ openFilterOnMount, setOpenFilterOnMount ] = useState( null );
 
 	useEffect( () => {
 		if (
@@ -114,6 +115,8 @@ export default function DataViews( {
 						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
+						openFilterOnMount={ openFilterOnMount }
+						setOpenFilterOnMount={ setOpenFilterOnMount }
 					/>
 				</HStack>
 				<ViewComponent
@@ -128,6 +131,7 @@ export default function DataViews( {
 					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
+					setOpenFilterOnMount={ setOpenFilterOnMount }
 				/>
 				<Pagination
 					view={ view }

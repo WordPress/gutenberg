@@ -12,7 +12,13 @@ import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
 import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
-const Filters = memo( function Filters( { fields, view, onChangeView } ) {
+const Filters = memo( function Filters( {
+	fields,
+	view,
+	onChangeView,
+	openFilterOnMount,
+	setOpenFilterOnMount,
+} ) {
 	const addFilterRef = useRef();
 	const filters = [];
 	fields.forEach( ( field ) => {
@@ -59,6 +65,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 			view={ view }
 			onChangeView={ onChangeView }
 			ref={ addFilterRef }
+			setOpenFilterOnMount={ setOpenFilterOnMount }
 		/>
 	);
 	const filterComponents = [
@@ -74,6 +81,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					view={ view }
 					onChangeView={ onChangeView }
 					addFilterRef={ addFilterRef }
+					openFilterOnMount={ openFilterOnMount }
 				/>
 			);
 		} ),

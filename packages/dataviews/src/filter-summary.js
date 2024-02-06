@@ -10,13 +10,11 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as dataviewsStore } from './store';
 import SearchWidget from './search-widget';
 import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 
@@ -147,20 +145,20 @@ function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
 	);
 }
 
-export default function FilterSummary( props ) {
+export default function FilterSummary( {
+	addFilterRef,
+	openFilterOnMount,
+	...commonProps
+} ) {
 	const toggleRef = useRef();
-	const { filter, view } = props;
-	const filterToOpenOnMount = useSelect(
-		( select ) => select( dataviewsStore ).getOpenFilterOnMount(),
-		[]
-	);
+	const { filter, view } = commonProps;
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
 	);
 	return (
 		<Dropdown
-			defaultOpen={ filterToOpenOnMount === filter.field }
+			defaultOpen={ openFilterOnMount === filter.field }
 			contentClassName="dataviews-filter-summary__popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
 			onClose={ () => {
@@ -184,9 +182,12 @@ export default function FilterSummary( props ) {
 			renderContent={ () => {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
-						<OperatorSelector { ...props } />
-						<SearchWidget { ...props } />
-						<ResetFilter { ...props } />
+						<OperatorSelector { ...commonProps } />
+						<SearchWidget { ...commonProps } />
+						<ResetFilter
+							{ ...commonProps }
+							addFilterRef={ addFilterRef }
+						/>
 					</VStack>
 				);
 			} }

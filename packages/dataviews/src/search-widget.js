@@ -105,6 +105,7 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 							className="dataviews-search-widget-filter-combobox-item"
 							hideOnClick={ false }
 							setValueOnClick={ false }
+							focusOnHover
 						>
 							<span className="dataviews-search-widget-filter-combobox-item-check">
 								{ selectedValues === element.value && (

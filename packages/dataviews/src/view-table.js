@@ -24,12 +24,10 @@ import {
 	Children,
 	Fragment,
 } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { store as dataviewsStore } from './store';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
@@ -68,10 +66,9 @@ const sanitizeOperators = ( field ) => {
 };
 
 const HeaderMenu = forwardRef( function HeaderMenu(
-	{ field, view, onChangeView, onHide },
+	{ field, view, onChangeView, onHide, setOpenFilterOnMount },
 	ref
 ) {
-	const { setOpenFilterOnMount } = useDispatch( dataviewsStore );
 	const isHidable = field.enableHiding !== false;
 	const isSortable = field.enableSorting !== false;
 	const isSorted = view.sort?.field === field.id;
@@ -229,6 +226,7 @@ function ViewTable( {
 	deferredRendering,
 	selection,
 	onSelectionChange,
+	setOpenFilterOnMount,
 } ) {
 	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
@@ -339,6 +337,9 @@ function ViewTable( {
 									view={ view }
 									onChangeView={ onChangeView }
 									onHide={ onHide }
+									setOpenFilterOnMount={
+										setOpenFilterOnMount
+									}
 								/>
 							</th>
 						) ) }
