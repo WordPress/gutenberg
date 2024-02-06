@@ -990,6 +990,11 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		}
 	}
 
+	/**
+	 * If WP_Theme_JSON::LATEST_SCHEMA is changed, the controller should be updated to handle any differences
+	 * in `fontFamilies` structure to ensure support for the latest theme.json schema, and backwards compatibility
+	 * for existing wp_font_family posts.
+	 */
 	public function test_controller_supports_latest_theme_json_version() {
 		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 	}

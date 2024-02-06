@@ -19,9 +19,6 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 		/**
 		 * The latest version of theme.json schema supported by the controller.
 		 *
-		 * If WP_Theme_JSON::LATEST_SCHEMA is changed, this controller should be updated to handle any differences
-		 * in `fontFamilies` structure to ensure support for the latest theme.json schema.
-		 *
 		 * @since 6.5.0
 		 * @var int
 		 */
