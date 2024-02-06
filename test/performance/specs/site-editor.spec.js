@@ -28,6 +28,7 @@ const results = {
 	inserterSearch: [],
 	listViewOpen: [],
 	navigate: [],
+	loadPatterns: [],
 };
 
 test.describe( 'Site Editor Performance', () => {
@@ -205,6 +206,90 @@ test.describe( 'Site Editor Performance', () => {
 				results.navigate.push( mouseClickEvents[ 0 ] );
 			} );
 		}
+	} );
+
+	test.describe( 'Loading Patterns', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test( 'Run the test', async ( { page, admin, perfUtils, editor } ) => {
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// We want to start from a fresh state each time, without
+				// queries or patterns already loaded.
+				await admin.visitSiteEditor( {
+					postId: 'twentytwentyfour//home',
+					postType: 'wp_template',
+					canvas: 'edit',
+				} );
+				await editor.openDocumentSettingsSidebar();
+				await page
+					.getByRole( 'button', {
+						name: 'Actions',
+					} )
+					.click();
+
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				const startTime = performance.now();
+
+				await page
+					.getByRole( 'menuitem', { name: 'Replace template' } )
+					.click();
+
+				const patterns = [
+					'Blogging home template',
+					'Business home template',
+					'Portfolio home template with post featured images',
+					'Writer Home Template',
+					'Blogging index template',
+					'Writer Index Template',
+				];
+
+				await Promise.all(
+					patterns.map( async ( pattern ) => {
+						const canvas = await perfUtils.getCanvas(
+							page
+								.getByRole( 'option', {
+									name: pattern,
+									exact: true,
+								} )
+								.getByTitle( 'Editor canvas' )
+						);
+
+						// Wait until the first block is rendered AND all
+						// patterns are replaced.
+						await Promise.all( [
+							canvas.locator( '.wp-block' ).first().waitFor(),
+							page.waitForFunction(
+								() =>
+									document.querySelectorAll(
+										'[data-type="core/pattern"]'
+									).length === 0
+							),
+						] );
+					} )
+				);
+
+				const endTime = performance.now();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.loadPatterns.push( endTime - startTime );
+				}
+
+				await page.keyboard.press( 'Escape' );
+			}
+		} );
 	} );
 } );
 
