@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -113,7 +114,7 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 	);
 }
 
-function ResetFilter( { filter, view, onChangeView } ) {
+function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
 	const isDisabled =
 		view.filters.find( ( _filter ) => _filter.field === filter.field )
 			?.value === undefined && filter.isPrimary;
@@ -133,6 +134,11 @@ function ResetFilter( { filter, view, onChangeView } ) {
 							( _filter ) => _filter.field !== filter.field
 						),
 					} );
+					// If the filter is not primary and can be removed, it will be added
+					// back to the available filters from `Add filter` component.
+					if ( ! filter.isPrimary ) {
+						addFilterRef.current?.focus();
+					}
 				} }
 			>
 				{ filter.isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
@@ -142,6 +148,7 @@ function ResetFilter( { filter, view, onChangeView } ) {
 }
 
 export default function FilterSummary( props ) {
+	const toggleRef = useRef();
 	const { filter, view } = props;
 	const filterToOpenOnMount = useSelect(
 		( select ) => select( dataviewsStore ).getOpenFilterOnMount(),
@@ -156,11 +163,16 @@ export default function FilterSummary( props ) {
 			defaultOpen={ filterToOpenOnMount === filter.field }
 			contentClassName="dataviews-filter-summary__popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
-			renderToggle={ ( { onToggle } ) => (
+			onClose={ () => {
+				toggleRef.current?.focus();
+			} }
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					__experimentalIsFocusable
 					size="compact"
 					onClick={ onToggle }
+					aria-expanded={ isOpen }
+					ref={ toggleRef }
 				>
 					<FilterText
 						activeElement={ activeElement }

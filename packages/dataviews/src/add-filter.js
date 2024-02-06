@@ -8,6 +8,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,7 +22,7 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { filters, view, onChangeView } ) {
+function AddFilter( { filters, view, onChangeView }, ref ) {
 	const { setOpenFilterOnMount } = useDispatch( dataviewsStore );
 	if ( filters.length === 0 ) {
 		return null;
@@ -37,6 +38,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					className="dataviews-filters-button"
 					variant="tertiary"
 					disabled={ ! inactiveFilters.length }
+					ref={ ref }
 				>
 					{ __( 'Add filter' ) }
 				</Button>
@@ -70,3 +72,5 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 		</DropdownMenu>
 	);
 }
+
+export default forwardRef( AddFilter );

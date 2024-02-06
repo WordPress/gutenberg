@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+import { memo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,6 +13,7 @@ import { sanitizeOperators } from './utils';
 import { ENUMERATION_TYPE } from './constants';
 
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
+	const addFilterRef = useRef();
 	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
@@ -57,6 +58,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 			filters={ filters }
 			view={ view }
 			onChangeView={ onChangeView }
+			ref={ addFilterRef }
 		/>
 	);
 	const filterComponents = [
@@ -71,6 +73,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 					filter={ filter }
 					view={ view }
 					onChangeView={ onChangeView }
+					addFilterRef={ addFilterRef }
 				/>
 			);
 		} ),
