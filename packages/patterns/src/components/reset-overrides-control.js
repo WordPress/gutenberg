@@ -36,7 +36,7 @@ export default function ResetOverridesControl( props ) {
 				getBlockParentsByBlockName( props.clientId, 'core/block' )
 			)[ 0 ];
 
-			if ( ! patternBlock?.attributes.overrides?.[ id ] ) {
+			if ( ! patternBlock?.attributes.content?.[ id ] ) {
 				return undefined;
 			}
 
@@ -60,7 +60,7 @@ export default function ResetOverridesControl( props ) {
 	};
 
 	return (
-		<BlockControls>
+		<BlockControls group="other">
 			<ToolbarGroup>
 				<ToolbarButton
 					onClick={ resetOverrides }
