@@ -219,7 +219,12 @@ export default function BorderPanel( {
 
 	const label = getBorderPanelLabel( {
 		blockName: name,
-		controls: defaultControls,
+		hasShadowControl,
+		hasBorderControl:
+			showBorderColor ||
+			showBorderStyle ||
+			showBorderWidth ||
+			showBorderRadius,
 	} );
 
 	return (
