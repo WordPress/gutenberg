@@ -557,8 +557,8 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  *
  * @return {Array} List of blocks hooked to the anchor block.
  */
-export function getHookedBlockNames( name ) {
-	return select( blocksStore ).getHookedBlockNames( name );
+export function getHookedBlocks( name ) {
+	return select( blocksStore ).getHookedBlocks( name );
 }
 
 /**

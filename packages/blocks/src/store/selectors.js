@@ -119,7 +119,7 @@ export function getBlockType( state, name ) {
  *
  * const ExampleComponent = () => {
  *     const hookedBlockNames = useSelect( ( select ) =>
- *         select( blocksStore ).getHookedBlockNames( 'core/navigation' ),
+ *         select( blocksStore ).getHookedBlocks( 'core/navigation' ),
  *         []
  *     );
  *
@@ -136,7 +136,7 @@ export function getBlockType( state, name ) {
  *
  * @return {Array} Array of hooked block names.
  */
-export const getHookedBlockNames = createSelector(
+export const getHookedBlocks = createSelector(
 	( state, blockName ) => {
 		const hookedBlockTypes = getBlockTypes( state ).filter(
 			( { blockHooks } ) => blockHooks && blockName in blockHooks

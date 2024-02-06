@@ -504,7 +504,7 @@ _Returns_
 
 -   `string?`: Name of the block for handling the grouping of blocks.
 
-### getHookedBlockNames
+### getHookedBlocks
 
 Returns an array with the hooked blocks for a given anchor block.
 
@@ -517,7 +517,7 @@ import { useSelect } from '@wordpress/data';
 const ExampleComponent = () => {
 	const hookedBlockNames = useSelect(
 		( select ) =>
-			select( blocksStore ).getHookedBlockNames( 'core/navigation' ),
+			select( blocksStore ).getHookedBlocks( 'core/navigation' ),
 		[]
 	);
 

@@ -234,7 +234,7 @@ _Returns_
 
 -   `?string`: Block name.
 
-### getHookedBlockNames
+### getHookedBlocks
 
 Returns all hooked blocks for a given anchor block.
 

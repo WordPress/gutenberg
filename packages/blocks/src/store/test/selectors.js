@@ -12,7 +12,7 @@ import {
 	getBlockVariations,
 	getDefaultBlockVariation,
 	getGroupingBlockName,
-	getHookedBlockNames,
+	getHookedBlocks,
 	isMatchingSearchTerm,
 	getCategories,
 	getActiveBlockVariation,
@@ -229,13 +229,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getHookedBlockNames', () => {
+	describe( 'getHookedBlocks', () => {
 		it( 'should return an empty object if state is empty', () => {
 			const state = {
 				blockTypes: {},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {} );
+			expect( getHookedBlocks( state, 'anchor' ) ).toEqual( {} );
 		} );
 
 		it( 'should return an empty object if the anchor block is not found', () => {
@@ -253,7 +253,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'otherAnchor' ) ).toEqual( {} );
+			expect( getHookedBlocks( state, 'otherAnchor' ) ).toEqual( {} );
 		} );
 
 		it( "should return the anchor block name even if the anchor block doesn't exist", () => {
@@ -268,7 +268,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {
+			expect( getHookedBlocks( state, 'anchor' ) ).toEqual( {
 				after: [ 'hookedBlock' ],
 			} );
 		} );
@@ -294,7 +294,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {
+			expect( getHookedBlocks( state, 'anchor' ) ).toEqual( {
 				after: [ 'hookedBlock1' ],
 				before: [ 'hookedBlock2' ],
 			} );
@@ -327,7 +327,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getHookedBlockNames( state, 'anchor' ) ).toEqual( {
+			expect( getHookedBlocks( state, 'anchor' ) ).toEqual( {
 				after: [ 'hookedBlock1', 'hookedBlock3' ],
 				before: [ 'hookedBlock2' ],
 			} );

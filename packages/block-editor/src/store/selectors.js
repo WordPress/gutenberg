@@ -10,7 +10,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
-	getHookedBlockNames,
+	getHookedBlocks,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -1941,7 +1941,7 @@ const buildBlockTypeItem =
 		let initialAttributes = {};
 
 		const ignoredHookedBlocks = Object.values(
-			getHookedBlockNames( id )
+			getHookedBlocks( id )
 		).flat();
 
 		if ( ignoredHookedBlocks.length ) {
