@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	getConfig,
+} from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -28,12 +33,12 @@ store(
 				const queryRef = ref.closest(
 					'.wp-block-query[data-wp-router-region]'
 				);
-				const isDisabled = queryRef?.dataset.wpNavigationDisabled;
+				const { clientNavigation = true } = getConfig( 'core/router' );
 
 				if (
 					isValidLink( ref ) &&
 					isValidEvent( event ) &&
-					! isDisabled
+					clientNavigation
 				) {
 					event.preventDefault();
 
