@@ -104,7 +104,22 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not a block needs a list item wrapper.
 	 */
 	private static function does_block_need_a_list_item_wrapper( $block ) {
-		return in_array( $block->name, static::$needs_list_item_wrapper, true );
+
+		/**
+		 * Filter the list of blocks that need a list item wrapper.
+		 *
+		 * This filter allows developers to add or remove blocks that need a list item wrapper.
+		 * This is useful for blocks that are not list items but should be wrapped in a list
+		 * item when used as a child of a navigation block.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $needs_list_item_wrapper The list of blocks that need a list item wrapper.
+		 * @return array The list of blocks that need a list item wrapper.
+		 */
+		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_needs_list_item_wrapper', static::$needs_list_item_wrapper );
+
+		return in_array( $block->name, $needs_list_item_wrapper, true );
 	}
 
 	/**
