@@ -2,6 +2,6 @@
 	@include caption-style-theme();
 }
 
-.wp-block-embed {
+:where(.wp-block-embed) {
 	margin: 0 0 1em 0;
 }
