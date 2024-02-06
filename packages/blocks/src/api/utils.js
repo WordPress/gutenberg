@@ -376,3 +376,23 @@ export function getBlockEdit( blockType ) {
 
 	return blockType.edit || blockType.save || null;
 }
+
+function* getBlockNames( block ) {
+	yield block.name;
+	if ( ! block.innerBlocks ) {
+		return;
+	}
+	for ( const innerBlock of block.innerBlocks ) {
+		yield* getBlockNames( innerBlock );
+	}
+}
+
+export function lazyLoadBlock( block ) {
+	const blockNames = Array.from( new Set( getBlockNames( block ) ) );
+	return Promise.all(
+		blockNames.map( ( blockName ) => {
+			const blockType = getBlockType( blockName );
+			return blockType.lazyEdit?.();
+		} )
+	);
+}

@@ -27,7 +27,7 @@ async function insertBlock(
 	);
 
 	await this.page.evaluate(
-		( [ _blockRepresentation, _clientId ] ) => {
+		async ( [ _blockRepresentation, _clientId ] ) => {
 			function recursiveCreateBlock( {
 				name,
 				attributes = {},
@@ -42,6 +42,8 @@ async function insertBlock(
 				);
 			}
 			const block = recursiveCreateBlock( _blockRepresentation );
+
+			await window.wp.blocks.lazyLoadBlock( block );
 
 			window.wp.data
 				.dispatch( 'core/block-editor' )

@@ -5,9 +5,9 @@ import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { remove, toHTMLString } from '@wordpress/rich-text';
 import {
-	getBlockType,
 	getBlockTransforms,
 	findTransform,
+	lazyLoadBlock,
 } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -40,16 +40,6 @@ function findSelection( blocks ) {
 	}
 
 	return null;
-}
-
-function* getBlockNames( block ) {
-	yield block.name;
-	if ( ! block.innerBlocks ) {
-		return;
-	}
-	for ( const innerBlock of block.innerBlocks ) {
-		yield* getBlockNames( innerBlock );
-	}
 }
 
 export function useInputRules( props ) {
@@ -94,12 +84,7 @@ export function useInputRules( props ) {
 
 			onChange( remove( value, 0, start ) );
 			const block = transformation.transform( START_OF_SELECTED_AREA );
-			for ( const blockName of getBlockNames( block ) ) {
-				const blockType = getBlockType( blockName );
-				if ( blockType.lazyEdit ) {
-					await blockType.lazyEdit();
-				}
-			}
+			await lazyLoadBlock( block );
 
 			const selection = findSelection( [ block ] );
 			if ( selection ) {

@@ -406,6 +406,10 @@ _Returns_
 
 -   `boolean`: True if the parameter is a valid icon and false otherwise.
 
+### lazyLoadBlock
+
+Undocumented declaration.
+
 ### normalizeIconObject
 
 Function that receives an icon as set by the blocks during the registration and returns a new icon object that is normalized so we can rely on just on possible icon structure in the codebase.
