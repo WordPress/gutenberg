@@ -149,10 +149,10 @@ function block_core_gallery_render( $attributes, $content ) {
 
 	// Randomize the order of Image blocks.
 	shuffle( $image_blocks );
-	$i = 0;
+	$i       = 0;
 	$content = preg_replace_callback(
 		$pattern,
-		static function( $matches ) use ( $image_blocks, &$i ) {
+		static function () use ( $image_blocks, &$i ) {
 			$new_image_block = $image_blocks[ $i ];
 			++$i;
 			return $new_image_block;
