@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `GradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58701](https://github.com/WordPress/gutenberg/pull/58701)).
 -   `CustomGradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58699](https://github.com/WordPress/gutenberg/pull/58699)).
 -   `AnglePickerControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58700](https://github.com/WordPress/gutenberg/pull/58700)).
 
@@ -13,6 +14,7 @@
 -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
 -   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
 -   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304))
+-   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
 
 ### Bug Fix
 
@@ -30,10 +32,6 @@
 -   `Tabs`: prevent internal focus from updating too early ([#58625](https://github.com/WordPress/gutenberg/pull/58625)).
 -   Expand theming support in the `COLORS` variable object ([#58097](https://github.com/WordPress/gutenberg/pull/58097)).
 -   `CustomSelect`: disable `virtualFocus` to fix issue for screenreaders ([#58585](https://github.com/WordPress/gutenberg/pull/58585)).
-
-### Enhancements
-
--   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
 
 ### Internal
 

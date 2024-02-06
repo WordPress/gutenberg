@@ -589,7 +589,6 @@ export function PaletteEdit( {
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
-								__nextHasNoMargin
 								gradients={ gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
