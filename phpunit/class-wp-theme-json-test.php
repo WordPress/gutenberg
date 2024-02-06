@@ -4082,9 +4082,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$plain = array(
 			'metadata' => array(
 				'path'     => array( 'styles', 'blocks', 'core/quote', 'variations', 'plain' ),
-				'selector' => '.is-style-plain.is-style-plain.wp-block-quote',
+				'selector' => '.is-style-plain.wp-block-quote',
 			),
-			'styles'   => '.is-style-plain.is-style-plain.wp-block-quote{background-color: hotpink;}',
+			'styles'   => ':where(.is-style-plain.wp-block-quote){background-color: hotpink;}',
 		);
 
 		return array(
