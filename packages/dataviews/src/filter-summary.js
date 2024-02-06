@@ -66,10 +66,13 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 	const value = currentFilter?.operator || filter.operators[ 0 ];
 	return (
 		<HStack
-			spacing={ 3 }
+			spacing={ 2 }
 			justify="flex-start"
 			className="dataviews-filter-summary__operators-container"
 		>
+			<FlexItem className="dataviews-filter-summary__operators-filter-name">
+				{ filter.name }
+			</FlexItem>
 			{ operatorOptions.length > 1 && (
 				<SelectControl
 					label={ filter.name }
@@ -103,7 +106,7 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 					} }
 					size="small"
 					__nextHasNoMarginBottom
-					labelPosition="side"
+					hideLabelFromVision
 				/>
 			) }
 		</HStack>

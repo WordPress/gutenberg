@@ -10,7 +10,7 @@ import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
-import { ENUMERATION_TYPE, LAYOUT_LIST } from './constants';
+import { ENUMERATION_TYPE } from './constants';
 
 const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
@@ -49,7 +49,8 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 				} );
 		}
 	} );
-
+	// Sort filters by primary property. We need the primary filters to be first.
+	filters.sort( ( a, b ) => b.isPrimary - a.isPrimary ); // Type coercion to numbers.
 	const addFilter = (
 		<AddFilter
 			key="add-filter"
@@ -76,7 +77,7 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 		addFilter,
 	];
 
-	if ( filterComponents.length > 1 && view.type !== LAYOUT_LIST ) {
+	if ( filterComponents.length > 1 ) {
 		filterComponents.push(
 			<ResetFilters
 				key="reset-filters"
