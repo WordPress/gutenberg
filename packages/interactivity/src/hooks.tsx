@@ -90,21 +90,22 @@ export const getElement = () => {
 	} );
 };
 
-export const getScope = () => scopeStack.slice( -1 )[ 0 ];
+export const getScope = (): Scope | undefined => scopeStack.slice( -1 )[ 0 ];
 
-export const setScope = ( scope: Scope ) => {
+export const setScope = ( scope: Scope ): void => {
 	scopeStack.push( scope );
 };
-export const resetScope = () => {
+export const resetScope = (): void => {
 	scopeStack.pop();
 };
 
-export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
+export const getNamespace = (): string | undefined =>
+	namespaceStack.slice( -1 )[ 0 ];
 
-export const setNamespace = ( namespace: string ) => {
+export const setNamespace = ( namespace: string ): void => {
 	namespaceStack.push( namespace );
 };
-export const resetNamespace = () => {
+export const resetNamespace = (): void => {
 	namespaceStack.pop();
 };
 

@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import type { VNode, Context, RefObject, h as createElement } from 'preact';
+import type {
+	VNode,
+	Context,
+	RefObject,
+	h as createElement,
+	ContainerNode,
+	ComponentChild,
+	ComponentChildren,
+} from 'preact';
 
 interface DirectiveEntry {
 	value: string | Object;
@@ -109,4 +117,18 @@ interface StoreOptions {
 	 * ```
 	 */
 	lock?: boolean | string;
+}
+
+interface PortalInterface extends VNode {
+	containerInfo?: ContainerNode;
+}
+
+interface PortalProps {
+	_container: ContainerNode;
+	_vnode: VNode;
+}
+
+interface ContextProviderProps {
+	context: any;
+	children?: ComponentChildren;
 }

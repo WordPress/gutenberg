@@ -1,12 +1,32 @@
 /**
  * External dependencies
  */
+import type { ContainerNode, VNode } from 'preact';
 import { createElement, render } from 'preact';
+/**
+ * Internal dependencies
+ */
+import type {
+	ContextProviderProps,
+	PortalInterface,
+	PortalProps,
+} from '../types';
 
 /**
- * @param {import('../../src/index').RenderableProps<{ context: any }>} props
+ * `ContextProvider` is a function component that provides context to its child components.
+ *
+ * @param props - The properties passed to the component.
+ *              It includes a `context` property which is the context to be provided to the child components,
+ *              and a `children` property which are the child components that will receive the context.
+ *
+ * @return The child components passed in through `props.children`.
+ *
+ * @example
+ * <ContextProvider context={myContext}>
+ *     <MyChildComponent />
+ * </ContextProvider>
  */
-function ContextProvider( props ) {
+function ContextProvider( props: ContextProviderProps ): any {
 	this.getChildContext = () => props.context;
 	return props.children;
 }
@@ -14,12 +34,11 @@ function ContextProvider( props ) {
 /**
  * Portal component
  *
- * @this {import('./internal').Component}
- * @param {object | null | undefined} props
+ * @param props - The properties passed to the component.
  *
- *                                          TODO: use createRoot() instead of fake root
+ *              TODO: use createRoot() instead of fake root
  */
-function Portal( props ) {
+function Portal( props: PortalProps | null | undefined ): any {
 	const _this = this;
 	const container = props._container;
 
@@ -91,14 +110,17 @@ function Portal( props ) {
 /**
  * Create a `Portal` to continue rendering the vnode tree at a different DOM node
  *
- * @param {import('./internal').VNode}         vnode     The vnode to render
- * @param {import('./internal').PreactElement} container The DOM node to continue rendering in to.
+ * @param vnode     The vnode to render
+ * @param container The DOM node to continue rendering in to.
  */
-export function createPortal( vnode, container ) {
+export function createPortal(
+	vnode: VNode,
+	container: ContainerNode
+): PortalInterface {
 	const el = createElement( Portal, {
 		_vnode: vnode,
 		_container: container,
-	} );
+	} ) as PortalInterface;
 	el.containerInfo = container;
 	return el;
 }
