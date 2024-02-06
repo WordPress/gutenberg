@@ -115,16 +115,15 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 					normalizedAttributes
 				);
 
-			const hookedBlocksForCurrentBlock =
-				getHookedBlockNames( blockName );
+			const ignoredHookedBlocks = Object.values(
+				getHookedBlockNames( blockName )
+			).flat();
 
-			if ( getHookedBlockNames( blockName )?.length ) {
+			if ( ignoredHookedBlocks.length ) {
 				const { metadata, ...otherAttributes } = blockAttributes;
 				blockAttributes = {
 					metadata: {
-						ignoredHookedBlocks: hookedBlocksForCurrentBlock.map(
-							( hookedBlock ) => hookedBlock.name
-						),
+						ignoredHookedBlocks,
 						...blockAttributes.metadata,
 					},
 					...otherAttributes,
