@@ -128,7 +128,6 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 					onBack();
 				} }
 				size="small"
-				aria-label={ __( 'Return to link search dialog.' ) }
 			>
 				{ __( 'Back' ) }
 			</Button>
