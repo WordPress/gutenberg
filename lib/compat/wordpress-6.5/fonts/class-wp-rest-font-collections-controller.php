@@ -160,7 +160,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		*
 		* @param WP_Font_Collection $item    Font collection object.
 		* @param WP_REST_Request    $request Request object.
-		* @return WP_REST_Response Response object.
+		* @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		*/
 		public function prepare_item_for_response( $item, $request ) {
 			$fields = $this->get_fields_for_response( $request );
