@@ -79,11 +79,7 @@ export function InputBase(
 		size = 'default',
 		suffix,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.InputBase',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
