@@ -158,22 +158,22 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		*
 		* @since 6.5.0
 		*
-		* @param WP_Font_Collection $collection Collection object.
-		* @param WP_REST_Request    $request    Request object.
+		* @param WP_Font_Collection $item    Font collection object.
+		* @param WP_REST_Request    $request Request object.
 		* @return WP_REST_Response Response object.
 		*/
-		public function prepare_item_for_response( $collection, $request ) {
+		public function prepare_item_for_response( $item, $request ) {
 			$fields = $this->get_fields_for_response( $request );
-			$item   = array();
+			$data   = array();
 
 			if ( rest_is_field_included( 'slug', $fields ) ) {
-				$item['slug'] = $collection->slug;
+				$data['slug'] = $item->slug;
 			}
 
 			// If any data fields are requested, get the collection data.
 			$data_fields = array( 'name', 'description', 'font_families', 'categories' );
 			if ( ! empty( array_intersect( $fields, $data_fields ) ) ) {
-				$collection_data = $collection->get_data();
+				$collection_data = $item->get_data();
 				if ( is_wp_error( $collection_data ) ) {
 					$collection_data->add_data( array( 'status' => 500 ) );
 					return $collection_data;
@@ -181,15 +181,15 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 
 				foreach ( $data_fields as $field ) {
 					if ( rest_is_field_included( $field, $fields ) ) {
-						$item[ $field ] = $collection_data[ $field ];
+						$data[ $field ] = $collection_data[ $field ];
 					}
 				}
 			}
 
-			$response = rest_ensure_response( $item );
+			$response = rest_ensure_response( $data );
 
 			if ( rest_is_field_included( '_links', $fields ) ) {
-				$links = $this->prepare_links( $collection );
+				$links = $this->prepare_links( $item );
 				$response->add_links( $links );
 			}
 
@@ -198,17 +198,15 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$response->data = $this->filter_response_by_context( $response->data, $context );
 
 			/**
-			 * Filters a font collection returned from the REST API.
-			 *
-			 * Allows modification of the font collection right before it is returned.
+			 * Filters the font collection data for a REST API response.
 			 *
 			 * @since 6.5.0
 			 *
 			 * @param WP_REST_Response   $response    The response object.
-			 * @param WP_Font_Collection $collection  The Font Collection object.
+			 * @param WP_Font_Collection $item        The font collection object.
 			 * @param WP_REST_Request    $request     Request used to generate the response.
 			 */
-			return apply_filters( 'rest_prepare_font_collection', $response, $collection, $request );
+			return apply_filters( 'rest_prepare_font_collection', $response, $item, $request );
 		}
 
 		/**
