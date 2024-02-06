@@ -33,32 +33,18 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
 /**
- * Filter to randomize the order of image blocks.
- *
- * @param array $parsed_block The block being rendered.
- * @return array The block object with randomized order of image blocks.
- */
-function block_core_gallery_random_order( $parsed_block ) {
-	if ( 'core/gallery' === $parsed_block['blockName'] && ! empty( $parsed_block['attrs']['randomOrder'] ) ) {
-		shuffle( $parsed_block['innerBlocks'] );
-	}
-	return $parsed_block;
-}
-
-add_filter( 'render_block_data', 'block_core_gallery_random_order' );
-
-/**
- * Adds a style tag for the --wp--style--unstable-gallery-gap var.
- *
- * The Gallery block needs to recalculate Image block width based on
- * the current gap setting in order to maintain the number of flex columns
- * so a css var is added to allow this.
+ * Renders the `core/gallery` block on the server.
  *
  * @param array  $attributes Attributes of the block being rendered.
  * @param string $content Content of the block being rendered.
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content ) {
+	// Adds a style tag for the --wp--style--unstable-gallery-gap var.
+	// The Gallery block needs to recalculate Image block width based on
+	// the current gap setting in order to maintain the number of flex columns
+	// so a css var is added to allow this.
+
 	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
@@ -130,7 +116,58 @@ function block_core_gallery_render( $attributes, $content ) {
 			'context' => 'block-supports',
 		)
 	);
-	return (string) $processed_content;
+
+	// Randomize the order of image blocks. Ideally we should shuffle
+	// the `$parsed_block['innerBlocks']` via the `render_block_data` hook.
+	// However, this hook doesn't apply inner block updates when blocks are
+	// nested.
+	// TODO: In the future, if this hook supports updating innerBlocks in
+	// nested blocks, it should be refactored.
+	// See: XXXXXXXXXXXXXXXXXXXXXXX
+	if ( empty( $attributes['randomOrder'] ) ) {
+		return $processed_content;
+	}
+
+	$processor = new WP_HTML_Tag_Processor( (string) $processed_content );
+
+	// Add an index to each figure tag to uniquely identify each Image block.
+	$i = 0;
+	while ( $processor->next_tag( array( 'class_name' => 'wp-block-image' ) ) ) {
+		$processor->set_attribute( 'data-image-index', $i );
+		++$i;
+	}
+	$content = $processor->get_updated_html();
+
+	$pattern = '/<figure[^>]*\bdata-image-index\b[^>]*>.*?<\/figure>/';
+
+	// Find all Image blocks.
+	preg_match_all( $pattern, $content, $matches );
+	if ( ! $matches ) {
+		return $content;
+	}
+	$image_blocks = $matches[0];
+
+	// Randomize the order of Image blocks.
+	shuffle( $image_blocks );
+	$i = 0;
+	$content = preg_replace_callback(
+		$pattern,
+		static function( $matches ) use ( $image_blocks, &$i ) {
+			$new_image_block = $image_blocks[ $i ];
+			++$i;
+			return $new_image_block;
+		},
+		$content
+	);
+
+	// Remove the index from each Image block.
+	$processor = new WP_HTML_Tag_Processor( $content );
+	while ( $processor->next_tag( array( 'class_name' => 'wp-block-image' ) ) ) {
+		$processor->remove_attribute( 'data-image-index' );
+	}
+	$content = $processor->get_updated_html();
+
+	return $content;
 }
 /**
  * Registers the `core/gallery` block on server.
