@@ -137,7 +137,10 @@ export default function LinkPreview( {
 				) }
 				<Button
 					icon={ copySmall }
-					label={ __( 'Copy link' ) }
+					// Ends up looking like "Copy link: https://example.com"
+					label={ `${ __( 'Copy link' ) }${
+						isEmptyURL ? '' : `: ${ value.url }`
+					}` }
 					ref={ ref }
 					disabled={ isEmptyURL }
 					size="compact"
