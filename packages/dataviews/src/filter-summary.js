@@ -64,17 +64,18 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 	);
 	const value = currentFilter?.operator || filter.operators[ 0 ];
 	return (
-		<HStack
-			spacing={ 2 }
-			justify="flex-start"
-			className="dataviews-filter-summary__operators-container"
-		>
-			<FlexItem className="dataviews-filter-summary__operators-filter-name">
-				{ filter.name }
-			</FlexItem>
-			{ operatorOptions.length > 1 && (
+		operatorOptions.length > 1 && (
+			<HStack
+				spacing={ 2 }
+				justify="flex-start"
+				className="dataviews-filter-summary__operators-container"
+			>
+				<FlexItem className="dataviews-filter-summary__operators-filter-name">
+					{ filter.name }
+				</FlexItem>
+
 				<SelectControl
-					label={ filter.name }
+					label={ __( 'Conditions' ) }
 					value={ value }
 					options={ operatorOptions }
 					onChange={ ( newValue ) => {
@@ -107,8 +108,8 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 					__nextHasNoMarginBottom
 					hideLabelFromVision
 				/>
-			) }
-		</HStack>
+			</HStack>
+		)
 	);
 }
 

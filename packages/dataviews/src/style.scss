@@ -558,7 +558,7 @@
 
 .dataviews-search-widget-filter-combobox__wrapper {
 	position: relative;
-	padding: $grid-unit-05;
+	padding: $grid-unit-10;
 
 	.dataviews-search-widget-filter-combobox__input {
 		@include input-control;
@@ -598,7 +598,7 @@
 
 	.dataviews-search-widget-filter-combobox__icon {
 		position: absolute;
-		left: $grid-unit-10;
+		left: $grid-unit-15;
 		top: 50%;
 		transform: translateY(-50%) scaleX(-1);
 		display: flex;
@@ -609,7 +609,7 @@
 }
 
 .dataviews-filter-summary__operators-container {
-	padding: $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-10 $grid-unit-05;
 	padding-bottom: 0;
 
 	&:empty {
@@ -617,11 +617,7 @@
 	}
 
 	.dataviews-filter-summary__operators-filter-name {
-		font-size: 11px;
-		font-weight: 500;
-		line-height: 1.4;
-		color: $gray-900;
-		text-transform: uppercase;
+		color: $gray-700;
 	}
 }
 
