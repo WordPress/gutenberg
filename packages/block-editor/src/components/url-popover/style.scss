@@ -59,6 +59,9 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	margin-right: $grid-unit-10;
+	// Avoids the popover from growing too wide when the URL is long.
+	// See https: //github.com/WordPress/gutenberg/issues/58599.
+	max-width: $modal-min-width;
 
 	&.has-invalid-link {
 		color: $alert-red;
