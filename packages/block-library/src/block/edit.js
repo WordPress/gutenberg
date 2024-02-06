@@ -33,7 +33,7 @@ import { parse, cloneBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { name as blockName } from './index';
+import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
@@ -135,7 +135,7 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
 	for ( const block of blocks ) {
-		if ( block.name === blockName ) continue;
+		if ( block.name === patternBlockName ) continue;
 		Object.assign(
 			content,
 			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
@@ -173,7 +173,7 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 			setEditMode,
 			block.innerBlocks,
 			// Disable editing for nested patterns.
-			block.name === blockName ? 'disabled' : mode
+			block.name === patternBlockName ? 'disabled' : mode
 		);
 	} );
 }
@@ -208,25 +208,34 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getPostLinkProps, editingMode } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const { getBlocks, getSettings, getBlockEditingMode } =
-					select( blockEditorStore );
-				const blocks = getBlocks( patternClientId );
-				const canEdit = canUser( 'update', 'blocks', ref );
+	const {
+		innerBlocks,
+		userCanEdit,
+		getBlockEditingMode,
+		getPostLinkProps,
+		editingMode,
+	} = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const {
+				getBlocks,
+				getSettings,
+				getBlockEditingMode: _getBlockEditingMode,
+			} = select( blockEditorStore );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					userCanEdit: canEdit,
-					getPostLinkProps: getSettings().getPostLinkProps,
-					editingMode: getBlockEditingMode( patternClientId ),
-				};
-			},
-			[ patternClientId, ref ]
-		);
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: _getBlockEditingMode,
+				getPostLinkProps: getSettings().getPostLinkProps,
+				editingMode: _getBlockEditingMode( patternClientId ),
+			};
+		},
+		[ patternClientId, ref ]
+	);
 
 	const editOriginalProps = getPostLinkProps
 		? getPostLinkProps( {
@@ -263,7 +272,6 @@ export default function ReusableBlockEdit( {
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
 		defaultContent.current = {};
-		const { getBlockEditingMode } = registry.select( blockEditorStore );
 		const originalEditingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
@@ -286,6 +294,7 @@ export default function ReusableBlockEdit( {
 		initialBlocks,
 		replaceInnerBlocks,
 		registry,
+		getBlockEditingMode,
 		setBlockEditingMode,
 		syncDerivedUpdates,
 	] );
