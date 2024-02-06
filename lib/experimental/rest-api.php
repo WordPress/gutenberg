@@ -123,3 +123,21 @@ if ( ! function_exists( 'wp_api_template_revision_args' ) ) {
 	}
 }
 add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
+
+/**
+ * Registers the Block Rederer REST API routes. This is to be seen
+ * if it will remain a separate endpoint or if we end up reusing
+ * the current block render endpoint.
+ *
+ * @see https://github.com/WordPress/wordpress-develop/blob/2ac96bcd07ca615216cedbd855d641fca65853e5/src/wp-includes/rest-api/endpoints/class-wp-rest-block-renderer-controller.php#L17
+ */
+function gutenberg_register_block_rederer_routes() {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( empty( $gutenberg_experiments ) || ! array_key_exists( 'gutenberg-server-block-previews', $gutenberg_experiments ) ) {
+		return;
+	}
+	$block_renderer_controller = new Gutenberg_Render_Blocks_Controller();
+	$block_renderer_controller->register_routes();
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_block_rederer_routes' );
