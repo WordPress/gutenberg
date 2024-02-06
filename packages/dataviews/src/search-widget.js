@@ -10,7 +10,7 @@ import removeAccents from 'remove-accents';
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import { BaseControl, VisuallyHidden, Icon } from '@wordpress/components';
+import { VisuallyHidden, Icon } from '@wordpress/components';
 import { search } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
@@ -75,24 +75,19 @@ export default function SearchWidget( { filter, view, onChangeView } ) {
 			} }
 			setValue={ setSearchValue }
 		>
-			<BaseControl
-				className="dataviews-search-widget-filter-combobox__wrapper"
-				__nextHasNoMarginBottom
-			>
-				<div className="dataviews-search-widget-filter-combobox__input-wrapper">
-					<Ariakit.ComboboxLabel render={ <VisuallyHidden /> }>
-						{ __( 'Search items' ) }
-					</Ariakit.ComboboxLabel>
-					<Ariakit.Combobox
-						autoSelect="always"
-						placeholder={ __( 'Search' ) }
-						className="dataviews-search-widget-filter-combobox__input"
-					/>
-					<div className="dataviews-search-widget-filter-combobox__icon">
-						<Icon icon={ search } />
-					</div>
+			<div className="dataviews-search-widget-filter-combobox__wrapper">
+				<Ariakit.ComboboxLabel render={ <VisuallyHidden /> }>
+					{ __( 'Search items' ) }
+				</Ariakit.ComboboxLabel>
+				<Ariakit.Combobox
+					autoSelect="always"
+					placeholder={ __( 'Search' ) }
+					className="dataviews-search-widget-filter-combobox__input"
+				/>
+				<div className="dataviews-search-widget-filter-combobox__icon">
+					<Icon icon={ search } />
 				</div>
-			</BaseControl>
+			</div>
 			<Ariakit.ComboboxList
 				className="dataviews-search-widget-filter-combobox-list"
 				alwaysVisible
