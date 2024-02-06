@@ -117,8 +117,10 @@ const deepImmutable = < T extends Object = {} >( target: T ): T => {
 	return immutableMap.get( target );
 };
 
-// Store stacks for the current scope and the default namespaces and export APIs
-// to interact with them.
+/*
+ * Store stacks for the current scope and the default namespaces and export APIs
+ * to interact with them.
+ */
 const scopeStack: Scope[] = [];
 const namespaceStack: string[] = [];
 
@@ -285,8 +287,10 @@ export const getEvaluate: GetEvaluate =
 		return hasNegationOperator ? ! result : result;
 	};
 
-// Separate directives by priority. The resulting array contains objects
-// of directives grouped by same priority, and sorted in ascending order.
+/*
+ * Separate directives by priority. The resulting array contains objects
+ * of directives grouped by same priority, and sorted in ascending order.
+ */
 const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 	const byPriority = Object.keys( directives ).reduce<
 		Record< number, string[] >
@@ -311,9 +315,11 @@ const Directives = ( {
 	originalProps,
 	previousScope,
 }: DirectivesProps ) => {
-	// Initialize the scope of this element. These scopes are different per each
-	// level because each level has a different context, but they share the same
-	// element ref, state and props.
+	/*
+	 * Initialize the scope of this element. These scopes are different per each
+	 * level because each level has a different context, but they share the same
+	 * element ref, state and props.
+	 */
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
 	scope.context = useContext( context );
@@ -321,8 +327,10 @@ const Directives = ( {
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a fresh copy of the vnode element and add the props to the scope,
-	// named as attributes (HTML Attributes).
+	/*
+	 * Create a fresh copy of the vnode element and add the props to the scope,
+	 * named as attributes (HTML Attributes).
+	 */
 	element = cloneElement( element, { ref: scope.ref } );
 	scope.attributes = element.props;
 

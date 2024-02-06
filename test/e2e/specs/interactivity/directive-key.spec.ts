@@ -21,7 +21,7 @@ test.describe( 'data-wp-key', () => {
 	test( 'should keep the elements when adding items to the start of the array', async ( {
 		page,
 	} ) => {
-		// Add a number to the node so we can check later that it is still there.
+		// Add a number to the node so can be checked later that it is still there.
 		await page
 			.getByTestId( 'first-item' )
 			.evaluate( ( n ) => ( ( n as any )._id = 123 ) );

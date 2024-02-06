@@ -15,22 +15,29 @@ const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
-	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.
-		// Match alphanumeric characters including hyphen-separated
-		// segments. It excludes underscore intentionally to prevent confusion.
-		// E.g., "custom-directive".
+	`^data-${ p }-` +
+		/*
+		 * ${p} must be a prefix string, like 'wp'.
+		 * Match alphanumeric characters including hyphen-separated
+		 * segments. It excludes underscore intentionally to prevent confusion.
+		 * E.g., "custom-directive".
+		 */
 		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
-		// (Optional) Match '--' followed by any alphanumeric charachters. It
-		// excludes underscore intentionally to prevent confusion, but it can
-		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
+		/*
+		 * (Optional) Match '--' followed by any alphanumeric charachters. It
+		 * excludes underscore intentionally to prevent confusion, but it can
+		 * contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
+		 */
 		'(?:--([a-z0-9_-]+))?$',
 	'i' // Case insensitive.
 );
 
-// Regular expression for reference parsing. It can contain a namespace before
-// the reference, separated by `::`, like `some-namespace::state.somePath`.
-// Namespaces can contain any alphanumeric characters, hyphens, underscores or
-// forward slashes. References don't have any restrictions.
+/*
+ * Regular expression for reference parsing. It can contain a namespace before
+ * the reference, separated by `::`, like `some-namespace::state.somePath`.
+ * Namespaces can contain any alphanumeric characters, hyphens, underscores or
+ * forward slashes. References don't have any restrictions.
+ */
 const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();

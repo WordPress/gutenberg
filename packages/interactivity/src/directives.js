@@ -182,7 +182,7 @@ export default () => {
 					useInit( () => {
 						/*
 						 * This seems necessary because Preact doesn't change the class
-						 * names on the hydration, so we have to do it manually. It doesn't
+						 * names on the hydration, so it must be done manually. It doesn't
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
@@ -213,7 +213,7 @@ export default () => {
 				useInit( () => {
 					/*
 					 * This seems necessary because Preact doesn't change the styles on
-					 * the hydration, so we have to do it manually. It doesn't need deps
+					 * the hydration, so it must be done manually. It doesn't need deps
 					 * because it only needs to do it the first time.
 					 */
 					if ( ! result ) {
@@ -235,15 +235,15 @@ export default () => {
 
 				/*
 				 * This is necessary because Preact doesn't change the attributes on the
-				 * hydration, so we have to do it manually. It only needs to do it the
+				 * hydration, so it must be done manually. It only needs to do it the
 				 * first time. After that, Preact will handle the changes.
 				 */
 				useInit( () => {
 					const el = element.ref.current;
 
 					/*
-					 * We set the value directly to the corresponding HTMLElement instance
-					 * property excluding the following special cases. We follow Preact's
+					 * Set the value directly to the corresponding HTMLElement instance
+					 * property excluding the following special cases. It follows Preact's
 					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					 */
 					if ( attribute === 'style' ) {
@@ -285,8 +285,8 @@ export default () => {
 					/*
 					 * aria- and data- attributes have no boolean representation.
 					 * A `false` value is different from the attribute not being
-					 * present, so we can't remove it.
-					 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+					 * present, so it can't be removed.
+					 * It follows Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
 					 */
 					if (
 						result !== null &&

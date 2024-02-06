@@ -36,10 +36,12 @@ const afterNextFrame = ( callback ) => {
 	} );
 };
 
-// Using the mangled properties:
-// this.c: this._callback
-// this.x: this._compute
-// https://github.com/preactjs/signals/blob/main/mangle.json
+/*
+ * Using the mangled properties:
+ * this.c: this._callback
+ * this.x: this._compute
+ * https://github.com/preactjs/signals/blob/main/mangle.json
+ */
 function createFlusher( compute, notify ) {
 	let flush;
 	const dispose = effect( function () {
@@ -51,9 +53,11 @@ function createFlusher( compute, notify ) {
 	return { flush, dispose };
 }
 
-// Version of `useSignalEffect` with a `useEffect`-like execution. This hook
-// implementation comes from this PR, but we added short-cirtuiting to avoid
-// infinite loops: https://github.com/preactjs/signals/pull/290
+/*
+ * Version of `useSignalEffect` with a `useEffect`-like execution. This hook
+ * implementation comes from this PR, but short-cirtuiting was added to avoid
+ * infinite loops: https://github.com/preactjs/signals/pull/290
+ */
 export function useSignalEffect( callback ) {
 	_useEffect( () => {
 		let eff = null;
@@ -212,8 +216,10 @@ export function useMemo( factory, inputs ) {
 	_useMemo( withScope( factory ), inputs );
 }
 
-// For wrapperless hydration.
-// See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
+/*
+ * For wrapperless hydration.
+ * See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
+ */
 export const createRootFragment = ( parent, replaceNode ) => {
 	replaceNode = [].concat( replaceNode );
 	const s = replaceNode[ replaceNode.length - 1 ].nextSibling;

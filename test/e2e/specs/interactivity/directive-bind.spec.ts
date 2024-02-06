@@ -112,7 +112,7 @@ test.describe( 'data-wp-bind', () => {
 			 */
 			values: Record<
 				/**
-				 * The type of value we are hydrating. E.g., false is `false`,
+				 * The type of value being hydrated. E.g., false is `false`,
 				 * undef is `undefined`, emptyString is `''`, etc.
 				 */
 				string,
