@@ -11,7 +11,7 @@
 function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
 	$module_fields = array(
 		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
-		'viewModule' => 'view_script_module_ids',
+		'viewModule'       => 'view_script_module_ids',
 		'viewScriptModule' => 'view_script_module_ids',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
@@ -162,7 +162,7 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 
 	$field_mappings = array(
 		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
-		'viewModule' => 'view-script-module',
+		'viewModule'       => 'view-script-module',
 		'viewScriptModule' => 'view-script-module',
 	);
 	$asset_handle   = str_replace( '/', '-', $block_name ) .
