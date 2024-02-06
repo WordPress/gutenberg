@@ -64,6 +64,76 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the heading block isn't wrapped in a list item to preserve accessible markup
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
+	 */
+	public function test_gutenberg_get_markup_for_inner_block_heading() {
+
+		// We are testing the site title block because we manually add list items around it.
+		$parsed_blocks    = parse_blocks(
+			'<!-- wp:heading --><h2 class="wp-block-heading">Hello World</h2><!-- /wp:heading -->'
+		);
+		$parsed_block     = $parsed_blocks[0];
+		$context          = array();
+		$heading_block = new WP_Block( $parsed_block, $context );
+
+		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
+		$method->setAccessible( true );
+		// Invoke the private method.
+		$result = $method->invoke( $reflection, $heading_block );
+
+		$expected = '<h2 class="wp-block-heading">Hello World</h2>';
+		$this->assertEquals( $expected, $result );
+	}
+
+	/**
+	 * Test that the heading block is wrapped in a list item when filtered to preserve accessible markup
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
+	 */
+	public function test_gutenberg_get_markup_for_inner_block_heading_filtered() {
+
+		$filter_needs_list_item_wrapper_function = static function ( $needs_list_item_wrapper ) {
+			$needs_list_item_wrapper[] = 'core/heading';
+			return $needs_list_item_wrapper;
+		};
+
+		add_filter(
+			'block_core_navigation_needs_list_item_wrapper',
+			$filter_needs_list_item_wrapper_function,
+			10,
+			1
+		);
+
+		// We are testing the site title block because we manually add list items around it.
+		$parsed_blocks    = parse_blocks(
+			'<!-- wp:heading --><h2 class="wp-block-heading">Hello Filtered World</h2><!-- /wp:heading -->'
+		);
+		$parsed_block     = $parsed_blocks[0];
+		$context          = array();
+		$heading_block = new WP_Block( $parsed_block, $context );
+
+		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
+		$method->setAccessible( true );
+		// Invoke the private method.
+		$result = $method->invoke( $reflection, $heading_block );
+
+		$expected = '<li class="wp-block-navigation-item"><h2 class="wp-block-heading">Hello Filtered World</h2></li>';
+		$this->assertEquals( $expected, $result );
+
+		remove_filter( 'block_core_navigation_needs_list_item_wrapper', $filter_needs_list_item_wrapper_function, 10, 1 );
+	}
+
+	/**
 	 * Test that the `get_inner_blocks_from_navigation_post` method returns an empty block list for a non-existent post.
 	 *
 	 * @group navigation-renderer
