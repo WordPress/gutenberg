@@ -31,6 +31,9 @@ html.interface-interface-skeleton__html-container {
 			top: 0;
 		}
 	}
+
+	// This default value avoids widows in multi-line paragraphs of text.
+	text-wrap: pretty;
 }
 
 .interface-interface-skeleton__editor {
