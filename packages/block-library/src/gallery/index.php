@@ -123,7 +123,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	// nested.
 	// TODO: In the future, if this hook supports updating innerBlocks in
 	// nested blocks, it should be refactored.
-	// See: XXXXXXXXXXXXXXXXXXXXXXX
+	// See: https://github.com/WordPress/gutenberg/pull/58733
 	if ( empty( $attributes['randomOrder'] ) ) {
 		return $processed_content;
 	}
