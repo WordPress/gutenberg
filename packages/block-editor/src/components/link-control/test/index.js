@@ -321,7 +321,7 @@ describe( 'Basic rendering', () => {
 
 			// Click the "Edit" button to trigger into the editing mode.
 			const editButton = screen.queryByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} );
 
 			await user.click( editButton );
@@ -379,7 +379,7 @@ describe( 'Basic rendering', () => {
 			render( <LinkControl value={ { url: 'https://example.com' } } /> );
 
 			const unLinkButton = screen.queryByRole( 'button', {
-				name: 'Unlink',
+				name: 'Remove link',
 			} );
 
 			expect( unLinkButton ).not.toBeInTheDocument();
@@ -397,7 +397,7 @@ describe( 'Basic rendering', () => {
 			);
 
 			const unLinkButton = screen.queryByRole( 'button', {
-				name: 'Unlink',
+				name: 'Remove link',
 			} );
 			expect( unLinkButton ).toBeVisible();
 
@@ -418,7 +418,7 @@ describe( 'Basic rendering', () => {
 			);
 
 			const unLinkButton = screen.queryByRole( 'button', {
-				name: 'Unlink',
+				name: 'Remove link',
 			} );
 			expect( unLinkButton ).toBeVisible();
 
@@ -822,7 +822,7 @@ describe( 'Manual link entry', () => {
 
 			// Click the "Edit" button to trigger into the editing mode.
 			let editButton = screen.queryByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} );
 
 			await user.click( editButton );
@@ -856,7 +856,7 @@ describe( 'Manual link entry', () => {
 
 			// Re-query the edit button as it's been replaced.
 			editButton = screen.queryByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} );
 
 			await user.click( editButton );
@@ -1060,7 +1060,7 @@ describe( 'Default search suggestions', () => {
 		// shown.
 		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
-			name: 'Edit',
+			name: 'Edit link',
 		} );
 		await user.click( currentLinkBtn );
 
@@ -1502,7 +1502,7 @@ describe( 'Selecting links', () => {
 
 		expect( currentLink ).toBeVisible();
 		expect(
-			screen.queryByRole( 'button', { name: 'Edit' } )
+			screen.queryByRole( 'button', { name: 'Edit link' } )
 		).toBeVisible();
 		expect( currentLinkAnchor ).toBeVisible();
 	} );
@@ -1527,7 +1527,7 @@ describe( 'Selecting links', () => {
 		// Required in order to select the button below.
 		let currentLinkUI = screen.getByLabelText( 'Currently selected' );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
-			name: 'Edit',
+			name: 'Edit link',
 		} );
 
 		// Simulate searching for a term.
@@ -1597,7 +1597,7 @@ describe( 'Selecting links', () => {
 
 				// Check that this suggestion is now shown as selected.
 				expect(
-					screen.getByRole( 'button', { name: 'Edit' } )
+					screen.getByRole( 'button', { name: 'Edit link' } )
 				).toBeVisible();
 				expect( currentLinkAnchor ).toBeVisible();
 			}
@@ -1709,7 +1709,7 @@ describe( 'Selecting links', () => {
 
 				expect( currentLink ).toBeVisible();
 				expect(
-					screen.getByRole( 'button', { name: 'Edit' } )
+					screen.getByRole( 'button', { name: 'Edit link' } )
 				).toBeVisible();
 				expect( currentLinkAnchor ).toBeVisible();
 			}
@@ -1995,25 +1995,6 @@ describe( 'Addition Settings UI', () => {
 				opensInNewTab: true,
 			} )
 		);
-	} );
-
-	it( 'should show tooltip with full URL alongside filtered display', async () => {
-		const user = userEvent.setup();
-		const url =
-			'http://www.wordpress.org/wp-content/uploads/a-document.pdf';
-		render( <LinkControl value={ { url } } /> );
-
-		const link = screen.getByRole( 'link' );
-
-		expect( link ).toHaveTextContent( 'a-document.pdf' );
-
-		await user.hover( link );
-
-		expect( await screen.findByRole( 'tooltip' ) ).toHaveTextContent( url );
-
-		await user.unhover( link );
-
-		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 	} );
 } );
 
