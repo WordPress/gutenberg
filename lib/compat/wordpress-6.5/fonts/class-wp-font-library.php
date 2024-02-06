@@ -118,7 +118,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 		 *
 		 * @param string $slug Font collection slug.
 		 * @return WP_Font_Collection|null Font collection object,
-		 *                                     or null object if the font collection doesn't exist.
+		 *                                     or null if the font collection doesn't exist.
 		 */
 		public function get_font_collection( $slug ) {
 			if ( $this->is_collection_registered( $slug ) ) {
