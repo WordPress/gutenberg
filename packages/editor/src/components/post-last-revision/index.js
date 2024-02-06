@@ -4,7 +4,7 @@
 import { sprintf, __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { external } from '@wordpress/icons';
+import { backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -30,7 +30,7 @@ function LastRevision() {
 					revision: lastRevisionId,
 				} ) }
 				className="editor-post-last-revision__title"
-				icon={ external }
+				icon={ backup }
 				iconPosition="right"
 				text={ sprintf(
 					/* translators: %s: number of revisions */
