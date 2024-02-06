@@ -13,6 +13,18 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 	 * Class to access font faces through the REST API.
 	 */
 	class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
+
+		/**
+		 * The latest version of theme.json schema supported by the controller.
+		 *
+		 * If WP_Theme_JSON::LATEST_SCHEMA is changed, this controller should be updated to handle any differences
+		 * in `fontFace` structure to ensure support for the latest theme.json schema.
+		 *
+		 * @since 6.5.0
+		 * @var int
+		 */
+		const LATEST_THEME_JSON_VERSION_SUPPORTED = 2;
+
 		/**
 		 * Whether the controller supports batching.
 		 *
@@ -443,7 +455,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				$data['id'] = $item->ID;
 			}
 			if ( rest_is_field_included( 'theme_json_version', $fields ) ) {
-				$data['theme_json_version'] = WP_Theme_JSON::LATEST_SCHEMA;
+				$data['theme_json_version'] = static::LATEST_THEME_JSON_VERSION_SUPPORTED;
 			}
 
 			if ( rest_is_field_included( 'parent', $fields ) ) {
@@ -504,9 +516,9 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					'theme_json_version' => array(
 						'description' => __( 'Version of the theme.json schema used for the typography settings.', 'gutenberg' ),
 						'type'        => 'integer',
-						'default'     => WP_Theme_JSON::LATEST_SCHEMA,
+						'default'     => static::LATEST_THEME_JSON_VERSION_SUPPORTED,
 						'minimum'     => 2,
-						'maximum'     => WP_Theme_JSON::LATEST_SCHEMA,
+						'maximum'     => static::LATEST_THEME_JSON_VERSION_SUPPORTED,
 						'context'     => array( 'view', 'edit', 'embed' ),
 					),
 					'parent'             => array(

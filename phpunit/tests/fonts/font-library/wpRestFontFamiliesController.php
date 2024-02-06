@@ -376,7 +376,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -405,7 +405,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in the response data.' );
-		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
+		$this->assertSame( WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED, $data['theme_json_version'], 'The default theme.json version should match the latest version supported by the controller.' );
 	}
 
 	/**
@@ -447,7 +447,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	public function test_create_item_with_default_preview( $settings ) {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -569,7 +569,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	public function test_create_item_invalid_settings( $settings ) {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -619,7 +619,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	public function test_create_item_invalid_settings_json() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_family_settings', 'invalid' );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -636,7 +636,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 	public function test_create_item_with_duplicate_slug() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_family_settings', wp_json_encode( array_merge( self::$default_settings, array( 'slug' => 'helvetica' ) ) ) );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -990,6 +990,10 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		}
 	}
 
+	public function test_controller_supports_latest_theme_json_version() {
+		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
+	}
+
 	protected function check_font_family_data( $data, $post_id, $links ) {
 		static::$post_ids_to_cleanup[] = $post_id;
 		$post                          = get_post( $post_id );
@@ -998,7 +1002,7 @@ class Tests_REST_WpRestFontFamiliesController extends WP_Test_REST_Controller_Te
 		$this->assertSame( $post->ID, $data['id'], 'The "id" from the response data should match the post ID.' );
 
 		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in response data.' );
-		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'], 'The "theme_json_version" from the response data should match WP_Theme_JSON::LATEST_SCHEMA.' );
+		$this->assertSame( WP_REST_Font_Families_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED, $data['theme_json_version'], 'The "theme_json_version" from the response data should match the latest version supported by the controller.' );
 
 		$font_face_ids = get_children(
 			array(
