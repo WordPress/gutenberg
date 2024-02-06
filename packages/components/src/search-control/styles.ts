@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  */
 import { space } from '../utils/space';
 import InputControl from '../input-control';
+import { COLORS } from '../utils';
 
 const INLINE_PADDING_SPACE = 1;
 
@@ -15,6 +16,10 @@ export const SearchIconWrapper = styled.div`
 	display: flex;
 	margin-inline-end: ${ space( INLINE_PADDING_SPACE * -1 ) };
 	padding-inline-start: ${ space( INLINE_PADDING_SPACE ) };
+
+	svg {
+		fill: currentColor;
+	}
 `;
 
 export const CloseIconWrapper = styled.div`
@@ -23,7 +28,7 @@ export const CloseIconWrapper = styled.div`
 	padding-inline-end: ${ space( INLINE_PADDING_SPACE ) };
 `;
 
-export const InputControlWithoutWebkitStyles = styled( InputControl )`
+export const StyledInputControl = styled( InputControl )`
 	input[type='search'] {
 		&::-webkit-search-decoration,
 		&::-webkit-search-cancel-button,
@@ -31,5 +36,9 @@ export const InputControlWithoutWebkitStyles = styled( InputControl )`
 		&::-webkit-search-results-decoration {
 			-webkit-appearance: none;
 		}
+	}
+
+	&:not( :focus-within ) {
+		--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;

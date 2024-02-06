@@ -21,7 +21,7 @@ import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
 import {
 	SearchIconWrapper,
-	InputControlWithoutWebkitStyles,
+	StyledInputControl,
 	CloseIconWrapper,
 } from './styles';
 
@@ -64,7 +64,11 @@ function UnforwardedSearchControl(
 		onClose,
 		size = 'default',
 		...restProps
-	}: WordPressComponentProps< SearchControlProps, 'input', false >,
+	}: Omit<
+		WordPressComponentProps< SearchControlProps, 'input', false >,
+		// TODO: Background styling currently doesn't support a disabled state. Needs design work.
+		'disabled'
+	>,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const searchRef = useRef< HTMLInputElement >( null );
@@ -73,17 +77,21 @@ function UnforwardedSearchControl(
 		'components-search-control'
 	);
 
-	// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
-	// to provide backwards compatibile margin for SearchControl.
-	// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
-	const baseControlContextValue = useMemo(
-		() => ( { BaseControl: { _overrides: { __nextHasNoMarginBottom } } } ),
+	const contextValue = useMemo(
+		() => ( {
+			// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+			// to provide backwards compatibile margin for SearchControl.
+			// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+			BaseControl: { _overrides: { __nextHasNoMarginBottom } },
+			// `isBorderless` is still experimental and not a public prop for InputControl yet.
+			InputBase: { isBorderless: true },
+		} ),
 		[ __nextHasNoMarginBottom ]
 	);
 
 	return (
-		<ContextSystemProvider value={ baseControlContextValue }>
-			<InputControlWithoutWebkitStyles
+		<ContextSystemProvider value={ contextValue }>
+			<StyledInputControl
 				__next40pxDefaultSize
 				id={ instanceId }
 				hideLabelFromVision={ hideLabelFromVision }
