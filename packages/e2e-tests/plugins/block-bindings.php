@@ -29,7 +29,7 @@ function gutenberg_test_block_bindings_register_custom_fields() {
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'single'       => true,
-			'default'      => '',
+			'default'      => '#url-custom-field',
 		)
 	);
 }

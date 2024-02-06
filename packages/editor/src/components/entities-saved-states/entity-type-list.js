@@ -59,7 +59,7 @@ function GlobalStylesDescription( { record } ) {
 			<h3 className="entities-saved-states__description-heading">
 				{ __( 'Changes made to:' ) }
 			</h3>
-			<PanelRow>{ globalStylesChanges.join( ', ' ) }</PanelRow>
+			<PanelRow>{ globalStylesChanges.join( ', ' ) }.</PanelRow>
 		</>
 	) : null;
 }
