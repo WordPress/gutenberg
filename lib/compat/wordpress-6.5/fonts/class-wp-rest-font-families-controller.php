@@ -491,7 +491,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 			foreach ( $font_face_ids as $font_face_id ) {
 				$links[] = array(
 					'embeddable' => true,
-					'href'       => rest_url( $this->namespace . '/' . $this->rest_base . '/' . $font_family_id . '/font-faces/' . $font_face_id ),
+					'href'       => rest_url( sprintf( '%s/%s/%s/font-faces/%s', $this->namespace, $this->rest_base, $font_family_id, $font_face_id ) ),
 				);
 			}
 			return $links;
