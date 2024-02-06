@@ -8,6 +8,7 @@ import {
 	useLayoutEffect as _useLayoutEffect,
 } from 'preact/hooks';
 import { effect } from '@preact/signals';
+import type { ContainerNode } from 'preact';
 
 /**
  * Internal dependencies
@@ -21,7 +22,6 @@ import {
 	resetNamespace,
 } from './hooks';
 import type { Scope, EffectFunction } from '../types';
-import type { ContainerNode } from 'preact';
 
 const afterNextFrame = ( callback: () => void ): Promise< void > => {
 	return new Promise( ( resolve ) => {
