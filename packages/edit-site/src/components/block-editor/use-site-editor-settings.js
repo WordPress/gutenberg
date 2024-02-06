@@ -6,6 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -92,13 +93,18 @@ function useArchiveLabel( templateSlug ) {
 
 function useGoBack() {
 	const location = useLocation();
+	const previousLocation = usePrevious( location );
 	const history = useHistory();
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.params.focusMode ||
-			FOCUSABLE_ENTITIES.includes( location.params.postType );
-		return isFocusMode ? () => history.back() : undefined;
-	}, [ location.params.focusMode, location.params.postType, history ] );
+			( location.params.postId &&
+				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
+		const didComeFromEditorCanvas =
+			previousLocation?.params.canvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+	}, [ location ] );
 	return goBack;
 }
 
