@@ -121,7 +121,7 @@ function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
 			<Button
 				disabled={ isDisabled }
 				__experimentalIsFocusable
-				__next40pxDefaultSize
+				size="compact"
 				variant="tertiary"
 				style={ { justifyContent: 'center', width: '100%' } }
 				onClick={ () => {

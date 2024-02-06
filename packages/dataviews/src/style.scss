@@ -501,7 +501,7 @@
 }
 
 .dataviews-search-widget-filter-combobox-list {
-	max-height: $grid-unit * 20;
+	max-height: $grid-unit * 22;
 	padding: $grid-unit-05;
 	overflow: auto;
 	border-top: 1px solid $gray-200;
@@ -509,7 +509,7 @@
 	.dataviews-search-widget-filter-combobox-item {
 		display: flex;
 		align-items: center;
-		gap: $grid-unit-05;
+		gap: $grid-unit-10;
 		border-radius: $radius-block-ui;
 		box-sizing: border-box;
 		padding: $grid-unit-10 $grid-unit-15;
@@ -558,7 +558,7 @@
 
 .dataviews-search-widget-filter-combobox__wrapper {
 	position: relative;
-	padding: $grid-unit-10;
+	padding: $grid-unit-05;
 
 	.dataviews-search-widget-filter-combobox__input {
 		@include input-control;
@@ -598,9 +598,9 @@
 
 	.dataviews-search-widget-filter-combobox__icon {
 		position: absolute;
-		left: $grid-unit-15;
+		left: $grid-unit-10;
 		top: 50%;
-		transform: translateY(-50%);
+		transform: translateY(-50%) scaleX(-1);
 		display: flex;
 		align-items: center;
 		justify-content: center;
