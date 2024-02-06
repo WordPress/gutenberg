@@ -11,18 +11,20 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import NewCustomSelect from '../default-component';
+import type _NewCustomSelect from '../default-component';
 import { CustomSelect, CustomSelectItem } from '..';
 
-const meta: Meta< typeof NewCustomSelect > = {
+const meta: Meta< typeof CustomSelect > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Default',
-	component: NewCustomSelect,
+	component: CustomSelect,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CustomSelectItem,
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		// exclude legacy options (type: never) from docs
+		//@ts-ignore
 		options: { table: { disable: true } },
 		renderSelectedValue: { control: { type: null } },
 		value: { control: { type: null } },
@@ -50,11 +52,11 @@ const meta: Meta< typeof NewCustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof NewCustomSelect > = ( props ) => {
+const Template: StoryFn< typeof _NewCustomSelect > = ( props ) => {
 	return <CustomSelect { ...props } />;
 };
 
-const ControlledTemplate: StoryFn< typeof NewCustomSelect > = ( props ) => {
+const ControlledTemplate: StoryFn< typeof _NewCustomSelect > = ( props ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
 		<CustomSelect
@@ -92,8 +94,8 @@ Default.args = {
  * `defaultValue` props. The argument of the `onChange` function will also
  * change accordingly.
  */
-export const MultiSelect = Template.bind( {} );
-MultiSelect.args = {
+export const MultipleSelection = Template.bind( {} );
+MultipleSelection.args = {
 	defaultValue: [ 'lavender', 'tangerine' ],
 	label: 'Select Colors',
 	renderSelectedValue: ( currentValue: string | string[] ) => {

@@ -10,7 +10,7 @@ function isLegacy( props: any ): props is LegacyCustomSelectProps {
 	return typeof props.options !== 'undefined';
 }
 
-export function DefaultExport(
+function CustomSelect(
 	props:
 		| LegacyCustomSelectProps
 		| WordPressComponentProps< CustomSelectProps, 'button' >
@@ -21,3 +21,5 @@ export function DefaultExport(
 
 	return <_NewCustomSelect { ...props } />;
 }
+
+export default CustomSelect;

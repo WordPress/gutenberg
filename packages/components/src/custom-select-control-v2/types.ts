@@ -60,8 +60,13 @@ export type _CustomSelectProps = {
 };
 
 export type CustomSelectProps = _CustomSelectProps &
-	Exclude< CustomSelectButtonProps, { size: 'small' } > & {
-		options?: never;
+	Omit< CustomSelectButtonProps, 'size' > & {
+		/**
+		 * The size of the control.
+		 *
+		 * @default 'default'
+		 */
+		size?: Exclude< CustomSelectButtonProps[ 'size' ], 'small' >;
 	};
 
 /**
