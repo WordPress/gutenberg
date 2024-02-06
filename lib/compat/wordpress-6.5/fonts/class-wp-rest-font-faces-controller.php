@@ -699,14 +699,16 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$query_params = parent::get_collection_params();
 
 			// Remove unneeded params.
-			unset( $query_params['after'] );
-			unset( $query_params['modified_after'] );
-			unset( $query_params['before'] );
-			unset( $query_params['modified_before'] );
-			unset( $query_params['search'] );
-			unset( $query_params['search_columns'] );
-			unset( $query_params['slug'] );
-			unset( $query_params['status'] );
+			unset(
+				$query_params['after'],
+				$query_params['modified_after'],
+				$query_params['before'],
+				$query_params['modified_before'],
+				$query_params['search'],
+				$query_params['search_columns'],
+				$query_params['slug'],
+				$query_params['status']
+			);
 
 			$query_params['orderby']['default'] = 'id';
 			$query_params['orderby']['enum']    = array( 'id', 'include' );
