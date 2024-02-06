@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Icon, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
@@ -171,14 +171,7 @@ export class MediaUploadProgress extends Component {
 		const { renderContent = () => null } = this.props;
 		const { isUploadInProgress, isUploadFailed, uploadState } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
-		const progress = this.state.progress * 100;
 		const retryMessage = this.getRetryMessage();
-
-		const progressBarStyle = [
-			styles.progressBar,
-			showSpinner || styles.progressBarHidden,
-			this.props.progressBarStyle,
-		];
 
 		return (
 			<View
@@ -189,16 +182,20 @@ export class MediaUploadProgress extends Component {
 				pointerEvents="box-none"
 				testID="progress-container"
 			>
-				{ ! this.props.hideProgressBar && (
-					<View style={ progressBarStyle }>
-						{ showSpinner && (
-							<Spinner
-								progress={ progress }
-								style={ this.props.spinnerStyle }
-								testID="spinner"
-							/>
-						) }
-					</View>
+				{ showSpinner && (
+					<ActivityIndicator
+						style={ styles.activityIndicator }
+						size="small"
+						color="#ffffff"
+					/>
+				) }
+				{ uploadState === 2 && (
+					<Icon
+						icon={ check }
+						fill="white"
+						size={ 26 }
+						style={ styles.activityIndicator }
+					/>
 				) }
 				{ renderContent( {
 					isUploadPaused:

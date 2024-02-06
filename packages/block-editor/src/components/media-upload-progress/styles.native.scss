@@ -3,13 +3,12 @@
 	z-index: 1;
 }
 
-.progressBar {
-	background-color: $gray-lighten-30;
+.activityIndicator {
+	background-color: rgba(0, 0, 0, 0.6);
+	position: absolute;
+	bottom: 6px;
+	right: 6px;
 	z-index: 1;
-	height: 6px;
-	margin-bottom: -6px;
-}
-
-.progressBarHidden {
-	background-color: transparent;
+	padding: 3px;
+	border-radius: 2px;
 }
