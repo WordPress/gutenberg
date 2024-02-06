@@ -14,7 +14,7 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import BulkActions from './bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
@@ -42,25 +42,27 @@ export default function DataViews( {
 		if (
 			selection.length > 0 &&
 			selection.some(
-				( id ) => ! data.some( ( item ) => item.id === id )
+				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
 			)
 		) {
 			const newSelection = selection.filter( ( id ) =>
-				data.some( ( item ) => item.id === id )
+				data.some( ( item ) => getItemId( item ) === id )
 			);
 			setSelection( newSelection );
 			onSelectionChange(
-				data.filter( ( item ) => newSelection.includes( item.id ) )
+				data.filter( ( item ) =>
+					newSelection.includes( getItemId( item ) )
+				)
 			);
 		}
-	}, [ selection, data, onSelectionChange ] );
+	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
-			setSelection( items.map( ( item ) => item.id ) );
+			setSelection( items.map( ( item ) => getItemId( item ) ) );
 			onSelectionChange( items );
 		},
-		[ setSelection, onSelectionChange ]
+		[ setSelection, getItemId, onSelectionChange ]
 	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
@@ -93,7 +95,8 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					{ view.type === LAYOUT_TABLE && (
+					{ ( view.type === LAYOUT_TABLE ||
+						view.type === LAYOUT_GRID ) && (
 						<BulkActions
 							actions={ actions }
 							data={ data }

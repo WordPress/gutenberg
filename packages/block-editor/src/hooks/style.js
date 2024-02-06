@@ -116,7 +116,9 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
-	[ `${ SHADOW_SUPPORT_KEY }` ]: [ SHADOW_SUPPORT_KEY ],
+	[ `${ SHADOW_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		SHADOW_SUPPORT_KEY,
+	],
 };
 
 /**

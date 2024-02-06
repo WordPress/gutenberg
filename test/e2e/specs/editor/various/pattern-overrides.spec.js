@@ -170,9 +170,11 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'core/block',
 					attributes: {
 						ref: patternId,
-						overrides: {
+						content: {
 							[ editableParagraphId ]: {
-								content: [ 1, 'I would word it this way' ],
+								values: {
+									content: 'I would word it this way',
+								},
 							},
 						},
 					},
@@ -181,9 +183,11 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'core/block',
 					attributes: {
 						ref: patternId,
-						overrides: {
+						content: {
 							[ editableParagraphId ]: {
-								content: [ 1, 'This one is different' ],
+								values: {
+									content: 'This one is different',
+								},
 							},
 						},
 					},
@@ -260,18 +264,19 @@ test.describe( 'Pattern Overrides', () => {
 		] );
 	} );
 
-	test( 'Supports `undefined` attribute values in patterns', async ( {
+	test( "handles button's link settings", async ( {
 		page,
 		admin,
-		editor,
 		requestUtils,
+		editor,
+		context,
 	} ) => {
 		const buttonId = 'button-id';
 		const { id } = await requestUtils.createBlock( {
-			title: 'Pattern with overrides',
+			title: 'Button with target',
 			content: `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"linkTarget":{"source":"core/pattern-overrides"}}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener">wp.org</a></div>
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"linkTarget":{"source":"core/pattern-overrides"},"rel":{"source":"core/pattern-overrides"}}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
 			status: 'publish',
@@ -284,41 +289,208 @@ test.describe( 'Pattern Overrides', () => {
 			attributes: { ref: id },
 		} );
 
+		// Focus the button, open the link popup.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Button' } )
 			.getByRole( 'textbox', { name: 'Button text' } )
 			.focus();
-
 		await expect(
 			page.getByRole( 'link', { name: 'wp.org' } )
 		).toContainText( 'opens in a new tab' );
 
+		// The link popup doesn't have a role which is a bit unfortunate.
+		// These are the buttons in the link popup.
+		const advancedPanel = page.getByRole( 'button', {
+			name: 'Advanced',
+			exact: true,
+		} );
+		const editLinkButton = page.getByRole( 'button', {
+			name: 'Edit',
+			exact: true,
+		} );
+		const saveLinkButton = page.getByRole( 'button', {
+			name: 'Save',
+			exact: true,
+		} );
+
+		await editLinkButton.click();
+		if (
+			( await advancedPanel.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await advancedPanel.click();
+		}
+
 		const openInNewTabCheckbox = page.getByRole( 'checkbox', {
 			name: 'Open in new tab',
 		} );
+		const markAsNoFollowCheckbox = page.getByRole( 'checkbox', {
+			name: 'Mark as nofollow',
+		} );
+		// Both checkboxes are checked.
 		await expect( openInNewTabCheckbox ).toBeChecked();
+		await expect( markAsNoFollowCheckbox ).toBeChecked();
 
+		// Check only the "open in new tab" checkbox.
+		await markAsNoFollowCheckbox.setChecked( false );
+		await saveLinkButton.click();
+
+		const postId = await editor.publishPost();
+		const previewPage = await context.newPage();
+		await previewPage.goto( `/?p=${ postId }` );
+		const buttonLink = previewPage.getByRole( 'link', { name: 'Button' } );
+
+		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
+		await expect( buttonLink ).toHaveAttribute(
+			'rel',
+			'noreferrer noopener'
+		);
+
+		// Uncheck both checkboxes.
+		await editLinkButton.click();
 		await openInNewTabCheckbox.setChecked( false );
+		await saveLinkButton.click();
 
+		// Update the post.
+		const updateButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Update' } );
+		await updateButton.click();
+		await expect( updateButton ).toBeDisabled();
+
+		await previewPage.reload();
+		await expect( buttonLink ).toHaveAttribute( 'target', '' );
+		await expect( buttonLink ).toHaveAttribute( 'rel', '' );
+
+		// Check only the "mark as nofollow" checkbox.
+		await editLinkButton.click();
+		await markAsNoFollowCheckbox.setChecked( true );
+		await saveLinkButton.click();
+
+		// Update the post.
+		await updateButton.click();
+		await expect( updateButton ).toBeDisabled();
+
+		await previewPage.reload();
+		await expect( buttonLink ).toHaveAttribute( 'target', '' );
+		await expect( buttonLink ).toHaveAttribute( 'rel', /^\s*nofollow\s*$/ );
+	} );
+
+	test( 'disables editing of nested patterns', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphId = 'paragraph-id';
+		const headingId = 'heading-id';
+		const innerPattern = await requestUtils.createBlock( {
+			title: 'Inner Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Inner paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+		const outerPattern = await requestUtils.createBlock( {
+			title: 'Outer Pattern',
+			content: `<!-- wp:heading {"metadata":{"id":"${ headingId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<h2 class="wp-block-heading">Outer heading</h2>
+<!-- /wp:heading -->
+<!-- wp:block {"ref":${ innerPattern.id },"overrides":{"${ paragraphId }":{"content":"Inner paragraph (edited)"}}} /-->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: outerPattern.id },
+		} );
+
+		// Make an edit to the outer pattern heading.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.fill( 'Outer heading (edited)' );
+
+		const postId = await editor.publishPost();
+
+		// Check it renders correctly.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/block',
 				attributes: {
-					ref: id,
-					overrides: {
-						[ buttonId ]: {
-							linkTarget: [ 0 ],
+					ref: outerPattern.id,
+					content: {
+						[ headingId ]: {
+							values: { content: 'Outer heading (edited)' },
 						},
 					},
 				},
+				innerBlocks: [
+					{
+						name: 'core/heading',
+						attributes: { content: 'Outer heading (edited)' },
+					},
+					{
+						name: 'core/block',
+						attributes: {
+							ref: innerPattern.id,
+							content: {
+								[ paragraphId ]: {
+									values: {
+										content: 'Inner paragraph (edited)',
+									},
+								},
+							},
+						},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: {
+									content: 'Inner paragraph (edited)',
+								},
+							},
+						],
+					},
+				],
 			},
 		] );
 
-		const postId = await editor.publishPost();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} ),
+			'The inner paragraph should not be editable'
+		).toHaveAttribute( 'inert', 'true' );
+
+		// Edit the outer pattern.
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.first()
+		);
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'link', { name: 'Edit original' } )
+			.click();
+
+		// The inner paragraph should be editable in the pattern focus mode.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} ),
+			'The inner paragraph should not be editable'
+		).not.toHaveAttribute( 'inert', 'true' );
+
+		// Visit the post on the frontend.
 		await page.goto( `/?p=${ postId }` );
 
-		const link = page.getByRole( 'link', { name: 'wp.org' } );
-		await expect( link ).toHaveAttribute( 'href', 'http://wp.org' );
-		await expect( link ).toHaveAttribute( 'target', '' );
+		await expect( page.getByRole( 'heading', { level: 2 } ) ).toHaveText(
+			'Outer heading (edited)'
+		);
+		await expect(
+			page.getByText( 'Inner paragraph (edited)' )
+		).toBeVisible();
 	} );
 } );

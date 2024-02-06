@@ -2,14 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
+	NavigableMenu,
 	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	MenuGroup,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
@@ -57,6 +58,17 @@ const ImageURLInputUI = ( {
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
+	const wrapperRef = useRef();
+
+	useEffect( () => {
+		if ( ! wrapperRef.current ) {
+			return;
+		}
+		const nextFocusTarget =
+			focus.focusable.find( wrapperRef.current )[ 0 ] ||
+			wrapperRef.current;
+		nextFocusTarget.focus();
+	}, [ isEditingLink, url, lightboxEnabled ] );
 
 	const startEditLink = () => {
 		if (
@@ -241,14 +253,15 @@ const ImageURLInputUI = ( {
 			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Add link' ) }
+				label={ __( 'Link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
-				isActive={ !! url }
+				isActive={ !! url || lightboxEnabled }
 			/>
 			{ isOpen && (
 				<URLPopover
+					ref={ wrapperRef }
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
@@ -257,7 +270,7 @@ const ImageURLInputUI = ( {
 					}
 					additionalControls={
 						showLinkEditor && (
-							<MenuGroup>
+							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
@@ -295,9 +308,10 @@ const ImageURLInputUI = ( {
 										{ __( 'Expand on click' ) }
 									</MenuItem>
 								) }
-							</MenuGroup>
+							</NavigableMenu>
 						)
 					}
+					offset={ 13 }
 				>
 					{ ( ! url || isEditingLink ) && ! lightboxEnabled && (
 						<>
