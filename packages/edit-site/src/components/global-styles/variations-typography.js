@@ -180,8 +180,9 @@ export default function TypographyVariations() {
 	};
 
 	/*
-		@TODO: not convinced about this yet.
-		Maybe the first iteration is to name the variations accoroding to their titles.
+		@TODO: not convinced about this yet. Originally, it skipped variations that didn't have
+		any heading/body fonts, and therefore names.
+		If we want to pull all "variations", then probably the first iteration is to name the variations according to their titles.
 	 */
 	typographyVariations?.forEach( ( variation ) => {
 		const [ bodyFontFamilyName, headingFontFamilyName ] =

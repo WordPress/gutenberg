@@ -102,7 +102,7 @@ export default function useThemeStyleVariationsByProperty( { styleProperty } ) {
 		/*
 		   @TODO:
 			For colors, should also get filter?
-			Memoize/cache all this better?
+			Memoize/cache all this better? E.g., should we memoize the variations?
 			Test with empty theme
 			Test with 2022 - typography font families bork for some reason
 
