@@ -49,8 +49,10 @@ test.describe( 'data-wp-each', () => {
 		test.beforeEach( async ( { page } ) => {
 			const elements = page.getByTestId( 'fruits' ).getByTestId( 'item' );
 
-			// These tags are included to check that the elements are not unmounted
-			// and mounted again. If an element remounts, its tag should be missing.
+			/*
+			 * These tags are included to check that the elements are not unmounted
+			 * and mounted again. If an element remounts, its tag should be missing.
+			 */
 			await elements.evaluateAll( ( refs ) =>
 				refs.forEach( ( ref, index ) => {
 					if ( ref instanceof HTMLElement ) {
@@ -105,8 +107,10 @@ test.describe( 'data-wp-each', () => {
 				'cherimoya',
 			] );
 
-			// Get the tags. They should not have disappeared or changed,
-			// except for the newly created element.
+			/*
+			 * Get the tags. They should not have disappeared or changed,
+			 * except for the newly created element.
+			 */
 			const [ ananas, avocado, banana, cherimoya ] = await elements.all();
 			await expect( ananas ).not.toHaveAttribute( 'data-tag' );
 			await expect( avocado ).toHaveAttribute( 'data-tag', '0' );
@@ -125,8 +129,10 @@ test.describe( 'data-wp-each', () => {
 				'cherimoya',
 			] );
 
-			// Get the tags. They should not have disappeared or changed,
-			// except for the newly created element.
+			/*
+			 * Get the tags. They should not have disappeared or changed,
+			 * except for the newly created element.
+			 */
 			const [ ananas, banana, cherimoya ] = await elements.all();
 			await expect( ananas ).not.toHaveAttribute( 'data-tag' );
 			await expect( banana ).toHaveAttribute( 'data-tag', '1' );
@@ -138,8 +144,10 @@ test.describe( 'data-wp-each', () => {
 		test.beforeEach( async ( { page } ) => {
 			const elements = page.getByTestId( 'books' ).getByTestId( 'item' );
 
-			// These tags are included to check that the elements are not unmounted
-			// and mounted again. If an element remounts, its tag should be missing.
+			/*
+			 * These tags are included to check that the elements are not unmounted
+			 * and mounted again. If an element remounts, its tag should be missing.
+			 */
 			await elements.evaluateAll( ( refs ) =>
 				refs.forEach( ( ref, index ) => {
 					if ( ref instanceof HTMLElement ) {
@@ -202,8 +210,10 @@ test.describe( 'data-wp-each', () => {
 				'A Storm of Swords',
 			] );
 
-			// Get the tags. They should not have disappeared or changed,
-			// except for the newly created element.
+			/*
+			 * Get the tags. They should not have disappeared or changed,
+			 * except for the newly created element.
+			 */
 			const [ affc, agot, acok, asos ] = await elements.all();
 			await expect( affc ).not.toHaveAttribute( 'data-tag' );
 			await expect( agot ).toHaveAttribute( 'data-tag', '0' );
@@ -222,8 +232,10 @@ test.describe( 'data-wp-each', () => {
 				'A Storm of Swords',
 			] );
 
-			// Get the tags. They should not have disappeared or changed,
-			// except for the newly created element.
+			/*
+			 * Get the tags. They should not have disappeared or changed,
+			 * except for the newly created element.
+			 */
 			const [ affc, acok, asos ] = await elements.all();
 			await expect( affc ).not.toHaveAttribute( 'data-tag' );
 			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
@@ -304,8 +316,10 @@ test.describe( 'data-wp-each', () => {
 			.getByTestId( 'navigation-updated list' )
 			.getByTestId( 'item' );
 
-		// These tags are included to check that the elements are not unmounted
-		// and mounted again. If an element remounts, its tag should be missing.
+		/*
+		 * These tags are included to check that the elements are not unmounted
+		 * and mounted again. If an element remounts, its tag should be missing.
+		 */
 		await elements.evaluateAll( ( refs ) =>
 			refs.forEach( ( ref, index ) => {
 				if ( ref instanceof HTMLElement ) {
@@ -328,8 +342,10 @@ test.describe( 'data-wp-each', () => {
 			'delta',
 		] );
 
-		// Get the tags. They should not have disappeared or changed,
-		// except for the newly created element.
+		/*
+		 * Get the tags. They should not have disappeared or changed,
+		 * except for the newly created element.
+		 */
 		const [ alpha, beta, gamma, delta ] = await elements.all();
 		await expect( alpha ).not.toHaveAttribute( 'data-tag' );
 		await expect( beta ).toHaveAttribute( 'data-tag', '0' );
@@ -340,8 +356,10 @@ test.describe( 'data-wp-each', () => {
 	test( 'should work with nested lists', async ( { page } ) => {
 		const mainElement = page.getByTestId( 'nested' );
 
-		// These tags are included to check that the elements are not unmounted
-		// and mounted again. If an element remounts, its tag should be missing.
+		/*
+		 * These tags are included to check that the elements are not unmounted
+		 * and mounted again. If an element remounts, its tag should be missing.
+		 */
 		const listItems = mainElement.getByRole( 'listitem' );
 		await listItems.evaluateAll( ( refs ) =>
 			refs.forEach( ( ref, index ) => {
@@ -465,8 +483,10 @@ test.describe( 'data-wp-each', () => {
 			.getByTestId( 'derived state' )
 			.getByTestId( 'item' );
 
-		// These tags are included to check that the elements are not unmounted
-		// and mounted again. If an element remounts, its tag should be missing.
+		/*
+		 * These tags are included to check that the elements are not unmounted
+		 * and mounted again. If an element remounts, its tag should be missing.
+		 */
 		await elements.evaluateAll( ( refs ) =>
 			refs.forEach( ( ref, index ) => {
 				if ( ref instanceof HTMLElement ) {

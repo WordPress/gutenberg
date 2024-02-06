@@ -224,11 +224,13 @@ test.describe( 'data-wp-bind', () => {
 						propValue,
 					] );
 
-					// Only check the rendered value if the new value is not
-					// `undefined` and the attibute is neither `value` nor
-					// `disabled` because Preact doesn't update the attribute
-					// for those cases.
-					// See https://github.com/preactjs/preact/blob/099c38c6ef92055428afbc116d18a6b9e0c2ea2c/src/diff/index.js#L471-L494
+					/*
+					 * Only check the rendered value if the new value is not
+					 * `undefined` and the attibute is neither `value` nor
+					 * `disabled` because Preact doesn't update the attribute
+					 * for those cases.
+					 * See https://github.com/preactjs/preact/blob/099c38c6ef92055428afbc116d18a6b9e0c2ea2c/src/diff/index.js#L471-L494
+					 */
 					if (
 						type === 'undef' &&
 						( name === 'value' || name === 'undefined' )
