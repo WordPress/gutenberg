@@ -117,8 +117,8 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings-registry.php';
 }
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/post-meta.php';
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/pattern.php';
+require __DIR__ . '/compat/wordpress-6.5/block-bindings/post-meta.php';
+require __DIR__ . '/compat/wordpress-6.5/block-bindings/pattern-overrides.php';
 require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 
 // Experimental features.

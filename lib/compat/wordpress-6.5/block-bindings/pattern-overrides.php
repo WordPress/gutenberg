@@ -1,17 +1,30 @@
 <?php
 /**
- * Add the metadata source to the block bindings API.
+ * Pattern Overrides source for the Block Bindings.
  *
  * @package gutenberg
  */
+
+/**
+ * Gets value for the Pattern Overrides source.
+ *
+ * @param array    $source_args    Array containing source arguments used to look up the override value.
+ *                                 Example: array( "key" => "foo" ).
+ * @param WP_Block $block_instance The block instance.
+ * @param string   $attribute_name The name of the target attribute.
+ * @return mixed The value computed for the source.
+ */
 function gutenberg_block_bindings_pattern_overrides_callback( $source_attrs, $block_instance, $attribute_name ) {
-	if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
+	if ( empty( $block_instance->attributes['metadata']['id'] ) ) {
 		return null;
 	}
 	$block_id = $block_instance->attributes['metadata']['id'];
 	return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, 'values', $attribute_name ), null );
 }
 
+/**
+ * Registers Pattern Overrides source in the Block Bindings registry.
+ */
 function gutenberg_register_block_bindings_pattern_overrides_source() {
 	// Override the "core/pattern-overrides" source from core.
 	if ( array_key_exists( 'core/pattern-overrides', get_all_registered_block_bindings_sources() ) ) {

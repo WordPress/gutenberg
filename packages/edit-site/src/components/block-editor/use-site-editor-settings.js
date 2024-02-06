@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -12,8 +13,10 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { usePostLinkProps } from './use-post-link-props';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -87,6 +90,18 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
+function useGoBack() {
+	const location = useLocation();
+	const history = useHistory();
+	const goBack = useMemo( () => {
+		const isFocusMode =
+			location.params.focusMode ||
+			FOCUSABLE_ENTITIES.includes( location.params.postType );
+		return isFocusMode ? () => history.back() : undefined;
+	}, [ location.params.focusMode, location.params.postType, history ] );
+	return goBack;
+}
+
 export function useSpecificEditorSettings() {
 	const getPostLinkProps = usePostLinkProps();
 	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
@@ -118,6 +133,7 @@ export function useSpecificEditorSettings() {
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
+	const goBack = useGoBack();
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
@@ -127,6 +143,7 @@ export function useSpecificEditorSettings() {
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
 			getPostLinkProps,
+			goBack,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -136,6 +153,7 @@ export function useSpecificEditorSettings() {
 		canvasMode,
 		defaultRenderingMode,
 		getPostLinkProps,
+		goBack,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );
