@@ -19,10 +19,10 @@ export const PointerCircle = styled.div`
 	will-change: transform;
 	z-index: 10000;
 	background: rgba( 255, 255, 255, 0.4 );
-	border: 1px solid rgba( 255, 255, 255, 0.3 );
+	border: 1px solid rgba( 255, 255, 255, 0.4 );
 	border-radius: 50%;
 	backdrop-filter: blur( 16px ) saturate( 180% );
-	box-shadow: rgb( 0 0 0 / 8% ) 0px 0px 8px;
+	box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 8px;
 	transition: transform 100ms linear;
 
 	${ reduceMotion( 'transition' ) }
@@ -30,7 +30,7 @@ export const PointerCircle = styled.div`
 	${ ( { isDragging }: { isDragging: boolean } ) =>
 		isDragging &&
 		`
-			box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 10px;
+			box-shadow: rgb( 0 0 0 / 12% ) 0px 0px 10px;
 			transform: scale( 1.1 );
 			cursor: grabbing;
 			` }
