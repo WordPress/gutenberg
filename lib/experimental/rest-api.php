@@ -131,7 +131,7 @@ add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
  *
  * @see https://github.com/WordPress/wordpress-develop/blob/2ac96bcd07ca615216cedbd855d641fca65853e5/src/wp-includes/rest-api/endpoints/class-wp-rest-block-renderer-controller.php#L17
  */
-function gutenberg_register_block_rederer_routes() {
+function gutenberg_register_block_renderer_routes() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
 	if ( empty( $gutenberg_experiments ) || ! array_key_exists( 'gutenberg-server-block-previews', $gutenberg_experiments ) ) {
 		return;
@@ -140,4 +140,4 @@ function gutenberg_register_block_rederer_routes() {
 	$block_renderer_controller->register_routes();
 }
 
-add_action( 'rest_api_init', 'gutenberg_register_block_rederer_routes' );
+add_action( 'rest_api_init', 'gutenberg_register_block_renderer_routes' );
