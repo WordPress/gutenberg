@@ -146,7 +146,9 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 				block.attributes[ attributeKey ] !==
 				defaultValues[ blockId ][ attributeKey ]
 			) {
-				content[ blockId ] ??= { values: {} };
+				content[ blockId ] ??= { values: {}, blockName: block.name };
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				content[ blockId ].values[ attributeKey ] =
 					block.attributes[ attributeKey ] === undefined
 						? // TODO: We use an empty string to represent undefined for now until
