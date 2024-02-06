@@ -19,11 +19,7 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
-import {
-	SearchIconWrapper,
-	StyledInputControl,
-	CloseIconWrapper,
-} from './styles';
+import { StyledInputControl, SuffixItemWrapper } from './styles';
 
 function SuffixItem( {
 	searchRef,
@@ -32,7 +28,7 @@ function SuffixItem( {
 	onClose,
 }: SuffixItemProps ) {
 	if ( ! onClose && ! value ) {
-		return null;
+		return <Icon icon={ search } />;
 	}
 
 	const onReset = () => {
@@ -41,14 +37,12 @@ function SuffixItem( {
 	};
 
 	return (
-		<CloseIconWrapper>
-			<Button
-				size="small"
-				icon={ closeSmall }
-				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
-				onClick={ onClose ?? onReset }
-			/>
-		</CloseIconWrapper>
+		<Button
+			size="small"
+			icon={ closeSmall }
+			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+			onClick={ onClose ?? onReset }
+		/>
 	);
 }
 
@@ -109,18 +103,15 @@ function UnforwardedSearchControl(
 				autoComplete="off"
 				placeholder={ placeholder }
 				value={ value || '' }
-				prefix={
-					<SearchIconWrapper>
-						<Icon icon={ search } />
-					</SearchIconWrapper>
-				}
 				suffix={
-					<SuffixItem
-						searchRef={ searchRef }
-						value={ value }
-						onChange={ onChange }
-						onClose={ onClose }
-					/>
+					<SuffixItemWrapper size={ size }>
+						<SuffixItem
+							searchRef={ searchRef }
+							value={ value }
+							onChange={ onChange }
+							onClose={ onClose }
+						/>
+					</SuffixItemWrapper>
 				}
 				{ ...restProps }
 			/>

@@ -9,23 +9,21 @@ import styled from '@emotion/styled';
 import { space } from '../utils/space';
 import InputControl from '../input-control';
 import { COLORS } from '../utils';
+import type { SearchControlProps } from './types';
 
-const INLINE_PADDING_SPACE = 1;
+const inlinePadding = ( {
+	size,
+}: Required< Pick< SearchControlProps, 'size' > > ) => {
+	return space( size === 'compact' ? 1 : 2 );
+};
 
-export const SearchIconWrapper = styled.div`
+export const SuffixItemWrapper = styled.div`
 	display: flex;
-	margin-inline-end: ${ space( INLINE_PADDING_SPACE * -1 ) };
-	padding-inline-start: ${ space( INLINE_PADDING_SPACE ) };
+	padding-inline-end: ${ inlinePadding };
 
 	svg {
 		fill: currentColor;
 	}
-`;
-
-export const CloseIconWrapper = styled.div`
-	display: flex;
-	margin-inline-start: ${ space( INLINE_PADDING_SPACE * -1 ) };
-	padding-inline-end: ${ space( INLINE_PADDING_SPACE ) };
 `;
 
 export const StyledInputControl = styled( InputControl )`
