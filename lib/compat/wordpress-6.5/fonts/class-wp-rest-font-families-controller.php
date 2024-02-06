@@ -205,7 +205,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 				return new WP_Error(
 					'rest_trash_not_supported',
 					/* translators: %s: force=true */
-					sprintf( __( "Font faces do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
+					sprintf( __( 'Font faces do not support trashing. Set "%s" to delete.', 'gutenberg' ), 'force=true' ),
 					array( 'status' => 501 )
 				);
 			}
