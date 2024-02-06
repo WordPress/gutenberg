@@ -32,6 +32,7 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
+	additionalControls,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -143,6 +144,7 @@ export default function LinkPreview( {
 				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
+			{ additionalControls && additionalControls() }
 		</div>
 	);
 }
