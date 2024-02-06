@@ -14,6 +14,10 @@
 	padding: $grid-unit-15 $grid-unit-40 0;
 	.components-search-control {
 		flex-grow: 1;
+
+		.components-base-control__field {
+			max-width: 240px;
+		}
 	}
 }
 
