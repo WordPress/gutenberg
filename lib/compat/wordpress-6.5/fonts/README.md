@@ -1,18 +1,200 @@
-## Font Library
+# Font Library
 
 Font Library consists of a font manager that enables users to install, remove, and activate typographic fonts from various sources in WordPress.
 
 The Font Library is available globally, independently of the theme activated, similar to the Media Library. This list of installed fonts and their assets are site-wide available, and the users can select the fonts activated (available in the editor) for each theme.
 
-### Glossary
+The font library consist of 3 main components that are combined to make it work: the UI, the PHP API and the REST API. These docs cover them in that order.
 
-- **Font family**: Is a typographic family that may include different variants. Typical examples are `Arial`, `Helvetica`, `Inter`.
-- **Font face**: Is a typographic variant of a font family. Each font family may include one or more font faces. Each font face has some unique characteristics as font weight (light, regular, bold, etc.) and font style (italic, normal, etc.). Typical examples are `Helvetica bold italic`, `Inter light normal`.
-- **Install font family**: Is to make a font family available to the user in the Font Library. The user will be able to activate and use the installed font families.
-- **Activate font family**: Is to make it ready to use in the site or post editor. All the active fonts will appear in the font pickers so the user can use them in the site elements.
-- **Deactivate font family**: Is to make a font family unusable. If a font family is inactive, it won't appear in the font pickers but will continue being listed in the font library.
-- **Uninstall font family**: Is to remove the font family from the font library permanently.
-- **Font Collection**: A font collection is a list of font family definitions ready to be installed by the user. The font family definition is a fontFamily item in `theme.json` like format.
+## Using the Font Library
+
+The Font Library UI enables users to browse, install, uninstall, activate and de-activate fonts. 
+
+### Browse installed fonts
+The list of installed fonts features the fonts provided by the active theme (via `theme.json`) and the fonts installed using the font library.
+
+### Install fonts
+Install font is to make a font family available to the user in the font library. When a font is installed its definition is stored in the database and their filee assets (if any) are stored in the file system.The fonts can be installed from a font collection or by uploading font  file assets. Fonts installed using the font library are available system wide.
+
+#### Install fonts from a font collection
+To install a font from a font collection the user needs to browse the font collection tab, select the font family, then check all the variants desired, and, finally, tap 'Install' button. 
+
+#### Install fonts by uploading files
+To install a font by uploading font files, the user needs to navigate the 'Upload' tab of the font library modal and drag and drop or select the font files of the font family to install.
+
+### Uninstall fonts
+Uninstall a font family is removing a font family from the font library permanently. It means that the font definition is removed from the database, and the font assets, if any, are removed from the file-system.
+
+### Activate and de-activate fonts
+When a font family is activated, the font defintion is added to the [Global Styles](/packages/edit-site/src/components/global-styles). Font families listed in global styles are rendered to pages and become available in the font pickers, so they can be applied to any element using the editor.
+
+When a font family is de-activated the font definition is removed from the global styles, so it won't be rendered on the frontend. The unactive fonts are still available on the font library and can be re-activated at any time. 
+
+When 
+
+
+## PHP API
+
+
+### Font Collections
+A font collection is a list of font family definitions ready to be installed by the user. The font family definition is a fontFamily item in `theme.json` like format. The font collections are presented to the users in the editor so one can choose whether to install a font family to their WordPress site.
+
+The only responsibility of a font collection is to present a list of font families in a correct format. Font collections are not in charge of installing the fonts; they just list a group of font families so users can choose the one they want to install. If the font family includes font faces, those font faces should have links to bundled (e.g: in a plugin assets) or external (e.g: from a CDN) font assets that will be downloaded or linked when the font family is installed.
+
+#### Register a font collection
+Register a font collection means providing a user a new list of fonts from one can select and install fonts. When a font collection is registered it is featured as a new tab in the font library modal and it's fetcheable using the `/font-collections/` REST API endpoint.
+
+To register a font collection you need to use `wp_register_font_collection` function.
+
+##### Register a font collection using PHP only
+Example:
+```php
+$font_families = [
+    array(
+        'font_family_settings' => (
+            array (
+                'fontFamily' => 'Piazzolla, serif',
+                'slug'       => 'paizzolla',
+                'name'       => 'Piazzolla',
+                'fontFace'   => array (
+                  array (
+                    'fontFamily' => 'Piazzolla',
+                    'fontWeight' => '400'
+                    'fontStyle'  => 'normal'
+                    'src'        => path_join( plugin_dir_path( __FILE__ ), "fonts/piazzolla400normal.woff2" )
+                  )
+                )
+            )
+        ),
+        'categories' => [ 'system-ui' ],
+    ),
+    array(
+        'font_family_settings' => (
+            array (
+                'fontFamily' => 'Arial, Helvetica, Tahoma, Geneva, sans-serif',
+                'slug'       => 'arial',
+                'name'       => 'Arial',
+            )
+        ),
+        'categories' => [ 'sans-serif' ],
+    ),
+];
+
+$categories = [
+    array(
+        'slug' => 'serif',
+        'name' => 'Serif',
+    ),
+    array(
+        'slug' => 'sans-serif',
+        'name' => 'Sans Serif',
+    ),
+];
+
+$config = array (
+    'name'          => 'My sytem fonts collection',
+    'description'   => 'Stacks of modern systems fonts, not font face assets needed. The look will vary on each system.',
+    'font_families' => $font_families,
+    'categories'    => $categories,
+);
+
+function register_my_collection(){
+    wp_register_font_collection ( 'my-font-foundry', $config );
+}
+
+add_action( 'init', 'register_my_collection' );
+```
+
+##### Register a font collection using a JSON file
+
+Example using a local JSON file:
+```php
+function register_my_collection(){
+    wp_register_font_collection ( 'my-font-foundry', path_join( __DIR__, 'my-collection.json' ) );
+}
+
+add_action( 'init', 'register_my_collection' );
+```
+
+Example using a JSON from an URL:
+```php
+function register_my_collection(){
+    wp_register_font_collection ( 'my-font-foundry', 'https://example.com/fonts/my-collection.json' );
+}
+
+add_action( 'init', 
+```
+
+`my-collection.json` file example:
+
+```json
+{
+  "$schema": "https://schemas.wp.org/trunk/font-collection.json",
+  "name": "My Font Foundry Collection",
+  "decription": "The font offered by My Font Foundry",
+  "categories": [
+    { "id": "sans-serif", "name": "Sans Serif" },
+    { "id": "serif", "name": "Serif" },
+  ],
+  "font_families": [
+    {
+      "font_family_settings": {
+        "name": "Aboreto",
+        "fontFamily": "Aboreto, system-ui",
+        "slug": "aboreto",
+        "fontFace": [
+          {
+            "src": "https://fonts.gstatic.com/s/aboreto/v2/5DCXAKLhwDDQ4N8blKHeA2yuxSY.woff2",
+            "fontWeight": "400",
+            "fontStyle": "normal",
+            "fontFamily": "Aboreto",
+            "preview": "https://s.w.org/images/fonts/17.6/previews/aboreto/aboreto-400-normal.svg"
+          }
+        ],
+        "preview": "https://s.w.org/images/fonts/17.6/previews/aboreto/aboreto.svg"
+      },
+      "categories": ["sans-serif"]
+    },
+    {
+      "font_family_settings": {
+        "name": "Abril Fatface",
+        "fontFamily": "Abril Fatface, system-ui",
+        "slug": "abril-fatface",
+        "fontFace": [
+          {
+            "src": "https://fonts.gstatic.com/s/abrilfatface/v23/zOL64pLDlL1D99S8g8PtiKchm-VsjOLhZBY.woff2",
+            "fontWeight": "400",
+            "fontStyle": "normal",
+            "fontFamily": "Abril Fatface",
+            "preview": "https://s.w.org/images/fonts/17.6/previews/abril-fatface/abril-fatface-400-normal.svg"
+          }
+        ],
+        "preview": "https://s.w.org/images/fonts/17.6/previews/abril-fatface/abril-fatface.svg"
+      },
+      "categories": ["serif"]
+    },
+  ]
+}
+```
+
+#### Unregister a font collection
+To unregister a font collection you need to add an action calling `wp_unregister_font_collection` with the font collection slug as the only parameter. The unregistered font collections won't appear as a font library modal tab and it won't be listed on the `/font-collections/` REST API endpoint.
+
+Example:
+```php
+function unregister_google_fonts(){
+    wp_unregister_font_collection ( 'google-fonts' );
+}
+add_action( 'init', 'unregister_google_fonts' );
+```
+
+### Assets storage
+
+**TODO:** add the `font_dir` docs.
+
+
+
+## Rest API
 
 ### Different types of installations
 
@@ -88,124 +270,6 @@ In a situation where you want to install a font family using the font files you 
 }
 ```
 
-### Extensibility
-Font Library is able to manage different font collections. A font collection is simply a list of font families ready to be installed by the user. Extenders can provide multiple typographic collections.
-
-#### Provide a font collection
-
-To provide a font collection you need to call `wp_register_font_collection()` function with your configuration as a parameter. Any font collection you provide will be available as a new tab in the Font Library modal.
-
-Adding a font collection example:
-
-```php
-$my_config = array (
-    'id'             => 'my-font-collection',
-    'name'           => 'My Font Collection',
-    'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-    'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
-);
-
-if ( function_exists( 'wp_register_font_collection' ) ) {
-    wp_register_font_collection ( $my_config );
-}
-```
-
-The Data JSON file for the collection created should look like this:
-```json
-{
-    "fontFamilies": [
-        ...
-    ],
-    "categories": [
-        ...
-    ]
-}
-```
-
-Example of a data JSON file providing 2 font families, with 2 font faces each and 2 categories:
-
-```json
-{
-  "fontFamilies": [
-    {
-      "name": "Montserrat",
-      "fontFamily": "Montserrat, sans-serif",
-      "slug": "montserrat",
-      "category": "sans-serif",
-      "fontFace": [
-        {
-          "src": "http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew-Y3tcoqK5.ttf",
-          "fontWeight": "400",
-          "fontStyle": "normal",
-          "fontFamily": "Montserrat"
-        },
-        {
-          "src": "http://fonts.gstatic.com/s/montserrat/v25/JTUFjIg1_i6t8kCHKm459Wx7xQYXK0vOoz6jq6R9aX9-p7K5ILg.ttf",
-          "fontWeight": "400",
-          "fontStyle": "italic",
-          "fontFamily": "Montserrat"
-        },
-      ]
-    },
-    {
-      "name": "Piazzolla",
-      "fontFamily": "Piazzolla, serif",
-      "slug": "piazzolla",
-      "category": "serif",
-      "fontFace": [
-        {
-          "src": "http://fonts.gstatic.com/s/piazzolla/v33/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7LYxnLy1AHfAAy5.ttf",
-          "fontWeight": "400",
-          "fontStyle": "normal",
-          "fontFamily": "Piazzolla"
-        },
-        {
-          "src": "http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf",
-          "fontWeight": "400",
-          "fontStyle": "italic",
-          "fontFamily": "Piazzolla"
-        },
-      ]
-    }
-  ],
-  "categories": [
-    "sans-serif",
-    "serif"
-  ]
-}
-```
-
-### Create a plugin to provide a font collection
-
-Here's an example of a plugin that provides a font collection:
-```php
-
-<?php
-/*
-Plugin Name: My Font Collection
-Plugin URI: https://your-website.com/
-Description: Add a font collection to your WordPress Font Library.
-Version: 1.0
-Author: Your Name
-Author URI: https://your-website.com/
-License: GPLv2 or later
-Text Domain: my-font-collection
-*/
-
-$my_config = array (
-    'id'             => 'my-font-collection',
-    'name'           => 'My Font Collection',
-    'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-    'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
-);
-
-if ( function_exists( 'wp_register_font_collection' ) ) {
-    wp_register_font_collection ( $my_config );
-}
-
-?>
-
-```
 
 ### API endpoints
 
