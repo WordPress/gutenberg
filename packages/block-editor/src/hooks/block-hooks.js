@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment, useMemo } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	PanelBody,
@@ -20,17 +20,20 @@ import { store as blockEditorStore } from '../store';
 const EMPTY_OBJECT = {};
 
 function BlockHooksControlPure( { name, clientId } ) {
-	const blockTypes = useSelect(
-		( select ) => select( blocksStore ).getBlockTypes(),
-		[]
-	);
-
-	const hookedBlocksForCurrentBlock = useMemo(
-		() =>
-			blockTypes?.filter(
-				( { blockHooks } ) => blockHooks && name in blockHooks
-			),
-		[ blockTypes, name ]
+	const hookedBlocksForCurrentBlock = useSelect(
+		( select ) => {
+			const hookedBlocks = select( blocksStore ).getHookedBlocks( name );
+			const _hookedBlocksForCurrentBlock = {};
+			for ( const relativePosition in hookedBlocks ) {
+				_hookedBlocksForCurrentBlock[ relativePosition ] = hookedBlocks[
+					relativePosition
+				].map( ( blockName ) =>
+					select( blocksStore ).getBlockType( blockName )
+				);
+			}
+			return _hookedBlocksForCurrentBlock;
+		},
+		[ name ]
 	);
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
@@ -52,54 +55,49 @@ function BlockHooksControlPure( { name, clientId } ) {
 			const { getBlock, getGlobalBlockCount } =
 				select( blockEditorStore );
 
-			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
-				( clientIds, block ) => {
-					// If the block doesn't exist anywhere in the block tree,
-					// we know that we have to set the toggle to disabled.
-					if ( getGlobalBlockCount( block.name ) === 0 ) {
-						return clientIds;
+			const _hookedBlockClientIds = {};
+			for ( const relativePosition in hookedBlocksForCurrentBlock ) {
+				hookedBlocksForCurrentBlock[ relativePosition ].forEach(
+					( block ) => {
+						// If the block doesn't exist anywhere in the block tree,
+						// we know that we have to set the toggle to disabled.
+						if ( getGlobalBlockCount( block.name ) === 0 ) {
+							return;
+						}
+
+						let candidates;
+						switch ( relativePosition ) {
+							case 'before':
+							case 'after':
+								// Any of the current block's siblings (with the right block type) qualifies
+								// as a hooked block (inserted `before` or `after` the current one), as the block
+								// might've been automatically inserted and then moved around a bit by the user.
+								candidates =
+									getBlock( rootClientId )?.innerBlocks;
+								break;
+
+							case 'first_child':
+							case 'last_child':
+								// Any of the current block's child blocks (with the right block type) qualifies
+								// as a hooked first or last child block, as the block might've been automatically
+								// inserted and then moved around a bit by the user.
+								candidates = getBlock( clientId ).innerBlocks;
+								break;
+						}
+
+						const hookedBlock = candidates?.find(
+							( candidate ) => candidate.name === block.name
+						);
+
+						// If the block exists in the designated location, we consider it hooked
+						// and show the toggle as enabled.
+						if ( hookedBlock ) {
+							_hookedBlockClientIds[ block.name ] =
+								hookedBlock.clientId;
+						}
 					}
-
-					const relativePosition = block?.blockHooks?.[ name ];
-					let candidates;
-
-					switch ( relativePosition ) {
-						case 'before':
-						case 'after':
-							// Any of the current block's siblings (with the right block type) qualifies
-							// as a hooked block (inserted `before` or `after` the current one), as the block
-							// might've been automatically inserted and then moved around a bit by the user.
-							candidates = getBlock( rootClientId )?.innerBlocks;
-							break;
-
-						case 'first_child':
-						case 'last_child':
-							// Any of the current block's child blocks (with the right block type) qualifies
-							// as a hooked first or last child block, as the block might've been automatically
-							// inserted and then moved around a bit by the user.
-							candidates = getBlock( clientId ).innerBlocks;
-							break;
-					}
-
-					const hookedBlock = candidates?.find(
-						( candidate ) => candidate.name === block.name
-					);
-
-					// If the block exists in the designated location, we consider it hooked
-					// and show the toggle as enabled.
-					if ( hookedBlock ) {
-						return {
-							...clientIds,
-							[ block.name ]: hookedBlock.clientId,
-						};
-					}
-
-					// If no hooked block was found in any of its designated locations,
-					// we set the toggle to disabled.
-					return clientIds;
-				},
-				{}
-			);
+				);
+			}
 
 			if ( Object.values( _hookedBlockClientIds ).length > 0 ) {
 				return _hookedBlockClientIds;
@@ -107,27 +105,26 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 			return EMPTY_OBJECT;
 		},
-		[ hookedBlocksForCurrentBlock, name, clientId, rootClientId ]
+		[ hookedBlocksForCurrentBlock, clientId, rootClientId ]
 	);
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
-	if ( ! hookedBlocksForCurrentBlock.length ) {
+	if ( ! Object.keys( hookedBlocksForCurrentBlock ).length ) {
 		return null;
 	}
 
 	// Group by block namespace (i.e. prefix before the slash).
-	const groupedHookedBlocks = hookedBlocksForCurrentBlock.reduce(
-		( groups, block ) => {
+	const groupedHookedBlocks = Object.values( hookedBlocksForCurrentBlock )
+		.flat()
+		.reduce( ( groups, block ) => {
 			const [ namespace ] = block.name.split( '/' );
 			if ( ! groups[ namespace ] ) {
 				groups[ namespace ] = [];
 			}
 			groups[ namespace ].push( block );
 			return groups;
-		},
-		{}
-	);
+		}, {} );
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
 		switch ( relativePosition ) {
