@@ -157,7 +157,7 @@ function TypographyVariation( { variation } ) {
 						{ headingFontFamilies?.name || variation?.title }
 					</div>
 					<div style={ bodyPreviewStyle }>
-						{ bodyFontFamilies?.name || __( 'Typeset' ) }
+						{ bodyFontFamilies?.name || __( 'Typography styles' ) }
 					</div>
 				</VStack>
 			</div>
@@ -169,6 +169,7 @@ export default function TypographyVariations() {
 	const typographyVariations = useThemeStyleVariationsByProperty( {
 		styleProperty: 'typography',
 	} );
+
 	const { base } = useContext( GlobalStylesContext );
 	const uniqueTypographyVariations = [];
 	const uniqueTypographyNames = [];
@@ -178,15 +179,21 @@ export default function TypographyVariations() {
 		} );
 	};
 
+	/*
+		@TODO: not convinced about this yet.
+		Maybe the first iteration is to name the variations accoroding to their titles.
+	 */
 	typographyVariations?.forEach( ( variation ) => {
 		const [ bodyFontFamilyName, headingFontFamilyName ] =
 			getFontFamilyNames( mergeBaseAndUserConfigs( base, variation ) );
 		if ( ! isDup( bodyFontFamilyName, headingFontFamilyName ) ) {
 			uniqueTypographyVariations.push( variation );
-			uniqueTypographyNames.push( [
-				bodyFontFamilyName,
-				headingFontFamilyName,
-			] );
+			if ( bodyFontFamilyName && headingFontFamilyName ) {
+				uniqueTypographyNames.push( [
+					bodyFontFamilyName,
+					headingFontFamilyName,
+				] );
+			}
 		}
 	} );
 
