@@ -59,7 +59,7 @@ function ControlsWithStoreSubscription( props ) {
 	const hasPatternBindings =
 		!! bindings &&
 		Object.values( bindings ).some(
-			( binding ) => binding.source?.name === 'core/pattern-overrides'
+			( binding ) => binding.source === 'core/pattern-overrides'
 		);
 
 	const shouldShowPartialSyncingControls =
