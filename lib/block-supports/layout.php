@@ -476,7 +476,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
 			);
 		}
 
@@ -591,6 +594,32 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'declarations' => $child_layout_declarations,
 	);
 
+	/**
+	 * If column span is set, it should be removed on small grids.
+	 */
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && $block['attrs']['style']['layout']['parentColumnWidth'] ) {
+		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
+		$parent_column_width = $block['attrs']['style']['layout']['parentColumnWidth'];
+		$parent_column_value = floatval( $parent_column_width );
+		$parent_column_unit  = explode( $parent_column_value, $parent_column_width )[1];
+
+		// Adding 1 to the column span to make up for gap value.
+		$container_query_value = ( $column_span_number + 1 ) * $parent_column_value;
+		$container_query_value = $container_query_value . $parent_column_unit;
+
+		$child_layout_styles[] = array(
+			'query'        => "@container (max-width: $container_query_value )",
+			'selector'     => ".$container_content_class",
+			'declarations' => array(
+				'grid-column' => 'auto',
+			),
+		);
+	}
+
+	/**
+	 * Add to the style engine store to enqueue and render layout styles.
+	 * Return styles here just to check if any exist.
+	 */
 	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
 		$child_layout_styles,
 		array(

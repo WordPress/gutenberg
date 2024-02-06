@@ -97,6 +97,7 @@ add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );
 function gutenberg_safe_grid_attrs( $attrs ) {
 	$attrs[] = 'grid-column';
 	$attrs[] = 'grid-row';
+	$attrs[] = 'container-type';
 	return $attrs;
 }
 add_filter( 'safe_style_css', 'gutenberg_safe_grid_attrs' );
