@@ -32,14 +32,14 @@ export const MediaContainer = styled.div`
 
 	&:after {
 		border-radius: inherit;
-		bottom: 0px;
+		bottom: 0;
 		box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 );
 		content: '';
-		left: 0px;
+		left: 0;
 		pointer-events: none;
 		position: absolute;
-		right: 0px;
-		top: 0px;
+		right: 0;
+		top: 0;
 	}
 
 	img,
