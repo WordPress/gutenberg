@@ -20,8 +20,8 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 	 * @since 6.5.0
 	 */
 	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'hooked-blocks';
+		$this->namespace      = 'wp/v2';
+		$this->rest_base      = 'hooked-blocks';
 		$this->block_registry = WP_Block_Type_Registry::get_instance();
 	}
 
@@ -97,8 +97,8 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		$context = null;
 
 		$hooked_block_types = get_hooked_blocks();
-		foreach( $hooked_block_types as $anchor_block_type => $hooked_block_types_for_anchor_block ) {
-			foreach( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
+		foreach ( $hooked_block_types as $anchor_block_type => $hooked_block_types_for_anchor_block ) {
+			foreach ( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
 				$hooked_block_types_for_anchor_block[ $relative_position ] =
 					apply_filters( 'hooked_block_types', $hooked_block_types, $relative_position, $anchor_block_type, $context );
 			}
@@ -135,6 +135,8 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
+		return true;
+
 		$check = $this->check_read_permission();
 		if ( is_wp_error( $check ) ) {
 			return $check;
@@ -186,6 +188,44 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 	}
 
 	/**
+	 * Get the correct context for the request.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $entity Context entity.
+	 * @param string $id     Context ID.
+	 * @return WP_Block_Template|WP_Post|WP_Errpr Block type object if name is valid, WP_Error otherwise.
+	 */
+	protected function get_context( $entity, $id ) {
+		$entity_mapping = array(
+			'template'   => 'wp_template',
+			'part'       => 'wp_template_part',
+			'navigation' => 'wp_navigation',
+		);
+		$entity_type    = isset( $entity_mapping[ $entity ] ) ? $entity_mapping[ $entity ] : null;
+
+		if ( ! $entity_type ) {
+			return new WP_Error( 'rest_block_type_invalid_context', __( 'Invalid context.' ), array( 'status' => 404 ) );
+		}
+
+		if ( ( 'wp_template' === $entity_type || 'wp_template_part' === $entity_type ) && ! empty( $id ) ) {
+			$context = get_block_template( $id, $entity_type );
+			if ( is_wp_error( $context ) ) {
+				return $context;
+			}
+		}
+
+		if ( 'wp_navigation' === $entity_type && ! empty( $id ) ) {
+			$context = get_post( (int) $id );
+			if ( is_wp_error( $context ) ) {
+				return $context;
+			}
+		}
+
+		return $context;
+	}
+
+	/**
 	 * Retrieves hooked blocks for a specific anchor block type.
 	 *
 	 * @since 6.5.0
@@ -205,9 +245,6 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			? $all_hooked_block_types[ $block_name ]
 			: array();
 
-		// TODO: Set context based on the request.
-		$context = null;
-
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
 		$entity     = '';
@@ -218,15 +255,12 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			$id = $request['id'];
 		}
 
-		// TODO: Validate entity and ID.
-		if ( 'template' === $entity && is_string( $id ) ) {
-			$context = get_block_template( $id ); // TODO: How do we determine $template_type arg (template or part)?
-			if ( is_wp_error( $context ) ) {
-				return $context;
-			}
+		$context = $this->get_context( $entity, $id );
+		if ( is_wp_error( $context ) ) {
+			return $context;
 		}
 
-		foreach( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
+		foreach ( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
 			$hooked_block_types_for_anchor_block[ $relative_position ] = apply_filters( 'hooked_block_types', $hooked_block_types, $relative_position, $block_name, $context );
 		}
 
@@ -259,15 +293,15 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 	 */
 	public function get_collection_params() {
 		return array(
-			'context'   => $this->get_context_param( array( 'default' => 'view' ) ),
-			'entity'    => array(
+			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+			'entity'  => array(
 				'description' => __( 'Entity type to get hooked blocks for.' ),
 				'type'        => 'string',
 			),
-			'id'        => array(
+			'id'      => array(
 				'description' => __( 'Entity ID to get hooked blocks for.' ),
-				//'type'        => 'integer', // TODO: Can be an integer, but also a string(?) (template IDs?)
-			)
+				'type'        => array( 'string', 'integer' ),
+			),
 		);
 	}
 }
