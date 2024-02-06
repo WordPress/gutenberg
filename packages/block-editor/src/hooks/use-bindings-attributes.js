@@ -4,12 +4,12 @@
 import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
+import { useMemo, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { useBlockEditContext } from '../components/block-edit/context';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -32,69 +32,105 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
-			const { clientId, name: blockName } = useBlockEditContext();
+			const { name, attributes, setAttributes, ...otherProps } = props;
 			const { getBlockBindingsSource } = unlock(
 				useSelect( blockEditorStore )
 			);
-			const { getBlockAttributes, updateBlockAttributes } =
-				useSelect( blockEditorStore );
 
-			const updatedAttributes = getBlockAttributes( clientId );
-			if ( updatedAttributes?.metadata?.bindings ) {
-				Object.entries( updatedAttributes.metadata.bindings ).forEach(
-					( [ attributeName, settings ] ) => {
-						const source = getBlockBindingsSource(
-							settings.source
-						);
+			const blockType = getBlockType( name );
 
-						if ( source ) {
-							// Second argument (`updateMetaValue`) will be used to update the value in the future.
-							const {
-								placeholder,
-								useValue: [ metaValue = null ] = [],
-							} = source.useSource( props, settings.args );
-
-							if ( placeholder && ! metaValue ) {
-								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
-								// Adding this workaround until attributes and metadata fields types are improved and include `url`.
-								const htmlAttribute =
-									getBlockType( blockName ).attributes[
-										attributeName
-									].attribute;
-								if (
-									htmlAttribute === 'src' ||
-									htmlAttribute === 'href'
-								) {
-									updatedAttributes[ attributeName ] = null;
-								} else {
-									updatedAttributes[ attributeName ] =
-										placeholder;
-								}
-							}
-
-							if ( metaValue ) {
-								updatedAttributes[ attributeName ] = metaValue;
-							}
-						}
+			const boundAttributes = {};
+			if ( attributes?.metadata?.bindings ) {
+				Object.entries( attributes?.metadata?.bindings ).forEach(
+					( [ attribute, binding ] ) => {
+						boundAttributes[ attribute ] = getBlockBindingsSource(
+							binding.source
+						).useSource( props, binding.args );
 					}
 				);
 			}
 
+			const attributesWithSourcedAttributes = useMemo( () => {
+				return {
+					...attributes,
+					...Object.fromEntries(
+						BLOCK_BINDINGS_ALLOWED_BLOCKS[ name ].map(
+							( attributeName ) => {
+								// Check bindings.
+								if ( boundAttributes[ attributeName ] ) {
+									const {
+										placeholder,
+										useValue: [ metaValue = null ] = [],
+									} = boundAttributes[ attributeName ];
+
+									const blockTypeAttribute =
+										blockType.attributes[ attributeName ];
+
+									if ( placeholder && ! metaValue ) {
+										// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
+										// Adding this workaround until attributes and metadata fields types are improved and include `url`.
+
+										const htmlAttribute =
+											blockTypeAttribute.attribute;
+										if (
+											htmlAttribute === 'src' ||
+											htmlAttribute === 'href'
+										) {
+											return [ attributeName, null ];
+										}
+										return [ attributeName, placeholder ];
+									}
+
+									if ( metaValue ) {
+										// TODO: If it is rich-text, I think we can't edit it this way.
+										return [ attributeName, metaValue ];
+									}
+								}
+								return [
+									attributeName,
+									attributes[ attributeName ],
+								];
+							}
+						)
+					),
+				};
+			}, [ attributes, blockType.attributes, boundAttributes, name ] );
+
+			const updatedSetAttributes = useCallback(
+				( nextAttributes ) => {
+					Object.entries( nextAttributes ?? {} )
+						.filter(
+							( [ attribute ] ) => attribute in boundAttributes
+						)
+						.forEach( ( [ attribute, value ] ) => {
+							const {
+								useValue: [ , updateMetaValue = null ] = [],
+							} = boundAttributes[ attribute ];
+							if ( updateMetaValue ) {
+								updateMetaValue( value );
+							}
+						} );
+					setAttributes( nextAttributes );
+				},
+				[
+					setAttributes,
+					attributesWithSourcedAttributes,
+					boundAttributes,
+				]
+			);
+
 			const registry = useRegistry();
 
 			return (
-				<>
-					<BlockEdit
-						key="edit"
-						attributes={ updatedAttributes }
-						setAttributes={ ( newAttributes, blockId ) =>
-							registry.batch( () =>
-								updateBlockAttributes( blockId, newAttributes )
-							)
-						}
-						{ ...props }
-					/>
-				</>
+				<BlockEdit
+					attributes={ attributesWithSourcedAttributes }
+					setAttributes={ ( newAttributes ) => {
+						registry.batch( () =>
+							updatedSetAttributes( newAttributes )
+						);
+					} }
+					{ ...otherProps }
+				/>
 			);
 		},
 		'useBoundAttributes'
