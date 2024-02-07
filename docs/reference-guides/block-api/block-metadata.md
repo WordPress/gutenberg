@@ -527,6 +527,26 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
+### View script
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewScript`
+-   Since: `WordPress 5.9.0`
+
+```json
+{ "viewScriptModule": [ "file:./view.js", "example-shared-script-module-id" ] }
+```
+
+Block type frontend script module definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a script module ID registered with the [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/) function, a path to a JavaScript module relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. In the future, it will be possible to depend on scripts from script modules.
+
+_Note: Available since WordPress `6.5.0`._
+
 ### Editor style
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
@@ -625,7 +645,7 @@ In `block.json`:
 
 ### `WPDefinedAsset`
 
-It extends `WPDefinedPath` for JavaScript and CSS files. An alternative to the file path would be a script or style handle name referencing an already registered asset using WordPress helpers.
+It extends `WPDefinedPath` for JavaScript and CSS files. An alternative to the file path would be a script handle, script module ID, or style handle referencing an already registered asset using WordPress helpers.
 
 **Example:**
 
@@ -635,21 +655,24 @@ In `block.json`:
 {
 	"editorScript": "file:./index.js",
 	"script": "file:./script.js",
-	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
+	"viewScriptModule": [
+		"file:./view.js",
+		"example-registered-script-module-id"
+	],
 	"editorStyle": "file:./index.css",
 	"style": [ "file:./style.css", "example-shared-style" ],
 	"viewStyle": [ "file:./view.css", "example-view-style" ]
 }
 ```
 
-In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file and use file paths rather than asset handles.
+In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts, script modules, and styles that are found in the `block.json` file and use file paths rather than asset handles.
 
-That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
+That's why the `WPDefinedAsset` type has to offer a way to mirror the parameters necessary to register scripts, script modules, and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/), [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/), and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles or script module IDs associated with the block.
 
 It's possible to provide an object which takes the following shape:
 
 -   `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
--   `dependencies` (`string[]`) - an array of registered script handles this script depends on. Default value: `[]`.
+-   `dependencies` (`string[]`|`{ id: string, import?: 'dynamic'|'static' }[]`) - an array of registered script handles this script depends on. Script modules may use a simple string for static dependencies or the object form to indicate a dynamic dependency. Dynamic dependencies are dependencies that may or may not be used at runtime and are typically used with the dynamic `import('module-id')` syntax. Default value: `[]`.
 -   `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
 The definition is stored inside separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.

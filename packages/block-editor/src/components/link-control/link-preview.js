@@ -6,16 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
-	Tooltip,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit, copy } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -66,7 +65,7 @@ export default function LinkPreview( {
 
 	const { createNotice } = useDispatch( noticesStore );
 	const ref = useCopyToClipboard( value.url, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+		createNotice( 'info', __( 'Link copied to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
@@ -99,16 +98,14 @@ export default function LinkPreview( {
 					<span className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
-								<Tooltip text={ value.url }>
-									<ExternalLink
-										className="block-editor-link-control__search-item-title"
-										href={ value.url }
-									>
-										<Truncate numberOfLines={ 1 }>
-											{ displayTitle }
-										</Truncate>
-									</ExternalLink>
-								</Tooltip>
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ value.url }
+								>
+									<Truncate numberOfLines={ 1 }>
+										{ displayTitle }
+									</Truncate>
+								</ExternalLink>
 								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
 										<Truncate numberOfLines={ 1 }>
@@ -124,27 +121,28 @@ export default function LinkPreview( {
 						) }
 					</span>
 				</span>
-
 				<Button
 					icon={ edit }
-					label={ __( 'Edit' ) }
-					className="block-editor-link-control__search-item-action"
+					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
 					size="compact"
 				/>
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
-						label={ __( 'Unlink' ) }
-						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
+						label={ __( 'Remove link' ) }
 						onClick={ onRemove }
 						size="compact"
 					/>
 				) }
 				<Button
-					icon={ copy }
-					label={ __( 'Copy URL' ) }
-					className="block-editor-link-control__search-item-action block-editor-link-control__copy"
+					icon={ copySmall }
+					label={ sprintf(
+						// Translators: %1$s is a placeholder for an optional colon, %2$s is a placeholder for the link URL (if present).
+						__( 'Copy link%1$s%2$s' ), // Ends up looking like "Copy link: https://example.com".
+						isEmptyURL ? '' : ': ',
+						value.url
+					) }
 					ref={ ref }
 					disabled={ isEmptyURL }
 					size="compact"
