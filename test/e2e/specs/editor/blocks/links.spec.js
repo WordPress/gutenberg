@@ -878,6 +878,48 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	// Fix for https://github.com/WordPress/gutenberg/issues/58322
+	test( 'can click links within the same paragraph to open the correct link preview (@firefox)', async ( {
+		editor,
+		LinkUtils,
+	} ) => {
+		// Create a paragraph with two links
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: `<a href="https://wordpressfoundation.org/donate/">Donate to the Wordpress Foundation</a> to support <a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
+			},
+		} );
+
+		// Click on "Gutenberg" link in the canvas
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
+
+		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		await expect(
+			linkPopover.getByText( 'wordpress.org/gutenberg' )
+		).toBeVisible();
+
+		// Click the other link in the same paragraph. We need a short delay between mousdown and mouseup to get the popover to show
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'WordPress',
+			} )
+			.click( { delay: 10 } );
+
+		await expect( linkPopover ).toBeVisible();
+		await expect(
+			linkPopover.getByText( 'wordpress.org/gutenberg' )
+		).toBeHidden();
+		await expect(
+			linkPopover.getByText( 'wordpressfoundation.org/donate/' )
+		).toBeVisible();
+	} );
+
 	test.describe( 'Editing link text', () => {
 		test( 'should allow for modification of link text via the Link UI', async ( {
 			page,
