@@ -228,7 +228,9 @@ test.describe( 'Links', () => {
 		await LinkUtils.createLink();
 
 		// Click on the Edit button.
-		await page.getByRole( 'button', { name: 'Edit', exact: true } ).click();
+		await page
+			.getByRole( 'button', { name: 'Edit link', exact: true } )
+			.click();
 
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
@@ -255,7 +257,9 @@ test.describe( 'Links', () => {
 
 		const linkPopover = LinkUtils.getLinkPopover();
 
-		await linkPopover.getByRole( 'button', { name: 'Unlink' } ).click();
+		await linkPopover
+			.getByRole( 'button', { name: 'Remove link' } )
+			.click();
 
 		// The link should have been removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [

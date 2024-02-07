@@ -305,7 +305,7 @@ test.describe( 'Pattern Overrides', () => {
 			exact: true,
 		} );
 		const editLinkButton = page.getByRole( 'button', {
-			name: 'Edit',
+			name: 'Edit link',
 			exact: true,
 		} );
 		const saveLinkButton = page.getByRole( 'button', {
