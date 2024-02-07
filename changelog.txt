@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 17.6.4 =
+
+### Bug Fixes
+
+ - Compatibility with WordPress trunk: Do not register font collections if already registered by Core.
+
+
 = 17.6.3 =
 
 ## Changelog
