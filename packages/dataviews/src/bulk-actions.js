@@ -5,6 +5,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Button,
 	Modal,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useCallback } from '@wordpress/element';
@@ -149,6 +150,9 @@ export default function BulkActions( {
 					>
 						{ selection.length > 0 && (
 							<div className="dataviews-bulk-edit-button__selection-count">
+								<VisuallyHidden>
+									{ __( 'Edit items:' ) }
+								</VisuallyHidden>
 								{ selection.length }
 							</div>
 						) }
