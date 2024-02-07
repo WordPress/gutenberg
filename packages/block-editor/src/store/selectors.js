@@ -1938,23 +1938,15 @@ const buildBlockTypeItem =
 			'inserter'
 		);
 
-		let initialAttributes = {};
-
 		const ignoredHookedBlocks = Object.values(
 			getHookedBlocks( id )
 		).flat();
 
-		if ( ignoredHookedBlocks.length ) {
-			initialAttributes = {
-				metadata: {
-					ignoredHookedBlocks,
-				},
-			};
-		}
-
 		return {
 			...blockItemBase,
-			initialAttributes,
+			initialAttributes: ignoredHookedBlocks
+				? { metadata: { ignoredHookedBlocks } }
+				: {},
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
