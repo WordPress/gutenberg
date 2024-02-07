@@ -41,7 +41,17 @@ export default function ChildLayoutControl( {
 	parentLayout,
 } ) {
 	const { selfStretch, flexSize, columnSpan, rowSpan } = childLayout;
-	const { type: parentLayoutType, minimumColumnWidth = '' } = parentLayout;
+	const {
+		type: parentLayoutType,
+		minimumColumnWidth = '12rem',
+		columnCount,
+	} = parentLayout;
+
+	/**
+	 * If columnCount is set, the parentColumnwidth isn't needed because
+	 * the grid has a fixed number of columns with responsive widths.
+	 */
+	const parentColumnWidth = columnCount ? null : minimumColumnWidth;
 
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
@@ -113,7 +123,7 @@ export default function ChildLayoutControl( {
 							onChange( {
 								...childLayout,
 								columnSpan: value,
-								parentColumnWidth: minimumColumnWidth || null,
+								parentColumnWidth,
 							} );
 						} }
 						value={ columnSpan }
