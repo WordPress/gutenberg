@@ -90,7 +90,7 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-function useGoBack() {
+function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
 	const history = useHistory();
 	const goBack = useMemo( () => {
@@ -133,7 +133,8 @@ export function useSpecificEditorSettings() {
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
-	const onNavigateToPreviousEntityRecord = useGoBack();
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
