@@ -667,7 +667,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
         class="components-spinner emotion-0 emotion-1"
         focusable="false"
         height="16"
-        role="presentation"
+        role="status"
         viewBox="0 0 100 100"
         width="16"
         xmlns="http://www.w3.org/2000/svg"
