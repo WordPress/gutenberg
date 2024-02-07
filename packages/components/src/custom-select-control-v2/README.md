@@ -18,7 +18,7 @@ CustomSelect can be used in an uncontrolled mode, where the component manages it
 const UncontrolledCustomSelect = () => (
 	<CustomSelect label="Colors">
 		<CustomSelectItem value="Blue">
-			`{ /* The `defaultValue` since it wasn't defined */ }
+			{ /* The `defaultValue` since it wasn't defined */ }
 			<span style={ { color: 'blue' } }>Blue</span>
 		</CustomSelectItem>
 		<CustomSelectItem value="Purple">
