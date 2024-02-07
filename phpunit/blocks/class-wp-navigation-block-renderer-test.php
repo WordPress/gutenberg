@@ -64,17 +64,27 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the heading block isn't wrapped in a list item to preserve accessible markup
+	 * Test that a given block will not be automatically wrapped in a list item by default.
 	 *
 	 * @group navigation-renderer
 	 *
 	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
 	 */
-	public function test_gutenberg_get_markup_for_inner_block_heading() {
+	public function test_gutenberg_block_not_automatically_wrapped_with_li_tag() {
+
+		register_block_type(
+			'testsuite/sample-block',
+			array(
+				'api_version'     => 2,
+				'render_callback' => function ( $attributes, $content ) {
+					return '<div class="wp-block-testsuite-sample-block">' . $content . '</div>';
+				},
+			)
+		);
 
 		// We are testing the site title block because we manually add list items around it.
 		$parsed_blocks = parse_blocks(
-			'<!-- wp:heading --><h2 class="wp-block-heading">Hello World</h2><!-- /wp:heading -->'
+			'<!-- wp:testsuite/sample-block {"content":"Hello World"} --><div class="wp-block-testsuite-sample-block">Hello World</div><!-- /wp:testsuite/sample-block -->'
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
@@ -87,21 +97,35 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
-		$expected = '<h2 class="wp-block-heading">Hello World</h2>';
+		$expected = '<div class="wp-block-testsuite-sample-block">Hello World</div>';
 		$this->assertEquals( $expected, $result );
+
+		unregister_block_type( 'testsuite/sample-block' );
 	}
 
 	/**
-	 * Test that the heading block is wrapped in a list item when filtered to preserve accessible markup
+	 * Test that a block can be added to the list of blocks which require a wrapping list item. 
+     * This allows extenders to opt in to the rendering behavior of the Navigation block  
+     * which helps to preserve accessible markup.
 	 *
 	 * @group navigation-renderer
 	 *
 	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
 	 */
-	public function test_gutenberg_get_markup_for_inner_block_heading_filtered() {
+	public function test_gutenberg_block_is_automatically_wrapped_with_li_tag_when_filtered() {
+
+		register_block_type(
+			'testsuite/sample-block',
+			array(
+				'api_version'     => 2,
+				'render_callback' => function ( $attributes, $content ) {
+					return '<div class="wp-block-testsuite-sample-block">' . $content . '</div>';
+				},
+			)
+		);
 
 		$filter_needs_list_item_wrapper_function = static function ( $needs_list_item_wrapper ) {
-			$needs_list_item_wrapper[] = 'core/heading';
+			$needs_list_item_wrapper[] = 'testsuite/sample-block';
 			return $needs_list_item_wrapper;
 		};
 
@@ -114,7 +138,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// We are testing the site title block because we manually add list items around it.
 		$parsed_blocks = parse_blocks(
-			'<!-- wp:heading --><h2 class="wp-block-heading">Hello Filtered World</h2><!-- /wp:heading -->'
+			'<!-- wp:testsuite/sample-block {"content":"Hello World"} --><div class="wp-block-testsuite-sample-block">Hello World</div><!-- /wp:testsuite/sample-block -->'
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
@@ -127,10 +151,12 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
-		$expected = '<li class="wp-block-navigation-item"><h2 class="wp-block-heading">Hello Filtered World</h2></li>';
+		$expected = '<li class="wp-block-navigation-item"><div class="wp-block-testsuite-sample-block">Hello World</div></li>';
 		$this->assertEquals( $expected, $result );
 
 		remove_filter( 'block_core_navigation_needs_list_item_wrapper', $filter_needs_list_item_wrapper_function, 10, 1 );
+
+		unregister_block_type( 'testsuite/sample-block' );
 	}
 
 	/**
