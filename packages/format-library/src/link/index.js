@@ -42,6 +42,8 @@ function Edit( {
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
+	const canMakeLink = ! isCollapsed( value ) || addingLink || isActive;
+
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
 		if ( ! editableContentElement ) {
@@ -138,7 +140,13 @@ function Edit( {
 
 	return (
 		<>
-			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
+			{ canMakeLink && (
+				<RichTextShortcut
+					type="primary"
+					character="k"
+					onUse={ addLink }
+				/>
+			) }
 			<RichTextShortcut
 				type="primaryShift"
 				character="k"
@@ -156,6 +164,7 @@ function Edit( {
 				shortcutCharacter="k"
 				aria-haspopup="true"
 				aria-expanded={ addingLink }
+				disabled={ ! canMakeLink }
 			/>
 			{ addingLink && (
 				<InlineLinkUI
