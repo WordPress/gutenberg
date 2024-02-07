@@ -418,7 +418,6 @@ export default function Image( {
 				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
-				href: hrefBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
@@ -430,9 +429,6 @@ export default function Image( {
 					getBlockBindingsSource( urlBinding?.source )
 						?.lockAttributesEditing === true,
 				lockHrefControls:
-					( !! hrefBinding &&
-						getBlockBindingsSource( hrefBinding?.source )
-							?.lockAttributesEditing === true ) ||
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
 					hasParentPattern,
@@ -454,7 +450,8 @@ export default function Image( {
 			<BlockControls group="block">
 				{ isSingleSelected &&
 					! isEditingImage &&
-					! lockHrefControls && (
+					! lockHrefControls &&
+					! lockUrlControls && (
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
