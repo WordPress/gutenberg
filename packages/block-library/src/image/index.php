@@ -250,7 +250,6 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.lightboxEnabled"
 			data-wp-class--hideAnimationEnabled="state.hideAnimationEnabled"
-			data-wp-init="callbacks.initOverlay"
 			data-wp-watch="callbacks.setOverlayFocus"
 			data-wp-on--keydown="actions.handleKeydown"
 			data-wp-on--touchstart="actions.handleTouchStart"
@@ -273,6 +272,7 @@ function block_core_image_print_lightbox_overlay() {
 					</figure>
 				</div>
 				<div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
+				<style data-wp-text="state.overlayStyles"></style>
 		</div>
 HTML;
 }

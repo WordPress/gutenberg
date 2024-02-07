@@ -3,16 +3,6 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const focusableSelectors = [
-	'a[href]',
-	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
-	'select:not([disabled]):not([aria-hidden])',
-	'textarea:not([disabled]):not([aria-hidden])',
-	'button:not([disabled]):not([aria-hidden])',
-	'[contenteditable]',
-	'[tabindex]:not([tabindex^="-"])',
-];
-
 /**
  * Stores a context-bound scroll handler.
  *
@@ -74,12 +64,14 @@ function handleScroll( ctx ) {
 }
 
 let imageRef;
+let triggerRef;
 
 const { state, actions, callbacks } = store( 'core/image', {
 	state: {
 		currentImage: {},
 		windowWidth: window.innerWidth,
 		windowHeight: window.innerHeight,
+		overlayStyles: 'someValue',
 		get lightboxEnabled() {
 			return !! state.currentImage.currentSrc;
 		},
@@ -114,6 +106,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 
 			ctx.currentSrc = ctx.imageRef.currentSrc;
 			imageRef = ctx.imageRef;
+			triggerRef = ctx.triggerRef;
 			state.currentImage = ctx;
 
 			callbacks.setOverlayStyles();
@@ -150,37 +143,24 @@ const { state, actions, callbacks } = store( 'core/image', {
 					// If we don't delay before changing the focus,
 					// the focus ring will appear on Firefox before
 					// the image has finished animating, which looks broken.
-					// ctx.lightboxTriggerRef.focus( {
-					// 	preventScroll: true,
-					// } );
+					triggerRef.focus( {
+						preventScroll: true,
+					} );
 				}, 450 );
 
 				state.currentImage = {};
 			}
 		},
 		handleKeydown( event ) {
-			const ctx = getContext();
 			if ( state.lightboxEnabled ) {
-				if ( event.key === 'Tab' || event.keyCode === 9 ) {
-					// If shift + tab it change the direction
-					if (
-						event.shiftKey &&
-						window.document.activeElement ===
-							ctx.firstFocusableElement
-					) {
-						event.preventDefault();
-						ctx.lastFocusableElement.focus();
-					} else if (
-						! event.shiftKey &&
-						window.document.activeElement ===
-							ctx.lastFocusableElement
-					) {
-						event.preventDefault();
-						ctx.firstFocusableElement.focus();
-					}
+				// Focuses the close button when the user presses the tab key.
+				if ( event.key === 'Tab' ) {
+					event.preventDefault();
+					const { ref } = getElement();
+					ref.querySelector( 'button' ).focus();
 				}
-
-				if ( event.key === 'Escape' || event.keyCode === 27 ) {
+				// Closes the lightbox when the user presses the escape key.
+				if ( event.key === 'Escape' ) {
 					actions.hideLightbox();
 				}
 			}
@@ -216,16 +196,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 		initTriggerButton() {
 			const ctx = getContext();
 			const { ref } = getElement();
-			ctx.lightboxTriggerRef = ref;
-		},
-		initOverlay() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			const focusableElements =
-				ref.querySelectorAll( focusableSelectors );
-			ctx.firstFocusableElement = focusableElements[ 0 ];
-			ctx.lastFocusableElement =
-				focusableElements[ focusableElements.length - 1 ];
+			ctx.triggerRef = ref;
 		},
 		setOverlayFocus() {
 			if ( state.lightboxEnabled ) {
@@ -461,33 +432,25 @@ const { state, actions, callbacks } = store( 'core/image', {
 			const lightboxImgHeight =
 				imgMaxHeight * ( containerHeight / containerMaxHeight );
 
-			// Add the CSS variables needed.
-			let styleTag = document.getElementById( 'wp-lightbox-styles' );
-			if ( ! styleTag ) {
-				styleTag = document.createElement( 'style' );
-				styleTag.id = 'wp-lightbox-styles';
-				document.head.appendChild( styleTag );
-			}
-
 			// As of this writing, using the calculations above will render the lightbox
 			// with a small, erroneous whitespace on the left side of the image in iOS Safari,
 			// perhaps due to an inconsistency in how browsers handle absolute positioning and CSS
 			// transformation. In any case, adding 1 pixel to the container width and height solves
 			// the problem, though this can be removed if the issue is fixed in the future.
-			styleTag.innerHTML = `
-		:root {
-			--wp--lightbox-initial-top-position: ${ screenPosY }px;
-			--wp--lightbox-initial-left-position: ${ screenPosX }px;
-			--wp--lightbox-container-width: ${ containerWidth + 1 }px;
-			--wp--lightbox-container-height: ${ containerHeight + 1 }px;
-			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
-			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
-			--wp--lightbox-scale: ${ containerScale };
-			--wp--lightbox-scrollbar-width: ${
-				window.innerWidth - document.documentElement.clientWidth
-			}px;
-		}
-	`;
+			state.overlayStyles = `
+				:root {
+					--wp--lightbox-initial-top-position: ${ screenPosY }px;
+					--wp--lightbox-initial-left-position: ${ screenPosX }px;
+					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
+					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
+					--wp--lightbox-image-width: ${ lightboxImgWidth }px;
+					--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+					--wp--lightbox-scale: ${ containerScale };
+					--wp--lightbox-scrollbar-width: ${
+						window.innerWidth - document.documentElement.clientWidth
+					}px;
+				}
+			`;
 		},
 	},
 } );
