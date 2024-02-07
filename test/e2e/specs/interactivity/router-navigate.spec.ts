@@ -18,6 +18,14 @@ test.describe( 'Router navigate', () => {
 			alias: 'router navigate - main',
 			attributes: { title: 'Main', links: [ link1, link2 ] },
 		} );
+		await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - disabled',
+			attributes: {
+				title: 'Main (navigation disabled)',
+				links: [ link1, link2 ],
+				disableNavigation: true,
+			},
+		} );
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
@@ -159,5 +167,28 @@ test.describe( 'Router navigate', () => {
 
 		// Make the fetch abort, just in case.
 		resolver!();
+	} );
+
+	test( 'should force a page reload when the `clientNavigation` config is set to false', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto( utils.getLink( 'router navigate - disabled' ) );
+
+		const navigations = page.getByTestId( 'router navigations' );
+		const status = page.getByTestId( 'router status' );
+		const title = page.getByTestId( 'title' );
+
+		// Check some elements to ensure the page has hydrated.
+		await expect( navigations ).toHaveText( '0' );
+		await expect( status ).toHaveText( 'idle' );
+
+		await page.getByTestId( 'link 1' ).click();
+
+		// Check the page has updated.
+		await expect( title ).toHaveText( 'Link 1' );
+
+		// Check that client-navigations count has not increased.
+		await expect( navigations ).toHaveText( '0' );
 	} );
 } );
