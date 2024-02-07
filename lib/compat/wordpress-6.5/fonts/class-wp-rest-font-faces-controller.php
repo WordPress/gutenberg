@@ -243,7 +243,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $value Encoded JSON string of font face settings.
-		 * @return array Decoded array of font face settings.
+		 * @return array Decoded and sanitized array of font face settings.
 		 */
 		public function sanitize_font_face_settings( $value ) {
 			// Settings arrive as stringified JSON, since this is a multipart/form-data request.
@@ -841,7 +841,6 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $value Font face src that is a URL or the key for a $_FILES array item.
-		 *
 		 * @return string Sanitized value.
 		 */
 		protected function sanitize_src( $value ) {
@@ -855,7 +854,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param array $file Single file item from $_FILES.
-		 * @return array|WP_Error Array containing uploaded file attributes on success, or error on failure.
+		 * @return array|WP_Error Array containing uploaded file attributes on success, or WP_Error object on failure.
 		 */
 		protected function handle_font_file_upload( $file ) {
 			add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
