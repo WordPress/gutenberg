@@ -9,7 +9,11 @@ import {
 	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	RichText,
+} from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
@@ -79,6 +83,17 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
+				{ displayAsDropdown && showLabel && (
+					<RichText
+						tagName="label"
+						value={ label }
+						htmlFor="wp-block-archives-1"
+						className={ 'wp-block-archives__label' }
+						onChange={ ( value ) =>
+							setAttributes( { label: value } )
+						}
+					/>
+				) }
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"

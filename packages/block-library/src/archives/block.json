@@ -25,7 +25,9 @@
 		},
 		"label": {
 			"type": "string",
-			"default": "Archives"
+			"default": "Archives",
+			"source": "html",
+			"selector": "label"
 		}
 	},
 	"supports": {
