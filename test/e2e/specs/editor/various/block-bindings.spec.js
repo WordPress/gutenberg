@@ -499,11 +499,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is enabled and with the original value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
@@ -516,11 +516,11 @@ test.describe( 'Block bindings', () => {
 
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -563,11 +563,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'text_custom_field' );
@@ -579,11 +579,11 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -626,11 +626,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is enabled and with the original value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
@@ -642,11 +642,11 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeDisabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'text_custom_field' );
@@ -698,11 +698,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'text_custom_field' );
@@ -714,11 +714,11 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -1106,11 +1106,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
@@ -1171,7 +1171,7 @@ test.describe( 'Block bindings', () => {
 
 				// Title input is disabled and with the custom field value.
 				const advancedButton = page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', {
 						name: 'Advanced',
 					} );
@@ -1182,11 +1182,11 @@ test.describe( 'Block bindings', () => {
 				}
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeDisabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'Value of the text_custom_field' );
@@ -1252,18 +1252,18 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeDisabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Title input is enabled and with the original value.
 				const advancedButton = page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', {
 						name: 'Advanced',
 					} );
@@ -1274,11 +1274,11 @@ test.describe( 'Block bindings', () => {
 				}
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
