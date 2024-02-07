@@ -105,14 +105,10 @@ function useHasTextColumnsControl( settings ) {
 
 function getUniqueFontSizesBySlug( settings ) {
 	const fontSizes = settings?.typography?.fontSizes;
-	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
-	const uniqueSizes = [];
-	for ( const currentSize of mergedFontSizes ) {
-		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
-			uniqueSizes.push( currentSize );
-		}
-	}
-	return uniqueSizes;
+	const mergedFontSizes = fontSizes
+		? mergeOrigins( fontSizes ).toReversed() // New array because mergeOrigins result is cached.
+		: [];
+	return uniqByProperty( mergedFontSizes, 'slug' ).reverse(); // In-place reverse to save memory.
 }
 
 /**
