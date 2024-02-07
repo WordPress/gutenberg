@@ -58,10 +58,18 @@ export function usePasteHandler( props ) {
 			const isInternal =
 				event.clipboardData.getData( 'rich-text' ) === 'true';
 
+			const trimmedPlainText = plainText.trim();
+
+			const isPasteableUrl =
+				__unstableEmbedURLOnPaste &&
+				isURL( trimmedPlainText ) &&
+				// For the link pasting feature, allow only http(s) protocols.
+				/^https?:/.test( trimmedPlainText );
+
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
-			if ( isInternal ) {
+			if ( isInternal && ! isPasteableUrl ) {
 				const pastedValue = create( { html } );
 				addActiveFormats( pastedValue, value.activeFormats );
 				onChange( insert( value, pastedValue ) );
@@ -115,15 +123,7 @@ export function usePasteHandler( props ) {
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-			const trimmedPlainText = plainText.trim();
-
-			if (
-				__unstableEmbedURLOnPaste &&
-				isEmpty( value ) &&
-				isURL( trimmedPlainText ) &&
-				// For the link pasting feature, allow only http(s) protocols.
-				/^https?:/.test( trimmedPlainText )
-			) {
+			if ( isPasteableUrl && isEmpty( value ) ) {
 				mode = 'BLOCKS';
 			}
 
