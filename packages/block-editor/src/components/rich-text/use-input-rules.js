@@ -81,21 +81,29 @@ function inputRule( props, ctx, onReplace ) {
 	if ( selection ) {
 		ctx.inserterActive = selection[ 0 ].name === 'core/paragraph';
 	}
-	lazyLoadBlock( block ).then( () => {
-		if ( selection ) {
-			const [ selectedBlock, selectedAttribute ] = selection;
-			const valueStr = toHTMLString( { value: getValue() } );
-			// To do: refactor this to use rich text's selection instead, so
-			// we no longer have to use on this hack inserting a special
-			// character.
-			selectedBlock.attributes[ selectedAttribute ] =
-				selectedBlock.attributes[ selectedAttribute ]
+	lazyLoadBlock( block )
+		// .then( () => new Promise( ( r ) => setTimeout( r, 1000 ) ) )
+		.then( () => {
+			if ( selection ) {
+				const [ selectedBlock, selectedAttribute ] = selection;
+				const valueStr = toHTMLString( { value: getValue() } );
+				// To do: refactor this to use rich text's selection instead, so
+				// we no longer have to use on this hack inserting a special
+				// character.
+				const newValue = selectedBlock.attributes[ selectedAttribute ]
 					.toString()
 					.replace( START_OF_SELECTED_AREA, valueStr );
-			selectionChange( selectedBlock.clientId, selectedAttribute, 0, 0 );
-		}
-		onReplace( [ block ] );
-	} );
+
+				selectedBlock.attributes[ selectedAttribute ] = newValue;
+				selectionChange(
+					selectedBlock.clientId,
+					selectedAttribute,
+					newValue.length,
+					newValue.length
+				);
+			}
+			onReplace( [ block ] );
+		} );
 
 	return true;
 }
