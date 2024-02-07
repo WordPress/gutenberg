@@ -527,6 +527,26 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
+### View script
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewScript`
+-   Since: `WordPress 5.9.0`
+
+```json
+{ "viewScriptModule": [ "file:./view.js", "example-shared-script-module-id" ] }
+```
+
+Block type frontend script module definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a script module ID registered with the [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/) function, a path to a JavaScript module relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. In the future, it will be possible to depend on scripts from script modules.
+
+_Note: Available since WordPress `6.5.0`._
+
 ### Editor style
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
