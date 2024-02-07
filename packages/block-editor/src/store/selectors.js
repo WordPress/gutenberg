@@ -1944,7 +1944,7 @@ const buildBlockTypeItem =
 
 		return {
 			...blockItemBase,
-			initialAttributes: ignoredHookedBlocks
+			initialAttributes: ignoredHookedBlocks.length
 				? { metadata: { ignoredHookedBlocks } }
 				: {},
 			description: blockType.description,
