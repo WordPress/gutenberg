@@ -73,6 +73,8 @@ function handleScroll( ctx ) {
 	}
 }
 
+let imageRef;
+
 const { state, actions, callbacks } = store( 'core/image', {
 	state: {
 		currentImage: {},
@@ -111,6 +113,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 			}
 
 			ctx.currentSrc = ctx.imageRef.currentSrc;
+			imageRef = ctx.imageRef;
 			state.currentImage = ctx;
 
 			callbacks.setOverlayStyles();
@@ -135,8 +138,6 @@ const { state, actions, callbacks } = store( 'core/image', {
 			window.addEventListener( 'scroll', scrollCallback, false );
 		},
 		hideLightbox() {
-			const ctx = getContext();
-			state.hideAnimationEnabled = true;
 			if ( state.lightboxEnabled ) {
 				// We want to wait until the close animation is completed
 				// before allowing a user to scroll again. The duration of this
@@ -149,12 +150,12 @@ const { state, actions, callbacks } = store( 'core/image', {
 					// If we don't delay before changing the focus,
 					// the focus ring will appear on Firefox before
 					// the image has finished animating, which looks broken.
-					ctx.lightboxTriggerRef.focus( {
-						preventScroll: true,
-					} );
+					// ctx.lightboxTriggerRef.focus( {
+					// 	preventScroll: true,
+					// } );
 				}, 450 );
 
-				state.lightboxEnabled = false;
+				state.currentImage = {};
 			}
 		},
 		handleKeydown( event ) {
@@ -184,9 +185,6 @@ const { state, actions, callbacks } = store( 'core/image', {
 				}
 			}
 		},
-		handleTouchStart() {
-			isTouching = true;
-		},
 		handleTouchMove( event ) {
 			// On mobile devices, we want to prevent triggering the
 			// scroll event because otherwise the page jumps around as
@@ -197,6 +195,9 @@ const { state, actions, callbacks } = store( 'core/image', {
 			if ( state.lightboxEnabled ) {
 				event.preventDefault();
 			}
+		},
+		handleTouchStart() {
+			isTouching = true;
 		},
 		handleTouchEnd() {
 			// We need to wait a few milliseconds before resetting
@@ -316,7 +317,6 @@ const { state, actions, callbacks } = store( 'core/image', {
 			}
 		},
 		setOverlayStyles() {
-			debugger;
 			// The reference img element lies adjacent
 			// to the event target button in the DOM.
 			let {
@@ -324,9 +324,9 @@ const { state, actions, callbacks } = store( 'core/image', {
 				naturalHeight,
 				offsetWidth: originalWidth,
 				offsetHeight: originalHeight,
-			} = state.currentImage.imageRef;
+			} = imageRef;
 			let { x: screenPosX, y: screenPosY } =
-				state.currentImage.imageRef.getBoundingClientRect();
+				imageRef.getBoundingClientRect();
 
 			// Natural ratio of the image clicked to open the lightbox.
 			const naturalRatio = naturalWidth / naturalHeight;
