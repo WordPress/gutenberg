@@ -568,7 +568,6 @@ export default function NavigationLinkEdit( {
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
 									// Need to handle refocusing the Nav block or the inserter?
-									//replaceBlock( clientId, [] );
 									onReplace( [] );
 								}
 							} }
