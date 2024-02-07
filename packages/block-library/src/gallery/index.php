@@ -117,6 +117,9 @@ function block_core_gallery_render( $attributes, $content ) {
 		)
 	);
 
+	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
+	// when the instance is treated as a string, but here we explicitly
+	// convert it to a string.
 	$updated_content = $processed_content->get_updated_html();
 
 	/*
