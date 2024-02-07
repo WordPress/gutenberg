@@ -4,21 +4,6 @@
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
 /**
- * Stores a context-bound scroll handler.
- *
- * This callback could be defined inline inside of the store
- * object but it's created externally to avoid confusion about
- * how its logic is called. This logic is not referenced directly
- * by the directives in the markup because the scroll event we
- * need to listen to is triggered on the window; so by defining it
- * outside of the store, we signal that the behavior here is different.
- * If we find a compelling reason to move it to the store, feel free.
- *
- * @type {Function}
- */
-let scrollCallback;
-
-/**
  * Tracks whether user is touching screen; used to
  * differentiate behavior for touch and mouse input.
  *
@@ -34,44 +19,12 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
-/**
- * Lightbox page-scroll handler: prevents scrolling.
- *
- * This handler is added to prevent scrolling behaviors that
- * trigger content shift while the lightbox is open.
- *
- * It would be better to accomplish this through CSS alone, but
- * using overflow: hidden is currently the only way to do so, and
- * that causes the layout to shift and prevents the zoom animation
- * from working in some cases because we're unable to account for
- * the layout shift when doing the animation calculations. Instead,
- * here we use JavaScript to prevent and reset the scrolling
- * behavior. In the future, we may be able to use CSS or overflow: hidden
- * instead to not rely on JavaScript, but this seems to be the best approach
- * for now that provides the best visual experience.
- *
- * @param {Object} ctx Context object with the `core/image` namespace.
- */
-function handleScroll( ctx ) {
-	// We can't override the scroll behavior on mobile devices
-	// because doing so breaks the pinch to zoom functionality, and we
-	// want to allow users to zoom in further on the high-res image.
-	if ( ! isTouching && Date.now() - lastTouchTime > 450 ) {
-		// We are unable to use event.preventDefault() to prevent scrolling
-		// because the scroll event can't be canceled, so we reset the position instead.
-		window.scrollTo( ctx.scrollLeftReset, ctx.scrollTopReset );
-	}
-}
-
 let imageRef;
 let triggerRef;
 
-const { state, actions, callbacks } = store( 'core/image', {
+const { state, actions } = store( 'core/image', {
 	state: {
 		currentImage: {},
-		windowWidth: window.innerWidth,
-		windowHeight: window.innerHeight,
-		overlayStyles: 'someValue',
 		get lightboxEnabled() {
 			return !! state.currentImage.currentSrc;
 		},
@@ -104,31 +57,18 @@ const { state, actions, callbacks } = store( 'core/image', {
 				return;
 			}
 
+			state.scrollTopReset = document.documentElement.scrollTop;
+			// In most cases, this value will be 0, but this is included
+			// in case a user has created a page with horizontal scrolling.
+			state.scrollLeftReset = document.documentElement.scrollLeft;
+			state.scrollDisabled = true;
+
 			ctx.currentSrc = ctx.imageRef.currentSrc;
 			imageRef = ctx.imageRef;
 			triggerRef = ctx.triggerRef;
 			state.currentImage = ctx;
 
-			callbacks.setOverlayStyles();
-
-			ctx.scrollTopReset = document.documentElement.scrollTop;
-
-			// In most cases, this value will be 0, but this is included
-			// in case a user has created a page with horizontal scrolling.
-			ctx.scrollLeftReset = document.documentElement.scrollLeft;
-
-			// We define and bind the scroll callback here so
-			// that we can pass the context and as an argument.
-			// We may be able to change this in the future if we
-			// define the scroll callback in the store instead, but
-			// this approach seems to tbe clearest for now.
-			scrollCallback = handleScroll.bind( null, ctx );
-
-			// We need to add a scroll event listener to the window
-			// here because we are unable to otherwise access it via
-			// the Interactivity API directives. If we add a native way
-			// to access the window, we can remove this.
-			window.addEventListener( 'scroll', scrollCallback, false );
+			actions.setOverlayStyles();
 		},
 		hideLightbox() {
 			if ( state.lightboxEnabled ) {
@@ -139,7 +79,7 @@ const { state, actions, callbacks } = store( 'core/image', {
 				// a few milliseconds longer than the duration, otherwise a user
 				// may scroll too soon and cause the animation to look sloppy.
 				setTimeout( function () {
-					window.removeEventListener( 'scroll', scrollCallback );
+					state.scrollDisabled = false;
 					// If we don't delay before changing the focus,
 					// the focus ring will appear on Firefox before
 					// the image has finished animating, which looks broken.
@@ -186,97 +126,29 @@ const { state, actions, callbacks } = store( 'core/image', {
 			lastTouchTime = Date.now();
 			isTouching = false;
 		},
-	},
-	callbacks: {
-		initImage() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.imageRef = ref;
-		},
-		initTriggerButton() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.triggerRef = ref;
-		},
-		setOverlayFocus() {
-			if ( state.lightboxEnabled ) {
-				const { ref } = getElement();
-				// Move focus to the dialog when opening it.
-				ref.focus();
-			}
-		},
-		setButtonStyles() {
-			const { ref } = getElement();
-			const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
-				ref;
-
-			// If the image isn't loaded yet, we can't
-			// calculate where the button should be.
-			if ( naturalWidth === 0 || naturalHeight === 0 ) {
-				return;
-			}
-
-			const figure = ref.parentElement;
-			const figureWidth = ref.parentElement.clientWidth;
-
-			// We need special handling for the height because
-			// a caption will cause the figure to be taller than
-			// the image, which means we need to account for that
-			// when calculating the placement of the button in the
-			// top right corner of the image.
-			let figureHeight = ref.parentElement.clientHeight;
-			const caption = figure.querySelector( 'figcaption' );
-			if ( caption ) {
-				const captionComputedStyle = window.getComputedStyle( caption );
-				if (
-					! [ 'absolute', 'fixed' ].includes(
-						captionComputedStyle.position
-					)
-				) {
-					figureHeight =
-						figureHeight -
-						caption.offsetHeight -
-						parseFloat( captionComputedStyle.marginTop ) -
-						parseFloat( captionComputedStyle.marginBottom );
+		handleScroll() {
+			// This handler is added to prevent scrolling behaviors that trigger content
+			// shift while the lightbox is open.  It would be better to accomplish this
+			// through CSS alone, but using overflow: hidden is currently the only way
+			// to do so, and that causes the layout to shift and prevents the zoom
+			// animation from working in some cases because we're unable to account for
+			// the layout shift when doing the animation calculations. Instead, here we
+			// use JavaScript to prevent and reset the scrolling behavior. In the
+			// future, we may be able to use CSS or overflow: hidden instead to not rely
+			// on JavaScript, but this seems to be the best approach for now that
+			// provides the best visual experience.
+			if ( state.scrollDisabled ) {
+				// We can't override the scroll behavior on mobile devices
+				// because doing so breaks the pinch to zoom functionality, and we
+				// want to allow users to zoom in further on the high-res image.
+				if ( ! isTouching && Date.now() - lastTouchTime > 450 ) {
+					// We are unable to use event.preventDefault() to prevent scrolling
+					// because the scroll event can't be canceled, so we reset the position instead.
+					window.scrollTo(
+						state.scrollLeftReset,
+						state.scrollTopReset
+					);
 				}
-			}
-
-			const buttonOffsetTop = figureHeight - offsetHeight;
-			const buttonOffsetRight = figureWidth - offsetWidth;
-
-			const ctx = getContext();
-
-			// In the case of an image with object-fit: contain, the
-			// size of the <img> element can be larger than the image itself,
-			// so we need to calculate where to place the button.
-			if ( ctx.scaleAttr === 'contain' ) {
-				// Natural ratio of the image.
-				const naturalRatio = naturalWidth / naturalHeight;
-				// Offset ratio of the image.
-				const offsetRatio = offsetWidth / offsetHeight;
-
-				if ( naturalRatio >= offsetRatio ) {
-					// If it reaches the width first, keep
-					// the width and compute the height.
-					const referenceHeight = offsetWidth / naturalRatio;
-					ctx.imageButtonTop =
-						( offsetHeight - referenceHeight ) / 2 +
-						buttonOffsetTop +
-						16;
-					ctx.imageButtonRight = buttonOffsetRight + 16;
-				} else {
-					// If it reaches the height first, keep
-					// the height and compute the width.
-					const referenceWidth = offsetHeight * naturalRatio;
-					ctx.imageButtonTop = buttonOffsetTop + 16;
-					ctx.imageButtonRight =
-						( offsetWidth - referenceWidth ) / 2 +
-						buttonOffsetRight +
-						16;
-				}
-			} else {
-				ctx.imageButtonTop = buttonOffsetTop + 16;
-				ctx.imageButtonRight = buttonOffsetRight + 16;
 			}
 		},
 		setOverlayStyles() {
@@ -443,6 +315,95 @@ const { state, actions, callbacks } = store( 'core/image', {
 					}px;
 				}
 			`;
+		},
+	},
+	callbacks: {
+		initTriggerButton() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.triggerRef = ref;
+		},
+		setOverlayFocus() {
+			if ( state.lightboxEnabled ) {
+				// Moves the focus to the dialog when it opens.
+				const { ref } = getElement();
+				ref.focus();
+			}
+		},
+		setButtonStyles() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.imageRef = ref;
+
+			const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
+				ref;
+
+			// If the image isn't loaded yet, we can't
+			// calculate where the button should be.
+			if ( naturalWidth === 0 || naturalHeight === 0 ) {
+				return;
+			}
+
+			const figure = ref.parentElement;
+			const figureWidth = ref.parentElement.clientWidth;
+
+			// We need special handling for the height because
+			// a caption will cause the figure to be taller than
+			// the image, which means we need to account for that
+			// when calculating the placement of the button in the
+			// top right corner of the image.
+			let figureHeight = ref.parentElement.clientHeight;
+			const caption = figure.querySelector( 'figcaption' );
+			if ( caption ) {
+				const captionComputedStyle = window.getComputedStyle( caption );
+				if (
+					! [ 'absolute', 'fixed' ].includes(
+						captionComputedStyle.position
+					)
+				) {
+					figureHeight =
+						figureHeight -
+						caption.offsetHeight -
+						parseFloat( captionComputedStyle.marginTop ) -
+						parseFloat( captionComputedStyle.marginBottom );
+				}
+			}
+
+			const buttonOffsetTop = figureHeight - offsetHeight;
+			const buttonOffsetRight = figureWidth - offsetWidth;
+
+			// In the case of an image with object-fit: contain, the
+			// size of the <img> element can be larger than the image itself,
+			// so we need to calculate where to place the button.
+			if ( ctx.scaleAttr === 'contain' ) {
+				// Natural ratio of the image.
+				const naturalRatio = naturalWidth / naturalHeight;
+				// Offset ratio of the image.
+				const offsetRatio = offsetWidth / offsetHeight;
+
+				if ( naturalRatio >= offsetRatio ) {
+					// If it reaches the width first, keep
+					// the width and compute the height.
+					const referenceHeight = offsetWidth / naturalRatio;
+					ctx.imageButtonTop =
+						( offsetHeight - referenceHeight ) / 2 +
+						buttonOffsetTop +
+						16;
+					ctx.imageButtonRight = buttonOffsetRight + 16;
+				} else {
+					// If it reaches the height first, keep
+					// the height and compute the width.
+					const referenceWidth = offsetHeight * naturalRatio;
+					ctx.imageButtonTop = buttonOffsetTop + 16;
+					ctx.imageButtonRight =
+						( offsetWidth - referenceWidth ) / 2 +
+						buttonOffsetRight +
+						16;
+				}
+			} else {
+				ctx.imageButtonTop = buttonOffsetTop + 16;
+				ctx.imageButtonRight = buttonOffsetRight + 16;
+			}
 		},
 	},
 } );
