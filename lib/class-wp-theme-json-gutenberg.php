@@ -2809,12 +2809,14 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 
-					// When the incoming theme preset is not allowed to override the defaults, we need to filter the slugs.
+					// Filter out default slugs from theme presets when defaults should not be overridden.
 					if ( 'theme' === $origin && $prevent_override ) {
-						$slugs_node       = static::get_default_slugs( $this->theme_json, $node['path'] );
-						$slugs_merged     = array_merge_recursive( $slugs_global, $slugs_node );
-						$slugs_for_preset = _wp_array_get( $slugs_merged, $preset['path'], array() );
-						$content          = static::filter_slugs( $content, $slugs_for_preset );
+						$slugs_node    = static::get_default_slugs( $this->theme_json, $node['path'] );
+						$preset_global = _wp_array_get( $slugs_global, $preset['path'], array() );
+						$preset_node   = _wp_array_get( $slugs_node, $preset['path'], array() );
+						$preset_slugs  = array_merge_recursive( $preset_global, $preset_node );
+
+						$content = static::filter_slugs( $content, $preset_slugs );
 					}
 
 					_wp_array_set( $this->theme_json, $path, $content );
