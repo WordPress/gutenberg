@@ -491,7 +491,7 @@ function LinkControl( {
 				</HStack>
 			) }
 
-			{ renderControlBottom && renderControlBottom() }
+			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }
