@@ -63,3 +63,23 @@ Additions to styles:
 ### Changes to property values
 
 The default font sizes provided by core (`settings.typography.fontSizes`) have been updated. The Normal and Huge sizes (with `normal` and `huge` slugs) have been removed from the list, and Extra Large (`x-large` slug) has been added. When the UI controls show the default values provided by core, Normal and Huge will no longer be present. However, their CSS classes and CSS Custom Properties are still enqueued to make sure existing content that uses them still works as expected.
+
+## Migrating from v2 to v3
+
+Upgrading to v3 adjusts preset defaults to be more consistent with one another.
+
+### How to migrate from v1 to v2:
+
+1. Update `version` to `3`.
+2. Configure the changed defaults if you'd like.
+
+### Changed defaults
+
+#### `settings.typography.defaultFontSizes`
+
+In theme.json v2, the default font sizes were always merged with the theme ones.
+
+The new `defaultFontSizes` option differs from that behavior.
+
+- When set to `true` it will show the default font sizes and prevent them from being overridden by the theme.
+- When set to `false` it will hide the default font sizes.
