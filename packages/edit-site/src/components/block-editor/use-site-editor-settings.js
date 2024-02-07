@@ -13,7 +13,7 @@ import { usePrevious } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { usePostLinkProps } from './use-post-link-props';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
@@ -91,7 +91,7 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-function useGoBack() {
+function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
 	const previousLocation = usePrevious( location );
 	const history = useHistory();
@@ -115,7 +115,7 @@ function useGoBack() {
 }
 
 export function useSpecificEditorSettings() {
-	const getPostLinkProps = usePostLinkProps();
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
@@ -145,7 +145,8 @@ export function useSpecificEditorSettings() {
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
-	const goBack = useGoBack();
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
@@ -154,8 +155,8 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			getPostLinkProps,
-			goBack,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -164,8 +165,8 @@ export function useSpecificEditorSettings() {
 		settings,
 		canvasMode,
 		defaultRenderingMode,
-		getPostLinkProps,
-		goBack,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );
