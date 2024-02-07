@@ -21,16 +21,6 @@
 		}
 	}
 
-	.edit-site-custom-template-modal__search {
-		&:not(:focus-within) {
-			--wp-components-color-background: #{$white};
-
-			.components-input-control__backdrop {
-				border-color: $gray-300;
-			}
-		}
-	}
-
 	@include break-medium() {
 		width: 456px;
 	}

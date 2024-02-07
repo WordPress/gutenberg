@@ -134,7 +134,6 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			{ showSearchControl && (
 				<SearchControl
 					__nextHasNoMarginBottom
-					className="edit-site-custom-template-modal__search"
 					onChange={ setSearch }
 					value={ search }
 					label={ labels.search_items }
