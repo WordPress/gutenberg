@@ -68,7 +68,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => editTemplate.onClick(),
+							onClick: () => editTemplate(),
 						},
 					],
 				}
@@ -101,7 +101,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				editTemplate.onClick();
+				editTemplate();
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

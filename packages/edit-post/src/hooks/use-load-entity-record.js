@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useCallback, useReducer, useMemo } from '@wordpress/element';
-import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -16,9 +15,9 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
  * @param {string} initialPostType The post type of the post when the editor loaded.
  *
  * @return {Object} An object containing the `currentPost` variable and
- *                 `getPostLinkProps` and `goBack` functions.
+ *                 `onSelectEntityRecord` and `goBack` functions.
  */
-export default function usePostHistory( initialPostId, initialPostType ) {
+export default function useLoadEntityRecord( initialPostId, initialPostType ) {
 	const [ postHistory, dispatch ] = useReducer(
 		( historyState, { type, post } ) => {
 			if ( type === 'push' ) {
@@ -42,27 +41,13 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		};
 	}, [ initialPostType, initialPostId ] );
 
-	const getPostLinkProps = useCallback( ( params ) => {
-		const currentArgs = getQueryArgs( window.location.href );
-		const currentUrlWithoutArgs = removeQueryArgs(
-			window.location.href,
-			...Object.keys( currentArgs )
-		);
-
-		const newUrl = addQueryArgs( currentUrlWithoutArgs, {
-			post: params.postId,
-			action: 'edit',
-		} );
-
-		return {
-			href: newUrl,
-			onClick: ( event ) => {
-				event?.preventDefault();
-				dispatch( {
-					type: 'push',
-					post: { postId: params.postId, postType: params.postType },
-				} );
-			},
+	const onSelectEntityRecord = useCallback( ( params ) => {
+		return ( event ) => {
+			event?.preventDefault();
+			dispatch( {
+				type: 'push',
+				post: { postId: params.postId, postType: params.postType },
+			} );
 		};
 	}, [] );
 
@@ -76,6 +61,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		currentPost,
 		getPostLinkProps,
 		initialPost,
+		onSelectEntityRecord,
 		goBack: postHistory.length > 1 ? goBack : undefined,
 	};
 }

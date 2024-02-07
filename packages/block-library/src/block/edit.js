@@ -212,7 +212,7 @@ export default function ReusableBlockEdit( {
 		innerBlocks,
 		userCanEdit,
 		getBlockEditingMode,
-		getPostLinkProps,
+		onSelectEntityRecord,
 		editingMode,
 	} = useSelect(
 		( select ) => {
@@ -230,19 +230,17 @@ export default function ReusableBlockEdit( {
 				innerBlocks: blocks,
 				userCanEdit: canEdit,
 				getBlockEditingMode: _getBlockEditingMode,
-				getPostLinkProps: getSettings().getPostLinkProps,
+				onSelectEntityRecord: getSettings().onSelectEntityRecord,
 				editingMode: _getBlockEditingMode( patternClientId ),
 			};
 		},
 		[ patternClientId, ref ]
 	);
 
-	const editOriginalProps = getPostLinkProps
-		? getPostLinkProps( {
-				postId: ref,
-				postType: 'wp_block',
-		  } )
-		: {};
+	const editOriginal = onSelectEntityRecord( {
+		postId: ref,
+		postType: 'wp_block',
+	} );
 
 	// Sync the editing mode of the pattern block with the inner blocks.
 	useEffect( () => {
@@ -343,7 +341,7 @@ export default function ReusableBlockEdit( {
 	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
 	const handleEditOriginal = ( event ) => {
-		editOriginalProps.onClick( event );
+		editOriginal( event );
 	};
 
 	const resetContent = () => {
@@ -380,13 +378,10 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
+			{ userCanEdit && editOriginal && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							href={ editOriginalProps.href }
-							onClick={ handleEditOriginal }
-						>
+						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>

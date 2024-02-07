@@ -64,7 +64,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		canCreate,
 		canEdit,
 		currentTemplateId,
-		getPostLinkProps,
+		onSelectEntityRecord,
 		getEditorSettings,
 	} = useSelect(
 		( select ) => {
@@ -94,20 +94,19 @@ function PostTemplateDropdownContent( { onClose } ) {
 					editorSettings.supportsTemplateMode &&
 					!! _currentTemplateId,
 				currentTemplateId: _currentTemplateId,
-				getPostLinkProps: editorSettings.getPostLinkProps,
+				onSelectEntityRecord: editorSettings.onSelectEntityRecord,
 				getEditorSettings: select( editorStore ).getEditorSettings,
 			};
 		},
 		[ allowSwitchingTemplate ]
 	);
 
-	const editTemplate =
-		getPostLinkProps && currentTemplateId
-			? getPostLinkProps( {
-					postId: currentTemplateId,
-					postType: 'wp_template',
-			  } )
-			: {};
+	const selectTemplate = currentTemplateId
+		? onSelectEntityRecord( {
+				postId: currentTemplateId,
+				postType: 'wp_template',
+		  } )
+		: undefined;
 
 	const options = useMemo(
 		() =>
@@ -168,12 +167,12 @@ function PostTemplateDropdownContent( { onClose } ) {
 					}
 				/>
 			) }
-			{ canEdit && (
+			{ canEdit && selectTemplate && (
 				<p>
 					<Button
 						variant="link"
 						onClick={ () => {
-							editTemplate.onClick();
+							selectTemplate();
 							onClose();
 							createSuccessNotice(
 								__(

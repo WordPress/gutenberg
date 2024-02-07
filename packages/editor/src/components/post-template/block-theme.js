@@ -24,18 +24,22 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden, getPostLinkProps, getEditorSettings, hasGoBack } =
-		useSelect( ( select ) => {
-			const { getRenderingMode, getEditorSettings: _getEditorSettings } =
-				unlock( select( editorStore ) );
-			const editorSettings = _getEditorSettings();
-			return {
-				isTemplateHidden: getRenderingMode() === 'post-only',
-				getPostLinkProps: editorSettings.getPostLinkProps,
-				getEditorSettings: _getEditorSettings,
-				hasGoBack: editorSettings.hasOwnProperty( 'goBack' ),
-			};
-		}, [] );
+	const {
+		isTemplateHidden,
+		onSelectEntityRecord,
+		getEditorSettings,
+		hasGoBack,
+	} = useSelect( ( select ) => {
+		const { getRenderingMode, getEditorSettings: _getEditorSettings } =
+			unlock( select( editorStore ) );
+		const editorSettings = _getEditorSettings();
+		return {
+			isTemplateHidden: getRenderingMode() === 'post-only',
+			onSelectEntityRecord: editorSettings.onSelectEntityRecord,
+			getEditorSettings: _getEditorSettings,
+			hasGoBack: editorSettings.hasOwnProperty( 'goBack' ),
+		};
+	}, [] );
 
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
@@ -44,16 +48,16 @@ export default function BlockThemeControl( { id } ) {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
-	const editTemplate = getPostLinkProps
-		? getPostLinkProps( {
-				postId: template.id,
-				postType: 'wp_template',
-		  } )
-		: {};
 
 	if ( ! hasResolved ) {
 		return null;
 	}
+
+	const selectTemplate = onSelectEntityRecord( {
+		postId: template.id,
+		postType: 'wp_template',
+	} );
+
 	// The site editor does not have a `goBack` setting as it uses its own routing
 	// and assigns its own backlink to focusMode pages.
 	const notificationAction = hasGoBack
@@ -80,7 +84,7 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							onClick={ ( event ) => {
-								editTemplate.onClick( event );
+								selectTemplate( event );
 								onClose();
 								createSuccessNotice(
 									__(
@@ -95,6 +99,7 @@ export default function BlockThemeControl( { id } ) {
 						>
 							{ __( 'Edit template' ) }
 						</MenuItem>
+
 						<SwapTemplateButton onClick={ onClose } />
 						<ResetDefaultTemplate onClick={ onClose } />
 						<CreateNewTemplate onClick={ onClose } />

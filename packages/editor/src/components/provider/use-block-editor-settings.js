@@ -51,7 +51,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'getPostLinkProps',
+	'onSelectEntityRecord',
 	'hasInlineToolbar',
 	'imageDefaultSize',
 	'imageDimensions',
