@@ -12,7 +12,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useLoadEntityRecord from './use-load-entity-record';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
@@ -103,7 +103,7 @@ function useGoBack() {
 }
 
 export function useSpecificEditorSettings() {
-	const onSelectEntityRecord = useLoadEntityRecord();
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
@@ -142,7 +142,7 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			onSelectEntityRecord,
+			onNavigateToEntityRecord,
 			goBack,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
@@ -152,7 +152,7 @@ export function useSpecificEditorSettings() {
 		settings,
 		canvasMode,
 		defaultRenderingMode,
-		onSelectEntityRecord,
+		onNavigateToEntityRecord,
 		goBack,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,

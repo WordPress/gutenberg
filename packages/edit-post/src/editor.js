@@ -21,7 +21,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import useLoadEntityRecord from './hooks/use-load-entity-record';
+import useNavigateToEntityRecord from './hooks/use-navigate-to-entity-record';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -32,8 +32,12 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { initialPost, currentPost, onSelectEntityRecord, goBack } =
-		useLoadEntityRecord( initialPostId, initialPostType );
+	const {
+		initialPost,
+		currentPost,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
+	} = useNavigateToEntityRecord( initialPostId, initialPostType );
 
 	const { hasInlineToolbar, post, preferredStyleVariations, template } =
 		useSelect(
@@ -81,8 +85,8 @@ function Editor( {
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
-			onSelectEntityRecord,
-			goBack,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
@@ -95,8 +99,8 @@ function Editor( {
 			hasInlineToolbar,
 			preferredStyleVariations,
 			updatePreferredStyleVariations,
-			onSelectEntityRecord,
-			goBack,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode,
 		]
 	);

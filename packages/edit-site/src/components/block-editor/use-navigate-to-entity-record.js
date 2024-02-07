@@ -11,10 +11,10 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function useLoadEntityRecord() {
+export default function useNavigateToEntityRecord() {
 	const history = useHistory();
 
-	const onSelectEntityRecord = useCallback(
+	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
 			return ( event ) => {
 				event?.preventDefault();
@@ -25,5 +25,5 @@ export default function useLoadEntityRecord() {
 		[ history ]
 	);
 
-	return onSelectEntityRecord;
+	return onNavigateToEntityRecord;
 }

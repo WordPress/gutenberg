@@ -26,7 +26,7 @@ const POPOVER_PROPS = {
 export default function BlockThemeControl( { id } ) {
 	const {
 		isTemplateHidden,
-		onSelectEntityRecord,
+		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
 	} = useSelect( ( select ) => {
@@ -35,9 +35,11 @@ export default function BlockThemeControl( { id } ) {
 		const editorSettings = _getEditorSettings();
 		return {
 			isTemplateHidden: getRenderingMode() === 'post-only',
-			onSelectEntityRecord: editorSettings.onSelectEntityRecord,
+			onNavigateToEntityRecord: editorSettings.onNavigateToEntityRecord,
 			getEditorSettings: _getEditorSettings,
-			hasGoBack: editorSettings.hasOwnProperty( 'goBack' ),
+			hasGoBack: editorSettings.hasOwnProperty(
+				'onNavigateToPreviousEntityRecord'
+			),
 		};
 	}, [] );
 
@@ -53,18 +55,19 @@ export default function BlockThemeControl( { id } ) {
 		return null;
 	}
 
-	const selectTemplate = onSelectEntityRecord( {
+	const selectTemplate = onNavigateToEntityRecord( {
 		postId: template.id,
 		postType: 'wp_template',
 	} );
 
-	// The site editor does not have a `goBack` setting as it uses its own routing
+	// The site editor does not have a `onNavigateToPreviousEntityRecord` setting as it uses its own routing
 	// and assigns its own backlink to focusMode pages.
 	const notificationAction = hasGoBack
 		? [
 				{
 					label: __( 'Go back' ),
-					onClick: () => getEditorSettings().goBack(),
+					onClick: () =>
+						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},
 		  ]
 		: undefined;
