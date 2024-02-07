@@ -150,8 +150,7 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 }
 
 function gutenberg_register_font_collections() {
-	// TODO: update to production font collection URL.
-	wp_register_font_collection( 'google-fonts', 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/01aa57731575bd13f9db8d86ab80a2d74e28a1ac/releases/gutenberg-17.6/collections/google-fonts-with-preview.json' );
+	wp_register_font_collection( 'google-fonts', 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json' );
 }
 add_action( 'init', 'gutenberg_register_font_collections' );
 
@@ -184,7 +183,6 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 * }
 	 */
 	function wp_get_font_dir( $defaults = array() ) {
-		// Multi site path
 		$site_path = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
 			$site_path = '/sites/' . get_current_blog_id();
@@ -258,9 +256,10 @@ if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 		}
 
 		$font_files = get_post_meta( $post_id, '_wp_font_face_file', false );
+		$font_dir   = wp_get_font_dir()['path'];
 
 		foreach ( $font_files as $font_file ) {
-			wp_delete_file( wp_get_font_dir()['path'] . '/' . $font_file );
+			wp_delete_file( $font_dir . '/' . $font_file );
 		}
 	}
 	add_action( 'before_delete_post', '_wp_before_delete_font_face', 10, 2 );

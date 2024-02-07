@@ -139,7 +139,8 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			showEditorPadding: !! editorSettings.goBack,
+			showEditorPadding:
+				!! editorSettings.onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
