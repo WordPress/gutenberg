@@ -219,11 +219,9 @@ test.describe( 'Site Editor Performance', () => {
 
 		test( 'Run the test', async ( { page, admin, perfUtils, editor } ) => {
 			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
-			for ( let i = 1; i <= iterations; i++ ) {
+			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
-				// queries or patterns already loaded.
+				// queries or patterns already cached.
 				await admin.visitSiteEditor( {
 					postId: 'twentytwentyfour//home',
 					postType: 'wp_template',
@@ -280,10 +278,7 @@ test.describe( 'Site Editor Performance', () => {
 
 				const endTime = performance.now();
 
-				// Save the results.
-				if ( i > throwaway ) {
-					results.loadPatterns.push( endTime - startTime );
-				}
+				results.loadPatterns.push( endTime - startTime );
 
 				await page.keyboard.press( 'Escape' );
 			}
