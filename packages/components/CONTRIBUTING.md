@@ -19,6 +19,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [Documentation](#documentation)
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
+- [Component versioning](#component-versioning)
 
 ## Introducing new components
 
@@ -591,3 +592,74 @@ component-family-name/
 ├── types.ts
 └── utils.ts
 ```
+
+## Component versioning
+
+As the needs of the package evolve with time, sometimes we may opt to fully rewrite an existing component — either to introduce substantial changes, support new features, or swap the implementation details.
+
+### Glossary
+
+Here is some terminology that will be used in the upcoming sections:
+
+- "Legacy" component: the version(s) of the component that existsted on `trunk` before the rewrite;
+- API surface: the component's public APIs. It includes the list of components (and sub-components) exported from the package, their props, any associated React context. It does not include internal classnames and internal DOM structure of the components.
+
+### Approaches
+
+We identified two approaches to the task.
+
+#### Swap the implementation, keep the same API surface
+
+One possible approach is to keep the existing API surface and only swap the internal implementation of the component.
+
+This is by far the simplest approach, since it doesn't involve making changes to the API surface.
+
+If the existing API surface is not a good fit for the new implementation, or if it is not possible (or simply not desirable) to preserve backward compatibility with the existing implementation, there is another approach that can be used.
+
+#### Create a new component (or component family)
+
+This second approach involves creating a new, separate version (ie. export) of the component. Having two separate exports will help to keep the package tree-shakeable, and it will make it easier to potentially deprecated and remove the legacy component.
+
+If possible, the legacy version of the component should be rewritten so that it uses the same underlying implementation of the new version, with an extra API "translation" layer to adapt the legacy API surface to the new API surface, e.g:
+
+```
+// legacy-component/index.tsx
+
+function LegacyComponent( props ) {
+	const newProps = useTranslateLegacyPropsToNewProps( props );
+
+	return ( <NewComponentImplementation { ...newProps } /> );
+}
+
+// new-component/index.tsx
+function NewComponent( props ) {
+	return ( <NewComponentImplementation { ...props } /> );
+}
+
+// new-component/implementation.tsx
+function NewComponentImplementation( props ) {
+	// implementation
+}
+
+```
+
+In case that is not possible (eg. too difficult to reconciliate new and legacy implementations, or impossible to preserve backward compatibility), then the legacy implementation can stay as-is.
+
+In any case, extra attention should be payed to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning warning when the above scenario happens — or even better, aliasing to the correct version of the component.
+
+##### Naming
+
+When it comes to naming the newly added component, there are two options.
+
+If there is a good reason for it, pick a new name for the component. For example, some legacy components have names that don't correspond to the corrent name of UI widget that they implement (for example, `TabPanel` should be called `Tabs`, and `Modal` should be called `Dialog`).
+
+Alternatively, version the component name. For example, the new version of `Component` could be called `ComponentV2`. This also applies for namespaced subcomponents (ie. `ComponentV2.SubComponent`).
+
+### Methodology
+
+Regardless of the chosen approach, we recommend adopting the following methodology:
+
+1. First, make sure that the legacy component is well covered by automated tests. Using those tests against the new implementation will serve as a great first layer to make sure that we don't break backward compatibility where necessary, and that we are otherwise aware of any differences in behavior;
+2. Create a new temporary folder, so that all the work can be done without affecting publicly exported APIs; make it explicit in the README, JSDocs and Storybook (by using badges) that the components are WIP and shouldn't be used outside of the components package;
+3. Once the first iteration of the new component(s) is complete, start testing it by exporting it via private APIs, and replacing usages of the legacy component across the Gutenberg repository. This process is great to gather more feedback, spot bugs and missing features;
+4. Once all usages are migrated, you can replace the legacy component with the new implementation, and delete the temporary folder and private exports. Don't forget to write a dev note when necessary.
