@@ -597,7 +597,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	/**
 	 * If column span is set, it should be removed on small grids.
 	 */
-	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && $block['attrs']['style']['layout']['parentColumnWidth'] ) {
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && isset( $block['attrs']['style']['layout']['parentColumnWidth'] ) ) {
 		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
 		$parent_column_width = $block['attrs']['style']['layout']['parentColumnWidth'];
 		$parent_column_value = floatval( $parent_column_width );
