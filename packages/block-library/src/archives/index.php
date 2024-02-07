@@ -14,7 +14,7 @@
  *
  * @return string Returns the post content with archives added.
  */
-function render_block_core_archives( $attributes, $content ) {
+function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
 	$type            = isset( $attributes['type'] ) ? $attributes['type'] : 'monthly';
 	$title           = isset( $attributes['label'] ) ? $attributes['label'] : __( 'Archives' );
