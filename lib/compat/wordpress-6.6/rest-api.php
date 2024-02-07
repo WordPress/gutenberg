@@ -9,8 +9,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
-//var_dump(wp_get_attachment_image_src( 7, 'thumbnail' ));
-//die();
+
 /**
  * Registers additional fields for search result rest api.
  *
