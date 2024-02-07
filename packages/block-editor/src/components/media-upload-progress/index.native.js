@@ -198,6 +198,7 @@ export class MediaUploadProgress extends Component {
 						style={ styles.activityIndicator }
 						size="small"
 						color="#ffffff"
+						testID="spinner"
 					/>
 				) }
 				{ uploadState === MEDIA_UPLOAD_STATE_SUCCEEDED && (
