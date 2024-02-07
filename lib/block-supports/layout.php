@@ -628,7 +628,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		)
 	);
 
-	$outer_class_names[] = $child_css ? $container_content_class : null;
+	if ( $child_css ) {
+		$outer_class_names[] = $container_content_class;
+	}
 
 	// Prep the processor for modifying the block output.
 	$processor = new WP_HTML_Tag_Processor( $block_content );
