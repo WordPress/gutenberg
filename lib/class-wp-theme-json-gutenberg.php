@@ -4006,7 +4006,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return array Styles configuration adhering to the theme.json schema.
+	 * @return array|null Styles configuration adhering to the theme.json schema.
 	 */
 	public static function get_from_block_styles_registry() {
 		$variations_data = array();
@@ -4019,6 +4019,10 @@ class WP_Theme_JSON_Gutenberg {
 					$variations_data[ $block_name ]['variations'][ $variation_name ] = $variation['style_data'];
 				}
 			}
+		}
+
+		if ( empty( $variations_data ) ) {
+			return null;
 		}
 
 		return array(

@@ -373,8 +373,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		if ( $options['with_block_style_variations'] ) {
 			// Absorb block style variations that were registered with a style object.
 			$block_style_variations_data = WP_Theme_JSON_Gutenberg::get_from_block_styles_registry();
-			$with_block_style_variations = new WP_Theme_JSON_Gutenberg( $block_style_variations_data );
-			$with_theme_supports->merge( $with_block_style_variations );
+
+			if ( $block_style_variations_data ) {
+				$with_block_style_variations = new WP_Theme_JSON_Gutenberg( $block_style_variations_data );
+				$with_theme_supports->merge( $with_block_style_variations );
+			}
 
 			// Resolve shared block style variations that were bundled in the
 			// theme via standalone theme.json files.
