@@ -104,9 +104,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a block can be added to the list of blocks which require a wrapping list item. 
-     * This allows extenders to opt in to the rendering behavior of the Navigation block  
-     * which helps to preserve accessible markup.
+	 * Test that a block can be added to the list of blocks which require a wrapping list item.
+	 * This allows extenders to opt in to the rendering behavior of the Navigation block
+	 * which helps to preserve accessible markup.
 	 *
 	 * @group navigation-renderer
 	 *
