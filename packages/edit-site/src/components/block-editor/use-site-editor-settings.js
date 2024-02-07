@@ -106,7 +106,11 @@ function useGoBack() {
 			previousLocation?.params.canvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
 		return showBackButton ? () => history.back() : undefined;
-	}, [ location ] );
+		// Disable reason: previousLocation changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ location, history ] );
 	return goBack;
 }
 
