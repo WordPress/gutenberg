@@ -118,8 +118,8 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 			'testsuite/sample-block',
 			array(
 				'api_version'     => 2,
-				'render_callback' => function ( $attributes, $content ) {
-					return '<div class="wp-block-testsuite-sample-block">' . $content . '</div>';
+				'render_callback' => function ( $attributes ) {
+					return '<div class="wp-block-testsuite-sample-block">' . $attributes['content'] . '</div>';
 				},
 			)
 		);
