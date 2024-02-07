@@ -18,10 +18,6 @@ $input-size: 300px;
 		margin: 0;
 		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
 
-		&:not(:focus) {
-			border-color: transparent;
-		}
-
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: $mobile-text-min-font-size;
 		@include break-small {
