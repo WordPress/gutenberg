@@ -133,7 +133,7 @@ export function useSpecificEditorSettings() {
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
-	const goBack = useGoBack();
+	const onNavigateToPreviousEntityRecord = useGoBack();
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
@@ -143,7 +143,7 @@ export function useSpecificEditorSettings() {
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
 			onNavigateToEntityRecord,
-			goBack,
+			onNavigateToPreviousEntityRecord,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -153,7 +153,7 @@ export function useSpecificEditorSettings() {
 		canvasMode,
 		defaultRenderingMode,
 		onNavigateToEntityRecord,
-		goBack,
+		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );
