@@ -524,22 +524,19 @@
 			margin-block-end: 0;
 		}
 
-		&:hover {
+		&:hover,
+		&[data-active-item],
+		&:focus {
 			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-			color: #fff;
+			color: $white;
 
 			.dataviews-search-widget-filter-combobox-item-check {
-				fill: #fff;
+				fill: $white;
 			}
 
 			.dataviews-search-widget-filter-combobox-item-description {
-				color: #fff;
+				color: $white;
 			}
-		}
-
-		&[data-active-item],
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 		}
 
 		.dataviews-search-widget-filter-combobox-item-check {
