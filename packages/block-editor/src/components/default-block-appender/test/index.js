@@ -53,9 +53,7 @@ describe( 'DefaultBlockAppender', () => {
 		blockEditorSelectors.getBlockCount.mockImplementation( () => 1 );
 		const user = userEvent.setup();
 
-		const { container } = render(
-			<DefaultBlockAppender showPrompt={ false } />
-		);
+		const { container } = render( <DefaultBlockAppender /> );
 
 		const appender = screen.getByRole( 'button', {
 			name: 'Add default block',
