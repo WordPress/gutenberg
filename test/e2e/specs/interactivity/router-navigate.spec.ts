@@ -169,7 +169,7 @@ test.describe( 'Router navigate', () => {
 		resolver!();
 	} );
 
-	test( 'should force a page reload when the `clientNavigation` config is set to false', async ( {
+	test( 'should force a page reload when the `clientNavigationDisabled` config is set to true', async ( {
 		page,
 		interactivityUtils: utils,
 	} ) => {

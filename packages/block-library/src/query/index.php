@@ -138,7 +138,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 
 				if ( isset( $dirty_enhanced_queries[ $block['attrs']['queryId'] ] ) ) {
 					// Disable navigation in the router store config.
-					wp_interactivity_config( 'core/router', array( 'clientNavigation' => false ) );
+					wp_interactivity_config( 'core/router', array( 'clientNavigationDisabled' => true ) );
 					$dirty_enhanced_queries[ $block['attrs']['queryId'] ] = null;
 				}
 

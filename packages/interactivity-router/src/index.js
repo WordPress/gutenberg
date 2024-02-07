@@ -133,8 +133,8 @@ export const { state, actions } = store( 'core/router', {
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href, options = {} ) {
-			const { clientNavigation = true } = getConfig( 'core/router' );
-			if ( ! clientNavigation ) {
+			const { clientNavigationDisabled } = getConfig( 'core/router' );
+			if ( clientNavigationDisabled ) {
 				yield forcePageReload( href );
 			}
 
@@ -225,8 +225,8 @@ export const { state, actions } = store( 'core/router', {
 		 *                                  fetching the requested URL.
 		 */
 		prefetch( url, options = {} ) {
-			const { clientNavigation = true } = getConfig( 'core/router' );
-			if ( ! clientNavigation ) return;
+			const { clientNavigationDisabled } = getConfig( 'core/router' );
+			if ( clientNavigationDisabled ) return;
 
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
