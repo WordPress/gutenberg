@@ -18,50 +18,6 @@ test.describe( 'Links', () => {
 		},
 	} );
 
-	test( `will use Post title as link text if link to existing post is created without any text selected`, async ( {
-		admin,
-		page,
-		editor,
-		requestUtils,
-	} ) => {
-		const titleText = 'Post to create a link to';
-		const { id: postId } = await requestUtils.createPost( {
-			title: titleText,
-			status: 'publish',
-		} );
-
-		await admin.createNewPost();
-
-		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-		} );
-		await page.keyboard.type( 'Here comes a link: ' );
-
-		// Insert a link deliberately not selecting any text.
-		await editor.clickBlockToolbarButton( 'Link' );
-
-		// Trigger the autocomplete suggestion list and select the first suggestion.
-		await page.keyboard.type( 'Post to create a' );
-		await page.getByRole( 'option', { name: titleText } ).click();
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content:
-						'Here comes a link: <a href="http://localhost:8889/?p=' +
-						postId +
-						'" data-type="post" data-id="' +
-						postId +
-						'">' +
-						titleText +
-						'</a>',
-				},
-			},
-		] );
-	} );
-
 	test( `can be created by selecting text and clicking link insertion button in block toolbar`, async ( {
 		page,
 		editor,
@@ -121,10 +77,11 @@ test.describe( 'Links', () => {
 		).toHaveValue( '' );
 	} );
 
-	test( `can be created without any text selected`, async ( {
+	test( `cannot be created without any text selected`, async ( {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		// Create a block with some text.
 		await editor.insertBlock( {
@@ -132,25 +89,24 @@ test.describe( 'Links', () => {
 		} );
 		await page.keyboard.type( 'This is Gutenberg: ' );
 
-		// Press Cmd+K to insert a link.
+		await editor.showBlockToolbar();
+
+		// Check that the Link button is disabled.
+		await page
+			.getByRole( 'toolbar', {
+				name: 'Block tools',
+			} )
+			.getByRole( 'button', {
+				name: 'Link',
+			} )
+			.isDisabled();
+
+		// Try Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Press Enter to apply the link.
-		await pageUtils.pressKeys( 'Enter' );
-
-		// A link with the URL as its text should have been inserted.
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content:
-						'This is Gutenberg: <a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
-				},
-			},
-		] );
+		// Expect the link popover not to be visible because
+		// there is no text selection.
+		await expect( LinkUtils.getLinkPopover() ).toBeHidden();
 	} );
 
 	test( `will automatically create a link if selected text is a valid HTTP based URL`, async ( {
