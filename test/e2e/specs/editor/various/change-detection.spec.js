@@ -61,7 +61,7 @@ test.describe( 'Change detection', () => {
 		] );
 
 		// Autosave draft as same user should do full save, i.e. not dirty.
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( false );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
 	test( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async ( {
@@ -92,7 +92,7 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt to confirm unsaved changes for autosaved published post', async ( {
@@ -128,13 +128,13 @@ test.describe( 'Change detection', () => {
 		);
 		await expect( updateButton ).toBeEnabled();
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should not prompt to confirm unsaved changes for new post', async ( {
 		changeDetectionUtils,
 	} ) => {
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( false );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
 	test( 'Should prompt to confirm unsaved changes for new post with initial edits', async ( {
@@ -147,7 +147,7 @@ test.describe( 'Change detection', () => {
 			excerpt: 'My excerpt',
 		} );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt if property changed without save', async ( {
@@ -158,7 +158,7 @@ test.describe( 'Change detection', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello World' );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt if content added without save', async ( {
@@ -168,7 +168,7 @@ test.describe( 'Change detection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Paragraph' );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should not prompt if changes saved', async ( {
@@ -181,7 +181,7 @@ test.describe( 'Change detection', () => {
 
 		await editor.saveDraft();
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( false );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
 	test( 'Should not prompt if changes saved right after typing', async ( {
@@ -194,7 +194,7 @@ test.describe( 'Change detection', () => {
 
 		await editor.saveDraft();
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( false );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
 	test( 'Should not save if all changes saved', async ( {
@@ -247,11 +247,7 @@ test.describe( 'Change detection', () => {
 		// Need to disable offline to allow reload.
 		await context.setOffline( false );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
-
-		// expect( console ).toHaveErroredWith(
-		// 	'Failed to load resource: net::ERR_INTERNET_DISCONNECTED'
-		// );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt if changes and save is in-flight', async ( {
@@ -271,7 +267,7 @@ test.describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pageUtils.pressKeys( 'primary+s' );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt if changes made while save is in-flight', async ( {
@@ -303,7 +299,7 @@ test.describe( 'Change detection', () => {
 
 		await changeDetectionUtils.releaseSaveIntercept();
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt if property changes made while save is in-flight, and save completes', async ( {
@@ -338,7 +334,7 @@ test.describe( 'Change detection', () => {
 			changeDetectionUtils.releaseSaveIntercept(),
 		] );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'Should prompt if block revision is made while save is in-flight, and save completes', async ( {
@@ -371,7 +367,7 @@ test.describe( 'Change detection', () => {
 			changeDetectionUtils.releaseSaveIntercept(),
 		] );
 
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( true );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
 
 	test( 'should save posts without titles and persist and overwrite the auto draft title', async ( {
@@ -392,7 +388,7 @@ test.describe( 'Change detection', () => {
 		).toHaveText( '' );
 
 		// Verify that the post is not dirty.
-		await expect.poll( changeDetectionUtils.getIsDirty ).toBe( false );
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
 	test( 'should not prompt to confirm unsaved changes when trashing an existing post', async ( {
@@ -509,11 +505,11 @@ class ChangeDetectionUtils {
 	}
 
 	/**
-	 * @return {boolean} Whether the post is dirty.
+	 * @return {Promise<boolean>} Whether the post is dirty.
 	 */
 	getIsDirty = async () => {
 		return await test.step(
-			'assert is dirty',
+			'assert the post is dirty',
 			async () => {
 				const hasDialog = new Promise( ( resolve ) => {
 					this.#page.on( 'dialog', ( dialog ) => {
