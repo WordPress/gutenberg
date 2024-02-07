@@ -118,7 +118,7 @@ class WP_Navigation_Block_Renderer {
 		 * @param array $needs_list_item_wrapper The list of blocks that need a list item wrapper.
 		 * @return array The list of blocks that need a list item wrapper.
 		 */
-		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_needs_list_item_wrapper', static::$needs_list_item_wrapper );
+		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_blocks_requiring_list_item_wrapper', static::$needs_list_item_wrapper );
 
 		return in_array( $block->name, $needs_list_item_wrapper, true );
 	}

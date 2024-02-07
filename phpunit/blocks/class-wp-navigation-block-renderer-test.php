@@ -130,7 +130,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		};
 
 		add_filter(
-			'block_core_navigation_needs_list_item_wrapper',
+			'block_core_navigation_blocks_requiring_list_item_wrapper',
 			$filter_needs_list_item_wrapper_function,
 			10,
 			1
@@ -154,7 +154,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$expected = '<li class="wp-block-navigation-item"><div class="wp-block-testsuite-sample-block">Hello World</div></li>';
 		$this->assertEquals( $expected, $result );
 
-		remove_filter( 'block_core_navigation_needs_list_item_wrapper', $filter_needs_list_item_wrapper_function, 10, 1 );
+		remove_filter( 'block_core_navigation_blocks_requiring_list_item_wrapper', $filter_needs_list_item_wrapper_function, 10, 1 );
 
 		unregister_block_type( 'testsuite/sample-block' );
 	}
