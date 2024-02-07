@@ -124,10 +124,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			selected: __( 'Item selected.' ),
 		},
 		__experimentalRenderItem,
-	} = useDeprecated36pxDefaultSizeProp< ComboboxControlProps >(
-		props,
-		'wp.components.ComboboxControl'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
