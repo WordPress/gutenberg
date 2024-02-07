@@ -113,9 +113,8 @@ function gutenberg_render_variation_support_styles( $pre_render, $block ) {
 		return null;
 	}
 
-	wp_register_style( 'variation-styles', false );
+	wp_register_style( 'variation-styles', false, array( 'global-styles' ) );
 	wp_add_inline_style( 'variation-styles', $variation_styles );
-	wp_enqueue_style( 'variation-styles' );
 }
 
 /**
@@ -162,9 +161,17 @@ function gutenberg_resolve_shared_block_style_variations( $theme_json ) {
 	return $variations_theme_json->update_with( $theme_json_data );
 }
 
+/**
+ * Enqueues styles for block style variations.
+ */
+function gutenberg_enqueue_variation_styles() {
+	wp_enqueue_style( 'variation-styles' );
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register( 'variation', array() );
 
 add_filter( 'pre_render_block', 'gutenberg_render_variation_support_styles', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_variation_support', 10, 2 );
 add_filter( 'wp_theme_json_data_user', 'gutenberg_resolve_shared_block_style_variations', 10, 1 );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_variation_styles', 1 );
