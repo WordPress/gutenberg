@@ -211,7 +211,7 @@ export function LinkUI( props ) {
 
 	// Selecting a block should close the popover and also remove the (previously) automatically inserted
 	// link block so that the newly selected block can be inserted in its place.
-	const onSelectBlock = props.onClose;
+	const { onClose: onSelectBlock } = props;
 
 	return (
 		<>
