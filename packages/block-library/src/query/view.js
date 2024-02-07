@@ -18,54 +18,62 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
-store( 'core/query', {
-	actions: {
-		*navigate( event ) {
-			const ctx = getContext();
-			const { ref } = getElement();
-			const queryRef = ref.closest(
-				'.wp-block-query[data-wp-router-region]'
-			);
-			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
-
-			if ( isValidLink( ref ) && isValidEvent( event ) && ! isDisabled ) {
-				event.preventDefault();
-
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
+store(
+	'core/query',
+	{
+		actions: {
+			*navigate( event ) {
+				const ctx = getContext();
+				const { ref } = getElement();
+				const queryRef = ref.closest(
+					'.wp-block-query[data-wp-router-region]'
 				);
-				yield actions.navigate( ref.href );
-				ctx.url = ref.href;
+				const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 
-				// Focus the first anchor of the Query block.
-				const firstAnchor = `.wp-block-post-template a[href]`;
-				queryRef.querySelector( firstAnchor )?.focus();
-			}
+				if (
+					isValidLink( ref ) &&
+					isValidEvent( event ) &&
+					! isDisabled
+				) {
+					event.preventDefault();
+
+					const { actions } = yield import(
+						'@wordpress/interactivity-router'
+					);
+					yield actions.navigate( ref.href );
+					ctx.url = ref.href;
+
+					// Focus the first anchor of the Query block.
+					const firstAnchor = `.wp-block-post-template a[href]`;
+					queryRef.querySelector( firstAnchor )?.focus();
+				}
+			},
+			*prefetch() {
+				const { ref } = getElement();
+				const queryRef = ref.closest(
+					'.wp-block-query[data-wp-router-region]'
+				);
+				const isDisabled = queryRef?.dataset.wpNavigationDisabled;
+				if ( isValidLink( ref ) && ! isDisabled ) {
+					const { actions } = yield import(
+						'@wordpress/interactivity-router'
+					);
+					yield actions.prefetch( ref.href );
+				}
+			},
 		},
-		*prefetch() {
-			const { ref } = getElement();
-			const queryRef = ref.closest(
-				'.wp-block-query[data-wp-router-region]'
-			);
-			const isDisabled = queryRef?.dataset.wpNavigationDisabled;
-			if ( isValidLink( ref ) && ! isDisabled ) {
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
-				);
-				yield actions.prefetch( ref.href );
-			}
+		callbacks: {
+			*prefetch() {
+				const { url } = getContext();
+				const { ref } = getElement();
+				if ( url && isValidLink( ref ) ) {
+					const { actions } = yield import(
+						'@wordpress/interactivity-router'
+					);
+					yield actions.prefetch( ref.href );
+				}
+			},
 		},
 	},
-	callbacks: {
-		*prefetch() {
-			const { url } = getContext();
-			const { ref } = getElement();
-			if ( url && isValidLink( ref ) ) {
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
-				);
-				yield actions.prefetch( ref.href );
-			}
-		},
-	},
-} );
+	{ lock: true }
+);

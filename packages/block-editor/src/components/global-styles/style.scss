@@ -1,13 +1,13 @@
-.block-editor-global-styles-effects-panel__toggle-icon {
+.block-editor-global-styles__toggle-icon {
 	fill: currentColor;
 }
 
-.block-editor-global-styles-effects-panel__shadow-popover-container {
+.block-editor-global-styles__shadow-popover-container {
 	width: 230px;
 }
 
 .block-editor-global-styles-filters-panel__dropdown,
-.block-editor-global-styles-effects-panel__shadow-dropdown {
+.block-editor-global-styles__shadow-dropdown {
 	display: block;
 	padding: 0;
 
@@ -22,7 +22,7 @@
 }
 
 // wrapper to clip the shadow beyond 6px
-.block-editor-global-styles-effects-panel__shadow-indicator-wrapper {
+.block-editor-global-styles__shadow-indicator-wrapper {
 	padding: $grid-unit-15 * 0.5;
 	display: flex;
 	align-items: center;
@@ -30,7 +30,7 @@
 }
 
 // These styles are similar to the color palette.
-.block-editor-global-styles-effects-panel__shadow-indicator {
+.block-editor-global-styles__shadow-indicator {
 	color: $gray-800;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;

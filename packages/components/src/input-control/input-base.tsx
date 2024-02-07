@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,7 +23,11 @@ import {
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
-import { ContextSystemProvider } from '../context';
+import {
+	ContextSystemProvider,
+	contextConnect,
+	useContextSystem,
+} from '../context';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
@@ -73,13 +77,16 @@ export function InputBase(
 		hideLabelFromVision = false,
 		labelPosition,
 		id: idProp,
+		isBorderless = false,
 		isFocused = false,
 		label,
 		prefix,
 		size = 'default',
 		suffix,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = useDeprecated36pxDefaultSizeProp(
+		useContextSystem( props, 'InputBase' )
+	);
 
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
@@ -134,10 +141,14 @@ export function InputBase(
 						</Suffix>
 					) }
 				</ContextSystemProvider>
-				<Backdrop disabled={ disabled } isFocused={ isFocused } />
+				<Backdrop
+					disabled={ disabled }
+					isBorderless={ isBorderless }
+					isFocused={ isFocused }
+				/>
 			</Container>
 		</Root>
 	);
 }
 
-export default forwardRef( InputBase );
+export default contextConnect( InputBase, 'InputBase' );

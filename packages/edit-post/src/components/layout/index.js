@@ -196,7 +196,7 @@ function Layout( { initialPost } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
-			hasHistory: !! getEditorSettings().goBack,
+			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 
