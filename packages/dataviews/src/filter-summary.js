@@ -115,8 +115,9 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 
 function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
 	const isDisabled =
+		filter.isPrimary &&
 		view.filters.find( ( _filter ) => _filter.field === filter.field )
-			?.value === undefined && filter.isPrimary;
+			?.value === undefined;
 	return (
 		<div className="dataviews-filter-summary__reset">
 			<Button
