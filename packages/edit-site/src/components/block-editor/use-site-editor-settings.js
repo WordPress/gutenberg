@@ -6,6 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -92,13 +93,24 @@ function useArchiveLabel( templateSlug ) {
 
 function useGoBack() {
 	const location = useLocation();
+	const previousLocation = usePrevious( location );
 	const history = useHistory();
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.params.focusMode ||
-			FOCUSABLE_ENTITIES.includes( location.params.postType );
-		return isFocusMode ? () => history.back() : undefined;
-	}, [ location.params.focusMode, location.params.postType, history ] );
+			( location.params.postId &&
+				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
+		const didComeFromEditorCanvas =
+			previousLocation?.params.postId &&
+			previousLocation?.params.postType &&
+			previousLocation?.params.canvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+		// Disable reason: previousLocation changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ location, history ] );
 	return goBack;
 }
 
