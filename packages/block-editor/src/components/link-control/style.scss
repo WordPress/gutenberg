@@ -138,6 +138,7 @@ $block-editor-link-control-number-of-actions: 1;
 	&.components-button.components-menu-item__button {
 		height: auto;
 		text-align: left;
+		max-height: $grid-unit * 11; // resolves to 44px
 	}
 
 	.components-menu-item__item {
