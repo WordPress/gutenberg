@@ -29,9 +29,11 @@ const ICONS_MAP = {
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
 	let imageURL = null;
+	let altText = '';
 
 	if ( suggestion.kind === 'media' ) {
 		imageURL = suggestion.thumbnail ? suggestion.thumbnail : null;
+		altText = suggestion.alt_text;
 	}
 
 	if ( isURL ) {
@@ -54,7 +56,7 @@ function SearchItemIcon( { isURL, suggestion } ) {
 				<img
 					className="block-editor-link-control__search-item-media-thumbnail"
 					src={ imageURL }
-					alt=""
+					alt={ altText }
 				/>
 			</span>
 		);

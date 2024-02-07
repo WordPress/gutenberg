@@ -32,7 +32,27 @@ function _gutenberg_get_search_result_thumbnail_field( $result_object, $field_na
 	return $thumbnail[0] ? $thumbnail[0] : '';
 }
 
-//ALT: $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+/**
+ * Registers additional fields for search result rest api.
+ *
+ * @access private* @internal
+ *
+ * @param  array $result_object      Search result object.
+ * @param  string $field_name        Current additional field's name (unused).
+ * @param  \WP_REST_Request $request Rest request object.
+ * @return string                    Alt text for the result object.
+ */
+function _gutenberg_get_search_result_alt_text_field( $result_object, $field_name, $request ) {
+
+	$object_id = $result_object['id'];
+	if ( empty( $object_id ) ) {
+		return '';
+	}
+
+	$alt_text = get_post_meta($object_id, '_wp_attachment_image_alt', true);
+
+	return $alt_text;
+}
 
 /**
  * Registers additional fields for search result rest api.
@@ -52,6 +72,21 @@ function _gutenberg_register_search_result_additional_fields() {
 		'thumbnail',
 		array(
 			'get_callback'    => '_gutenberg_get_search_result_thumbnail_field',
+			'update_callback' => null,
+			'schema'          => array(
+				'description' => __( 'Object human readable subtype.', 'gutenberg' ),
+				'type'        => 'string',
+				'readonly'    => true,
+				'context'     => array( 'view', 'embed' ),
+			),
+		)
+	);
+
+	register_rest_field(
+		'search-result',
+		'alt_text',
+		array(
+			'get_callback'    => '_gutenberg_get_search_result_alt_text_field',
 			'update_callback' => null,
 			'schema'          => array(
 				'description' => __( 'Object human readable subtype.', 'gutenberg' ),

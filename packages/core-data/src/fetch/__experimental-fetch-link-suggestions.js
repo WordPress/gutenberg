@@ -231,6 +231,7 @@ const fetchLinkSuggestions = async (
 					type: result.subtype || result.type,
 					kind: result?.meta?.kind,
 					thumbnail: result?.thumbnail,
+					alt_text: result?.alt_text,
 				};
 			} );
 	} );
