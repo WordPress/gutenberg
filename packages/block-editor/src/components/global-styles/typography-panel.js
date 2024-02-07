@@ -103,45 +103,31 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
+function getUniqueFontSizesBySlug( settings ) {
+	const fontSizes = settings?.typography?.fontSizes;
+	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
+	const uniqueSizes = [];
+	for ( const currentSize of mergedFontSizes ) {
+		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
+			uniqueSizes.push( currentSize );
+		}
+	}
+	return uniqueSizes;
+}
+
 /**
- * TODO: The reversing and filtering of default font sizes is a hack so the
- * dropdown UI matches what is generated in the global styles CSS stylesheet.
- *
- * This is a temporary solution until #57733 is resolved. At which point,
- * the mergedFontSizes would just need to be the concatenated array of all
- * presets or a custom dropdown with sections for each.
- *
- * @see {@link https://github.com/WordPress/gutenberg/issues/57733}
+ * Concatenate all the font sizes.
  *
  * @param {Object} settings The global styles settings.
  *
  * @return {Array} The merged font sizes.
  */
 function getMergedFontSizes( settings ) {
-	// The font size presets are merged in reverse order so that the duplicates
-	// that may defined later in the array have higher priority to match the CSS.
-	const mergedFontSizesAll = uniqByProperty(
-		[
-			settings?.typography?.fontSizes?.custom,
-			settings?.typography?.fontSizes?.theme,
-			settings?.typography?.fontSizes?.default,
-		].flatMap( ( presets ) => presets?.toReversed() ?? [] ),
-		'slug'
-	).reverse();
-
-	// Default presets exist in the global styles CSS no matter the setting, so
-	// filtering them out in the UI has to be done after merging.
-	const mergedFontSizes =
-		settings?.typography?.defaultFontSizes === false
-			? mergedFontSizesAll.filter(
-					( { slug } ) =>
-						! [ 'small', 'medium', 'large', 'x-large' ].includes(
-							slug
-						)
-			  )
-			: mergedFontSizesAll;
-
-	return mergedFontSizes;
+	return [
+		...( settings?.typography?.fontSizes?.custom ?? [] ),
+		...( settings?.typography?.fontSizes?.theme ?? [] ),
+		...( settings?.typography?.fontSizes?.default ?? [] ),
+	];
 }
 
 function TypographyToolsPanel( {
@@ -217,7 +203,17 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const mergedFontSizes = getMergedFontSizes( settings );
+
+	/*
+	 * For backwards compatibility with presets converting from a hardcoded `false`
+	 * for `prevent_override` to a path to a boolean (`defaultFontSizes`, for example),
+	 * the 'merge' value for the new setting both overrides the preset and tells the
+	 * UI to continue to display a merged set of the default values.
+	 */
+	const mergedFontSizes =
+		settings?.typography?.defaultFontSizes === 'merge'
+			? getUniqueFontSizesBySlug( settings )
+			: getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
