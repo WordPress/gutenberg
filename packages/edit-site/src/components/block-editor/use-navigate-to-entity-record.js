@@ -16,11 +16,7 @@ export default function useNavigateToEntityRecord() {
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			return ( event ) => {
-				event?.preventDefault();
-
-				history.push( { ...params, focusMode: true, canvas: 'edit' } );
-			};
+			history.push( { ...params, focusMode: true, canvas: 'edit' } );
 		},
 		[ history ]
 	);

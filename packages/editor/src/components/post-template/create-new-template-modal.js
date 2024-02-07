@@ -98,11 +98,10 @@ export default function CreateNewTemplateModal( { onClose } ) {
 		} );
 
 		setIsBusy( false );
-		const selectTemplate = onNavigateToEntityRecord( {
+		onNavigateToEntityRecord( {
 			postId: newTemplate.id,
 			postType: 'wp_template',
 		} );
-		selectTemplate();
 		cancel();
 	};
 

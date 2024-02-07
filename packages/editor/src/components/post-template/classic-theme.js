@@ -102,13 +102,6 @@ function PostTemplateDropdownContent( { onClose } ) {
 		[ allowSwitchingTemplate ]
 	);
 
-	const selectTemplate = currentTemplateId
-		? onNavigateToEntityRecord( {
-				postId: currentTemplateId,
-				postType: 'wp_template',
-		  } )
-		: undefined;
-
 	const options = useMemo(
 		() =>
 			Object.entries( {
@@ -168,12 +161,15 @@ function PostTemplateDropdownContent( { onClose } ) {
 					}
 				/>
 			) }
-			{ canEdit && selectTemplate && (
+			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
 						variant="link"
 						onClick={ () => {
-							selectTemplate();
+							onNavigateToEntityRecord( {
+								postId: currentTemplateId,
+								postType: 'wp_template',
+							} );
 							onClose();
 							createSuccessNotice(
 								__(

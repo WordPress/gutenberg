@@ -55,11 +55,6 @@ export default function BlockThemeControl( { id } ) {
 		return null;
 	}
 
-	const selectTemplate = onNavigateToEntityRecord( {
-		postId: template.id,
-		postType: 'wp_template',
-	} );
-
 	// The site editor does not have a `onNavigateToPreviousEntityRecord` setting as it uses its own routing
 	// and assigns its own backlink to focusMode pages.
 	const notificationAction = hasGoBack
@@ -86,8 +81,11 @@ export default function BlockThemeControl( { id } ) {
 				<>
 					<MenuGroup>
 						<MenuItem
-							onClick={ ( event ) => {
-								selectTemplate( event );
+							onClick={ () => {
+								onNavigateToEntityRecord( {
+									postId: template.id,
+									postType: 'wp_template',
+								} );
 								onClose();
 								createSuccessNotice(
 									__(

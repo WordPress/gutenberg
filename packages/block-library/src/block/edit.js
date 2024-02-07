@@ -238,13 +238,6 @@ export default function ReusableBlockEdit( {
 		[ patternClientId, ref ]
 	);
 
-	const editOriginal = onNavigateToEntityRecord
-		? onNavigateToEntityRecord( {
-				postId: ref,
-				postType: 'wp_block',
-		  } )
-		: undefined;
-
 	// Sync the editing mode of the pattern block with the inner blocks.
 	useEffect( () => {
 		setBlockEditMode(
@@ -343,8 +336,11 @@ export default function ReusableBlockEdit( {
 		}, blockEditorStore );
 	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
-	const handleEditOriginal = ( event ) => {
-		editOriginal( event );
+	const handleEditOriginal = () => {
+		onNavigateToEntityRecord( {
+			postId: ref,
+			postType: 'wp_block',
+		} );
 	};
 
 	const resetContent = () => {
@@ -381,7 +377,7 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginal && (
+			{ userCanEdit && onNavigateToEntityRecord && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton onClick={ handleEditOriginal }>
