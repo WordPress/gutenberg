@@ -117,13 +117,16 @@ function block_core_gallery_render( $attributes, $content ) {
 		)
 	);
 
-	// Randomize the order of image blocks. Ideally we should shuffle
-	// the `$parsed_block['innerBlocks']` via the `render_block_data` hook.
-	// However, this hook doesn't apply inner block updates when blocks are
-	// nested.
-	// TODO: In the future, if this hook supports updating innerBlocks in
-	// nested blocks, it should be refactored.
-	// See: https://github.com/WordPress/gutenberg/pull/58733
+	/*
+	 * Randomize the order of image blocks. Ideally we should shuffle
+	 * the `$parsed_block['innerBlocks']` via the `render_block_data` hook.
+	 * However, this hook doesn't apply inner block updates when blocks are
+	 * nested.
+	 * @todo: In the future, if this hook supports updating innerBlocks in
+	 * nested blocks, it should be refactored.
+	 *
+	 * @see: https://github.com/WordPress/gutenberg/pull/58733
+	 */
 	if ( empty( $attributes['randomOrder'] ) ) {
 		return $processed_content;
 	}
