@@ -2767,10 +2767,10 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// Replace the presets.
-			foreach ( static::PRESETS_METADATA as $preset ) {
-				$prevent_override = $preset['prevent_override'];
+			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+				$prevent_override = $preset_metadata['prevent_override'];
 				if ( is_array( $prevent_override ) ) {
-					$prevent_override = _wp_array_get( $this->theme_json['settings'], $preset['prevent_override'] );
+					$prevent_override = _wp_array_get( $this->theme_json['settings'], $preset_metadata['prevent_override'] );
 
 					/*
 					 * For backwards compatibility with presets converting from a hardcoded `false`
@@ -2785,7 +2785,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = $node['path'];
-					foreach ( $preset['path'] as $leaf ) {
+					foreach ( $preset_metadata['path'] as $leaf ) {
 						$base_path[] = $leaf;
 					}
 
@@ -2798,7 +2798,7 @@ class WP_Theme_JSON_Gutenberg {
 					}
 
 					// Set names for theme presets based on the slug if they are not set and can use default names.
-					if ( 'theme' === $origin && $preset['use_default_names'] ) {
+					if ( 'theme' === $origin && $preset_metadata['use_default_names'] ) {
 						foreach ( $content as $key => $item ) {
 							if ( ! isset( $item['name'] ) ) {
 								$name = static::get_name_from_defaults( $item['slug'], $base_path );
@@ -2812,8 +2812,8 @@ class WP_Theme_JSON_Gutenberg {
 					// Filter out default slugs from theme presets when defaults should not be overridden.
 					if ( 'theme' === $origin && $prevent_override ) {
 						$slugs_node    = static::get_default_slugs( $this->theme_json, $node['path'] );
-						$preset_global = _wp_array_get( $slugs_global, $preset['path'], array() );
-						$preset_node   = _wp_array_get( $slugs_node, $preset['path'], array() );
+						$preset_global = _wp_array_get( $slugs_global, $preset_metadata['path'], array() );
+						$preset_node   = _wp_array_get( $slugs_node, $preset_metadata['path'], array() );
 						$preset_slugs  = array_merge_recursive( $preset_global, $preset_node );
 
 						$content = static::filter_slugs( $content, $preset_slugs );
