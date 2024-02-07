@@ -101,6 +101,8 @@ function useGoBack() {
 			( location.params.postId &&
 				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
 		const didComeFromEditorCanvas =
+			previousLocation?.params.postId &&
+			previousLocation?.params.postType &&
 			previousLocation?.params.canvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
 		return showBackButton ? () => history.back() : undefined;
