@@ -302,5 +302,5 @@ export function store(
 
 // Parse and populate the initial state.
 Object.entries( parseInitialState() ).forEach( ( [ namespace, state ] ) => {
-	store( namespace, { state } );
+	store( namespace, { state }, { lock: universalUnlock } );
 } );
