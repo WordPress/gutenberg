@@ -125,7 +125,7 @@ if ( ! class_exists( 'WP_Font_Library' ) ) {
 			if ( array_key_exists( $slug, $this->collections ) ) {
 				return $this->collections[ $slug ];
 			}
-			return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
+			return null;
 		}
 
 		/**
