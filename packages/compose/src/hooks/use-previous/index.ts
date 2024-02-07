@@ -1,24 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 
 /**
- * Use something's value from the previous render.
- * Based on https://usehooks.com/usePrevious/.
+ * Use the previous value of a prop or state in a component.
+ *
+ * Based on https://usehooks.com/usePrevious/, but uses refs to avoid rendering twice. See
+ * https://www.developerway.com/posts/implementing-advanced-use-previous-hook.
  *
  * @param value The value to track.
  *
- * @return The value from the previous render.
+ * @return What the value was before it was updated.
  */
 export default function usePrevious< T >( value: T ): T | undefined {
-	const ref = useRef< T >();
-
-	// Store current value in ref.
-	useEffect( () => {
-		ref.current = value;
-	}, [ value ] ); // Re-run when value changes.
-
-	// Return previous value (happens before update in useEffect above).
-	return ref.current;
+	const valueRef = useRef< T >( value );
+	const previousRef = useRef< T | undefined >();
+	if ( value !== valueRef.current ) {
+		previousRef.current = valueRef.current;
+		valueRef.current = value;
+	}
+	return previousRef.current;
 }

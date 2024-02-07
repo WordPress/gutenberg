@@ -106,7 +106,7 @@ function useGoBack() {
 			previousLocation?.params.canvas === 'edit';
 		const showBackButton = isFocusMode && didComeFromEditorCanvas;
 		return showBackButton ? () => history.back() : undefined;
-	}, [ location ] );
+	}, [ location, previousLocation, history ] );
 	return goBack;
 }
 
