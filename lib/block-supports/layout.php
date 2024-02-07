@@ -595,7 +595,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	);
 
 	/**
-	 * If column span is set, it should be removed on small grids.
+	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+	 * the columnSpan should be removed on small grids.
 	 */
 	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && isset( $block['attrs']['style']['layout']['parentColumnWidth'] ) ) {
 		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
@@ -608,7 +609,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$container_query_value = $container_query_value . $parent_column_unit;
 
 		$child_layout_styles[] = array(
-			'query'        => "@container (max-width: $container_query_value )",
+			'at_rule'      => "@container (max-width: $container_query_value )",
 			'selector'     => ".$container_content_class",
 			'declarations' => array(
 				'grid-column' => 'auto',
