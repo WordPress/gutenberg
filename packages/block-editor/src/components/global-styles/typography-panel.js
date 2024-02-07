@@ -123,10 +123,22 @@ function getUniqueFontSizesBySlug( settings ) {
  * @return {Array} The merged font sizes.
  */
 function getMergedFontSizes( settings ) {
+	/*
+	 * For backwards compatibility with presets converting from a hardcoded `false`
+	 * for `prevent_override` to a path to a boolean (`defaultFontSizes`, for example),
+	 * the 'merge' value for the new setting both overrides the preset and tells the
+	 * UI to continue to display a merged set of the default values.
+	 */
+	if ( settings?.typography?.defaultFontSizes === 'merge' ) {
+		return getUniqueFontSizesBySlug( settings );
+	}
+
+	const fontSizes = settings?.typography?.fontSizes;
+	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
 	return [
-		...( settings?.typography?.fontSizes?.custom ?? [] ),
-		...( settings?.typography?.fontSizes?.theme ?? [] ),
-		...( settings?.typography?.fontSizes?.default ?? [] ),
+		...( fontSizes?.custom ?? [] ),
+		...( fontSizes?.theme ?? [] ),
+		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
 	];
 }
 
@@ -203,17 +215,7 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-
-	/*
-	 * For backwards compatibility with presets converting from a hardcoded `false`
-	 * for `prevent_override` to a path to a boolean (`defaultFontSizes`, for example),
-	 * the 'merge' value for the new setting both overrides the preset and tells the
-	 * UI to continue to display a merged set of the default values.
-	 */
-	const mergedFontSizes =
-		settings?.typography?.defaultFontSizes === 'merge'
-			? getUniqueFontSizesBySlug( settings )
-			: getMergedFontSizes( settings );
+	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
