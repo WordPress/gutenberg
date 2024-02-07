@@ -135,9 +135,10 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-item {
 
-	&.components-button.components-menu-item__button {
+	&.components-button.components-menu-item__button.has-icon {
 		height: auto;
 		text-align: left;
+		padding-right: $grid-unit-15;
 	}
 
 	.components-menu-item__item {
