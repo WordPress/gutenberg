@@ -225,6 +225,9 @@ export const { state, actions } = store( 'core/router', {
 		 *                                  fetching the requested URL.
 		 */
 		prefetch( url, options = {} ) {
+			const { clientNavigation = true } = getConfig( 'core/router' );
+			if ( ! clientNavigation ) return;
+
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
 				pages.set( pagePath, fetchPage( pagePath, options ) );
