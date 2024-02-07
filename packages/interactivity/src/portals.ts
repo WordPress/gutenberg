@@ -10,7 +10,7 @@ import type {
 	ContextProviderProps,
 	PortalInterface,
 	PortalProps,
-} from '../types';
+} from './types';
 
 /**
  * `ContextProvider` is a function component that provides context to its child components.

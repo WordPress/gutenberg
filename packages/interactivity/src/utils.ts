@@ -21,7 +21,7 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
-import type { Scope, EffectFunction } from '../types';
+import type { Scope, EffectFunction } from './types';
 
 const afterNextFrame = ( callback: () => void ): Promise< void > => {
 	return new Promise( ( resolve ) => {

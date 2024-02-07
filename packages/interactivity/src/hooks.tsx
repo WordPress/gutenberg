@@ -23,7 +23,7 @@ import type {
 	GetEvaluate,
 	GetPriorityLevels,
 	Scope,
-} from '../types';
+} from './types';
 
 // Main context.
 const context = createContext< any >( {} );

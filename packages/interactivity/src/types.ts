@@ -7,7 +7,6 @@ import type {
 	RefObject,
 	h as createElement,
 	ContainerNode,
-	ComponentChild,
 	ComponentChildren,
 } from 'preact';
 
@@ -17,7 +16,7 @@ interface DirectiveEntry {
 	suffix: string;
 }
 
-interface Scope {
+export interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
@@ -54,11 +53,11 @@ interface DirectiveArgs {
 	evaluate: Evaluate;
 }
 
-interface DirectiveCallback {
+export interface DirectiveCallback {
 	( args: DirectiveArgs ): VNode | void;
 }
 
-interface DirectiveOptions {
+export interface DirectiveOptions {
 	/**
 	 * Value that specifies the priority to evaluate directives of this type.
 	 * Lower numbers correspond with earlier execution.
@@ -68,7 +67,7 @@ interface DirectiveOptions {
 	priority?: number;
 }
 
-interface DirectivesProps {
+export interface DirectivesProps {
 	directives: DirectiveEntries;
 	priorityLevels: PriorityLevel[];
 	element: VNode;
@@ -76,22 +75,22 @@ interface DirectivesProps {
 	previousScope?: Scope;
 }
 
-interface GetEvaluate {
+export interface GetEvaluate {
 	( args: { scope: Scope } ): Evaluate;
 }
 
 type PriorityLevel = string[];
 
-interface GetPriorityLevels {
+export interface GetPriorityLevels {
 	( directives: DirectiveEntries ): PriorityLevel[];
 }
 
-type EffectFunction = {
+export type EffectFunction = {
 	c: () => void;
 	x: () => void;
 };
 
-interface StoreOptions {
+export interface StoreOptions {
 	/**
 	 * Property to block/unblock private store namespaces.
 	 *
@@ -119,16 +118,16 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
-interface PortalInterface extends VNode {
+export interface PortalInterface extends VNode {
 	containerInfo?: ContainerNode;
 }
 
-interface PortalProps {
+export interface PortalProps {
 	_container: ContainerNode;
 	_vnode: VNode;
 }
 
-interface ContextProviderProps {
+export interface ContextProviderProps {
 	context: any;
 	children?: ComponentChildren;
 }
