@@ -2768,8 +2768,8 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Replace the presets.
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = false;
-				if ( is_array( $preset['prevent_override'] ) ) {
+				$prevent_override = $preset['prevent_override'];
+				if ( is_array( $prevent_override ) ) {
 					$prevent_override = _wp_array_get( $this->theme_json['settings'], $preset['prevent_override'] );
 					/*
 					 * For backwards compatibility with presets converting from a hardcoded `false`
@@ -2778,9 +2778,7 @@ class WP_Theme_JSON_Gutenberg {
 					 * UI to continue to display a merged set of the default values.
 					 */
 					if ( 'merge' === $prevent_override ) {
-						$override_preset = true;
-					} elseif ( is_bool( $prevent_override ) ) {
-						$override_preset = ! $prevent_override;
+						$prevent_override = false;
 					}
 				}
 
@@ -2809,19 +2807,14 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 
-					if (
-						( 'theme' !== $origin ) ||
-						( 'theme' === $origin && $override_preset )
-					) {
-						_wp_array_set( $this->theme_json, $path, $content );
-					} else {
-						$slugs_node = static::get_default_slugs( $this->theme_json, $node['path'] );
-						$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
-
-						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
+					if ( 'theme' === $origin && $prevent_override ) {
+						$slugs_node       = static::get_default_slugs( $this->theme_json, $node['path'] );
+						$slugs_merged     = array_merge_recursive( $slugs_global, $slugs_node );
+						$slugs_for_preset = _wp_array_get( $slugs_merged, $preset['path'], array() );
 						$content          = static::filter_slugs( $content, $slugs_for_preset );
-						_wp_array_set( $this->theme_json, $path, $content );
 					}
+
+					_wp_array_set( $this->theme_json, $path, $content );
 				}
 			}
 		}
