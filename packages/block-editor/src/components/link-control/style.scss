@@ -40,7 +40,7 @@ $block-editor-link-control-number-of-actions: 1;
 // Provides positioning context for reset button. Without this then when an
 // error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
-	margin-bottom: $grid-unit-10;
+	margin-bottom: $grid-unit-05;
 	position: relative;
 }
 
