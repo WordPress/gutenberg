@@ -2230,7 +2230,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 2 ]
+			"enum": [ 3 ]
 		},
 		"title": {
 			"type": "string",
