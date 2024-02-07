@@ -18,9 +18,9 @@ import { AUTHORS_QUERY } from './constants';
 function PostAuthorCombobox() {
 	const [ fieldValue, setFieldValue ] = useState();
 
-	const { authorId, isLoading, authors, postAuthor } = useSelect(
+	const { authorId, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { getUser, getUsers, isResolving } = select( coreStore );
+			const { getUser, getUsers } = select( coreStore );
 			const { getEditedPostAttribute } = select( editorStore );
 			const author = getUser( getEditedPostAttribute( 'author' ), {
 				context: 'view',
@@ -35,7 +35,6 @@ function PostAuthorCombobox() {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
 				authors: getUsers( query ),
-				isLoading: isResolving( 'core', 'getUsers', [ query ] ),
 			};
 		},
 		[ fieldValue ]
@@ -89,10 +88,6 @@ function PostAuthorCombobox() {
 		setFieldValue( inputValue );
 	};
 
-	if ( ! postAuthor ) {
-		return null;
-	}
-
 	return (
 		<ComboboxControl
 			__nextHasNoMarginBottom
@@ -102,7 +97,6 @@ function PostAuthorCombobox() {
 			value={ authorId }
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleSelect }
-			isLoading={ isLoading }
 			allowReset={ false }
 		/>
 	);
