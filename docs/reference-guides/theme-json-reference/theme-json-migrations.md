@@ -82,4 +82,4 @@ In theme.json v2, the default font sizes were always merged with the theme ones.
 The new `defaultFontSizes` option differs from that behavior.
 
 - When set to `true` it will show the default font sizes and prevent them from being overridden by the theme.
-- When set to `false` it will hide the default font sizes.
+- When set to `false` it will hide the default font sizes and allow the theme to use the default slugs.
