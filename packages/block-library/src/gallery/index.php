@@ -117,6 +117,8 @@ function block_core_gallery_render( $attributes, $content ) {
 		)
 	);
 
+	$updated_content = $processed_content->get_updated_html();
+
 	/*
 	 * Randomize the order of image blocks. Ideally we should shuffle
 	 * the `$parsed_block['innerBlocks']` via the `render_block_data` hook.
@@ -128,25 +130,16 @@ function block_core_gallery_render( $attributes, $content ) {
 	 * @see: https://github.com/WordPress/gutenberg/pull/58733
 	 */
 	if ( empty( $attributes['randomOrder'] ) ) {
-		return $processed_content;
+		return $updated_content;
 	}
 
-	$processor = new WP_HTML_Tag_Processor( (string) $processed_content );
-
-	// Add an index to each figure tag to uniquely identify each Image block.
-	$i = 0;
-	while ( $processor->next_tag( array( 'class_name' => 'wp-block-image' ) ) ) {
-		$processor->set_attribute( 'data-image-index', $i );
-		++$i;
-	}
-	$content = $processor->get_updated_html();
-
-	$pattern = '/<figure[^>]*\bdata-image-index\b[^>]*>.*?<\/figure>/';
+	// Matches figure elements with class `wp-block-image`
+	$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/';
 
 	// Find all Image blocks.
-	preg_match_all( $pattern, $content, $matches );
+	preg_match_all( $pattern, $updated_content, $matches );
 	if ( ! $matches ) {
-		return $content;
+		return $updated_content;
 	}
 	$image_blocks = $matches[0];
 
@@ -160,15 +153,8 @@ function block_core_gallery_render( $attributes, $content ) {
 			++$i;
 			return $new_image_block;
 		},
-		$content
+		$updated_content
 	);
-
-	// Remove the index from each Image block.
-	$processor = new WP_HTML_Tag_Processor( $content );
-	while ( $processor->next_tag( array( 'class_name' => 'wp-block-image' ) ) ) {
-		$processor->remove_attribute( 'data-image-index' );
-	}
-	$content = $processor->get_updated_html();
 
 	return $content;
 }
