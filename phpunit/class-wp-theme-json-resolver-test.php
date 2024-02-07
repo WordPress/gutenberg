@@ -1095,8 +1095,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 										'palette' => array(
 											'theme' => array(
 												array(
-													'slug'  => 'dark',
-													'name'  => 'Dark',
+													'slug' => 'dark',
+													'name' => 'Dark',
 													'color' => '#010101',
 												),
 											),
@@ -1116,8 +1116,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 										'palette' => array(
 											'theme' => array(
 												array(
-													'slug'  => 'dark',
-													'name'  => 'Dark',
+													'slug' => 'dark',
+													'name' => 'Dark',
 													'color' => '#010101',
 												),
 											),
