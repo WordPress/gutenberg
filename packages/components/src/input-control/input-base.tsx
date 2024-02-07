@@ -85,9 +85,7 @@ export function InputBase(
 		suffix,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp(
-		useContextSystem( props, 'InputBase' ),
-		'wp.components.InputBase',
-		'6.4'
+		useContextSystem( props, 'InputBase' )
 	);
 
 	const id = useUniqueId( idProp );

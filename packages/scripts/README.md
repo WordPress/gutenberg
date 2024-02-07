@@ -108,9 +108,9 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
 
-Experimental support for the block.json `viewModule` field is available via the
+Experimental support for the block.json `viewScriptModule` field is available via the
 `--experimental-modules` option. With this option enabled, script and module fields will all be
-compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
+compiled. The `viewScriptModule` field is analogous to the `viewScript` field, but will compile a module
 and should be registered in WordPress using the Modules API.
 
 #### Advanced information
@@ -396,9 +396,9 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
 
-Experimental support for the block.json `viewModule` field is available via the
+Experimental support for the block.json `viewScriptModule` field is available via the
 `--experimental-modules` option. With this option enabled, script and module fields will all be
-compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
+compiled. The `viewScriptModule` field is analogous to the `viewScript` field, but will compile a module
 and should be registered in WordPress using the Modules API.
 
 #### Advanced information

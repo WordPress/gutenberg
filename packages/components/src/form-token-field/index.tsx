@@ -74,10 +74,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
 		tokenizeOnBlur = false,
-	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
-		props,
-		'wp.components.FormTokenField'
-	);
+	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
 
 	const instanceId = useInstanceId( FormTokenField );
 

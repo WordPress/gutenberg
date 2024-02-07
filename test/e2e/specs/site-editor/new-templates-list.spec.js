@@ -60,11 +60,9 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 6 );
 
 		// Filter by author.
-		await page
-			.getByRole( 'button', { name: 'Filters', exact: true } )
-			.click();
-		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page.getByRole( 'menuitemradio', { name: 'admin' } ).click();
+		await page.getByRole( 'button', { name: 'Add filter' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Author' } ).click();
+		await page.getByRole( 'option', { name: 'admin' } ).click();
 		await page.keyboard.press( 'Escape' ); // close the menu.
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Date Archives' );
@@ -75,11 +73,9 @@ test.describe( 'Templates', () => {
 			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'archives' );
 		await expect( titles ).toHaveCount( 3 );
-		await page
-			.getByRole( 'button', { name: 'Filters', exact: true } )
-			.click();
-		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page.getByRole( 'menuitemradio', { name: 'Emptytheme' } ).click();
+		await page.getByRole( 'button', { name: 'Add filter' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Author' } ).click();
+		await page.getByRole( 'option', { name: 'Emptytheme' } ).click();
 		await page.keyboard.press( 'Escape' ); // close the menu.
 		await expect( titles ).toHaveCount( 2 );
 	} );
