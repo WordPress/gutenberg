@@ -250,9 +250,7 @@ test.describe( 'Site Editor Performance', () => {
 					'Blogging home template',
 					'Business home template',
 					'Portfolio home template with post featured images',
-					'Writer Home Template',
 					'Blogging index template',
-					'Writer Index Template',
 				];
 
 				await Promise.all(
