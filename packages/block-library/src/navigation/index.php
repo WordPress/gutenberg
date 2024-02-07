@@ -108,7 +108,7 @@ class WP_Navigation_Block_Renderer {
 		/**
 		 * Filter the list of blocks that need a list item wrapper.
 		 *
-		 * Affords ability to customize which blocks need a list item wrapper when rendered 
+		 * Affords the ability to customize which blocks need a list item wrapper when rendered
 		 * within a core/navigation block.
 		 * This is useful for blocks that are not list items but should be wrapped in a list
 		 * item when used as a child of a navigation block.
