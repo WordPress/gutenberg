@@ -32,6 +32,8 @@ function _gutenberg_get_search_result_thumbnail_field( $result_object, $field_na
 	return $thumbnail[0] ? $thumbnail[0] : '';
 }
 
+//ALT: $alt_text = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+
 /**
  * Registers additional fields for search result rest api.
  *

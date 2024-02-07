@@ -31,7 +31,7 @@ function SearchItemIcon( { isURL, suggestion } ) {
 	let imageURL = null;
 
 	if ( suggestion.kind === 'media' ) {
-		imageURL = suggestion.thumbnail;
+		imageURL = suggestion.thumbnail ? suggestion.thumbnail : null;
 	}
 
 	if ( isURL ) {
