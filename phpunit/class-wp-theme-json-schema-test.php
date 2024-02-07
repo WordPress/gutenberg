@@ -120,11 +120,185 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 					'width'  => false,
 				),
 				'typography' => array(
+					'defaultFontSizes' => 'merge',
+					'fontStyle'        => false,
+					'fontWeight'       => false,
+					'letterSpacing'    => false,
+					'textDecoration'   => false,
+					'textTransform'    => false,
+				),
+				'blocks'     => array(
+					'core/group' => array(
+						'border'     => array(
+							'color'  => true,
+							'radius' => true,
+							'style'  => true,
+							'width'  => true,
+						),
+						'typography' => array(
+							'fontStyle'      => true,
+							'fontWeight'     => true,
+							'letterSpacing'  => true,
+							'textDecoration' => true,
+							'textTransform'  => true,
+						),
+					),
+				),
+			),
+			'styles'   => array(
+				'color'    => array(
+					'background' => 'purple',
+				),
+				'blocks'   => array(
+					'core/group' => array(
+						'color'    => array(
+							'background' => 'red',
+						),
+						'spacing'  => array(
+							'padding' => array(
+								'top' => '10px',
+							),
+						),
+						'elements' => array(
+							'link' => array(
+								'color' => array(
+									'text' => 'yellow',
+								),
+							),
+						),
+					),
+				),
+				'elements' => array(
+					'link' => array(
+						'color' => array(
+							'text' => 'red',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_migrate_v2_to_latest() {
+		$theme_json_v2 = array(
+			'version'  => 2,
+			'settings' => array(
+				'color'      => array(
+					'palette' => array(
+						array(
+							'name'  => 'Pale Pink',
+							'slug'  => 'pale-pink',
+							'color' => '#f78da7',
+						),
+						array(
+							'name'  => 'Vivid Red',
+							'slug'  => 'vivid-red',
+							'color' => '#cf2e2e',
+						),
+					),
+					'custom'  => false,
+					'link'    => true,
+				),
+				'border'     => array(
+					'color'  => false,
+					'radius' => false,
+					'style'  => false,
+					'width'  => false,
+				),
+				'typography' => array(
 					'fontStyle'      => false,
 					'fontWeight'     => false,
 					'letterSpacing'  => false,
 					'textDecoration' => false,
 					'textTransform'  => false,
+				),
+				'blocks'     => array(
+					'core/group' => array(
+						'border'     => array(
+							'color'  => true,
+							'radius' => true,
+							'style'  => true,
+							'width'  => true,
+						),
+						'typography' => array(
+							'fontStyle'      => true,
+							'fontWeight'     => true,
+							'letterSpacing'  => true,
+							'textDecoration' => true,
+							'textTransform'  => true,
+						),
+					),
+				),
+			),
+			'styles'   => array(
+				'color'    => array(
+					'background' => 'purple',
+				),
+				'blocks'   => array(
+					'core/group' => array(
+						'color'    => array(
+							'background' => 'red',
+						),
+						'spacing'  => array(
+							'padding' => array(
+								'top' => '10px',
+							),
+						),
+						'elements' => array(
+							'link' => array(
+								'color' => array(
+									'text' => 'yellow',
+								),
+							),
+						),
+					),
+				),
+				'elements' => array(
+					'link' => array(
+						'color' => array(
+							'text' => 'red',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json_v2 );
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'      => array(
+					'palette' => array(
+						array(
+							'name'  => 'Pale Pink',
+							'slug'  => 'pale-pink',
+							'color' => '#f78da7',
+						),
+						array(
+							'name'  => 'Vivid Red',
+							'slug'  => 'vivid-red',
+							'color' => '#cf2e2e',
+						),
+					),
+					'custom'  => false,
+					'link'    => true,
+				),
+				'border'     => array(
+					'color'  => false,
+					'radius' => false,
+					'style'  => false,
+					'width'  => false,
+				),
+				'typography' => array(
+					'defaultFontSizes' => 'merge',
+					'fontStyle'        => false,
+					'fontWeight'       => false,
+					'letterSpacing'    => false,
+					'textDecoration'   => false,
+					'textTransform'    => false,
 				),
 				'blocks'     => array(
 					'core/group' => array(
