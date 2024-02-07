@@ -250,7 +250,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 
 				// Alignment controls exist.
@@ -312,7 +312,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 
 				// Format controls exist.
@@ -376,7 +376,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 
 				// Alignment controls are visible.
@@ -734,11 +734,11 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the value of the custom field when exists', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
+						anchor: 'paragraph-binding',
 						content: 'paragraph default content',
 						metadata: {
 							bindings: {
@@ -763,7 +763,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				await BlockBindingsUtils.setId( 'paragraph-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect(
@@ -777,11 +776,11 @@ test.describe( 'Block bindings', () => {
 			test( "Should show the value of the key when custom field doesn't exists", async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
+						anchor: 'paragraph-binding',
 						content: 'p',
 						metadata: {
 							bindings: {
@@ -806,7 +805,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend doesn't show the content.
-				await BlockBindingsUtils.setId( 'paragraph-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect(
@@ -818,11 +816,11 @@ test.describe( 'Block bindings', () => {
 		test( 'Heading - should show the value of the custom field', async ( {
 			editor,
 			page,
-			BlockBindingsUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/heading',
 				attributes: {
+					anchor: 'heading-binding',
 					content: 'heading default content',
 					metadata: {
 						bindings: {
@@ -847,7 +845,6 @@ test.describe( 'Block bindings', () => {
 			);
 
 			// Check the frontend shows the value of the custom field.
-			await BlockBindingsUtils.setId( 'heading-binding' );
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 			await expect( page.locator( '#heading-binding' ) ).toBeVisible();
@@ -860,7 +857,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the value of the custom field when text is bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -868,6 +864,7 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
+								anchor: 'button-text-binding',
 								text: 'button default text',
 								url: '#default-url',
 								metadata: {
@@ -887,7 +884,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 				await expect( buttonBlock ).toHaveText(
 					'Value of the text_custom_field'
@@ -900,7 +897,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				await BlockBindingsUtils.setId( 'button-text-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				const buttonDom = page.locator( '#button-text-binding a' );
@@ -917,7 +913,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Should use the value of the custom field when url is bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -925,6 +920,7 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
+								anchor: 'button-url-binding',
 								text: 'button default text',
 								url: '#default-url',
 								metadata: {
@@ -941,7 +937,6 @@ test.describe( 'Block bindings', () => {
 				} );
 
 				// Check the frontend shows the original value of the custom field.
-				await BlockBindingsUtils.setId( 'button-url-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				const buttonDom = page.locator( '#button-url-binding a' );
@@ -956,7 +951,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Should use the values of the custom fields when text and url are bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -964,6 +958,7 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
+								anchor: 'button-multiple-bindings',
 								text: 'button default text',
 								url: '#default-url',
 								metadata: {
@@ -984,7 +979,6 @@ test.describe( 'Block bindings', () => {
 				} );
 
 				// Check the frontend uses the values of the custom fields.
-				await BlockBindingsUtils.setId( 'button-multiple-bindings' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				const buttonDom = page.locator( '#button-multiple-bindings a' );
@@ -1031,6 +1025,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-url-binding',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1055,7 +1050,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend uses the value of the custom field.
-				await BlockBindingsUtils.setId( 'image-url-binding' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-url-binding img' );
@@ -1082,6 +1076,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-alt-binding',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1121,7 +1116,6 @@ test.describe( 'Block bindings', () => {
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
-				await BlockBindingsUtils.setId( 'image-alt-binding' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-alt-binding img' );
@@ -1148,6 +1142,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-title-binding',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1197,7 +1192,6 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
-				await BlockBindingsUtils.setId( 'image-title-binding' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-title-binding img' );
@@ -1224,6 +1218,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-multiple-bindings',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1289,7 +1284,6 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 
 				// Check the frontend uses the values of the custom fields.
-				await BlockBindingsUtils.setId( 'image-multiple-bindings' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-multiple-bindings img' );
@@ -1314,24 +1308,6 @@ test.describe( 'Block bindings', () => {
 class BlockBindingsUtils {
 	constructor( { page } ) {
 		this.page = page;
-	}
-
-	// Helper to add an anchor/id to be able to locate the block in the frontend.
-	async setId( testId ) {
-		const isAdvancedPanelOpen = await this.page
-			.getByRole( 'tabpanel', { name: 'Block' } )
-			.getByRole( 'button', { name: 'Advanced' } )
-			.getAttribute( 'aria-expanded' );
-		if ( isAdvancedPanelOpen === 'false' ) {
-			await this.page
-				.getByRole( 'tabpanel', { name: 'Block' } )
-				.getByRole( 'button', { name: 'Advanced' } )
-				.click();
-		}
-		await this.page
-			.getByRole( 'tabpanel', { name: 'Block' } )
-			.getByLabel( 'HTML anchor' )
-			.fill( testId );
 	}
 
 	// Helper to update the post.
