@@ -6,6 +6,7 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalInputControl as InputControl,
 	__experimentalText as Text,
+	__experimentalVStack as VStack,
 	SelectControl,
 	Spinner,
 	Icon,
@@ -22,7 +23,6 @@ import { search, closeSmall } from '@wordpress/icons';
  */
 import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
-import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
 import CollectionFontDetails from './collection-font-details';
@@ -48,6 +48,7 @@ function FontCollection( { slug } ) {
 
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
+	const [ page, setPage ] = useState( 1 );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
@@ -109,22 +110,32 @@ function FontCollection( { slug } ) {
 		[ collectionFonts, filters ]
 	);
 
+	const pageSize = Math.floor( ( window.innerHeight - 417 ) / 61 );
+	const totalPages = Math.ceil( fonts.length / pageSize );
+	const itemsStart = ( page - 1 ) * pageSize;
+	const itemsLimit = page * pageSize;
+	const items = fonts.slice( itemsStart, itemsLimit );
+
 	const handleCategoryFilter = ( category ) => {
 		setFilters( { ...filters, category } );
+		setPage( 1 );
 	};
 
 	const handleUpdateSearchInput = ( value ) => {
 		setFilters( { ...filters, search: value } );
+		setPage( 1 );
 	};
 
 	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
 
 	const resetFilters = () => {
 		setFilters( {} );
+		setPage( 1 );
 	};
 
 	const resetSearch = () => {
 		setFilters( { ...filters, search: '' } );
+		setPage( 1 );
 	};
 
 	const handleUnselectFont = () => {
@@ -199,10 +210,18 @@ function FontCollection( { slug } ) {
 			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
-				<Footer
-					handleInstall={ handleInstall }
-					isDisabled={ fontsToInstall.length === 0 }
-				/>
+				selectedFont ? (
+					<InstallFooter
+						handleInstall={ handleInstall }
+						isDisabled={ fontsToInstall.length === 0 }
+					/>
+				) : (
+					<PaginationFooter
+						page={ page }
+						totalPages={ totalPages }
+						setPage={ setPage }
+					/>
+				)
 			}
 		>
 			{ renderConfirmDialog && (
@@ -275,23 +294,64 @@ function FontCollection( { slug } ) {
 			) }
 
 			{ ! renderConfirmDialog && ! selectedFont && (
-				<FontsGrid>
-					{ fonts.map( ( font ) => (
-						<FontCard
-							key={ font.font_family_settings.slug }
-							font={ font.font_family_settings }
-							onClick={ () => {
-								setSelectedFont( font.font_family_settings );
-							} }
-						/>
-					) ) }
-				</FontsGrid>
+				<VStack spacing={ 0 }>
+					<div className="font-library-modal__fonts-grid__main">
+						{ items.map( ( font ) => (
+							<FontCard
+								key={ font.font_family_settings.slug }
+								font={ font.font_family_settings }
+								onClick={ () => {
+									setSelectedFont(
+										font.font_family_settings
+									);
+								} }
+							/>
+						) ) }
+					</div>
+				</VStack>
 			) }
 		</TabPanelLayout>
 	);
 }
 
-function Footer( { handleInstall, isDisabled } ) {
+function PaginationFooter( { page, totalPages, setPage } ) {
+	return (
+		<Flex justify="center">
+			<Button onClick={ () => setPage( 1 ) } disabled={ page === 1 }>
+				&lt;&lt;
+			</Button>
+			<Button
+				onClick={ () => setPage( page - 1 ) }
+				disabled={ page === 1 }
+			>
+				&lt;
+			</Button>
+			<Text>{ `Page ` }</Text>
+			<SelectControl
+				value={ page }
+				options={ [ ...Array( totalPages ) ].map( ( e, i ) => {
+					return { label: i + 1, value: i + 1 };
+				} ) }
+				onChange={ ( newPage ) => setPage( newPage ) }
+			/>
+			<Text>{ ` of ${ totalPages }` }</Text>
+			<Button
+				onClick={ () => setPage( page + 1 ) }
+				disabled={ page === totalPages }
+			>
+				&gt;
+			</Button>
+			<Button
+				onClick={ () => setPage( totalPages ) }
+				disabled={ page === totalPages }
+			>
+				&gt;&gt;
+			</Button>
+		</Flex>
+	);
+}
+
+function InstallFooter( { handleInstall, isDisabled } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
 
 	return (

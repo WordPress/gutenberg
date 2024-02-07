@@ -7,6 +7,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
 	Button,
 	Spinner,
 	FlexItem,
@@ -17,7 +18,6 @@ import {
  */
 import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
-import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
@@ -123,34 +123,35 @@ function InstalledFonts() {
 					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
-							<FontsGrid>
-								{ baseCustomFonts.map( ( font ) => (
-									<LibraryFontCard
-										font={ font }
-										key={ font.slug }
-										onClick={ () => {
-											handleSelectFont( font );
-										} }
-									/>
-								) ) }
-							</FontsGrid>
+							{ baseCustomFonts.map( ( font ) => (
+								<LibraryFontCard
+									font={ font }
+									key={ font.slug }
+									onClick={ () => {
+										handleSelectFont( font );
+									} }
+								/>
+							) ) }
 							<Spacer margin={ 8 } />
 						</>
 					) }
 
 					{ baseThemeFonts.length > 0 && (
 						<>
-							<FontsGrid title={ __( 'Theme Fonts' ) }>
-								{ baseThemeFonts.map( ( font ) => (
-									<LibraryFontCard
-										font={ font }
-										key={ font.slug }
-										onClick={ () => {
-											handleSelectFont( font );
-										} }
-									/>
-								) ) }
-							</FontsGrid>
+							<Text className="font-library-modal__subtitle">
+								{ __( 'Theme Fonts' ) }
+							</Text>
+
+							<Spacer margin={ 2 } />
+							{ baseThemeFonts.map( ( font ) => (
+								<LibraryFontCard
+									font={ font }
+									key={ font.slug }
+									onClick={ () => {
+										handleSelectFont( font );
+									} }
+								/>
+							) ) }
 						</>
 					) }
 				</>
