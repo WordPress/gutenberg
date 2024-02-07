@@ -362,7 +362,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$files = $this->setup_font_file_upload( array( 'woff2' ) );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
@@ -406,7 +406,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$files = $this->setup_font_file_upload( array( 'ttf', 'otf', 'woff', 'woff2' ) );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
@@ -452,7 +452,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
@@ -478,7 +478,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	public function test_create_item_with_url_src() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
@@ -523,7 +523,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		);
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_face_settings', wp_json_encode( $properties ) );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -597,7 +597,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		$this->assertSame( 201, $response->get_status(), 'The response status should be 201.' );
 		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in the response data.' );
-		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
+		$this->assertSame( WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED, $data['theme_json_version'], 'The default theme.json version should match the latest version supported by the controller.' );
 	}
 
 	/**
@@ -639,7 +639,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	public function test_create_item_invalid_settings( $settings ) {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_face_settings', wp_json_encode( $settings ) );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -693,7 +693,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 	public function test_create_item_invalid_settings_json() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param( 'font_face_settings', 'invalid' );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -713,7 +713,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		wp_set_current_user( self::$admin_id );
 		$src     = 'invalid';
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
@@ -738,7 +738,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'theme_json_version', WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
@@ -974,9 +974,9 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$properties = $data['schema']['properties'];
 		$this->assertCount( 4, $properties, 'There should be 4 properties in the schema::properties data.' );
 		$this->assertArrayHasKey( 'id', $properties, 'The id property should exist in the schema::properties data.' );
-		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The id property should exist in the schema::properties data.' );
-		$this->assertArrayHasKey( 'parent', $properties, 'The id property should exist in the schema::properties data.' );
-		$this->assertArrayHasKey( 'font_face_settings', $properties, 'The id property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'theme_json_version', $properties, 'The theme_json_version property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'parent', $properties, 'The parent property should exist in the schema::properties data.' );
+		$this->assertArrayHasKey( 'font_face_settings', $properties, 'The font_face_settings property should exist in the schema::properties data.' );
 	}
 
 	/**
@@ -1013,6 +1013,16 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		}
 	}
 
+
+	/**
+	 * If WP_Theme_JSON::LATEST_SCHEMA is changed, the controller should be updated to handle any differences
+	 * in `fontFace` structure to ensure support for the latest theme.json schema, and backwards compatibility
+	 * for existing wp_font_face posts.
+	 */
+	public function test_controller_supports_latest_theme_json_version() {
+		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED );
+	}
+
 	protected function check_font_face_data( $data, $post_id, $links ) {
 		self::$post_ids_for_cleanup[] = $post_id;
 		$post                         = get_post( $post_id );
@@ -1024,7 +1034,7 @@ class Tests_REST_WpRestFontFacesController extends WP_Test_REST_Controller_Testc
 		$this->assertSame( $post->post_parent, $data['parent'], 'The "parent" from the response data should match the post parent.' );
 
 		$this->assertArrayHasKey( 'theme_json_version', $data, 'The theme_json_version property should exist in response data.' );
-		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'], 'The "theme_json_version" from the response data should match WP_Theme_JSON::LATEST_SCHEMA.' );
+		$this->assertSame( WP_REST_Font_Faces_Controller::LATEST_THEME_JSON_VERSION_SUPPORTED, $data['theme_json_version'], 'The "theme_json_version" from the response data should match the latest version supported by the controller.' );
 
 		$this->assertArrayHasKey( 'font_face_settings', $data, 'The font_face_settings property should exist in response data.' );
 		$this->assertSame( $post->post_content, wp_json_encode( $data['font_face_settings'] ), 'The encoded "font_face_settings" from the response data should match the post content.' );
