@@ -444,9 +444,7 @@ _Returns_
 
 ### usePrevious
 
-Use the previous value of a prop or state in a component.
-
-Based on <https://usehooks.com/usePrevious/>, but uses refs to avoid rendering twice. See <https://www.developerway.com/posts/implementing-advanced-use-previous-hook>.
+Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.
 
 _Parameters_
 
@@ -454,7 +452,7 @@ _Parameters_
 
 _Returns_
 
--   `T | undefined`: What the value was before it was updated.
+-   `T | undefined`: The value from the previous render.
 
 ### useReducedMotion
 
