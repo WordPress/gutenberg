@@ -108,8 +108,8 @@ add_action( 'rest_api_init', '_gutenberg_register_search_result_additional_field
  * @return array
  */
 function _gutenberg_register_media_search_handler( $handlers ) {
-	if ( class_exists( 'WP_REST_Media_Search_Handler_Gutenberg' ) ) {
-		$handlers[] = new WP_REST_Media_Search_Handler_Gutenberg();
+	if ( class_exists( 'WP_REST_Media_Search_Handler_Gutenberg_6_6' ) ) {
+		$handlers[] = new WP_REST_Media_Search_Handler_Gutenberg_6_6();
 	}
 
 	return $handlers;

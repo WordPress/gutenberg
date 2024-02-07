@@ -18,7 +18,7 @@ if ( class_exists( 'WP_REST_Media_Search_Handler' ) ) {
  *
  * @see WP_REST_Search_Handler
  */
-class WP_REST_Media_Search_Handler_Gutenberg extends WP_REST_Post_Search_Handler {
+class WP_REST_Media_Search_Handler_Gutenberg_6_6 extends WP_REST_Post_Search_Handler {
 
 	/**
 	 * Constructor.
