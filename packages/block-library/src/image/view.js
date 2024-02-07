@@ -37,9 +37,6 @@ const { state, actions } = store( 'core/image', {
 		get ariaLabel() {
 			return state.lightboxEnabled ? state.currentAriaLabel : null;
 		},
-		get lightboxObjectFit() {
-			return 'cover';
-		},
 		get enlargedSrc() {
 			return (
 				state.currentImage.uploadedSrc ||
