@@ -5,14 +5,10 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const focusableSelectors = [
 	'a[href]',
-	'area[href]',
 	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
 	'select:not([disabled]):not([aria-hidden])',
 	'textarea:not([disabled]):not([aria-hidden])',
 	'button:not([disabled]):not([aria-hidden])',
-	'iframe',
-	'object',
-	'embed',
 	'[contenteditable]',
 	'[tabindex]:not([tabindex^="-"])',
 ];
@@ -79,60 +75,51 @@ function handleScroll( ctx ) {
 
 const { state, actions, callbacks } = store( 'core/image', {
 	state: {
-		lightboxEnabled: false,
-		hideAnimationEnabled: false,
-		imageCurrentSrc: false,
+		currentImage: {},
 		windowWidth: window.innerWidth,
 		windowHeight: window.innerHeight,
+		get lightboxEnabled() {
+			return !! state.currentImage.currentSrc;
+		},
 		get roleAttribute() {
 			return state.lightboxEnabled ? 'dialog' : null;
 		},
 		get ariaModal() {
 			return state.lightboxEnabled ? 'true' : null;
 		},
-		get dialogLabel() {
-			const ctx = getContext();
-			return state.lightboxEnabled ? state.currentDialogLabel : null;
+		get ariaLabel() {
+			return state.lightboxEnabled ? state.currentAriaLabel : null;
 		},
 		get lightboxObjectFit() {
-			const ctx = getContext();
-			// if ( ctx.initialized ) {
-			// 	return 'cover';
-			// }
+			return 'cover';
 		},
-		get enlargedImgSrc() {
-			const ctx = getContext();
-			return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-			// return ctx.initialized
-			// 	? ctx.imageUploadedSrc
-			// 	: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+		get enlargedSrc() {
+			return (
+				state.currentImage.uploadedSrc ||
+				'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+			);
 		},
 	},
 	actions: {
-		showLightbox( event ) {
+		showLightbox() {
 			const ctx = getContext();
+
 			// We can't initialize the lightbox until the reference
 			// image is loaded, otherwise the UX is broken.
-			if ( ! ctx.imageLoaded ) {
+			if ( ! ctx.imageRef.complete ) {
 				return;
 			}
-			ctx.initialized = true;
-			ctx.lastFocusedElement = window.document.activeElement;
-			ctx.scrollDelta = 0;
-			ctx.pointerType = event.pointerType;
 
-			state.lightboxEnabled = true;
-			state.currentDialogLabel = ctx.dialogLabel;
-			state.imageCurrentSrc = ctx.imageCurrentSrc;
-			setStyles( ctx, ctx.imageRef );
+			ctx.currentSrc = ctx.imageRef.currentSrc;
+			state.currentImage = ctx;
 
-			ctx.scrollTopReset =
-				window.pageYOffset || document.documentElement.scrollTop;
+			callbacks.setOverlayStyles();
+
+			ctx.scrollTopReset = document.documentElement.scrollTop;
 
 			// In most cases, this value will be 0, but this is included
 			// in case a user has created a page with horizontal scrolling.
-			ctx.scrollLeftReset =
-				window.pageXOffset || document.documentElement.scrollLeft;
+			ctx.scrollLeftReset = document.documentElement.scrollLeft;
 
 			// We define and bind the scroll callback here so
 			// that we can pass the context and as an argument.
@@ -193,18 +180,9 @@ const { state, actions, callbacks } = store( 'core/image', {
 				}
 
 				if ( event.key === 'Escape' || event.keyCode === 27 ) {
-					actions.hideLightbox( event );
+					actions.hideLightbox();
 				}
 			}
-		},
-		// This is fired just by lazily loaded
-		// images on the page, not all images.
-		handleLoad() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			ctx.imageLoaded = true;
-			ctx.imageCurrentSrc = ref.currentSrc;
-			callbacks.setButtonStyles();
 		},
 		handleTouchStart() {
 			isTouching = true;
@@ -229,30 +207,28 @@ const { state, actions, callbacks } = store( 'core/image', {
 		},
 	},
 	callbacks: {
-		initOriginImage() {
+		initImage() {
 			const ctx = getContext();
 			const { ref } = getElement();
 			ctx.imageRef = ref;
-			if ( ref.complete ) {
-				ctx.imageLoaded = true;
-				ctx.imageCurrentSrc = ref.currentSrc;
-			}
 		},
 		initTriggerButton() {
 			const ctx = getContext();
 			const { ref } = getElement();
 			ctx.lightboxTriggerRef = ref;
 		},
-		initLightbox() {
+		initOverlay() {
 			const ctx = getContext();
 			const { ref } = getElement();
+			const focusableElements =
+				ref.querySelectorAll( focusableSelectors );
+			ctx.firstFocusableElement = focusableElements[ 0 ];
+			ctx.lastFocusableElement =
+				focusableElements[ focusableElements.length - 1 ];
+		},
+		setOverlayFocus() {
 			if ( state.lightboxEnabled ) {
-				const focusableElements =
-					ref.querySelectorAll( focusableSelectors );
-				ctx.firstFocusableElement = focusableElements[ 0 ];
-				ctx.lastFocusableElement =
-					focusableElements[ focusableElements.length - 1 ];
-
+				const { ref } = getElement();
 				// Move focus to the dialog when opening it.
 				ref.focus();
 			}
@@ -332,14 +308,186 @@ const { state, actions, callbacks } = store( 'core/image', {
 			}
 		},
 		setStylesOnResize() {
-			const ctx = getContext();
-			const { ref } = getElement();
 			if (
 				state.lightboxEnabled &&
 				( state.windowWidth || state.windowHeight )
 			) {
-				setStyles( ctx, ref );
+				callbacks.setOverlayStyles();
 			}
+		},
+		setOverlayStyles() {
+			debugger;
+			// The reference img element lies adjacent
+			// to the event target button in the DOM.
+			let {
+				naturalWidth,
+				naturalHeight,
+				offsetWidth: originalWidth,
+				offsetHeight: originalHeight,
+			} = state.currentImage.imageRef;
+			let { x: screenPosX, y: screenPosY } =
+				state.currentImage.imageRef.getBoundingClientRect();
+
+			// Natural ratio of the image clicked to open the lightbox.
+			const naturalRatio = naturalWidth / naturalHeight;
+			// Original ratio of the image clicked to open the lightbox.
+			let originalRatio = originalWidth / originalHeight;
+
+			// If it has object-fit: contain, recalculate the original sizes
+			// and the screen position without the blank spaces.
+			if ( state.currentImage.scaleAttr === 'contain' ) {
+				if ( naturalRatio > originalRatio ) {
+					const heightWithoutSpace = originalWidth / naturalRatio;
+					// Recalculate screen position without the top space.
+					screenPosY += ( originalHeight - heightWithoutSpace ) / 2;
+					originalHeight = heightWithoutSpace;
+				} else {
+					const widthWithoutSpace = originalHeight * naturalRatio;
+					// Recalculate screen position without the left space.
+					screenPosX += ( originalWidth - widthWithoutSpace ) / 2;
+					originalWidth = widthWithoutSpace;
+				}
+			}
+			originalRatio = originalWidth / originalHeight;
+
+			// Typically, we use the image's full-sized dimensions. If those
+			// dimensions have not been set (i.e. an external image with only one size),
+			// the image's dimensions in the lightbox are the same
+			// as those of the image in the content.
+			let imgMaxWidth = parseFloat(
+				state.currentImage.targetWidth !== 'none'
+					? state.currentImage.targetWidth
+					: naturalWidth
+			);
+			let imgMaxHeight = parseFloat(
+				state.currentImage.targetHeight !== 'none'
+					? state.currentImage.targetHeight
+					: naturalHeight
+			);
+
+			// Ratio of the biggest image stored in the database.
+			let imgRatio = imgMaxWidth / imgMaxHeight;
+			let containerMaxWidth = imgMaxWidth;
+			let containerMaxHeight = imgMaxHeight;
+			let containerWidth = imgMaxWidth;
+			let containerHeight = imgMaxHeight;
+			// Check if the target image has a different ratio than the original one (thumbnail).
+			// Recalculate the width and height.
+			if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
+				if ( naturalRatio > imgRatio ) {
+					// If the width is reached before the height, we keep the maxWidth
+					// and recalculate the height.
+					// Unless the difference between the maxHeight and the reducedHeight
+					// is higher than the maxWidth, where we keep the reducedHeight and
+					// recalculate the width.
+					const reducedHeight = imgMaxWidth / naturalRatio;
+					if ( imgMaxHeight - reducedHeight > imgMaxWidth ) {
+						imgMaxHeight = reducedHeight;
+						imgMaxWidth = reducedHeight * naturalRatio;
+					} else {
+						imgMaxHeight = imgMaxWidth / naturalRatio;
+					}
+				} else {
+					// If the height is reached before the width, we keep the maxHeight
+					// and recalculate the width.
+					// Unless the difference between the maxWidth and the reducedWidth
+					// is higher than the maxHeight, where we keep the reducedWidth and
+					// recalculate the height.
+					const reducedWidth = imgMaxHeight * naturalRatio;
+					if ( imgMaxWidth - reducedWidth > imgMaxHeight ) {
+						imgMaxWidth = reducedWidth;
+						imgMaxHeight = reducedWidth / naturalRatio;
+					} else {
+						imgMaxWidth = imgMaxHeight * naturalRatio;
+					}
+				}
+				containerWidth = imgMaxWidth;
+				containerHeight = imgMaxHeight;
+				imgRatio = imgMaxWidth / imgMaxHeight;
+
+				// Calculate the max size of the container.
+				if ( originalRatio > imgRatio ) {
+					containerMaxWidth = imgMaxWidth;
+					containerMaxHeight = containerMaxWidth / originalRatio;
+				} else {
+					containerMaxHeight = imgMaxHeight;
+					containerMaxWidth = containerMaxHeight * originalRatio;
+				}
+			}
+
+			// If the image has been pixelated on purpose, keep that size.
+			if (
+				originalWidth > containerWidth ||
+				originalHeight > containerHeight
+			) {
+				containerWidth = originalWidth;
+				containerHeight = originalHeight;
+			}
+
+			// Calculate the final lightbox image size and the
+			// scale factor. MaxWidth is either the window container
+			// (accounting for padding) or the image resolution.
+			let horizontalPadding = 0;
+			if ( window.innerWidth > 480 ) {
+				horizontalPadding = 80;
+			} else if ( window.innerWidth > 1920 ) {
+				horizontalPadding = 160;
+			}
+			const verticalPadding = 80;
+
+			const targetMaxWidth = Math.min(
+				window.innerWidth - horizontalPadding,
+				containerWidth
+			);
+			const targetMaxHeight = Math.min(
+				window.innerHeight - verticalPadding,
+				containerHeight
+			);
+			const targetContainerRatio = targetMaxWidth / targetMaxHeight;
+
+			if ( originalRatio > targetContainerRatio ) {
+				// If targetMaxWidth is reached before targetMaxHeight
+				containerWidth = targetMaxWidth;
+				containerHeight = containerWidth / originalRatio;
+			} else {
+				// If targetMaxHeight is reached before targetMaxWidth
+				containerHeight = targetMaxHeight;
+				containerWidth = containerHeight * originalRatio;
+			}
+
+			const containerScale = originalWidth / containerWidth;
+			const lightboxImgWidth =
+				imgMaxWidth * ( containerWidth / containerMaxWidth );
+			const lightboxImgHeight =
+				imgMaxHeight * ( containerHeight / containerMaxHeight );
+
+			// Add the CSS variables needed.
+			let styleTag = document.getElementById( 'wp-lightbox-styles' );
+			if ( ! styleTag ) {
+				styleTag = document.createElement( 'style' );
+				styleTag.id = 'wp-lightbox-styles';
+				document.head.appendChild( styleTag );
+			}
+
+			// As of this writing, using the calculations above will render the lightbox
+			// with a small, erroneous whitespace on the left side of the image in iOS Safari,
+			// perhaps due to an inconsistency in how browsers handle absolute positioning and CSS
+			// transformation. In any case, adding 1 pixel to the container width and height solves
+			// the problem, though this can be removed if the issue is fixed in the future.
+			styleTag.innerHTML = `
+		:root {
+			--wp--lightbox-initial-top-position: ${ screenPosY }px;
+			--wp--lightbox-initial-left-position: ${ screenPosX }px;
+			--wp--lightbox-container-width: ${ containerWidth + 1 }px;
+			--wp--lightbox-container-height: ${ containerHeight + 1 }px;
+			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
+			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+			--wp--lightbox-scale: ${ containerScale };
+			--wp--lightbox-scrollbar-width: ${
+				window.innerWidth - document.documentElement.clientWidth
+			}px;
+		}
+	`;
 		},
 	},
 } );
@@ -360,171 +508,6 @@ window.addEventListener(
  * @param {Object} ctx - Context for the `core/image` namespace.
  * @param {Object} ref - The element reference.
  */
-function setStyles( ctx, ref ) {
-	// The reference img element lies adjacent
-	// to the event target button in the DOM.
-	let {
-		naturalWidth,
-		naturalHeight,
-		offsetWidth: originalWidth,
-		offsetHeight: originalHeight,
-	} = ref;
-	let { x: screenPosX, y: screenPosY } = ref.getBoundingClientRect();
-
-	// Natural ratio of the image clicked to open the lightbox.
-	const naturalRatio = naturalWidth / naturalHeight;
-	// Original ratio of the image clicked to open the lightbox.
-	let originalRatio = originalWidth / originalHeight;
-
-	// If it has object-fit: contain, recalculate the original sizes
-	// and the screen position without the blank spaces.
-	if ( ctx.scaleAttr === 'contain' ) {
-		if ( naturalRatio > originalRatio ) {
-			const heightWithoutSpace = originalWidth / naturalRatio;
-			// Recalculate screen position without the top space.
-			screenPosY += ( originalHeight - heightWithoutSpace ) / 2;
-			originalHeight = heightWithoutSpace;
-		} else {
-			const widthWithoutSpace = originalHeight * naturalRatio;
-			// Recalculate screen position without the left space.
-			screenPosX += ( originalWidth - widthWithoutSpace ) / 2;
-			originalWidth = widthWithoutSpace;
-		}
-	}
-	originalRatio = originalWidth / originalHeight;
-
-	// Typically, we use the image's full-sized dimensions. If those
-	// dimensions have not been set (i.e. an external image with only one size),
-	// the image's dimensions in the lightbox are the same
-	// as those of the image in the content.
-	let imgMaxWidth = parseFloat(
-		ctx.targetWidth !== 'none' ? ctx.targetWidth : naturalWidth
-	);
-	let imgMaxHeight = parseFloat(
-		ctx.targetHeight !== 'none' ? ctx.targetHeight : naturalHeight
-	);
-
-	// Ratio of the biggest image stored in the database.
-	let imgRatio = imgMaxWidth / imgMaxHeight;
-	let containerMaxWidth = imgMaxWidth;
-	let containerMaxHeight = imgMaxHeight;
-	let containerWidth = imgMaxWidth;
-	let containerHeight = imgMaxHeight;
-	// Check if the target image has a different ratio than the original one (thumbnail).
-	// Recalculate the width and height.
-	if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
-		if ( naturalRatio > imgRatio ) {
-			// If the width is reached before the height, we keep the maxWidth
-			// and recalculate the height.
-			// Unless the difference between the maxHeight and the reducedHeight
-			// is higher than the maxWidth, where we keep the reducedHeight and
-			// recalculate the width.
-			const reducedHeight = imgMaxWidth / naturalRatio;
-			if ( imgMaxHeight - reducedHeight > imgMaxWidth ) {
-				imgMaxHeight = reducedHeight;
-				imgMaxWidth = reducedHeight * naturalRatio;
-			} else {
-				imgMaxHeight = imgMaxWidth / naturalRatio;
-			}
-		} else {
-			// If the height is reached before the width, we keep the maxHeight
-			// and recalculate the width.
-			// Unless the difference between the maxWidth and the reducedWidth
-			// is higher than the maxHeight, where we keep the reducedWidth and
-			// recalculate the height.
-			const reducedWidth = imgMaxHeight * naturalRatio;
-			if ( imgMaxWidth - reducedWidth > imgMaxHeight ) {
-				imgMaxWidth = reducedWidth;
-				imgMaxHeight = reducedWidth / naturalRatio;
-			} else {
-				imgMaxWidth = imgMaxHeight * naturalRatio;
-			}
-		}
-		containerWidth = imgMaxWidth;
-		containerHeight = imgMaxHeight;
-		imgRatio = imgMaxWidth / imgMaxHeight;
-
-		// Calculate the max size of the container.
-		if ( originalRatio > imgRatio ) {
-			containerMaxWidth = imgMaxWidth;
-			containerMaxHeight = containerMaxWidth / originalRatio;
-		} else {
-			containerMaxHeight = imgMaxHeight;
-			containerMaxWidth = containerMaxHeight * originalRatio;
-		}
-	}
-
-	// If the image has been pixelated on purpose, keep that size.
-	if ( originalWidth > containerWidth || originalHeight > containerHeight ) {
-		containerWidth = originalWidth;
-		containerHeight = originalHeight;
-	}
-
-	// Calculate the final lightbox image size and the
-	// scale factor. MaxWidth is either the window container
-	// (accounting for padding) or the image resolution.
-	let horizontalPadding = 0;
-	if ( window.innerWidth > 480 ) {
-		horizontalPadding = 80;
-	} else if ( window.innerWidth > 1920 ) {
-		horizontalPadding = 160;
-	}
-	const verticalPadding = 80;
-
-	const targetMaxWidth = Math.min(
-		window.innerWidth - horizontalPadding,
-		containerWidth
-	);
-	const targetMaxHeight = Math.min(
-		window.innerHeight - verticalPadding,
-		containerHeight
-	);
-	const targetContainerRatio = targetMaxWidth / targetMaxHeight;
-
-	if ( originalRatio > targetContainerRatio ) {
-		// If targetMaxWidth is reached before targetMaxHeight
-		containerWidth = targetMaxWidth;
-		containerHeight = containerWidth / originalRatio;
-	} else {
-		// If targetMaxHeight is reached before targetMaxWidth
-		containerHeight = targetMaxHeight;
-		containerWidth = containerHeight * originalRatio;
-	}
-
-	const containerScale = originalWidth / containerWidth;
-	const lightboxImgWidth =
-		imgMaxWidth * ( containerWidth / containerMaxWidth );
-	const lightboxImgHeight =
-		imgMaxHeight * ( containerHeight / containerMaxHeight );
-
-	// Add the CSS variables needed.
-	let styleTag = document.getElementById( 'wp-lightbox-styles' );
-	if ( ! styleTag ) {
-		styleTag = document.createElement( 'style' );
-		styleTag.id = 'wp-lightbox-styles';
-		document.head.appendChild( styleTag );
-	}
-
-	// As of this writing, using the calculations above will render the lightbox
-	// with a small, erroneous whitespace on the left side of the image in iOS Safari,
-	// perhaps due to an inconsistency in how browsers handle absolute positioning and CSS
-	// transformation. In any case, adding 1 pixel to the container width and height solves
-	// the problem, though this can be removed if the issue is fixed in the future.
-	styleTag.innerHTML = `
-		:root {
-			--wp--lightbox-initial-top-position: ${ screenPosY }px;
-			--wp--lightbox-initial-left-position: ${ screenPosX }px;
-			--wp--lightbox-container-width: ${ containerWidth + 1 }px;
-			--wp--lightbox-container-height: ${ containerHeight + 1 }px;
-			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
-			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
-			--wp--lightbox-scale: ${ containerScale };
-			--wp--lightbox-scrollbar-width: ${
-				window.innerWidth - document.documentElement.clientWidth
-			}px;
-		}
-	`;
-}
 
 /**
  * Debounces a function call.

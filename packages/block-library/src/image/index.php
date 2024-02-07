@@ -166,37 +166,32 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w = new WP_HTML_Tag_Processor( $block_content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
+	$class_names = $w->get_attribute( 'class' );
 	$w->set_attribute( 'data-wp-interactive', '{"namespace":"core/image"}' );
 
 	$w->set_attribute(
 		'data-wp-context',
-		sprintf(
-			'{  "imageLoaded": false,
-				"initialized": false,
-				"lightboxEnabled": false,
-				"preloadInitialized": false,
-				"imageUploadedSrc": "%s",
-				"targetWidth": "%s",
-				"targetHeight": "%s",
-				"scaleAttr": "%s",
-				"dialogLabel": "%s"
-			}',
-			$img_uploaded_src,
-			$img_width,
-			$img_height,
-			$scale_attr,
-			__( 'Enlarged image' )
+		wp_json_encode(
+			array(
+				'uploadedSrc'  => $img_uploaded_src,
+				'classNames'   => $class_names,
+				'targetWidth'  => $img_width,
+				'targetHeight' => $img_height,
+				'scaleAttr'    => $scale_attr,
+				'ariaLabel'    => $aria_label,
+			),
+			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'callbacks.initOriginImage' );
-	$w->set_attribute( 'data-wp-on--load', 'actions.handleLoad' );
+	$w->set_attribute( 'data-wp-init--image', 'callbacks.initImage' );
 	$w->set_attribute( 'data-wp-init--set-button-styles', 'callbacks.setButtonStyles' );
+	$w->set_attribute( 'data-wp-on--load', 'callbacks.setButtonStyles' );
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
 	$w->set_attribute( 'data-wp-on--click', 'actions.showLightbox' );
-	$w->set_attribute( 'data-wp-watch--setStylesOnResize', 'callbacks.setStylesOnResize' );
+	$w->set_attribute( 'data-wp-watch', 'callbacks.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
 	// Add a button alongside image in the body content.
@@ -222,46 +217,17 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
-	// We need both a responsive image and an enlarged image to animate
-	// the zoom seamlessly on slow internet connections; the responsive
-	// image is a copy of the one in the body, which animates immediately
-	// as the lightbox is opened, while the enlarged one is a full-sized
-	// version that will likely still be loading as the animation begins.
-	$m = new WP_HTML_Tag_Processor( $block_content );
-	$m->next_tag( 'figure' );
-	$m->add_class( 'responsive-image' );
-	$m->next_tag( 'img' );
-	// We want to set the 'src' attribute to an empty string in the responsive image
-	// because otherwise, as of this writing, the wp_filter_content_tags() function in
-	// WordPress will automatically add a 'srcset' attribute to the image, which will at
-	// times cause the incorrectly sized image to be loaded in the lightbox on Firefox.
-	// Because of this, we bind the 'src' attribute explicitly the current src to reliably
-	// use the exact same image as in the content when the lightbox is first opened while
-	// we wait for the larger image to load.
-	$m->set_attribute( 'src', '' );
-	$m->set_attribute( 'data-wp-bind--src', 'state.imageCurrentSrc' );
-	$m->set_attribute( 'data-wp-style--object-fit', 'state.lightboxObjectFit' );
-	$initial_image_content = $m->get_updated_html();
+	add_action( 'wp_footer', 'block_core_image_print_lightbox_overlay' );
 
-	$q = new WP_HTML_Tag_Processor( $block_content );
-	$q->next_tag( 'figure' );
-	$q->add_class( 'enlarged-image' );
-	$q->next_tag( 'img' );
+	return $body_content;
+}
 
-	// We set the 'src' attribute to an empty string to prevent the browser from loading the image
-	// on initial page load, then bind the attribute to a selector that returns the full-sized image src when
-	// the lightbox is opened. We could use 'loading=lazy' in combination with the 'hidden' attribute to
-	// accomplish the same behavior, but that approach breaks progressive loading of the image in Safari
-	// and Chrome (see https://github.com/WordPress/gutenberg/pull/52765#issuecomment-1674008151). Until that
-	// is resolved, manually setting the 'src' seems to be the best solution to load the large image on demand.
-	$q->set_attribute( 'src', '' );
-	$q->set_attribute( 'data-wp-bind--src', 'state.enlargedImgSrc' );
-	$q->set_attribute( 'data-wp-style--object-fit', 'state.lightboxObjectFit' );
-	$enlarged_image_content = $q->get_updated_html();
+function block_core_image_print_lightbox_overlay() {
+	$close_button_label = esc_attr__( 'Close' );
 
-	// If the current theme does NOT have a `theme.json`, or the colors are not defined,
-	// we need to set the background color & close button color to some default values
-	// because we can't get them from the Global Styles.
+	// If the current theme does NOT have a `theme.json`, or the colors are not
+	// defined, we need to set the background color & close button color to some
+	// default values because we can't get them from the Global Styles.
 	$background_color   = '#fff';
 	$close_button_color = '#000';
 	if ( wp_theme_has_theme_json() ) {
@@ -274,44 +240,41 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		}
 	}
 
-	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
-	$close_button_label = esc_attr__( 'Close' );
-
-	$lightbox_html = <<<HTML
-        <div 
-						data-wp-interactive='{"namespace":"core/image"}'
-						data-wp-context='{}'
-						class="wp-lightbox-overlay zoom"
-            data-wp-bind--role="state.roleAttribute"
-            data-wp-bind--aria-label="state.dialogLabel"
-            data-wp-class--active="state.lightboxEnabled"
-            data-wp-class--hideAnimationEnabled="state.hideAnimationEnabled"
-            data-wp-bind--aria-modal="state.ariaModal"
-            data-wp-watch="callbacks.initLightbox"
-            data-wp-on--keydown="actions.handleKeydown"
-            data-wp-on--touchstart="actions.handleTouchStart"
-            data-wp-on--touchmove="actions.handleTouchMove"
-            data-wp-on--touchend="actions.handleTouchEnd"
-            data-wp-on--click="actions.hideLightbox"
-            tabindex="-1"
-            >
-                <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.hideLightbox">
-                    $close_button_icon
-                </button>
-                <div class="lightbox-image-container">$initial_image_content</div>
-                <div class="lightbox-image-container">$enlarged_image_content</div>
-                <div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
-        </div>
+	echo <<<HTML
+		<div 
+			class="wp-lightbox-overlay zoom"
+			data-wp-interactive='{"namespace":"core/image"}'
+			data-wp-context='{}'
+			data-wp-bind--role="state.roleAttribute"
+			data-wp-bind--aria-label="state.ariaLabel"
+			data-wp-bind--aria-modal="state.ariaModal"
+			data-wp-class--active="state.lightboxEnabled"
+			data-wp-class--hideAnimationEnabled="state.hideAnimationEnabled"
+			data-wp-init="callbacks.initOverlay"
+			data-wp-watch="callbacks.setOverlayFocus"
+			data-wp-on--keydown="actions.handleKeydown"
+			data-wp-on--touchstart="actions.handleTouchStart"
+			data-wp-on--touchmove="actions.handleTouchMove"
+			data-wp-on--touchend="actions.handleTouchEnd"
+			data-wp-on--click="actions.hideLightbox"
+			tabindex="-1"
+			>
+				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.hideLightbox">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>
+				</button>
+				<div class="lightbox-image-container">
+					<figure data-wp-bind--class="state.currentImage.classNames" data-wp-bind--style="state.currentImage.styles">
+						<img data-wp-bind--src="state.currentImage.currentSrc" data-wp-style--object-fit="state.lightboxObjectFit">
+					</figure>
+				</div>
+				<div class="lightbox-image-container">
+					<figure data-wp-bind--class="state.currentImage.classNames" data-wp-bind--style="state.currentImage.styles">
+						<img data-wp-bind--src="state.enlargedSrc" data-wp-style--object-fit="state.lightboxObjectFit" >
+					</figure>
+				</div>
+				<div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
+		</div>
 HTML;
-
-	add_action(
-		'wp_footer',
-		function () use ( $lightbox_html ) {
-			echo $lightbox_html;
-		}
-	);
-
-	return $body_content;
 }
 
 /**
