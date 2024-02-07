@@ -20,10 +20,7 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-function AddFilter(
-	{ filters, view, onChangeView, setOpenFilterOnMount },
-	ref
-) {
+function AddFilter( { filters, view, onChangeView, setOpenedFilter }, ref ) {
 	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
 		return null;
 	}
@@ -49,7 +46,7 @@ function AddFilter(
 					<DropdownMenuItem
 						key={ filter.field }
 						onClick={ () => {
-							setOpenFilterOnMount( filter.field );
+							setOpenedFilter( filter.field );
 							onChangeView( {
 								...view,
 								page: 1,

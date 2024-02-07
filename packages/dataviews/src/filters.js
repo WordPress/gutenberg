@@ -16,8 +16,8 @@ const Filters = memo( function Filters( {
 	fields,
 	view,
 	onChangeView,
-	openFilterOnMount,
-	setOpenFilterOnMount,
+	openedFilter,
+	setOpenedFilter,
 } ) {
 	const addFilterRef = useRef();
 	const filters = [];
@@ -57,7 +57,16 @@ const Filters = memo( function Filters( {
 		}
 	} );
 	// Sort filters by primary property. We need the primary filters to be first.
-	filters.sort( ( a, b ) => b.isPrimary - a.isPrimary ); // Type coercion to numbers.
+	// Then we sort by name.
+	filters.sort( ( a, b ) => {
+		if ( a.isPrimary && ! b.isPrimary ) {
+			return -1;
+		}
+		if ( ! a.isPrimary && b.isPrimary ) {
+			return 1;
+		}
+		return a.name.localeCompare( b.name );
+	} );
 	const addFilter = (
 		<AddFilter
 			key="add-filter"
@@ -65,7 +74,7 @@ const Filters = memo( function Filters( {
 			view={ view }
 			onChangeView={ onChangeView }
 			ref={ addFilterRef }
-			setOpenFilterOnMount={ setOpenFilterOnMount }
+			setOpenedFilter={ setOpenedFilter }
 		/>
 	);
 	const filterComponents = [
@@ -81,7 +90,7 @@ const Filters = memo( function Filters( {
 					view={ view }
 					onChangeView={ onChangeView }
 					addFilterRef={ addFilterRef }
-					openFilterOnMount={ openFilterOnMount }
+					openedFilter={ openedFilter }
 				/>
 			);
 		} ),

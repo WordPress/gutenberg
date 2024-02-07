@@ -148,7 +148,7 @@ function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
 
 export default function FilterSummary( {
 	addFilterRef,
-	openFilterOnMount,
+	openedFilter,
 	...commonProps
 } ) {
 	const toggleRef = useRef();
@@ -159,7 +159,7 @@ export default function FilterSummary( {
 	);
 	return (
 		<Dropdown
-			defaultOpen={ openFilterOnMount === filter.field }
+			defaultOpen={ openedFilter === filter.field }
 			contentClassName="dataviews-filter-summary__popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
 			onClose={ () => {

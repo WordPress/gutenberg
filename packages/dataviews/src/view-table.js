@@ -66,7 +66,7 @@ const sanitizeOperators = ( field ) => {
 };
 
 const HeaderMenu = forwardRef( function HeaderMenu(
-	{ field, view, onChangeView, onHide, setOpenFilterOnMount },
+	{ field, view, onChangeView, onHide, setOpenedFilter },
 	ref
 ) {
 	const isHidable = field.enableHiding !== false;
@@ -151,7 +151,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						<DropdownMenuItem
 							prefix={ <Icon icon={ funnel } /> }
 							onClick={ () => {
-								setOpenFilterOnMount( field.id );
+								setOpenedFilter( field.id );
 								onChangeView( {
 									...view,
 									page: 1,
@@ -226,7 +226,7 @@ function ViewTable( {
 	deferredRendering,
 	selection,
 	onSelectionChange,
-	setOpenFilterOnMount,
+	setOpenedFilter,
 } ) {
 	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
@@ -337,9 +337,7 @@ function ViewTable( {
 									view={ view }
 									onChangeView={ onChangeView }
 									onHide={ onHide }
-									setOpenFilterOnMount={
-										setOpenFilterOnMount
-									}
+									setOpenedFilter={ setOpenedFilter }
 								/>
 							</th>
 						) ) }
