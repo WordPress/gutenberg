@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
@@ -137,10 +137,12 @@ export default function LinkPreview( {
 				) }
 				<Button
 					icon={ copySmall }
-					// Ends up looking like "Copy link: https://example.com"
-					label={ `${ __( 'Copy link' ) }${
-						isEmptyURL ? '' : `: ${ value.url }`
-					}` }
+					label={ sprintf(
+						// Translators: %1$s is a placeholder for an optional colon, %2$s is a placeholder for the link URL (if present).
+						__( 'Copy link%1$s%2$s' ), // Ends up looking like "Copy link: https://example.com".
+						isEmptyURL ? '' : ': ',
+						value.url
+					) }
 					ref={ ref }
 					disabled={ isEmptyURL }
 					size="compact"
