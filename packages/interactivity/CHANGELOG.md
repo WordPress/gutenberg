@@ -11,6 +11,10 @@
 
 -   Avoid initializing private stores as public when they have initial state. ([#58754](https://github.com/WordPress/gutenberg/pull/58754))
 
+### Bug fixes
+
+-   Interactivity API: Remove non default suffix data wp context processing. ([#58664](https://github.com/WordPress/gutenberg/pull/58664))
+
 ## 4.0.1 (2024-01-31)
 
 ### Bug Fixes
