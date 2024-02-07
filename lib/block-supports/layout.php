@@ -561,9 +561,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	// If there is any value in style -> layout, the block has a child layout.
-	$layout_from_parent = $block['attrs']['style']['layout'] ?? null;
+	$child_layout = $block['attrs']['style']['layout'] ?? null;
 
-	if ( ! $block_supports_layout && ! $layout_from_parent ) {
+	if ( ! $block_supports_layout && ! $child_layout ) {
 		return $block_content;
 	}
 
