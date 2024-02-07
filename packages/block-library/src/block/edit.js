@@ -29,6 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -131,6 +132,16 @@ function applyInitialContentValuesToInnerBlocks(
 	} );
 }
 
+function isAttributeEqual( attribute1, attribute2 ) {
+	if (
+		attribute1 instanceof RichTextData &&
+		attribute2 instanceof RichTextData
+	) {
+		return attribute1.toString() === attribute2.toString();
+	}
+	return attribute1 === attribute2;
+}
+
 function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
@@ -145,8 +156,10 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 		const attributes = getOverridableAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				! isAttributeEqual(
+					block.attributes[ attributeKey ],
+					defaultValues[ blockId ][ attributeKey ]
+				)
 			) {
 				content[ blockId ] ??= { values: {} };
 				content[ blockId ].values[ attributeKey ] =

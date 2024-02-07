@@ -493,4 +493,95 @@ test.describe( 'Pattern Overrides', () => {
 			page.getByText( 'Inner paragraph (edited)' )
 		).toBeVisible();
 	} );
+
+	test( 'resets overrides after clicking the reset button', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const headingId = 'heading-id';
+		const paragraphId = 'paragraph-id';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:heading {"metadata":{"id":"${ headingId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->
+<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Make an edit to the heading.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.fill( 'Heading (edited)' );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const headingBlock = patternBlock.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		const paragraphBlock = patternBlock.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const resetButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Reset' } );
+
+		// Assert the pattern block.
+		await editor.selectBlocks( patternBlock );
+		await editor.showBlockToolbar();
+		await expect(
+			resetButton,
+			'The pattern block should have the reset button enabled'
+		).toBeEnabled();
+
+		// Assert the modified heading block with overrides.
+		await editor.selectBlocks( headingBlock );
+		await editor.showBlockToolbar();
+		await expect(
+			resetButton,
+			'The heading block should have the reset button enabled'
+		).toBeEnabled();
+
+		// Assert the unmodified paragraph block (no overrides).
+		await editor.selectBlocks( paragraphBlock );
+		await editor.showBlockToolbar();
+		await expect(
+			resetButton,
+			'The paragraph block should not have the reset button enabled'
+		).toBeDisabled();
+
+		// Reset the whole pattern.
+		await editor.selectBlocks( patternBlock );
+		await editor.showBlockToolbar();
+		await resetButton.click();
+		await expect( headingBlock ).toHaveText( 'Heading' );
+
+		// Undo should work
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+		await expect( headingBlock ).toHaveText( 'Heading (edited)' );
+
+		// Reset the individual heading block.
+		await editor.selectBlocks( headingBlock );
+		await editor.showBlockToolbar();
+		await resetButton.click();
+		await expect( headingBlock ).toHaveText( 'Heading' );
+		await editor.selectBlocks( patternBlock );
+		await editor.showBlockToolbar();
+		await expect( resetButton ).toBeDisabled();
+	} );
 } );
