@@ -14,24 +14,47 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { AUTHORS_QUERY } from './constants';
 
-function PostAuthorSelect() {
+export default function PostAuthorSelect() {
 	const { editPost } = useDispatch( editorStore );
-	const { postAuthor, authors } = useSelect( ( select ) => {
+	const { authorId, postAuthor, authors } = useSelect( ( select ) => {
+		const { getUser, getUsers } = select( coreStore );
+		const { getEditedPostAttribute } = select( editorStore );
+		const _authorId = getEditedPostAttribute( 'author' );
+
 		return {
-			postAuthor:
-				select( editorStore ).getEditedPostAttribute( 'author' ),
-			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
+			authorId: _authorId,
+			authors: getUsers( AUTHORS_QUERY ),
+			postAuthor: getUser( _authorId, {
+				context: 'view',
+			} ),
 		};
 	}, [] );
 
 	const authorOptions = useMemo( () => {
-		return ( authors ?? [] ).map( ( author ) => {
+		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
 			return {
 				value: author.id,
 				label: decodeEntities( author.name ),
 			};
 		} );
-	}, [ authors ] );
+
+		// Ensure the current author is included in the dropdown list.
+		const foundAuthor = fetchedAuthors.findIndex(
+			( { value } ) => postAuthor?.id === value
+		);
+
+		if ( foundAuthor < 0 && postAuthor ) {
+			return [
+				{
+					value: postAuthor.id,
+					label: decodeEntities( postAuthor.name ),
+				},
+				...fetchedAuthors,
+			];
+		}
+
+		return fetchedAuthors;
+	}, [ authors, postAuthor ] );
 
 	const setAuthorId = ( value ) => {
 		const author = Number( value );
@@ -46,9 +69,7 @@ function PostAuthorSelect() {
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			onChange={ setAuthorId }
-			value={ postAuthor }
+			value={ authorId }
 		/>
 	);
 }
-
-export default PostAuthorSelect;
