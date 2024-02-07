@@ -84,7 +84,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// We are testing the site title block because we manually add list items around it.
 		$parsed_blocks = parse_blocks(
-			'<!-- wp:testsuite/sample-block {"content":"Hello World"} --><div class="wp-block-testsuite-sample-block">Hello World</div><!-- /wp:testsuite/sample-block -->'
+			'<!-- wp:testsuite/sample-block {"content":"Hello World"} /-->'
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
@@ -138,7 +138,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// We are testing the site title block because we manually add list items around it.
 		$parsed_blocks = parse_blocks(
-			'<!-- wp:testsuite/sample-block {"content":"Hello World"} --><div class="wp-block-testsuite-sample-block">Hello World</div><!-- /wp:testsuite/sample-block -->'
+			'<!-- wp:testsuite/sample-block {"content":"Hello World"} /-->'
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
