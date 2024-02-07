@@ -21,14 +21,12 @@
 		}
 	}
 
-	.components-search-control {
-		input[type="search"].components-search-control__input {
-			background: $white;
-			border: 1px solid $gray-300;
+	.edit-site-custom-template-modal__search {
+		&:not(:focus-within) {
+			--wp-components-color-background: #{$white};
 
-			&:focus {
-				border-color: var(--wp-admin-theme-color);
-				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+			.components-input-control__backdrop {
+				border-color: $gray-300;
 			}
 		}
 	}
