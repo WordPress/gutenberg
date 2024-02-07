@@ -3,12 +3,9 @@
 	font-weight: 500;
 }
 
-.components-button.editor-post-last-revision__title.has-icon {
+.editor-post-last-revision__title.components-button.has-icon {
 	height: 100%;
-
-	&.has-icon {
-		justify-content: space-between;
-	}
+	justify-content: space-between;
 
 	&:hover,
 	&:active {
