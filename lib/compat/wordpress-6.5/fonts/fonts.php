@@ -101,8 +101,11 @@ function gutenberg_create_initial_rest_routes() {
  * @since 6.5
  */
 function gutenberg_init_font_library() {
-	gutenberg_create_initial_post_types();
-	gutenberg_create_initial_rest_routes();
+	// Runs only if the Font Library class is not available ( i.e. in core < 6.5 ).
+	if ( ! class_exists( 'WP_Font_Library' ) ) { 
+		gutenberg_create_initial_post_types();
+		gutenberg_create_initial_rest_routes();
+	}
 }
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library' );
