@@ -43,6 +43,14 @@ function Edit( {
 	const [ openedBy, setOpenedBy ] = useState( null );
 
 	useLayoutEffect( () => {
+		// close the Link popover if there is no active selection
+		// after the link was added - this can happen if the user
+		// adds a link without any text selected
+		if ( addingLink && ! value.activeFormats ) {
+			setAddingLink( false );
+			return;
+		}
+
 		const editableContentElement = contentRef.current;
 		if ( ! editableContentElement ) {
 			return;
@@ -67,7 +75,7 @@ function Edit( {
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
 		};
-	}, [ contentRef, isActive ] );
+	}, [ contentRef, isActive, addingLink, value ] );
 
 	function addLink( target ) {
 		const text = getTextContent( slice( value ) );
