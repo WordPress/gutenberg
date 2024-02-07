@@ -2771,6 +2771,7 @@ class WP_Theme_JSON_Gutenberg {
 				$prevent_override = $preset['prevent_override'];
 				if ( is_array( $prevent_override ) ) {
 					$prevent_override = _wp_array_get( $this->theme_json['settings'], $preset['prevent_override'] );
+
 					/*
 					 * For backwards compatibility with presets converting from a hardcoded `false`
 					 * for `prevent_override` to a path to a boolean (`defaultFontSizes`, for example),
@@ -2796,6 +2797,7 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
+					// Set names for theme presets based on the slug if they are not set and can use default names.
 					if ( 'theme' === $origin && $preset['use_default_names'] ) {
 						foreach ( $content as $key => $item ) {
 							if ( ! isset( $item['name'] ) ) {
@@ -2807,6 +2809,7 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 
+					// When the incoming theme preset is not allowed to override the defaults, we need to filter the slugs.
 					if ( 'theme' === $origin && $prevent_override ) {
 						$slugs_node       = static::get_default_slugs( $this->theme_json, $node['path'] );
 						$slugs_merged     = array_merge_recursive( $slugs_global, $slugs_node );
