@@ -25,9 +25,15 @@
 		},
 		"label": {
 			"type": "string",
-			"default": "Archives",
-			"source": "html",
-			"selector": "label"
+			"default": "Archives"
+		},
+		"isEdit": {
+			"type": "boolean",
+			"default": false
+		},
+		"uniqueId": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {

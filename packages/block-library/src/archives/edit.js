@@ -3,7 +3,6 @@
  */
 import {
 	PanelBody,
-	TextControl,
 	ToggleControl,
 	SelectControl,
 	Disabled,
@@ -15,10 +14,24 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { useInstanceId } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showLabel, showPostCounts, displayAsDropdown, type, label } =
-		attributes;
+	const {
+		showLabel,
+		showPostCounts,
+		displayAsDropdown,
+		type,
+		label,
+		uniqueId,
+	} = attributes;
+	const editAttributes = structuredClone( attributes );
+	editAttributes.isEdit = true;
+	const instanceId = useInstanceId( ArchivesEdit, 'wp-block-archives' );
+	useEffect( () => {
+		setAttributes( { uniqueId: instanceId } );
+	} );
 
 	return (
 		<>
@@ -43,16 +56,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 								setAttributes( {
 									showLabel: ! showLabel,
 								} )
-							}
-						/>
-					) }
-					{ displayAsDropdown && showLabel && (
-						<TextControl
-							__nextHasNoMarginBottom
-							label={ __( 'Label' ) }
-							value={ label }
-							onChange={ ( value ) =>
-								setAttributes( { label: value } )
 							}
 						/>
 					) }
@@ -87,18 +90,19 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					<RichText
 						tagName="label"
 						value={ label }
-						htmlFor="wp-block-archives-1"
+						htmlFor={ uniqueId }
 						className={ 'wp-block-archives__label' }
 						onChange={ ( value ) =>
 							setAttributes( { label: value } )
 						}
+						placeholder={ __( 'Archives' ) }
 					/>
 				) }
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
 						skipBlockSupportAttributes
-						attributes={ attributes }
+						attributes={ editAttributes }
 					/>
 				</Disabled>
 			</div>
