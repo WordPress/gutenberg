@@ -37,7 +37,7 @@ function LastRevision() {
 					__( 'Revisions (%s)' ),
 					revisionsCount
 				) }
-			></Button>
+			/>
 		</PostLastRevisionCheck>
 	);
 }
