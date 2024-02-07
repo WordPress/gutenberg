@@ -102,7 +102,7 @@ function gutenberg_create_initial_rest_routes() {
 function gutenberg_init_font_library() {
 	global $wp_version;
 
-	// Runs only if the Font Library class is not available ( i.e. in core < 6.5-alpha ).
+	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
 	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
 		gutenberg_create_initial_post_types();
 		gutenberg_create_initial_rest_routes();
