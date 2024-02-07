@@ -1,4 +1,4 @@
-# Theme.json Version 2
+# Theme.json Version 3
 
 > This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
 >
