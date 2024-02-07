@@ -13,6 +13,8 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,6 +26,14 @@ import { unlock } from './lock-unlock';
 import useNavigateToEntityRecord from './hooks/use-navigate-to-entity-record';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'bindings/core/pattern-overrides': __(
+		'Blocks from synced patterns that can have overriden content.'
+	),
+};
 
 function Editor( {
 	postId: initialPostId,
@@ -123,6 +133,7 @@ function Editor( {
 					<CommandMenu />
 					<EditorInitialization postId={ currentPost.postId } />
 					<Layout initialPost={ initialPost } />
+					<BlockRemovalWarningModal rules={ blockRemovalRules } />
 				</ErrorBoundary>
 				<PostLockedModal />
 			</ExperimentalEditorProvider>
