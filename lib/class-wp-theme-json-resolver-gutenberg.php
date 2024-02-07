@@ -244,7 +244,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_json_data = static::read_json_file( $theme_json_file );
 				$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			} else {
-				$theme_json_data = array();
+				$theme_json_data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 			}
 
 			/**
