@@ -97,8 +97,7 @@ if ( ! class_exists( 'WP_A_Stable_Class' ) ) {
 
 Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
 
-The early return pattern shown below is considered an **anti-pattern** because it is not supported by older versions of PHP and can cause [unexpected side effects](https://github.com/WordPress/gutenberg/pull/58429#issuecomment-1916670097):
-
+The `return` operator is considered an anti-pattern in the context provided below because it [does not halt](https://www.php.net/manual/en/function.return.php#112515) the parsing of the PHP script and can cause [unexpected side effects](https://github.com/WordPress/gutenberg/pull/58429#issuecomment-1916670097):
 ```php
 /**
  * ANTI-PATTERN
