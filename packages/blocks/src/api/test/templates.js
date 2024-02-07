@@ -28,7 +28,11 @@ describe( 'templates', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/test-block', {
-			attributes: {},
+			attributes: {
+				metadata: {
+					type: 'object',
+				},
+			},
 			save: noop,
 			category: 'text',
 			title: 'test block',
@@ -127,6 +131,38 @@ describe( 'templates', () => {
 				synchronizeBlocksWithTemplate( blockList, template )
 			).toMatchObject( [
 				{ name: 'core/test-block' },
+				{ name: 'core/test-block-2' },
+				{ name: 'core/test-block-2' },
+			] );
+		} );
+
+		it( 'should set ignoredHookedBlocks metadata if a block has hooked blocks', () => {
+			registerBlockType( 'core/hooked-block', {
+				attributes: {},
+				save: noop,
+				category: 'text',
+				title: 'hooked block',
+				blockHooks: { 'core/test-block': 'after' },
+			} );
+
+			const template = [
+				[ 'core/test-block' ],
+				[ 'core/test-block-2' ],
+				[ 'core/test-block-2' ],
+			];
+			const blockList = [];
+
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toMatchObject( [
+				{
+					name: 'core/test-block',
+					attributes: {
+						metadata: {
+							ignoredHookedBlocks: [ 'core/hooked-block' ],
+						},
+					},
+				},
 				{ name: 'core/test-block-2' },
 				{ name: 'core/test-block-2' },
 			] );
