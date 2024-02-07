@@ -179,10 +179,11 @@ const fetchLinkSuggestions = async (
 	if ( ! type || type === 'attachment' ) {
 		queries.push(
 			apiFetch( {
-				path: addQueryArgs( '/wp/v2/media', {
+				path: addQueryArgs( '/wp/v2/search', {
 					search,
 					page,
 					per_page: perPage,
+					type: 'media',
 				} ),
 			} )
 				.then( ( results ) => {
@@ -229,6 +230,7 @@ const fetchLinkSuggestions = async (
 						) || __( '(no title)' ),
 					type: result.subtype || result.type,
 					kind: result?.meta?.kind,
+					thumbnail: result?.thumbnail,
 				};
 			} );
 	} );
