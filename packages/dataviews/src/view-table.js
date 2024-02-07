@@ -31,7 +31,8 @@ import {
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
+import { sanitizeOperators } from './utils';
+import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -54,16 +55,6 @@ function WithSeparators( { children } ) {
 }
 
 const sortArrows = { asc: '↑', desc: '↓' };
-
-const sanitizeOperators = ( field ) => {
-	let operators = field.filterBy?.operators;
-	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = Object.keys( OPERATORS );
-	}
-	return operators.filter( ( operator ) =>
-		Object.keys( OPERATORS ).includes( operator )
-	);
-};
 
 const HeaderMenu = forwardRef( function HeaderMenu(
 	{ field, view, onChangeView, onHide, setOpenedFilter },
