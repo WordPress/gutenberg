@@ -369,7 +369,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$blocks;
 		}
 
-		$config = array( 'version' => 2 );
+		$config = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
 				$config['styles']['blocks'][ $block_name ] = static::remove_json_comments( $block_type->supports['__experimentalStyle'] );
