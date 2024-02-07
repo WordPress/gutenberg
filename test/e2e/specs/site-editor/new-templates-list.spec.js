@@ -50,7 +50,7 @@ test.describe( 'Templates', () => {
 		} );
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		// Global search.
-		await page.getByRole( 'searchbox', { name: 'Filter list' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 		await page.keyboard.type( 'tag' );
 		const titles = page
 			.getByRole( 'region', { name: 'Template' } )
@@ -72,7 +72,7 @@ test.describe( 'Templates', () => {
 
 		// Filter by author and text.
 		await page.getByRole( 'button', { name: 'Reset filters' } ).click();
-		await page.getByRole( 'searchbox', { name: 'Filter list' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 		await page.keyboard.type( 'archives' );
 		await expect( titles ).toHaveCount( 3 );
 		await page
