@@ -256,6 +256,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-on--touchmove="actions.handleTouchMove"
 			data-wp-on--touchend="actions.handleTouchEnd"
 			data-wp-on--click="actions.hideLightbox"
+			data-wp-on-window--resize="callbacks.setOverlayStyles"
 			tabindex="-1"
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">

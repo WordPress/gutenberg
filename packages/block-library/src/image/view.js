@@ -279,17 +279,9 @@ const { state, actions, callbacks } = store( 'core/image', {
 				ctx.imageButtonRight = buttonOffsetRight + 16;
 			}
 		},
-		setStylesOnResize() {
-			if (
-				state.lightboxEnabled &&
-				( state.windowWidth || state.windowHeight )
-			) {
-				callbacks.setOverlayStyles();
-			}
-		},
 		setOverlayStyles() {
-			// The reference img element lies adjacent
-			// to the event target button in the DOM.
+			// The reference img element lies adjacent to the event target button in
+			// the DOM.
 			let {
 				naturalWidth,
 				naturalHeight,
@@ -454,39 +446,3 @@ const { state, actions, callbacks } = store( 'core/image', {
 		},
 	},
 } );
-
-// TODO: Move to `data-wp-window--resize` directive.
-window.addEventListener(
-	'resize',
-	debounce( () => {
-		state.windowWidth = window.innerWidth;
-		state.windowHeight = window.innerHeight;
-	} )
-);
-
-/**
- * Computes styles for the lightbox and adds them to the document.
- *
- * @function
- * @param {Object} ctx - Context for the `core/image` namespace.
- * @param {Object} ref - The element reference.
- */
-
-/**
- * Debounces a function call.
- *
- * @function
- * @param {Function} func - A function to be called
- * @param {number}   wait - The time to wait before calling the function
- */
-function debounce( func, wait = 50 ) {
-	let timeout;
-	return () => {
-		const later = () => {
-			timeout = null;
-			func();
-		};
-		clearTimeout( timeout );
-		timeout = setTimeout( later, wait );
-	};
-}
