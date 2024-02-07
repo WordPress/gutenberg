@@ -117,7 +117,7 @@ export const GridView = styled.div`
 
 export const GridLine = styled.div`
 	background: rgba( 255, 255, 255, 0.4 );
-	backdrop-filter: blur( 16px ) saturate( 200% );
+	backdrop-filter: blur( 16px ) saturate( 180% );
 	position: absolute;
 	transform: translateZ( 0 );
 `;
