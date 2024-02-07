@@ -70,6 +70,10 @@ $block-editor-link-control-number-of-actions: 1;
 		position: relative;
 		width: 100%;
 
+		&:not(:focus) {
+			border-color: $gray-600;
+		}
+
 		.has-actions & {
 			padding-right: $grid-unit-20;
 		}
