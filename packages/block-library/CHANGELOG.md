@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Query Loop Block: Moves per page, offset, and pages controls into Inspector Controls. ([#58207](https://github.com/WordPress/gutenberg/pull/58207))
+
 ## 8.27.0 (2024-01-24)
 
 ## 8.26.0 (2024-01-10)
@@ -19,7 +23,6 @@
 ### Bug Fix
 
 -   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
-
 
 ## 8.20.0 (2023-10-05)
 
