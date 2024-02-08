@@ -405,7 +405,6 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
 	}
 
 	$generated_variations = block_core_navigation_link_build_variations();
-	// TODO: Mabe check if there are already variations for this post type/taxonomy?
 	return array_merge( $variations, $generated_variations );
 }
 
