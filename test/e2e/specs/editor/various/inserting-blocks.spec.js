@@ -573,14 +573,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			} )
 			.click();
 
-		const searchBox = page.getByRole( 'searchbox', {
-			name: 'Search for blocks and patterns',
-		} );
-
-		await searchBox.fill( 'Verse' );
+		await page
+			.getByRole( 'searchbox', {
+				name: 'Search for blocks and patterns',
+			} )
+			.fill( 'Verse' );
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 
-		await expect( searchBox ).toHaveValue( 'Verse' );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Block Library' } )
+				.getByRole( 'searchbox', {
+					name: 'Search for blocks and patterns',
+				} )
+		).toHaveValue( 'Verse' );
 		await expect(
 			page.getByRole( 'listbox', { name: 'Blocks' } )
 		).toHaveCount( 1 );
