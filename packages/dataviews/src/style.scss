@@ -237,7 +237,8 @@
 		}
 		&:focus {
 			color: var(--wp-admin-theme-color--rgb);
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+			border-radius: $grid-unit-05;
 		}
 	}
 
