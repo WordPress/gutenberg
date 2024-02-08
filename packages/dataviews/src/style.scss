@@ -235,6 +235,10 @@
 		&:hover {
 			color: $gray-900;
 		}
+		&:focus {
+			color: var(--wp-admin-theme-color--rgb);
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
 	}
 
 	button.components-button.is-link {
