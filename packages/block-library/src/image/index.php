@@ -266,12 +266,12 @@ function block_core_image_print_lightbox_overlay() {
 				</button>
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.currentImage.classNames" data-wp-bind--style="state.currentImage.styles">
-						<img data-wp-bind--src="state.currentImage.currentSrc" style="object-fit: cover;">
+						<img class="responsive-img" data-wp-bind--src="state.currentImage.currentSrc" style="object-fit: cover;">
 					</figure>
 				</div>
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.currentImage.classNames" data-wp-bind--style="state.currentImage.styles">
-						<img data-wp-bind--src="state.enlargedSrc" style="object-fit: cover;">
+						<img class="enlarged-img" data-wp-bind--src="state.enlargedSrc" style="object-fit: cover;">
 					</figure>
 				</div>
 				<div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
