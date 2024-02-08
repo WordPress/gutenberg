@@ -106,7 +106,7 @@ function UnforwardedSearchControl(
 				}
 				autoComplete="off"
 				placeholder={ placeholder }
-				value={ value || '' }
+				value={ value ?? '' }
 				suffix={
 					<SuffixItemWrapper size={ size }>
 						<SuffixItem
