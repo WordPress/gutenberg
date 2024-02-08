@@ -9,8 +9,12 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { useBlockEditContext } from '../components/block-edit/context';
 import { unlock } from '../lock-unlock';
+
+/**
+ * External dependencies
+ */
+import { useEffect, useState } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -32,63 +36,100 @@ export const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
-			const { clientId, name: blockName } = useBlockEditContext();
-			const { getBlockBindingsSource } = unlock(
-				useSelect( blockEditorStore )
-			);
-			const { getBlockAttributes } = useSelect( blockEditorStore );
+			const { attributes: updatedAttributes, name: blockName } = props;
 
-			const updatedAttributes = getBlockAttributes( clientId );
-			if ( updatedAttributes?.metadata?.bindings ) {
-				Object.entries( updatedAttributes.metadata.bindings ).forEach(
-					( [ attributeName, settings ] ) => {
-						const source = getBlockBindingsSource(
-							settings.source
-						);
+			// active sources state
+			const [ sourcesState, setSourcesState ] = useState();
 
-						if ( source ) {
-							// Second argument (`updateMetaValue`) will be used to update the value in the future.
-							const {
-								placeholder,
-								useValue: [ metaValue = null ] = [],
-							} = source.useSource( props, settings.args );
-
-							if ( placeholder && ! metaValue ) {
-								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
-								// Adding this workaround until attributes and metadata fields types are improved and include `url`.
-								const htmlAttribute =
-									getBlockType( blockName ).attributes[
-										attributeName
-									].attribute;
-								if (
-									htmlAttribute === 'src' ||
-									htmlAttribute === 'href'
-								) {
-									updatedAttributes[ attributeName ] = null;
-								} else {
-									updatedAttributes[ attributeName ] =
-										placeholder;
-								}
+			useEffect( () => {
+				Object.entries( sourcesState || {} ).forEach(
+					( [ attributeName, [ placeholder, metaValue ] ] ) => {
+						if ( placeholder && ! metaValue ) {
+							// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
+							// Adding this workaround until attributes and metadata fields types are improved and include `url`.
+							const htmlAttribute =
+								getBlockType( blockName ).attributes[
+									attributeName
+								].attribute;
+							if (
+								htmlAttribute === 'src' ||
+								htmlAttribute === 'href'
+							) {
+								updatedAttributes[ attributeName ] = null;
+							} else {
+								updatedAttributes[ attributeName ] =
+									placeholder;
 							}
+						}
 
-							if ( metaValue ) {
-								updatedAttributes[ attributeName ] = metaValue;
-							}
+						if ( metaValue ) {
+							updatedAttributes[ attributeName ] = metaValue;
 						}
 					}
 				);
-			}
+			}, [ sourcesState, blockName ] );
 
 			return (
-				<BlockEdit
-					key="edit"
-					attributes={ updatedAttributes }
-					{ ...props }
-				/>
+				<>
+					{ Object.entries(
+						updatedAttributes?.metadata?.bindings || {}
+					).map( ( [ attributeName, settings ] ) => (
+						<SourceWrapper
+							key={ attributeName }
+							attributeName={ attributeName }
+							settings={ settings }
+							setSourcesState={ setSourcesState }
+							{ ...props }
+						/>
+					) ) }
+					<BlockEdit
+						key="edit"
+						{ ...props }
+						attributes={ updatedAttributes }
+					/>
+				</>
 			);
 		},
 		'useBoundAttributes'
 	);
+
+/*
+ * A wrapper component for sources to avoid breaking the "rules of hooks" when
+ * using hooks in a loop.
+ */
+const SourceWrapper = ( {
+	attributeName,
+	settings,
+	setSourcesState,
+	...props
+} ) => {
+	const { getBlockBindingsSource } = unlock( useSelect( blockEditorStore ) );
+	const source = getBlockBindingsSource( settings.source );
+
+	const { placeholder, useValue: [ metaValue = null ] = [] } =
+		source.useSource( props, settings.args );
+
+	useEffect( () => {
+		if ( ! source ) {
+			return;
+		}
+
+		setSourcesState( ( prevState ) => ( {
+			...prevState,
+			[ attributeName ]: [ placeholder, metaValue ],
+		} ) );
+	}, [
+		source,
+		settings.source,
+		settings.attribute,
+		attributeName,
+		metaValue,
+		setSourcesState,
+		placeholder,
+	] );
+
+	return null;
+};
 
 /**
  * Filters a registered block's settings to enhance a block's `edit` component
