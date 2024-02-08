@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param  \WP_REST_Request $request Rest request object.
  * @return string                    Thumbnail for the result object.
  */
-function _gutenberg_get_search_result_thumbnail_field( $result_object, $field_name, $request ) {
+function _gutenberg_get_search_result_thumbnail_field( $result_object ) {
 
 	$object_id = $result_object['id'];
 	if ( empty( $object_id ) ) {
@@ -42,14 +42,14 @@ function _gutenberg_get_search_result_thumbnail_field( $result_object, $field_na
  * @param  \WP_REST_Request $request Rest request object.
  * @return string                    Alt text for the result object.
  */
-function _gutenberg_get_search_result_alt_text_field( $result_object, $field_name, $request ) {
+function _gutenberg_get_search_result_alt_text_field( $result_object ) {
 
 	$object_id = $result_object['id'];
 	if ( empty( $object_id ) ) {
 		return '';
 	}
 
-	$alt_text = get_post_meta($object_id, '_wp_attachment_image_alt', true);
+	$alt_text = get_post_meta( $object_id, '_wp_attachment_image_alt', true );
 
 	return $alt_text;
 }
