@@ -3,6 +3,7 @@
  */
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,18 +58,17 @@ export function useLink( params, state, shouldReplace ) {
 	return getPostLinkProps( history, params, state, shouldReplace );
 }
 
-export default function Link( {
-	params = {},
-	state,
-	replace: shouldReplace = false,
-	children,
-	...props
-} ) {
+function Link(
+	{ params = {}, state, replace: shouldReplace = false, children, ...props },
+	ref
+) {
 	const { href, onClick } = useLink( params, state, shouldReplace );
 
 	return (
-		<a href={ href } onClick={ onClick } { ...props }>
+		<a href={ href } onClick={ onClick } { ...props } ref={ ref }>
 			{ children }
 		</a>
 	);
 }
+
+export default forwardRef( Link );

@@ -8,7 +8,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { forwardRef, useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 
 /**
@@ -104,7 +104,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 	);
 }
 
-export default function ItemActions( { item, actions, isCompact } ) {
+function ItemActions( { item, actions, isCompact, ...props }, ref ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
 			( accumulator, action ) => {
@@ -129,6 +129,8 @@ export default function ItemActions( { item, actions, isCompact } ) {
 				item={ item }
 				primaryActions={ primaryActions }
 				secondaryActions={ secondaryActions }
+				{ ...props }
+				ref={ ref }
 			/>
 		);
 	}
@@ -164,10 +166,12 @@ export default function ItemActions( { item, actions, isCompact } ) {
 			<DropdownMenu
 				trigger={
 					<Button
+						{ ...props }
 						size="compact"
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
 						disabled={ ! secondaryActions.length }
+						ref={ ref }
 					/>
 				}
 				placement="bottom-end"
@@ -181,17 +185,24 @@ export default function ItemActions( { item, actions, isCompact } ) {
 	);
 }
 
-function CompactItemActions( { item, primaryActions, secondaryActions } ) {
+export default forwardRef( ItemActions );
+
+const CompactItemActions = forwardRef( function CompactItemActions(
+	{ item, primaryActions, secondaryActions, ...props },
+	ref
+) {
 	return (
 		<DropdownMenu
 			trigger={
 				<Button
+					{ ...props }
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={
 						! primaryActions.length && ! secondaryActions.length
 					}
+					ref={ ref }
 				/>
 			}
 			placement="bottom-end"
@@ -210,4 +221,4 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 			) }
 		</DropdownMenu>
 	);
-}
+} );

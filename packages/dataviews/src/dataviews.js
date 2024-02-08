@@ -67,10 +67,13 @@ export default function DataViews( {
 		( v ) => v.type === view.type
 	).component;
 	const _fields = useMemo( () => {
-		return fields.map( ( field ) => ( {
-			...field,
-			render: field.render || field.getValue,
-		} ) );
+		return fields.map( ( field ) => {
+			const renderField = field.render || field.getValue;
+			const render = ( { ref: refAsProp, ...props } = {}, ref ) =>
+				renderField?.( props, ref ?? refAsProp );
+
+			return { ...field, render };
+		} );
 	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">

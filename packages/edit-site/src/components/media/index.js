@@ -2,8 +2,12 @@
  * WordPress dependencies
  */
 import { useEntityRecord } from '@wordpress/core-data';
+import { forwardRef } from '@wordpress/element';
 
-function Media( { id, size = [ 'large', 'medium', 'thumbnail' ], ...props } ) {
+function Media(
+	{ id, size = [ 'large', 'medium', 'thumbnail' ], ...props },
+	ref
+) {
 	const { record: media } = useEntityRecord( 'root', 'media', id );
 	const currentSize = size.find(
 		( s ) => !! media?.media_details?.sizes[ s ]
@@ -18,8 +22,9 @@ function Media( { id, size = [ 'large', 'medium', 'thumbnail' ], ...props } ) {
 			{ ...props }
 			src={ mediaDetails.source_url }
 			alt={ media.alt_text }
+			ref={ ref }
 		/>
 	);
 }
 
-export default Media;
+export default forwardRef( Media );

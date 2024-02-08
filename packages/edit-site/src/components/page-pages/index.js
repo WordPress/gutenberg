@@ -10,7 +10,13 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useCallback,
+	useEffect,
+	forwardRef,
+} from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -162,7 +168,7 @@ const STATUSES = [
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
-function FeaturedImage( { item, viewType } ) {
+const FeaturedImage = forwardRef( ( { item, viewType }, ref ) => {
 	const { onClick } = useLink( {
 		postId: item.id,
 		postType: item.type,
@@ -178,6 +184,7 @@ function FeaturedImage( { item, viewType } ) {
 			className="edit-site-page-pages__featured-image"
 			id={ item.featured_media }
 			size={ size }
+			ref={ ref }
 		/>
 	) : null;
 	if ( viewType === LAYOUT_LIST ) {
@@ -196,7 +203,7 @@ function FeaturedImage( { item, viewType } ) {
 			{ media }
 		</button>
 	);
-}
+} );
 
 export default function PagePages() {
 	const postType = 'page';
@@ -278,8 +285,12 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item } ) => (
-					<FeaturedImage item={ item } viewType={ view.type } />
+				render: ( { item }, ref ) => (
+					<FeaturedImage
+						item={ item }
+						viewType={ view.type }
+						ref={ ref }
+					/>
 				),
 				enableSorting: false,
 				width: '1%',
@@ -287,8 +298,7 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered,
-				render: ( { item } ) => {
+				render: ( { item, ...props }, ref ) => {
 					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 						view.type
 					) ? (
@@ -298,6 +308,8 @@ export default function PagePages() {
 								postType: item.type,
 								canvas: 'edit',
 							} }
+							{ ...props }
+							ref={ ref }
 						>
 							{ decodeEntities( item.title?.rendered ) ||
 								__( '(no title)' ) }
@@ -338,12 +350,12 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				getValue: ( { item } ) => item.date,
-				render: ( { item } ) => {
+				render: ( { item }, ref ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
 						getDate( item.date )
 					);
-					return <time>{ formattedDate }</time>;
+					return <time ref={ ref }>{ formattedDate }</time>;
 				},
 			},
 		],
