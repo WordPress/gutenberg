@@ -169,6 +169,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$class_names = $w->get_attribute( 'class' );
+	$styles      = $w->get_attribute( 'style' );
 	$w->set_attribute( 'data-wp-interactive', '{"namespace":"core/image"}' );
 	$w->set_attribute(
 		'data-wp-context',
@@ -176,6 +177,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			array(
 				'uploadedSrc'  => $img_uploaded_src,
 				'classNames'   => $class_names,
+				'styles'       => $styles,
 				'targetWidth'  => $img_width,
 				'targetHeight' => $img_height,
 				'scaleAttr'    => $scale_attr,
@@ -207,7 +209,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-init="callbacks.initTriggerButton"
-			data-wp-on--click="actions.showLightbox"
 			data-wp-style--right="context.imageButtonRight"
 			data-wp-style--top="context.imageButtonTop"
 		>
@@ -247,7 +248,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-interactive='{"namespace":"core/image"}'
 			data-wp-context='{}'
 			data-wp-bind--role="state.roleAttribute"
-			data-wp-bind--aria-label="state.ariaLabel"
+			data-wp-bind--aria-label="state.currentImage.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.lightboxEnabled"
 			data-wp-class--hideAnimationEnabled="state.hideAnimationEnabled"

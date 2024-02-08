@@ -34,9 +34,6 @@ const { state, actions } = store( 'core/image', {
 		get ariaModal() {
 			return state.lightboxEnabled ? 'true' : null;
 		},
-		get ariaLabel() {
-			return state.lightboxEnabled ? state.currentAriaLabel : null;
-		},
 		get enlargedSrc() {
 			return (
 				state.currentImage.uploadedSrc ||
@@ -48,8 +45,8 @@ const { state, actions } = store( 'core/image', {
 		showLightbox() {
 			const ctx = getContext();
 
-			// We can't initialize the lightbox until the reference
-			// image is loaded, otherwise the UX is broken.
+			// We can't initialize the lightbox until the reference image is loaded,
+			// otherwise the UX is broken.
 			if ( ! ctx.imageRef.complete ) {
 				return;
 			}
@@ -85,6 +82,7 @@ const { state, actions } = store( 'core/image', {
 					} );
 				}, 450 );
 
+				state.hideAnimationEnabled = true;
 				state.currentImage = {};
 			}
 		},
