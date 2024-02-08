@@ -103,7 +103,8 @@ export default {
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`
+				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr));
+				container-type: inline-size;`
 			);
 		}
 
