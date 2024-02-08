@@ -24,8 +24,9 @@ function render_block_core_query( $attributes, $content, $block ) {
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
 	if ( $is_interactive ) {
+		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-			$module_url = gutenberg_url( "/build/interactivity/query.min.js" );
+			$module_url = gutenberg_url( '/build/interactivity/query.min.js' );
 		}
 
 		wp_register_script_module(
