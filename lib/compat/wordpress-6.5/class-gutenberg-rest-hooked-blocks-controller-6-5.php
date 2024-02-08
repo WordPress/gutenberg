@@ -129,14 +129,22 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			return $context;
 		}
 
+		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+
 		$hooked_block_types                 = get_hooked_blocks();
 		$hooked_block_types_by_anchor_block = array();
-		foreach ( $hooked_block_types as $anchor_block_type => $hooked_block_types_for_anchor_block ) {
-			foreach ( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
-				$hooked_block_types_for_anchor_block[ $relative_position ] =
-				apply_filters( 'hooked_block_types', $hooked_block_types, $relative_position, $anchor_block_type, $context );
+		foreach ( $block_types as $block_type ) {
+			foreach ( $this->position_types as $position ) {
+				$hooked_block_types_for_anchor_block = isset( $hooked_block_types[ $block_type->name ][ $position ] )
+					? $hooked_block_types[ $block_type->name ][ $position ]
+					: array();
+
+				$positioned_hooked_block_types = isset( $hooked_block_types[ $position ] )
+					? $hooked_block_types[ $position ]
+					: array();
+
+				$hooked_block_types_by_anchor_block[ $block_type->name ][ $position ] = apply_filters( 'hooked_block_types', $positioned_hooked_block_types, $position, $block_type->name, $context );
 			}
-			$hooked_block_types_by_anchor_block[ $anchor_block_type ] = $hooked_block_types_for_anchor_block;
 		}
 
 		foreach ( $hooked_block_types_by_anchor_block as $anchor_block_type => $hooked_block_types_for_anchor_block ) {
@@ -149,6 +157,8 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			}
 			$data[ $anchor_block_type ] = $this->prepare_response_for_collection( $hooked_block_types_for_anchor_block );
 		}
+
+		$data = $this->filter_empty_anchor_blocks( $data );
 
 		return rest_ensure_response( $data );
 	}
@@ -241,13 +251,10 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			$hooked_block_types_for_anchor_block[ $position ] = apply_filters( 'hooked_block_types', $positioned_hooked_block_types, $position, $block_name, $context );
 		}
 
-		// Filter non-empty arrays.
-		$filtered_hooked_block_types_for_anchor_block = array_filter(
-			$hooked_block_types_for_anchor_block,
-			function ( $hooked_block_types_for_position ) {
-				return ! empty( $hooked_block_types_for_position );
-			}
-		);
+		$filtered_hooked_block_types_for_anchor_block = $this->filter_empty_anchor_blocks( array( $block_name => $hooked_block_types_for_anchor_block ) );
+		$filtered_hooked_block_types_for_anchor_block = isset( $filtered_hooked_block_types_for_anchor_block[ $block_name ] )
+			? $filtered_hooked_block_types_for_anchor_block[ $block_name ]
+			: array();
 
 		$data = $this->prepare_item_for_response( $filtered_hooked_block_types_for_anchor_block, $request );
 
@@ -342,5 +349,34 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		}
 
 		return $context;
+	}
+
+	/**
+	 * Filters out empty anchor blocks from the response array.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $hooked_blocks Array of block types and their hooked blocks.
+	 * @return array Filtered array of block types and their hooked blocks.
+	 */
+	protected function filter_empty_anchor_blocks( $hooked_blocks ) {
+		$filtered_array = array();
+
+		foreach ( $hooked_blocks as $key => $value ) {
+			// If the current value is an array and it's not empty, add it to the filtered array
+			if ( is_array( $value ) && ! empty( $value ) ) {
+				// Recursively filter the children arrays
+				$filtered_children = $this->filter_empty_anchor_blocks( $value );
+				// If any non-empty children were found, add them to the filtered array
+				if ( ! empty( $filtered_children ) ) {
+					$filtered_array[ $key ] = $filtered_children;
+				}
+			} elseif ( ! empty( $value ) ) {
+				// If the value is not an array but not empty, add it directly to the filtered array
+				$filtered_array[ $key ] = $value;
+			}
+		}
+
+		return $filtered_array;
 	}
 }
