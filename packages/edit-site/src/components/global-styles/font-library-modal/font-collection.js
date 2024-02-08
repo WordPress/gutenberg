@@ -332,7 +332,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				options={ [ ...Array( totalPages ) ].map( ( e, i ) => {
 					return { label: i + 1, value: i + 1 };
 				} ) }
-				onChange={ ( newPage ) => setPage( newPage ) }
+				onChange={ ( newPage ) => setPage( parseInt( newPage ) ) }
 			/>
 			<Text>{ ` of ${ totalPages }` }</Text>
 			<Button
