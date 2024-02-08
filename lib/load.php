@@ -112,6 +112,7 @@ require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivit
 require __DIR__ . '/compat/wordpress-6.5/interactivity-api/interactivity-api.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
+require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings-registry.php';
 }
