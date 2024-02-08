@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "suspended-block/suspended-block",
+	"version": "1.0.0",
+	"title": "Suspended Block",
+	"category": "theme",
+	"icon": "smiley",
+	"description": "An example of React Suspended applied to Gutenberg Blocks",
+	"example": {},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "suspended-block",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js"
+}
