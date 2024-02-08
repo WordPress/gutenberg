@@ -322,7 +322,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...( __experimentalSelectBlockPatterns( select ) ?? [] ),
+			...( __experimentalSelectBlockPatterns?.( select ) ?? [] ),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
