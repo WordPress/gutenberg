@@ -126,7 +126,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				blockAttributes = {
 					metadata: {
 						ignoredHookedBlocks,
-						...blockAttributes.metadata,
+						...metadata,
 					},
 					...otherAttributes,
 				};
