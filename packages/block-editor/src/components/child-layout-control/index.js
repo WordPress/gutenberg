@@ -127,6 +127,7 @@ export default function ChildLayoutControl( {
 							} );
 						} }
 						value={ columnSpan }
+						min={ 1 }
 					/>
 					<InputControl
 						size={ '__unstable-large' }
@@ -139,6 +140,7 @@ export default function ChildLayoutControl( {
 							} );
 						} }
 						value={ rowSpan }
+						min={ 1 }
 					/>
 				</HStack>
 			) }
