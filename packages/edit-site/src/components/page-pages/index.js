@@ -187,7 +187,7 @@ const FeaturedImage = forwardRef( ( { item, viewType }, ref ) => {
 			ref={ ref }
 		/>
 	) : null;
-	if ( viewType === LAYOUT_LIST ) {
+	if ( viewType !== LAYOUT_TABLE ) {
 		return media;
 	}
 	return (
@@ -298,6 +298,8 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
+				getValue: ( { item } ) =>
+					decodeEntities( item.title?.rendered ),
 				render: ( { item, ...props }, ref ) => {
 					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 						view.type
