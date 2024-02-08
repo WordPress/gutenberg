@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 17.6.5 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Script Modules API
+- Import Maps: Only emit CDATA wrappers for inline scripts for JavaScript. ([58859](https://github.com/WordPress/gutenberg/pull/58859))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@c4rl0sbr4v0
+
+
 = 17.6.4 =
 
 ### Bug Fixes
