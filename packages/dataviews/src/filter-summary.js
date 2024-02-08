@@ -242,6 +242,9 @@ export default function FilterSummary( {
 									// back to the available filters from `Add filter` component.
 									if ( ! isPrimary ) {
 										addFilterRef.current?.focus();
+									} else {
+										// If is primary, focus the toggle button.
+										toggleRef.current?.focus();
 									}
 								} }
 							>
