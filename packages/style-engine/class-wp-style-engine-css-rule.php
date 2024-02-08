@@ -24,6 +24,13 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		protected $selector;
 
 		/**
+		 * The container.
+		 *
+		 * @var string
+		 */
+		protected $container;
+
+		/**
 		 * The selector declarations.
 		 *
 		 * Contains a WP_Style_Engine_CSS_Declarations object.
@@ -66,6 +73,30 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 			$this->selector = $selector;
 			return $this;
 		}
+
+		/**
+		 * Sets the container.
+		 *
+		 * @param string $container The CSS selector.
+		 *
+		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
+		 */
+		public function set_container( $container ) {
+			if ( ! empty( $container ) ) {
+				$this->container = $container;
+			}
+			return $this;
+		}
+
+		/**
+		 * Gets the container.
+		 *
+		 * @return string Container.
+		 */
+		public function get_container() {
+			return $this->container;
+		}
+
 
 		/**
 		 * Sets the declarations.
@@ -165,3 +196,4 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		}
 	}
 }
+

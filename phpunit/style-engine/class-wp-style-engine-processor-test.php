@@ -393,4 +393,63 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			'Return value of get_css() does not match expectations when combining 4 CSS rules'
 		);
 	}
+
+	public function test_should_return_store_rules_with_css_containers() {
+		$panda_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'panda' );
+		// Add a nested rule.
+		$panda_store_rule_1  = $panda_store->add_rule(  '.blueberry' )->set_container( '@container (width > 400px)' );
+		$panda_store_rule_1->add_declarations( array(
+			'background-color'  => 'blue',
+		) );
+
+		// Add a regular rule.
+		$panda_store_rule_2  = $panda_store->add_rule(  '.wp-block-mushroom a:hover' );
+		$panda_store_rule_2->add_declarations( array(
+			'padding' => '100px',
+		) );
+
+
+		$a_panda_renderer = new WP_Style_Engine_Processor_Gutenberg();
+		$a_panda_renderer->add_store( $panda_store );
+		$this->assertSame(
+			'@container (width > 400px){.blueberry{background-color:blue;}}.wp-block-mushroom a:hover{padding:100px;}',
+			$a_panda_renderer->get_css( array( 'prettify' => false ) ),
+			'Returns processed CSS rules with containers'
+		);
+
+		// Combine with a nested rule added directly to the processor.
+		$a_raspberry_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
+			'.raspberry',
+			array(
+				'background-color'  => 'red',
+			)
+		);
+		$a_raspberry_rule->set_container( '@container (width > 400px)' );
+
+		$a_panda_renderer->add_rules( $a_raspberry_rule );
+
+		$this->assertSame(
+			'@container (width > 400px){.blueberry{background-color:blue;}.raspberry{background-color:red;}}.wp-block-mushroom a:hover{padding:100px;}',
+			$a_panda_renderer->get_css( array( 'prettify' => false ) ),
+			'Returns processed CSS rules with rules added to containers'
+		);
+
+		$expected_prettified = '@container (width > 400px) {
+	.blueberry {
+		background-color: blue;
+	}
+	.raspberry {
+		background-color: red;
+	}
+}
+.wp-block-mushroom a:hover {
+	padding: 100px;
+}
+';
+		$this->assertSame(
+			$expected_prettified,
+			$a_panda_renderer->get_css( array( 'prettify' => true ) ),
+			'Returns prettified processed CSS rules'
+		);
+	}
 }

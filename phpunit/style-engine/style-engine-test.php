@@ -236,6 +236,29 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'style_block_with_nested_selector'                    => array(
+				'block_styles'    => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => '42px',
+							'left'   => '2%',
+							'bottom' => '44px',
+							'right'  => '5rem',
+						),
+					),
+				),
+				'options'         => array( 'selector' => '.wp-selector > p', 'container' => '@layer sandwich' ),
+				'expected_output' => array(
+					'css'          => '@layer sandwich{.wp-selector > p{padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;}}',
+					'declarations' => array(
+						'padding-top'    => '42px',
+						'padding-left'   => '2%',
+						'padding-bottom' => '44px',
+						'padding-right'  => '5rem',
+					),
+				),
+			),
+
 			'elements_with_css_var_value'                  => array(
 				'block_styles'    => array(
 					'color'      => array(
@@ -647,6 +670,48 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 			array(
 				'selector'     => '.radagast',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '60px',
+					'border-style' => 'dashed',
+					'align-self'   => 'stretch',
+				),
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+
+		$this->assertSame( '.saruman{color:white;height:100px;border-style:solid;align-self:unset;}.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet from a set of nested rules.
+	 */
+	public function test_should_return_stylesheet_from_nested_css_rules() {
+		$css_rules = array(
+			array(
+				'selector'     => '.saruman',
+				'container'    => '@supports (align-self: stretch)',
+				'declarations' => array(
+					'color'        => 'white',
+					'height'       => '100px',
+					'border-style' => 'solid',
+					'align-self'   => 'stretch',
+				),
+			),
+			array(
+				'selector'     => '.gandalf',
+				'container'    => '@supports (border-style: dotted)',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+					'align-self'   => 'safe center',
+				),
+			),
+			array(
+				'selector'     => '.radagast',
+				'container'    => '@supports (align-self: stretch)',
 				'declarations' => array(
 					'color'        => 'brown',
 					'height'       => '60px',
