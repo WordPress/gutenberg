@@ -634,6 +634,7 @@
 
 .dataviews-filter-summary__chip-container {
 	position: relative;
+	white-space: pre-wrap;
 
 	.dataviews-filter-summary__chip {
 		border-radius: $grid-unit-20;
@@ -713,5 +714,9 @@
 			outline: none;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
+	}
+
+	.dataviews-filter-summary__filter-text-value {
+		color: $white;
 	}
 }

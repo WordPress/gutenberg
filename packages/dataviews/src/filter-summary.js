@@ -17,7 +17,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
@@ -32,15 +32,23 @@ const FilterText = ( { activeElement, filterInView, filter } ) => {
 		return filter.name;
 	}
 
+	const filterTextWrappers = {
+		Span1: <span className="dataviews-filter-summary__filter-text-name" />,
+		Span2: <span className="dataviews-filter-summary__filter-text-value" />,
+	};
+
 	if (
 		activeElement !== undefined &&
 		filterInView?.operator === OPERATOR_IN
 	) {
-		return sprintf(
-			/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is Admin". */
-			__( '%1$s is %2$s' ),
-			filter.name,
-			activeElement.label
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is Admin". */
+				__( '<Span1>%1$s </Span1><Span2>is %2$s</Span2>' ),
+				filter.name,
+				activeElement.label
+			),
+			filterTextWrappers
 		);
 	}
 
@@ -48,11 +56,14 @@ const FilterText = ( { activeElement, filterInView, filter } ) => {
 		activeElement !== undefined &&
 		filterInView?.operator === OPERATOR_NOT_IN
 	) {
-		return sprintf(
-			/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not Admin". */
-			__( '%1$s is not %2$s' ),
-			filter.name,
-			activeElement.label
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not Admin". */
+				__( '<Span1>%1$s </Span1><Span2>is not %2$s</Span2>' ),
+				filter.name,
+				activeElement.label
+			),
+			filterTextWrappers
 		);
 	}
 
@@ -206,6 +217,7 @@ export default function FilterSummary( {
 									[ ENTER, SPACE ].includes( event.keyCode )
 								) {
 									onToggle();
+									event.preventDefault();
 								}
 							} }
 							aria-pressed={ isOpen }
