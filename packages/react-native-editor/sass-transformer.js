@@ -60,9 +60,14 @@ const imports =
 	'@import "' + autoImportAssets.join( '";\n@import "' ) + '";\n\n';
 
 // Iterate through the include paths and extensions to find the file variant.
-function findVariant( name, extensions, includePaths ) {
+function findVariant( name, extensions, includePaths, projectRoot ) {
 	for ( let i = 0; i < includePaths.length; i++ ) {
-		const includePath = includePaths[ i ];
+		let includePath = includePaths[ i ];
+
+		// Workaround for not having the full path when loaded from Gutenberg Mobile
+		if ( includePath.startsWith( 'gutenberg' ) ) {
+			includePath = `${ projectRoot }/${ includePath }`;
+		}
 
 		// Try to find the file iterating through the extensions, in order.
 		const foundExtention = extensions.find( ( extension ) => {
@@ -117,7 +122,12 @@ function transform( src, filename, options ) {
 						path.resolve( path.dirname( filename ), urlPath.dir )
 					); // Add the file's dir to the search array.
 				}
-				const f = findVariant( urlPath.name, exts, incPaths );
+				const f = findVariant(
+					urlPath.name,
+					exts,
+					incPaths,
+					options.projectRoot
+				);
 
 				if ( f ) {
 					return { file: f };
