@@ -22,7 +22,7 @@ let lastTouchTime = 0;
 let imageRef;
 let triggerRef;
 
-const { state, actions } = store(
+const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
@@ -70,7 +70,7 @@ const { state, actions } = store(
 				state.currentImage = ctx;
 				state.lightboxEnabled = true;
 
-				actions.setOverlayStyles();
+				callbacks.setOverlayStyles();
 			},
 			hideLightbox() {
 				if ( state.lightboxEnabled ) {
@@ -154,6 +154,8 @@ const { state, actions } = store(
 					}
 				}
 			},
+		},
+		callbacks: {
 			setOverlayStyles() {
 				// The reference img element lies adjacent to the event target button in
 				// the DOM.
@@ -320,20 +322,6 @@ const { state, actions } = store(
 				}
 			`;
 			},
-		},
-		callbacks: {
-			initTriggerButton() {
-				const ctx = getContext();
-				const { ref } = getElement();
-				ctx.triggerRef = ref;
-			},
-			setOverlayFocus() {
-				if ( state.lightboxEnabled ) {
-					// Moves the focus to the dialog when it opens.
-					const { ref } = getElement();
-					ref.focus();
-				}
-			},
 			setButtonStyles() {
 				const ctx = getContext();
 				const { ref } = getElement();
@@ -413,6 +401,18 @@ const { state, actions } = store(
 					ctx.imageButtonTop = buttonOffsetTop + 16;
 					ctx.imageButtonRight = buttonOffsetRight + 16;
 				}
+			},
+			setOverlayFocus() {
+				if ( state.lightboxEnabled ) {
+					// Moves the focus to the dialog when it opens.
+					const { ref } = getElement();
+					ref.focus();
+				}
+			},
+			initTriggerButton() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				ctx.triggerRef = ref;
 			},
 		},
 	},

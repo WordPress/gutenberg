@@ -184,6 +184,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$p->next_tag( 'img' );
 	$p->set_attribute( 'data-wp-init', 'callbacks.setButtonStyles' );
 	$p->set_attribute( 'data-wp-on--load', 'callbacks.setButtonStyles' );
+	$p->set_attribute( 'data-wp-on-window--resize', 'callbacks.setButtonStyles' );
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
@@ -253,7 +254,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-on--touchmove="actions.handleTouchMove"
 			data-wp-on--touchend="actions.handleTouchEnd"
 			data-wp-on--click="actions.hideLightbox"
-			data-wp-on-window--resize="actions.setOverlayStyles"
+			data-wp-on-window--resize="callbacks.setOverlayStyles"
 			data-wp-on-window--scroll="actions.handleScroll"
 			tabindex="-1"
 			>
