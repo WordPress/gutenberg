@@ -14,7 +14,7 @@ global.navigator = global.navigator ?? {};
 require( '../../packages/react-native-editor/src/globals' );
 
 // Set up Reanimated library for testing
-require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
+require( 'react-native-reanimated' ).setUpTests();
 global.__reanimatedWorkletInit = jest.fn();
 global.ReanimatedDataMock = {
 	now: () => 0,
