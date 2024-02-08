@@ -405,6 +405,7 @@ export default function Image( {
 
 	const {
 		lockUrlControls = false,
+		lockHrefControls = false,
 		lockAltControls = false,
 		lockTitleControls = false,
 	} = useSelect(
@@ -413,19 +414,24 @@ export default function Image( {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const { getBlockBindingsSource, getBlockParentsByBlockName } =
+				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
+			const hasParentPattern =
+				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
 			return {
 				lockUrlControls:
 					!! urlBinding &&
 					getBlockBindingsSource( urlBinding?.source )
 						?.lockAttributesEditing === true,
+				lockHrefControls:
+					// Disable editing the link of the URL if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
 					getBlockBindingsSource( altBinding?.source )
@@ -436,27 +442,30 @@ export default function Image( {
 						?.lockAttributesEditing === true,
 			};
 		},
-		[ isSingleSelected ]
+		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-					<ImageURLInputUI
-						url={ href || '' }
-						onChangeUrl={ onSetHref }
-						linkDestination={ linkDestination }
-						mediaUrl={ ( image && image.source_url ) || url }
-						mediaLink={ image && image.link }
-						linkTarget={ linkTarget }
-						linkClass={ linkClass }
-						rel={ rel }
-						showLightboxSetting={ showLightboxSetting }
-						lightboxEnabled={ lightboxChecked }
-						onSetLightbox={ onSetLightbox }
-					/>
-				) }
+				{ isSingleSelected &&
+					! isEditingImage &&
+					! lockHrefControls &&
+					! lockUrlControls && (
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ ( image && image.source_url ) || url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+							showLightboxSetting={ showLightboxSetting }
+							lightboxEnabled={ lightboxChecked }
+							onSetLightbox={ onSetLightbox }
+						/>
+					) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
