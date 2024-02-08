@@ -82,8 +82,8 @@ const createEditFunctionWithBindingsAttribute = () =>
 			return (
 				<BlockEdit
 					key="edit"
-					attributes={ updatedAttributes }
 					{ ...props }
+					attributes={ updatedAttributes }
 				/>
 			);
 		},
