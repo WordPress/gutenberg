@@ -40,7 +40,7 @@ function render_block_core_file( $attributes, $content ) {
 	if ( ! empty( $attributes['displayPreview'] ) ) {
 		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-			$module_url = gutenberg_url( "/build/interactivity/file{$suffix}.js" );
+			$module_url = gutenberg_url( '/build/interactivity/file.min.js' );
 		}
 
 		wp_register_script_module(
