@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { Animated, ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Icon, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
@@ -35,7 +34,6 @@ export class MediaUploadProgress extends Component {
 			isUploadFailed: false,
 		};
 
-		this.checkmarkOpacity = new Animated.Value( 1 );
 		this.mediaUpload = this.mediaUpload.bind( this );
 		this.getRetryMessage = this.getRetryMessage.bind( this );
 	}
@@ -95,15 +93,6 @@ export class MediaUploadProgress extends Component {
 			uploadState: payload.state,
 			isUploadInProgress: false,
 		} );
-
-		this.checkmarkOpacity.setValue( 1 );
-
-		Animated.timing( this.checkmarkOpacity, {
-			toValue: 0,
-			duration: 500,
-			delay: 1200,
-			useNativeDriver: true,
-		} ).start();
 
 		if ( this.props.onFinishMediaUploadWithSuccess ) {
 			this.props.onFinishMediaUploadWithSuccess( payload );
@@ -197,19 +186,9 @@ export class MediaUploadProgress extends Component {
 					<ActivityIndicator
 						style={ styles.activityIndicator }
 						size="small"
-						color="#ffffff"
+						color="#111111"
 						testID="spinner"
 					/>
-				) }
-				{ uploadState === MEDIA_UPLOAD_STATE_SUCCEEDED && (
-					<Animated.View
-						style={ [
-							styles.activityIndicator,
-							{ opacity: this.checkmarkOpacity },
-						] }
-					>
-						<Icon icon={ check } fill="white" size={ 26 } />
-					</Animated.View>
 				) }
 				{ renderContent( {
 					isUploadPaused:
