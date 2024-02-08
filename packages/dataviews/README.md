@@ -20,13 +20,7 @@ npm install @wordpress/dataviews --save
 	onChangeView={ onChangeView }
 	fields={ fields }
 	actions={ [ trashPostAction ] }
-	search={ false }
-	searchLabel="Filter list"
-	getItemId={ ( item ) => item.id }
-	isLoading={ isLoadingData }
 	supportedLayouts={ [ 'table' ] }
-	deferredRendering={ true }
-	onSelectionChange={ ( items ) => { /* ... */ } }
 />
 ```
 
@@ -88,7 +82,7 @@ Example:
 -   `hiddenFields`: the `id` of the fields that are hidden in the UI.
 -   `layout`: config that is specific to a particular layout type.
     -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
-    -   `primaryField`: used by the `grid` and `list` layouts. The `id` of the field to be highlighted in each card/list item.
+    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each card/list item.
 
 ### onChangeView: syncing view and data
 
