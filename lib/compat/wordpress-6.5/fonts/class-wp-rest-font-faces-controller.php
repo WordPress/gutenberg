@@ -858,7 +858,11 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 */
 		protected function handle_font_file_upload( $file ) {
 			add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
-			add_filter( 'upload_dir', 'wp_get_font_dir' );
+			$wp_get_font_dir = wp_get_font_dir();
+
+			add_filter( 'upload_dir', function ( $defaults ) use ( $wp_get_font_dir ) {
+				return $wp_get_font_dir;
+			} );
 
 			$overrides = array(
 				'upload_error_handler' => array( $this, 'handle_font_file_upload_error' ),
@@ -876,7 +880,6 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 
 			$uploaded_file = wp_handle_upload( $file, $overrides );
 
-			remove_filter( 'upload_dir', 'wp_get_font_dir' );
 			remove_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 
 			return $uploaded_file;
