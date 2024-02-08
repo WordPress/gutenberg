@@ -1,19 +1,45 @@
+import React, { Suspense } from 'react';
+
 import { useBlockProps } from '@wordpress/block-editor';
 import { useSuspenseSelect, useSelect } from '@wordpress/data';
-
-import './editor.scss';
-import React, { Suspense } from 'react';
 import { Spinner } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
+import fetch from '@wordpress/api-fetch';
+
+import './editor.scss';
 
 export default function Edit() {
 	return (
 		<div { ...useBlockProps() }>
 			<Suspense fallback={ <Spinner /> }>
-				<SuspenseEntities />
+				<SelectEntities />
 			</Suspense>
 		</div>
 	);
+}
+
+function FetchEntities() {
+	const [ entities, setEntities ] = React.useState( undefined );
+
+	React.useEffect( () => {
+		fetch( { path: '?rest_route=/wp/v2/pag' } )
+			.then( ( data ) => {
+				setEntities( data ?? null );
+			} )
+			.catch( ( err ) => {
+				console.error( err );
+				setEntities( null );
+			} );
+	}, [] );
+
+	if ( entities === undefined ) {
+		return <Spinner />;
+	}
+	if ( entities === null ) {
+		return <p>No entities found</p>;
+	}
+
+	return <Entities entities={ entities } />;
 }
 
 function SuspenseEntities() {
