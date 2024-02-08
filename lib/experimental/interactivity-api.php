@@ -14,7 +14,7 @@
 function gutenberg_interactivity_override_script_module_urls( $url ) {
 	$pattern = '/wp-includes\/js\/dist\/interactivity(-router)?(\.min)?\.js/';
 	if ( preg_match( $pattern, $url, $matches ) ) {
-		return gutenberg_url( '/build/interactivity/' . ( $matches[1] ? 'router' : 'index' ) . wp_scripts_get_suffix() . '.js' );
+		return gutenberg_url( '/build/interactivity/' . ( ( isset( $matches[1] ) && $matches[1] ) ? 'router' : 'index' ) . wp_scripts_get_suffix() . '.js' );
 	}
 	return $url;
 }
