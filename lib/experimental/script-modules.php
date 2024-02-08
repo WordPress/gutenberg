@@ -42,7 +42,7 @@ function gutenberg_filter_block_type_metadata_settings_register_view_module( $se
 	return $settings;
 }
 
-add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_view_module', 10, 2 );
+add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_view_module', 20, 2 );
 
 /**
  * Finds a module ID for the selected block metadata field. It detects

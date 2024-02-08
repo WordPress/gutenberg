@@ -70,7 +70,7 @@ if ( ! function_exists( 'wp_script_modules' ) ) {
 		return $settings;
 	}
 
-	add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 11, 2 );
+	add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 10, 2 );
 
 	/**
 	 * Enqueue modules associated with the block.
