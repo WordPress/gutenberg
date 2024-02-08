@@ -38,8 +38,9 @@ function render_block_core_file( $attributes, $content ) {
 
 	// If it's interactive, enqueue the script module and add the directives.
 	if ( ! empty( $attributes['displayPreview'] ) ) {
+		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-			$module_url = gutenberg_url( "/build/interactivity/file.min.js" );
+			$module_url = gutenberg_url( "/build/interactivity/file{$suffix}.js" );
 		}
 
 		wp_register_script_module(

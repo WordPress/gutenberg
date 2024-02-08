@@ -80,8 +80,9 @@ function render_block_core_search( $attributes ) {
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
 		if ( $is_expandable_searchfield ) {
+			$suffix = wp_scripts_get_suffix();
 			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-				$module_url = gutenberg_url( "/build/interactivity/search.min.js" );
+				$module_url = gutenberg_url( "/build/interactivity/search{$suffix}.js" );
 			}
 
 			wp_register_script_module(
