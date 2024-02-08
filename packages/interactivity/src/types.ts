@@ -29,7 +29,7 @@ interface Evaluate {
 
 type DirectiveEntries = Record< string, DirectiveEntry[] >;
 
-interface DirectiveArgs {
+export interface DirectiveArgs {
 	/**
 	 * Object map with the defined directives of the element being evaluated.
 	 */
@@ -37,15 +37,15 @@ interface DirectiveArgs {
 	/**
 	 * Props present in the current element.
 	 */
-	props: Object;
+	props?: Record< string, any >;
 	/**
 	 * Virtual node representing the element.
 	 */
-	element: VNode;
+	element?: Element;
 	/**
 	 * The inherited context.
 	 */
-	context: Context< any >;
+	context?: Context< any >;
 	/**
 	 * Function that resolves a given path to a value either in the store or the
 	 * context.
@@ -54,7 +54,7 @@ interface DirectiveArgs {
 }
 
 export interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | void;
+	( args: DirectiveArgs ): Element | void;
 }
 
 export interface DirectiveOptions {
@@ -132,8 +132,9 @@ export interface ContextProviderProps {
 	children?: ComponentChildren;
 }
 
+// Cannot export some types needed from deepsignal library.
 export interface SignalObject {
 	[ key: string ]: {
-		peek: () => any; // Cannot export types from deepsignal library.
+		peek: () => any;
 	};
 }
