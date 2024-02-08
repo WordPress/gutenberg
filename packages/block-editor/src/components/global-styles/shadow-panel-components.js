@@ -5,18 +5,30 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 	FlexItem,
 	Dropdown,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
+
 /**
  * External dependencies
  */
 import classNames from 'classnames';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const defaultShadows = settings?.shadow?.presets?.default || [];
@@ -43,8 +55,14 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 }
 
 export function ShadowPresets( { presets, activeShadow, onSelect } ) {
+	const compositeStore = useCompositeStore();
 	return ! presets ? null : (
-		<Grid columns={ 6 } gap={ 0 } align="center" justify="center">
+		<Composite
+			store={ compositeStore }
+			role="listbox"
+			className="block-editor-global-styles__shadow__list"
+			aria-label={ __( 'Drop shadows' ) }
+		>
 			{ presets.map( ( { name, slug, shadow } ) => (
 				<ShadowIndicator
 					key={ slug }
@@ -56,23 +74,34 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 					shadow={ shadow }
 				/>
 			) ) }
-		</Grid>
+		</Composite>
 	);
 }
 
 export function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 	return (
-		<div className="block-editor-global-styles__shadow-indicator-wrapper">
-			<Button
-				className="block-editor-global-styles__shadow-indicator"
-				onClick={ onSelect }
-				label={ label }
-				style={ { boxShadow: shadow } }
-				showTooltip
-			>
-				{ isActive && <Icon icon={ check } /> }
-			</Button>
-		</div>
+		<CompositeItem
+			role="option"
+			aria-label={ label }
+			aria-selected={ isActive }
+			className={ classNames(
+				'block-editor-global-styles__shadow__item',
+				{
+					'is-active': isActive,
+				}
+			) }
+			render={
+				<Button
+					className="block-editor-global-styles__shadow-indicator"
+					onClick={ onSelect }
+					label={ label }
+					style={ { boxShadow: shadow } }
+					showTooltip
+				>
+					{ isActive && <Icon icon={ check } /> }
+				</Button>
+			}
+		/>
 	);
 }
 
