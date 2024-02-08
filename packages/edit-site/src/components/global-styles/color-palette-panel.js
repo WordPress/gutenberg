@@ -49,6 +49,9 @@ export default function ColorPalettePanel( { name } ) {
 	);
 	const colorVariations = useThemeStyleVariationsByProperty( {
 		styleProperty: 'color',
+		filter: ( variation ) =>
+			variation?.settings?.color &&
+			Object.keys( variation?.settings?.color ).length,
 	} );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
@@ -94,7 +97,9 @@ export default function ColorPalettePanel( { name } ) {
 				popoverProps={ popoverProps }
 			/>
 			{ /* @TODO: pass down variations to component? */ }
-			{ !! colorVariations.length && <ColorVariations /> }
+			{ !! colorVariations.length && (
+				<ColorVariations variations={ colorVariations } />
+			) }
 		</VStack>
 	);
 }

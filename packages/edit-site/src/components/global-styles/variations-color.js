@@ -24,7 +24,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
-import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
 import Subtitle from './subtitle';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
@@ -118,11 +117,7 @@ function ColorVariation( { variation } ) {
 	);
 }
 
-export default function ColorVariations() {
-	const colorVariations = useThemeStyleVariationsByProperty( {
-		styleProperty: 'color',
-	} );
-
+export default function ColorVariations( { variations } ) {
 	return (
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
@@ -130,15 +125,11 @@ export default function ColorVariations() {
 				columns={ 2 }
 				className="edit-site-global-styles-color-variations"
 			>
-				{ colorVariations &&
-					colorVariations.map( ( variation, index ) => {
-						return (
-							<ColorVariation
-								key={ index }
-								variation={ variation }
-							/>
-						);
-					} ) }
+				{ variations.map( ( variation, index ) => {
+					return (
+						<ColorVariation key={ index } variation={ variation } />
+					);
+				} ) }
 			</Grid>
 		</VStack>
 	);

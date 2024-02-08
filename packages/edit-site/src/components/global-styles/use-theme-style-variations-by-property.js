@@ -87,7 +87,10 @@ export const getVariationsByProperty = ( user, variations, property ) => {
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
-export default function useThemeStyleVariationsByProperty( { styleProperty } ) {
+export default function useThemeStyleVariationsByProperty( {
+	styleProperty,
+	filter,
+} ) {
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -107,12 +110,16 @@ export default function useThemeStyleVariationsByProperty( { styleProperty } ) {
 			Test with 2022 - typography font families bork for some reason
 
 		 */
-		const styleVariations = getVariationsByProperty(
+		let styleVariations = getVariationsByProperty(
 			user,
 			variations,
 			styleProperty
 		);
 
-		return styleVariations.length ? styleVariations : [];
-	}, [ styleProperty, variations ] );
+		if ( 'function' === typeof filter ) {
+			styleVariations = styleVariations.filter( filter );
+		}
+
+		return styleVariations;
+	}, [ styleProperty, variations, filter ] );
 }

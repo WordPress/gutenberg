@@ -168,6 +168,9 @@ function TypographyVariation( { variation } ) {
 export default function TypographyVariations() {
 	const typographyVariations = useThemeStyleVariationsByProperty( {
 		styleProperty: 'typography',
+		filter: ( variation ) =>
+			variation?.settings?.typography?.fontFamilies &&
+			Object.keys( variation?.settings?.typography?.fontFamilies ).length,
 	} );
 
 	const { base } = useContext( GlobalStylesContext );

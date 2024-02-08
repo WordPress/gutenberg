@@ -30,7 +30,11 @@ function ScreenTypography() {
 	);
 	const typographyVariations = useThemeStyleVariationsByProperty( {
 		styleProperty: 'typography',
+		filter: ( variation ) =>
+			variation?.settings?.typography?.fontFamilies &&
+			Object.keys( variation?.settings?.typography?.fontFamilies ).length,
 	} );
+
 	return (
 		<>
 			<ScreenHeader
