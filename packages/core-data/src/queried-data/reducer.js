@@ -57,7 +57,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
 		// We need to check against the possible maximum upper boundary because
-		// a page could recieve less items than what was previously stored.
+		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
 		mergedItemIds[ i ] = isInNextItemsRange

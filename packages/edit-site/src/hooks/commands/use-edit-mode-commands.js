@@ -24,6 +24,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -37,20 +38,35 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { useLink } from '../../components/routes/link';
 
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
-		( select ) => ( {
-			isPage: select( editSiteStore ).isPage(),
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
-		} ),
+	const { isPage, canvasMode, templateId, currentPostType } = useSelect(
+		( select ) => {
+			const { isPage: _isPage, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const { getCurrentPostType, getCurrentTemplateId } =
+				select( editorStore );
+			return {
+				isPage: _isPage(),
+				canvasMode: getCanvasMode(),
+				templateId: getCurrentTemplateId(),
+				currentPostType: getCurrentPostType(),
+			};
+		},
 		[]
 	);
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+
+	const { onClick: editTemplate } = useLink( {
+		postType: 'wp_template',
+		postId: templateId,
+	} );
+
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! isPage || canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
@@ -58,7 +74,7 @@ function usePageContentFocusCommands() {
 
 	const commands = [];
 
-	if ( hasPageContentFocus ) {
+	if ( currentPostType !== 'wp_template' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
 			/* translators: %1$s: template title */
@@ -68,7 +84,7 @@ function usePageContentFocusCommands() {
 			),
 			icon: layout,
 			callback: ( { close } ) => {
-				setHasPageContentFocus( false );
+				editTemplate();
 				close();
 			},
 		} );
@@ -78,7 +94,7 @@ function usePageContentFocusCommands() {
 			label: __( 'Back to page' ),
 			icon: page,
 			callback: ( { close } ) => {
-				setHasPageContentFocus( true );
+				setRenderingMode( 'template-locked' );
 				close();
 			},
 		} );
@@ -122,8 +138,10 @@ function useManipulateDocumentCommands() {
 	const { isLoaded, record: template } = useEditedEntityRecord();
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const history = useHistory();
-	const hasPageContentFocus = useSelect(
-		( select ) => select( editSiteStore ).hasPageContentFocus(),
+	const isEditingPage = useSelect(
+		( select ) =>
+			select( editSiteStore ).isPage() &&
+			select( editorStore ).getCurrentPostType() !== 'wp_template',
 		[]
 	);
 
@@ -133,7 +151,7 @@ function useManipulateDocumentCommands() {
 
 	const commands = [];
 
-	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
+	if ( isTemplateRevertable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
@@ -157,7 +175,7 @@ function useManipulateDocumentCommands() {
 		} );
 	}
 
-	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
+	if ( isTemplateRemovable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
@@ -210,23 +228,23 @@ function useEditUICommands() {
 		showBlockBreadcrumbs,
 		isListViewOpen,
 		isDistractionFree,
+		isTopToolbar,
+		isFocusMode,
 	} = useSelect( ( select ) => {
-		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editSiteStore );
+		const { isListViewOpened } = select( editorStore );
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: getEditorMode(),
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editSiteStore.name
 			),
-			showBlockBreadcrumbs: select( preferencesStore ).get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: select( preferencesStore ).get(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			isDistractionFree: get( 'core', 'distractionFree' ),
+			isFocusMode: get( 'core', 'focusMode' ),
+			isTopToolbar: get( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -269,16 +287,33 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',
-		label: __( 'Toggle spotlight mode' ),
+		label: __( 'Toggle spotlight' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
+			createInfoNotice(
+				isFocusMode ? __( 'Spotlight off.' ) : __( 'Spotlight on.' ),
+				{
+					id: 'core/edit-site/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	commands.push( {
 		name: 'core/toggle-distraction-free',
-		label: __( 'Toggle distraction free' ),
+		label: isDistractionFree
+			? __( 'Exit Distraction Free' )
+			: __( 'Enter Distraction Free ' ),
 		callback: ( { close } ) => {
 			toggleDistractionFree();
 			close();
@@ -289,11 +324,28 @@ function useEditUICommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
 			close();
+			createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar off.' )
+					: __( 'Top toolbar on.' ),
+				{
+					id: 'core/edit-site/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
@@ -332,7 +384,7 @@ function useEditUICommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
@@ -348,11 +400,20 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
+		label: isListViewOpen
+			? __( 'Close List View' )
+			: __( 'Open List View' ),
 		icon: listView,
 		callback: ( { close } ) => {
 			setIsListViewOpened( ! isListViewOpen );
 			close();
+			createInfoNotice(
+				isListViewOpen ? __( 'List View off.' ) : __( 'List View on.' ),
+				{
+					id: 'core/edit-site/toggle-list-view/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 

@@ -2,11 +2,20 @@
 	display: flex;
 	align-items: center;
 	padding: 2rem 0;
-	width: 100%;
 	background: var(--ifm-color-secondary);
+}
+
+.features > div {
+	max-width: var(--ifm-container-width);
+	margin: auto;
+	justify-content: space-between;
 }
 
 .featureSvg {
 	height: 200px;
 	width: 200px;
+}
+
+.feature {
+	max-width: 30%;
 }

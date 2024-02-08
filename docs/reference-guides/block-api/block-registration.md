@@ -29,7 +29,7 @@ _Note:_ A block name can only contain lowercase alphanumeric characters and dash
 
 _Note:_ This name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
 
-### Block Configuration
+### Block configuration
 
 -   **Type:** `Object` [ `{ key: value }` ]
 
@@ -275,7 +275,19 @@ The `ancestor` property makes a block available inside the specified block types
 ancestor: [ 'core/columns' ],
 ```
 
-#### Block Hooks (optional)
+#### allowedBlocks (optional)
+
+-   **Type:** `Array`
+-   **Since**: `WordPress 6.5.0`
+
+Setting the `allowedBlocks` property will limit which block types can be nested as direct children of the block.
+
+```js
+// Only allow the Columns block to be nested as direct child of this block
+allowedBlocks: [ 'core/columns' ],
+```
+
+#### blockHooks (optional)
 
 -   **Type:** `Object`
 -   **Since**: `WordPress 6.4.0`
@@ -304,7 +316,7 @@ It’s crucial to emphasize that the Block Hooks feature is only designed to wor
 
 Block Hooks will not work with post content or patterns crafted by the user, such as synced patterns, or theme templates and template parts that have been modified by the user.
 
-## Block Collections
+## Block collections
 
 ## `registerBlockCollection`
 

@@ -59,7 +59,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					</PanelBody>
 				</InspectorControls>
 			) }
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
 					autoComplete="off"
 					label={ __( 'Name' ) }

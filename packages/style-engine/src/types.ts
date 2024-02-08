@@ -26,6 +26,8 @@ export interface Style {
 			url?: CSSProperties[ 'backgroundImage' ];
 			source?: string;
 		};
+		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
+		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
 	};
 	border?: {
@@ -46,6 +48,7 @@ export interface Style {
 		left?: BorderIndividualStyles< 'left' >;
 	};
 	dimensions?: {
+		aspectRatio?: CSSProperties[ 'aspectRatio' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
 	};
 	spacing?: {

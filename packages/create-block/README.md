@@ -8,18 +8,6 @@ _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/
 
 > _Learn more about the [Block API at the Gutenberg HandBook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
 
-## Table of Contents
-
-- [Quick start](#quick-start)
-- [Usage](#usage)
-    - [Interactive Mode](#interactive-mode)
-    - [`slug`](#slug)
-    - [`options`](#options)
-- [Available Commands](#available-commands-in-the-scaffolded-project)
-- [External Project Templates](#external-project-templates)
-- [Contributing to this package](#contributing-to-this-package)
-
-
 ## Quick start
 
 ```bash
@@ -141,7 +129,7 @@ For example, running the `start` script from inside the generated folder (`npm s
 
 ## External Project Templates
 
-[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block-tutorial-template/) for information on External Project Templates
+[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/packages-create-block-external-template/) for information on External Project Templates
 
 ## Contributing to this package
 

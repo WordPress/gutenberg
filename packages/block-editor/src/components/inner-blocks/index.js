@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -29,9 +29,20 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_OBJECT = {};
+
+function BlockContext( { children, clientId } ) {
+	const context = useBlockContext( clientId );
+	return (
+		<BlockContextProvider value={ context }>
+			{ children }
+		</BlockContextProvider>
+	);
+}
+
+const BlockListItemsMemo = memo( BlockListItems );
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -60,10 +71,15 @@ function UncontrolledInnerBlocks( props ) {
 		orientation,
 		placeholder,
 		layout,
+		name,
+		blockType,
+		parentLock,
+		defaultLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
 		clientId,
+		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -83,23 +99,12 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const context = useBlockContext( clientId );
-	const name = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.name;
-		},
-		[ clientId ]
-	);
-
 	const defaultLayoutBlockSupport =
 		getBlockSupport( name, 'layout' ) ||
 		getBlockSupport( name, '__experimentalLayout' ) ||
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-
-	const [ defaultLayout ] = useSettings( 'layout' );
-
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
 	const memoedLayout = useMemo(
@@ -114,20 +119,24 @@ function UncontrolledInnerBlocks( props ) {
 		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
-	// This component needs to always be synchronous as it's the one changing
-	// the async mode depending on the block selection.
-	return (
-		<BlockContextProvider value={ context }>
-			<BlockListItems
-				rootClientId={ clientId }
-				renderAppender={ renderAppender }
-				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				layout={ memoedLayout }
-				wrapperRef={ wrapperRef }
-				placeholder={ placeholder }
-			/>
-		</BlockContextProvider>
+	// For controlled inner blocks, we don't want a change in blocks to
+	// re-render the blocks list.
+	const items = (
+		<BlockListItemsMemo
+			rootClientId={ clientId }
+			renderAppender={ renderAppender }
+			__experimentalAppenderTagName={ __experimentalAppenderTagName }
+			layout={ memoedLayout }
+			wrapperRef={ wrapperRef }
+			placeholder={ placeholder }
+		/>
 	);
+
+	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+		return items;
+	}
+
+	return <BlockContext clientId={ clientId }>{ items }</BlockContext>;
 }
 
 /**
@@ -169,15 +178,17 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
-		options;
+	const {
+		__unstableDisableLayoutClassNames,
+		__unstableDisableDropZone,
+		dropZoneElement,
+	} = options;
 	const {
 		clientId,
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
-	const isSmallScreen = useViewportMatch( 'medium', '<' );
-	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
+	const selected = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return {};
@@ -188,14 +199,21 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+				getTemplateLock,
+				getBlockRootClientId,
+				getBlockEditingMode,
+				getBlockSettings,
+				isDragging,
+			} = unlock( select( blockEditorStore ) );
+			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
-				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
+				__unstableGetEditorMode() === 'navigation';
+			const blockEditingMode = getBlockEditingMode( clientId );
+			const parentClientId = getBlockRootClientId( clientId );
+			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 			return {
-				__experimentalCaptureToolbars: select(
-					blocksStore
-				).hasBlockSupport(
+				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
 					'__experimentalExposeControlsToChildren',
 					false
@@ -204,14 +222,34 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blockName !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough,
+					enableClickThrough &&
+					! isDragging(),
+				name: blockName,
+				blockType: getBlockType( blockName ),
+				parentLock: getTemplateLock( parentClientId ),
+				parentClientId,
+				isDropZoneDisabled: blockEditingMode === 'disabled',
+				defaultLayout,
 			};
 		},
-		[ clientId, isSmallScreen ]
+		[ clientId ]
 	);
+	const {
+		__experimentalCaptureToolbars,
+		hasOverlay,
+		name,
+		blockType,
+		parentLock,
+		parentClientId,
+		isDropZoneDisabled,
+		defaultLayout,
+	} = selected;
 
 	const blockDropZoneRef = useBlockDropZone( {
+		dropZoneElement,
 		rootClientId: clientId,
+		parentClientId,
+		isDisabled: isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
@@ -222,6 +260,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
 		layout,
+		name,
+		blockType,
+		parentLock,
+		defaultLayout,
 		...options,
 	};
 	const InnerBlocks =

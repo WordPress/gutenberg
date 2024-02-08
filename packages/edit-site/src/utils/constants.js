@@ -38,19 +38,17 @@ export const FOCUSABLE_ENTITIES = [
 	PATTERN_TYPES.user,
 ];
 
-/**
- * Block types that are considered to be page content. These are the only blocks
- * editable when hasPageContentFocus() is true.
- */
-export const PAGE_CONTENT_BLOCK_TYPES = {
-	'core/post-title': true,
-	'core/post-featured-image': true,
-	'core/post-content': true,
-};
-
 export const POST_TYPE_LABELS = {
 	[ TEMPLATE_POST_TYPE ]: __( 'Template' ),
 	[ TEMPLATE_PART_POST_TYPE ]: __( 'Template part' ),
 	[ PATTERN_TYPES.user ]: __( 'Pattern' ),
 	[ NAVIGATION_POST_TYPE ]: __( 'Navigation' ),
 };
+
+// DataViews constants
+export const LAYOUT_GRID = 'grid';
+export const LAYOUT_TABLE = 'table';
+export const LAYOUT_LIST = 'list';
+export const ENUMERATION_TYPE = 'enumeration';
+export const OPERATOR_IN = 'in';
+export const OPERATOR_NOT_IN = 'notIn';

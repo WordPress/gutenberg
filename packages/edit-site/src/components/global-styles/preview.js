@@ -11,8 +11,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
-import { useState, useMemo } from '@wordpress/element';
+import {
+	useThrottle,
+	useReducedMotion,
+	useResizeObserver,
+} from '@wordpress/compose';
+import { useLayoutEffect, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -60,6 +64,13 @@ const normalizedHeight = 152;
 
 const normalizedColorSwatchSize = 32;
 
+// Throttle options for useThrottle. Must be defined outside of the component,
+// so that the object reference is the same on each render.
+const THROTTLE_OPTIONS = {
+	leading: true,
+	trailing: true,
+};
+
 const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 	const [ fontWeight ] = useGlobalStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useGlobalStyle( 'typography.fontFamily' );
@@ -79,7 +90,47 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 	const disableMotion = useReducedMotion();
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ containerResizeListener, { width } ] = useResizeObserver();
-	const ratio = width ? width / normalizedWidth : 1;
+	const [ throttledWidth, setThrottledWidthState ] = useState( width );
+	const [ ratioState, setRatioState ] = useState();
+
+	const setThrottledWidth = useThrottle(
+		setThrottledWidthState,
+		250,
+		THROTTLE_OPTIONS
+	);
+
+	// Must use useLayoutEffect to avoid a flash of the iframe at the wrong
+	// size before the width is set.
+	useLayoutEffect( () => {
+		if ( width ) {
+			setThrottledWidth( width );
+		}
+	}, [ width, setThrottledWidth ] );
+
+	// Must use useLayoutEffect to avoid a flash of the iframe at the wrong
+	// size before the width is set.
+	useLayoutEffect( () => {
+		const newRatio = throttledWidth ? throttledWidth / normalizedWidth : 1;
+		const ratioDiff = newRatio - ( ratioState || 0 );
+
+		// Only update the ratio state if the difference is big enough
+		// or if the ratio state is not yet set. This is to avoid an
+		// endless loop of updates at particular viewport heights when the
+		// presence of a scrollbar causes the width to change slightly.
+		const isRatioDiffBigEnough = Math.abs( ratioDiff ) > 0.1;
+
+		if ( isRatioDiffBigEnough || ! ratioState ) {
+			setRatioState( newRatio );
+		}
+	}, [ throttledWidth, ratioState ] );
+
+	// Set a fallbackRatio to use before the throttled ratio has been set.
+	const fallbackRatio = width ? width / normalizedWidth : 1;
+	// Use the throttled ratio if it has been calculated, otherwise
+	// use the fallback ratio. The throttled ratio is used to avoid
+	// an endless loop of updates at particular viewport heights.
+	// See: https://github.com/WordPress/gutenberg/issues/55112
+	const ratio = ratioState ? ratioState : fallbackRatio;
 
 	const { paletteColors, highlightedColors } = useStylesPreviewColors();
 
@@ -108,6 +159,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 				<Iframe
 					className="edit-site-global-styles-preview__iframe"
 					style={ {
+						width: '100%',
 						height: normalizedHeight * ratio,
 					} }
 					onMouseEnter={ () => setIsHovered( true ) }

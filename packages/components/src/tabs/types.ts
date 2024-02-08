@@ -78,8 +78,10 @@ export type TabListProps = {
 export type TabProps = {
 	/**
 	 * The id of the tab, which is prepended with the `Tabs` instanceId.
+	 * The value of this prop should match with the value of the `tabId` prop on
+	 * the corresponding `Tabs.TabPanel` component.
 	 */
-	id: string;
+	tabId: string;
 	/**
 	 * The children elements, generally the text to display on the tab.
 	 */
@@ -103,9 +105,12 @@ export type TabPanelProps = {
 	 */
 	children?: React.ReactNode;
 	/**
-	 * A unique identifier for the tabpanel, which is used to generate a unique `id` for the underlying element.
+	 * A unique identifier for the tabpanel, which is used to generate an
+	 * instanced id for the underlying element.
+	 * The value of this prop should match with the value of the `tabId` prop on
+	 * the corresponding `Tabs.Tab` component.
 	 */
-	id: string;
+	tabId: string;
 	/**
 	 * Determines whether or not the tabpanel element should be focusable.
 	 * If `false`, pressing the tab key will skip over the tabpanel, and instead

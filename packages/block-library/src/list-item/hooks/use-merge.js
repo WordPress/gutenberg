@@ -20,7 +20,7 @@ export default function useMerge( clientId, onMerge ) {
 	} = useSelect( blockEditorStore );
 	const { mergeBlocks, moveBlocksToPosition } =
 		useDispatch( blockEditorStore );
-	const [ , outdentListItem ] = useOutdentListItem( clientId );
+	const outdentListItem = useOutdentListItem();
 
 	function getTrailingId( id ) {
 		const order = getBlockOrder( id );

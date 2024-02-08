@@ -50,6 +50,7 @@ describe( 'useGlobalStylesRevisions', () => {
 			},
 		],
 		isLoadingGlobalStylesRevisions: false,
+		revisionsCount: 1,
 	};
 
 	it( 'returns loaded revisions with no unsaved changes', () => {
@@ -157,5 +158,71 @@ describe( 'useGlobalStylesRevisions', () => {
 		expect( isLoading ).toBe( true );
 		expect( hasUnsavedChanges ).toBe( false );
 		expect( revisions ).toEqual( [] );
+	} );
+
+	it( 'should prepend unsaved changes item and append reset item to paginated results', () => {
+		useSelect.mockImplementation( () => ( {
+			...selectValue,
+			revisionsCount: 2,
+			isDirty: true,
+		} ) );
+
+		// Prepend unsaved changes item to paginated results.
+		const { result: resultPrepend } = renderHook( () =>
+			useGlobalStylesRevisions( {
+				query: {
+					per_page: 1,
+					page: 1,
+				},
+			} )
+		);
+		expect( resultPrepend.current.revisions ).toEqual( [
+			{
+				author: {
+					avatar_urls: {},
+					name: 'fred',
+				},
+				id: 'unsaved',
+				modified: resultPrepend.current.revisions[ 0 ].modified,
+				settings: 'cake',
+				styles: 'ice-cream',
+			},
+			{
+				author: {
+					id: 4,
+					name: 'sam',
+				},
+				id: 1,
+				isLatest: true,
+				settings: {},
+				styles: {},
+			},
+		] );
+
+		// Append reset item to paginated results.
+		const { result: resultAppend } = renderHook( () =>
+			useGlobalStylesRevisions( {
+				query: {
+					per_page: 1,
+					page: 2,
+				},
+			} )
+		);
+		expect( resultAppend.current.revisions ).toEqual( [
+			{
+				author: {
+					id: 4,
+					name: 'sam',
+				},
+				id: 1,
+				settings: {},
+				styles: {},
+			},
+			{
+				id: 'parent',
+				settings: {},
+				styles: {},
+			},
+		] );
 	} );
 } );

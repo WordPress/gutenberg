@@ -1,8 +1,20 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
+import { unlock } from '../../../../lock-unlock';
+import { fetchInstallFontFace } from '../resolvers';
 import { formatFontFamily } from './preview-styles';
+
+/**
+ * Browser dependencies
+ */
+const { File } = window;
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -82,10 +94,11 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 		// eslint-disable-next-line no-undef
 	} else if ( source instanceof File ) {
 		dataSource = await source.arrayBuffer();
+	} else {
+		return;
 	}
 
-	// eslint-disable-next-line no-undef
-	const newFont = new FontFace(
+	const newFont = new window.FontFace(
 		formatFontFamily( fontFace.fontFamily ),
 		dataSource,
 		{
@@ -129,29 +142,139 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
-export function makeFormDataFromFontFamilies( fontFamilies ) {
+export function makeFontFamilyFormData( fontFamily ) {
 	const formData = new FormData();
-	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
-		if ( family?.fontFace ) {
-			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
-				if ( face.file ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
+
+	const { fontFace, category, ...familyWithValidParameters } = fontFamily;
+	const fontFamilySettings = {
+		...familyWithValidParameters,
+		slug: kebabCase( fontFamily.slug ),
+	};
+
+	formData.append(
+		'font_family_settings',
+		JSON.stringify( fontFamilySettings )
+	);
+	return formData;
+}
+
+export function makeFontFacesFormData( font ) {
+	if ( font?.fontFace ) {
+		const fontFacesFormData = font.fontFace.map( ( item, faceIndex ) => {
+			const face = { ...item };
+			const formData = new FormData();
+			if ( face.file ) {
+				// Normalize to an array, since face.file may be a single file or an array of files.
+				const files = Array.isArray( face.file )
+					? face.file
+					: [ face.file ];
+				const src = [];
+
+				files.forEach( ( file, key ) => {
 					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const fileId = `file-${ familyIndex }-${ faceIndex }`;
+					const fileId = `file-${ faceIndex }-${ key }`;
 					// Add the files to the formData
-					formData.append( fileId, face.file, face.file.name );
-					// remove the file object from the face object the file is referenced by the uploadedFile key
-					const { file, ...faceWithoutFileProperty } = face;
-					const newFace = {
-						...faceWithoutFileProperty,
-						uploadedFile: fileId,
-					};
-					return newFace;
-				}
-				return face;
+					formData.append( fileId, file, file.name );
+					src.push( fileId );
+				} );
+
+				face.src = src.length === 1 ? src[ 0 ] : src;
+				delete face.file;
+
+				formData.append( 'font_face_settings', JSON.stringify( face ) );
+			} else {
+				formData.append( 'font_face_settings', JSON.stringify( face ) );
+			}
+			return formData;
+		} );
+
+		return fontFacesFormData;
+	}
+}
+
+export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
+	const promises = fontFacesData.map( ( faceData ) =>
+		fetchInstallFontFace( fontFamilyId, faceData )
+	);
+	const responses = await Promise.allSettled( promises );
+
+	const results = {
+		errors: [],
+		successes: [],
+	};
+
+	responses.forEach( ( result, index ) => {
+		if ( result.status === 'fulfilled' ) {
+			const response = result.value;
+			if ( response.id ) {
+				results.successes.push( response );
+			} else {
+				results.errors.push( {
+					data: fontFacesData[ index ],
+					message: `Error: ${ response.message }`,
+				} );
+			}
+		} else {
+			// Handle network errors or other fetch-related errors
+			results.errors.push( {
+				data: fontFacesData[ index ],
+				message: `Fetch error: ${ result.reason.message }`,
 			} );
 		}
-		return family;
 	} );
-	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
-	return formData;
+
+	return results;
+}
+
+/*
+ * Downloads a font face asset from a URL to the client and returns a File object.
+ */
+export async function downloadFontFaceAssets( src ) {
+	// Normalize to an array, since `src` could be a string or array.
+	src = Array.isArray( src ) ? src : [ src ];
+
+	const files = await Promise.all(
+		src.map( async ( url ) => {
+			return fetch( new Request( url ) )
+				.then( ( response ) => {
+					if ( ! response.ok ) {
+						throw new Error(
+							`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
+						);
+					}
+					return response.blob();
+				} )
+				.then( ( blob ) => {
+					const filename = url.split( '/' ).pop();
+					const file = new File( [ blob ], filename, {
+						type: blob.type,
+					} );
+					return file;
+				} );
+		} )
+	);
+
+	// If we only have one file return it (not the array).  Otherwise return all of them in the array.
+	return files.length === 1 ? files[ 0 ] : files;
+}
+
+/*
+ * Determine if a given Font Face is present in a given collection.
+ * We determine that a font face has been installed by comparing the fontWeight and fontStyle
+ *
+ * @param {Object} fontFace The Font Face to seek
+ * @param {Array} collection The Collection to seek in
+ * @returns True if the font face is found in the collection.  Otherwise False.
+ */
+export function checkFontFaceInstalled( fontFace, collection ) {
+	return (
+		-1 !==
+		collection.findIndex( ( collectionFontFace ) => {
+			return (
+				collectionFontFace.fontWeight === fontFace.fontWeight &&
+				collectionFontFace.fontStyle === fontFace.fontStyle
+			);
+		} )
+	);
 }

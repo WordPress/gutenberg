@@ -238,14 +238,13 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
@@ -351,6 +350,38 @@ function entity( entityConfig ) {
 								error: action.error,
 							},
 						};
+				}
+
+				return state;
+			},
+
+			revisions: ( state = {}, action ) => {
+				// Use the same queriedDataReducer shape for revisions.
+				if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+					const recordKey = action.recordKey;
+					delete action.recordKey;
+					const newState = queriedDataReducer( state[ recordKey ], {
+						...action,
+						type: 'RECEIVE_ITEMS',
+					} );
+					return {
+						...state,
+						[ recordKey ]: newState,
+					};
+				}
+
+				if ( action.type === 'REMOVE_ITEMS' ) {
+					return Object.fromEntries(
+						Object.entries( state ).filter(
+							( [ id ] ) =>
+								! action.itemIds.some( ( itemId ) => {
+									if ( Number.isInteger( itemId ) ) {
+										return itemId === +id;
+									}
+									return itemId === id;
+								} )
+						)
+					);
 				}
 
 				return state;

@@ -335,6 +335,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			dropZoneElement: ref.current,
 		}
 	);
 
@@ -430,7 +431,8 @@ function CoverEdit( {
 			toggleSelection( true );
 			setAttributes( { minHeight: newMinHeight } );
 		},
-		showHandle: true,
+		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
+		showHandle: ! attributes.style?.dimensions?.aspectRatio ? true : false,
 		size: resizableBoxDimensions,
 		width,
 	};

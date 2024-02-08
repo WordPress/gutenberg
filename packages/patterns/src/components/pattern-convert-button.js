@@ -26,12 +26,17 @@ import { PATTERN_SYNC_TYPES } from '../constants';
 /**
  * Menu control to convert block(s) to a pattern block.
  *
- * @param {Object}   props              Component props.
- * @param {string[]} props.clientIds    Client ids of selected blocks.
- * @param {string}   props.rootClientId ID of the currently selected top-level block.
+ * @param {Object}   props                        Component props.
+ * @param {string[]} props.clientIds              Client ids of selected blocks.
+ * @param {string}   props.rootClientId           ID of the currently selected top-level block.
+ * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
  * @return {import('react').ComponentType} The menu control or null.
  */
-export default function PatternConvertButton( { clientIds, rootClientId } ) {
+export default function PatternConvertButton( {
+	clientIds,
+	rootClientId,
+	closeBlockSettingsMenu,
+} ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	// Ignore reason: false positive of the lint rule.
@@ -104,6 +109,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 
 			replaceBlocks( clientIds, newBlock );
 			setEditingPattern( newBlock.clientId, true );
+			closeBlockSettingsMenu();
 		}
 
 		createSuccessNotice(

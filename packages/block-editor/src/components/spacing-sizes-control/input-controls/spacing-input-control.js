@@ -139,7 +139,7 @@ export default function SpacingInputControl( {
 		useMemo(
 			() => parseQuantityAndUnitFromRawValue( currentValue ),
 			[ currentValue ]
-		)[ 1 ] || units[ 0 ].value;
+		)[ 1 ] || units[ 0 ]?.value;
 
 	const setInitialValue = () => {
 		if ( value === undefined ) {
@@ -317,7 +317,7 @@ export default function SpacingInputControl( {
 						setShowCustomValueControl( ! showCustomValueControl );
 					} }
 					isPressed={ showCustomValueControl }
-					isSmall
+					size="small"
 					className="spacing-sizes-control__custom-toggle"
 					iconSize={ 24 }
 				/>

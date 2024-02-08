@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.27.0 (2024-01-24)
+
+-   Started exporting the `PureComponent` React API ([#58076](https://github.com/WordPress/gutenberg/pull/58076)).
+
+## 5.26.0 (2024-01-10)
+
+## 5.25.0 (2023-12-13)
+
+## 5.24.0 (2023-11-29)
+
+## 5.23.0 (2023-11-16)
+
 ## 5.22.0 (2023-11-02)
 
 ## 5.21.0 (2023-10-18)

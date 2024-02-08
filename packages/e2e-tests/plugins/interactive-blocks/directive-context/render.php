@@ -5,14 +5,16 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+wp_enqueue_script_module( 'directive-context-view' );
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{"namespace": "directive-context"}'>
 	<div
 		data-wp-context='{ "prop1":"parent","prop2":"parent","obj":{"prop4":"parent","prop5":"parent"},"array":[1,2,3] }'
 	>
 		<pre
 			data-testid="parent context"
-			data-wp-bind--children="derived.renderContext"
+			data-wp-bind--children="state.renderContext"
 		>
 			<!-- rendered during hydration -->
 		</pre>
@@ -53,7 +55,7 @@
 		>
 			<pre
 				data-testid="child context"
-				data-wp-bind--children="derived.renderContext"
+				data-wp-bind--children="state.renderContext"
 			>
 				<!-- rendered during hydration -->
 			</pre>
@@ -121,8 +123,8 @@
 </div>
 
 <div
-	data-wp-interactive
-	data-wp-navigation-id="navigation"
+	data-wp-interactive='{"namespace": "directive-context-navigate"}'
+	data-wp-router-region="navigation"
 	data-wp-context='{ "text": "first page" }'
 >
 	<div data-testid="navigation text" data-wp-text="context.text"></div>
@@ -131,4 +133,13 @@
 	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
 	<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
+</div>
+
+<div
+	data-wp-interactive='{"namespace": "directive-context-non-default"}'
+	data-wp-context--non-default='{ "text": "non default" }'
+	data-wp-context='{ "defaultText": "default" }'
+>
+	<span data-testid="non-default suffix context" data-wp-text="context.text"></span>
+	<span data-testid="default suffix context" data-wp-text="context.defaultText"></span>
 </div>

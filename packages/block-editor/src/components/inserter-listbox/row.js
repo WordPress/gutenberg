@@ -1,24 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useContext } from '@wordpress/element';
-import { __unstableCompositeGroup as CompositeGroup } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import InserterListboxContext from './context';
+import { unlock } from '../../lock-unlock';
+
+const { CompositeGroupV2: CompositeGroup } = unlock( componentsPrivateApis );
 
 function InserterListboxRow( props, ref ) {
-	const state = useContext( InserterListboxContext );
-	return (
-		<CompositeGroup
-			state={ state }
-			role="presentation"
-			ref={ ref }
-			{ ...props }
-		/>
-	);
+	return <CompositeGroup role="presentation" ref={ ref } { ...props } />;
 }
 
 export default forwardRef( InserterListboxRow );

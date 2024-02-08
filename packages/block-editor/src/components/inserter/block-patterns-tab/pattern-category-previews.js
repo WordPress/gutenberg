@@ -22,7 +22,7 @@ import {
  * Internal dependencies
  */
 import usePatternsState from '../hooks/use-patterns-state';
-import BlockPatternList from '../../block-patterns-list';
+import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
 import { usePatternCategories } from './use-pattern-categories';
@@ -30,6 +30,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	INSERTER_PATTERN_TYPES,
 } from './utils';
 
 const noop = () => {};
@@ -69,24 +70,27 @@ export function PatternCategoryPreviews( {
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
-				if ( category.name === myPatternsCategory.name && pattern.id ) {
+
+				if (
+					category.name === myPatternsCategory.name &&
+					pattern.type === INSERTER_PATTERN_TYPES.user
+				) {
 					return true;
 				}
-				if ( category.name !== 'uncategorized' ) {
-					return pattern.categories?.includes( category.name );
+
+				if ( category.name === 'uncategorized' ) {
+					// The uncategorized category should show all the patterns without any category...
+					if ( ! pattern.categories ) {
+						return true;
+					}
+
+					// ...or with no available category.
+					return ! pattern.categories.some( ( catName ) =>
+						availableCategories.some( ( c ) => c.name === catName )
+					);
 				}
 
-				// The uncategorized category should show all the patterns without any category
-				// or with no available category.
-				const availablePatternCategories =
-					pattern.categories?.filter( ( cat ) =>
-						availableCategories.find(
-							( availableCategory ) =>
-								availableCategory.name === cat
-						)
-					) ?? [];
-
-				return availablePatternCategories.length === 0;
+				return pattern.categories?.includes( category.name );
 			} ),
 		[
 			allPatterns,
@@ -155,7 +159,7 @@ export function PatternCategoryPreviews( {
 			</VStack>
 
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternList
+				<BlockPatternsList
 					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }

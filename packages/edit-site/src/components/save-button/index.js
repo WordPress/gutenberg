@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 
@@ -11,7 +11,10 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { isPreviewingTheme } from '../../utils/is-previewing-theme';
+import {
+	currentlyPreviewingTheme,
+	isPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -21,24 +24,37 @@ export default function SaveButton( {
 	icon,
 	__next40pxDefaultSize = false,
 } ) {
-	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
-			isResolving,
-		} = select( coreStore );
-		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-		const { isSaveViewOpened } = select( editSiteStore );
-		const isActivatingTheme = isResolving( 'activateTheme' );
-		return {
-			isDirty: dirtyEntityRecords.length > 0,
-			isSaving:
-				dirtyEntityRecords.some( ( record ) =>
-					isSavingEntityRecord( record.kind, record.name, record.key )
-				) || isActivatingTheme,
-			isSaveViewOpen: isSaveViewOpened(),
-		};
-	}, [] );
+	const { isDirty, isSaving, isSaveViewOpen, previewingThemeName } =
+		useSelect( ( select ) => {
+			const {
+				__experimentalGetDirtyEntityRecords,
+				isSavingEntityRecord,
+				isResolving,
+			} = select( coreStore );
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const { isSaveViewOpened } = select( editSiteStore );
+			const isActivatingTheme = isResolving( 'activateTheme' );
+			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
+
+			return {
+				isDirty: dirtyEntityRecords.length > 0,
+				isSaving:
+					dirtyEntityRecords.some( ( record ) =>
+						isSavingEntityRecord(
+							record.kind,
+							record.name,
+							record.key
+						)
+					) || isActivatingTheme,
+				isSaveViewOpen: isSaveViewOpened(),
+				// Do not call `getTheme` with null, it will cause a request to
+				// the server.
+				previewingThemeName: currentlyPreviewingThemeId
+					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
+							?.name?.rendered
+					: undefined,
+			};
+		}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
@@ -47,13 +63,26 @@ export default function SaveButton( {
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
-				return __( 'Activating' );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activating %s' ),
+					previewingThemeName
+				);
 			} else if ( disabled ) {
 				return __( 'Saved' );
 			} else if ( isDirty ) {
-				return __( 'Activate & Save' );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activate %s & Save' ),
+					previewingThemeName
+				);
 			}
-			return __( 'Activate' );
+
+			return sprintf(
+				/* translators: %s: The name of theme to be activated. */
+				__( 'Activate %s' ),
+				previewingThemeName
+			);
 		}
 
 		if ( isSaving ) {
@@ -85,11 +114,12 @@ export default function SaveButton( {
 			 * Displaying the keyboard shortcut conditionally makes the tooltip
 			 * itself show conditionally. This would trigger a full-rerendering
 			 * of the button that we want to avoid. By setting `showTooltip`,
-			 & the tooltip is always rendered even when there's no keyboard shortcut.
+			 * the tooltip is always rendered even when there's no keyboard shortcut.
 			 */
 			showTooltip={ showTooltip }
 			icon={ icon }
 			__next40pxDefaultSize={ __next40pxDefaultSize }
+			size="compact"
 		>
 			{ label }
 		</Button>

@@ -74,7 +74,7 @@ export default function BlockParentSelector() {
 				onClick={ () => selectBlock( firstParentClientId ) }
 				label={ sprintf(
 					/* translators: %s: Name of the block's parent. */
-					__( 'Select %s' ),
+					__( 'Select parent block: %s' ),
 					blockInformation?.title
 				) }
 				showTooltip

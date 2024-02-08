@@ -183,14 +183,13 @@ export default function ReusableBlockConvertButton( {
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 							/>
-
 							<ToggleControl
 								label={ _x(
 									'Synced',
 									'Option that makes an individual pattern synchronized'
 								) }
 								help={ __(
-									'Editing the pattern will update it anywhere it is used.'
+									'Sync this pattern across multiple locations.'
 								) }
 								checked={ ! syncType }
 								onChange={ () => {

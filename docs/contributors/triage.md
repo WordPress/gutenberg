@@ -48,7 +48,7 @@ When triaging, either one of the lists above or issues in general, work through 
     - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
     - Consider adding the Good First Issue label if you believe this is a relatively easy issue for a first-time contributor to try to solve.
 
-**Commonly Used Labels**
+**Commonly used labels**
 
 Generally speaking, the following labels are very useful for triaging issues and will likely be the ones you use the most consistently. You can view all possible labels [here](https://github.com/WordPress/gutenberg/labels).
 
@@ -61,7 +61,7 @@ Generally speaking, the following labels are very useful for triaging issues and
 | `Needs More Info`          | When it’s not clear what the issue is or it would help to provide additional details.     |
 | `Needs Testing`            | When a new issue needs to be confirmed or old bugs seem like they are no longer relevant. |
 
-**Determining Priority Labels**
+**Determining priority labels**
 
 If you have enough knowledge about the report at hand and feel confident in doing so, you can consider adding priority. Note that it’s on purpose that no priority label infers a normal level.
 
@@ -81,7 +81,7 @@ Issues are closed for the following reasons:
 -   An issue that needs more information that the author of the issue hasn't responded to for 2+ weeks.
 -   An item that is determined as unable to be fixed or is working as intended.
 
-## Specific Triages
+## Specific triages
 
 ### Release specific triage
 

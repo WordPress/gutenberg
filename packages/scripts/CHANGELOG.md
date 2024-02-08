@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add experimental support for `viewScriptModule` field in block.json for `build` and `start` scripts ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
+
+### Enhancements
+
+-   Ensure that watched module builds detect block.json changes ([#57927](https://github.com/WordPress/gutenberg/pull/57927)).
+
+### Deprecations
+
+-   Experimental support for `viewModule` field in block.json is deprecated in favor of `viewScriptModule` ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
+
+## 27.1.0 (2024-01-24)
+
+## 27.0.0 (2024-01-10)
+
+### New Features
+
+-   Add experimental support for `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).
+
+### Breaking Changes
+
+-   Drop support for Node.js versions < 18.
+
+## 26.19.0 (2023-12-13)
+
+### Bug Fix
+
+-   Fix CSS imports not minified ([#56516](https://github.com/WordPress/gutenberg/pull/56516)).
+
+## 26.18.0 (2023-11-29)
+
+### Internal
+
+-   The bundled `jest-dev-server` dependency has been updated from `^6.0.2` to `^9.0.1` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+## 26.17.0 (2023-11-16)
+
 ## 26.16.0 (2023-11-02)
 
 ## 26.15.0 (2023-10-18)

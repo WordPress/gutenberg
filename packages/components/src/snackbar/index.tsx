@@ -8,7 +8,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { useEffect, forwardRef, renderToString } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	forwardRef,
+	renderToString,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
@@ -88,17 +94,24 @@ function UnforwardedSnackbar(
 
 	useSpokenMessage( spokenMessage, politeness );
 
-	// Only set up the timeout dismiss if we're not explicitly dismissing.
+	// The `onDismiss/onRemove` can have unstable references,
+	// trigger side-effect cleanup, and reset timers.
+	const callbackRefs = useRef( { onDismiss, onRemove } );
+	useLayoutEffect( () => {
+		callbackRefs.current = { onDismiss, onRemove };
+	} );
+
 	useEffect( () => {
+		// Only set up the timeout dismiss if we're not explicitly dismissing.
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				onDismiss?.();
-				onRemove?.();
+				callbackRefs.current.onDismiss?.();
+				callbackRefs.current.onRemove?.();
 			}
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ onDismiss, onRemove, explicitDismiss ] );
+	}, [ explicitDismiss ] );
 
 	const classes = classnames( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
@@ -106,7 +119,7 @@ function UnforwardedSnackbar(
 	if ( actions && actions.length > 1 ) {
 		// We need to inform developers that snackbar only accepts 1 action.
 		warning(
-			'Snackbar can only have 1 action, use Notice if your message require many messages'
+			'Snackbar can only have one action. Use Notice if your message requires many actions.'
 		);
 		// return first element only while keeping it inside an array
 		actions = [ actions[ 0 ] ];

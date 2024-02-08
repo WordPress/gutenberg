@@ -651,6 +651,14 @@ const v6 = {
 			},
 		},
 	},
+	migrate( attributes ) {
+		const { height, width } = attributes;
+		return {
+			...attributes,
+			width: typeof width === 'number' ? `${ width }px` : width,
+			height: typeof height === 'number' ? `${ height }px` : height,
+		};
+	},
 	save( { attributes } ) {
 		const {
 			url,

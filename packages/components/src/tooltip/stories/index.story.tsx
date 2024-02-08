@@ -30,7 +30,7 @@ const meta: Meta< typeof Tooltip > = {
 				'bottom right',
 			],
 		},
-		shortcut: { control: { type: 'text' } },
+		shortcut: { control: { type: 'object' } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -56,4 +56,21 @@ KeyboardShortcut.args = {
 		display: '⇧⌘,',
 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 	},
+};
+
+/**
+ * In case one or more `Tooltip` components are rendered inside another
+ * `Tooltip` component, only the tooltip associated to the outermost `Tooltip`
+ * component will be rendered in the browser and shown to the user
+ * appropriately. The rest of the nested `Tooltip` components will simply no-op
+ * and pass-through their anchor.
+ */
+export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
+Nested.args = {
+	children: (
+		<Tooltip text="Nested tooltip text (that will never show)">
+			<Button variant="primary">Tooltip Anchor</Button>
+		</Tooltip>
+	),
+	text: 'Outer tooltip text',
 };

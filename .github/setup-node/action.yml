@@ -14,6 +14,7 @@ runs:
           with:
               node-version-file: '.nvmrc'
               node-version: ${{ inputs.node-version }}
+              check-latest: true
               cache: npm
 
         - name: Get Node.js and npm version

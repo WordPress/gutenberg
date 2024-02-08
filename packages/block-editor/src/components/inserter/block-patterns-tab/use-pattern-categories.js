@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { _x, _n, sprintf } from '@wordpress/i18n';
 
 import { speak } from '@wordpress/a11y';
@@ -14,7 +14,18 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	INSERTER_PATTERN_TYPES,
 } from './utils';
+
+function hasRegisteredCategory( pattern, allCategories ) {
+	if ( ! pattern.categories || ! pattern.categories.length ) {
+		return false;
+	}
+
+	return pattern.categories.some( ( cat ) =>
+		allCategories.some( ( category ) => category.name === cat )
+	);
+}
 
 export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 	const [ patterns, allCategories ] = usePatternsState(
@@ -33,19 +44,6 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 		[ sourceFilter, patterns ]
 	);
 
-	const hasRegisteredCategory = useCallback(
-		( pattern ) => {
-			if ( ! pattern.categories || ! pattern.categories.length ) {
-				return false;
-			}
-
-			return pattern.categories.some( ( cat ) =>
-				allCategories.some( ( category ) => category.name === cat )
-			);
-		},
-		[ allCategories ]
-	);
-
 	// Remove any empty categories.
 	const populatedCategories = useMemo( () => {
 		const categories = allCategories
@@ -58,7 +56,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 
 		if (
 			filteredPatterns.some(
-				( pattern ) => ! hasRegisteredCategory( pattern )
+				( pattern ) => ! hasRegisteredCategory( pattern, allCategories )
 			) &&
 			! categories.find(
 				( category ) => category.name === 'uncategorized'
@@ -69,7 +67,11 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-		if ( filteredPatterns.some( ( pattern ) => pattern.id ) ) {
+		if (
+			filteredPatterns.some(
+				( pattern ) => pattern.type === INSERTER_PATTERN_TYPES.user
+			)
+		) {
 			categories.unshift( myPatternsCategory );
 		}
 		if ( filteredPatterns.length > 0 ) {
@@ -90,7 +92,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 			)
 		);
 		return categories;
-	}, [ allCategories, filteredPatterns, hasRegisteredCategory ] );
+	}, [ allCategories, filteredPatterns ] );
 
 	return populatedCategories;
 }

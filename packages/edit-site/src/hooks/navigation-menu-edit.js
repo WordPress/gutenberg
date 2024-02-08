@@ -43,7 +43,7 @@ function NavigationMenuEdit( { attributes } ) {
 		},
 		{
 			// this applies to Navigation Menus as well.
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || navigationMenu?.id,
 		}
 	);
 

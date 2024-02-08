@@ -8,7 +8,12 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,8 +49,8 @@ function Tabs( {
 
 	const isControlled = selectedTabId !== undefined;
 
-	const { items, selectedId } = store.useState();
-	const { setSelectedId } = store;
+	const { items, selectedId, activeId } = store.useState();
+	const { setSelectedId, setActiveId } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
@@ -154,8 +159,42 @@ function Tabs( {
 		setSelectedId,
 	] );
 
+	useEffect( () => {
+		if ( ! isControlled ) {
+			return;
+		}
+
+		requestAnimationFrame( () => {
+			const focusedElement =
+				items?.[ 0 ]?.element?.ownerDocument.activeElement;
+
+			if (
+				! focusedElement ||
+				! items.some( ( item ) => focusedElement === item.element )
+			) {
+				return; // Return early if no tabs are focused.
+			}
+
+			// If, after ariakit re-computes the active tab, that tab doesn't match
+			// the currently focused tab, then we force an update to ariakit to avoid
+			// any mismatches, especially when navigating to previous/next tab with
+			// arrow keys.
+			if ( activeId !== focusedElement.id ) {
+				setActiveId( focusedElement.id );
+			}
+		} );
+	}, [ activeId, isControlled, items, setActiveId ] );
+
+	const contextValue = useMemo(
+		() => ( {
+			store,
+			instanceId,
+		} ),
+		[ store, instanceId ]
+	);
+
 	return (
-		<TabsContext.Provider value={ { store, instanceId } }>
+		<TabsContext.Provider value={ contextValue }>
 			{ children }
 		</TabsContext.Provider>
 	);
@@ -164,4 +203,6 @@ function Tabs( {
 Tabs.TabList = TabList;
 Tabs.Tab = Tab;
 Tabs.TabPanel = TabPanel;
+Tabs.Context = TabsContext;
+
 export default Tabs;

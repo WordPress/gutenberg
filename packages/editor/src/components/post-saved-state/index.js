@@ -16,6 +16,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -26,16 +27,12 @@ import { store as editorStore } from '../../store';
  * Component showing whether the post is saved or not and providing save
  * buttons.
  *
- * @param {Object}   props                Component props.
- * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
- *                                        as dirty.
- * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
+ * @param {Object}   props              Component props.
+ * @param {?boolean} props.forceIsDirty Whether to force the post to be marked
+ *                                      as dirty.
  * @return {import('react').ComponentType} The component.
  */
-export default function PostSavedState( {
-	forceIsDirty,
-	showIconLabels = false,
-} ) {
+export default function PostSavedState( { forceIsDirty } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
 	const isLargeViewport = useViewportMatch( 'small' );
 
@@ -49,6 +46,7 @@ export default function PostSavedState( {
 		isSaving,
 		isScheduled,
 		hasPublishAction,
+		showIconLabels,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -62,6 +60,7 @@ export default function PostSavedState( {
 				isAutosavingPost,
 				getEditedPostAttribute,
 			} = select( editorStore );
+			const { get } = select( preferencesStore );
 
 			return {
 				isAutosaving: isAutosavingPost(),
@@ -74,6 +73,7 @@ export default function PostSavedState( {
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
+				showIconLabels: get( 'core', 'showIconLabels' ),
 			};
 		},
 		[ forceIsDirty ]
@@ -152,16 +152,9 @@ export default function PostSavedState( {
 			 * button does something, i.e. when it's not disabled.
 			 */
 			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
-			/*
-			 * Displaying the keyboard shortcut conditionally makes the tooltip
-			 * itself show conditionally. This would trigger a full-rerendering
-			 * of the button that we want to avoid. By setting `showTooltip`,
-			 & the tooltip is always rendered even when there's no keyboard shortcut.
-			 */
-			showTooltip
 			variant="tertiary"
+			size="compact"
 			icon={ isLargeViewport ? undefined : cloudUpload }
-			// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
 			label={ text || label }
 			aria-disabled={ isDisabled }
 		>

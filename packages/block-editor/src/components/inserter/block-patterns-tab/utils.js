@@ -2,26 +2,22 @@
  * WordPress dependencies
  */
 
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
-export const PATTERN_TYPES = {
-	all: 'all',
-	synced: 'synced',
-	unsynced: 'unsynced',
+export const INSERTER_PATTERN_TYPES = {
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
 };
 
-export const SYNC_TYPES = {
-	all: 'all',
+export const INSERTER_SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
 };
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All patterns' ),
+	label: _x( 'All', 'patterns' ),
 };
 
 export const myPatternsCategory = {
@@ -38,7 +34,7 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	// If theme source selected, filter out user created patterns and those from
 	// the core patterns directory.
 	if (
-		sourceFilter === PATTERN_TYPES.theme &&
+		sourceFilter === INSERTER_PATTERN_TYPES.theme &&
 		( isUserPattern || isDirectoryPattern )
 	) {
 		return true;
@@ -47,25 +43,30 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	// If the directory source is selected, filter out user created patterns
 	// and those bundled with the theme.
 	if (
-		sourceFilter === PATTERN_TYPES.directory &&
+		sourceFilter === INSERTER_PATTERN_TYPES.directory &&
 		( isUserPattern || ! isDirectoryPattern )
 	) {
 		return true;
 	}
 
-	// If user source selected, filter out theme patterns. Any pattern without
-	// an id wasn't created by a user.
-	if ( sourceFilter === PATTERN_TYPES.user && ! pattern.id ) {
+	// If user source selected, filter out theme patterns.
+	if (
+		sourceFilter === INSERTER_PATTERN_TYPES.user &&
+		pattern.type !== INSERTER_PATTERN_TYPES.user
+	) {
 		return true;
 	}
 
 	// Filter by sync status.
-	if ( syncFilter === SYNC_TYPES.full && pattern.syncStatus !== '' ) {
+	if (
+		syncFilter === INSERTER_SYNC_TYPES.full &&
+		pattern.syncStatus !== ''
+	) {
 		return true;
 	}
 
 	if (
-		syncFilter === SYNC_TYPES.unsynced &&
+		syncFilter === INSERTER_SYNC_TYPES.unsynced &&
 		pattern.syncStatus !== 'unsynced' &&
 		isUserPattern
 	) {

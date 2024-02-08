@@ -15,7 +15,11 @@ import {
 import { __, _x, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import {
+	useAsyncList,
+	useViewportMatch,
+	useDebouncedInput,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,10 +29,9 @@ import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
-import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
 import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../../utils/constants';
-import Pagination from './pagination';
+import Pagination from '../pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -214,6 +217,7 @@ export default function PatternsList( { categoryId, type } ) {
 			</VStack>
 			{ numPages > 1 && (
 				<Pagination
+					className="edit-site-patterns__pagination"
 					currentPage={ currentPage }
 					numPages={ numPages }
 					changePage={ changePage }

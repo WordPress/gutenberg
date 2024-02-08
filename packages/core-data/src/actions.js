@@ -218,6 +218,8 @@ export function receiveThemeSupports() {
  * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
  * Ignored from documentation as it's internal to the data store.
  *
+ * @deprecated since WordPress 6.5.0. Callers should use `dispatch( 'core' ).receiveRevision` instead.
+ *
  * @ignore
  *
  * @param {number} currentId The post id.
@@ -226,6 +228,13 @@ export function receiveThemeSupports() {
  * @return {Object} Action object.
  */
 export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	deprecated(
+		"wp.data.dispatch( 'core' ).receiveThemeGlobalStyleRevisions()",
+		{
+			since: '6.5.0',
+			alternative: "wp.data.dispatch( 'core' ).receiveRevisions",
+		}
+	);
 	return {
 		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
 		currentId,
@@ -924,3 +933,39 @@ export function receiveDefaultTemplateId( query, templateId ) {
 		templateId,
 	};
 }
+
+/**
+ * Action triggered to receive revision items.
+ *
+ * @param {string}        kind            Kind of the received entity record revisions.
+ * @param {string}        name            Name of the received entity record revisions.
+ * @param {number|string} recordKey       The key of the entity record whose revisions you want to fetch.
+ * @param {Array|Object}  records         Revisions received.
+ * @param {?Object}       query           Query Object.
+ * @param {?boolean}      invalidateCache Should invalidate query caches.
+ * @param {?Object}       meta            Meta information about pagination.
+ */
+export const receiveRevisions =
+	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+		const key =
+			entityConfig && entityConfig?.revisionKey
+				? entityConfig.revisionKey
+				: DEFAULT_ENTITY_KEY;
+
+		dispatch( {
+			type: 'RECEIVE_ITEM_REVISIONS',
+			key,
+			items: Array.isArray( records ) ? records : [ records ],
+			recordKey,
+			meta,
+			query,
+			kind,
+			name,
+			invalidateCache,
+		} );
+	};

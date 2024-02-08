@@ -10,7 +10,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { upload } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
@@ -135,7 +134,7 @@ export default function PostFormatPanel() {
 		<PanelBody initialOpen={ true } title={ panelBodyTitle }>
 			<p>
 				{ __(
-					'There are some external images in the post which can be uploaded to the media library. Images coming from different domains may not always display correctly, load slowly for visitors, or be removed unexpectedly.'
+					'Upload external images to the Media Library. Images from different domains may load slowly, display incorrectly, or be removed unexpectedly.'
 				) }
 			</p>
 			<div
@@ -153,12 +152,8 @@ export default function PostFormatPanel() {
 				{ isUploading ? (
 					<Spinner />
 				) : (
-					<Button
-						icon={ upload }
-						variant="primary"
-						onClick={ uploadImages }
-					>
-						{ __( 'Upload all' ) }
+					<Button variant="primary" onClick={ uploadImages }>
+						{ __( 'Upload' ) }
 					</Button>
 				) }
 			</div>

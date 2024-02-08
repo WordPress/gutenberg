@@ -87,6 +87,7 @@ async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 		testRunnerDir,
 		{
 			...process.env,
+			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
 			RESULTS_ID: runKey,
 		}

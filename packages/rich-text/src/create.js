@@ -10,6 +10,8 @@ import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import { toHTMLString } from './to-html-string';
+import { getTextContent } from './get-text-content';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -70,14 +72,6 @@ function toFormat( { tagName, attributes } ) {
 
 		registeredAttributes[ key ] = _attributes[ name ];
 
-		if ( formatType.__unstableFilterAttributeValue ) {
-			registeredAttributes[ key ] =
-				formatType.__unstableFilterAttributeValue(
-					key,
-					registeredAttributes[ key ]
-				);
-		}
-
 		// delete the attribute and what's left is considered
 		// to be unregistered.
 		delete _attributes[ name ];
@@ -102,6 +96,91 @@ function toFormat( { tagName, attributes } ) {
 		attributes: registeredAttributes,
 		unregisteredAttributes,
 	};
+}
+
+/**
+ * The RichTextData class is used to instantiate a wrapper around rich text
+ * values, with methods that can be used to transform or manipulate the data.
+ *
+ * - Create an empty instance: `new RichTextData()`.
+ * - Create one from an HTML string: `RichTextData.fromHTMLString(
+ *   '<em>hello</em>' )`.
+ * - Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
+ *   document.querySelector( 'p' ) )`.
+ * - Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
+ * - Create one from a rich text value: `new RichTextData( { text: '...',
+ *   formats: [ ... ] } )`.
+ *
+ * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
+ */
+export class RichTextData {
+	#value;
+
+	static empty() {
+		return new RichTextData();
+	}
+	static fromPlainText( text ) {
+		return new RichTextData( create( { text } ) );
+	}
+	static fromHTMLString( html ) {
+		return new RichTextData( create( { html } ) );
+	}
+	static fromHTMLElement( htmlElement, options = {} ) {
+		const { preserveWhiteSpace = false } = options;
+		const element = preserveWhiteSpace
+			? htmlElement
+			: collapseWhiteSpace( htmlElement );
+		const richTextData = new RichTextData( create( { element } ) );
+		Object.defineProperty( richTextData, 'originalHTML', {
+			value: htmlElement.innerHTML,
+		} );
+		return richTextData;
+	}
+	constructor( init = createEmptyValue() ) {
+		this.#value = init;
+	}
+	toPlainText() {
+		return getTextContent( this.#value );
+	}
+	// We could expose `toHTMLElement` at some point as well, but we'd only use
+	// it internally.
+	toHTMLString() {
+		return this.originalHTML || toHTMLString( { value: this.#value } );
+	}
+	valueOf() {
+		return this.toHTMLString();
+	}
+	toString() {
+		return this.toHTMLString();
+	}
+	toJSON() {
+		return this.toHTMLString();
+	}
+	get length() {
+		return this.text.length;
+	}
+	get formats() {
+		return this.#value.formats;
+	}
+	get replacements() {
+		return this.#value.replacements;
+	}
+	get text() {
+		return this.#value.text;
+	}
+}
+
+for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
+	if ( RichTextData.prototype.hasOwnProperty( name ) ) {
+		continue;
+	}
+
+	Object.defineProperty( RichTextData.prototype, name, {
+		value( ...args ) {
+			// Should we convert back to RichTextData?
+			return this.toHTMLString()[ name ]( ...args );
+		},
+	} );
 }
 
 /**
@@ -136,7 +215,6 @@ function toFormat( { tagName, attributes } ) {
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
  * @param {boolean} [$1.__unstableIsEditableTree]
- *
  * @return {RichTextValue} A rich text value.
  */
 export function create( {
@@ -146,6 +224,14 @@ export function create( {
 	range,
 	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
+	if ( html instanceof RichTextData ) {
+		return {
+			text: html.text,
+			formats: html.formats,
+			replacements: html.replacements,
+		};
+	}
+
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
@@ -276,10 +362,42 @@ function filterRange( node, range, filter ) {
  * @see
  * https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse#collapsing_of_white_space
  *
- * @param {string} string
+ * @param {HTMLElement} element
+ * @param {boolean}     isRoot
+ *
+ * @return {HTMLElement} New element with collapsed whitespace.
  */
-export function collapseWhiteSpace( string ) {
-	return string.replace( /[\n\r\t]+/g, ' ' );
+function collapseWhiteSpace( element, isRoot = true ) {
+	const clone = element.cloneNode( true );
+	clone.normalize();
+	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
+		if ( node.nodeType === node.TEXT_NODE ) {
+			let newNodeValue = node.nodeValue;
+
+			if ( /[\n\t\r\f]/.test( newNodeValue ) ) {
+				newNodeValue = newNodeValue.replace( /[\n\t\r\f]+/g, ' ' );
+			}
+
+			if ( newNodeValue.indexOf( '  ' ) !== -1 ) {
+				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
+			}
+
+			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
+				newNodeValue = newNodeValue.slice( 1 );
+			} else if (
+				isRoot &&
+				i === nodes.length - 1 &&
+				newNodeValue.endsWith( ' ' )
+			) {
+				newNodeValue = newNodeValue.slice( 0, -1 );
+			}
+
+			node.nodeValue = newNodeValue;
+		} else if ( node.nodeType === node.ELEMENT_NODE ) {
+			collapseWhiteSpace( node, false );
+		}
+	} );
+	return clone;
 }
 
 /**
