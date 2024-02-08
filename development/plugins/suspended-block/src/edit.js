@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { useSuspenseSelect } from '@wordpress/data';
+import { useSuspenseSelect, useSelect } from '@wordpress/data';
 
 import './editor.scss';
 import React, { Suspense } from 'react';
@@ -26,6 +26,16 @@ function SuspenseEntities() {
 	return <Entities entities={ entities } />;
 }
 
+function SelectEntities() {
+	const { entities } = useSelect( ( select ) => {
+		return {
+			entities: select( 'core' ).getEntityRecords( 'postType', 'page' ),
+		};
+	}, [] );
+
+	return <Entities entities={ entities } />;
+}
+
 function EntitiesRecords() {
 	const entities = useEntityRecords( 'postType', 'page' );
 
@@ -44,7 +54,7 @@ function EntitiesRecords() {
 		return <p>No entities found</p>;
 	}
 
-	return <Entities entities={ entities.records ?? [] } />;
+	return <Entities entities={ entities.records } />;
 }
 
 function Entities( { entities } ) {
