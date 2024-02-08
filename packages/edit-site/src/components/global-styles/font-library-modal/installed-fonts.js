@@ -154,6 +154,7 @@ function InstalledFonts() {
 							) ) }
 						</>
 					) }
+					<Spacer margin={ 16 } />
 				</>
 			) }
 
