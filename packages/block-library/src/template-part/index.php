@@ -112,7 +112,7 @@ function render_block_core_template_part( $attributes ) {
 	if ( is_null( $content ) ) {
 		if ( $is_debug ) {
 			if ( ! isset( $attributes['slug'] ) ) {
-				// If there is no slug this is a placeholder and we dont want to return any message.
+				// If there is no slug, this acts as a placeholder and no message should be returned.
 				return '';
 			}
 			return sprintf(
