@@ -32,7 +32,7 @@ const noop = () => {};
 /**
  * These are global entities that are only there to split blocks into logical units
  * They don't provide a "context" for the current post/page being rendered.
- * So we should use their ids as post context. This is important to allow post blocks
+ * So we should not use their ids as post context. This is important to allow post blocks
  * (post content, post title) to be used within them without issues.
  */
 const NON_CONTEXTUAL_POST_TYPES = [
