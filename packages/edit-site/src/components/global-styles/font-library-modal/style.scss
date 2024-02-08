@@ -62,12 +62,21 @@
 	.font-library-modal__font-card__count {
 		color: #6e6e6e;
 	}
+	&:hover{
+		outline: 1px solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+		border-color:transparent;
+	}
 }
 
 .font-library-modal__library-font-variant {
 	border: 1px solid #e5e5e5;
 	padding: 1rem;
 	margin-top: -1px; /* To collapse the margin with the previous element */
+	&:hover{
+		.components-checkbox-control__input[type=checkbox]{
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
 }
 
 .font-library-modal__font-variant {
