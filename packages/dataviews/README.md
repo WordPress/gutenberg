@@ -15,16 +15,17 @@ npm install @wordpress/dataviews --save
 ```js
 <DataViews
 	data={ data }
-	paginationInfo={ { totalItems, totalPages } }
+	fields={ fields }
 	view={ view }
 	onChangeView={ onChangeView }
-	fields={ fields }
 	actions={ [ trashPostAction ] }
-	supportedLayouts={ [ 'table' ] }
+	paginationInfo={ { totalItems, totalPages } }
 />
 ```
 
-## Data
+## Properties
+
+### Data
 
 The dataset to work with, represented as a one-dimensional array.
 
@@ -39,12 +40,57 @@ Example:
 
 By default, dataviews would use each record's `id` as an unique identifier. If it's not, the consumer should provide a `getItemId` function that returns one. See "Other props" section.
 
-## Pagination Info
+### Fields
 
-- `totalItems`: the total number of items in the datasets.
-- `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
+The fields describe the visible items for each record in the dataset.
 
-## View
+Example:
+
+```js
+[
+	{
+		id: 'date',
+		header: __( 'Date' ),
+		getValue: ( { item } ) => item.date,
+		render: ( { item } ) => {
+			return (
+				<time>{ getFormattedDate( item.date ) }</time>
+			);
+		},
+		enableHiding: false
+	},
+	{
+		id: 'author',
+		header: __( 'Author' ),
+		getValue: ( { item } ) => item.author,
+		render: ( { item } ) => {
+			return (
+				<a href="...">{ item.author }</a>
+			);
+		},
+		type: 'enumeration',
+		elements: [
+			{ value: 1, label: 'Admin' }
+			{ value: 2, label: 'User' }
+		]
+		enableSorting: false
+	}
+]
+```
+
+-   `id`: identifier for the field. Unique.
+-   `header`: the field's name to be shown in the UI.
+-   `getValue`: function that returns the value of the field.
+-   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
+-   `elements`: the set of valid values for the field's value.
+-   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
+-   `enableSorting`: whether the data can be sorted by the given field. True by default.
+-   `enableHiding`: whether the field can be hidden. True by default.
+-   `filterBy`: configuration for the filters.
+    - `operators`: the list of operators supported by the field.
+    - `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
+
+### View
 
 The view object configures how the dataset is visible to the user.
 
@@ -141,63 +187,13 @@ function MyCustomPageTable() {
 			data={ records }
 			view={ view }
 			onChangeView={ setView }
-			"..."
+			// ...
 		/>
 	);
 }
 ```
 
-## Fields
-
-The fields describe the visible items for each record in the dataset.
-
-Example:
-
-```js
-[
-	{
-		id: 'date',
-		header: __( 'Date' ),
-		getValue: ( { item } ) => item.date,
-		render: ( { item } ) => {
-			return (
-				<time>{ getFormattedDate( item.date ) }</time>
-			);
-		},
-		enableHiding: false
-	},
-	{
-		id: 'author',
-		header: __( 'Author' ),
-		getValue: ( { item } ) => item.author,
-		render: ( { item } ) => {
-			return (
-				<a href="...">{ item.author }</a>
-			);
-		},
-		type: 'enumeration',
-		elements: [
-			{ value: 1, label: 'Admin' }
-			{ value: 2, label: 'User' }
-		]
-		enableSorting: false
-	}
-]
-```
-
--   `id`: identifier for the field. Unique.
--   `header`: the field's name to be shown in the UI.
--   `getValue`: function that returns the value of the field.
--   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
--   `elements`: the set of valid values for the field's value.
--   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
--   `enableSorting`: whether the data can be sorted by the given field. True by default.
--   `enableHiding`: whether the field can be hidden. True by default.
--   `filterBy`: configuration for the filters.
-    - `operators`: the list of operators supported by the field.
-    - `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
-
-## Actions
+### Actions
 
 Array of operations that can be performed upon each record. Each action is an object with the following properties:
 
@@ -211,19 +207,12 @@ Array of operations that can be performed upon each record. Each action is an ob
 -   `RenderModal`: ReactElement, optional. If an action requires that some UI be rendered in a modal, it can provide a component which takes as props the record as `item` and a `closeModal` function. When this prop is provided, the `callback` property is ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
 
-## Types
+### Pagination Info
 
-- Layout types:
-    - `table`: the view uses a table layout.
-    - `grid`: the view uses a grid layout.
-    - `list`: the view uses a list layout.
-- Field types:
-    - `enumeration`: the field value should be taken and can be filtered from a closed list of elements.
-- Operator types:
-    - `in`: operator to be used in filters for fields of type `enumeration`.
-    - `notIn`: operator to be used in filters for fields of type `enumeration`.
+- `totalItems`: the total number of items in the datasets.
+- `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
 
-## Other properties
+### Other properties
 
 - `search`: whether the search input is enabled. `true` by default.
 - `searchLabel`: what text to show in the search input. "Search" by default.
@@ -233,6 +222,21 @@ Array of operations that can be performed upon each record. Each action is an ob
 - `deferredRendering`: whether the items should be rendered asynchronously. Useful when there's a field that takes a lot of time (e.g.: previews). `false` by default.
 - `onSelectionChange`: callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
 - `onDetailsChange`: callback that signals the user triggered the details for one of more items, and takes them as paremeter. So far, only the `list` view implements it.
+
+
+## Types
+
+- View/Layout types:
+    - `table`: the view uses a table layout.
+    - `grid`: the view uses a grid layout.
+    - `list`: the view uses a list layout.
+
+- Field types:
+    - `enumeration`: the field value should be taken and can be filtered from a closed list of elements.
+
+- Operator types:
+    - `in`: operator to be used in filters for fields of type `enumeration`.
+    - `notIn`: operator to be used in filters for fields of type `enumeration`.
 
 ## Contributing to this package
 
