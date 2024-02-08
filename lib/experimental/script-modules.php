@@ -5,13 +5,12 @@
  * This filter allows us to register modules from block metadata and attach additional fields to
  * WP_Block_Type instances.
  *
- * @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
- *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
  */
 function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(
+		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
 		'viewModule' => 'view_script_module_ids',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
