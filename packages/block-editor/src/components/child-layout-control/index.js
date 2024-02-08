@@ -76,7 +76,6 @@ export default function ChildLayoutControl( {
 							const newFlexSize =
 								value !== 'fixed' ? null : flexSize;
 							onChange( {
-								...childLayout,
 								selfStretch: value,
 								flexSize: newFlexSize,
 							} );
@@ -104,7 +103,7 @@ export default function ChildLayoutControl( {
 							size={ '__unstable-large' }
 							onChange={ ( value ) => {
 								onChange( {
-									...childLayout,
+									selfStretch,
 									flexSize: value,
 								} );
 							} }
@@ -121,7 +120,7 @@ export default function ChildLayoutControl( {
 						type="number"
 						onChange={ ( value ) => {
 							onChange( {
-								...childLayout,
+								rowSpan,
 								columnSpan: value,
 								parentColumnWidth,
 							} );
@@ -135,7 +134,8 @@ export default function ChildLayoutControl( {
 						type="number"
 						onChange={ ( value ) => {
 							onChange( {
-								...childLayout,
+								columnSpan,
+								parentColumnWidth,
 								rowSpan: value,
 							} );
 						} }

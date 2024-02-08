@@ -43,8 +43,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			css = `${ selector } {
 				flex-grow: 1;
 			}`;
-		}
-		if ( columnSpan ) {
+		} else if ( columnSpan ) {
 			css = `${ selector } {
 				grid-column: span ${ columnSpan };
 			}`;

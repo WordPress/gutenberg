@@ -408,7 +408,6 @@ export default function DimensionsPanel( {
 		onChange( {
 			...value,
 			layout: {
-				...value?.layout,
 				...newChildLayout,
 			},
 		} );
