@@ -25,8 +25,8 @@ let triggerRef;
 const { state, actions } = store( 'core/image', {
 	state: {
 		currentImage: {},
-		get lightboxEnabled() {
-			return !! state.currentImage.currentSrc;
+		get scrollDisabled() {
+			return state.currentImage.currentSrc;
 		},
 		get roleAttribute() {
 			return state.lightboxEnabled ? 'dialog' : null;
@@ -39,6 +39,12 @@ const { state, actions } = store( 'core/image', {
 				state.currentImage.uploadedSrc ||
 				'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 			);
+		},
+		imgAttributes( attribute ) {
+			return state.currentImage[ `img-${ attribute }` ];
+		},
+		figureAttributes( attribute ) {
+			return state.currentImage[ `figure-${ attribute }` ];
 		},
 	},
 	actions: {
@@ -55,12 +61,12 @@ const { state, actions } = store( 'core/image', {
 			// In most cases, this value will be 0, but this is included
 			// in case a user has created a page with horizontal scrolling.
 			state.scrollLeftReset = document.documentElement.scrollLeft;
-			state.scrollDisabled = true;
 
 			ctx.currentSrc = ctx.imageRef.currentSrc;
 			imageRef = ctx.imageRef;
 			triggerRef = ctx.triggerRef;
 			state.currentImage = ctx;
+			state.lightboxEnabled = true;
 
 			actions.setOverlayStyles();
 		},
@@ -73,7 +79,7 @@ const { state, actions } = store( 'core/image', {
 				// a few milliseconds longer than the duration, otherwise a user
 				// may scroll too soon and cause the animation to look sloppy.
 				setTimeout( function () {
-					state.scrollDisabled = false;
+					state.currentImage = {};
 					// If we don't delay before changing the focus,
 					// the focus ring will appear on Firefox before
 					// the image has finished animating, which looks broken.
@@ -83,7 +89,7 @@ const { state, actions } = store( 'core/image', {
 				}, 450 );
 
 				state.hideAnimationEnabled = true;
-				state.currentImage = {};
+				state.lightboxEnabled = false;
 			}
 		},
 		handleKeydown( event ) {
