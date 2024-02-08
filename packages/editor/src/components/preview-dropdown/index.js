@@ -10,7 +10,14 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check, desktop, mobile, tablet, external } from '@wordpress/icons';
+import {
+	check,
+	desktop,
+	mobile,
+	tablet,
+	external,
+	chevronUpDown,
+} from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -79,7 +86,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			icon={
+				isZoomedOutView
+					? chevronUpDown
+					: deviceIcons[ deviceType.toLowerCase() ]
+			}
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>
@@ -91,7 +102,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								setDeviceType( 'Desktop' );
 								__unstableSetEditorMode( 'edit' );
 							} }
-							icon={ deviceType === 'Desktop' && check }
+							icon={
+								deviceType === 'Desktop' &&
+								! isZoomedOutView &&
+								check
+							}
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
@@ -118,15 +133,10 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
-									__unstableSetEditorMode( 'edit' );
-								} }
-								icon={ ! isZoomedOutView && check }
-							>
-								{ __( 'Zoom to 100%' ) }
-							</MenuItem>
-							<MenuItem
-								onClick={ () => {
-									__unstableSetEditorMode( 'zoom-out' );
+									setDeviceType( 'Desktop' );
+									__unstableSetEditorMode(
+										isZoomedOutView ? 'edit' : 'zoom-out'
+									);
 								} }
 								icon={ isZoomedOutView && check }
 							>
