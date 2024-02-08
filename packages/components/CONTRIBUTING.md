@@ -645,7 +645,7 @@ function NewComponentImplementation( props ) {
 
 In case that is not possible (eg. too difficult to reconciliate new and legacy implementations, or impossible to preserve backward compatibility), then the legacy implementation can stay as-is.
 
-In any case, extra attention should be payed to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning warning when the above scenario happens — or even better, aliasing to the correct version of the component.
+In any case, extra attention should be payed to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning when the above scenario happens — or even better, aliasing to the correct version of the component.
 
 ##### Naming
 
