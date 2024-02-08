@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+-   Pass the style prop, the class name and the attribute name as single params (not inside objects) in the `data-wp-style`, `data-wp-class` and `data-wp-bind` directives. ([#]()).
+
 ### Enhancements
 
 -   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))

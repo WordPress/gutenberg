@@ -160,15 +160,15 @@ export default () => {
 	// data-wp-class--[classname]
 	directive(
 		'class',
-		( { directives: { class: className }, element, evaluate } ) => {
-			className
+		( { directives: { class: classNames }, element, evaluate } ) => {
+			classNames
 				.filter( ( { suffix } ) => suffix !== 'default' )
 				.forEach( ( entry ) => {
-					const name = entry.suffix;
-					const result = evaluate( entry, { className: name } );
+					const className = entry.suffix;
+					const result = evaluate( entry, className );
 					const currentClass = element.props.class || '';
 					const classFinder = new RegExp(
-						`(^|\\s)${ name }(\\s|$)`,
+						`(^|\\s)${ className }(\\s|$)`,
 						'g'
 					);
 					if ( ! result )
@@ -177,8 +177,8 @@ export default () => {
 							.trim();
 					else if ( ! classFinder.test( currentClass ) )
 						element.props.class = currentClass
-							? `${ currentClass } ${ name }`
-							: name;
+							? `${ currentClass } ${ className }`
+							: className;
 
 					useInit( () => {
 						/*
@@ -187,29 +187,29 @@ export default () => {
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							element.ref.current.classList.remove( name );
+							element.ref.current.classList.remove( className );
 						} else {
-							element.ref.current.classList.add( name );
+							element.ref.current.classList.add( className );
 						}
 					} );
 				} );
 		}
 	);
 
-	// data-wp-style--[style-key]
+	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
-				const key = entry.suffix;
-				const result = evaluate( entry, { key } );
+				const styleProp = entry.suffix;
+				const result = evaluate( entry, styleProp );
 				element.props.style = element.props.style || {};
 				if ( typeof element.props.style === 'string' )
 					element.props.style = cssStringToObject(
 						element.props.style
 					);
-				if ( ! result ) delete element.props.style[ key ];
-				else element.props.style[ key ] = result;
+				if ( ! result ) delete element.props.style[ styleProp ];
+				else element.props.style[ styleProp ] = result;
 
 				useInit( () => {
 					/*
@@ -218,9 +218,9 @@ export default () => {
 					 * because it only needs to do it the first time.
 					 */
 					if ( ! result ) {
-						element.ref.current.style.removeProperty( key );
+						element.ref.current.style.removeProperty( styleProp );
 					} else {
-						element.ref.current.style[ key ] = result;
+						element.ref.current.style[ styleProp ] = result;
 					}
 				} );
 			} );
@@ -231,7 +231,7 @@ export default () => {
 		bind.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
 				const attribute = entry.suffix;
-				const result = evaluate( entry );
+				const result = evaluate( entry, attribute );
 				element.props[ attribute ] = result;
 
 				/*
