@@ -92,6 +92,31 @@ if ( ! function_exists( 'wp_script_modules' ) ) {
 	}
 
 	add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_script_modules', 10, 3 );
+
+	/**
+	 * Registers a REST field for block types to provide view script module IDs.
+	 *
+	 * Adds the `view_script_module_ids` and `view_module_ids` (deprecated) field to block type objects in the REST API, which
+	 * lists the script module IDs for any script modules associated with the
+	 * block's viewScriptModule key.
+	 */
+	function gutenberg_register_view_script_module_ids_rest_field() {
+		register_rest_field(
+			'block-type',
+			'view_script_module_ids',
+			array(
+				'get_callback' => function ( $item ) {
+					$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
+					if ( isset( $block_type->view_script_module_ids ) ) {
+						return $block_type->view_script_module_ids;
+					}
+					return array();
+				},
+			)
+		);
+	}
+
+	add_action( 'rest_api_init', 'gutenberg_register_view_script_module_ids_rest_field' );
 }
 
 if ( ! function_exists( 'wp_register_script_module' ) ) {

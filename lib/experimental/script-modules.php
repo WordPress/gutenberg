@@ -142,7 +142,7 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
  * lists the script module IDs for any script modules associated with the
  * block's viewScriptModule key.
  */
-function gutenberg_register_view_script_module_ids_rest_field() {
+function gutenberg_register_view_module_ids_rest_field() {
 	// @todo remove view_module_ids support in Gutenberg >= 17.8 (replaced by view_script_module_ids).
 	register_rest_field(
 		'block-type',
@@ -157,23 +157,9 @@ function gutenberg_register_view_script_module_ids_rest_field() {
 			},
 		)
 	);
-
-	register_rest_field(
-		'block-type',
-		'view_script_module_ids',
-		array(
-			'get_callback' => function ( $item ) {
-				$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
-				if ( isset( $block_type->view_script_module_ids ) ) {
-					return $block_type->view_script_module_ids;
-				}
-				return array();
-			},
-		)
-	);
 }
 
-add_action( 'rest_api_init', 'gutenberg_register_view_script_module_ids_rest_field' );
+add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
 
 /**
  * Registers the module if no module with that module identifier has already
