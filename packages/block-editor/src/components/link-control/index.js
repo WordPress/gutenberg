@@ -230,9 +230,9 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[ 0 ] ||
-			wrapperNode.current;
-
+			focus.focusable.find( wrapperNode.current ).find( ( element ) => {
+				return element.classList.contains( 'is-primary' );
+			} ) || wrapperNode.current;
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
@@ -266,13 +266,14 @@ function LinkControl( {
 			{}
 		);
 
-		onChange( {
+		setInternalControlValue( {
 			...internalControlValue,
 			...nonSettingsChanges,
 			// As title is not a setting, it must be manually applied
 			// in such a way as to preserve the users changes over
 			// any "title" value provided by the "suggestion".
 			title: internalControlValue?.title || updatedValue?.title,
+			showEdit: true,
 		} );
 
 		stopEditing();
@@ -280,15 +281,25 @@ function LinkControl( {
 
 	const handleSubmit = () => {
 		if ( valueHasChanges ) {
-			// Submit the original value with new stored values applied
-			// on top. URL is a special case as it may also be a prop.
-			onChange( {
+			setInternalControlValue( {
 				...value,
 				...internalControlValue,
+				title: internalControlValue?.title,
 				url: currentUrlInputValue,
+				showEdit: true,
 			} );
 		}
-		stopEditing();
+	};
+
+	const handleSave = () => {
+		// Submit the original value with new stored values applied
+		// on top. URL is a special case as it may also be a prop.
+		onChange( {
+			...value,
+			...internalControlValue,
+			url: currentUrlInputValue,
+			showEdit: false,
+		} );
 	};
 
 	const handleSubmitWithEnter = ( event ) => {
@@ -325,6 +336,7 @@ function LinkControl( {
 		onCancel?.();
 	};
 
+	const showEdit = internalControlValue.showEdit;
 	const currentUrlInputValue =
 		propInputValue || internalControlValue?.url || '';
 
@@ -333,7 +345,7 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showActions = isEditingLink && hasLinkValue;
+	const showActions = showEdit || ( isEditingLink && hasLinkValue );
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -356,7 +368,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ isEditing && (
+			{ ( showEdit || isEditing ) && (
 				<>
 					<div
 						className={ classnames( {
@@ -365,7 +377,7 @@ function LinkControl( {
 							'has-actions': showActions,
 						} ) }
 					>
-						{ showTextControl && (
+						{ ( showEdit || showTextControl ) && (
 							<TextControl
 								__nextHasNoMarginBottom
 								ref={ textInputRef }
@@ -420,7 +432,7 @@ function LinkControl( {
 				</>
 			) }
 
-			{ value && ! isEditingLink && ! isCreatingPage && (
+			{ ! showEdit && value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
 					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ value }
@@ -434,7 +446,7 @@ function LinkControl( {
 				/>
 			) }
 
-			{ showSettings && (
+			{ ( showEdit || showSettings ) && (
 				<div className="block-editor-link-control__tools">
 					{ ! currentInputIsEmpty && (
 						<LinkControlSettingsDrawer
@@ -463,7 +475,7 @@ function LinkControl( {
 					</Button>
 					<Button
 						variant="primary"
-						onClick={ isDisabled ? noop : handleSubmit }
+						onClick={ isDisabled ? noop : handleSave }
 						className="block-editor-link-control__search-submit"
 						aria-disabled={ isDisabled }
 					>
