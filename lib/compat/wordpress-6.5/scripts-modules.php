@@ -210,7 +210,7 @@ if ( ! function_exists( 'wp_dequeue_script_module' ) ) {
 
 if ( ! function_exists( 'wp_deregister_script_module' ) ) {
 	/**
-	 * Unregisters the script module.
+	 * Deregisters the script module.
 	 *
 	 * @since 6.5.0
 	 *

@@ -153,16 +153,14 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		}
 
 		/**
-		 * Deregister the script module so it will no longer be registered.
+		 * Removes a registered script module.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @param string $id The identifier of the script module.
 		 */
 		public function deregister( string $id ) {
-			if ( isset( $this->registered[ $id ] ) ) {
-				unset( $this->registered[ $id ] );
-			}
+			unset( $this->registered[ $id ] );
 			unset( $this->enqueued_before_registered[ $id ] );
 		}
 
