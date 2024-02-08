@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -8,9 +13,13 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 	SelectControl,
+	Tooltip,
+	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -153,11 +162,14 @@ export default function FilterSummary( {
 	...commonProps
 } ) {
 	const toggleRef = useRef();
-	const { filter, view } = commonProps;
+	const { filter, view, onChangeView } = commonProps;
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
 	);
+	const isPrimary = filter.isPrimary;
+	const hasValues = filterInView?.value !== undefined;
+	const canResetOrRemove = ! isPrimary || hasValues;
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
@@ -167,19 +179,77 @@ export default function FilterSummary( {
 				toggleRef.current?.focus();
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					__experimentalIsFocusable
-					size="compact"
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-					ref={ toggleRef }
-				>
-					<FilterText
-						activeElement={ activeElement }
-						filterInView={ filterInView }
-						filter={ filter }
-					/>
-				</Button>
+				<div className="dataviews-filter-summary__chip-container">
+					<Tooltip
+						text={ sprintf(
+							/* translators: 1: Filter name. */
+							__( 'Filter by: %1$s' ),
+							filter.name.toLowerCase()
+						) }
+						placement="top"
+					>
+						<div
+							className={ classnames(
+								'dataviews-filter-summary__chip',
+								{
+									'has-reset': canResetOrRemove,
+									'has-values': hasValues,
+									'is-primary': isPrimary,
+								}
+							) }
+							role="button"
+							tabIndex={ 0 }
+							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+							onClick={ onToggle }
+							onKeyDown={ ( event ) => {
+								if (
+									[ ENTER, SPACE ].includes( event.keyCode )
+								) {
+									onToggle();
+								}
+							} }
+							aria-pressed={ isOpen }
+							aria-expanded={ isOpen }
+							ref={ toggleRef }
+						>
+							<FilterText
+								activeElement={ activeElement }
+								filterInView={ filterInView }
+								filter={ filter }
+							/>
+						</div>
+					</Tooltip>
+					{ canResetOrRemove && (
+						<Tooltip
+							text={ isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
+							placement="top"
+						>
+							<button
+								className={ classnames(
+									'dataviews-filter-summary__chip-remove',
+									{ 'is-primary': isPrimary }
+								) }
+								onClick={ () => {
+									onChangeView( {
+										...view,
+										page: 1,
+										filters: view.filters.filter(
+											( _filter ) =>
+												_filter.field !== filter.field
+										),
+									} );
+									// If the filter is not primary and can be removed, it will be added
+									// back to the available filters from `Add filter` component.
+									if ( ! isPrimary ) {
+										addFilterRef.current?.focus();
+									}
+								} }
+							>
+								<Icon icon={ closeSmall } />
+							</button>
+						</Tooltip>
+					) }
+				</div>
 			) }
 			renderContent={ () => {
 				return (
