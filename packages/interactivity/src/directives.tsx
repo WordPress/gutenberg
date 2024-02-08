@@ -5,6 +5,7 @@
  */
 import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
+import type { DeepSignalObject } from 'deepsignal';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -14,14 +15,14 @@ import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
-import { DirectiveArgs, SignalObject } from './types';
+import type { DirectiveArgs } from './types';
 
 /**
  * Checks if the provided item is an object and not an array.
  *
  * @param item The item to check.
  *
- * @returns Whether the item is an object.
+ * @return Whether the item is an object.
  *
  * @example
  * isObject({}); // returns true
@@ -29,17 +30,16 @@ import { DirectiveArgs, SignalObject } from './types';
  * isObject('string'); // returns false
  * isObject(null); // returns false
  */
-const isObject = ( item:any ): boolean =>
+const isObject = ( item: any ): boolean =>
 	item && typeof item === 'object' && ! Array.isArray( item );
-
 
 /**
  * Recursively merges properties from the source object into the target object.
  * If `overwrite` is true, existing properties in the target object are overwritten by properties in the source object with the same key.
  * If `overwrite` is false, existing properties in the target object are preserved.
  *
- * @param target - The target object that properties are merged into.
- * @param source - The source object that properties are merged from.
+ * @param target    - The target object that properties are merged into.
+ * @param source    - The source object that properties are merged from.
  * @param overwrite - Whether to overwrite existing properties in the target object.
  *
  * @example
@@ -48,7 +48,11 @@ const isObject = ( item:any ): boolean =>
  * mergeDeepSignals(target, source, true);
  * // target is now { $key1: { peek: () => ({ a: 3 }) }, $key2: { peek: () => ({ b: 2 }) }, $key3: { peek: () => ({ c: 3 }) } }
  */
-const mergeDeepSignals = ( target: SignalObject, source: SignalObject, overwrite: boolean = false ) => {
+const mergeDeepSignals = (
+	target: DeepSignalObject< any >,
+	source: DeepSignalObject< any >,
+	overwrite: boolean = false
+) => {
 	for ( const k in source ) {
 		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
@@ -115,7 +119,7 @@ const getGlobalEventDirective =
 					globalVar.addEventListener( entry.suffix, cb );
 					return () =>
 						globalVar.removeEventListener( entry.suffix, cb );
-				});
+				} );
 			} );
 	};
 
@@ -128,7 +132,6 @@ export default (): void => {
 			props: { children },
 			context: inheritedContext,
 		}: DirectiveArgs ): Element => {
-
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );

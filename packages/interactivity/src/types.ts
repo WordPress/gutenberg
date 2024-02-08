@@ -131,10 +131,3 @@ export interface ContextProviderProps {
 	context: any;
 	children?: ComponentChildren;
 }
-
-// Cannot export some types needed from deepsignal library.
-export interface SignalObject {
-	[ key: string ]: {
-		peek: () => any;
-	};
-}
