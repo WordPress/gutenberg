@@ -8,9 +8,7 @@ import { useState, useMemo, useCallback } from '@wordpress/element';
  */
 import { DataViews } from '../index';
 import { DEFAULT_VIEW, actions, data } from './fixtures';
-
-const LAYOUT_GRID = 'grid';
-const LAYOUT_TABLE = 'table';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 
 const meta = {
 	title: 'DataViews (Experimental)/DataViews',
