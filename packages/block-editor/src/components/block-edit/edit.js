@@ -34,7 +34,7 @@ const Edit = ( props ) => {
 	const { name } = props;
 	const blockType = getBlockType( name );
 
-	const Component = useMemo( () => getBlockEdit( blockType ), [ blockType ] );
+	const Component = getBlockEdit( blockType );
 	if ( ! Component ) {
 		return null;
 	}

@@ -365,13 +365,20 @@ export function lazyEdit( cb ) {
 	};
 }
 
+const lazyEditCache = new WeakMap();
+
 export function getBlockEdit( blockType ) {
 	if ( ! blockType ) {
 		return null;
 	}
 
 	if ( blockType.lazyEdit ) {
-		return lazyEdit( blockType.lazyEdit );
+		let edit = lazyEditCache.get( blockType.lazyEdit );
+		if ( ! edit ) {
+			edit = lazyEdit( blockType.lazyEdit );
+			lazyEditCache.set( blockType.lazyEdit, edit );
+		}
+		return edit;
 	}
 
 	return blockType.edit || blockType.save || null;
