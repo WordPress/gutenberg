@@ -603,16 +603,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$parent_column_width = $block['attrs']['style']['layout']['parentColumnWidth'];
 		$parent_column_value = floatval( $parent_column_width );
 		$parent_column_unit  = explode( $parent_column_value, $parent_column_width )[1];
-
-		// Adding 1 to the column span to make up for gap value.
-		$container_query_value = ( $column_span_number + 1 ) * $parent_column_value;
+		/**
+		 * A default gap value is used for this computation because custom gap values may not be
+		 * viable to use in the computation of the container query value.
+		 */
+		$default_gap_value     = 'px' === $parent_column_unit ? '24' : '1.5';
+		$container_query_value = $column_span_number * $parent_column_value + ( $column_span_number - 1 ) * $default_gap_value;
 		$container_query_value = $container_query_value . $parent_column_unit;
 
 		$child_layout_styles[] = array(
 			'at_rule'      => "@container (max-width: $container_query_value )",
 			'selector'     => ".$container_content_class",
 			'declarations' => array(
-				'grid-column' => 'auto',
+				'grid-column' => '1/-1',
 			),
 		);
 	}
