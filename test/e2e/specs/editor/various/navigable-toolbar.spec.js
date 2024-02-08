@@ -273,20 +273,14 @@ test.describe( 'Block Toolbar', () => {
 		} );
 
 		// Make sure it's in an acvite state for now
-		await expect( blockToolbarMoveUpButton ).not.toHaveAttribute(
-			'aria-disabled',
-			'true'
-		);
+		await expect( blockToolbarMoveUpButton ).toBeEnabled();
 
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
-		await expect( blockToolbarMoveUpButton ).toHaveAttribute(
-			'aria-disabled',
-			'true'
-		);
+		await expect( blockToolbarMoveUpButton ).toBeDisabled();
 
 		// Check to make sure focus returns to the Move Up button roving index after all of this
 		await pageUtils.pressKeys( 'Tab' );

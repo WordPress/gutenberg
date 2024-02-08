@@ -30,7 +30,7 @@ function getEntityDescription( entity, count ) {
 			);
 		case 'page':
 		case 'post':
-			return __( 'The following content has been modified.' );
+			return __( 'The following has been modified.' );
 	}
 }
 
@@ -55,18 +55,15 @@ function GlobalStylesDescription( { record } ) {
 		}
 	);
 	return globalStylesChanges.length ? (
-		<>
-			<h3 className="entities-saved-states__description-heading">
-				{ __( 'Changes made to:' ) }
-			</h3>
-			<PanelRow>{ globalStylesChanges.join( ', ' ) }.</PanelRow>
-		</>
+		<PanelRow className="entities-saved-states__change-summary">
+			{ globalStylesChanges.join( ', ' ) }.
+		</PanelRow>
 	) : null;
 }
 
 function EntityDescription( { record, count } ) {
 	if ( 'globalStyles' === record?.name ) {
-		return <GlobalStylesDescription record={ record } />;
+		return null;
 	}
 	const description = getEntityDescription( record?.name, count );
 	return description ? <PanelRow>{ description }</PanelRow> : null;
@@ -117,6 +114,9 @@ export default function EntityTypeList( {
 					/>
 				);
 			} ) }
+			{ 'globalStyles' === firstRecord?.name && (
+				<GlobalStylesDescription record={ firstRecord } />
+			) }
 		</PanelBody>
 	);
 }

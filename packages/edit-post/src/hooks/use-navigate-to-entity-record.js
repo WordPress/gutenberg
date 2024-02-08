@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useCallback, useReducer, useMemo } from '@wordpress/element';
-import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -16,9 +15,12 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
  * @param {string} initialPostType The post type of the post when the editor loaded.
  *
  * @return {Object} An object containing the `currentPost` variable and
- *                 `getPostLinkProps` and `goBack` functions.
+ *                 `onNavigateToEntityRecord` and `onNavigateToPreviousEntityRecord` functions.
  */
-export default function usePostHistory( initialPostId, initialPostType ) {
+export default function useNavigateToEntityRecord(
+	initialPostId,
+	initialPostType
+) {
 	const [ postHistory, dispatch ] = useReducer(
 		( historyState, { type, post } ) => {
 			if ( type === 'push' ) {
@@ -42,31 +44,14 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		};
 	}, [ initialPostType, initialPostId ] );
 
-	const getPostLinkProps = useCallback( ( params ) => {
-		const currentArgs = getQueryArgs( window.location.href );
-		const currentUrlWithoutArgs = removeQueryArgs(
-			window.location.href,
-			...Object.keys( currentArgs )
-		);
-
-		const newUrl = addQueryArgs( currentUrlWithoutArgs, {
-			post: params.postId,
-			action: 'edit',
+	const onNavigateToEntityRecord = useCallback( ( params ) => {
+		dispatch( {
+			type: 'push',
+			post: { postId: params.postId, postType: params.postType },
 		} );
-
-		return {
-			href: newUrl,
-			onClick: ( event ) => {
-				event?.preventDefault();
-				dispatch( {
-					type: 'push',
-					post: { postId: params.postId, postType: params.postType },
-				} );
-			},
-		};
 	}, [] );
 
-	const goBack = useCallback( () => {
+	const onNavigateToPreviousEntityRecord = useCallback( () => {
 		dispatch( { type: 'pop' } );
 	}, [] );
 
@@ -74,8 +59,11 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 
 	return {
 		currentPost,
-		getPostLinkProps,
 		initialPost,
-		goBack: postHistory.length > 1 ? goBack : undefined,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord:
+			postHistory.length > 1
+				? onNavigateToPreviousEntityRecord
+				: undefined,
 	};
 }

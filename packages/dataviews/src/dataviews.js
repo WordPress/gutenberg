@@ -37,30 +37,33 @@ export default function DataViews( {
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+	const [ openedFilter, setOpenedFilter ] = useState( null );
 
 	useEffect( () => {
 		if (
 			selection.length > 0 &&
 			selection.some(
-				( id ) => ! data.some( ( item ) => item.id === id )
+				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
 			)
 		) {
 			const newSelection = selection.filter( ( id ) =>
-				data.some( ( item ) => item.id === id )
+				data.some( ( item ) => getItemId( item ) === id )
 			);
 			setSelection( newSelection );
 			onSelectionChange(
-				data.filter( ( item ) => newSelection.includes( item.id ) )
+				data.filter( ( item ) =>
+					newSelection.includes( getItemId( item ) )
+				)
 			);
 		}
-	}, [ selection, data, onSelectionChange ] );
+	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
-			setSelection( items.map( ( item ) => item.id ) );
+			setSelection( items.map( ( item ) => getItemId( item ) ) );
 			onSelectionChange( items );
 		},
-		[ setSelection, onSelectionChange ]
+		[ setSelection, getItemId, onSelectionChange ]
 	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
@@ -77,27 +80,20 @@ export default function DataViews( {
 	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 0 } justify="flex-start">
+			<VStack spacing={ 3 } justify="flex-start">
 				<HStack
 					alignment="flex-start"
+					justify="start"
 					className="dataviews-filters__view-actions"
 				>
-					<HStack justify="start" wrap>
-						{ search && (
-							<Search
-								label={ searchLabel }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
-						) }
-						<Filters
-							fields={ _fields }
+					{ search && (
+						<Search
+							label={ searchLabel }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
-					</HStack>
-					{ ( view.type === LAYOUT_TABLE ||
-						view.type === LAYOUT_GRID ) && (
+					) }
+					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
 						<BulkActions
 							actions={ actions }
 							data={ data }
@@ -113,6 +109,19 @@ export default function DataViews( {
 						supportedLayouts={ supportedLayouts }
 					/>
 				</HStack>
+				<HStack
+					justify="start"
+					className="dataviews-filters__container"
+					wrap
+				>
+					<Filters
+						fields={ _fields }
+						view={ view }
+						onChangeView={ onChangeView }
+						openedFilter={ openedFilter }
+						setOpenedFilter={ setOpenedFilter }
+					/>
+				</HStack>
 				<ViewComponent
 					fields={ _fields }
 					view={ view }
@@ -125,6 +134,7 @@ export default function DataViews( {
 					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
+					setOpenedFilter={ setOpenedFilter }
 				/>
 				<Pagination
 					view={ view }
