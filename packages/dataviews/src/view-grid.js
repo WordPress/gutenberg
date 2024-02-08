@@ -127,7 +127,9 @@ function useRows( cells, targetRef ) {
  */
 function getFocusSelector( context, element ) {
 	if ( ! element || ! element.parentElement ) return undefined;
-	if ( element.id && element.id === context ) return `#${ context }`;
+	if ( element.id && element.id === context ) {
+		return `#${ context.replaceAll( '/', '\\/' ) }`;
+	}
 
 	const parent = getFocusSelector( context, element.parentElement );
 	const siblings = Array.from( element.parentElement.children );
@@ -146,6 +148,10 @@ function Grid( props = {} ) {
 	const id = useInstanceId( Grid, 'view-grid', preferredId );
 	const rows = useRows( cells, gridRef );
 	const focusedNodeSelectorRef = useRef( null );
+	const eventControllerRef = useRef( null );
+	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const [ pointerIsWithinBounds, setPointerIsWithinBounds ] =
+		useState( false );
 	const setFocusedNode = ( context, node ) => {
 		focusedNodeSelectorRef.current = getFocusSelector( context, node );
 	};
@@ -157,6 +163,7 @@ function Grid( props = {} ) {
 		setLastSelectedItem: ( _id, selected = true ) => {
 			setLastSelectedItem( { id: _id, selected } );
 		},
+		hasNoPointerEvents,
 	};
 
 	useEffect( () => {
@@ -167,6 +174,33 @@ function Grid( props = {} ) {
 		}
 	}, [ rows ] );
 
+	useEffect( () => {
+		if ( eventControllerRef.current ) {
+			eventControllerRef.current.abort( 'Pointer moved' );
+		}
+
+		const doc = gridRef.current?.ownerDocument;
+		if ( ! doc ) return;
+
+		if ( pointerIsWithinBounds ) {
+			const listener = ( { key, type } ) => {
+				if ( key === ( isAppleOS() ? 'Meta' : 'Control' ) ) {
+					setHasNoPointerEvents( type === 'keydown' );
+				}
+			};
+			const controller = new AbortController();
+			controller.signal.addEventListener( 'abort', () => {
+				eventControllerRef.current = null;
+			} );
+			const config = { capture: true, signal: controller.signal };
+			doc.body.addEventListener( 'keydown', listener, config );
+			doc.body.addEventListener( 'keyup', listener, config );
+			eventControllerRef.current = controller;
+
+			return () => controller.abort( 'Component unmounted' );
+		}
+	}, [ pointerIsWithinBounds ] );
+
 	return (
 		<Composite
 			role="grid"
@@ -174,6 +208,14 @@ function Grid( props = {} ) {
 			id={ id }
 			store={ store }
 			ref={ gridRef }
+			onMouseEnter={ ( { metaKey, ctrlKey } ) => {
+				setPointerIsWithinBounds( true );
+				setHasNoPointerEvents( isAppleOS() ? metaKey : ctrlKey );
+			} }
+			onMouseLeave={ () => {
+				setPointerIsWithinBounds( false );
+				setHasNoPointerEvents( false );
+			} }
 		>
 			<GridContext.Provider value={ context }>
 				{ rows }
@@ -198,6 +240,7 @@ function GridItem( {
 		setFocusedNode,
 		setLastSelectedItem,
 		lastSelectedItem,
+		hasNoPointerEvents,
 		item: getGridItem,
 		getState: getGridState,
 		useState: useGridState,
@@ -212,7 +255,6 @@ function GridItem( {
 	const isSelected = selection.includes( itemId );
 	const { activeId } = useGridState();
 	const isActive = activeId === id;
-	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
 	const [ isInteractive, setIsInteractive ] = useState( isActive );
 	const itemRef = useRef( null );
 	const primaryFieldRef = useRef( null );
@@ -400,28 +442,14 @@ function GridItem( {
 				setFocusedNode( id, null );
 			} }
 			onKeyDown={ keyDownHandler }
-			onMouseEnter={ ( event ) => {
-				setIsInteractive( true );
-				setHasNoPointerEvents(
-					isAppleOS() ? event.metaKey : event.ctrlKey
-				);
-			} }
-			onMouseLeave={ () => {
-				setIsInteractive( isActive );
-				setHasNoPointerEvents( false );
-			} }
-			onMouseMove={ ( event ) =>
-				setHasNoPointerEvents(
-					isAppleOS() ? event.metaKey : event.ctrlKey
-				)
-			}
+			onMouseEnter={ () => setIsInteractive( true ) }
+			onMouseLeave={ () => setIsInteractive( isActive ) }
 			onMouseDown={ ( event ) => {
 				setActiveId( id );
 				event.currentTarget.focus();
 				const { ctrlKey, metaKey, shiftKey } = event;
 				if ( isAppleOS() ? metaKey : ctrlKey ) {
 					event.preventDefault();
-					setHasNoPointerEvents( true );
 					if (
 						shiftKey &&
 						lastSelectedItem?.id &&
