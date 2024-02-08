@@ -43,16 +43,19 @@ function Edit( {
 	const [ openedBy, setOpenedBy ] = useState( null );
 
 	useLayoutEffect( () => {
-		// close the Link popover if there is no active selection
-		// after the link was added - this can happen if the user
-		// adds a link without any text selected
-		if ( addingLink && ! value.activeFormats ) {
-			setAddingLink( false );
+		const editableContentElement = contentRef.current;
+		if ( ! editableContentElement ) {
 			return;
 		}
 
-		const editableContentElement = contentRef.current;
-		if ( ! editableContentElement ) {
+		// Close the Link popover if there is no active selection
+		// after the link was added - this can happen if the user
+		// adds a link without any text selected.
+		// We assume that if there is no active selection after
+		// link insertion there are no active formats.
+		if ( ! value.activeFormats ) {
+			editableContentElement.focus();
+			setAddingLink( false );
 			return;
 		}
 
