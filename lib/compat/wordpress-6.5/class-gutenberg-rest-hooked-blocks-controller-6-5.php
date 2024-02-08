@@ -302,6 +302,48 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		);
 	}
 
+	/**
+	 * Retrieves the hooked blocks schema, conforming to JSON Schema.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->post_type,
+			'type'       => 'array',
+			'properties' => array(
+				'block_name' => array(
+					'description' => __( 'Block namespace.' ),
+					'type'        => array( 'array' ),
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit' ),
+					'properties'  => array(
+						'position_key' => array(
+							'description' => __( 'Positive key' ),
+							'type'        => 'array',
+							'readonly'    => true,
+							'context'     => array( 'view', 'edit' ),
+							'items'       => array(
+								'type' => 'string',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
 		/**
 	 * Get the block, if the name is valid.
 	 *
