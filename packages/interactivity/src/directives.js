@@ -10,7 +10,6 @@ import { deepSignal, peek } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
@@ -120,11 +119,6 @@ export default () => {
 		},
 		{ priority: 5 }
 	);
-
-	// data-wp-body
-	directive( 'body', ( { props: { children } } ) => {
-		return createPortal( children, document.body );
-	} );
 
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
