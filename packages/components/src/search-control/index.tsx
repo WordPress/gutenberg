@@ -66,7 +66,7 @@ function UnforwardedSearchControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.
-	// Work with the design team if you need this feature.
+	// Work with the design team (@WordPress/gutenberg-design) if you need this feature.
 	delete restProps.disabled;
 
 	const searchRef = useRef< HTMLInputElement >( null );
