@@ -194,7 +194,7 @@ Example:
 -   `id`: identifier for the field. Unique.
 -   `header`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field.
--   `render`: function that renders the field.
+-   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
 -   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
