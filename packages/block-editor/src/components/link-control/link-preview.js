@@ -137,10 +137,9 @@ export default function LinkPreview( {
 				<Button
 					icon={ copySmall }
 					label={ sprintf(
-						// Translators: %1$s is a placeholder for an optional colon, %2$s is a placeholder for the link URL (if present).
-						__( 'Copy link%1$s%2$s' ), // Ends up looking like "Copy link: https://example.com".
-						isEmptyURL ? '' : ': ',
-						value.url
+						// Translators: %s is a placeholder for the link URL and an optional colon, (if a Link URL is present).
+						__( 'Copy link%s' ), // Ends up looking like "Copy link: https://example.com".
+						isEmptyURL ? '' : ': ' + value.url
 					) }
 					ref={ ref }
 					disabled={ isEmptyURL }
