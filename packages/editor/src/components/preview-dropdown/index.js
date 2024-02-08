@@ -102,11 +102,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								setDeviceType( 'Desktop' );
 								__unstableSetEditorMode( 'edit' );
 							} }
-							icon={
-								deviceType === 'Desktop' &&
-								! isZoomedOutView &&
-								check
-							}
+							icon={ deviceType === 'Desktop' && check }
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
@@ -134,9 +130,16 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							<MenuItem
 								onClick={ () => {
 									setDeviceType( 'Desktop' );
-									__unstableSetEditorMode(
-										isZoomedOutView ? 'edit' : 'zoom-out'
-									);
+									__unstableSetEditorMode( 'edit' );
+								} }
+								icon={ ! isZoomedOutView && check }
+							>
+								{ __( 'Zoom to 100%' ) }
+							</MenuItem>
+							<MenuItem
+								onClick={ () => {
+									setDeviceType( 'Desktop' );
+									__unstableSetEditorMode( 'zoom-out' );
 								} }
 								icon={ isZoomedOutView && check }
 							>
