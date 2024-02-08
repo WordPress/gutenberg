@@ -355,6 +355,9 @@
 	*::after {
 		box-sizing: inherit;
 	}
+
+	// This default value avoids widows in multi-line paragraphs of text.
+	text-wrap: pretty;
 }
 
 // The editor input reset with increased specificity to avoid theme styles bleeding in.
