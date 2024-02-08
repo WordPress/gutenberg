@@ -61,11 +61,7 @@ test.describe( 'Footnotes', () => {
 		] );
 
 		// Check if the numbers in the editor content updated.
-		const anchorNumber = await editor.canvas
-			.locator( ':root' )
-			.evaluate( () => document.querySelector( '.fn' ).textContent );
-
-		expect( anchorNumber ).toBe( '1' );
+		await expect( editor.canvas.locator( '.fn' ) ).toHaveText( '1' );
 
 		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
