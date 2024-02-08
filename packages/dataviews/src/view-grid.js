@@ -416,6 +416,8 @@ function GridItem( {
 				)
 			}
 			onMouseDown={ ( event ) => {
+				setActiveId( id );
+				event.currentTarget.focus();
 				const { ctrlKey, metaKey, shiftKey } = event;
 				if ( isAppleOS() ? metaKey : ctrlKey ) {
 					event.preventDefault();
