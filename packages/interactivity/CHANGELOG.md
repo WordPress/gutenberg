@@ -4,7 +4,8 @@
 
 ### Breaking changes
 
--   Pass the style prop, the class name and the attribute name as single params (not inside objects) in the `data-wp-style`, `data-wp-class` and `data-wp-bind` directives. ([#]()).
+-   Pass the style prop, the class name and the attribute name as single params (not inside objects) in the `data-wp-style`, `data-wp-class` and `data-wp-bind` directives. ([#58835](https://github.com/WordPress/gutenberg/pull/58835)).
+-   Remove the `data-wp-body` directive. ([#58835](https://github.com/WordPress/gutenberg/pull/58835))
 
 ### Enhancements
 
