@@ -28,7 +28,7 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-const NON_CONTEXTUALU_POST_TYPES = [
+const NON_CONTEXTUAL_POST_TYPES = [
 	'wp_block',
 	'wp_template',
 	'wp_navigation',
@@ -119,7 +119,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
-				! NON_CONTEXTUALU_POST_TYPES.includes( rootLevelPost.type ) ||
+				! NON_CONTEXTUAL_POST_TYPES.includes( rootLevelPost.type ) ||
 				shouldRenderTemplate
 					? { postId: post.id, postType: post.type }
 					: {};
