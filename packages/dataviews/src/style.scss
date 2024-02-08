@@ -259,7 +259,6 @@
 		border: 1px solid $gray-200;
 		height: 100%;
 		justify-content: flex-start;
-		position: relative;
 		scroll-margin-top: 5em;
 		max-width: 26em;
 
@@ -532,9 +531,28 @@
 	margin-left: $grid-unit-10;
 }
 
-.dataviews-view-grid__card.has-no-pointer-events * {
-	pointer-events: none;
+.dataviews-view-grid__card {
+	position: relative;
+
+	&.has-no-pointer-events {
+		&::after {
+			content: "";
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			cursor: default;
+			z-index: 2;
+		}
+
+		* {
+			pointer-events: none;
+		}
+	}
 }
+
 .dataviews-filter-summary__popover {
 	.components-popover__content {
 		width: 230px;

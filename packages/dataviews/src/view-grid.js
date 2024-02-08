@@ -388,9 +388,6 @@ function GridItem( {
 				'is-selected': isSelected,
 				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
-			onKeyDown={ keyDownHandler }
-			onMouseEnter={ () => setIsInteractive( true ) }
-			onMouseLeave={ () => setIsInteractive( isActive ) }
 			onFocus={ ( { target } ) => {
 				setIsInteractive( true );
 				setActiveId( id );
@@ -402,6 +399,22 @@ function GridItem( {
 				}
 				setFocusedNode( id, null );
 			} }
+			onKeyDown={ keyDownHandler }
+			onMouseEnter={ ( event ) => {
+				setIsInteractive( true );
+				setHasNoPointerEvents(
+					isAppleOS() ? event.metaKey : event.ctrlKey
+				);
+			} }
+			onMouseLeave={ () => {
+				setIsInteractive( isActive );
+				setHasNoPointerEvents( false );
+			} }
+			onMouseMove={ ( event ) =>
+				setHasNoPointerEvents(
+					isAppleOS() ? event.metaKey : event.ctrlKey
+				)
+			}
 			onMouseDown={ ( event ) => {
 				const { ctrlKey, metaKey, shiftKey } = event;
 				if ( isAppleOS() ? metaKey : ctrlKey ) {
@@ -436,11 +449,6 @@ function GridItem( {
 					} else {
 						toggleIsSelected();
 					}
-				}
-			} }
-			onClick={ () => {
-				if ( hasNoPointerEvents ) {
-					setHasNoPointerEvents( false );
 				}
 			} }
 		>
