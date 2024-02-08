@@ -167,9 +167,9 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	
 	// Figure.
 	$w->next_tag( 'figure' );
-	$w->add_class( 'wp-lightbox-container' );
 	$class_names = $w->get_attribute( 'class' );
 	$styles      = $w->get_attribute( 'style' );
+	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', '{"namespace":"core/image"}' );
 	$w->set_attribute(
 		'data-wp-context',
