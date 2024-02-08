@@ -328,7 +328,8 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 }
 
 // Spotlight mode. Fade out blocks unless they contain a selected block.
-.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
+.wp-block-post-content.is-focus-mode .block-editor-block-list__block:not(.has-child-selected),
+.wp-site-blocks.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
 	opacity: 0.2;
 	transition: opacity 0.1s linear;
 	@include reduce-motion("transition");
