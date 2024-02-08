@@ -227,7 +227,8 @@ export default function FilterSummary( {
 							<button
 								className={ classnames(
 									'dataviews-filter-summary__chip-remove',
-									{ 'is-primary': isPrimary }
+									{ 'is-primary': isPrimary },
+									{ 'has-values': hasValues }
 								) }
 								onClick={ () => {
 									onChangeView( {

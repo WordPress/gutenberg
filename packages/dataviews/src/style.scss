@@ -639,31 +639,34 @@
 		border-radius: $grid-unit-20;
 		border: 1px solid transparent;
 		cursor: pointer;
-		transition: all 0.1s linear;
-		@include reduce-motion("transition");
-		padding: 6px $grid-unit-15;
+		padding: 0 $grid-unit-15;
+		height: $grid-unit-40;
 		background: $gray-100;
 		color: $gray-700;
 		position: relative;
+		display: flex;
+		align-items: center;
 
 		&.has-reset {
 			padding-inline-end: 28px;
 		}
 
 		&:hover,
-		&:focus {
+		&:focus-visible {
 			background: $gray-200;
 			color: $gray-900;
 		}
 
-		&.is-primary.has-values {
+		&.has-values {
 			color: var(--wp-admin-theme-color);
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
 			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 			}
 		}
 
-		&:focus {
+		&:focus-visible {
 			outline: none;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
@@ -676,7 +679,7 @@
 		border: 0;
 		padding: 0;
 		position: absolute;
-		right: 2px;
+		right: $grid-unit-05;
 		top: 50%;
 		transform: translateY(-50%);
 		display: flex;
@@ -697,16 +700,16 @@
 			}
 		}
 
-		&.is-primary {
+		&.has-values {
 			svg {
 				fill: var(--wp-admin-theme-color);
 			}
 			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 			}
 		}
 
-		&:focus {
+		&:focus-visible {
 			outline: none;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
