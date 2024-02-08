@@ -18,6 +18,7 @@ const meta: Meta< typeof SearchControl > = {
 	component: SearchControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
+		value: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -46,7 +47,6 @@ const Template: StoryFn< typeof SearchControl > = ( {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	label: 'Label Text',
 	help: 'Help text to explain the input.',
 };
 
