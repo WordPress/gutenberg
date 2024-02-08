@@ -233,7 +233,12 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		}
 
 		foreach ( $this->position_types as $position ) {
-			$hooked_block_types_for_anchor_block[ $position ] = apply_filters( 'hooked_block_types', $hooked_block_types_for_anchor_block[ $position ], $position, $block_name, $context );
+			// Making sure that we always pass an array to the filter.
+			$positioned_hooked_block_types = isset( $hooked_block_types_for_anchor_block[ $position ] )
+				? $hooked_block_types_for_anchor_block[ $position ]
+				: array();
+
+			$hooked_block_types_for_anchor_block[ $position ] = apply_filters( 'hooked_block_types', $positioned_hooked_block_types, $position, $block_name, $context );
 		}
 
 		// Filter non-empty arrays.
