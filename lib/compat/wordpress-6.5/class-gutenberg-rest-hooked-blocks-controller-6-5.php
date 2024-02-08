@@ -129,8 +129,9 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			return $context;
 		}
 
-		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
-
+		// We need to get all registered block types and loop over each of them for the filter.
+		// TODO: Look into whether we can optimize get_hooked_blocks() to return filtered results as well.
+		$block_types                        = WP_Block_Type_Registry::get_instance()->get_all_registered();
 		$hooked_block_types                 = get_hooked_blocks();
 		$hooked_block_types_by_anchor_block = array();
 		foreach ( $block_types as $block_type ) {
