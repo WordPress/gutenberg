@@ -90,6 +90,8 @@ if ( ! function_exists( 'wp_interactivity' ) ) {
 		}
 		return $wp_interactivity;
 	}
+
+	wp_interactivity()->add_hooks();
 }
 
 if ( ! function_exists( 'wp_interactivity_process_directives' ) ) {

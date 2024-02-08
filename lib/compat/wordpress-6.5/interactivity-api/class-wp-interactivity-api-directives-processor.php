@@ -16,7 +16,7 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 	 *
 	 * @access private
 	 */
-	final class WP_Interactivity_API_Directives_Processor extends WP_HTML_Tag_Processor {
+	final class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 		/**
 		 * List of tags whose closer tag is not visited by the WP_HTML_Tag_Processor.
 		 *
@@ -78,7 +78,7 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 			}
 			list( $after_opener_tag, $before_closer_tag ) = $positions;
 
-			$this->lexical_updates[] = new WP_HTML_Text_Replacement(
+			$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5(
 				$after_opener_tag,
 				$before_closer_tag - $after_opener_tag,
 				esc_html( $new_content )
@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 			$this->release_bookmark( $bookmark );
 
 			// Appends the new content.
-			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closing_tag, 0, $new_content );
+			$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $after_closing_tag, 0, $new_content );
 
 			return true;
 		}
@@ -238,7 +238,7 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 			$tag_name = $this->get_tag();
 
 			return null !== $tag_name && (
-			! WP_HTML_Processor::is_void( $tag_name ) &&
+			! Gutenberg_HTML_Processor_6_5::is_void( $tag_name ) &&
 			! in_array( $tag_name, self::TAGS_THAT_DONT_VISIT_CLOSER_TAG, true )
 			);
 		}
