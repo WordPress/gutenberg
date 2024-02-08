@@ -393,7 +393,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( '/tag cloud' );
 
 		await expect(
@@ -413,7 +415,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## Heading' );
@@ -465,7 +469,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await editor.insertBlock( { name: 'core/image' } );
 
