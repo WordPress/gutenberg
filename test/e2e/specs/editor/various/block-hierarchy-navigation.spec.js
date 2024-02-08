@@ -127,7 +127,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await pageUtils.pressKeys( 'ctrl+`' );
 
 		// Navigate to the block settings sidebar and tweak the column count.
-		await pageUtils.pressKeys( 'Tab', { times: 4 } );
+		await pageUtils.pressKeys( 'Tab', { times: 5 } );
 		await expect(
 			page.getByRole( 'slider', { name: 'Columns' } )
 		).toBeFocused();

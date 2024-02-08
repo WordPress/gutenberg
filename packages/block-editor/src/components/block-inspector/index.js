@@ -30,6 +30,7 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
+import { getBorderPanelLabel } from '../../hooks/border';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
@@ -139,7 +140,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 						/>
 						<InspectorControls.Slot
 							group="border"
-							label={ __( 'Border' ) }
+							label={ getBorderPanelLabel( {
+								blockName: selectedBlockName,
+							} ) }
 						/>
 						<InspectorControls.Slot group="styles" />
 					</>
@@ -248,6 +251,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const borderPanelLabel = getBorderPanelLabel( { blockName } );
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -300,7 +304,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					/>
 					<InspectorControls.Slot
 						group="border"
-						label={ __( 'Border' ) }
+						label={ borderPanelLabel }
 					/>
 					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot
@@ -308,10 +312,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ __( 'Background' ) }
 					/>
 					<PositionControls />
-					<InspectorControls.Slot
-						group="effects"
-						label={ __( 'Effects' ) }
-					/>
 					<div>
 						<AdvancedControls />
 					</div>

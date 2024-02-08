@@ -5,6 +5,17 @@
 ### Enhancements
 
 -   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))
+-   Support setting the namespace using a string in `data-wp-interactive`, like `data-wp-interactive="myPlugin"`. ([#58743](https://github.com/WordPress/gutenberg/pull/58743))
+
+### Bug Fixes
+
+-   Avoid initializing private stores as public when they have initial state. ([#58754](https://github.com/WordPress/gutenberg/pull/58754))
+
+### Bug fixes
+
+-   Interactivity API: Remove non default suffix data wp context processing. ([#58664](https://github.com/WordPress/gutenberg/pull/58664))
+
+## 4.0.1 (2024-01-31)
 
 ### Bug Fixes
 
@@ -17,6 +28,7 @@
 -   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
 -   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([#57891](https://github.com/WordPress/gutenberg/pull/57891))
 -   Export `withScope()` and allow to use it with asynchronous operations. ([#58013](https://github.com/WordPress/gutenberg/pull/58013))
+-   Add `block supports` for `clientNavigation` and `interactive` properties on `block.json` schema.([#58132](https://github.com/WordPress/gutenberg/pull/58132))
 
 ### New Features
 

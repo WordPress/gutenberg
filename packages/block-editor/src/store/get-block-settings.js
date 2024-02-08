@@ -11,12 +11,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getValueFromObjectPath } from '../utils/object';
-import {
-	getBlockParents,
-	getBlockName,
-	getSettings,
-	getBlockAttributes,
-} from './selectors';
+import { getBlockName, getSettings, getBlockAttributes } from './selectors';
 
 const blockedPaths = [
 	'color',
@@ -132,22 +127,17 @@ export function hasMergedOrigins( value ) {
 
 export function getBlockSettings( state, clientId, ...paths ) {
 	const blockName = getBlockName( state, clientId );
-	const candidates = clientId
-		? [
-				clientId,
-				...getBlockParents( state, clientId, /* ascending */ true ),
-		  ].filter( ( candidateClientId ) => {
-				const candidateBlockName = getBlockName(
-					state,
-					candidateClientId
-				);
-				return hasBlockSupport(
-					candidateBlockName,
-					'__experimentalSettings',
-					false
-				);
-		  } )
-		: [];
+	const candidates = [];
+
+	if ( clientId ) {
+		let id = clientId;
+		do {
+			const name = getBlockName( state, id );
+			if ( hasBlockSupport( name, '__experimentalSettings', false ) ) {
+				candidates.push( id );
+			}
+		} while ( ( id = state.blocks.parents.get( id ) ) );
+	}
 
 	return paths.map( ( path ) => {
 		if ( blockedPaths.includes( path ) ) {

@@ -13,6 +13,7 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
+import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -101,21 +102,26 @@ export default () => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
-			const passedValues = context.map( ( { value } ) => value );
+			const defaultEntry = context.find(
+				( { suffix } ) => suffix === 'default'
+			);
 
 			currentValue.current = useMemo( () => {
-				const newValue = context
-					.map( ( c ) => deepSignal( { [ c.namespace ]: c.value } ) )
-					.reduceRight( mergeDeepSignals );
-
+				if ( ! defaultEntry ) return null;
+				const { namespace, value } = defaultEntry;
+				const newValue = deepSignal( { [ namespace ]: value } );
 				mergeDeepSignals( newValue, inheritedValue );
 				mergeDeepSignals( currentValue.current, newValue, true );
 				return currentValue.current;
-			}, [ inheritedValue, ...passedValues ] );
+			}, [ inheritedValue, defaultEntry ] );
 
-			return (
-				<Provider value={ currentValue.current }>{ children }</Provider>
-			);
+			if ( currentValue.current ) {
+				return (
+					<Provider value={ currentValue.current }>
+						{ children }
+					</Provider>
+				);
+			}
 		},
 		{ priority: 5 }
 	);
@@ -356,7 +362,8 @@ export default () => {
 			return list.map( ( item ) => {
 				const mergedContext = deepSignal( {} );
 
-				const itemProp = suffix === 'default' ? 'item' : suffix;
+				const itemProp =
+					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const newValue = deepSignal( {
 					[ namespace ]: { [ itemProp ]: item },
 				} );

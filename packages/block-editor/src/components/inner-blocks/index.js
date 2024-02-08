@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -41,6 +41,8 @@ function BlockContext( { children, clientId } ) {
 		</BlockContextProvider>
 	);
 }
+
+const BlockListItemsMemo = memo( BlockListItems );
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -117,8 +119,10 @@ function UncontrolledInnerBlocks( props ) {
 		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
+	// For controlled inner blocks, we don't want a change in blocks to
+	// re-render the blocks list.
 	const items = (
-		<BlockListItems
+		<BlockListItemsMemo
 			rootClientId={ clientId }
 			renderAppender={ renderAppender }
 			__experimentalAppenderTagName={ __experimentalAppenderTagName }
@@ -197,10 +201,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableGetEditorMode,
 				getTemplateLock,
 				getBlockRootClientId,
-				__unstableIsWithinBlockOverlay,
-				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
 				getBlockSettings,
+				isDragging,
 			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -219,15 +222,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blockName !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough,
+					enableClickThrough &&
+					! isDragging(),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
-				isDropZoneDisabled:
-					blockEditingMode !== 'default' ||
-					__unstableHasActiveBlockOverlayActive( clientId ) ||
-					__unstableIsWithinBlockOverlay( clientId ),
+				isDropZoneDisabled: blockEditingMode === 'disabled',
 				defaultLayout,
 			};
 		},

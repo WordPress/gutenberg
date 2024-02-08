@@ -10,14 +10,15 @@
  * Changes to the inline script output should be synced with Core in the file
  * src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
  *
- * @since 6.5.0
+ * @since 6.4.0 Added relative time date strings.
+ * @since 6.5.0 Added timezone offset value.
  *
  * @global WP_Locale $wp_locale WordPress date and time locale object.
  *
  * @param WP_Scripts $scripts WP_Scripts object.
  */
-function gutenberg_update_wp_date_timezone_settings( $scripts ) {
-	if ( $scripts->query( 'wp-date', 'registered' ) ) {
+function gutenberg_update_wp_date_settings( $scripts ) {
+	if ( did_action( 'init' ) && $scripts->query( 'wp-date', 'registered' ) ) {
 		global $wp_locale;
 		// Calculate the timezone abbr (EDT, PST) if possible.
 		$timezone_string = get_option( 'timezone_string', 'UTC' );
@@ -50,27 +51,27 @@ function gutenberg_update_wp_date_timezone_settings( $scripts ) {
 								'past'   => __( '%s ago', 'gutenberg' ),
 								/* translators: One second from or to a particular datetime, e.g., "a second ago" or "a second from now". */
 								's'      => __( 'a second', 'gutenberg' ),
-								/* translators: %s: Duration in seconds from or to a particular datetime, e.g., "4 seconds ago" or "4 seconds from now". */
+								/* translators: %d: Duration in seconds from or to a particular datetime, e.g., "4 seconds ago" or "4 seconds from now". */
 								'ss'     => __( '%d seconds', 'gutenberg' ),
 								/* translators: One minute from or to a particular datetime, e.g., "a minute ago" or "a minute from now". */
 								'm'      => __( 'a minute', 'gutenberg' ),
-								/* translators: %s: Duration in minutes from or to a particular datetime, e.g., "4 minutes ago" or "4 minutes from now". */
+								/* translators: %d: Duration in minutes from or to a particular datetime, e.g., "4 minutes ago" or "4 minutes from now". */
 								'mm'     => __( '%d minutes', 'gutenberg' ),
-								/* translators: %s: One hour from or to a particular datetime, e.g., "an hour ago" or "an hour from now". */
+								/* translators: One hour from or to a particular datetime, e.g., "an hour ago" or "an hour from now". */
 								'h'      => __( 'an hour', 'gutenberg' ),
-								/* translators: %s: Duration in hours from or to a particular datetime, e.g., "4 hours ago" or "4 hours from now". */
+								/* translators: %d: Duration in hours from or to a particular datetime, e.g., "4 hours ago" or "4 hours from now". */
 								'hh'     => __( '%d hours', 'gutenberg' ),
-								/* translators: %s: One day from or to a particular datetime, e.g., "a day ago" or "a day from now". */
+								/* translators: One day from or to a particular datetime, e.g., "a day ago" or "a day from now". */
 								'd'      => __( 'a day', 'gutenberg' ),
-								/* translators: %s: Duration in days from or to a particular datetime, e.g., "4 days ago" or "4 days from now". */
+								/* translators: %d: Duration in days from or to a particular datetime, e.g., "4 days ago" or "4 days from now". */
 								'dd'     => __( '%d days', 'gutenberg' ),
-								/* translators: %s: One month from or to a particular datetime, e.g., "a month ago" or "a month from now". */
+								/* translators: One month from or to a particular datetime, e.g., "a month ago" or "a month from now". */
 								'M'      => __( 'a month', 'gutenberg' ),
-								/* translators: %s: Duration in months from or to a particular datetime, e.g., "4 months ago" or "4 months from now". */
+								/* translators: %d: Duration in months from or to a particular datetime, e.g., "4 months ago" or "4 months from now". */
 								'MM'     => __( '%d months', 'gutenberg' ),
-								/* translators: %s: One year from or to a particular datetime, e.g., "a year ago" or "a year from now". */
+								/* translators: One year from or to a particular datetime, e.g., "a year ago" or "a year from now". */
 								'y'      => __( 'a year', 'gutenberg' ),
-								/* translators: %s: Duration in years from or to a particular datetime, e.g., "4 years ago" or "4 years from now". */
+								/* translators: %d: Duration in years from or to a particular datetime, e.g., "4 years ago" or "4 years from now". */
 								'yy'     => __( '%d years', 'gutenberg' ),
 							),
 							'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
@@ -98,4 +99,4 @@ function gutenberg_update_wp_date_timezone_settings( $scripts ) {
 	}
 }
 
-add_action( 'wp_default_scripts', 'gutenberg_update_wp_date_timezone_settings' );
+add_action( 'wp_default_scripts', 'gutenberg_update_wp_date_settings' );

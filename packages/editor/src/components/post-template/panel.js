@@ -47,7 +47,11 @@ export default function PostTemplatePanel() {
 		return canCreateTemplates;
 	}, [] );
 
-	if ( ! isBlockTheme && isVisible ) {
+	const canViewTemplates = useSelect( ( select ) => {
+		return select( coreStore ).canUser( 'read', 'templates' ) ?? false;
+	}, [] );
+
+	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
 		return (
 			<PostPanelRow label={ __( 'Template' ) }>
 				<ClassicThemeControl />

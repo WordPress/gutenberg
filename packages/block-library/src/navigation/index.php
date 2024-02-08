@@ -9,6 +9,12 @@
  * Helper functions used to render the navigation block.
  */
 class WP_Navigation_Block_Renderer {
+
+	/**
+	 * Used to determine whether or not a navigation has submenus.
+	 */
+	private static $has_submenus = false;
+
 	/**
 	 * Used to determine which blocks are wrapped in an <li>.
 	 *
@@ -58,22 +64,37 @@ class WP_Navigation_Block_Renderer {
 	 * Returns whether or not a navigation has a submenu.
 	 *
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
-	 * @return bool Returns whether or not a navigation has a submenu.
+	 * @return bool Returns whether or not a navigation has a submenu and also sets the member variable.
 	 */
 	private static function has_submenus( $inner_blocks ) {
+		if ( true === static::$has_submenus ) {
+			return static::$has_submenus;
+		}
+
 		foreach ( $inner_blocks as $inner_block ) {
-			$inner_block_content = $inner_block->render();
-			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
-			if ( $p->next_tag(
-				array(
-					'name'       => 'LI',
-					'class_name' => 'has-child',
-				)
-			) ) {
-				return true;
+			// If this is a page list then work out if any of the pages have children.
+			if ( 'core/page-list' === $inner_block->name ) {
+				$all_pages = get_pages(
+					array(
+						'sort_column' => 'menu_order,post_title',
+						'order'       => 'asc',
+					)
+				);
+				foreach ( (array) $all_pages as $page ) {
+					if ( $page->post_parent ) {
+						static::$has_submenus = true;
+						break;
+					}
+				}
+			}
+			// If this is a navigation submenu then we know we have submenus.
+			if ( 'core/navigation-submenu' === $inner_block->name ) {
+				static::$has_submenus = true;
+				break;
 			}
 		}
-		return false;
+
+		return static::$has_submenus;
 	}
 
 	/**
@@ -567,6 +588,17 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
+			$suffix = wp_scripts_get_suffix();
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( "/build/interactivity/navigation{$suffix}.js" );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/navigation',
+				isset( $module_url ) ? $module_url : includes_url( "blocks/navigation/view{$suffix}.js" ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
 			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
 		}
 	}
@@ -968,7 +1000,9 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 function block_core_navigation_get_fallback_blocks() {
 	$page_list_fallback = array(
 		array(
-			'blockName' => 'core/page-list',
+			'blockName'    => 'core/page-list',
+			'innerContent' => array(),
+			'attrs'        => array(),
 		),
 	);
 
@@ -1073,13 +1107,6 @@ function register_block_core_navigation() {
 		array(
 			'render_callback' => 'render_block_core_navigation',
 		)
-	);
-
-	wp_register_script_module(
-		'@wordpress/block-library/navigation',
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ? gutenberg_url( '/build/interactivity/navigation.min.js' ) : includes_url( 'blocks/navigation/view.min.js' ),
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }
 
