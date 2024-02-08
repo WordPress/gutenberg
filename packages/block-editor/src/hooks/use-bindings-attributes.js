@@ -3,7 +3,7 @@
  */
 import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
@@ -36,8 +36,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 			const { getBlockBindingsSource } = unlock(
 				useSelect( blockEditorStore )
 			);
-			const { getBlockAttributes, updateBlockAttributes } =
-				useSelect( blockEditorStore );
+			const { getBlockAttributes } = useSelect( blockEditorStore );
 
 			const updatedAttributes = getBlockAttributes( clientId );
 			if ( updatedAttributes?.metadata?.bindings ) {
@@ -80,21 +79,12 @@ const createEditFunctionWithBindingsAttribute = () =>
 				);
 			}
 
-			const registry = useRegistry();
-
 			return (
-				<>
-					<BlockEdit
-						key="edit"
-						attributes={ updatedAttributes }
-						setAttributes={ ( newAttributes, blockId ) =>
-							registry.batch( () =>
-								updateBlockAttributes( blockId, newAttributes )
-							)
-						}
-						{ ...props }
-					/>
-				</>
+				<BlockEdit
+					key="edit"
+					attributes={ updatedAttributes }
+					{ ...props }
+				/>
 			);
 		},
 		'useBoundAttributes'
