@@ -11,7 +11,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 import cloneDeep from '../../utils/clone-deep';
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
+import { mergeBaseAndUserConfigs } from '../../components/global-styles/global-styles-provider';
 /**
  * Returns a new object with only the properties specified in `properties`.
  *
@@ -96,6 +96,7 @@ export default function useThemeStyleVariationsByProperty( {
 			coreStore
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
+
 	const { user } = useContext( GlobalStylesContext );
 
 	return useMemo( () => {
