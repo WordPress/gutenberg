@@ -20,7 +20,6 @@ import type {
 	DirectiveCallback,
 	DirectiveOptions,
 	DirectivesProps,
-	GetEvaluate,
 	GetPriorityLevels,
 	Scope,
 } from './types';
@@ -205,7 +204,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-export const getEvaluate: GetEvaluate =
+export const getEvaluate: any =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;

@@ -41,7 +41,7 @@ export interface DirectiveArgs {
 	/**
 	 * Virtual node representing the element.
 	 */
-	element?: Element;
+	element?: any;
 	/**
 	 * The inherited context.
 	 */
@@ -54,7 +54,7 @@ export interface DirectiveArgs {
 }
 
 export interface DirectiveCallback {
-	( args: DirectiveArgs ): Element | void;
+	( args: DirectiveArgs ): VNode | void;
 }
 
 export interface DirectiveOptions {

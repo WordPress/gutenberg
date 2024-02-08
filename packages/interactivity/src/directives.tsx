@@ -51,7 +51,7 @@ const isObject = ( item: any ): boolean =>
 const mergeDeepSignals = (
 	target: DeepSignalObject< any >,
 	source: DeepSignalObject< any >,
-	overwrite: boolean = false
+	overwrite?: boolean
 ) => {
 	for ( const k in source ) {
 		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
@@ -123,7 +123,7 @@ const getGlobalEventDirective =
 			} );
 	};
 
-export default (): void => {
+export default () => {
 	// data-wp-context
 	directive(
 		'context',
@@ -131,25 +131,31 @@ export default (): void => {
 			directives: { context },
 			props: { children },
 			context: inheritedContext,
-		}: DirectiveArgs ): Element => {
+		} ) => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
-			const passedValues = context.map( ( { value } ) => value );
+			const defaultEntry = context.find(
+				( { suffix } ) => suffix === 'default'
+			);
 
 			currentValue.current = useMemo( () => {
-				const newValue = context
-					.map( ( c ) => deepSignal( { [ c.namespace ]: c.value } ) )
-					.reduceRight( mergeDeepSignals );
-
+				if ( ! defaultEntry ) return null;
+				const { namespace, value } = defaultEntry;
+				const newValue = deepSignal( { [ namespace ]: value } );
 				mergeDeepSignals( newValue, inheritedValue );
 				mergeDeepSignals( currentValue.current, newValue, true );
 				return currentValue.current;
-			}, [ inheritedValue, ...passedValues ] );
+			}, [ inheritedValue, defaultEntry ] );
 
-			return (
-				<Provider value={ currentValue.current }>{ children }</Provider>
-			);
+			if ( currentValue.current ) {
+				return (
+					<Provider value={ currentValue.current }>
+						{ children }
+					</Provider>
+				);
+			}
+			return undefined;
 		},
 		{ priority: 5 }
 	);
@@ -220,9 +226,9 @@ export default (): void => {
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							element.ref.current.classList.remove( name );
+							element.ref!.current.classList.remove( name );
 						} else {
-							element.ref.current.classList.add( name );
+							element.ref!.current.classList.add( name );
 						}
 					} );
 				} );
