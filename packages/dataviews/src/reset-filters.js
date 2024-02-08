@@ -6,21 +6,15 @@ import { __ } from '@wordpress/i18n';
 
 export default function ResetFilter( { filters, view, onChangeView } ) {
 	const isPrimary = ( field ) =>
-		filters.some( ( f ) => f.field === field && f.isPrimary );
-	let isDisabled = true;
-	if ( view.search !== '' ) {
-		isDisabled = false;
-	} else if (
-		view.filters?.length > 0 &&
-		( view.filters.some( ( filter ) => filter.value !== undefined ) ||
-			view.filters.some(
-				( filter ) =>
-					filter.value === undefined && ! isPrimary( filter.field )
-			) )
-	) {
-		isDisabled = false;
-	}
-
+		filters.some(
+			( _filter ) => _filter.field === field && _filter.isPrimary
+		);
+	const isDisabled =
+		! view.search &&
+		! view.filters?.some(
+			( _filter ) =>
+				_filter.value !== undefined || ! isPrimary( _filter.field )
+		);
 	return (
 		<Button
 			disabled={ isDisabled }

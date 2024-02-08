@@ -64,7 +64,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		canCreate,
 		canEdit,
 		currentTemplateId,
-		getPostLinkProps,
+		onNavigateToEntityRecord,
 		getEditorSettings,
 	} = useSelect(
 		( select ) => {
@@ -94,20 +94,13 @@ function PostTemplateDropdownContent( { onClose } ) {
 					editorSettings.supportsTemplateMode &&
 					!! _currentTemplateId,
 				currentTemplateId: _currentTemplateId,
-				getPostLinkProps: editorSettings.getPostLinkProps,
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
 				getEditorSettings: select( editorStore ).getEditorSettings,
 			};
 		},
 		[ allowSwitchingTemplate ]
 	);
-
-	const editTemplate =
-		getPostLinkProps && currentTemplateId
-			? getPostLinkProps( {
-					postId: currentTemplateId,
-					postType: 'wp_template',
-			  } )
-			: {};
 
 	const options = useMemo(
 		() =>
@@ -168,12 +161,15 @@ function PostTemplateDropdownContent( { onClose } ) {
 					}
 				/>
 			) }
-			{ canEdit && (
+			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
 						variant="link"
 						onClick={ () => {
-							editTemplate.onClick();
+							onNavigateToEntityRecord( {
+								postId: currentTemplateId,
+								postType: 'wp_template',
+							} );
 							onClose();
 							createSuccessNotice(
 								__(
@@ -185,7 +181,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 										{
 											label: __( 'Go back' ),
 											onClick: () =>
-												getEditorSettings().goBack(),
+												getEditorSettings().onNavigateToPreviousEntityRecord(),
 										},
 									],
 								}

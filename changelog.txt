@@ -1,5 +1,28 @@
 == Changelog ==
 
+= 17.6.4 =
+
+### Bug Fixes
+
+ - Compatibility with WordPress trunk: Do not register font collections if already registered by Core.
+
+
+= 17.6.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- Navigation: Update the fallback block list to avoid a PHP Warning ([58588](https://github.com/WordPress/gutenberg/pull/58588))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@dd32 
+
+
 = 17.6.2 =
 
 

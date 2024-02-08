@@ -28,6 +28,12 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
+const NON_CONTEXTUAL_POST_TYPES = [
+	'wp_block',
+	'wp_template',
+	'wp_navigation',
+	'wp_template_part',
+];
 
 /**
  * Depending on the post, template and template mode,
@@ -113,7 +119,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
-				rootLevelPost.type !== 'wp_template' || shouldRenderTemplate
+				! NON_CONTEXTUAL_POST_TYPES.includes( rootLevelPost.type ) ||
+				shouldRenderTemplate
 					? { postId: post.id, postType: post.type }
 					: {};
 
@@ -124,7 +131,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						? rootLevelPost.slug
 						: undefined,
 			};
-		}, [ post.id, post.type, rootLevelPost.type, rootLevelPost.slug ] );
+		}, [
+			shouldRenderTemplate,
+			post.id,
+			post.type,
+			rootLevelPost.type,
+			rootLevelPost.slug,
+		] );
 		const { editorSettings, selection, isReady } = useSelect(
 			( select ) => {
 				const {

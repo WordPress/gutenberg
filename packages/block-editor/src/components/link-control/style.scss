@@ -245,6 +245,10 @@ $block-editor-link-control-number-of-actions: 1;
 		border-radius: $radius-block-ui;
 		line-height: 1.1;
 
+		&:focus {
+			box-shadow: none;
+		}
+
 		&:focus-visible {
 			@include block-toolbar-button-style__focus();
 			text-decoration: none;
@@ -352,11 +356,6 @@ $block-editor-link-control-number-of-actions: 1;
 	position: relative;
 }
 
-.block-editor-link-control__unlink {
-	padding-left: $grid-unit-20;
-	padding-right: $grid-unit-20;
-}
-
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;
@@ -424,9 +423,4 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control .block-editor-link-control__search-input-wrapper.has-actions .components-spinner {
 	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
 	right: $grid-unit-15;
-}
-
-.block-editor-link-control__search-item-action {
-	margin-left: auto; // push to far right hand side
-	flex-shrink: 0;
 }
