@@ -23,7 +23,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
@@ -42,7 +42,6 @@ import {
 
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
-
 	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
 			const {
@@ -76,6 +75,8 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+
+	const registry = useRegistry();
 	const { getBlocks, getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -102,13 +103,13 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	 * @param {string} newVerticalAlignment The vertical alignment setting.
 	 */
 	function updateAlignment( newVerticalAlignment ) {
-		// Update own alignment.
-		setAttributes( { verticalAlignment: newVerticalAlignment } );
-
-		// Update all child Column Blocks to match.
 		const innerBlockClientIds = getBlockOrder( clientId );
-		innerBlockClientIds.forEach( ( innerBlockClientId ) => {
-			updateBlockAttributes( innerBlockClientId, {
+
+		// Update own and child Column block vertical alignments.
+		// This is a single action; the batching prevents creating multiple history records.
+		registry.batch( () => {
+			setAttributes( { verticalAlignment: newVerticalAlignment } );
+			updateBlockAttributes( innerBlockClientIds, {
 				verticalAlignment: newVerticalAlignment,
 			} );
 		} );
