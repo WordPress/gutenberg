@@ -1938,9 +1938,9 @@ const buildBlockTypeItem =
 			'inserter'
 		);
 
-		const ignoredHookedBlocks = Object.values(
-			getHookedBlocks( id )
-		).flat();
+		const ignoredHookedBlocks = [
+			...new Set( Object.values( getHookedBlocks( id ) ).flat() ),
+		];
 
 		return {
 			...blockItemBase,

@@ -115,9 +115,11 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 					normalizedAttributes
 				);
 
-			const ignoredHookedBlocks = Object.values(
-				getHookedBlocks( blockName )
-			).flat();
+			const ignoredHookedBlocks = [
+				...new Set(
+					Object.values( getHookedBlocks( blockName ) ).flat()
+				),
+			];
 
 			if ( ignoredHookedBlocks.length ) {
 				const { metadata, ...otherAttributes } = blockAttributes;
