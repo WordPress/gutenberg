@@ -33,7 +33,6 @@ export default function QueryContent( {
 	clientId,
 } ) {
 	const {
-		queryId,
 		query,
 		displayLayout,
 		tagName: TagName = 'div',
@@ -79,14 +78,18 @@ export default function QueryContent( {
 			updateQuery( newQuery );
 		}
 	}, [ query.perPage, postsPerPage, inherit ] );
-	// We need this for multi-query block pagination.
-	// Query parameters for each block are scoped to their ID.
+
+	// Each instance of the block needs to have a unique queryId so that pagination works
+	// when multiple instances of this block are present. `instanceId` is the index of
+	// the block on the page and is stable across saves with automatic handling for
+	// re-indexing when these blocks are added, removed, or moved. Depending on
+	// what it's set to it might be changed during block editing but that won't
+	// negatively impact the functionality and pagination will still work.
 	useEffect( () => {
-		if ( ! Number.isFinite( queryId ) ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { queryId: instanceId } );
-		}
-	}, [ queryId, instanceId ] );
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { queryId: instanceId } );
+	}, [] );
+
 	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
 	const updateDisplayLayout = ( newDisplayLayout ) =>
