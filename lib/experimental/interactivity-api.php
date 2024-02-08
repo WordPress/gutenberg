@@ -13,7 +13,7 @@
  */
 function gutenberg_interactivity_override_script_module_urls( $url ) {
 	$pattern = '/wp-includes\/js\/dist\/interactivity(-router)?(\.min)?\.js/';
-	if ( preg_match( $pattern, $url, $matches ) ) {
+	if ( preg_match( $pattern, $url, $matches ) && isset( $matches[1] ) ) {
 		return gutenberg_url( '/build/interactivity/' . ( $matches[1] ? 'router' : 'index' ) . wp_scripts_get_suffix() . '.js' );
 	}
 	return $url;
