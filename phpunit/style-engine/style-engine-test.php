@@ -700,6 +700,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 			array(
+				'selector'     => '.saruman',
+				'container'    => '@supports (align-self: stretch)',
+				'declarations' => array(
+					'color'        => 'black',
+					'font-family'  => 'The-Great-Eye',
+				),
+			),
+			array(
 				'selector'     => '.gandalf',
 				'container'    => '@supports (border-style: dotted)',
 				'declarations' => array(
@@ -723,7 +731,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
-		$this->assertSame( '.saruman{color:white;height:100px;border-style:solid;align-self:unset;}.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}', $compiled_stylesheet );
+		$this->assertSame( '@supports (align-self: stretch){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}}@supports (border-style: dotted){.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}}', $compiled_stylesheet );
 	}
 
 	/**

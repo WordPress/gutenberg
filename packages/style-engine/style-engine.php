@@ -121,7 +121,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 			continue;
 		}
 		// @TODO should this be in $options['container']?
-		$container = $css_rules['container'] ?? null;
+		$container = $css_rule['container'] ?? null;
 
 		if ( ! empty( $options['context'] ) ) {
 			// @TODO how to combine rules with the same container? in a container_rule class?
@@ -131,6 +131,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		}
 		$new_rule = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
 		$new_rule->set_container( $container );
+
 		$css_rule_objects[] = $new_rule;
 	}
 
