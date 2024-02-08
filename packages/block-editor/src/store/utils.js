@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { selectBlockPatternsKey } from './private-keys';
+
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
 		return list;
@@ -45,7 +50,7 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalUserPatternCategories,
 		state.settings.__experimentalReusableBlocks,
-		state.settings.__experimentalSelectBlockPatterns?.( select ),
+		state.settings[ selectBlockPatternsKey ]?.( select ),
 		state.blockPatterns,
 	];
 };

@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -19,8 +20,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-const __experimentalSelectBlockPatterns = ( select ) =>
+const selectBlockPatterns = ( select ) =>
 	select( coreStore ).getBlockPatterns();
 
 const EMPTY_BLOCKS_LIST = [];
@@ -249,7 +251,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			__experimentalSelectBlockPatterns,
+			[ unlock( privateApis ).selectBlockPatternsKey ]:
+				selectBlockPatterns,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
