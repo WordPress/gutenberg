@@ -42,8 +42,7 @@ const parseInitialData = () => {
 		try {
 			return JSON.parse( storeTag.textContent );
 		} catch ( e ) {
-			// eslint-disable-next-line no-console
-			console.log( e );
+			// Do nothing.
 		}
 	}
 	return {};
