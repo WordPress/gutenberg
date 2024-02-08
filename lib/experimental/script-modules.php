@@ -5,14 +5,14 @@
  * This filter allows us to register modules from block metadata and attach additional fields to
  * WP_Block_Type instances.
  *
+ * @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
+ *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
  */
-function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
+function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(
-		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
 		'viewModule'       => 'view_script_module_ids',
-		'viewScriptModule' => 'view_script_module_ids',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
 		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
@@ -42,28 +42,7 @@ function gutenberg_filter_block_type_metadata_settings_register_modules( $settin
 	return $settings;
 }
 
-add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 10, 2 );
-
-/**
- * Enqueue modules associated with the block.
- *
- * @param string   $block_content  The block content.
- * @param array    $parsed_block   The full block, including name and attributes.
- * @param WP_Block $block_instance The block instance.
- */
-function gutenberg_filter_render_block_enqueue_view_script_modules( $block_content, $parsed_block, $block_instance ) {
-	$block_type = $block_instance->block_type;
-
-	if ( ! empty( $block_type->view_script_module_ids ) ) {
-		foreach ( $block_type->view_script_module_ids as $module_id ) {
-			wp_enqueue_script_module( $module_id );
-		}
-	}
-
-	return $block_content;
-}
-
-add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_script_modules', 10, 3 );
+add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_view_module', 10, 2 );
 
 /**
  * Finds a module ID for the selected block metadata field. It detects
