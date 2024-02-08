@@ -92,7 +92,7 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 		unregister_post_type( 'temp_custom_book' );
 		unregister_taxonomy( 'temp_book_type' );
 
-		// See comment in set_up for dexplanation.
+		// See comment in set_up for explanation.
 		if ( $this->pre_65_compat ) {
 			$this->handle_pre_65_post_type_variation_unregistration( 'custom_book' );
 			$this->handle_pre_65_post_type_variation_unregistration( 'private_custom_book' );

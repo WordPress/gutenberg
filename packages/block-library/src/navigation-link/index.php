@@ -417,7 +417,6 @@ function block_core_navigation_link_filter_variations( $variations, $block_type 
  * @return array
  */
 function block_core_navigation_link_build_variations() {
-	// This will only handle post types and taxonomies registered until this point.
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
 
@@ -463,8 +462,8 @@ function block_core_navigation_link_build_variations() {
  */
 function register_block_core_navigation_link() {
 	/*
-	 * On Core versions < 6.5 the get_block_type_variations is not available.
-	 * Therefore directly register the (until here) known variations.
+	 * On Core versions < 6.5 get_block_type_variations is not available.
+	 * Therefore directly register the variations for post/taxonomies that have been registered at this point.
 	 * This keeps pre-6.5 behaviour in pre-6.5 versions.
 	 *
 	 * This callback will be called by a shim in lib/compat/wordpress-6.5/blocks.php
