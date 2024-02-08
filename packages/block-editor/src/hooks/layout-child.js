@@ -15,9 +15,22 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
 	} );
 	const layout = style?.layout ?? {};
-	const { selfStretch, flexSize, columnSpan, rowSpan } = layout;
+	const { selfStretch, flexSize, columnSpan, rowSpan, parentColumnWidth } =
+		layout;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
+
+	// Calculate container query if needed.
+	const columnSpanNumber = parseInt( columnSpan );
+	const parentColumnValue = parseFloat( parentColumnWidth );
+	const parentColumnUnit = parentColumnWidth?.replace(
+		parentColumnValue,
+		''
+	);
+	const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
+	const containerQueryValue =
+		columnSpanNumber * parentColumnValue +
+		( columnSpanNumber - 1 ) * defaultGapValue;
 
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
@@ -34,6 +47,17 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		if ( columnSpan ) {
 			css = `${ selector } {
 				grid-column: span ${ columnSpan };
+			}`;
+		}
+		/**
+		 * If parentColumnWidth is set, the grid is responsive
+		 * so a container query is needed for the span to resize.
+		 */
+		if ( columnSpan && parentColumnWidth ) {
+			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
+				${ selector } {
+					grid-column: 1 / -1;
+				}
 			}`;
 		}
 		if ( rowSpan ) {
