@@ -23,6 +23,14 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 	 */
 	protected $valid_entity_types = array( 'wp_template', 'wp_template_part', 'wp_navigation' );
 
+	/*
+	 * Possible positions for hooked blocks.
+	 *
+	 * @since 6.5.0
+	 * @var string[]
+	 */
+	protected $position_types = array( 'first_child', 'last_child', 'before', 'after' );
+
 	/**
 	 * Constructs the controller.
 	 *
@@ -224,11 +232,19 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			return $context;
 		}
 
-		foreach ( $hooked_block_types_for_anchor_block as $relative_position => $hooked_block_types ) {
-			$hooked_block_types_for_anchor_block[ $relative_position ] = apply_filters( 'hooked_block_types', $hooked_block_types, $relative_position, $block_name, $context );
+		foreach ( $this->position_types as $position ) {
+			$hooked_block_types_for_anchor_block[ $position ] = apply_filters( 'hooked_block_types', $hooked_block_types_for_anchor_block[ $position ], $position, $block_name, $context );
 		}
 
-		$data = $this->prepare_item_for_response( $hooked_block_types_for_anchor_block, $request );
+		// Filter non-empty arrays.
+		$filtered_hooked_block_types_for_anchor_block = array_filter(
+			$hooked_block_types_for_anchor_block,
+			function ( $hooked_block_types_for_position ) {
+				return ! empty( $hooked_block_types_for_position );
+			}
+		);
+
+		$data = $this->prepare_item_for_response( $filtered_hooked_block_types_for_anchor_block, $request );
 
 		return rest_ensure_response( $data );
 	}
