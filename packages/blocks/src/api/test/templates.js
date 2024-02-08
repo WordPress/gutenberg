@@ -168,6 +168,48 @@ describe( 'templates', () => {
 			] );
 		} );
 
+		it( 'retains previously set ignoredHookedBlocks metadata', () => {
+			registerBlockType( 'core/hooked-block', {
+				attributes: {},
+				save: noop,
+				category: 'text',
+				title: 'hooked block',
+				blockHooks: { 'core/test-block': 'after' },
+			} );
+
+			const template = [
+				[
+					'core/test-block',
+					{
+						metadata: {
+							ignoredHookedBlocks: [ 'core/other-hooked-block' ],
+						},
+					},
+				],
+				[ 'core/test-block-2' ],
+				[ 'core/test-block-2' ],
+			];
+			const blockList = [];
+
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toMatchObject( [
+				{
+					name: 'core/test-block',
+					attributes: {
+						metadata: {
+							ignoredHookedBlocks: [
+								'core/hooked-block',
+								'core/other-hooked-block',
+							],
+						},
+					},
+				},
+				{ name: 'core/test-block-2' },
+				{ name: 'core/test-block-2' },
+			] );
+		} );
+
 		it( 'should create nested blocks', () => {
 			const template = [
 				[ 'core/test-block', {}, [ [ 'core/test-block-2' ] ] ],

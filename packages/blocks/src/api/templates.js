@@ -122,11 +122,23 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			];
 
 			if ( ignoredHookedBlocks.length ) {
-				const { metadata, ...otherAttributes } = blockAttributes;
+				const { metadata = {}, ...otherAttributes } = blockAttributes;
+				const {
+					ignoredHookedBlocks: ignoredHookedBlocksFromTemplate = [],
+					...otherMetadata
+				} = metadata;
+
+				const newIgnoredHookedBlocks = [
+					...new Set( [
+						...ignoredHookedBlocks,
+						...ignoredHookedBlocksFromTemplate,
+					] ),
+				];
+
 				blockAttributes = {
 					metadata: {
-						ignoredHookedBlocks,
-						...metadata,
+						ignoredHookedBlocks: newIgnoredHookedBlocks,
+						...otherMetadata,
 					},
 					...otherAttributes,
 				};
