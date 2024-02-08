@@ -36,7 +36,7 @@ const icons = {
 
 function useDebouncedValue( value ) {
 	const [ debouncedValue, setDebouncedValue ] = useState( '' );
-	const debounced = useDebounce( setDebouncedValue, 400 );
+	const debounced = useDebounce( setDebouncedValue, 250 );
 
 	useEffect( () => {
 		debounced( value );
