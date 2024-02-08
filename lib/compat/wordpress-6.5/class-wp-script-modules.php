@@ -216,7 +216,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		public function print_import_map() {
 			$import_map = $this->get_import_map();
 			if ( ! empty( $import_map['imports'] ) ) {
-				wp_print_inline_script_tag(
+				gutenberg_print_inline_script_tag(
 					wp_json_encode( $import_map, JSON_HEX_TAG | JSON_HEX_AMP ),
 					array(
 						'type' => 'importmap',
