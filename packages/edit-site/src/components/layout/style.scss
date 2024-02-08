@@ -32,6 +32,7 @@
 }
 
 .edit-site-layout__header-container {
+	background-color: $white;
 	z-index: z-index(".edit-site-layout__header-container");
 }
 
@@ -258,6 +259,7 @@
 		right: 0;
 		z-index: z-index(".edit-site-layout__header-container");
 		width: 100%;
+		background-color: #fff;
 
 		// We need ! important because we override inline styles
 		// set by the motion component.
