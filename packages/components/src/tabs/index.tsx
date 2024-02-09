@@ -151,13 +151,7 @@ function Tabs( {
 		if ( tabsHavePopulated.current && !! selectedTabId && ! selectedTab ) {
 			setSelectedId( null );
 		}
-	}, [
-		isControlled,
-		selectedId,
-		selectedTab,
-		selectedTabId,
-		setSelectedId,
-	] );
+	}, [ isControlled, selectedTab, selectedTabId, setSelectedId ] );
 
 	useEffect( () => {
 		if ( ! isControlled ) {
