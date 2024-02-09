@@ -31,21 +31,25 @@ function extractFontWeights( fontFaces ) {
 }
 
 export function formatFontFamily( input ) {
-	return input
-		.split( ',' )
-		.map( ( font ) => {
-			font = font.trim(); // Remove any leading or trailing white spaces
-			// If the font doesn't start with quotes and contains a space, then wrap in quotes.
-			// Check that string starts with a single or double quote and not a space
-			if (
-				! ( font.startsWith( '"' ) || font.startsWith( "'" ) ) &&
-				font.indexOf( ' ' ) !== -1
-			) {
-				return `"${ font }"`;
-			}
-			return font; // Return font as is if no transformation is needed
-		} )
-		.join( ', ' );
+	return input.includes( ',' )
+		? input
+				.split( ',' )
+				.map( ( font ) => {
+					font = font.trim(); // Remove any leading or trailing white spaces
+					// If the font doesn't start with quotes and contains a space, then wrap in quotes.
+					// Check that string starts with a single or double quote and not a space
+					if (
+						! (
+							font.startsWith( '"' ) || font.startsWith( "'" )
+						) &&
+						font.indexOf( ' ' ) !== -1
+					) {
+						return `"${ font }"`;
+					}
+					return font; // Return font as is if no transformation is needed
+				} )
+				.join( ', ' )
+		: input.replace( /"/g, '' );
 }
 
 export function getFamilyPreviewStyle( family ) {
