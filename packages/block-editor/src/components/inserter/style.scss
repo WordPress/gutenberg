@@ -108,10 +108,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-
-	.components-search-control__icon {
-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
-	}
 }
 
 .block-editor-inserter__tabs {
@@ -615,15 +611,9 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		&.components-search-control {
-			input[type="search"].components-search-control__input {
-				background: $white;
-			}
-			button.components-button {
-				min-width: auto;
-				padding-left: $grid-unit-05 * 0.5;
-				padding-right: $grid-unit-05 * 0.5;
-			}
+		// TODO: Consider using the Theme component to automatically adapt to a gray background.
+		&:not(:focus-within) {
+			--wp-components-color-background: #{$white};
 		}
 	}
 }

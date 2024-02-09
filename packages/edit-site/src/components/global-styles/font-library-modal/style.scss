@@ -74,7 +74,6 @@
 .font-library-modal__font-variant_demo-text {
 	white-space: nowrap;
 	flex-shrink: 0;
-	font-size: 18px;
 	transition: opacity 0.3s ease-in-out;
 	@include reduce-motion("transition");
 }

@@ -43,7 +43,9 @@ export const settings = {
 			return;
 		}
 
-		return decodeEntities( entity.title ) || capitalCase( entity.slug );
+		return (
+			decodeEntities( entity.title ) || capitalCase( entity.slug || '' )
+		);
 	},
 	edit,
 };

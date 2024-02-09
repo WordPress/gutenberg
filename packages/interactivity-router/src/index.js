@@ -1,14 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	render,
-	store,
-	privateApis,
-	getConfig,
-} from '@wordpress/interactivity';
+import { store, privateApis, getConfig } from '@wordpress/interactivity';
 
-const { directivePrefix, getRegionRootFragment, initialVdom, toVdom } =
+const { directivePrefix, getRegionRootFragment, initialVdom, toVdom, render } =
 	privateApis(
 		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 	);
