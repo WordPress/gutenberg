@@ -358,11 +358,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @return void.
 		 */
-		public static function store_css_rule( $store_name, $css_selector, $css_declarations ) {
+		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $css_at_rule = '' ) {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
 				return;
 			}
-			static::get_store( $store_name )->add_rule( $css_selector )->add_declarations( $css_declarations );
+			static::get_store( $store_name )->add_rule( $css_selector, $css_at_rule )->add_declarations( $css_declarations );
 		}
 
 		/**
