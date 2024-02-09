@@ -368,20 +368,22 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 	 * @return WP_Block_Template|WP_Post|null Context object if name is valid, WP_Error otherwise.
 	 */
 	protected function get_context( $entity, $id ) {
-		$entity_type = in_array( $entity, $this->valid_entity_types, true ) ? $entity : null;
+		if ( ! $entity && ! $id ) {
+			return null; // No context specified.
+		}
 
-		if ( ! $entity_type || ! $id ) {
+		if ( ! in_array( $entity, $this->valid_entity_types, true ) ) {
 			return new WP_Error( 'rest_hooked_blocks_invalid_entity_context', __( 'Invalid entity.' ), array( 'status' => 404 ) );
 		}
 
 		// Suppress all hooked blocks getting inserted into the context.
 		add_filter( 'hooked_block_types', '__return_empty_array', 99999, 0 );
 
-		if ( ( 'wp_template' === $entity_type || 'wp_template_part' === $entity_type ) && ! empty( $id ) ) {
-			$context = get_block_template( $id, $entity_type );
+		if ( ( 'wp_template' === $entity || 'wp_template_part' === $entity ) && ! empty( $id ) ) {
+			$context = get_block_template( $id, $entity );
 		}
 
-		if ( 'wp_navigation' === $entity_type && ! empty( $id ) ) {
+		if ( 'wp_navigation' === $entity && ! empty( $id ) ) {
 			$context = get_post( (int) $id );
 		}
 
