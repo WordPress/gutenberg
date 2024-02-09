@@ -140,7 +140,7 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 					? $hooked_block_types[ $anchor_block_type ][ $position ]
 					: array();
 
-				$hooked_block_types_by_anchor_block[ $anchor_block_type ][ $position ] = apply_filters( 'hooked_block_types', $hooked_block_types_by_anchor_block_position, $position, $block_type->name, $context );
+				$hooked_block_types_by_anchor_block[ $anchor_block_type ][ $position ] = apply_filters( 'hooked_block_types', $hooked_block_types_by_anchor_block_position, $position, $anchor_block_type, $context );
 			}
 		}
 
