@@ -312,7 +312,7 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => $this->post_type,
+			'title'      => 'hooked_blocks',
 			'type'       => 'array',
 			'properties' => array(
 				'block_name' => array(
