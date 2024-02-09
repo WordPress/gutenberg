@@ -102,7 +102,7 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 
 	return (
 		<>
-			{ hideLabelFromVision ? (
+			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
 				<Styled.CustomSelectLabel store={ store }>
