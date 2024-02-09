@@ -335,7 +335,11 @@ describe( 'Cover block', () => {
 			describe( 'when colors are disabled', () => {
 				test( 'does not render overlay control', async () => {
 					await setup( undefined, true, disabledColorSettings );
-					await createAndSelectBlock();
+					await userEvent.click(
+						screen.getByRole( 'document', {
+							name: 'Block: Cover',
+						} )
+					);
 					await userEvent.click(
 						screen.getByRole( 'tab', { name: 'Styles' } )
 					);
@@ -348,7 +352,11 @@ describe( 'Cover block', () => {
 				} );
 				test( 'does not render opacity control', async () => {
 					await setup( undefined, true, disabledColorSettings );
-					await createAndSelectBlock();
+					await userEvent.click(
+						screen.getByRole( 'document', {
+							name: 'Block: Cover',
+						} )
+					);
 					await userEvent.click(
 						screen.getByRole( 'tab', { name: 'Styles' } )
 					);
