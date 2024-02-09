@@ -649,7 +649,7 @@
 		align-items: center;
 
 		&.has-reset {
-			padding-inline-end: 28px;
+			padding-inline-end: $button-size-small + $grid-unit-05;
 		}
 
 		&:hover,
