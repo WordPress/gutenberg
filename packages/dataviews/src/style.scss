@@ -671,6 +671,10 @@
 			outline: none;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
+
+		.dataviews-filter-summary__filter-text-name {
+			font-weight: 500;
+		}
 	}
 
 	.dataviews-filter-summary__chip-remove {
