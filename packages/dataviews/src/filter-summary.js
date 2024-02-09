@@ -205,7 +205,6 @@ export default function FilterSummary( {
 								{
 									'has-reset': canResetOrRemove,
 									'has-values': hasValues,
-									'is-primary': isPrimary,
 								}
 							) }
 							role="button"
@@ -238,7 +237,6 @@ export default function FilterSummary( {
 							<button
 								className={ classnames(
 									'dataviews-filter-summary__chip-remove',
-									{ 'is-primary': isPrimary },
 									{ 'has-values': hasValues }
 								) }
 								onClick={ () => {
