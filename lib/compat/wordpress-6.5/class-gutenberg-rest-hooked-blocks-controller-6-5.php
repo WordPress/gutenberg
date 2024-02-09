@@ -64,6 +64,20 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/(?P<namespace>[a-zA-Z0-9_-]+)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/(?P<namespace>[a-zA-Z0-9_-]+)/(?P<name>[a-zA-Z0-9_-]+)',
 			array(
 				'args'   => array(
@@ -113,6 +127,7 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
 		$entity     = '';
+		$id         = null;
 		$namespace  = '';
 		if ( isset( $registered['entity'] ) && ! empty( $request['entity'] ) ) {
 			$entity = $request['entity'];
