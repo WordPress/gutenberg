@@ -123,8 +123,13 @@ function InlineLinkUI( {
 				inserted,
 				linkFormat,
 				value.start,
-				value.end + newText.length
+				value.start + newText.length
 			);
+
+			onChange( newValue );
+			// If there was no selection, move straight back to editing content flow
+			stopAddingLink();
+			return;
 		} else if ( newText === richTextText ) {
 			newValue = applyFormat( value, linkFormat );
 		} else {
