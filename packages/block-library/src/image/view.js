@@ -68,7 +68,7 @@ const { state, actions, callbacks } = store(
 				const ctx = getContext();
 
 				// Bails out if the image has not loaded yet.
-				if ( ! ctx.imageRef.complete ) {
+				if ( ! ctx.imageRef?.complete ) {
 					return;
 				}
 
@@ -97,6 +97,9 @@ const { state, actions, callbacks } = store(
 					setTimeout( function () {
 						// Resets the current image to mark the overlay as closed.
 						state.currentImage = {};
+						imageRef = null;
+						buttonRef = null;
+
 						// Delays before changing the focus. Otherwise the focus ring will
 						// appear on Firefox before the image has finished animating, which
 						// looks broken.
@@ -171,6 +174,8 @@ const { state, actions, callbacks } = store(
 		},
 		callbacks: {
 			setOverlayStyles() {
+				if ( ! imageRef ) return;
+
 				let {
 					naturalWidth,
 					naturalHeight,
