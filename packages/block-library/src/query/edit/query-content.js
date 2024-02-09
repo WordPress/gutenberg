@@ -88,7 +88,7 @@ export default function QueryContent( {
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { queryId: instanceId } );
-	}, [] );
+	}, [ instanceId ] );
 
 	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
