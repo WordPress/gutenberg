@@ -57,7 +57,3 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
-
-add_action( 'init', function () {
-	add_theme_support( 'post-formats', array_keys( get_post_format_strings() ) );
-} );
