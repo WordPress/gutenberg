@@ -977,8 +977,10 @@ test.describe.skip( 'Image - interactivity', () => {
 
 				const lightbox = page.locator( '.wp-lightbox-overlay' );
 				await expect( lightbox ).toBeHidden();
-				const responsiveImage = lightbox.locator( '.responsive-image' );
-				const enlargedImage = lightbox.locator( '.enlarged-image' );
+				const responsiveImage = lightbox.locator(
+					'.responsive-image img'
+				);
+				const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
 				await expect( responsiveImage ).toHaveAttribute(
 					'src',
@@ -1368,8 +1370,8 @@ test.describe.skip( 'Image - interactivity', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
-		const responsiveImage = lightbox.locator( '.responsive-image' );
-		const enlargedImage = lightbox.locator( '.enlarged-image' );
+		const responsiveImage = lightbox.locator( '.responsive-image img' );
+		const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
 		await expect( responsiveImage ).toHaveAttribute(
 			'src',
