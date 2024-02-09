@@ -4,37 +4,48 @@
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
 /**
- * Tracks whether user is touching screen; used to
- * differentiate behavior for touch and mouse input.
+ * Tracks whether user is touching screen; used to differentiate behavior for
+ * touch and mouse input.
  *
  * @type {boolean}
  */
 let isTouching = false;
 
 /**
- * Tracks the last time the screen was touched; used to
- * differentiate behavior for touch and mouse input.
+ * Tracks the last time the screen was touched; used to differentiate behavior
+ * for touch and mouse input.
  *
  * @type {number}
  */
 let lastTouchTime = 0;
 
+/**
+ * Stores the image reference of the currently opened lightbox.
+ *
+ * @type {HTMLElement}
+ */
 let imageRef;
-let triggerRef;
+
+/**
+ * Stores the button reference of the currently opened lightbox.
+ *
+ * @type {HTMLElement}
+ */
+let buttonRef;
 
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
 			currentImage: {},
-			get scrollDisabled() {
+			get overlayOpened() {
 				return state.currentImage.currentSrc;
 			},
 			get roleAttribute() {
-				return state.lightboxEnabled ? 'dialog' : null;
+				return state.overlayOpened ? 'dialog' : null;
 			},
 			get ariaModal() {
-				return state.lightboxEnabled ? 'true' : null;
+				return state.overlayOpened ? 'true' : null;
 			},
 			get enlargedSrc() {
 				return (
@@ -42,60 +53,66 @@ const { state, actions, callbacks } = store(
 					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 				);
 			},
-			imgAttributes( attribute ) {
-				return state.currentImage[ `img-${ attribute }` ];
-			},
-			figureAttributes( attribute ) {
-				return state.currentImage[ `figure-${ attribute }` ];
+			get imgStyles() {
+				return (
+					state.overlayOpened &&
+					`${ state.currentImage.imgStyles?.replace(
+						/;$/,
+						''
+					) }; object-fit:contain;`
+				);
 			},
 		},
 		actions: {
 			showLightbox() {
 				const ctx = getContext();
 
-				// We can't initialize the lightbox until the reference image is loaded,
-				// otherwise the UX is broken.
+				// Bails out if the image has not loaded yet.
 				if ( ! ctx.imageRef.complete ) {
 					return;
 				}
 
+				// Stores the positons of the scroll to fix it until the overlay is
+				// closed.
 				state.scrollTopReset = document.documentElement.scrollTop;
-				// In most cases, this value will be 0, but this is included
-				// in case a user has created a page with horizontal scrolling.
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
+				// Moves the information of the expaned image to the state.
 				ctx.currentSrc = ctx.imageRef.currentSrc;
 				imageRef = ctx.imageRef;
-				triggerRef = ctx.triggerRef;
+				buttonRef = ctx.buttonRef;
 				state.currentImage = ctx;
-				state.lightboxEnabled = true;
+				state.overlayEnabled = true;
 
+				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
 			},
 			hideLightbox() {
-				if ( state.lightboxEnabled ) {
-					// We want to wait until the close animation is completed
-					// before allowing a user to scroll again. The duration of this
-					// animation is defined in the styles.scss and depends on if the
-					// animation is 'zoom' or 'fade', but in any case we should wait
-					// a few milliseconds longer than the duration, otherwise a user
-					// may scroll too soon and cause the animation to look sloppy.
+				if ( state.overlayEnabled ) {
+					// Waits until the close animation has completed before allowing a
+					// user to scroll again. The duration of this animation is defined in
+					// the `styles.scss` file, but in any case we should wait a few
+					// milliseconds longer than the duration, otherwise a user may scroll
+					// too soon and cause the animation to look sloppy.
 					setTimeout( function () {
+						// Resets the current image to mark the overlay as closed.
 						state.currentImage = {};
-						// If we don't delay before changing the focus,
-						// the focus ring will appear on Firefox before
-						// the image has finished animating, which looks broken.
-						triggerRef.focus( {
+						// Delays before changing the focus. Otherwise the focus ring will
+						// appear on Firefox before the image has finished animating, which
+						// looks broken.
+						buttonRef.focus( {
 							preventScroll: true,
 						} );
 					}, 450 );
 
-					state.hideAnimationEnabled = true;
-					state.lightboxEnabled = false;
+					// Starts the overlay closing animation. The showClosingAnimation
+					// class is used to avoid showing it on page load.
+					state.showClosingAnimation = true;
+					state.overlayEnabled = false;
 				}
 			},
 			handleKeydown( event ) {
-				if ( state.lightboxEnabled ) {
+				if ( state.overlayEnabled ) {
 					// Focuses the close button when the user presses the tab key.
 					if ( event.key === 'Tab' ) {
 						event.preventDefault();
@@ -109,13 +126,13 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			handleTouchMove( event ) {
-				// On mobile devices, we want to prevent triggering the
-				// scroll event because otherwise the page jumps around as
-				// we reset the scroll position. This also means that closing
-				// the lightbox requires that a user perform a simple tap. This
-				// may be changed in the future if we find a better alternative
-				// to override or reset the scroll position during swipe actions.
-				if ( state.lightboxEnabled ) {
+				// On mobile devices, prevents triggering the scroll event because
+				// otherwise the page jumps around when it resets the scroll position.
+				// This also means that closing the lightbox requires that a user
+				// perform a simple tap. This may be changed in the future if there is a
+				// better alternative to override or reset the scroll position during
+				// swipe actions.
+				if ( state.overlayEnabled ) {
 					event.preventDefault();
 				}
 			},
@@ -123,30 +140,27 @@ const { state, actions, callbacks } = store(
 				isTouching = true;
 			},
 			handleTouchEnd() {
-				// We need to wait a few milliseconds before resetting
-				// to ensure that pinch to zoom works consistently
-				// on mobile devices when the lightbox is open.
+				// Waits a few milliseconds before resetting to ensure that pinch to
+				// zoom works consistently on mobile devices when the lightbox is open.
 				lastTouchTime = Date.now();
 				isTouching = false;
 			},
 			handleScroll() {
-				// This handler is added to prevent scrolling behaviors that trigger content
-				// shift while the lightbox is open.  It would be better to accomplish this
-				// through CSS alone, but using overflow: hidden is currently the only way
-				// to do so, and that causes the layout to shift and prevents the zoom
-				// animation from working in some cases because we're unable to account for
-				// the layout shift when doing the animation calculations. Instead, here we
-				// use JavaScript to prevent and reset the scrolling behavior. In the
-				// future, we may be able to use CSS or overflow: hidden instead to not rely
-				// on JavaScript, but this seems to be the best approach for now that
-				// provides the best visual experience.
-				if ( state.scrollDisabled ) {
-					// We can't override the scroll behavior on mobile devices
-					// because doing so breaks the pinch to zoom functionality, and we
-					// want to allow users to zoom in further on the high-res image.
+				// Prevents scrolling behaviors that trigger content shift while the
+				// lightbox is open. It would be better to accomplish through CSS alone,
+				// but using overflow: hidden is currently the only way to do so and
+				// that causes a layout to shift and prevents the zoom animation from
+				// working in some cases because it's not possible to account for the
+				// layout shift when doing the animation calculations. Instead, it uses
+				// JavaScript to prevent and reset the scrolling behavior.
+				if ( state.overlayOpened ) {
+					// Avoids overriding the scroll behavior on mobile devices because
+					// doing so breaks the pinch to zoom functionality, and users should
+					// be able to zoom in further on the high-res image.
 					if ( ! isTouching && Date.now() - lastTouchTime > 450 ) {
-						// We are unable to use event.preventDefault() to prevent scrolling
-						// because the scroll event can't be canceled, so we reset the position instead.
+						// It doesn't rely on `event.preventDefault()` to prevent scrolling
+						// because the scroll event can't be canceled, so it resets the
+						// position instead.
 						window.scrollTo(
 							state.scrollLeftReset,
 							state.scrollTopReset
@@ -157,8 +171,6 @@ const { state, actions, callbacks } = store(
 		},
 		callbacks: {
 			setOverlayStyles() {
-				// The reference img element lies adjacent to the event target button in
-				// the DOM.
 				let {
 					naturalWidth,
 					naturalHeight,
@@ -173,27 +185,27 @@ const { state, actions, callbacks } = store(
 				// Original ratio of the image clicked to open the lightbox.
 				let originalRatio = originalWidth / originalHeight;
 
-				// If it has object-fit: contain, recalculate the original sizes
+				// If it has object-fit: contain, recalculates the original sizes
 				// and the screen position without the blank spaces.
 				if ( state.currentImage.scaleAttr === 'contain' ) {
 					if ( naturalRatio > originalRatio ) {
 						const heightWithoutSpace = originalWidth / naturalRatio;
-						// Recalculate screen position without the top space.
+						// Recalculates screen position without the top space.
 						screenPosY +=
 							( originalHeight - heightWithoutSpace ) / 2;
 						originalHeight = heightWithoutSpace;
 					} else {
 						const widthWithoutSpace = originalHeight * naturalRatio;
-						// Recalculate screen position without the left space.
+						// Recalculates screen position without the left space.
 						screenPosX += ( originalWidth - widthWithoutSpace ) / 2;
 						originalWidth = widthWithoutSpace;
 					}
 				}
 				originalRatio = originalWidth / originalHeight;
 
-				// Typically, we use the image's full-sized dimensions. If those
-				// dimensions have not been set (i.e. an external image with only one size),
-				// the image's dimensions in the lightbox are the same
+				// Typically, it uses the image's full-sized dimensions. If those
+				// dimensions have not been set (i.e. an external image with only one
+				// size), the image's dimensions in the lightbox are the same
 				// as those of the image in the content.
 				let imgMaxWidth = parseFloat(
 					state.currentImage.targetWidth !== 'none'
@@ -212,15 +224,14 @@ const { state, actions, callbacks } = store(
 				let containerMaxHeight = imgMaxHeight;
 				let containerWidth = imgMaxWidth;
 				let containerHeight = imgMaxHeight;
-				// Check if the target image has a different ratio than the original one (thumbnail).
-				// Recalculate the width and height.
+				// Checks if the target image has a different ratio than the original
+				// one (thumbnail). Recalculates the width and height.
 				if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
 					if ( naturalRatio > imgRatio ) {
-						// If the width is reached before the height, we keep the maxWidth
-						// and recalculate the height.
-						// Unless the difference between the maxHeight and the reducedHeight
-						// is higher than the maxWidth, where we keep the reducedHeight and
-						// recalculate the width.
+						// If the width is reached before the height, it keeps the maxWidth
+						// and recalculates the height unless the difference between the
+						// maxHeight and the reducedHeight is higher than the maxWidth,
+						// where it keeps the reducedHeight and recalculate the width.
 						const reducedHeight = imgMaxWidth / naturalRatio;
 						if ( imgMaxHeight - reducedHeight > imgMaxWidth ) {
 							imgMaxHeight = reducedHeight;
@@ -229,11 +240,10 @@ const { state, actions, callbacks } = store(
 							imgMaxHeight = imgMaxWidth / naturalRatio;
 						}
 					} else {
-						// If the height is reached before the width, we keep the maxHeight
-						// and recalculate the width.
-						// Unless the difference between the maxWidth and the reducedWidth
-						// is higher than the maxHeight, where we keep the reducedWidth and
-						// recalculate the height.
+						// If the height is reached before the width, it keeps the maxHeight
+						// and recalculate the width unlesss the difference between the
+						// maxWidth and the reducedWidth is higher than the maxHeight, where
+						// it keeps the reducedWidth and recalculate the height.
 						const reducedWidth = imgMaxHeight * naturalRatio;
 						if ( imgMaxWidth - reducedWidth > imgMaxHeight ) {
 							imgMaxWidth = reducedWidth;
@@ -246,7 +256,7 @@ const { state, actions, callbacks } = store(
 					containerHeight = imgMaxHeight;
 					imgRatio = imgMaxWidth / imgMaxHeight;
 
-					// Calculate the max size of the container.
+					// Calculates the max size of the container.
 					if ( originalRatio > imgRatio ) {
 						containerMaxWidth = imgMaxWidth;
 						containerMaxHeight = containerMaxWidth / originalRatio;
@@ -256,7 +266,7 @@ const { state, actions, callbacks } = store(
 					}
 				}
 
-				// If the image has been pixelated on purpose, keep that size.
+				// If the image has been pixelated on purpose, it keeps that size.
 				if (
 					originalWidth > containerWidth ||
 					originalHeight > containerHeight
@@ -265,9 +275,9 @@ const { state, actions, callbacks } = store(
 					containerHeight = originalHeight;
 				}
 
-				// Calculate the final lightbox image size and the
-				// scale factor. MaxWidth is either the window container
-				// (accounting for padding) or the image resolution.
+				// Calculates the final lightbox image size and the scale factor.
+				// MaxWidth is either the window container (accounting for padding) or
+				// the image resolution.
 				let horizontalPadding = 0;
 				if ( window.innerWidth > 480 ) {
 					horizontalPadding = 80;
@@ -287,11 +297,11 @@ const { state, actions, callbacks } = store(
 				const targetContainerRatio = targetMaxWidth / targetMaxHeight;
 
 				if ( originalRatio > targetContainerRatio ) {
-					// If targetMaxWidth is reached before targetMaxHeight
+					// If targetMaxWidth is reached before targetMaxHeight.
 					containerWidth = targetMaxWidth;
 					containerHeight = containerWidth / originalRatio;
 				} else {
-					// If targetMaxHeight is reached before targetMaxWidth
+					// If targetMaxHeight is reached before targetMaxWidth.
 					containerHeight = targetMaxHeight;
 					containerWidth = containerHeight * originalRatio;
 				}
@@ -302,11 +312,12 @@ const { state, actions, callbacks } = store(
 				const lightboxImgHeight =
 					imgMaxHeight * ( containerHeight / containerMaxHeight );
 
-				// As of this writing, using the calculations above will render the lightbox
-				// with a small, erroneous whitespace on the left side of the image in iOS Safari,
-				// perhaps due to an inconsistency in how browsers handle absolute positioning and CSS
-				// transformation. In any case, adding 1 pixel to the container width and height solves
-				// the problem, though this can be removed if the issue is fixed in the future.
+				// As of this writing, using the calculations above will render the
+				// lightbox with a small, erroneous whitespace on the left side of the
+				// image in iOS Safari, perhaps due to an inconsistency in how browsers
+				// handle absolute positioning and CSS transformation. In any case,
+				// adding 1 pixel to the container width and height solves the problem,
+				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
 				:root {
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
@@ -334,8 +345,8 @@ const { state, actions, callbacks } = store(
 					offsetHeight,
 				} = ref;
 
-				// If the image isn't loaded yet, we can't
-				// calculate where the button should be.
+				// If the image isn't loaded yet, it can't calculate where the button
+				// should be.
 				if ( naturalWidth === 0 || naturalHeight === 0 ) {
 					return;
 				}
@@ -343,10 +354,9 @@ const { state, actions, callbacks } = store(
 				const figure = ref.parentElement;
 				const figureWidth = ref.parentElement.clientWidth;
 
-				// We need special handling for the height because
-				// a caption will cause the figure to be taller than
-				// the image, which means we need to account for that
-				// when calculating the placement of the button in the
+				// It needs special handling for the height because a caption will cause
+				// the figure to be taller than the image, which means it needs to
+				// account for that when calculating the placement of the button in the
 				// top right corner of the image.
 				let figureHeight = ref.parentElement.clientHeight;
 				const caption = figure.querySelector( 'figcaption' );
@@ -369,9 +379,9 @@ const { state, actions, callbacks } = store(
 				const buttonOffsetTop = figureHeight - offsetHeight;
 				const buttonOffsetRight = figureWidth - offsetWidth;
 
-				// In the case of an image with object-fit: contain, the
-				// size of the <img> element can be larger than the image itself,
-				// so we need to calculate where to place the button.
+				// In the case of an image with object-fit: contain, the size of the
+				// <img> element can be larger than the image itself, so it needs to
+				// calculate where to place the button.
 				if ( ctx.scaleAttr === 'contain' ) {
 					// Natural ratio of the image.
 					const naturalRatio = naturalWidth / naturalHeight;
@@ -379,8 +389,8 @@ const { state, actions, callbacks } = store(
 					const offsetRatio = offsetWidth / offsetHeight;
 
 					if ( naturalRatio >= offsetRatio ) {
-						// If it reaches the width first, keep
-						// the width and compute the height.
+						// If it reaches the width first, it keeps the width and compute the
+						// height.
 						const referenceHeight = offsetWidth / naturalRatio;
 						ctx.imageButtonTop =
 							( offsetHeight - referenceHeight ) / 2 +
@@ -388,8 +398,8 @@ const { state, actions, callbacks } = store(
 							16;
 						ctx.imageButtonRight = buttonOffsetRight + 16;
 					} else {
-						// If it reaches the height first, keep
-						// the height and compute the width.
+						// If it reaches the height first, it keeps the height and compute
+						// the width.
 						const referenceWidth = offsetHeight * naturalRatio;
 						ctx.imageButtonTop = buttonOffsetTop + 16;
 						ctx.imageButtonRight =
@@ -403,7 +413,7 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			setOverlayFocus() {
-				if ( state.lightboxEnabled ) {
+				if ( state.overlayEnabled ) {
 					// Moves the focus to the dialog when it opens.
 					const { ref } = getElement();
 					ref.focus();
@@ -412,7 +422,7 @@ const { state, actions, callbacks } = store(
 			initTriggerButton() {
 				const ctx = getContext();
 				const { ref } = getElement();
-				ctx.triggerRef = ref;
+				ctx.buttonRef = ref;
 			},
 		},
 	},
