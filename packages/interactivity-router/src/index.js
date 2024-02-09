@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { render, store, privateApis } from '@wordpress/interactivity';
+import { store, privateApis, getConfig } from '@wordpress/interactivity';
 
-const { directivePrefix, getRegionRootFragment, initialVdom, toVdom } =
+const { directivePrefix, getRegionRootFragment, initialVdom, toVdom, render } =
 	privateApis(
 		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 	);
@@ -61,6 +61,21 @@ const renderRegions = ( page ) => {
 	}
 };
 
+/**
+ * Load the given page forcing a full page reload.
+ *
+ * The function returns a promise that won't resolve, useful to prevent any
+ * potential feedback indicating that the navigation has finished while the new
+ * page is being loaded.
+ *
+ * @param {string} href The page href.
+ * @return {Promise} Promise that never resolves.
+ */
+const forcePageReload = ( href ) => {
+	window.location.assign( href );
+	return new Promise( () => {} );
+};
+
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 window.addEventListener( 'popstate', async () => {
@@ -113,6 +128,11 @@ export const { state, actions } = store( 'core/router', {
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href, options = {} ) {
+			const { clientNavigationDisabled } = getConfig();
+			if ( clientNavigationDisabled ) {
+				yield forcePageReload( href );
+			}
+
 			const pagePath = getPagePath( href );
 			const { navigation } = state;
 			const {
@@ -183,11 +203,7 @@ export const { state, actions } = store( 'core/router', {
 							: '' );
 				}
 			} else {
-				window.location.assign( href );
-				// Await a promise that won't resolve to prevent any potential
-				// feedback indicating that the navigation has finished while
-				// the new page is being loaded.
-				yield new Promise( () => {} );
+				yield forcePageReload( href );
 			}
 		},
 
@@ -204,6 +220,9 @@ export const { state, actions } = store( 'core/router', {
 		 *                                  fetching the requested URL.
 		 */
 		prefetch( url, options = {} ) {
+			const { clientNavigationDisabled } = getConfig();
+			if ( clientNavigationDisabled ) return;
+
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
 				pages.set( pagePath, fetchPage( pagePath, options ) );

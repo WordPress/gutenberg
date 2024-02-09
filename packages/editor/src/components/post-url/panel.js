@@ -47,6 +47,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 	const label = usePostURLLabel();
 	return (
 		<Button
+			__next40pxDefaultSize
 			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }

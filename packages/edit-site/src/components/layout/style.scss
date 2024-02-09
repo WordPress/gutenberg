@@ -19,15 +19,10 @@
 	}
 
 	.edit-site-layout.is-full-canvas & {
-		padding-right: $grid-unit-20;
+		padding-right: 0;
 		border-radius: 0;
-		width: 100vw;
+		width: $header-height;
 		box-shadow: none;
-
-		@include break-medium {
-			width: $header-height;
-			padding-right: 0;
-		}
 	}
 }
 
