@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 export default {
 	name: 'core/pattern-overrides',
-	label: __( 'Pattern Overrides' ),
+	label: _x( 'Pattern Overrides' ),
 	useSource: null,
 	lockAttributesEditing: false,
 };
