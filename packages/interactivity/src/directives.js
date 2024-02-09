@@ -164,7 +164,7 @@ export default () => {
 				.filter( ( { suffix } ) => suffix !== 'default' )
 				.forEach( ( entry ) => {
 					const className = entry.suffix;
-					const result = evaluate( entry, className );
+					const result = evaluate( entry );
 					const currentClass = element.props.class || '';
 					const classFinder = new RegExp(
 						`(^|\\s)${ className }(\\s|$)`,
@@ -201,7 +201,7 @@ export default () => {
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
 				const styleProp = entry.suffix;
-				const result = evaluate( entry, styleProp );
+				const result = evaluate( entry );
 				element.props.style = element.props.style || {};
 				if ( typeof element.props.style === 'string' )
 					element.props.style = cssStringToObject(
@@ -230,7 +230,7 @@ export default () => {
 		bind.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
 				const attribute = entry.suffix;
-				const result = evaluate( entry, attribute );
+				const result = evaluate( entry );
 				element.props[ attribute ] = result;
 
 				/*
@@ -246,7 +246,11 @@ export default () => {
 					 * property excluding the following special cases. We follow Preact's
 					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					 */
-					if (
+					if ( attribute === 'style' ) {
+						if ( typeof result === 'string' )
+							el.style.cssText = result;
+						return;
+					} else if (
 						attribute !== 'width' &&
 						attribute !== 'height' &&
 						attribute !== 'href' &&
