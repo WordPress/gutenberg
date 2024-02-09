@@ -374,7 +374,12 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		}
 
 		if ( ( 'wp_template' === $entity_type || 'wp_template_part' === $entity_type ) && ! empty( $id ) ) {
+			$suppress_all_hooked_blocks_filter = function() {
+				return array();
+			};
+			add_filter( 'hooked_block_types', $suppress_all_hooked_blocks_filter, 99999, 0 );
 			$context = get_block_template( $id, $entity_type );
+			remove_filter( 'hooked_block_types', $suppress_all_hooked_blocks_filter, 99999 );
 			if ( is_wp_error( $context ) ) {
 				return $context;
 			}
