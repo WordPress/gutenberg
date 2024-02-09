@@ -11,8 +11,8 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type _NewCustomSelect from '../default-component';
-import { CustomSelect, CustomSelectItem } from '..';
+import CustomSelect from '../default-component';
+import { CustomSelectItem } from '..';
 
 const meta: Meta< typeof CustomSelect > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Default',
@@ -23,10 +23,6 @@ const meta: Meta< typeof CustomSelect > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
-		// exclude legacy options (type: never) from docs
-		//@ts-ignore
-		options: { table: { disable: true } },
-		renderSelectedValue: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {
@@ -34,7 +30,6 @@ const meta: Meta< typeof CustomSelect > = {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
-			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
 		},
 	},
@@ -52,11 +47,7 @@ const meta: Meta< typeof CustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof _NewCustomSelect > = ( props ) => {
-	return <CustomSelect { ...props } />;
-};
-
-const ControlledTemplate: StoryFn< typeof _NewCustomSelect > = ( props ) => {
+const Template: StoryFn< typeof CustomSelect > = ( props ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
 		<CustomSelect
@@ -72,7 +63,7 @@ const ControlledTemplate: StoryFn< typeof _NewCustomSelect > = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	label: 'Label',
+	label: 'Label text',
 	defaultValue: 'Select a color...',
 	children: (
 		<>
@@ -91,21 +82,13 @@ Default.args = {
 
 /**
  * Multiple selection can be enabled by using an array for the `value` and
- * `defaultValue` props. The argument of the `onChange` function will also
+ * `defaultValue` props. The argument type of the `onChange` function will also
  * change accordingly.
  */
 export const MultipleSelection = Template.bind( {} );
 MultipleSelection.args = {
-	defaultValue: [ 'lavender', 'tangerine' ],
 	label: 'Select Colors',
-	renderSelectedValue: ( currentValue: string | string[] ) => {
-		if ( ! Array.isArray( currentValue ) ) {
-			return currentValue;
-		}
-		if ( currentValue.length === 0 ) return 'No colors selected';
-		if ( currentValue.length === 1 ) return currentValue[ 0 ];
-		return `${ currentValue.length } colors selected`;
-	},
+	defaultValue: [ 'lavender', 'tangerine' ],
 	children: (
 		<>
 			{ [
@@ -124,32 +107,34 @@ MultipleSelection.args = {
 	),
 };
 
-const renderControlledValue = ( gravatar: string | string[] ) => {
+const renderSelectedValue = ( gravatar: string | string[] ) => {
 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
 		<div style={ { display: 'flex', alignItems: 'center' } }>
 			<img
 				style={ { maxHeight: '75px', marginRight: '10px' } }
-				key={ avatar }
 				src={ avatar }
 				alt=""
-				aria-hidden="true"
 			/>
 			<span>{ gravatar }</span>
 		</div>
 	);
 };
 
-export const Controlled = ControlledTemplate.bind( {} );
-Controlled.args = {
+/**
+ * The `renderSelectedValue` prop can be used to customize how the selected value
+ * is rendered in the dropdown trigger.
+ */
+export const CustomSelectedValue = Template.bind( {} );
+CustomSelectedValue.args = {
 	label: 'Default Gravatars',
-	renderSelectedValue: renderControlledValue,
+	renderSelectedValue,
 	children: (
 		<>
 			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
 				( option ) => (
 					<CustomSelectItem key={ option } value={ option }>
-						{ renderControlledValue( option ) }
+						{ renderSelectedValue( option ) }
 					</CustomSelectItem>
 				)
 			) }

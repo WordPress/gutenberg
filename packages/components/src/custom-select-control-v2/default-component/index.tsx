@@ -9,7 +9,7 @@ import * as Ariakit from '@ariakit/react';
 import _CustomSelect from '../custom-select';
 import type { CustomSelectProps } from '../types';
 
-function _NewCustomSelect( props: CustomSelectProps ) {
+function CustomSelect( props: CustomSelectProps ) {
 	const { defaultValue, onChange, value, ...restProps } = props;
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
@@ -21,4 +21,4 @@ function _NewCustomSelect( props: CustomSelectProps ) {
 	return <_CustomSelect { ...restProps } store={ store } />;
 }
 
-export default _NewCustomSelect;
+export default CustomSelect;
