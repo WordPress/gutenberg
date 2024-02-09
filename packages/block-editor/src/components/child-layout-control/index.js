@@ -99,30 +99,11 @@ export default function ChildLayoutControl( {
 	const widthOptions = [];
 
 	if ( parentLayoutTypeToUse === 'constrained' ) {
-		widthOptions.push(
-			{
-				key: 'content',
-				value: 'content',
-				name: __( 'Content' ),
-			},
-			{
-				key: 'fixedNoShrink',
-				value: 'fixedNoShrink',
-				name: __( 'Fixed' ),
-			},
-			{
-				key: 'fit',
-				value: 'fit',
-				name: __( 'Fit' ),
-			}
-		);
-		if ( supportsFullAlign ) {
-			widthOptions.push( {
-				key: 'fill',
-				value: 'fill',
-				name: __( 'Fill' ),
-			} );
-		}
+		widthOptions.push( {
+			key: 'content',
+			value: 'content',
+			name: __( 'Default' ),
+		} );
 		if ( supportsWideAlign ) {
 			widthOptions.push( {
 				key: 'wide',
@@ -130,6 +111,25 @@ export default function ChildLayoutControl( {
 				name: __( 'Wide' ),
 			} );
 		}
+		if ( supportsFullAlign ) {
+			widthOptions.push( {
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			} );
+		}
+		widthOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Custom' ),
+			}
+		);
 	} else if (
 		parentLayoutTypeToUse === 'default' ||
 		( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' )

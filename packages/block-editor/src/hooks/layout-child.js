@@ -108,6 +108,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				css += `${ selector } {
 					flex-grow: 1;
 					flex-shrink: 1;
+					flex-basis: 100%;
 				}`;
 			} else if ( layout[ widthProp ] === 'fit' ) {
 				css += `${ selector } {

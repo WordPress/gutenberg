@@ -265,8 +265,8 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		innerWidthOptions.unshift( {
 			key: 'theme',
 			value: 'theme',
-			__experimentalHint: 'Content width is set by theme',
-			name: __( 'Boxed' ),
+			__experimentalHint: 'The default container width set by the theme',
+			name: __( 'Default' ),
 		} );
 	}
 
@@ -568,6 +568,7 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 							type === 'default' ||
 							type === 'constrained' ) && (
 							<CustomSelectControl
+								className="layout-controls-inner-width-select"
 								label={ __( 'Content width' ) }
 								value={ selectedContentWidth }
 								options={ innerWidthOptions }
