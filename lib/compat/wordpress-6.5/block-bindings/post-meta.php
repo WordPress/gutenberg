@@ -17,7 +17,7 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 		return null;
 	}
 
-	$post_id = isset( $block_instance->context['postId'] );
+	$post_id = $block_instance->context['postId'];
 	// If a post isn't public, we need to prevent unauthorized users from accessing the post meta.
 	$post = get_post( $post_id );
 	if ( ( ! is_post_publicly_viewable( $post ) && ! current_user_can( 'read_post', $post_id ) ) || post_password_required( $post ) ) {
