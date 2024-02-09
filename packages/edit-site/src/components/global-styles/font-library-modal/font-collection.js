@@ -203,6 +203,24 @@ function FontCollection( { slug } ) {
 		resetFontsToInstall();
 	};
 
+	let footerComponent = null;
+	if ( selectedFont ) {
+		footerComponent = (
+			<InstallFooter
+				handleInstall={ handleInstall }
+				isDisabled={ fontsToInstall.length === 0 }
+			/>
+		);
+	} else if ( ! renderConfirmDialog ) {
+		footerComponent = (
+			<PaginationFooter
+				page={ page }
+				totalPages={ totalPages }
+				setPage={ setPage }
+			/>
+		);
+	}
+
 	return (
 		<TabPanelLayout
 			title={
@@ -215,20 +233,7 @@ function FontCollection( { slug } ) {
 			}
 			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
-			footer={
-				selectedFont ? (
-					<InstallFooter
-						handleInstall={ handleInstall }
-						isDisabled={ fontsToInstall.length === 0 }
-					/>
-				) : (
-					<PaginationFooter
-						page={ page }
-						totalPages={ totalPages }
-						setPage={ setPage }
-					/>
-				)
-			}
+			footer={ footerComponent }
 		>
 			{ renderConfirmDialog && (
 				<>
