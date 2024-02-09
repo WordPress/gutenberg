@@ -60,6 +60,9 @@ function _gutenberg_get_search_result_label_field( $result_object, $field_name, 
 			$term  = get_term_by( 'term_taxonomy_id', $object_id );
 			$label = $term && ! is_wp_error( $term ) ? get_taxonomy( $term->taxonomy )->labels->singular_name : '';
 			break;
+		case 'post-format':
+			$label = get_post_format_string( $object_id );
+			break;
 		default:
 			$label = '';
 	}
