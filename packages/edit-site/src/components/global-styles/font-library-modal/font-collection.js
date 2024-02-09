@@ -325,7 +325,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 	return (
 		<Flex justify="center">
 			<Button
-				aria-label={ __( 'first page' ) }
+				label={ __( 'first page' ) }
 				size="compact"
 				onClick={ () => setPage( 1 ) }
 				disabled={ page === 1 }
@@ -334,7 +334,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				<span>«</span>
 			</Button>
 			<Button
-				aria-label={ __( 'previous page' ) }
+				label={ __( 'previous page' ) }
 				size="compact"
 				onClick={ () => setPage( page - 1 ) }
 				disabled={ page === 1 }
@@ -373,7 +373,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				) }
 			</HStack>
 			<Button
-				aria-label={ __( 'next page' ) }
+				label={ __( 'next page' ) }
 				size="compact"
 				onClick={ () => setPage( page + 1 ) }
 				disabled={ page === totalPages }
@@ -382,7 +382,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				<span>›</span>
 			</Button>
 			<Button
-				aria-label={ __( 'last page' ) }
+				label={ __( 'last page' ) }
 				size="compact"
 				onClick={ () => setPage( totalPages ) }
 				disabled={ page === totalPages }
