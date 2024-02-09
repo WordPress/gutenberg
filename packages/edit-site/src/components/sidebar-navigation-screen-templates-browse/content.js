@@ -10,7 +10,7 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  */
 import DataViewItem from '../sidebar-dataviews/dataview-item';
 import { useAddedBy } from '../list/added-by';
-import { layout } from '@wordpress/icons';
+import { file } from '@wordpress/icons';
 
 const EMPTY_ARRAY = [];
 
@@ -53,9 +53,9 @@ export default function DataviewsTemplatesSidebarContent( {
 	return (
 		<ItemGroup>
 			<DataViewItem
-				slug={ 'all' }
+				slug="all"
 				title={ config[ postType ].title }
-				icon={ layout }
+				icon={ file }
 				isActive={ activeView === 'all' }
 				isCustom="false"
 			/>
