@@ -8,32 +8,31 @@
 		// @see packages/block-editor/src/components/inserter/style.scss
 		width: 350px;
 	}
-
-	.editor-list-view-sidebar__close-button {
-		position: absolute;
-		right: $grid-unit-10;
-		top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
-		z-index: 1;
-		background: $white;
-	}
-
-	// The TabPanel style overrides in the following blocks should be removed when the new TabPanel is available.
-	.components-tab-panel__tabs {
-		border-bottom: $border-width solid $gray-300;
-		box-sizing: border-box;
+	.edit-post-editor__document-overview-panel__header {
 		display: flex;
-		width: 100%;
-		padding-right: $grid-unit-70;
-
-		.editor-list-view-sidebar__panel-tab {
-			width: 50%;
-			margin-bottom: -$border-width;
-		}
+		border-bottom: $border-width solid $gray-300;
 	}
-
-	.components-tab-panel__tab-content {
-		height: calc(100% - #{$grid-unit-60 - $border-width});
+	.editor-list-view-sidebar__close-button {
+		background: $white;
+		order: 1;
+		align-self: center;
+		margin-right: $grid-unit-10;
 	}
+}
+
+.editor-list-view-sidebar__tabs-tablist {
+	box-sizing: border-box;
+	flex-grow: 1;
+
+}
+
+.editor-list-view-sidebar__tabs-tab {
+	width: 50%;
+	margin-bottom: -$border-width;
+}
+
+.editor-list-view-sidebar__tabs-tabpanel {
+	height: calc(100% - #{$grid-unit-60 - $border-width});
 }
 
 .editor-list-view-sidebar__list-view-panel-content,
@@ -82,3 +81,4 @@
 		color: $gray-700;
 	}
 }
+

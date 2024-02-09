@@ -108,25 +108,6 @@ function ListViewBlock( {
 		blockEditingMode === 'default';
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
-	const blockPositionDescription = getBlockPositionDescription(
-		position,
-		siblingBlockCount,
-		level
-	);
-
-	const blockAriaLabel = isLocked
-		? sprintf(
-				// translators: %s: The title of the block. This string indicates a link to select the locked block.
-				__( '%s (locked)' ),
-				blockTitle
-		  )
-		: blockTitle;
-
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s' ),
-		blockTitle
-	);
 
 	const {
 		expand,
@@ -137,18 +118,6 @@ function ListViewBlock( {
 		setInsertedBlock,
 		treeGridElementRef,
 	} = useListViewContext();
-
-	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const moverCellClassName = classnames(
-		'block-editor-list-view-block__mover-cell',
-		{ 'is-visible': isHovered || isSelected }
-	);
-
-	const listViewBlockSettingsClassName = classnames(
-		'block-editor-list-view-block__menu-cell',
-		{ 'is-visible': isHovered || isFirstSelectedBlock }
-	);
 
 	// If multiple blocks are selected, deselect all blocks when the user
 	// presses the escape key.
@@ -187,7 +156,7 @@ function ListViewBlock( {
 				selectBlock( undefined, focusClientId, null, null );
 			}
 
-			focusListItem( focusClientId, treeGridElementRef );
+			focusListItem( focusClientId, treeGridElementRef?.current );
 		},
 		[ selectBlock, treeGridElementRef ]
 	);
@@ -256,6 +225,54 @@ function ListViewBlock( {
 		setSettingsAnchorRect( undefined );
 	}, [ setSettingsAnchorRect ] );
 
+	// Pass in a ref to the row, so that it can be scrolled
+	// into view when selected. For long lists, the placeholder for the
+	// selected block is also observed, within ListViewLeafPlaceholder.
+	useListViewScrollIntoView( {
+		isSelected,
+		rowItemRef: rowRef,
+		selectedClientIds,
+	} );
+
+	// When switching between rendering modes (such as template preview and content only),
+	// it is possible for a block to temporarily be unavailable. In this case, we should not
+	// render the leaf, to avoid errors further down the tree.
+	if ( ! block ) {
+		return null;
+	}
+
+	const blockPositionDescription = getBlockPositionDescription(
+		position,
+		siblingBlockCount,
+		level
+	);
+
+	const blockAriaLabel = isLocked
+		? sprintf(
+				// translators: %s: The title of the block. This string indicates a link to select the locked block.
+				__( '%s (locked)' ),
+				blockTitle
+		  )
+		: blockTitle;
+
+	const settingsAriaLabel = sprintf(
+		// translators: %s: The title of the block.
+		__( 'Options for %s' ),
+		blockTitle
+	);
+
+	const hasSiblings = siblingBlockCount > 0;
+	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const moverCellClassName = classnames(
+		'block-editor-list-view-block__mover-cell',
+		{ 'is-visible': isHovered || isSelected }
+	);
+
+	const listViewBlockSettingsClassName = classnames(
+		'block-editor-list-view-block__menu-cell',
+		{ 'is-visible': isHovered || isFirstSelectedBlock }
+	);
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -287,15 +304,6 @@ function ListViewBlock( {
 	const dropdownClientIds = selectedClientIds.includes( clientId )
 		? selectedClientIds
 		: [ clientId ];
-
-	// Pass in a ref to the row, so that it can be scrolled
-	// into view when selected. For long lists, the placeholder for the
-	// selected block is also observed, within ListViewLeafPlaceholder.
-	useListViewScrollIntoView( {
-		isSelected,
-		rowItemRef: rowRef,
-		selectedClientIds,
-	} );
 
 	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
 	const currentlyEditingBlockInCanvas =

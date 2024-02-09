@@ -47,11 +47,6 @@ const restrictedImports = [
 		message: 'Please use native functionality instead.',
 	},
 	{
-		name: 'reakit',
-		message:
-			'Please use Reakit API through `@wordpress/components` instead.',
-	},
-	{
 		name: '@ariakit/react',
 		message:
 			'Please use Ariakit API through `@wordpress/components` instead.',
@@ -355,6 +350,26 @@ module.exports = {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'Literal[value=/--wp-admin-theme-/]',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
 			},
 		},
 		{

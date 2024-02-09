@@ -56,6 +56,8 @@ export function CustomSelect( {
 		setValue: ( nextValue ) => onChange?.( nextValue ),
 		defaultValue,
 		value,
+		// fix for Safari bug: https://github.com/WordPress/gutenberg/issues/55023#issuecomment-1834035917
+		virtualFocus: false,
 	} );
 
 	const { value: currentValue } = store.useState();

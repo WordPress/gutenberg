@@ -56,11 +56,7 @@ function UnforwardedUnitControl(
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
-	} = useDeprecated36pxDefaultSizeProp(
-		unitControlProps,
-		'wp.components.UnitControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
