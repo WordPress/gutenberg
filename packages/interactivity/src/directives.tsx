@@ -5,13 +5,12 @@
  */
 import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-import type { DeepSignalObject } from 'deepsignal';
+import type { DeepSignal } from 'deepsignal';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
  * Internal dependencies
  */
-import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
@@ -49,8 +48,8 @@ const isObject = ( item: any ): boolean =>
  * // target is now { $key1: { peek: () => ({ a: 3 }) }, $key2: { peek: () => ({ b: 2 }) }, $key3: { peek: () => ({ c: 3 }) } }
  */
 const mergeDeepSignals = (
-	target: DeepSignalObject< any >,
-	source: DeepSignalObject< any >,
+	target: DeepSignal< any >,
+	source: DeepSignal< any >,
 	overwrite?: boolean
 ) => {
 	for ( const k in source ) {
@@ -160,11 +159,6 @@ export default () => {
 		{ priority: 5 }
 	);
 
-	// data-wp-body
-	directive( 'body', ( { props: { children } } ) => {
-		return createPortal( children, document.body );
-	} );
-
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
@@ -199,15 +193,15 @@ export default () => {
 	// data-wp-class--[classname]
 	directive(
 		'class',
-		( { directives: { class: className }, element, evaluate } ) => {
-			className
+		( { directives: { class: classNames }, element, evaluate } ) => {
+			classNames
 				.filter( ( { suffix } ) => suffix !== 'default' )
 				.forEach( ( entry ) => {
-					const name = entry.suffix;
-					const result = evaluate( entry, { className: name } );
+					const className = entry.suffix;
+					const result = evaluate( entry );
 					const currentClass = element.props.class || '';
 					const classFinder = new RegExp(
-						`(^|\\s)${ name }(\\s|$)`,
+						`(^|\\s)${ className }(\\s|$)`,
 						'g'
 					);
 					if ( ! result )
@@ -216,19 +210,19 @@ export default () => {
 							.trim();
 					else if ( ! classFinder.test( currentClass ) )
 						element.props.class = currentClass
-							? `${ currentClass } ${ name }`
-							: name;
+							? `${ currentClass } ${ className }`
+							: className;
 
 					useInit( () => {
 						/*
 						 * This seems necessary because Preact doesn't change the class
-						 * names on the hydration, so it must be done manually. It doesn't
+						 * names on the hydration, so we have to do it manually. It doesn't
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							element.ref!.current.classList.remove( name );
+							element.ref.current.classList.remove( className );
 						} else {
-							element.ref!.current.classList.add( name );
+							element.ref.current.classList.add( className );
 						}
 					} );
 				} );
@@ -240,26 +234,26 @@ export default () => {
 		style
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
-				const key = entry.suffix;
-				const result = evaluate( entry, { key } );
+				const styleProp = entry.suffix;
+				const result = evaluate( entry );
 				element.props.style = element.props.style || {};
 				if ( typeof element.props.style === 'string' )
 					element.props.style = cssStringToObject(
 						element.props.style
 					);
-				if ( ! result ) delete element.props.style[ key ];
-				else element.props.style[ key ] = result;
+				if ( ! result ) delete element.props.style[ styleProp ];
+				else element.props.style[ styleProp ] = result;
 
 				useInit( () => {
 					/*
 					 * This seems necessary because Preact doesn't change the styles on
-					 * the hydration, so it must be done manually. It doesn't need deps
+					 * the hydration, so we have to do it manually. It doesn't need deps
 					 * because it only needs to do it the first time.
 					 */
 					if ( ! result ) {
-						element.ref.current.style.removeProperty( key );
+						element.ref.current.style.removeProperty( styleProp );
 					} else {
-						element.ref.current.style[ key ] = result;
+						element.ref.current.style[ styleProp ] = result;
 					}
 				} );
 			} );
@@ -275,18 +269,22 @@ export default () => {
 
 				/*
 				 * This is necessary because Preact doesn't change the attributes on the
-				 * hydration, so it must be done manually. It only needs to do it the
+				 * hydration, so we have to do it manually. It only needs to do it the
 				 * first time. After that, Preact will handle the changes.
 				 */
 				useInit( () => {
 					const el = element.ref.current;
 
 					/*
-					 * Set the value directly to the corresponding HTMLElement instance
-					 * property excluding the following special cases. It follows Preact's
+					 * We set the value directly to the corresponding HTMLElement instance
+					 * property excluding the following special cases. We follow Preact's
 					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					 */
-					if (
+					if ( attribute === 'style' ) {
+						if ( typeof result === 'string' )
+							el.style.cssText = result;
+						return;
+					} else if (
 						attribute !== 'width' &&
 						attribute !== 'height' &&
 						attribute !== 'href' &&
@@ -321,8 +319,8 @@ export default () => {
 					/*
 					 * aria- and data- attributes have no boolean representation.
 					 * A `false` value is different from the attribute not being
-					 * present, so it can't be removed.
-					 * It follows Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+					 * present, so we can't remove it.
+					 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
 					 */
 					if (
 						result !== null &&

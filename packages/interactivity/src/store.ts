@@ -183,34 +183,6 @@ const handlers = {
 export const getConfig = ( namespace: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
-interface StoreOptions {
-	/**
-	 * Property to block/unblock private store namespaces.
-	 *
-	 * If the passed value is `true`, it blocks the given namespace, making it
-	 * accessible only trough the returned variables of the `store()` call. In
-	 * the case a lock string is passed, it also blocks the namespace, but can
-	 * be unblocked for other `store()` calls using the same lock string.
-	 *
-	 * @example
-	 * ```
-	 * // The store can only be accessed where the `state` const can.
-	 * const { state } = store( 'myblock/private', { ... }, { lock: true } );
-	 * ```
-	 *
-	 * @example
-	 * ```
-	 * // Other modules knowing `SECRET_LOCK_STRING` can access the namespace.
-	 * const { state } = store(
-	 *   'myblock/private',
-	 *   { ... },
-	 *   { lock: 'SECRET_LOCK_STRING' }
-	 * );
-	 * ```
-	 */
-	lock?: boolean | string;
-}
-
 const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
