@@ -378,18 +378,5 @@
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
-	},
-	"wp-env": {
-		"plugin-dir": "gutenberg",
-		"plugin-name": "Gutenberg",
-		"docker-template": "./bin/docker-compose.override.yml.template",
-		"welcome-logo": [
-			",⁻⁻⁻·       .                 |",
-			"|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.",
-			"|   | |   | |     |---' |   | |   | |---' |     |   |",
-			"`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|",
-			"                                                `---'"
-		],
-		"welcome-build-command": "npm run dev"
 	}
 }
