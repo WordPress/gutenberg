@@ -17,6 +17,9 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 		return null;
 	}
 
+	if ( ! isset( $block_instance->context['postId'] ) ) {
+		return null;
+	}
 	$post_id = $block_instance->context['postId'];
 	// If a post isn't public, we need to prevent unauthorized users from accessing the post meta.
 	$post = get_post( $post_id );
@@ -40,6 +43,7 @@ function gutenberg_register_block_bindings_post_meta_source() {
 		array(
 			'label'              => _x( 'Post Meta', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_post_meta_callback',
+			'uses_context'       => array( 'postId', 'postType' ),
 		)
 	);
 }
