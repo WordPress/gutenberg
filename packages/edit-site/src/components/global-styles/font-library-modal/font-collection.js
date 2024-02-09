@@ -317,14 +317,23 @@ function FontCollection( { slug } ) {
 function PaginationFooter( { page, totalPages, setPage } ) {
 	return (
 		<Flex justify="center">
-			<Button onClick={ () => setPage( 1 ) } disabled={ page === 1 }>
-				&lt;&lt;
+			<Button
+				aria-label={ __( 'first page' ) }
+				size="compact"
+				onClick={ () => setPage( 1 ) }
+				disabled={ page === 1 }
+				__experimentalIsFocusable
+			>
+				<span>«</span>
 			</Button>
 			<Button
+				aria-label={ __( 'previous page' ) }
+				size="compact"
 				onClick={ () => setPage( page - 1 ) }
 				disabled={ page === 1 }
+				__experimentalIsFocusable
 			>
-				&lt;
+				<span>‹</span>
 			</Button>
 			<Text>{ `Page ` }</Text>
 			<SelectControl
@@ -336,16 +345,22 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 			/>
 			<Text>{ ` of ${ totalPages }` }</Text>
 			<Button
+				aria-label={ __( 'next page' ) }
+				size="compact"
 				onClick={ () => setPage( page + 1 ) }
 				disabled={ page === totalPages }
+				__experimentalIsFocusable
 			>
-				&gt;
+				<span>›</span>
 			</Button>
 			<Button
+				aria-label={ __( 'last page' ) }
+				size="compact"
 				onClick={ () => setPage( totalPages ) }
 				disabled={ page === totalPages }
+				__experimentalIsFocusable
 			>
-				&gt;&gt;
+				<span>»</span>
 			</Button>
 		</Flex>
 	);
