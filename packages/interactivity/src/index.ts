@@ -13,7 +13,7 @@ import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive, getNamespace } from './hooks';
 
-export { store } from './store';
+export { store, getConfig } from './store';
 export { getContext, getElement } from './hooks';
 export {
 	withScope,

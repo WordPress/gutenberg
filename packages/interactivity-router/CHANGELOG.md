@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `clientNavigationDisabled` option to the `core/router` config. ([58749](https://github.com/WordPress/gutenberg/pull/58749))
+
 ## 1.0.0 (2024-01-24)
 
 ### Breaking changes
