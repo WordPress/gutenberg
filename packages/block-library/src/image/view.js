@@ -95,17 +95,17 @@ const { state, actions, callbacks } = store(
 					// milliseconds longer than the duration, otherwise a user may scroll
 					// too soon and cause the animation to look sloppy.
 					setTimeout( function () {
-						// Resets the current image to mark the overlay as closed.
-						state.currentImage = {};
-						imageRef = null;
-						buttonRef = null;
-
 						// Delays before changing the focus. Otherwise the focus ring will
 						// appear on Firefox before the image has finished animating, which
 						// looks broken.
 						buttonRef.focus( {
 							preventScroll: true,
 						} );
+
+						// Resets the current image to mark the overlay as closed.
+						state.currentImage = {};
+						imageRef = null;
+						buttonRef = null;
 					}, 450 );
 
 					// Starts the overlay closing animation. The showClosingAnimation
