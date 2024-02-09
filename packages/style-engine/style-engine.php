@@ -30,6 +30,8 @@
  *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
  *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
  *                                                   otherwise, the value will be a concatenated string of CSS declarations.
+ *     @type string      $container                  Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
+ *                                                   such as `@media (min-width: 80rem)` or `@layer module
  * }
  *
  * @return array {
@@ -55,15 +57,30 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	$styles_output = array();
 
 	if ( ! empty( $parsed_styles['declarations'] ) ) {
-		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'], $options['container'] );
-		$styles_output['declarations'] = $parsed_styles['declarations'];
-		if ( ! empty( $options['context'] ) && ! empty( $options['selector'] ) ) {
-			// @TODO Or could return the store from WP_Style_Engine::store_css_rule() and use it to get the rules.
-			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
-			// @TODO WP_Style_Engine_CSS_Rules_Store could maybe do with a get_rule().
-			WP_Style_Engine::get_store( $options['context'] )->add_rule( $options['selector'] )->set_container( $options['container'] );
+		$container                     = $options['container'] ?? null;
+		$selector                      = $options['selector'] ?? null;
+		$css_declarations              = new WP_Style_Engine_CSS_Declarations( $parsed_styles['declarations'] );
+		$new_rule                      = null;
+
+		if ( $selector ) {
+			$new_rule = new WP_Style_Engine_CSS_Rule( $options['selector'], $css_declarations );
+			if ( $container ) {
+				$new_rule->set_container( $container );
+				$css_container = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
+				$styles_output['css'] = $css_container->get_css();
+			} else {
+				$styles_output['css'] = $new_rule->get_css();
+			}
+		} else {
+			$styles_output['css'] = $css_declarations->get_declarations_string();
+		}
+
+		if ( ! empty( $options['context'] ) && $new_rule ) {
+			WP_Style_Engine::get_store( $options['context'] )->add_rule( $new_rule );
 		}
 	}
+
+	$styles_output['declarations'] = $parsed_styles['declarations'];
 
 	if ( ! empty( $parsed_styles['classnames'] ) ) {
 		$styles_output['classnames'] = implode( ' ', array_unique( $parsed_styles['classnames'] ) );
@@ -87,7 +104,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *     Required. A collection of CSS rules.
  *
  *     @type array ...$0 {
- *         @type string   $container    A parent selector in the case or nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+ *         @type string   $container    A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
  *         @type string   $selector     A CSS selector.
  *         @type string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
  *     }
@@ -120,17 +137,14 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		if ( empty( $css_rule['selector'] ) || empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
 			continue;
 		}
-		// @TODO should this be in $options['container']?
+
 		$container = $css_rule['container'] ?? null;
+		$new_rule  = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+		$new_rule->set_container( $container );
 
 		if ( ! empty( $options['context'] ) ) {
-			// @TODO how to combine rules with the same container? in a container_rule class?
-			WP_Style_Engine::store_css_rule( $options['context'], $css_rule['selector'], $css_rule['declarations'] );
-			// @TODO WP_Style_Engine_CSS_Rules_Store could maybe do with a get_rule().
-			WP_Style_Engine::get_store( $options['context'] )->add_rule( $css_rule['selector'] )->set_container( $container );
+			WP_Style_Engine::get_store( $options['context'] )->add_rule( $new_rule );
 		}
-		$new_rule = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
-		$new_rule->set_container( $container );
 
 		$css_rule_objects[] = $new_rule;
 	}

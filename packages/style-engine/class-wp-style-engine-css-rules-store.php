@@ -109,21 +109,30 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		 * Gets a WP_Style_Engine_CSS_Rule object by its selector.
 		 * If the rule does not exist, it will be created.
 		 *
-		 * @param string $selector The CSS selector.
+		 * @param string|WP_Style_Engine_CSS_Rule $rule The CSS selector or a WP_Style_Engine_CSS_Rule object.
 		 *
 		 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 		 */
-		public function add_rule( $selector ) {
-			$selector = trim( $selector );
+		public function add_rule( $rule ) {
+			if ( empty( $rule ) ) {
+				return;
+			}
 
-			// Bail early if there is no selector.
+			if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+				$selector = $rule->get_selector();
+			} else {
+				$selector = trim( $rule );
+			}
+
 			if ( empty( $selector ) ) {
 				return;
 			}
 
 			// Create the rule if it doesn't exist.
 			if ( empty( $this->rules[ $selector ] ) ) {
-				$this->rules[ $selector ] = new WP_Style_Engine_CSS_Rule( $selector );
+				if ( ! empty( $selector ) ) {
+					$this->rules[ $selector ] = $rule instanceof WP_Style_Engine_CSS_Rule ? $rule : new WP_Style_Engine_CSS_Rule( $selector );
+				}
 			}
 
 			return $this->rules[ $selector ];

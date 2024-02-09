@@ -79,7 +79,7 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 				if ( ! empty( $container ) ) {
 					if ( isset( $this->css_containers[ $container ] ) ) {
-						$this->css_containers[ $container ]->add_rule( $rule );
+						$this->css_containers[ $container ]->add_rules( $rule );
 					} else {
 						$this->css_containers[ $container ] = new WP_Style_Engine_CSS_Rules_Container( $container, $rule );
 					}

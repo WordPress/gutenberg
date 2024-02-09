@@ -626,7 +626,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @return string A compiled CSS string.
 		 */
-		public static function compile_css( $css_declarations, $css_selector, $container = '' ) {
+		public static function compile_css( $css_declarations, $css_selector ) {
 			if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
 				return '';
 			}
@@ -634,12 +634,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
-				if ( $container ) {
-					$css_rule->set_container( $container );
-					$css_container = new WP_Style_Engine_CSS_Rules_Container( $container, $css_rule );
-					return $css_container->get_css();
-				}
-
 				return $css_rule->get_css();
 			}
 

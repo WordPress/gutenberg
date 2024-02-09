@@ -10,7 +10,7 @@
 if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 
 	/**
-	 * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
+	 * Holds, sanitizes, processes and prints CSS rules for the Style Engine.
 	 *
 	 * @access private
 	 */
@@ -23,7 +23,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		protected $selector;
 
 		/**
-		 * A CSS selector or CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @var string
 		 */
@@ -65,8 +65,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		/**
 		 * Sets the container.
 		 *
-		 * @param string $container The CSS container selector or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
-		 *
+		 * @param string $container A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
+		 *                          such as `@media (min-width: 80rem)` or `@layer module`.
 		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 		 */
 		public function set_container( $container ) {
@@ -154,4 +154,3 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		}
 	}
 }
-
