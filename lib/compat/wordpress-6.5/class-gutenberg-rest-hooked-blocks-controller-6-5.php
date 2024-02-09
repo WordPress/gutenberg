@@ -40,6 +40,7 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		$this->namespace      = 'wp/v2';
 		$this->rest_base      = 'hooked-blocks';
 		$this->block_registry = WP_Block_Type_Registry::get_instance();
+		$this->hooked_blocks  = get_hooked_blocks();
 	}
 
 	/**
@@ -147,32 +148,51 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		// We need to get all registered block types and loop over each of them for the filter.
 		// TODO: Look into whether we can optimize get_hooked_blocks() to return filtered results as well.
 		$block_types                        = WP_Block_Type_Registry::get_instance()->get_all_registered();
-		$hooked_block_types                 = get_hooked_blocks();
 		$hooked_block_types_by_anchor_block = array();
-		foreach ( array_column( $block_types, 'name' ) as $anchor_block_type ) {
-			foreach ( $this->position_types as $position ) {
-				$hooked_block_types_by_anchor_block_position = isset( $hooked_block_types[ $anchor_block_type ][ $position ] )
-					? $hooked_block_types[ $anchor_block_type ][ $position ]
-					: array();
 
-				$hooked_block_types_by_anchor_block[ $anchor_block_type ][ $position ] = apply_filters( 'hooked_block_types', $hooked_block_types_by_anchor_block_position, $position, $anchor_block_type, $context );
-			}
+		foreach ( array_column( $block_types, 'name' ) as $anchor_block_name ) {
+			$hooked_block_types_by_anchor_block[ $anchor_block_name ] = $this->get_hooked_blocks_by_anchor( $anchor_block_name, $context );
 		}
 
-		foreach ( $hooked_block_types_by_anchor_block as $anchor_block_type => $hooked_block_types_for_anchor_block ) {
+		foreach ( $hooked_block_types_by_anchor_block as $anchor_block_name => $hooked_block_types_for_anchor_block ) {
 			if ( $namespace ) {
-				list ( $block_namespace ) = explode( '/', $anchor_block_type );
+				list ( $block_namespace ) = explode( '/', $anchor_block_name );
 
 				if ( $namespace !== $block_namespace ) {
 					continue;
 				}
 			}
-			$data[ $anchor_block_type ] = $this->prepare_response_for_collection( $hooked_block_types_for_anchor_block );
+			$data[ $anchor_block_name ] = $this->prepare_response_for_collection( $hooked_block_types_for_anchor_block );
 		}
 
 		$data = $this->filter_empty_anchor_blocks( $data );
 
 		return rest_ensure_response( $data );
+	}
+
+	/**
+	 * Retrieves hooked blocks for a specific anchor block type.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $anchor_block_name Anchor block name.
+	 * @param WP_Block_Template|WP_Post|null $context Context object.
+	 * @return array Array of hooked blocks keyed by position.
+	 */
+	protected function get_hooked_blocks_by_anchor( $anchor_block_name, $context ) {
+		$hooked_block_types_for_anchor_block = isset( $this->hooked_blocks[ $anchor_block_name ] )
+		? $this->hooked_blocks[ $anchor_block_name ]
+		: array();
+
+		foreach ( $this->position_types as $position ) {
+			$positioned_hooked_block_types = isset( $hooked_block_types_for_anchor_block[ $position ] )
+				? $hooked_block_types_for_anchor_block[ $position ]
+				: array();
+
+			$hooked_block_types_for_anchor_block[ $position ] = apply_filters( 'hooked_block_types', $positioned_hooked_block_types, $position, $anchor_block_name, $context );
+		}
+
+		return $hooked_block_types_for_anchor_block;
 	}
 
 	/**
@@ -245,25 +265,12 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			$id = $request['id'];
 		}
 
-		$all_hooked_block_types              = get_hooked_blocks();
-		$hooked_block_types_for_anchor_block = isset( $all_hooked_block_types[ $block_name ] )
-			? $all_hooked_block_types[ $block_name ]
-			: array();
-
 		$context = $this->get_context( $entity, $id );
 		if ( is_wp_error( $context ) ) {
 			return $context;
 		}
 
-		foreach ( $this->position_types as $position ) {
-			// Making sure that we always pass an array to the filter.
-			$positioned_hooked_block_types = isset( $hooked_block_types_for_anchor_block[ $position ] )
-				? $hooked_block_types_for_anchor_block[ $position ]
-				: array();
-
-			$hooked_block_types_for_anchor_block[ $position ] = apply_filters( 'hooked_block_types', $positioned_hooked_block_types, $position, $block_name, $context );
-		}
-
+		$hooked_block_types_for_anchor_block          = $this->get_hooked_blocks_by_anchor( $block_name, $context );
 		$filtered_hooked_block_types_for_anchor_block = $this->filter_empty_anchor_blocks( array( $block_name => $hooked_block_types_for_anchor_block ) );
 		$filtered_hooked_block_types_for_anchor_block = isset( $filtered_hooked_block_types_for_anchor_block[ $block_name ] )
 			? $filtered_hooked_block_types_for_anchor_block[ $block_name ]
