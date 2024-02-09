@@ -687,11 +687,17 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests returning a generated stylesheet from a set of nested rules.
 	 */
-	public function test_should_return_stylesheet_from_nested_css_rules() {
+	public function test_should_return_stylesheet_with_combined_nested_css_rules_printed_after_non_nested() {
 		$css_rules = array(
 			array(
 				'selector'     => '.saruman',
-				'container'    => '@supports (align-self: stretch)',
+				'declarations' => array(
+					'letter-spacing' => '1px',
+				),
+			),
+			array(
+				'selector'     => '.saruman',
+				'container'    => '@container (min-width: 700px)',
 				'declarations' => array(
 					'color'        => 'white',
 					'height'       => '100px',
@@ -701,10 +707,24 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 			array(
 				'selector'     => '.saruman',
-				'container'    => '@supports (align-self: stretch)',
+				'container'    => '@container (min-width: 700px)',
 				'declarations' => array(
 					'color'        => 'black',
 					'font-family'  => 'The-Great-Eye',
+				),
+			),
+			array(
+				'selector'     => '.voldemort',
+				'container'    => '@supports (align-self: stretch)',
+				'declarations' => array(
+					'height'     => '100px',
+					'align-self' => 'stretch',
+				),
+			),
+			array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
+					'letter-spacing' => '2px',
 				),
 			),
 			array(
@@ -731,7 +751,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
-		$this->assertSame( '@supports (align-self: stretch){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}}@supports (border-style: dotted){.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}}', $compiled_stylesheet );
+		$this->assertSame( '.saruman{letter-spacing:1px;}.gandalf{letter-spacing:2px;}@container (min-width: 700px){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}}@supports (align-self: stretch){.voldemort{height:100px;align-self:stretch;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}}@supports (border-style: dotted){.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}}', $compiled_stylesheet );
 	}
 
 	/**

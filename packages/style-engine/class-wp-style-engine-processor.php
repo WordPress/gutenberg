@@ -31,6 +31,14 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 		protected $css_rules = array();
 
 		/**
+		 * The set of nested CSS rules that this processor will work on.
+		 *
+		 * @var WP_Style_Engine_CSS_Rules_Container[]
+		 */
+		protected $css_containers = array();
+
+
+		/**
 		 * Add a store to the processor.
 		 *
 		 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
@@ -69,20 +77,20 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 				$container = $rule->get_container();
 				$selector  = $rule->get_selector();
 
-				if ( ! empty( $selector ) && empty( $container ) ) {
-					if ( isset( $this->css_rules[ $selector ] ) ) {
-						$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
+				if ( ! empty( $container ) ) {
+					if ( isset( $this->css_containers[ $container ] ) ) {
+						$this->css_containers[ $container ]->add_rule( $rule );
 					} else {
-						$this->css_rules[ $rule->get_selector() ] = $rule;
+						$this->css_containers[ $container ] = new WP_Style_Engine_CSS_Rules_Container( $container, $rule );
 					}
 					continue;
 				}
 
-				if ( ! empty( $container ) ) {
-					if ( isset( $this->css_rules[ $container ] ) ) {
-						$this->css_rules[ $container ]->add_rule( $rule );
+				if ( ! empty( $selector ) ) {
+					if ( isset( $this->css_rules[ $selector ] ) ) {
+						$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
 					} else {
-						$this->css_rules[ $container ] = new WP_Style_Engine_CSS_Rules_Container( $container, $rule );
+						$this->css_rules[ $rule->get_selector() ] = $rule;
 					}
 				}
 			}
@@ -123,10 +131,14 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 			// Build the CSS.
 			$css = '';
-			foreach ( $this->css_rules as $rule ) {
+			// Merge the rules and containers. Containers come last.
+			$merged_rules = array_merge( $this->css_rules, $this->css_containers );
+
+			foreach ( $merged_rules as $rule ) {
 				$css .= $rule->get_css( $options['prettify'] );
 				$css .= $options['prettify'] ? "\n" : '';
 			}
+
 			return $css;
 		}
 
@@ -166,63 +178,5 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 				$this->css_rules[ $duplicate_selectors ] = new WP_Style_Engine_CSS_Rule( $duplicate_selectors, $declarations );
 			}
 		}
-	}
-}
-
-
-// @TODO new file and tests
-// Should have same/similar interface to WP_Style_Engine_CSS_Rule or maybe even part of it?
-class WP_Style_Engine_CSS_Rules_Container {
-	protected $container;
-	protected $rules = array();
-
-	public function __construct( $container = '', $rule ) {
-		$this->set_container( $container );
-		// @TODO should be able to add multiple rules.
-		// @TODO check for instance of WP_Style_Engine_CSS_Rule
-		$this->add_rule( $rule );
-	}
-
-	public function set_container( $container ) {
-		$this->container = $container;
-		return $this;
-	}
-
-	public function get_container() {
-		return $this->container;
-	}
-
-	public function get_rules() {
-		return $this->rules;
-	}
-
-	public function add_rule( $rule ) {
-		// @TODO should be able to add multiple rules.
-		// @TODO check for instance of WP_Style_Engine_CSS_Rule
-		$selector = $rule->get_selector();
-
-		if ( isset( $this->rules[ $selector ] ) ) {
-			$this->rules[ $selector ]->add_declarations( $rule->get_declarations() );
-		} else {
-			$this->rules[ $selector ] = $rule;
-		}
-		return $this;
-	}
-
-	public function get_css( $should_prettify = false, $indent_count = 0 ) {
-		$css                 = '';
-		$indent_count         = $should_prettify ? $indent_count + 1 : $indent_count;
-		$new_line            = $should_prettify ? "\n" : '';
-		$spacer              = $should_prettify ? ' ' : '';
-		foreach ( $this->rules as $rule ) {
-			$css .= $rule->get_css( $should_prettify, $indent_count );
-			$css .= $should_prettify ? "\n" : '';
-		}
-
-		if ( empty( $css ) ) {
-			return '';
-		}
-
-		return "{$this->container}{$spacer}{{$new_line}{$css}}";
 	}
 }
