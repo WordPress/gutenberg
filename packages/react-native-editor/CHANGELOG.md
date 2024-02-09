@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Update Image block progress indicator to use a spinner [#58759]
 
 ## 1.112.0
 -   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]
