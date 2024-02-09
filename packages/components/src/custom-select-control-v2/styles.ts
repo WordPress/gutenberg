@@ -8,9 +8,11 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import type { CustomSelectButtonProps } from './types';
+
+const ITEM_PADDING = space( 2 );
 
 export const WithHintWrapper = styled.div`
 	display: flex;
@@ -19,14 +21,14 @@ export const WithHintWrapper = styled.div`
 `;
 
 export const SelectedExperimentalHintItem = styled.span`
-	color: ${ COLORS.gray[ 600 ] };
-	margin-left: ${ space( 2 ) };
+	color: ${ COLORS.theme.gray[ 600 ] };
+	margin-inline-start: ${ space( 2 ) };
 `;
 
 export const ExperimentalHintItem = styled.span`
-	color: ${ COLORS.gray[ 600 ] };
+	color: ${ COLORS.theme.gray[ 600 ] };
 	text-align: right;
-	padding-right: ${ space( 1 ) };
+	margin-inline-end: ${ space( 1 ) };
 `;
 
 export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
@@ -53,18 +55,18 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 		const sizes = {
 			compact: {
 				[ heightProperty ]: 32,
-				paddingLeft: space( 2 ),
-				paddingRight: space( 2 ),
+				paddingInlineStart: space( 2 ),
+				paddingInlineEnd: space( 1 ),
 			},
 			default: {
 				[ heightProperty ]: 40,
-				paddingLeft: space( 4 ),
-				paddingRight: space( 4 ),
+				paddingInlineStart: space( 4 ),
+				paddingInlineEnd: space( 3 ),
 			},
 			small: {
 				[ heightProperty ]: 24,
-				paddingLeft: space( 2 ),
-				paddingRight: space( 2 ),
+				paddingInlineStart: space( 2 ),
+				paddingInlineEnd: space( 1 ),
 				fontSize: 11,
 			},
 		};
@@ -76,40 +78,43 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		background-color: ${ COLORS.white };
-		border: 1px solid ${ COLORS.gray[ 600 ] };
-		border-radius: ${ space( 0.5 ) };
+		background-color: ${ COLORS.theme.background };
+		border: 1px solid ${ COLORS.ui.border };
+		border-radius: 2px;
 		cursor: pointer;
+		font-size: ${ CONFIG.fontSize };
 		width: 100%;
 		&[data-focus-visible] {
 			outline-style: solid;
 		}
 		&[aria-expanded='true'] {
-			outline-style: 1.5px solid ${ COLORS.theme.accent };
+			outline: 1.5px solid ${ COLORS.theme.accent };
 		}
 		${ getSize() }
 	`;
 } );
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
-	border-radius: ${ space( 0.5 ) };
-	background: ${ COLORS.white };
-	border: 1px solid ${ COLORS.gray[ 900 ] };
+	border-radius: 2px;
+	background: ${ COLORS.theme.background };
+	border: 1px solid ${ COLORS.theme.foreground };
 `;
 
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: ${ space( 2 ) };
-	line-height: 2.15rem;
+	padding: ${ ITEM_PADDING };
+	font-size: ${ CONFIG.fontSize };
+	line-height: 2.15rem; // TODO: Remove this in default but keep for back-compat in legacy
 	&[data-active-item] {
-		background-color: ${ COLORS.gray[ 300 ] };
+		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}
 `;
 
 export const SelectedItemCheckmark = styled( Ariakit.SelectItemCheck )`
 	display: flex;
 	align-items: center;
-	justify-content: end;
+	margin-inline-start: ${ ITEM_PADDING };
+	font-size: 24px; // Size of checkmark icon
 `;

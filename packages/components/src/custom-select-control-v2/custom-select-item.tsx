@@ -22,9 +22,7 @@ export function CustomSelectItem( {
 			{ ...props }
 		>
 			{ children ?? props.value }
-			<Styled.SelectedItemCheckmark
-				style={ { width: '30px', height: '30px' } }
-			>
+			<Styled.SelectedItemCheckmark>
 				<Icon icon={ check } />
 			</Styled.SelectedItemCheckmark>
 		</Styled.CustomSelectItem>
