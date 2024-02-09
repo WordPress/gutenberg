@@ -27,16 +27,15 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const editTemplate = useSelect( ( select ) => {
+	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
 		const { getEditorSettings, getCurrentTemplateId } =
 			select( editorStore );
-		const { getPostLinkProps } = getEditorSettings();
-		return getPostLinkProps
-			? getPostLinkProps( {
-					postId: getCurrentTemplateId(),
-					postType: 'wp_template',
-			  } )
-			: {};
+
+		return {
+			onNavigateToEntityRecord:
+				getEditorSettings().onNavigateToEntityRecord,
+			templateId: getCurrentTemplateId(),
+		};
 	}, [] );
 
 	const { getNotices } = useSelect( noticesStore );
@@ -68,7 +67,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => editTemplate.onClick(),
+							onClick: () =>
+								onNavigateToEntityRecord( {
+									postId: templateId,
+									postType: 'wp_template',
+								} ),
 						},
 					],
 				}
@@ -93,7 +96,15 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, contentRef.current ] );
+	}, [
+		lastNoticeId,
+		contentRef,
+		getNotices,
+		createInfoNotice,
+		onNavigateToEntityRecord,
+		templateId,
+		removeNotice,
+	] );
 
 	return (
 		<ConfirmDialog
@@ -101,7 +112,10 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				editTemplate.onClick();
+				onNavigateToEntityRecord( {
+					postId: templateId,
+					postType: 'wp_template',
+				} );
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

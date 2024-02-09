@@ -31,6 +31,8 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 
 	const faceStyles = getFacePreviewStyle( fontFace );
 	const textDemoStyle = {
+		fontSize: '18px',
+		lineHeight: 1,
 		opacity: isAssetLoaded ? '1' : '0',
 		...faceStyles,
 		...style,

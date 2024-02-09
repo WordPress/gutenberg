@@ -3,12 +3,15 @@
  */
 import {
 	store,
-	directive,
 	useInit,
 	useWatch,
-	cloneElement,
 	getElement,
+	privateApis
 } from '@wordpress/interactivity';
+
+const { directive, cloneElement } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 // Custom directive to show hide the content elements in which it is placed.
 directive(

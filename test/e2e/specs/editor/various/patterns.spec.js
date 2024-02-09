@@ -203,7 +203,9 @@ test.describe( 'Synced pattern', () => {
 		await editor.showBlockToolbar();
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'link', { name: 'Edit original' } )
+			.getByRole( 'button', {
+				name: 'Edit original',
+			} )
 			.click();
 
 		const editorTopBar = page.getByRole( 'region', {
@@ -276,7 +278,9 @@ test.describe( 'Synced pattern', () => {
 		);
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'link', { name: 'Edit original' } )
+			.getByRole( 'button', {
+				name: 'Edit original',
+			} )
 			.click();
 
 		const editorTopBar = page.getByRole( 'region', {
@@ -551,7 +555,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.showBlockToolbar();
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'link', { name: 'Edit original' } )
+			.getByRole( 'button', { name: 'Edit original' } )
 			.click();
 
 		await editor.canvas

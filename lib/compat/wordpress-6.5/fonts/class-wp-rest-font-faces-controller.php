@@ -13,6 +13,15 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 	 * Class to access font faces through the REST API.
 	 */
 	class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
+
+		/**
+		 * The latest version of theme.json schema supported by the controller.
+		 *
+		 * @since 6.5.0
+		 * @var int
+		 */
+		const LATEST_THEME_JSON_VERSION_SUPPORTED = 2;
+
 		/**
 		 * Whether the controller supports batching.
 		 *
@@ -233,9 +242,8 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string          $value   Encoded JSON string of font face settings.
-		 * @param WP_REST_Request $request Request object.
-		 * @return array                   Decoded array of font face settings.
+		 * @param string $value Encoded JSON string of font face settings.
+		 * @return array Decoded and sanitized array of font face settings.
 		 */
 		public function sanitize_font_face_settings( $value ) {
 			// Settings arrive as stringified JSON, since this is a multipart/form-data request.
@@ -328,7 +336,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					'update_post_term_cache' => false,
 				)
 			);
-			if ( ! empty( $query->get_posts() ) ) {
+			if ( ! empty( $query->posts ) ) {
 				return new WP_Error(
 					'rest_duplicate_font_face',
 					__( 'A font face matching those settings already exists.', 'gutenberg' ),
@@ -418,7 +426,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				return new WP_Error(
 					'rest_trash_not_supported',
 					/* translators: %s: force=true */
-					sprintf( __( "Font faces do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
+					sprintf( __( 'Font faces do not support trashing. Set "%s" to delete.', 'gutenberg' ), 'force=true' ),
 					array( 'status' => 501 )
 				);
 			}
@@ -443,7 +451,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				$data['id'] = $item->ID;
 			}
 			if ( rest_is_field_included( 'theme_json_version', $fields ) ) {
-				$data['theme_json_version'] = 2;
+				$data['theme_json_version'] = static::LATEST_THEME_JSON_VERSION_SUPPORTED;
 			}
 
 			if ( rest_is_field_included( 'parent', $fields ) ) {
@@ -504,9 +512,9 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					'theme_json_version' => array(
 						'description' => __( 'Version of the theme.json schema used for the typography settings.', 'gutenberg' ),
 						'type'        => 'integer',
-						'default'     => 2,
+						'default'     => static::LATEST_THEME_JSON_VERSION_SUPPORTED,
 						'minimum'     => 2,
-						'maximum'     => 2,
+						'maximum'     => static::LATEST_THEME_JSON_VERSION_SUPPORTED,
 						'context'     => array( 'view', 'edit', 'embed' ),
 					),
 					'parent'             => array(
@@ -699,14 +707,16 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$query_params = parent::get_collection_params();
 
 			// Remove unneeded params.
-			unset( $query_params['after'] );
-			unset( $query_params['modified_after'] );
-			unset( $query_params['before'] );
-			unset( $query_params['modified_before'] );
-			unset( $query_params['search'] );
-			unset( $query_params['search_columns'] );
-			unset( $query_params['slug'] );
-			unset( $query_params['status'] );
+			unset(
+				$query_params['after'],
+				$query_params['modified_after'],
+				$query_params['before'],
+				$query_params['modified_before'],
+				$query_params['search'],
+				$query_params['search_columns'],
+				$query_params['slug'],
+				$query_params['status']
+			);
 
 			$query_params['orderby']['default'] = 'id';
 			$query_params['orderby']['enum']    = array( 'id', 'include' );
@@ -803,7 +813,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param WP_REST_Request $request Request object.
-		 * @return stdClass|WP_Error Post object or WP_Error.
+		 * @return stdClass Post object.
 		 */
 		protected function prepare_item_for_database( $request ) {
 			$prepared_post = new stdClass();
@@ -831,7 +841,6 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $value Font face src that is a URL or the key for a $_FILES array item.
-		 *
 		 * @return string Sanitized value.
 		 */
 		protected function sanitize_src( $value ) {
@@ -845,7 +854,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param array $file Single file item from $_FILES.
-		 * @return array Array containing uploaded file attributes on success, or error on failure.
+		 * @return array|WP_Error Array containing uploaded file attributes on success, or WP_Error object on failure.
 		 */
 		protected function handle_font_file_upload( $file ) {
 			add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );

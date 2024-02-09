@@ -47,7 +47,7 @@ jobs:
               run: npm run native test:e2e:setup
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@3b1b3b9a2104c2b47fbae53f3938079c00c9bb87 # v3.0.0
+              uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
 
             - name: AVD cache
               uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
@@ -81,13 +81,13 @@ jobs:
                   profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+            - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+            - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: appium-logs
