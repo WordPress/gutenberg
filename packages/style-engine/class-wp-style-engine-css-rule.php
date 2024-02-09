@@ -33,15 +33,26 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		protected $declarations;
 
 		/**
+		 * The CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 *
+		 * @var string
+		 */
+		protected $at_rule;
+
+
+		/**
 		 * Constructor
 		 *
 		 * @param string                                    $selector     The CSS selector.
 		 * @param string[]|WP_Style_Engine_CSS_Declarations $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
 		 *                                                                or a WP_Style_Engine_CSS_Declarations object.
+		 * @param string                                    $at_rule      A CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 *
 		 */
-		public function __construct( $selector = '', $declarations = array() ) {
+		public function __construct( $selector = '', $declarations = array(), $at_rule = '' ) {
 			$this->set_selector( $selector );
 			$this->add_declarations( $declarations );
+			$this->set_at_rule( $at_rule );
 		}
 
 		/**
@@ -81,6 +92,18 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		}
 
 		/**
+		 * Sets the at_rule.
+		 *
+		 * @param string $at_rule A CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 *
+		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
+		 */
+		public function set_at_rule( $at_rule ) {
+			$this->at_rule = $at_rule;
+			return $this;
+		}
+
+		/**
 		 * Gets the declarations object.
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations The declarations object.
@@ -99,6 +122,15 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		}
 
 		/**
+		 * Gets the at_rule.
+		 *
+		 * @return string
+		 */
+		public function get_at_rule() {
+			return $this->at_rule;
+		}
+
+		/**
 		 * Gets the CSS.
 		 *
 		 * @param bool   $should_prettify Whether to add spacing, new lines and indents.
@@ -107,17 +139,26 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		 * @return string
 		 */
 		public function get_css( $should_prettify = false, $indent_count = 0 ) {
-			$rule_indent         = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
-			$declarations_indent = $should_prettify ? $indent_count + 1 : 0;
-			$suffix              = $should_prettify ? "\n" : '';
-			$spacer              = $should_prettify ? ' ' : '';
+			$rule_indent                = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
+			$nested_rule_indent         = $should_prettify ? str_repeat( "\t", $indent_count + 1 ) : '';
+			$declarations_indent        = $should_prettify ? $indent_count + 1 : 0;
+			$nested_declarations_indent = $should_prettify ? $indent_count + 2 : 0;
+			$suffix                     = $should_prettify ? "\n" : '';
+			$spacer                     = $should_prettify ? ' ' : '';
 			// Trims any multiple selectors strings.
-			$selector         = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
-			$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
-			$css_declarations = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
+			$selector                = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
+			$selector                = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
+			$css_declarations        = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
+			$nested_css_declarations = $this->declarations->get_declarations_string( $should_prettify, $nested_declarations_indent );
+			$at_rule                 = $this->get_at_rule();
 
 			if ( empty( $css_declarations ) ) {
 				return '';
+			}
+
+			if ( ! empty( $at_rule ) ) {
+				$selector = "{$rule_indent}{$at_rule}{$spacer}{{$suffix}{$nested_rule_indent}{$selector}{$spacer}{{$suffix}{$nested_css_declarations}{$suffix}{$nested_rule_indent}}{$suffix}{$rule_indent}}";
+				return $selector;
 			}
 
 			return "{$rule_indent}{$selector}{$spacer}{{$suffix}{$css_declarations}{$suffix}{$rule_indent}}";
