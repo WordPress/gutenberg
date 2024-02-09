@@ -222,6 +222,7 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
 		$entity     = '';
+		$id         = null;
 		if ( isset( $registered['entity'] ) && ! empty( $request['entity'] ) ) {
 			$entity = $request['entity'];
 		}
