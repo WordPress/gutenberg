@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.2.0 (2024-02-09)
+
 ### New Features
 
 -   Add experimental support for `viewScriptModule` field in block.json for `build` and `start` scripts ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
