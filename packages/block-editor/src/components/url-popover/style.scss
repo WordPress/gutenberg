@@ -4,13 +4,11 @@
 }
 
 .block-editor-url-popover__input-container {
-	padding: $grid-unit-20;
-	padding-right: $grid-unit-10;
+	padding: $grid-unit-10;
 }
 
 .block-editor-url-popover__row {
 	display: flex;
-	align-items: center;
 	gap: $grid-unit-05;
 }
 
@@ -43,6 +41,7 @@
 .block-editor-url-popover__settings {
 	display: block;
 	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-900;
 }
 
 .block-editor-url-popover__link-editor,

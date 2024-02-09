@@ -281,7 +281,6 @@ If passed, children are rendered after the input.
 			label={ __( 'Submit' ) }
 			icon={ keyboardReturn }
 			className="block-editor-link-control__search-submit"
-			size="compact"
 		/>
 	</HStack>
 </LinkControlSearchInput>

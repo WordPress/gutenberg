@@ -1,4 +1,5 @@
 // Link input
+$input-padding: $grid-unit $grid-unit $grid-unit $grid-unit-15;
 $input-size: 300px;
 
 .block-editor-block-list__block .block-editor-url-input,
@@ -13,10 +14,9 @@ $input-size: 300px;
 		@include break-small() {
 			width: $input-size;
 		}
-		padding: $grid-unit-10;
-		padding-left: $grid-unit-15;
-		margin: 0;
-		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
+		padding: $input-padding;
+		margin-left: 0;
+		margin-right: 0;
 
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: $mobile-text-min-font-size;
