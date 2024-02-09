@@ -11,6 +11,7 @@ import {
 	getScope,
 	setScope,
 	resetScope,
+	getNamespace,
 	setNamespace,
 	resetNamespace,
 } from './hooks';
@@ -171,7 +172,7 @@ const handlers = {
  * @return Defined config for the given namespace.
  */
 export const getConfig = ( namespace: string ) =>
-	storeConfigs.get( namespace ) || {};
+	storeConfigs.get( namespace || getNamespace() ) || {};
 
 interface StoreOptions {
 	/**
