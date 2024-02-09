@@ -143,8 +143,8 @@ describe( 'formatFontFamily', () => {
 		);
 	} );
 
-	it( 'should wrap single font name with spaces in quotes', () => {
-		expect( formatFontFamily( 'Baloo 2' ) ).toBe( '"Baloo 2"' );
+	it( 'should not add quotes to single font name with spaces', () => {
+		expect( formatFontFamily( 'Baloo 2' ) ).toBe( 'Baloo 2' );
 	} );
 
 	it( 'should wrap multiple font names with spaces in quotes', () => {
