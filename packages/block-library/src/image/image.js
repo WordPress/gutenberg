@@ -427,7 +427,7 @@ export default function Image( {
 				lockUrlControls:
 					!! urlBinding &&
 					getBlockBindingsSource( urlBinding?.source )
-						?.lockAttributesEditing !== false,
+						?.lockAttributesEditing,
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
@@ -435,11 +435,11 @@ export default function Image( {
 				lockAltControls:
 					!! altBinding &&
 					getBlockBindingsSource( altBinding?.source )
-						?.lockAttributesEditing !== false,
+						?.lockAttributesEditing,
 				lockTitleControls:
 					!! titleBinding &&
 					getBlockBindingsSource( titleBinding?.source )
-						?.lockAttributesEditing !== false,
+						?.lockAttributesEditing,
 			};
 		},
 		[ clientId, isSingleSelected, metadata?.bindings ]
