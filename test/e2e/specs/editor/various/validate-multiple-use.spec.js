@@ -9,11 +9,11 @@ test.describe( 'Validate multiple use', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should display correct amount of warning message', async ( {
+	test( 'should display correct number of warning messages', async ( {
 		editor,
 		pageUtils,
 	} ) => {
-		// Insert a block with `multiple` feature enabled, such as `core/more`
+		// Insert a block with the `multiple` feature enabled, such as `core/more`
 		await editor.insertBlock( {
 			name: 'core/more',
 		} );
@@ -26,7 +26,7 @@ test.describe( 'Validate multiple use', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await editor.clickBlockOptionsMenuItem( 'Duplicate' );
 
-		// Check if warnings is visible
+		// Check if warning is visible
 		await expect(
 			editor.canvas.getByRole( 'button', {
 				name: 'Find original',
