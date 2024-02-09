@@ -71,7 +71,7 @@ const UnconnectedCustomSelectButton = (
 	);
 
 	return (
-		<Styled.CustomSelectButton
+		<Styled.Select
 			{ ...restProps }
 			size={ size }
 			hasCustomRenderProp={ !! renderSelectedValue }
@@ -82,7 +82,7 @@ const UnconnectedCustomSelectButton = (
 		>
 			<div>{ computedRenderSelectedValue( currentValue ) }</div>
 			<Icon icon={ chevronDown } size={ 18 } />
-		</Styled.CustomSelectButton>
+		</Styled.Select>
 	);
 };
 
@@ -105,16 +105,16 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
-				<Styled.CustomSelectLabel store={ store }>
+				<Styled.SelectLabel store={ store }>
 					{ label }
-				</Styled.CustomSelectLabel>
+				</Styled.SelectLabel>
 			) }
 			<CustomSelectButton { ...restProps } store={ store } />
-			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
+			<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
 				</CustomSelectContext.Provider>
-			</Styled.CustomSelectPopover>
+			</Styled.SelectPopover>
 		</>
 	);
 }

@@ -31,7 +31,7 @@ export const ExperimentalHintItem = styled.span`
 	margin-inline-end: ${ space( 1 ) };
 `;
 
-export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
+export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;
@@ -39,7 +39,7 @@ export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	margin-bottom: ${ space( 2 ) };
 `;
 
-export const CustomSelectButton = styled( Ariakit.Select, {
+export const Select = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
 } )( ( {
@@ -94,13 +94,13 @@ export const CustomSelectButton = styled( Ariakit.Select, {
 	`;
 } );
 
-export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
+export const SelectPopover = styled( Ariakit.SelectPopover )`
 	border-radius: 2px;
 	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
 `;
 
-export const CustomSelectItem = styled( Ariakit.SelectItem )`
+export const SelectItem = styled( Ariakit.SelectItem )`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -112,7 +112,7 @@ export const CustomSelectItem = styled( Ariakit.SelectItem )`
 	}
 `;
 
-export const SelectedItemCheckmark = styled( Ariakit.SelectItemCheck )`
+export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	display: flex;
 	align-items: center;
 	margin-inline-start: ${ ITEM_PADDING };

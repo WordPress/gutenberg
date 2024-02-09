@@ -17,15 +17,12 @@ export function CustomSelectItem( {
 }: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
-		<Styled.CustomSelectItem
-			store={ customSelectContext?.store }
-			{ ...props }
-		>
+		<Styled.SelectItem store={ customSelectContext?.store } { ...props }>
 			{ children ?? props.value }
-			<Styled.SelectedItemCheckmark>
+			<Styled.SelectedItemCheck>
 				<Icon icon={ check } />
-			</Styled.SelectedItemCheckmark>
-		</Styled.CustomSelectItem>
+			</Styled.SelectedItemCheck>
+		</Styled.SelectItem>
 	);
 }
 
