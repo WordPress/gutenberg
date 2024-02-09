@@ -110,24 +110,15 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		 * If the rule does not exist, it will be created.
 		 *
 		 * @param string $selector The CSS selector.
-		 * @param string $at_rule  The CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 		 */
-		public function add_rule( $selector, $at_rule = '' ) {
+		public function add_rule( $selector ) {
 			$selector = trim( $selector );
-			$at_rule  = trim( $at_rule );
 
 			// Bail early if there is no selector.
 			if ( empty( $selector ) ) {
 				return;
-			}
-
-			if ( ! empty( $at_rule ) ) {
-				if ( empty( $this->rules[ "$at_rule $selector" ] ) ) {
-					$this->rules[ "$at_rule $selector" ] = new WP_Style_Engine_CSS_Rule( $selector, array(), $at_rule );
-				}
-				return $this->rules[ "$at_rule $selector" ];
 			}
 
 			// Create the rule if it doesn't exist.

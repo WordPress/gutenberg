@@ -66,29 +66,13 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 			foreach ( $css_rules as $rule ) {
 				$selector = $rule->get_selector();
-				$at_rule  = $rule->get_at_rule();
-
-				/**
-				 * If there is an at_rule and it already exists in the css_rules array,
-				 * add the rule to it.
-				 * Otherwise, create a new entry for the at_rule
-				 */
-				if ( ! empty( $at_rule ) ) {
-					if ( isset( $this->css_rules[ "$at_rule $selector" ] ) ) {
-						$this->css_rules[ "$at_rule $selector" ]->add_declarations( $rule->get_declarations() );
-						continue;
-					}
-					$this->css_rules[ "$at_rule $selector" ] = $rule;
-					continue;
-				}
-
-				// If the selector already exists, add the declarations to it.
 				if ( isset( $this->css_rules[ $selector ] ) ) {
 					$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
 					continue;
 				}
 				$this->css_rules[ $rule->get_selector() ] = $rule;
 			}
+
 			return $this;
 		}
 
@@ -126,7 +110,6 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			// Build the CSS.
 			$css = '';
 			foreach ( $this->css_rules as $rule ) {
-				// See class WP_Style_Engine_CSS_Rule for the get_css method.
 				$css .= $rule->get_css( $options['prettify'] );
 				$css .= $options['prettify'] ? "\n" : '';
 			}
