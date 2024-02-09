@@ -397,11 +397,11 @@ function FontLibraryProvider( { children } ) {
 		fontsToAdd.forEach( ( font ) => {
 			if ( font.fontFace ) {
 				font.fontFace.forEach( ( face ) => {
-					// Load font faces just in the iframe because they already are in the document.
+					// Load font face in the browser.
 					loadFontFaceInBrowser(
 						face,
 						getDisplaySrcFromFontFace( face.src ),
-						'iframe'
+						'all'
 					);
 				} );
 			}
