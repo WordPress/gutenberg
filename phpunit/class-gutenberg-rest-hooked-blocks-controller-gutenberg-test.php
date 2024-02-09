@@ -31,12 +31,6 @@ class Gutenberg_REST_Hooked_Blocks_Controller_Test extends WP_Test_REST_Controll
 	 */
 	protected static $subscriber_id;
 
-	protected static $anchor_block_name = 'fake/anchor-block';
-	protected static $hooked_block_name = 'fake/hooked-block';
-
-	protected static $other_anchor_block_name = 'fake/other-anchor-block';
-	protected static $other_hooked_block_name = 'fake/other-hooked-block';
-
 	/**
 	 * Create fake data before our tests run.
 	 *
@@ -66,8 +60,8 @@ class Gutenberg_REST_Hooked_Blocks_Controller_Test extends WP_Test_REST_Controll
 			)
 		);
 
-		register_block_type( self::$anchor_block_name, $anchor_block_settings );
-		register_block_type( self::$hooked_block_name, $hooked_block_settings );
+		register_block_type( 'fake/anchor-block', $anchor_block_settings );
+		register_block_type( 'fake/hooked-block', $hooked_block_settings );
 
 		$other_hooked_block_settings = array(
 			'block_hooks' => array(
@@ -75,17 +69,17 @@ class Gutenberg_REST_Hooked_Blocks_Controller_Test extends WP_Test_REST_Controll
 			)
 		);
 
-		register_block_type( self::$other_anchor_block_name, array() );
-		register_block_type( self::$other_hooked_block_name, $other_hooked_block_settings );
+		register_block_type( 'fake/other-anchor-block', array() );
+		register_block_type( 'fake/other-hooked-block', $other_hooked_block_settings );
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$subscriber_id );
-		unregister_block_type( self::$anchor_block_name );
-		unregister_block_type( self::$hooked_block_name );
-		unregister_block_type( self::$other_anchor_block_name );
-		unregister_block_type( self::$other_hooked_block_name );
+		unregister_block_type( 'fake/anchor-block' );
+		unregister_block_type( 'fake/hooked-block' );
+		unregister_block_type( 'fake/other-anchor-block' );
+		unregister_block_type( 'fake/other-hooked-block' );
 	}
 
 	public function test_register_routes() {
@@ -121,28 +115,28 @@ class Gutenberg_REST_Hooked_Blocks_Controller_Test extends WP_Test_REST_Controll
 		$data     = $response->get_data();
 		$this->assertCount( 2, $data );
 		$this->assertSame( $data, array(
-			self::$anchor_block_name => array(
-				'after' => array( self::$hooked_block_name )
+			'fake/anchor-block' => array(
+				'after' => array( 'fake/hooked-block' )
 			),
-			self::$other_anchor_block_name => array(
-				'first_child' => array( self::$other_hooked_block_name )
+			'fake/other-anchor-block' => array(
+				'first_child' => array( 'fake/other-hooked-block' )
 			),
 		) );
 	}
 
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/hooked-blocks/' . self::$anchor_block_name );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/hooked-blocks/fake/anchor-block' );
 		$response = rest_get_server()->dispatch( $request );
 		$data	  = $response->get_data();
 		$this->assertSame( $data, array(
-			'after' => array( self::$hooked_block_name )
+			'after' => array( 'fake/hooked-block' )
 		) );
 	}
 
 	public function test_get_item_with_no_hooked_blocks() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/hooked-blocks/' . self::$hooked_block_name );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/hooked-blocks/fake/hooked-block' );
 		$response = rest_get_server()->dispatch( $request );
 		$data	  = $response->get_data();
 		$this->assertSame( $data, array() );
@@ -150,7 +144,7 @@ class Gutenberg_REST_Hooked_Blocks_Controller_Test extends WP_Test_REST_Controll
 
 	public function test_get_item_with_hooked_block_added_by_filter() {
 		$add_hooked_block = function( $hooked_block_types, $relative_position, $anchor_block_type ) {
-			if ( 'last_child' === $relative_position && self::$anchor_block_name === $anchor_block_type ) {
+			if ( 'last_child' === $relative_position && 'fake/anchor-block' === $anchor_block_type ) {
 				$hooked_block_types[] = 'fake/hooked-block-added-by-filter';
 			}
 			return $hooked_block_types;
@@ -158,13 +152,13 @@ class Gutenberg_REST_Hooked_Blocks_Controller_Test extends WP_Test_REST_Controll
 		add_filter( 'hooked_block_types', $add_hooked_block, 10, 3 );
 
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/hooked-blocks/' . self::$anchor_block_name );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/hooked-blocks/fake/anchor-block' );
 		$response = rest_get_server()->dispatch( $request );
 		$data	  = $response->get_data();
 
 		remove_filter( 'hooked_block_types', $add_hooked_block, 10 );
 		$this->assertSame( $data, array(
-			'after'      => array( self::$hooked_block_name ),
+			'after'      => array( 'fake/hooked-block' ),
 			'last_child' => array( 'fake/hooked-block-added-by-filter' )
 		) );
 	}
