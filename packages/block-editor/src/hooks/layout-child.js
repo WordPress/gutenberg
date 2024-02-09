@@ -20,18 +20,6 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
 
-	// Calculate container query if needed.
-	const columnSpanNumber = parseInt( columnSpan );
-	const parentColumnValue = parseFloat( parentColumnWidth );
-	const parentColumnUnit = parentColumnWidth?.replace(
-		parentColumnValue,
-		''
-	);
-	const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
-	const containerQueryValue =
-		columnSpanNumber * parentColumnValue +
-		( columnSpanNumber - 1 ) * defaultGapValue;
-
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
 		if ( selfStretch === 'fixed' && flexSize ) {
@@ -53,6 +41,34 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		 * so a container query is needed for the span to resize.
 		 */
 		if ( columnSpan && parentColumnWidth ) {
+			// Calculate the container query value.
+			const columnSpanNumber = parseInt( columnSpan );
+			let parentColumnValue = parseFloat( parentColumnWidth );
+			/**
+			 * 12rem is the default minimumColumnWidth value.
+			 * If parentColumnValue is not a number, default to 12.
+			 */
+			if ( isNaN( parentColumnValue ) ) {
+				parentColumnValue = 12;
+			}
+
+			let parentColumnUnit = parentColumnWidth?.replace(
+				parentColumnValue,
+				''
+			);
+			/**
+			 * Check that parent column unit is either 'px', 'rem' or 'em'.
+			 * If not, default to 'rem'.
+			 */
+			if ( ! [ 'px', 'rem', 'em' ].includes( parentColumnUnit ) ) {
+				parentColumnUnit = 'rem';
+			}
+
+			const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
+			const containerQueryValue =
+				columnSpanNumber * parentColumnValue +
+				( columnSpanNumber - 1 ) * defaultGapValue;
+
 			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: 1 / -1;
