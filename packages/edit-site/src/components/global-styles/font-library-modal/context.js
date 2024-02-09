@@ -263,28 +263,29 @@ function FontLibraryProvider( { children } ) {
 			}
 
 			// Install the fonts (upload the font files to the server and create the post in the database).
-			let sucessfullyInstalledFontFaces = [];
-			let unsucessfullyInstalledFontFaces = [];
+			let successfullyInstalledFontFaces = [];
+			let unsuccessfullyInstalledFontFaces = [];
 			if ( fontFamilyToInstall?.fontFace?.length > 0 ) {
 				const response = await batchInstallFontFaces(
 					installedFontFamily.id,
 					makeFontFacesFormData( fontFamilyToInstall )
 				);
-				sucessfullyInstalledFontFaces = response?.successes;
-				unsucessfullyInstalledFontFaces = response?.errors;
+				successfullyInstalledFontFaces = response?.successes;
+				unsuccessfullyInstalledFontFaces = response?.errors;
 			}
 
-			const detailedErrorMessage = unsucessfullyInstalledFontFaces.reduce(
-				( errorMessageCollection, error ) => {
-					return `${ errorMessageCollection } ${ error.message }`;
-				},
-				''
-			);
+			const detailedErrorMessage =
+				unsuccessfullyInstalledFontFaces.reduce(
+					( errorMessageCollection, error ) => {
+						return `${ errorMessageCollection } ${ error.message }`;
+					},
+					''
+				);
 
 			// If there were no successes and nothing already installed then we don't need to activate anything and can bounce now.
 			if (
 				fontFamilyToInstall?.fontFace?.length > 0 &&
-				sucessfullyInstalledFontFaces.length === 0 &&
+				successfullyInstalledFontFaces.length === 0 &&
 				alreadyInstalledFontFaces.length === 0
 			) {
 				throw new Error(
@@ -296,14 +297,14 @@ function FontLibraryProvider( { children } ) {
 				);
 			}
 
-			// Use the sucessfully installed font faces
+			// Use the successfully installed font faces
 			// As well as any font faces that were already installed (those will be activated)
 			if (
-				sucessfullyInstalledFontFaces?.length > 0 ||
+				successfullyInstalledFontFaces?.length > 0 ||
 				alreadyInstalledFontFaces?.length > 0
 			) {
 				fontFamilyToInstall.fontFace = [
-					...sucessfullyInstalledFontFaces,
+					...successfullyInstalledFontFaces,
 					...alreadyInstalledFontFaces,
 				];
 			}
@@ -318,7 +319,7 @@ function FontLibraryProvider( { children } ) {
 
 			refreshLibrary();
 
-			if ( unsucessfullyInstalledFontFaces.length > 0 ) {
+			if ( unsuccessfullyInstalledFontFaces.length > 0 ) {
 				throw new Error(
 					sprintf(
 						/* translators: %s: Specific error message returned from server. */
