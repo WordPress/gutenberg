@@ -4,7 +4,7 @@
  *
  * @package WordPress
  * @subpackage REST_API
- * @since X.X.X
+ * @since 6.6.0
  */
 
 if ( class_exists( 'WP_REST_Media_Search_Handler' ) ) {
@@ -14,7 +14,7 @@ if ( class_exists( 'WP_REST_Media_Search_Handler' ) ) {
 /**
  * Core class representing a search handler for attachments in the REST API.
  *
- * @since X.X.X
+ * @since 6.6.0
  *
  * @see WP_REST_Search_Handler
  */
@@ -23,7 +23,7 @@ class WP_REST_Media_Search_Handler_Gutenberg extends WP_REST_Post_Search_Handler
 	/**
 	 * Constructor.
 	 *
-	 * @since X.X.X
+	 * @since 6.6.0
 	 */
 	public function __construct() {
 		parent::__construct();
@@ -34,7 +34,7 @@ class WP_REST_Media_Search_Handler_Gutenberg extends WP_REST_Post_Search_Handler
 	/**
 	 * Searches the object type content for a given search request.
 	 *
-	 * @since X.X.X
+	 * @since 6.6.0
 	 *
 	 * @param WP_REST_Request $request Full REST request.
 	 * @return array Associative array containing an `WP_REST_Search_Handler::RESULT_IDS` containing
@@ -70,7 +70,7 @@ class WP_REST_Media_Search_Handler_Gutenberg extends WP_REST_Post_Search_Handler
 		 *
 		 * Enables adding extra arguments or setting defaults for a media search request.
 		 *
-		 * @since X.X.X
+		 * @since 6.6.0
 		 *
 		 * @param array           $query_args Key value array of query var to query value.
 		 * @param WP_REST_Request $request    The request used.
@@ -92,7 +92,7 @@ class WP_REST_Media_Search_Handler_Gutenberg extends WP_REST_Post_Search_Handler
 	/**
 	 * Prepares the search result for a given ID.
 	 *
-	 * @since X.X.X
+	 * @since 6.6.0
 	 *
 	 * @param int   $id     Item ID.
 	 * @param array $fields Fields to include for the item.
