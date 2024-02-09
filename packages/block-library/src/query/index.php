@@ -26,7 +26,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 	if ( $is_interactive ) {
 		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-			$module_url = gutenberg_url( "/build/interactivity/query{$suffix}.js" );
+			$module_url = gutenberg_url( '/build/interactivity/query.min.js' );
 		}
 
 		wp_register_script_module(
@@ -137,11 +137,8 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				}
 
 				if ( isset( $dirty_enhanced_queries[ $block['attrs']['queryId'] ] ) ) {
-					$p = new WP_HTML_Tag_Processor( $content );
-					if ( $p->next_tag() ) {
-						$p->set_attribute( 'data-wp-navigation-disabled', 'true' );
-					}
-					$content = $p->get_updated_html();
+					// Disable navigation in the router store config.
+					wp_interactivity_config( 'core/router', array( 'clientNavigationDisabled' => true ) );
 					$dirty_enhanced_queries[ $block['attrs']['queryId'] ] = null;
 				}
 

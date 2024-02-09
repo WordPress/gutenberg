@@ -527,13 +527,13 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
-### View script
+### View script module
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
--   Property: `viewScript`
--   Since: `WordPress 5.9.0`
+-   Property: `viewScriptModule`
+-   Since: `WordPress 6.5.0`
 
 ```json
 { "viewScriptModule": [ "file:./view.js", "example-shared-script-module-id" ] }

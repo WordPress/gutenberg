@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 5.0.0 (2024-02-09)
+
+### New Features
+
+-   Export `getConfig()` to retrieve the server-defined configuration for the passed namespace. ([58749](https://github.com/WordPress/gutenberg/pull/58749))
+
+### Breaking changes
+
+-   Remove the style prop (`key`) and class name arguments the `data-wp-style` and `data-wp-class` directives. ([#58835](https://github.com/WordPress/gutenberg/pull/58835)).
+-   Remove the `data-wp-body` directive. ([#58835](https://github.com/WordPress/gutenberg/pull/58835))
+
 ### Enhancements
 
 -   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))

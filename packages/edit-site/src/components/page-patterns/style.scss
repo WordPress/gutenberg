@@ -31,17 +31,12 @@
 		flex-grow: 1;
 	}
 
-	// The increased specificity here is to overcome component styles
-	// without relying on internal component class names.
+	// TODO: Consider using the Theme component to automatically adapt to a dark background.
 	.edit-site-patterns__search {
-		input[type="search"] {
-			height: $button-size-next-default-40px;
-			background: $gray-800;
-			color: $gray-200;
+		--wp-components-color-foreground: #{$gray-200};
 
-			&:focus {
-				background: $gray-800;
-			}
+		.components-input-control__container {
+			background: $gray-800;
 		}
 
 		svg {
