@@ -602,7 +602,23 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
 		$parent_column_width = $block['attrs']['style']['layout']['parentColumnWidth'];
 		$parent_column_value = floatval( $parent_column_width );
-		$parent_column_unit  = explode( $parent_column_value, $parent_column_width )[1];
+		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+		/**
+		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
+		 * to defaults.
+		 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
+		 */
+		if ( count( $parent_column_unit ) <= 1 ) {
+			$parent_column_unit  = 'rem';
+			$parent_column_value = 12;
+		} else {
+			$parent_column_unit = $parent_column_unit[1];
+
+			if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
+				$parent_column_unit = 'rem';
+			}
+		}
+
 		/**
 		 * A default gap value is used for this computation because custom gap values may not be
 		 * viable to use in the computation of the container query value.
