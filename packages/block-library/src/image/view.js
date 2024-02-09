@@ -59,7 +59,7 @@ const { state, actions, callbacks } = store(
 					`${ state.currentImage.imgStyles?.replace(
 						/;$/,
 						''
-					) }; object-fit:contain;`
+					) }; object-fit:cover;`
 				);
 			},
 		},
