@@ -514,7 +514,7 @@ class ChangeDetectionUtils {
 				const hasDialog = new Promise( ( resolve ) => {
 					this.#page.on( 'dialog', ( dialog ) => {
 						void dialog.accept();
-						resolve( true );
+						resolve( dialog.type() === 'beforeunload' );
 					} );
 					this.#page.on( 'load', () => resolve( false ) );
 				} );
