@@ -95,7 +95,7 @@ export default function usePatternDetails( postType, postId ) {
 			value:
 				record.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced
 					? __( 'Not synced' )
-					: __( 'Fully synced' ),
+					: __( 'Synced' ),
 		} );
 
 		if ( record.wp_pattern_category?.length === 0 ) {
