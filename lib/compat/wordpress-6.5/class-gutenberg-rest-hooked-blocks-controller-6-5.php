@@ -332,13 +332,13 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			'type'       => 'array',
 			'properties' => array(
 				'block_name' => array(
-					'description' => __( 'Block namespace.' ),
+					'description' => __( 'Block name.' ),
 					'type'        => array( 'array' ),
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit' ),
 					'properties'  => array(
-						'position_key' => array(
-							'description' => __( 'Positive key' ),
+						'relative_position' => array(
+							'description' => __( 'Relative position.' ),
 							'type'        => 'array',
 							'readonly'    => true,
 							'context'     => array( 'view', 'edit' ),
