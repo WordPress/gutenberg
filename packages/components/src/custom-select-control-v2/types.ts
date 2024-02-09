@@ -16,8 +16,8 @@ export type CustomSelectContext = CustomSelectStore | undefined;
 
 export type CustomSelectButtonProps = {
 	/**
-	 * An optional default value for the control. If left `undefined`, the first
-	 * non-disabled item will be used.
+	 * An optional default value for the control when used in uncontrolled mode.
+	 * If left `undefined`, the first non-disabled item will be used.
 	 */
 	defaultValue?: string | string[];
 	/**
@@ -37,14 +37,14 @@ export type CustomSelectButtonProps = {
 	 */
 	size?: 'compact' | 'default' | 'small';
 	/**
-	 * Can be used to externally control the value of the control.
+	 * The value of the control when used in uncontrolled mode.
 	 */
 	value?: string | string[];
 };
 
 export type _CustomSelectProps = {
 	/**
-	 * The child elements. This should be composed of CustomSelectItem components.
+	 * The child elements. This should be composed of `CustomSelectItem` components.
 	 */
 	children: React.ReactNode;
 	/**
@@ -54,7 +54,7 @@ export type _CustomSelectProps = {
 	 */
 	hideLabelFromVision?: boolean;
 	/**
-	 * Label for the control.
+	 * Accessible label for the control.
 	 */
 	label: string;
 };
@@ -72,7 +72,7 @@ export type CustomSelectProps = _CustomSelectProps &
 /**
  * The legacy object structure for the options array.
  */
-type Option = {
+type LegacyOption = {
 	key: string;
 	name: string;
 	style?: React.CSSProperties;
@@ -88,7 +88,7 @@ type LegacyOnChangeObject = {
 	inputValue?: string;
 	isOpen?: boolean;
 	type?: string;
-	selectedItem: Option;
+	selectedItem: LegacyOption;
 };
 
 export type LegacyCustomSelectProps = {
@@ -144,7 +144,7 @@ export type LegacyCustomSelectProps = {
 	/**
 	 * The options that can be chosen from.
 	 */
-	options: Array< Option >;
+	options: Array< LegacyOption >;
 	/**
 	 * The size of the control.
 	 *
@@ -154,7 +154,7 @@ export type LegacyCustomSelectProps = {
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
-	value?: Option;
+	value?: LegacyOption;
 	/**
 	 * Legacy way to add additional text to the right of each option.
 	 *

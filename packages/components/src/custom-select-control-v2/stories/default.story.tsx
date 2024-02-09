@@ -107,7 +107,7 @@ MultipleSelection.args = {
 	),
 };
 
-const renderSelectedValue = ( gravatar: string | string[] ) => {
+const renderItem = ( gravatar: string | string[] ) => {
 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
 		<div style={ { display: 'flex', alignItems: 'center' } }>
@@ -128,13 +128,13 @@ const renderSelectedValue = ( gravatar: string | string[] ) => {
 export const CustomSelectedValue = Template.bind( {} );
 CustomSelectedValue.args = {
 	label: 'Default Gravatars',
-	renderSelectedValue,
+	renderSelectedValue: renderItem,
 	children: (
 		<>
 			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
 				( option ) => (
 					<CustomSelectItem key={ option } value={ option }>
-						{ renderSelectedValue( option ) }
+						{ renderItem( option ) }
 					</CustomSelectItem>
 				)
 			) }
