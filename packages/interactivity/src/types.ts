@@ -75,10 +75,6 @@ export interface DirectivesProps {
 	previousScope?: Scope;
 }
 
-export interface GetEvaluate {
-	( args: { scope: Scope } ): Evaluate;
-}
-
 type PriorityLevel = string[];
 
 export interface GetPriorityLevels {
