@@ -135,9 +135,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 							),
 						),
 					),
-					'typography' => array(
-						'defaultFontSizes' => 'merge',
-					),
 				),
 				'styles'   => array(
 					'blocks' => array(
