@@ -246,7 +246,7 @@ function ButtonEdit( props ) {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					getBlockBindingsSource( metadata?.bindings?.url?.source )
-						?.lockAttributesEditing === true,
+						?.lockAttributesEditing !== false,
 			};
 		},
 		[ isSelected ]
