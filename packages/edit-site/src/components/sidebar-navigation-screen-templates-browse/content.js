@@ -4,29 +4,18 @@
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import DataViewItem from '../sidebar-dataviews/dataview-item';
-import { useAddedBy } from '../list/added-by';
-import { file } from '@wordpress/icons';
-
-const EMPTY_ARRAY = [];
-
-function TemplateDataviewItem( { template, isActive } ) {
-	const { text, icon } = useAddedBy( template.type, template.id );
-	return (
-		<DataViewItem
-			key={ text }
-			slug={ text }
-			title={ text }
-			icon={ icon }
-			isActive={ isActive }
-			isCustom="false"
-		/>
-	);
-}
+import {
+	file as fileIcon,
+	layout as themeIcon,
+	commentAuthorAvatar as customIcon,
+	plugins as pluginIcon,
+} from '@wordpress/icons';
 
 export default function DataviewsTemplatesSidebarContent( {
 	activeView,
@@ -36,18 +25,29 @@ export default function DataviewsTemplatesSidebarContent( {
 	const { records } = useEntityRecords( 'postType', postType, {
 		per_page: -1,
 	} );
-	const firstItemPerAuthorText = useMemo( () => {
-		const firstItemPerAuthor = records?.reduce( ( acc, template ) => {
-			const author = template.author_text;
-			if ( author && ! acc[ author ] ) {
-				acc[ author ] = template;
+
+	const sources = useMemo( () => {
+		if ( records ) {
+			const _sources = {
+				theme: undefined,
+				user: undefined,
+				plugin: {},
+			};
+
+			for ( const template of records ) {
+				const src = template.original_source;
+				const obj = src === 'plugin' ? _sources.plugin : _sources;
+				if ( ! obj[ src ] ) {
+					obj[ src ] = {
+						count: 0,
+						slug: template.author_text,
+					};
+				}
+				obj[ src ].count++;
 			}
-			return acc;
-		}, {} );
-		return (
-			( firstItemPerAuthor && Object.values( firstItemPerAuthor ) ) ??
-			EMPTY_ARRAY
-		);
+
+			return _sources;
+		}
 	}, [ records ] );
 
 	return (
@@ -55,19 +55,45 @@ export default function DataviewsTemplatesSidebarContent( {
 			<DataViewItem
 				slug="all"
 				title={ config[ postType ].title }
-				icon={ file }
+				icon={ fileIcon }
 				isActive={ activeView === 'all' }
 				isCustom="false"
+				suffix={ <span>{ records?.length }</span> }
 			/>
-			{ firstItemPerAuthorText.map( ( template ) => {
-				return (
-					<TemplateDataviewItem
-						key={ template.author_text }
-						template={ template }
-						isActive={ activeView === template.author_text }
-					/>
-				);
-			} ) }
+			{ sources?.theme && (
+				<DataViewItem
+					slug={ sources.theme.slug }
+					title={ __( 'Theme' ) }
+					icon={ themeIcon }
+					isActive={ activeView === sources.theme.slug }
+					isCustom="false"
+					suffix={ <span>{ sources.theme.count }</span> }
+				/>
+			) }
+			{ sources?.user && (
+				<DataViewItem
+					slug={ sources.user.slug }
+					title={ __( 'Custom' ) }
+					icon={ customIcon }
+					isActive={ activeView === sources.user.slug }
+					isCustom="false"
+					suffix={ <span>{ sources.user.count }</span> }
+				/>
+			) }
+			{ sources?.plugin &&
+				Object.entries( sources.plugin ).map(
+					( [ key, { count, slug } ] ) => (
+						<DataViewItem
+							key={ key }
+							slug={ slug }
+							title={ slug }
+							icon={ pluginIcon }
+							isActive={ activeView === slug }
+							isCustom="false"
+							suffix={ <span>{ count }</span> }
+						/>
+					)
+				) }
 		</ItemGroup>
 	);
 }
