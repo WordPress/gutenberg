@@ -12,7 +12,6 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalInputControl as InputControl,
 	__experimentalText as Text,
-	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	SelectControl,
 	Spinner,
@@ -301,21 +300,17 @@ function FontCollection( { slug } ) {
 			) }
 
 			{ ! renderConfirmDialog && ! selectedFont && (
-				<VStack spacing={ 0 }>
-					<div className="font-library-modal__fonts-grid__main">
-						{ items.map( ( font ) => (
-							<FontCard
-								key={ font.font_family_settings.slug }
-								font={ font.font_family_settings }
-								onClick={ () => {
-									setSelectedFont(
-										font.font_family_settings
-									);
-								} }
-							/>
-						) ) }
-					</div>
-				</VStack>
+				<div className="font-library-modal__fonts-grid__main">
+					{ items.map( ( font ) => (
+						<FontCard
+							key={ font.font_family_settings.slug }
+							font={ font.font_family_settings }
+							onClick={ () => {
+								setSelectedFont( font.font_family_settings );
+							} }
+						/>
+					) ) }
+				</div>
 			) }
 		</TabPanelLayout>
 	);
