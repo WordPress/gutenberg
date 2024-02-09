@@ -48,7 +48,10 @@ export default function PostSyncStatus() {
 			<div className="editor-post-sync-status__value">
 				{ syncStatus === 'unsynced'
 					? __( 'Not synced' )
-					: __( 'Synced' ) }
+					: _x(
+							'Synced',
+							'Text that indicates that the pattern is synchronized'
+					  ) }
 			</div>
 		</PostPanelRow>
 	);
