@@ -68,6 +68,22 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
  * @since 6.3.0
  */
 function register_block_core_footnotes() {
+	register_block_type_from_metadata(
+		__DIR__ . '/footnotes',
+		array(
+			'render_callback' => 'render_block_core_footnotes',
+		)
+	);
+}
+add_action( 'init', 'register_block_core_footnotes' );
+
+
+/**
+ * Registers the footnotes meta field required for footnotes to work.
+ *
+ * @since 6.5.0
+ */
+function wp_register_footnotes_post_meta() {
 	$post_types = get_post_types(
 		array(
 			'show_in_rest' => true,
@@ -76,7 +92,11 @@ function register_block_core_footnotes() {
 	);
 	foreach ( $post_types as $post_type ) {
 		// Only register the meta field if the post type supports the editor, custom fields, and revisions.
-		if ( post_type_supports( $post_type, 'editor' ) && post_type_supports( $post_type, 'custom-fields' ) && post_type_supports( $post_type, 'revisions' ) ) {
+		if (
+			post_type_supports( $post_type, 'editor' ) &&
+			post_type_supports( $post_type, 'custom-fields' ) &&
+			post_type_supports( $post_type, 'revisions' )
+		) {
 			register_post_meta(
 				$post_type,
 				'footnotes',
@@ -89,14 +109,9 @@ function register_block_core_footnotes() {
 			);
 		}
 	}
-	register_block_type_from_metadata(
-		__DIR__ . '/footnotes',
-		array(
-			'render_callback' => 'render_block_core_footnotes',
-		)
-	);
 }
-add_action( 'init', 'register_block_core_footnotes' );
+// Use a priority of 20 to be higher than the default of 10 the priority with which most post types are registered.
+add_action( 'init', 'wp_register_footnotes_post_meta', 20 );
 
 /**
  * Adds the footnotes field to the revisions display.
