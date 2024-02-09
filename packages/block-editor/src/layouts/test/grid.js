@@ -18,4 +18,18 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+	it( 'should return only `grid-template-columns` if columnCount property is provided', () => {
+		const expected = `.editor-styles-wrapper .my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { columnCount: 3 },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
 } );
