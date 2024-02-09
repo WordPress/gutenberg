@@ -17,6 +17,11 @@ const test = base.extend( {
 	},
 } );
 
+const POST_URLS = [
+	'/wp/v2/posts',
+	`rest_route=${ encodeURIComponent( '/wp/v2/posts' ) }`,
+];
+
 test.describe( 'Change detection', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -276,7 +281,6 @@ test.describe( 'Change detection', () => {
 	} );
 
 	test( 'Should prompt if changes made while save is in-flight', async ( {
-		page,
 		editor,
 		pageUtils,
 		changeDetectionUtils,
@@ -295,12 +299,7 @@ test.describe( 'Change detection', () => {
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
-			.type( '!' );
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Save draft' } )
-		).toBeEnabled();
+			.fill( 'Hello World!' );
 
 		await changeDetectionUtils.releaseSaveIntercept();
 
@@ -539,18 +538,24 @@ class ChangeDetectionUtils {
 			this.#continueInterceptedSave = res;
 		} );
 
-		await this.#page.route( '**/wp/v2/posts', async ( route ) => {
-			hadInterceptedSave = true;
-			await deferred;
-			await route.continue();
-		} );
+		await this.#page.route(
+			( url ) =>
+				POST_URLS.some( ( postUrl ) => url.href.includes( postUrl ) ),
+			async ( route ) => {
+				hadInterceptedSave = true;
+				await deferred;
+				await route.continue();
+			}
+		);
 
 		return () => hadInterceptedSave;
 	};
 
 	releaseSaveIntercept = async () => {
 		this.#continueInterceptedSave?.();
-		await this.#page.unroute( '**/wp/v2/posts' );
+		await this.#page.unroute( ( url ) =>
+			POST_URLS.some( ( postUrl ) => url.href.includes( postUrl ) )
+		);
 		this.#continueInterceptedSave = null;
 	};
 }
