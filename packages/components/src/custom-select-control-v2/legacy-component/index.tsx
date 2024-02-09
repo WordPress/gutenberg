@@ -16,7 +16,7 @@ import { CustomSelectItem } from '..';
 import * as Styled from '../styles';
 import { ContextSystemProvider } from '../../context';
 
-function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
+function CustomSelect( props: LegacyCustomSelectProps ) {
 	const {
 		__experimentalShowSelectedHint,
 		__next40pxDefaultSize = false,
@@ -130,4 +130,4 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	);
 }
 
-export default _LegacyCustomSelect;
+export default CustomSelect;

@@ -13,7 +13,7 @@ function isLegacy( props: any ): props is LegacyCustomSelectProps {
 function CustomSelect(
 	props:
 		| LegacyCustomSelectProps
-		| WordPressComponentProps< CustomSelectProps, 'button' >
+		| WordPressComponentProps< CustomSelectProps, 'button', false >
 ) {
 	if ( isLegacy( props ) ) {
 		return <_LegacyCustomSelect { ...props } />;

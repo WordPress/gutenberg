@@ -119,18 +119,26 @@ export type LegacyCustomSelectProps = {
 	onChange?: ( newValue: LegacyOnChangeObject ) => void;
 	/**
 	 * A handler for `onBlur` events.
+	 *
+	 * @ignore
 	 */
 	onBlur?: FocusEventHandler< HTMLButtonElement >;
 	/**
 	 * A handler for `onFocus` events.
+	 *
+	 * @ignore
 	 */
 	onFocus?: FocusEventHandler< HTMLButtonElement >;
 	/**
 	 * A handler for `onMouseOver` events.
+	 *
+	 * @ignore
 	 */
 	onMouseOut?: MouseEventHandler< HTMLButtonElement >;
 	/**
 	 * A handler for `onMouseOut` events.
+	 *
+	 * @ignore
 	 */
 	onMouseOver?: MouseEventHandler< HTMLButtonElement >;
 	/**
@@ -158,6 +166,7 @@ export type LegacyCustomSelectProps = {
 	 * WordPress 6.5. The prop is no longer needed and can be safely removed.
 	 *
 	 * @deprecated
+	 * @ignore
 	 */
 	__nextUnconstrainedWidth?: boolean;
 	/**
