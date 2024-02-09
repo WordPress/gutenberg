@@ -887,7 +887,7 @@ test.describe( 'Links', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
-				content: `<a href="https://wordpressfoundation.org/donate/">Donate to the Wordpress Foundation</a> to support <a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
+				content: `<a href="https://wordpressfoundation.org/donate/">Donate to the WordPress Foundation</a> to support <a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
 			},
 		} );
 
