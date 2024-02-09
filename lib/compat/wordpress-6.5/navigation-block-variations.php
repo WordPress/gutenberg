@@ -90,7 +90,7 @@ function gutenberg_block_core_navigation_link_unregister_taxonomy_variation( $ta
  *
  * @param array $variation Variation array from build_variation_for_navigation_link.
  */
-function gutenberg_eblock_core_navigation_link_register_variation( $variation ) {
+function gutenberg_block_core_navigation_link_register_variation( $variation ) {
 	_deprecated_function( __FUNCTION__, '6.5.0', 'WP_Block_Type::get_variations' );
 	/*
 	 * Directly set the variations on the registered block type
