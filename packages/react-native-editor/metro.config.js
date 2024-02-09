@@ -15,6 +15,8 @@ const packageNames = fs.readdirSync( PACKAGES_DIR ).filter( ( file ) => {
 	return stats.isDirectory();
 } );
 
+const defaultConfig = getDefaultConfig( __dirname );
+
 /**
  * Metro configuration
  * https://facebook.github.io/metro/docs/configuration
@@ -24,8 +26,12 @@ const packageNames = fs.readdirSync( PACKAGES_DIR ).filter( ( file ) => {
 const config = {
 	watchFolders: [ path.resolve( __dirname, '../..' ) ],
 	resolver: {
-		sourceExts: [ 'js', 'cjs', 'json', 'scss', 'sass', 'ts', 'tsx' ],
-		platforms: [ 'native', 'android', 'ios' ],
+		sourceExts: [
+			...defaultConfig.resolver.sourceExts,
+			'cjs',
+			'scss',
+			'sass',
+		],
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer.js' ),
@@ -64,4 +70,4 @@ const config = {
 	},
 };
 
-module.exports = mergeConfig( getDefaultConfig( __dirname ), config );
+module.exports = mergeConfig( defaultConfig, config );
