@@ -11,7 +11,7 @@ import { store as editorStore } from '../store';
 
 export default {
 	name: 'core/post-meta',
-	label: _x( 'Post Meta' ),
+	label: _x( 'Post Meta', 'block bindings source' ),
 	useSource( props, sourceAttributes ) {
 		const { getCurrentPostType } = useSelect( editorStore );
 		const { context } = props;
