@@ -134,7 +134,7 @@ Can be used to render select UI with custom styled values.
 The size of the control.
 
 -   Required: no
--   Default: `default`
+-   Default: `'default'`
 
 ##### `value`: `string | string[]`
 
