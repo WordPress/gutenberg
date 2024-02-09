@@ -231,7 +231,6 @@
 		overflow: hidden;
 		display: block;
 		width: 100%;
-		margin: 0 var(--wp-admin-border-width-focus);
 
 		&:hover {
 			color: $gray-900;
@@ -239,7 +238,7 @@
 		&:focus {
 			color: var(--wp-admin-theme-color--rgb);
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-			border-radius: $grid-unit-05;
+			border-radius: $radius-block-ui;
 		}
 	}
 
