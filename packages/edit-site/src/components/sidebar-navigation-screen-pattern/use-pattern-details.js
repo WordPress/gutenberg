@@ -94,7 +94,10 @@ export default function usePatternDetails( postType, postId ) {
 			label: __( 'Syncing' ),
 			value:
 				record.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced
-					? __( 'Not synced' )
+					? _x(
+							'Not synced',
+							'Text that indicates that the pattern is not synchronized'
+					  )
 					: _x(
 							'Synced',
 							'Text that indicates that the pattern is synchronized'
