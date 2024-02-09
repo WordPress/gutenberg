@@ -909,7 +909,7 @@ test.describe( 'Links', () => {
 			.getByRole( 'link', {
 				name: 'WordPress',
 			} )
-			.click( { delay: 10 } );
+			.click( { delay: 100 } );
 
 		await expect( linkPopover ).toBeVisible();
 		await expect(
