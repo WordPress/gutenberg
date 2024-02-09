@@ -103,16 +103,8 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
-function getUniqueFontSizesBySlug( settings ) {
-	const fontSizes = settings?.typography?.fontSizes;
-	const mergedFontSizes = fontSizes
-		? mergeOrigins( fontSizes ).toReversed() // New array because mergeOrigins result is cached.
-		: [];
-	return uniqByProperty( mergedFontSizes, 'slug' ).reverse(); // In-place reverse to save memory.
-}
-
 /**
- * Concatenate all the font sizes.
+ * Concatenate all the font sizes into a single list for the font size picker.
  *
  * @param {Object} settings The global styles settings.
  *
@@ -120,13 +112,18 @@ function getUniqueFontSizesBySlug( settings ) {
  */
 function getMergedFontSizes( settings ) {
 	/*
-	 * For backwards compatibility with presets converting from a hardcoded `false`
-	 * for `prevent_override` to a path to a boolean (`defaultFontSizes`, for example),
-	 * the 'merge' value for the new setting both overrides the preset and tells the
-	 * UI to continue to display a merged set of the default values.
+	 * Backward compatibility for theme.json v2 is triggered by the 'merge'
+	 * value added during the migration process. The old behavior that didn't
+	 * match the other preset controls was to list the partially overridden
+	 * default font sizes. The new behavior either shows all the default font
+	 * sizes or none of them.
 	 */
 	if ( settings?.typography?.defaultFontSizes === 'merge' ) {
-		return getUniqueFontSizesBySlug( settings );
+		const fontSizes = settings?.typography?.fontSizes;
+		const mergedFontSizes = fontSizes
+			? mergeOrigins( fontSizes ).toReversed() // New array because mergeOrigins result is cached.
+			: [];
+		return uniqByProperty( mergedFontSizes, 'slug' ).reverse(); // In-place reverse to save memory.
 	}
 
 	const fontSizes = settings?.typography?.fontSizes;
