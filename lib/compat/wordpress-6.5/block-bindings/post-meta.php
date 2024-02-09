@@ -12,7 +12,7 @@
  *                           Example: array( "key" => "foo" ).
  * @return mixed The value computed for the source.
  */
-function gutenberg_block_bindings_post_meta_callback( $source_attrs ) {
+function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_instance ) {
 	if ( ! isset( $source_attrs['key'] ) ) {
 		return null;
 	}
@@ -21,8 +21,7 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs ) {
 	if ( isset( $source_attrs['postId'] ) ) {
 		$post_id = $source_attrs['postId'];
 	} else {
-		// I tried using $block_instance->context['postId'] but it wasn't available in the image block.
-		$post_id = get_the_ID();
+		$post_id = isset( $block_instance->context['postId'] ) ? $block_instance->context['postId'] : get_the_ID();
 	}
 
 	// If a post isn't public, we need to prevent unauthorized users from accessing the post meta.
