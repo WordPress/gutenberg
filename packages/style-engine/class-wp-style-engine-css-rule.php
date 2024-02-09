@@ -146,18 +146,18 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 			$suffix                     = $should_prettify ? "\n" : '';
 			$spacer                     = $should_prettify ? ' ' : '';
 			// Trims any multiple selectors strings.
-			$selector                = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
-			$selector                = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
-			$css_declarations        = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
-			$nested_css_declarations = $this->declarations->get_declarations_string( $should_prettify, $nested_declarations_indent );
-			$at_rule                 = $this->get_at_rule();
+			$selector         = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
+			$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
+			$at_rule          = $this->get_at_rule();
+			$has_at_rule      = ! empty( $at_rule );
+			$css_declarations = $this->declarations->get_declarations_string( $should_prettify, $has_at_rule ? $nested_declarations_indent : $declarations_indent );
 
 			if ( empty( $css_declarations ) ) {
 				return '';
 			}
 
-			if ( ! empty( $at_rule ) ) {
-				$selector = "{$rule_indent}{$at_rule}{$spacer}{{$suffix}{$nested_rule_indent}{$selector}{$spacer}{{$suffix}{$nested_css_declarations}{$suffix}{$nested_rule_indent}}{$suffix}{$rule_indent}}";
+			if ( $has_at_rule ) {
+				$selector = "{$rule_indent}{$at_rule}{$spacer}{{$suffix}{$nested_rule_indent}{$selector}{$spacer}{{$suffix}{$css_declarations}{$suffix}{$nested_rule_indent}}{$suffix}{$rule_indent}}";
 				return $selector;
 			}
 
