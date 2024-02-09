@@ -162,10 +162,13 @@ test.describe( 'Change detection', () => {
 	} );
 
 	test( 'Should prompt if content added without save', async ( {
+		editor,
 		page,
 		changeDetectionUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Paragraph' );
 
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
@@ -189,7 +192,9 @@ test.describe( 'Change detection', () => {
 		editor,
 		changeDetectionUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Hello World' );
 
 		await editor.saveDraft();
@@ -376,7 +381,9 @@ test.describe( 'Change detection', () => {
 		changeDetectionUtils,
 	} ) => {
 		// Enter content.
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Paragraph' );
 
 		// Save.
