@@ -623,7 +623,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * A default gap value is used for this computation because custom gap values may not be
 		 * viable to use in the computation of the container query value.
 		 */
-		$default_gap_value     = 'px' === $parent_column_unit ? '24' : '1.5';
+		$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
 		$container_query_value = $column_span_number * $parent_column_value + ( $column_span_number - 1 ) * $default_gap_value;
 		$container_query_value = $container_query_value . $parent_column_unit;
 
