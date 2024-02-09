@@ -373,24 +373,19 @@ class Gutenberg_REST_Hooked_Blocks_Controller_6_5 extends WP_REST_Controller {
 			return new WP_Error( 'rest_hooked_blocks_invalid_entity_context', __( 'Invalid entity.' ), array( 'status' => 404 ) );
 		}
 
+		// Suppress all hooked blocks getting inserted into the context.
+		add_filter( 'hooked_block_types', '__return_empty_array', 99999, 0 );
+
 		if ( ( 'wp_template' === $entity_type || 'wp_template_part' === $entity_type ) && ! empty( $id ) ) {
-			$suppress_all_hooked_blocks_filter = function() {
-				return array();
-			};
-			add_filter( 'hooked_block_types', $suppress_all_hooked_blocks_filter, 99999, 0 );
 			$context = get_block_template( $id, $entity_type );
-			remove_filter( 'hooked_block_types', $suppress_all_hooked_blocks_filter, 99999 );
-			if ( is_wp_error( $context ) ) {
-				return $context;
-			}
 		}
 
 		if ( 'wp_navigation' === $entity_type && ! empty( $id ) ) {
 			$context = get_post( (int) $id );
-			if ( is_wp_error( $context ) ) {
-				return $context;
-			}
 		}
+
+		// Remove the filter to allow hooked blocks to be inserted for all purposes.
+		remove_filter( 'hooked_block_types', '__return_empty_array', 99999 );
 
 		return $context;
 	}
