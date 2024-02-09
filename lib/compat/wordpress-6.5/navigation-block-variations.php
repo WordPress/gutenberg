@@ -33,7 +33,7 @@ function gutenberg_block_core_navigation_link_register_post_type_variation( $pos
 	_deprecated_function( __FUNCTION__, '6.5.0', 'WP_Block_Type::get_variations' );
 	if ( $post_type_object->show_in_nav_menus ) {
 		$variation = build_variation_for_navigation_link( $post_type_object, 'post-type' );
-		block_core_navigation_link_register_variation( $variation );
+		gutenberg_block_core_navigation_link_register_variation( $variation );
 	}
 }
 
@@ -52,7 +52,7 @@ function gutenberg_block_core_navigation_link_register_taxonomy_variation( $taxo
 	_deprecated_function( __FUNCTION__, '6.5.0', 'WP_Block_Type::get_variations' );
 	if ( isset( $args['show_in_nav_menus'] ) && $args['show_in_nav_menus'] ) {
 		$variation = build_variation_for_navigation_link( (object) $args, 'post-type' );
-		block_core_navigation_link_register_variation( $variation );
+		gutenberg_block_core_navigation_link_register_variation( $variation );
 	}
 }
 
@@ -66,7 +66,7 @@ function gutenberg_block_core_navigation_link_register_taxonomy_variation( $taxo
  */
 function gutenberg_block_core_navigation_link_unregister_post_type_variation( $post_type ) {
 	_deprecated_function( __FUNCTION__, '6.5.0', 'WP_Block_Type::get_variations' );
-	block_core_navigation_link_unregister_variation( $post_type );
+	gutenberg_block_core_navigation_link_unregister_variation( $post_type );
 }
 
 /**
@@ -79,7 +79,7 @@ function gutenberg_block_core_navigation_link_unregister_post_type_variation( $p
  */
 function gutenberg_block_core_navigation_link_unregister_taxonomy_variation( $taxonomy ) {
 	_deprecated_function( __FUNCTION__, '6.5.0', 'WP_Block_Type::get_variations' );
-	block_core_navigation_link_unregister_variation( $taxonomy );
+	gutenberg_block_core_navigation_link_unregister_variation( $taxonomy );
 }
 
 /**
