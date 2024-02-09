@@ -1,12 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useState,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalInputControl as InputControl,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	SelectControl,
 	Spinner,
 	Icon,
@@ -15,7 +22,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { __, _x } from '@wordpress/i18n';
+import { sprintf, __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
 
 /**
@@ -335,15 +342,36 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 			>
 				<span>‹</span>
 			</Button>
-			<Text>{ `Page ` }</Text>
-			<SelectControl
-				value={ page }
-				options={ [ ...Array( totalPages ) ].map( ( e, i ) => {
-					return { label: i + 1, value: i + 1 };
-				} ) }
-				onChange={ ( newPage ) => setPage( parseInt( newPage ) ) }
-			/>
-			<Text>{ ` of ${ totalPages }` }</Text>
+			<HStack justify="flex-start" expanded={ false } spacing={ 2 }>
+				{ createInterpolateElement(
+					sprintf(
+						// translators: %s: Total number of pages.
+						_x( 'Page <CurrenPageControl /> of %s', 'paging' ),
+						totalPages
+					),
+					{
+						CurrenPageControl: (
+							<SelectControl
+								aria-label={ __( 'Current page' ) }
+								value={ page }
+								options={ [ ...Array( totalPages ) ].map(
+									( e, i ) => {
+										return {
+											label: i + 1,
+											value: i + 1,
+										};
+									}
+								) }
+								onChange={ ( newPage ) =>
+									setPage( parseInt( newPage ) )
+								}
+								size={ 'compact' }
+								__nextHasNoMarginBottom
+							/>
+						),
+					}
+				) }
+			</HStack>
 			<Button
 				aria-label={ __( 'next page' ) }
 				size="compact"
