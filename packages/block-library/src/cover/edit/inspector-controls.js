@@ -167,7 +167,7 @@ export default function CoverInspectorControls( {
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ isImageBackground && (
 							<>
 								<ToggleControl
@@ -188,7 +188,8 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								label={ __( 'Focal point picker' ) }
+								__next40pxDefaultSize
+								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
 								onDragStart={ imperativeFocalPointPreview }

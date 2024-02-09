@@ -84,6 +84,9 @@ const blockRemovalRules = {
 	'core/post-template': __(
 		'Post Template displays each post or page in a Query Loop.'
 	),
+	'bindings/core/pattern-overrides': __(
+		'Blocks from synced patterns that can have overriden content.'
+	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -106,6 +109,7 @@ export default function Editor( { isLoading } ) {
 		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
+		isDistractionFree,
 		showIconLabels,
 		showBlockBreadcrumbs,
 		postTypeLabel,
@@ -140,6 +144,7 @@ export default function Editor( { isLoading } ) {
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			postTypeLabel: getPostTypeLabel(),
@@ -150,6 +155,7 @@ export default function Editor( { isLoading } ) {
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
 	const shouldShowBlockBreadcrumbs =
+		! isDistractionFree &&
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -210,7 +216,7 @@ export default function Editor( { isLoading } ) {
 					<SidebarComplementaryAreaFills />
 					{ isEditMode && <StartTemplateOptions /> }
 					<InterfaceSkeleton
-						isDistractionFree={ true }
+						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }
 						className={ classnames(
 							'edit-site-editor__interface-skeleton',

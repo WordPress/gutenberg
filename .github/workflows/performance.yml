@@ -86,7 +86,7 @@ jobs:
 
             - name: Archive performance results
               if: success()
-              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               with:
                   name: performance-results
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
@@ -100,7 +100,7 @@ jobs:
                   ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA b61dde2e5ec29d98801e623de968bfb286c5be3f $COMMITTED_AT
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: failure()
               with:
                   name: failures-artifacts

@@ -35,6 +35,7 @@ const {
 	useLayoutClasses,
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
+	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
 
 const noop = () => {};
@@ -138,7 +139,8 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			showEditorPadding: !! editorSettings.goBack,
+			showEditorPadding:
+				!! editorSettings.onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -290,6 +292,9 @@ function EditorCanvas( {
 	const contentRef = useMergeRefs( [
 		localRef,
 		renderingMode === 'post-only' ? typewriterRef : noop,
+		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
 	] );
 
 	return (
@@ -364,8 +369,7 @@ function EditorCanvas( {
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
-						renderingMode !== 'all' && 'is-' + renderingMode
+							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
 					layout={ blockListLayout }
 					dropZoneElement={
@@ -376,8 +380,14 @@ function EditorCanvas( {
 							: localRef.current?.parentNode
 					}
 					renderAppender={ renderAppender }
+					__unstableDisableDropZone={
+						// In template preview mode, disable drop zones at the root of the template.
+						renderingMode === 'template-locked' ? true : false
+					}
 				/>
-				<EditTemplateBlocksNotification contentRef={ localRef } />
+				{ renderingMode === 'template-locked' && (
+					<EditTemplateBlocksNotification contentRef={ localRef } />
+				) }
 			</RecursionProvider>
 			{ children }
 		</BlockCanvas>

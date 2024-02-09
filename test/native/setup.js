@@ -284,6 +284,14 @@ jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
 	success( 0, 0 )
 );
 
+jest.spyOn( Image, 'prefetch' ).mockImplementation(
+	( url, callback = () => {} ) => {
+		const mockRequestId = `mockRequestId-${ url }`;
+		callback( mockRequestId );
+		return Promise.resolve( true );
+	}
+);
+
 jest.mock( 'react-native/Libraries/Utilities/BackHandler', () => {
 	return jest.requireActual(
 		'react-native/Libraries/Utilities/__mocks__/BackHandler.js'

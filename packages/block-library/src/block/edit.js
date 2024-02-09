@@ -29,33 +29,16 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
+import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
-
-function isPartiallySynced( block ) {
-	return (
-		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		)
-	);
-}
-function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
-}
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -88,51 +71,57 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-/**
- * Enum for patch operations.
- * We use integers here to minimize the size of the serialized data.
- * This has to be deserialized accordingly on the server side.
- * See block-bindings/sources/pattern.php
- */
-const PATCH_OPERATIONS = {
-	/** @type {0} */
-	Remove: 0,
-	/** @type {1} */
-	Replace: 1,
-	// Other operations are reserved for future use. (e.g. Add)
-};
+function hasOverridableAttributes( block ) {
+	return (
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source === 'core/pattern-overrides'
+		)
+	);
+}
 
-/**
- * @typedef {[typeof PATCH_OPERATIONS.Remove]} RemovePatch
- * @typedef {[typeof PATCH_OPERATIONS.Replace, unknown]} ReplacePatch
- * @typedef {RemovePatch | ReplacePatch} OverridePatch
- */
+function hasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( hasOverridableAttributes( block ) ) return true;
+		return hasOverridableBlocks( block.innerBlocks );
+	} );
+}
 
-function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
+function getOverridableAttributes( block ) {
+	return Object.entries( block.attributes.metadata.bindings )
+		.filter(
+			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
+		)
+		.map( ( [ attributeKey ] ) => attributeKey );
+}
+
+function applyInitialContentValuesToInnerBlocks(
+	blocks,
+	content = {},
+	defaultValues
+) {
 	return blocks.map( ( block ) => {
-		const innerBlocks = applyInitialOverrides(
+		const innerBlocks = applyInitialContentValuesToInnerBlocks(
 			block.innerBlocks,
-			overrides,
+			content,
 			defaultValues
 		);
 		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId )
+		if ( ! hasOverridableAttributes( block ) || ! blockId )
 			return { ...block, innerBlocks };
-		const attributes = getPartiallySyncedAttributes( block );
+		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
 			defaultValues[ blockId ] ??= {};
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			/** @type {OverridePatch} */
-			const overrideAttribute = overrides[ blockId ]?.[ attributeKey ];
-			if ( ! overrideAttribute ) {
-				continue;
-			}
-			if ( overrideAttribute[ 0 ] === PATCH_OPERATIONS.Remove ) {
-				delete newAttributes[ attributeKey ];
-			} else if ( overrideAttribute[ 0 ] === PATCH_OPERATIONS.Replace ) {
-				newAttributes[ attributeKey ] = overrideAttribute[ 1 ];
+
+			const contentValues = content[ blockId ]?.values;
+			if ( contentValues?.[ attributeKey ] !== undefined ) {
+				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
 			}
 		}
 		return {
@@ -143,66 +132,70 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	} );
 }
 
-function getOverridesFromBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, Record<string, OverridePatch>>} */
-	const overrides = {};
+function isAttributeEqual( attribute1, attribute2 ) {
+	if (
+		attribute1 instanceof RichTextData &&
+		attribute2 instanceof RichTextData
+	) {
+		return attribute1.toString() === attribute2.toString();
+	}
+	return attribute1 === attribute2;
+}
+
+function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
+	/** @type {Record<string, { values: Record<string, unknown>}>} */
+	const content = {};
 	for ( const block of blocks ) {
+		if ( block.name === patternBlockName ) continue;
 		Object.assign(
-			overrides,
-			getOverridesFromBlocks( block.innerBlocks, defaultValues )
+			content,
+			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
 		);
-		/** @type {string} */
 		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
-		const attributes = getPartiallySyncedAttributes( block );
+		if ( ! hasOverridableAttributes( block ) || ! blockId ) continue;
+		const attributes = getOverridableAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				! isAttributeEqual(
+					block.attributes[ attributeKey ],
+					defaultValues[ blockId ][ attributeKey ]
+				)
 			) {
-				overrides[ blockId ] ??= {};
-				/**
-				 * Create a patch operation for the binding attribute.
-				 * We use a tuple here to minimize the size of the serialized data.
-				 * The first item is the operation type, the second item is the value if any.
-				 */
-				if ( block.attributes[ attributeKey ] === undefined ) {
-					/** @type {RemovePatch} */
-					overrides[ blockId ][ attributeKey ] = [
-						PATCH_OPERATIONS.Remove,
-					];
-				} else {
-					/** @type {ReplacePatch} */
-					overrides[ blockId ][ attributeKey ] = [
-						PATCH_OPERATIONS.Replace,
-						block.attributes[ attributeKey ],
-					];
-				}
+				content[ blockId ] ??= { values: {}, blockName: block.name };
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
+				content[ blockId ].values[ attributeKey ] =
+					block.attributes[ attributeKey ] === undefined
+						? // TODO: We use an empty string to represent undefined for now until
+						  // we support a richer format for overrides and the block binding API.
+						  // Currently only the `linkTarget` attribute of `core/button` is affected.
+						  ''
+						: block.attributes[ attributeKey ];
 			}
 		}
 	}
-	return Object.keys( overrides ).length > 0 ? overrides : undefined;
+	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
 		const editMode =
-			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
+			mode ||
+			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
-		setBlockEditMode( setEditMode, block.innerBlocks, mode );
-	} );
-}
 
-function getHasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( isPartiallySynced( block ) ) return true;
-		return getHasOverridableBlocks( block.innerBlocks );
+		setBlockEditMode(
+			setEditMode,
+			block.innerBlocks,
+			// Disable editing for nested patterns.
+			block.name === patternBlockName ? 'disabled' : mode
+		);
 	} );
 }
 
 export default function ReusableBlockEdit( {
 	name,
-	attributes: { ref, overrides },
+	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 	setAttributes,
@@ -215,8 +208,13 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialOverrides = useRef( overrides );
-	const defaultValuesRef = useRef( {} );
+
+	// The initial value of the `content` attribute.
+	const initialContent = useRef( content );
+
+	// The default content values from the original pattern for overridable attributes.
+	// Set by the `applyInitialContentValuesToInnerBlocks` function.
+	const defaultContent = useRef( {} );
 
 	const {
 		replaceInnerBlocks,
@@ -225,43 +223,48 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const {
-					getBlocks,
-					getBlockEditingMode: editingMode,
-					getSettings,
-				} = select( blockEditorStore );
-				const blocks = getBlocks( patternClientId );
-				const canEdit = canUser( 'update', 'blocks', ref );
+	const {
+		innerBlocks,
+		userCanEdit,
+		getBlockEditingMode,
+		onNavigateToEntityRecord,
+		editingMode,
+	} = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const {
+				getBlocks,
+				getSettings,
+				getBlockEditingMode: _getBlockEditingMode,
+			} = select( blockEditorStore );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					userCanEdit: canEdit,
-					getBlockEditingMode: editingMode,
-					getPostLinkProps: getSettings().getPostLinkProps,
-				};
-			},
-			[ patternClientId, ref ]
-		);
-
-	const editOriginalProps = getPostLinkProps
-		? getPostLinkProps( {
-				postId: ref,
-				postType: 'wp_block',
-		  } )
-		: {};
-
-	useEffect(
-		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
-		[ innerBlocks, setBlockEditingMode ]
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: _getBlockEditingMode,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+				editingMode: _getBlockEditingMode( patternClientId ),
+			};
+		},
+		[ patternClientId, ref ]
 	);
 
-	const hasOverridableBlocks = useMemo(
-		() => getHasOverridableBlocks( innerBlocks ),
+	// Sync the editing mode of the pattern block with the inner blocks.
+	useEffect( () => {
+		setBlockEditMode(
+			setBlockEditingMode,
+			innerBlocks,
+			// Disable editing if the pattern itself is disabled.
+			editingMode === 'disabled' ? 'disabled' : undefined
+		);
+	}, [ editingMode, innerBlocks, setBlockEditingMode ] );
+
+	const canOverrideBlocks = useMemo(
+		() => hasOverridableBlocks( innerBlocks ),
 		[ innerBlocks ]
 	);
 
@@ -277,22 +280,22 @@ export default function ReusableBlockEdit( {
 
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
-		defaultValuesRef.current = {};
-		const editingMode = getBlockEditingMode( patternClientId );
+		defaultContent.current = {};
+		const originalEditingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
 			syncDerivedUpdates( () => {
 				replaceInnerBlocks(
 					patternClientId,
-					applyInitialOverrides(
+					applyInitialContentValuesToInnerBlocks(
 						initialBlocks,
-						initialOverrides.current,
-						defaultValuesRef.current
+						initialContent.current,
+						defaultContent.current
 					)
 				);
 			} );
-			setBlockEditingMode( patternClientId, editingMode );
+			setBlockEditingMode( patternClientId, originalEditingMode );
 		} );
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
@@ -327,7 +330,7 @@ export default function ReusableBlockEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `overrides` attribute from the updated blocks to the pattern block.
+	// Sync the `content` attribute from the updated blocks to the pattern block.
 	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
 		const { getBlocks } = registry.select( blockEditorStore );
@@ -338,9 +341,9 @@ export default function ReusableBlockEdit( {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
 					setAttributes( {
-						overrides: getOverridesFromBlocks(
+						content: getContentValuesFromInnerBlocks(
 							blocks,
-							defaultValuesRef.current
+							defaultContent.current
 						),
 					} );
 				} );
@@ -348,13 +351,15 @@ export default function ReusableBlockEdit( {
 		}, blockEditorStore );
 	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
-	const handleEditOriginal = ( event ) => {
-		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
-		editOriginalProps.onClick( event );
+	const handleEditOriginal = () => {
+		onNavigateToEntityRecord( {
+			postId: ref,
+			postType: 'wp_block',
+		} );
 	};
 
-	const resetOverrides = () => {
-		if ( overrides ) {
+	const resetContent = () => {
+		if ( content ) {
 			replaceInnerBlocks( patternClientId, initialBlocks );
 		}
 	};
@@ -387,25 +392,22 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
+			{ userCanEdit && onNavigateToEntityRecord && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							href={ editOriginalProps.href }
-							onClick={ handleEditOriginal }
-						>
+						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
 
-			{ hasOverridableBlocks && (
+			{ canOverrideBlocks && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
-							onClick={ resetOverrides }
-							disabled={ ! overrides }
+							onClick={ resetContent }
+							disabled={ ! content }
 							__experimentalIsFocusable
 						>
 							{ __( 'Reset' ) }
