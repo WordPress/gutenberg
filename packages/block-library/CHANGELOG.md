@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Query Loop Block: Ensure that the `queryId` attribute is always unique.
+
 ## 8.27.0 (2024-01-24)
 
 ## 8.26.0 (2024-01-10)
