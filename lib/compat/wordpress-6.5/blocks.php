@@ -219,38 +219,3 @@ function gutenberg_process_block_bindings( $block_content, $parsed_block, $block
 }
 
 add_filter( 'render_block', 'gutenberg_process_block_bindings', 20, 3 );
-
-/**
- * Add `postId` and `postType` context to blocks that can use block bindings.
- *
- * @param string $args Array of arguments for registering a block type.
- * @param string $block_name The name of the block to process.
- * @return array The modified arguments for registering a block type.
- */
-function gutenberg_add_context_for_block_bindings( $args, $block_name ) {
-	$allowed_blocks = array(
-		'core/paragraph' => array( 'content' ),
-		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text' ),
-	);
-
-	if ( ! isset( $allowed_blocks[ $block_name ] ) ) {
-		return $args;
-	}
-	if ( ! isset( $args['uses_context'] ) ) {
-		$args['uses_context'] = array( 'postId', 'postType' );
-	} else {
-		// Check if 'postId' exists in 'uses_context' and add it if it doesn't.
-		if ( ! in_array( 'postId', $args['uses_context'], true ) ) {
-			$args['uses_context'][] = 'postId';
-		}
-		// Check if 'postType' exists in 'uses_context' and add it if it doesn't.
-		if ( ! in_array( 'postType', $args['uses_context'], true ) ) {
-			$args['uses_context'][] = 'postType';
-		}
-	}
-
-	return $args;
-}
-add_filter( 'register_block_type_args', 'gutenberg_add_context_for_block_bindings', 10, 2 );
