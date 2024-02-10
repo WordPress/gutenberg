@@ -317,6 +317,15 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Supports:** 
 -	**Attributes:** 
 
+## Formula
+
+Render mathematical formulæ. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/formula))
+
+-	**Name:** core/formula
+-	**Category:** text
+-	**Supports:** align, anchor, spacing (blockGap, margin, padding), ~~html~~
+-	**Attributes:** alt, formulaSource
+
 ## Classic
 
 Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
