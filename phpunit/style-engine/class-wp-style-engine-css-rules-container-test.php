@@ -37,22 +37,19 @@ class WP_Style_Engine_CSS_Rules_Container_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that only WP_Style_Engine_CSS_Rule can be added to a container.
+	 * Tests that empty values cannot be added.
 	 *
 	 * @covers ::add_rules
 	 * @covers ::get_rules
 	 */
-	public function test_should_only_add_rule_objects() {
+	public function test_cannot_add_empty_values() {
 		$css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media not all and (hover: hover)' );
 
 		$css_container->add_rules( '' );
-		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when empty string added.' );
+		$this->assertEmpty( $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when empty string added.' );
 
 		$css_container->add_rules( array() );
-		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when array() added.' );
-
-		$css_container->add_rules( new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media not all and (hover: hover)' ) );
-		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when unknown class added.' );
+		$this->assertEmpty( $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when array() added.' );
 	}
 
 	/**

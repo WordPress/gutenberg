@@ -106,7 +106,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 				if ( ! $rule instanceof WP_Style_Engine_CSS_Rule ) {
 					_doing_it_wrong(
 						__METHOD__,
-						__( 'Rules passed to WP_Style_Engine_CSS_Rules_Containermust be an instance of WP_Style_Engine_CSS_Rule', 'default' ),
+						__( 'Rules passed to WP_Style_Engine_CSS_Rules_Container must be an instance of WP_Style_Engine_CSS_Rule', 'default' ),
 						'6.6.0'
 					);
 					continue;
