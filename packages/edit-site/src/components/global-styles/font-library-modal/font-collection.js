@@ -373,7 +373,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				) }
 			</HStack>
 			<Button
-				label={ __( 'next page' ) }
+				label={ __( 'Next page' ) }
 				size="compact"
 				onClick={ () => setPage( page + 1 ) }
 				disabled={ page === totalPages }
