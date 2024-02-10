@@ -382,7 +382,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				<span>›</span>
 			</Button>
 			<Button
-				label={ __( 'last page' ) }
+				label={ __( 'Last page' ) }
 				size="compact"
 				onClick={ () => setPage( totalPages ) }
 				disabled={ page === totalPages }
