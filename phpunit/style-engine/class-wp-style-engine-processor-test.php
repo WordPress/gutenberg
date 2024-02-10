@@ -96,54 +96,6 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests compiling nested CSS rules and formatting them with new lines and indents.
-	 *
-	 * @covers ::get_css
-	 */
-	public function test_should_return_prettified_nested_css_rules() {
-		$a_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-wonderful-rule' );
-		$a_wonderful_css_rule->add_declarations(
-			array(
-				'color'            => 'var(--wonderful-color)',
-				'background-color' => 'orange',
-			)
-		);
-		$a_wonderful_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media (min-width: 80rem)', $a_wonderful_css_rule );
-
-
-		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-very_wonderful-rule' );
-		$a_very_wonderful_css_rule->add_declarations(
-			array(
-				'color'            => 'var(--wonderful-color)',
-				'background-color' => 'orange',
-			)
-		);
-		$a_very_wonderful_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@layer wonderfulness', $a_very_wonderful_css_rule );
-
-
-		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
-		$a_wonderful_processor->add_rules( array( $a_wonderful_css_container, $a_very_wonderful_css_container ) );
-
-		$expected = '@media (min-width: 80rem) {
-	.a-wonderful-rule {
-		color: var(--wonderful-color);
-		background-color: orange;
-	}
-}
-@layer wonderfulness {
-	.a-very_wonderful-rule {
-		color: var(--wonderful-color);
-		background-color: orange;
-	}
-}
-';
-		$this->assertSame(
-			$expected,
-			$a_wonderful_processor->get_css( array( 'prettify' => true ) )
-		);
-	}
-
-	/**
 	 * Tests adding a store and compiling CSS rules from that store.
 	 *
 	 * @covers ::add_store
@@ -398,7 +350,55 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that incoming CSS rules are optimized and merged with existing CSS rules.
+	 * Tests compiling nested CSS rules and formatting them with new lines and indents.
+	 *
+	 * @covers ::get_css
+	 */
+	public function test_should_return_prettified_nested_css_rules() {
+		// Create nested CSS rule 1.
+		$a_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-wonderful-rule' );
+		$a_wonderful_css_rule->add_declarations(
+			array(
+				'color'            => 'var(--wonderful-color)',
+				'background-color' => 'orange',
+			)
+		);
+		$a_wonderful_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media (min-width: 80rem)', $a_wonderful_css_rule );
+
+		// Create nested CSS rule 2.
+		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-very_wonderful-rule' );
+		$a_very_wonderful_css_rule->add_declarations(
+			array(
+				'color'            => 'var(--wonderful-color)',
+				'background-color' => 'orange',
+			)
+		);
+		$a_very_wonderful_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@layer wonderfulness', $a_very_wonderful_css_rule );
+
+		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
+		$a_wonderful_processor->add_rules( array( $a_wonderful_css_container, $a_very_wonderful_css_container ) );
+
+		$expected = '@media (min-width: 80rem) {
+	.a-wonderful-rule {
+		color: var(--wonderful-color);
+		background-color: orange;
+	}
+}
+@layer wonderfulness {
+	.a-very_wonderful-rule {
+		color: var(--wonderful-color);
+		background-color: orange;
+	}
+}
+';
+		$this->assertSame(
+			$expected,
+			$a_wonderful_processor->get_css( array( 'prettify' => true ) )
+		);
+	}
+
+	/**
+	 * Tests that incoming CSS rules are merged with existing CSS rules and that containers appear at the end of the CSS output.
 	 *
 	 * @covers ::add_rules
 	 * @covers ::get_rules
@@ -407,43 +407,50 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$panda_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'panda' );
 		// Add a nested rule.
 		$panda_store->add_rule(
-			new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@container (width > 400px)', new WP_Style_Engine_CSS_Rule_Gutenberg(
-				'.blueberry',
-				array(
-					'background-color' => 'blue',
+			new WP_Style_Engine_CSS_Rules_Container_Gutenberg(
+				'@container (width > 400px)',
+				new WP_Style_Engine_CSS_Rule_Gutenberg(
+					'.blueberry',
+					array(
+						'background-color' => 'blue',
+					)
 				)
-			) ) );
-
+			)
+		);
 
 		// Add a regular rule.
-		$panda_store_rule = $panda_store->add_rule(  '.wp-block-mushroom a:hover' );
-		$panda_store_rule->add_declarations( array(
-			'padding' => '100px',
-		) );
-
+		$panda_store_rule = $panda_store->add_rule( '.wp-block-mushroom a:hover' );
+		$panda_store_rule->add_declarations(
+			array(
+				'padding' => '100px',
+			)
+		);
 
 		$a_panda_renderer = new WP_Style_Engine_Processor_Gutenberg();
 		$a_panda_renderer->add_store( $panda_store );
 		$this->assertSame(
 			'.wp-block-mushroom a:hover{padding:100px;}@container (width > 400px){.blueberry{background-color:blue;}}',
 			$a_panda_renderer->get_css( array( 'prettify' => false ) ),
-			'Returns processed CSS rules with containers'
+			'Returns processed CSS rules with containers and containers at the end of the CSS output.'
 		);
 
 		// Combine existing nested rule with one added directly to the processor.
 		$a_panda_renderer->add_rules(
-			new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@container (width > 400px)',
+			new WP_Style_Engine_CSS_Rules_Container_Gutenberg(
+				'@container (width > 400px)',
 				new WP_Style_Engine_CSS_Rule_Gutenberg(
-			'.raspberry',
-						array(
-							'background-color' => 'red',
-						)
-				) ) );
+					'.raspberry',
+					array(
+						'background-color' => 'red',
+					)
+				)
+			)
+		);
 
 		$this->assertSame(
 			'.wp-block-mushroom a:hover{padding:100px;}@container (width > 400px){.blueberry{background-color:blue;}.raspberry{background-color:red;}}',
 			$a_panda_renderer->get_css( array( 'prettify' => false ) ),
-			'Returns processed CSS rules with rules added to containers'
+			'Returns processed CSS rules with rules added to containers.'
 		);
 
 		$expected_prettified = '.wp-block-mushroom a:hover {
@@ -461,7 +468,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			$expected_prettified,
 			$a_panda_renderer->get_css( array( 'prettify' => true ) ),
-			'Returns prettified processed CSS rules'
+			'Returns prettified processed CSS rules and nested rules'
 		);
 	}
 }

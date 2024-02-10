@@ -236,7 +236,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'style_block_with_nested_selector'                    => array(
+			'style_block_with_nested_selector'             => array(
 				'block_styles'    => array(
 					'spacing' => array(
 						'padding' => array(
@@ -247,7 +247,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array( 'selector' => '.wp-selector > p', 'container' => '@layer sandwich' ),
+				'options'         => array(
+					'selector'  => '.wp-selector > p',
+					'container' => '@layer sandwich',
+				),
 				'expected_output' => array(
 					'css'          => '@layer sandwich{.wp-selector > p{padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;}}',
 					'declarations' => array(
@@ -709,8 +712,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'selector'     => '.saruman',
 				'container'    => '@container (min-width: 700px)',
 				'declarations' => array(
-					'color'        => 'black',
-					'font-family'  => 'The-Great-Eye',
+					'color'       => 'black',
+					'font-family' => 'The-Great-Eye',
 				),
 			),
 			array(

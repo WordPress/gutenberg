@@ -57,15 +57,15 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	$styles_output = array();
 
 	if ( ! empty( $parsed_styles['declarations'] ) ) {
-		$container                     = $options['container'] ?? null;
-		$selector                      = $options['selector'] ?? null;
-		$css_declarations              = new WP_Style_Engine_CSS_Declarations( $parsed_styles['declarations'] );
-		$new_rule                      = null;
+		$container        = $options['container'] ?? null;
+		$selector         = $options['selector'] ?? null;
+		$css_declarations = new WP_Style_Engine_CSS_Declarations( $parsed_styles['declarations'] );
+		$new_rule         = null;
 
 		if ( $selector ) {
 			$new_rule = new WP_Style_Engine_CSS_Rule( $options['selector'], $css_declarations );
 			if ( $container ) {
-				$css_container = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
+				$css_container        = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
 				$styles_output['css'] = $css_container->get_css();
 			} else {
 				$styles_output['css'] = $new_rule->get_css();
@@ -138,7 +138,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		}
 
 		$container = $css_rule['container'] ?? null;
-		$new_rule = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+		$new_rule  = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
 
 		if ( $container ) {
 			$new_rule = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
