@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 					continue;
 				}
 
-				$selector  = $rule->get_selector();
+				$selector = $rule->get_selector();
 
 				if ( isset( $this->rules[ $selector ] ) ) {
 					$this->rules[ $selector ]->add_declarations( $rule->get_declarations() );
