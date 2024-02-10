@@ -556,15 +556,9 @@
 					}
 				},
 				"shadow": {
+					"type": "boolean",
 					"description": "Allow blocks to define a box shadow.",
-					"oneOf": [
-						{
-							"type": "boolean"
-						},
-						{
-							"type": "object"
-						}
-					]
+					"default": false
 				},
 				"typography": {
 					"type": "object",
