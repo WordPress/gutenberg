@@ -47,7 +47,7 @@ import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
-import { BLOCK_BINDINGS_ALLOWED_BLOCKS } from '../../hooks/use-bindings-attributes';
+import { isItPossibleToBindBlock } from '../block-binding-support';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -161,7 +161,7 @@ export function RichTextWrapper(
 		( select ) => {
 			// Disable Rich Text editing if block bindings specify that.
 			let _disableBoundBlocks = false;
-			if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
+			if ( blockBindings && isItPossibleToBindBlock( blockName ) ) {
 				const blockTypeAttributes =
 					getBlockType( blockName ).attributes;
 				const { getBlockBindingsSource } = unlock(
