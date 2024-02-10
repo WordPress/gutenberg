@@ -66,54 +66,57 @@ const withBlockBindingSupport = createHigherOrderComponent(
 
 		const { getBlockBindingsSource } = useSelect( blockEditorStore );
 
+		// Bail early if there are no bindings.
 		const bindings = attributes?.metadata?.bindings;
+		if ( ! bindings ) {
+			return <BlockEdit { ...props } />;
+		}
+
 		const BindingConnectorInstances = [];
 
-		if ( bindings ) {
-			Object.entries( bindings ).forEach( ( [ attrName, settings ] ) => {
-				const source = getBlockBindingsSource( settings.source );
-				const { useSource } = source;
+		Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
+			const source = getBlockBindingsSource( settings.source );
+			const { useSource } = source;
 
-				if ( source ) {
-					const attrValue = attributes[ attrName ];
+			if ( source ) {
+				const attrValue = attributes[ attrName ];
 
-					/*
-					 * Pick the prop value and setter
-					 * from the source custom hook.
-					 */
-					const { useValue: [ propValue, setPropValue ] = [] } =
-						useSource( props, settings.args );
+				/*
+				 * Pick the prop value and setter
+				 * from the source custom hook.
+				 */
+				const { useValue: [ propValue, setPropValue ] = [] } =
+					useSource( props, settings.args );
 
-					// Create a unique key for the connector instance
-					const key = `${ settings.source.replace(
-						/\//gi,
-						'-'
-					) }-${ attrName }`;
+				// Create a unique key for the connector instance
+				const key = `${ settings.source.replace(
+					/\//gi,
+					'-'
+				) }-${ attrName }-${ i }`;
 
-					BindingConnectorInstances.push(
-						<BlockBindingConnector
-							key={ key }
-							attrValue={ attrValue }
-							onAttributeChange={ useCallback(
-								( newAttrValue ) => {
-									setAttributes( {
-										[ attrName ]: newAttrValue,
-									} );
-								},
-								[ attrName ]
-							) }
-							propValue={ propValue }
-							onPropValueChange={ useCallback(
-								( newPropValue ) => {
-									setPropValue?.( newPropValue );
-								},
-								[ setPropValue ]
-							) }
-						/>
-					);
-				}
-			} );
-		}
+				BindingConnectorInstances.push(
+					<BlockBindingConnector
+						key={ key }
+						attrValue={ attrValue }
+						onAttributeChange={ useCallback(
+							( newAttrValue ) => {
+								setAttributes( {
+									[ attrName ]: newAttrValue,
+								} );
+							},
+							[ attrName ]
+						) }
+						propValue={ propValue }
+						onPropValueChange={ useCallback(
+							( newPropValue ) => {
+								setPropValue?.( newPropValue );
+							},
+							[ setPropValue ]
+						) }
+					/>
+				);
+			}
+		} );
 
 		return (
 			<>
