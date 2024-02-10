@@ -93,7 +93,11 @@ function processObjWithInnerKeys( obj ) {
 			rtn.push( `${ key } (${ obj[ key ].sort().join( ', ' ) })` );
 		} else if ( typeof obj[ key ] === 'object' ) {
 			const innerKeys = getTruthyKeys( obj[ key ] );
-			rtn.push( `${ key } (${ innerKeys.sort().join( ', ' ) })` );
+			if ( innerKeys.length > 0 ) {
+				rtn.push( `${ key } (${ innerKeys.sort().join( ', ' ) })` );
+			} else {
+				rtn.push( key );
+			}
 		} else {
 			rtn.push( key );
 		}
