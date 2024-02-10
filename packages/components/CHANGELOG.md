@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Modal`: Add `box-sizing` reset style ([#58905](https://github.com/WordPress/gutenberg/pull/58905)).
+
 ### Experimental
 
 -   `CustomSelectControlV2`: Adapt component for legacy usage ([#57902](https://github.com/WordPress/gutenberg/pull/57902)).
