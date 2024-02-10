@@ -325,7 +325,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 	return (
 		<Flex justify="center">
 			<Button
-				label={ __( 'first page' ) }
+				label={ __( 'First page' ) }
 				size="compact"
 				onClick={ () => setPage( 1 ) }
 				disabled={ page === 1 }
