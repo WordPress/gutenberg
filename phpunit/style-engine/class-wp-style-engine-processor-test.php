@@ -337,7 +337,6 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nicer_css_rule->set_container( '@layer nicety' );
 		$a_nicer_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@layer nicety', $a_nicer_css_rule );
 
 		$a_nice_processor = new WP_Style_Engine_Processor_Gutenberg();

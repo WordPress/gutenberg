@@ -36,9 +36,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 		 *
 		 * @param string                                              $selector  A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
 		 *                                                                       such as `@media (min-width: 80rem)` or `@layer module`.
-		 * @param WP_Style_Engine_CSS_Rule[]|WP_Style_Engine_CSS_Rule $rule      A WP_Style_Engine_CSS_Rule object.
+		 * @param WP_Style_Engine_CSS_Rule[]|WP_Style_Engine_CSS_Rule $rule      Optional. A WP_Style_Engine_CSS_Rule object.
 		 */
-		public function __construct( $selector = '', $rule ) {
+		public function __construct( $selector = '', $rule = array() ) {
 			$this->set_selector( $selector );
 			$this->add_rules( $rule );
 		}
@@ -94,6 +94,10 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 		 * @return WP_Style_Engine_CSS_Rules_Container Returns the object to allow chaining of methods.
 		 */
 		public function add_rules( $rules ) {
+			if ( empty( $rules ) ) {
+				return $this;
+			}
+
 			if ( ! is_array( $rules ) ) {
 				$rules = array( $rules );
 			}
