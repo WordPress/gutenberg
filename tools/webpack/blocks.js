@@ -142,7 +142,32 @@ module.exports = [
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
 								const classSuffix = 'Gutenberg';
+								let coreHooks = '';
 								content = content.toString();
+
+								coreHooks = content.match(
+									/^add_(action|filter)\(.*\);/gm
+								);
+
+								if ( coreHooks ) {
+									coreHooks = coreHooks.join( '\n\t\t' );
+									coreHooks = coreHooks.replaceAll(
+										'add_action',
+										'remove_action'
+									);
+									coreHooks = coreHooks.replaceAll(
+										'add_filter',
+										'remove_filter'
+									);
+
+									coreHooks =
+										"\n// Prevent core hooks from firing.\nadd_action(\n\t'init',\n\tfunction() {\n\t\t" +
+										coreHooks +
+										'\n\t},\n\t5\n);\n';
+								} else {
+									// Restore to a string
+									coreHooks = '';
+								}
 
 								// Within content, search and prefix any function calls from the
 								// `prefixFunctions` list. This is needed because some functions
@@ -213,7 +238,7 @@ module.exports = [
 										.replace(
 											/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
 											'$1, 20'
-										)
+										) + coreHooks
 								);
 							},
 							noErrorOnMissing: true,
