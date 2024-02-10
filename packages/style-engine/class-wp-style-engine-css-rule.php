@@ -15,19 +15,13 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 	 * @access private
 	 */
 	class WP_Style_Engine_CSS_Rule {
+
 		/**
 		 * The selector.
 		 *
 		 * @var string
 		 */
 		protected $selector;
-
-		/**
-		 * A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
-		 *
-		 * @var string
-		 */
-		protected $container;
 
 		/**
 		 * The selector declarations.
@@ -61,30 +55,6 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 			$this->selector = $selector;
 			return $this;
 		}
-
-		/**
-		 * Sets the container.
-		 *
-		 * @param string $container A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
-		 *                          such as `@media (min-width: 80rem)` or `@layer module`.
-		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
-		 */
-		public function set_container( $container ) {
-			if ( ! empty( $container ) ) {
-				$this->container = $container;
-			}
-			return $this;
-		}
-
-		/**
-		 * Gets the container.
-		 *
-		 * @return string Container.
-		 */
-		public function get_container() {
-			return $this->container;
-		}
-
 
 		/**
 		 * Sets the declarations.
