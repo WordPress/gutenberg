@@ -145,6 +145,53 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::add_rule
 	 */
+	public function test_should_combine_existing_rule_objects_to_store() {
+		$new_hotdog_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'hotdog' );
+
+		$selector         = '.pickle';
+		$pickle_rule      = new WP_Style_Engine_CSS_Rule_Gutenberg(
+			$selector,
+			array(
+				'color'         => 'brown',
+				'border-color'  => 'yellow',
+				'border-radius' => '10rem',
+			)
+		);
+		$pickle_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '.hotdog', $pickle_rule );
+		$added_rule       = $new_hotdog_store->add_rule( $pickle_container );
+		$expected         = '.hotdog{.pickle{color:brown;border-color:yellow;border-radius:10rem;}}';
+
+		$this->assertSame( $expected, $added_rule->get_css(), 'Return value of store rule get_css() matches passed rule object get_css().' );
+
+		$pickle_container_2 = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '.hotdog', array(
+				new WP_Style_Engine_CSS_Rule_Gutenberg(
+					'.pickle-2',
+					array(
+						'color'         => 'pink',
+						'border-color'  => 'blue',
+						'border-radius' => '11rem',
+					)
+				),
+				new WP_Style_Engine_CSS_Rule_Gutenberg(
+					$selector,
+					array(
+						'border-radius' => '1px',
+					)
+				)
+			)
+		);
+		$pickle_container->add_declarations( array( 'padding' => '100px' ) );
+		$added_rule       = $new_hotdog_store->add_rule( $pickle_container_2 );
+		$expected         = '.hotdog{padding:100px;.pickle{color:brown;border-color:yellow;border-radius:1px;}.pickle-2{color:pink;border-color:blue;border-radius:11rem;}}';
+		$this->assertSame( $expected, $added_rule->get_css(), 'Return value of store rule get_css() matches passed rule object get_css().' );
+	}
+
+
+	/**
+	 * Tests adding rules to an existing store.
+	 *
+	 * @covers ::add_rule
+	 */
 	public function test_should_add_rule_object_to_existing_store() {
 		$new_hotdog_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'hotdog' );
 

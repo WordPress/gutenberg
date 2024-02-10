@@ -6,21 +6,29 @@
  *
  * @package Gutenberg
  */
-// @TODO add unit tests
-// @TODO Should have same/similar interface to WP_Style_Engine_CSS_Rule or maybe inherits from WP_Style_Engine_CSS_Rule?
+
 if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 	/**
 	 * Holds, sanitizes, processes and prints nested CSS rules for the Style Engine.
 	 *
 	 * @access private
 	 */
-	class WP_Style_Engine_CSS_Rules_Container {
+	class WP_Style_Engine_CSS_Rules_Container extends WP_Style_Engine_CSS_Rule {
 		/**
 		 * A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`
 		 *
 		 * @var string
 		 */
 		protected $selector;
+
+		/**
+		 * The selector declarations.
+		 *
+		 * Contains a WP_Style_Engine_CSS_Declarations object.
+		 *
+		 * @var WP_Style_Engine_CSS_Declarations
+		 */
+		protected $declarations;
 
 		/**
 		 * The container declarations.
@@ -41,30 +49,6 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 		public function __construct( $selector = '', $rule = array() ) {
 			$this->set_selector( $selector );
 			$this->add_rules( $rule );
-		}
-
-		/**
-		 * Sets the selector/container name.
-		 *
-		 * @param string $selector A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
-		 *                          such as `@media (min-width: 80rem)` or `@layer module`.
-		 *
-		 * @return WP_Style_Engine_CSS_Rules_Container Returns the object to allow chaining of methods.
-		 */
-		public function set_selector( $selector ) {
-			if ( ! empty( $selector ) ) {
-				$this->selector = $selector;
-			}
-			return $this;
-		}
-
-		/**
-		 * Gets the selector/container name.
-		 *
-		 * @return string Container.
-		 */
-		public function get_selector() {
-			return $this->selector;
 		}
 
 		/**
@@ -137,6 +121,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 			$indent_count = $should_prettify ? $indent_count + 1 : $indent_count;
 			$new_line     = $should_prettify ? "\n" : '';
 			$spacer       = $should_prettify ? ' ' : '';
+			$css         .=  ! empty( $this->declarations ) ? $this->declarations->get_declarations_string( $should_prettify, $indent_count ) : '';
 
 			foreach ( $this->rules as $rule ) {
 				$css .= $rule->get_css( $should_prettify, $indent_count );

@@ -23,7 +23,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @covers ::gutenberg_style_engine_get_styles
+	 * @covers ::wp_style_engine_get_styles
 	 * @covers WP_Style_Engine_Gutenberg::parse_block_styles
 	 * @covers WP_Style_Engine_Gutenberg::compile_css
 	 *
@@ -557,7 +557,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 *
-	 * @covers ::gutenberg_style_engine_get_styles
+	 * @covers ::wp_style_engine_get_styles
 	 * @covers WP_Style_Engine_Gutenberg::store_css_rule
 	 */
 	public function test_should_store_block_styles_using_context() {
@@ -583,6 +583,49 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$rule             = $store->get_all_rules()['article'];
 
 		$this->assertSame( $generated_styles['css'], $rule->get_css() );
+	}
+
+	/**
+	 * Tests adding nested rules/containers to a store and retrieving a generated stylesheet.
+	 *
+	 * @covers ::wp_style_engine_get_styles
+	 * @covers ::wp_style_engine_get_stylesheet_from_context
+	 * @covers WP_Style_Engine_Gutenberg::store_css_rule
+	 */
+	public function test_should_store_nested_block_styles_using_context() {
+		gutenberg_style_engine_get_styles(
+			array(
+				'color' => array(
+					'text' => 'var:preset|color|texas-flood',
+				),
+			),
+			array(
+				'context'   => 'block-supports',
+				'container' => 'main'
+			)
+		);
+
+		gutenberg_style_engine_get_styles(
+			array(
+				'spacing' => array(
+					'padding' => array(
+						'top'    => '42px',
+						'left'   => '2%',
+						'bottom' => '44px',
+						'right'  => '5rem',
+					),
+				),
+			),
+			array(
+				'context'   => 'block-supports',
+				'selector'  => '& .container',
+				'container' => 'main'
+			)
+		);
+
+		$store_css = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+		$this->assertSame( 'main{color:var(--wp--preset--color--texas-flood);& .container{padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;}}', $store_css );
 	}
 
 	/**
@@ -615,7 +658,20 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * @covers ::wp_style_engine_get_stylesheet_from_context
 	 */
 	public function test_should_get_stored_stylesheet_from_context() {
-		$css_rules           = array(
+		$css_rules = array(
+			array(
+				'container'    => '.gollem',
+				'declarations' => array(
+					'background-color' => 'green',
+				),
+			),
+			array(
+				'container'    => '.gollem',
+				'selector'     => '&.precious:hover',
+				'declarations' => array(
+					'background-color' => 'gold',
+				),
+			),
 			array(
 				'selector'     => '.pippin',
 				'container'    => '@container (min-width: 700px)',
@@ -658,7 +714,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'selector'     => '.pippin',
 				'container'    => '@container (min-width: 700px)',
 				'declarations' => array(
-					'color'        => 'tan',
+					'color' => 'tan',
 				),
 			),
 		);
@@ -677,7 +733,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests returning a generated stylesheet from a set of rules.
 	 *
-	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_return_stylesheet_from_css_rules() {
@@ -721,6 +777,19 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 */
 	public function test_should_return_stylesheet_with_combined_nested_css_rules_printed_after_non_nested() {
 		$css_rules = array(
+			array(
+				'container'    => '.sauron',
+				'declarations' => array(
+					'text-transform' => 'uppercase',
+				),
+			),
+			array(
+				'container'    => '.sauron',
+				'selector'     => '.witch-king',
+				'declarations' => array(
+					'text-transform' => 'lowercase',
+				),
+			),
 			array(
 				'selector'     => '.saruman',
 				'declarations' => array(
@@ -783,7 +852,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
-		$this->assertSame( '.saruman{letter-spacing:1px;}.gandalf{letter-spacing:2px;}@container (min-width: 700px){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}}@supports (align-self: stretch){.voldemort{height:100px;align-self:stretch;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}}@supports (border-style: dotted){.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}}', $compiled_stylesheet );
+		$this->assertSame( '.saruman{letter-spacing:1px;}.gandalf{letter-spacing:2px;}.sauron{text-transform:uppercase;.witch-king{text-transform:lowercase;}}@container (min-width: 700px){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}}@supports (align-self: stretch){.voldemort{height:100px;align-self:stretch;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}}@supports (border-style: dotted){.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}}', $compiled_stylesheet );
 	}
 
 	/**
@@ -791,7 +860,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @ticket 58811
 	 *
-	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_dedupe_and_merge_css_rules() {
@@ -841,7 +910,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * This is testing this fix: https://github.com/WordPress/gutenberg/pull/49004
 	 *
-	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_return_stylesheet_from_duotone_css_rules() {

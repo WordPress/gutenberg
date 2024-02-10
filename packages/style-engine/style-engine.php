@@ -62,14 +62,20 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $parsed_styles['declarations'] );
 		$new_rule         = null;
 
-		if ( $selector ) {
-			$new_rule = new WP_Style_Engine_CSS_Rule( $options['selector'], $css_declarations );
-			if ( $container ) {
-				$css_container        = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
-				$styles_output['css'] = $css_container->get_css();
-			} else {
-				$styles_output['css'] = $new_rule->get_css();
+		// TODO: Extend WP_Style_Engine::compile_css to do this if block.
+		if ( $selector || $container ) {
+			if ( $selector ) {
+				$new_rule = new WP_Style_Engine_CSS_Rule( $options['selector'], $css_declarations );
 			}
+
+			if ( $container ) {
+				$new_rule = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
+				if ( ! $selector ) {
+					$new_rule->add_declarations( $css_declarations );
+				}
+			}
+
+			$styles_output['css'] = $new_rule->get_css();
 		} else {
 			$styles_output['css'] = $css_declarations->get_declarations_string();
 		}
@@ -133,15 +139,23 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 
 	$css_rule_objects = array();
 	foreach ( $css_rules as $css_rule ) {
-		if ( empty( $css_rule['selector'] ) || empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
+		if ( empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
 			continue;
 		}
 
 		$container = $css_rule['container'] ?? null;
-		$new_rule  = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+		$selector  = $css_rule['selector'] ?? null;
+		$new_rule  = null;
+
+		if ( $selector ) {
+			$new_rule  = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+		}
 
 		if ( $container ) {
 			$new_rule = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
+			if ( ! $selector ) {
+				$new_rule->add_declarations( $css_rule['declarations'] );
+			}
 		}
 
 		if ( ! empty( $options['context'] ) ) {

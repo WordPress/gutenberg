@@ -135,7 +135,14 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 			/*
 				Create a new WP_Style_Engine_CSS_Rule rule by default if it doesn't exist.
 			*/
-			if ( empty( $this->rules[ $selector ] ) ) {
+			if ( isset( $this->rules[ $selector ] ) ) {
+				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
+					$this->rules[ $selector ]->add_rules( $rule->get_rules() );
+				}
+				if ( $is_rules_object ) {
+					$this->rules[ $selector ]->add_declarations( $rule->get_declarations() );
+				}
+			} else {
 				$this->rules[ $selector ] = $is_rules_object ? $rule : new WP_Style_Engine_CSS_Rule( $selector );
 			}
 

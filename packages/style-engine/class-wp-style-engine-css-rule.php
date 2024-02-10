@@ -52,7 +52,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 		 */
 		public function set_selector( $selector ) {
-			$this->selector = $selector;
+			if ( ! empty( $selector ) ) {
+				$this->selector = $selector;
+			}
 			return $this;
 		}
 
@@ -65,6 +67,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 		 */
 		public function add_declarations( $declarations ) {
+			if ( empty( $declarations ) ) {
+				return $this;
+			}
 			$is_declarations_object = ! is_array( $declarations );
 			$declarations_array     = $is_declarations_object ? $declarations->get_declarations() : $declarations;
 
@@ -114,7 +119,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 			// Trims any multiple selectors strings.
 			$selector         = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
 			$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
-			$css_declarations = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
+			$css_declarations = ! empty( $this->declarations ) ? $this->declarations->get_declarations_string( $should_prettify, $declarations_indent ) : '';
+
 
 			if ( empty( $css_declarations ) ) {
 				return '';

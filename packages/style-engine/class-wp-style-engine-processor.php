@@ -80,20 +80,21 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 					continue;
 				}
 
+				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
+					if ( isset( $this->css_containers[ $selector ] ) ) {
+						$this->css_containers[ $selector ]->add_rules( $rule->get_rules() );
+						$this->css_containers[ $selector ]->add_declarations( $rule->get_declarations() );
+					} else {
+						$this->css_containers[ $selector ] = $rule;
+					}
+					continue;
+				}
+
 				if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
 					if ( isset( $this->css_rules[ $selector ] ) ) {
 						$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
 					} else {
 						$this->css_rules[ $selector ] = $rule;
-					}
-					continue;
-				}
-
-				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
-					if ( isset( $this->css_containers[ $selector ] ) ) {
-						$this->css_containers[ $selector ]->add_rules( $rule->get_rules() );
-					} else {
-						$this->css_containers[ $selector ] = $rule;
 					}
 				}
 			}
