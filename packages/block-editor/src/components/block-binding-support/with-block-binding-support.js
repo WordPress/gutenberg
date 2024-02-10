@@ -76,9 +76,9 @@ const withBlockBindingSupport = createHigherOrderComponent(
 
 		Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
 			const source = getBlockBindingsSource( settings.source );
-			const { useSource } = source;
 
 			if ( source ) {
+				const { useSource } = source;
 				const attrValue = attributes[ attrName ];
 
 				/*
