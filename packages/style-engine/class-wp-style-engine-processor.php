@@ -74,7 +74,7 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 			foreach ( $css_rules as $rule ) {
 				// Check for rules that need to be nested in containers.
-				$selector  = $rule->get_selector();
+				$selector = $rule->get_selector();
 
 				if ( empty( $selector ) ) {
 					continue;

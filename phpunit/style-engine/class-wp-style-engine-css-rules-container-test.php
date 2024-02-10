@@ -44,15 +44,15 @@ class WP_Style_Engine_CSS_Rules_Container_Test extends WP_UnitTestCase {
 	 */
 	public function test_should_only_add_rule_objects() {
 		$css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media not all and (hover: hover)' );
-		$selector      = '.goanna';
-		$css_rule_1    = new WP_Style_Engine_CSS_Rule_Gutenberg(
-			$selector,
-			array(
-				'font-size' => '2rem',
-			)
-		);
+
 		$css_container->add_rules( '' );
-		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules.' );
+		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when empty string added.' );
+
+		$css_container->add_rules( array() );
+		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when array() added.' );
+
+		$css_container->add_rules( new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media not all and (hover: hover)' ) );
+		$this->assertSame( array(), $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when unknown class added.' );
 	}
 
 	/**

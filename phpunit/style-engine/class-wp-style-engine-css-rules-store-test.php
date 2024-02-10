@@ -149,14 +149,17 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$new_hotdog_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'hotdog' );
 
 		$selector         = '.pickle';
-		$pickle_rule      = new WP_Style_Engine_CSS_Rule_Gutenberg( $selector, array(
-			'color'         => 'brown',
-			'border-color'  => 'yellow',
-			'border-radius' => '10rem',
-		) );
+		$pickle_rule      = new WP_Style_Engine_CSS_Rule_Gutenberg(
+			$selector,
+			array(
+				'color'         => 'brown',
+				'border-color'  => 'yellow',
+				'border-radius' => '10rem',
+			)
+		);
 		$pickle_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '.hotdog', $pickle_rule );
 		$added_rule       = $new_hotdog_store->add_rule( $pickle_container );
-		$expected         = ".hotdog{.pickle{color:brown;border-color:yellow;border-radius:10rem;}}";
+		$expected         = '.hotdog{.pickle{color:brown;border-color:yellow;border-radius:10rem;}}';
 
 		$this->assertSame( $expected, $added_rule->get_css(), 'Return value of store rule get_css() matches passed rule object get_css().' );
 	}
