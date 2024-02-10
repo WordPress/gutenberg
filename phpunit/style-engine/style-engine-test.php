@@ -617,6 +617,26 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	public function test_should_get_stored_stylesheet_from_context() {
 		$css_rules           = array(
 			array(
+				'selector'     => '.pippin',
+				'container'    => '@container (min-width: 700px)',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '12px',
+					'width'        => '15px',
+					'border-style' => 'dashed',
+				),
+			),
+			array(
+				'selector'     => '.merry',
+				'container'    => '@container (min-width: 700px)',
+				'declarations' => array(
+					'color'        => 'khaki',
+					'height'       => '23px',
+					'width'        => '23px',
+					'border-style' => 'solid',
+				),
+			),
+			array(
 				'selector'     => '.frodo',
 				'declarations' => array(
 					'color'        => 'brown',
@@ -634,7 +654,16 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'border-style' => 'solid',
 				),
 			),
+			array(
+				'selector'     => '.pippin',
+				'container'    => '@container (min-width: 700px)',
+				'declarations' => array(
+					'color'        => 'tan',
+				),
+			),
 		);
+
+		// Unit tests for the `wp_style_engine_get_stylesheet_from_css_rules` function below.
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules(
 			$css_rules,
 			array(
