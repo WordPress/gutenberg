@@ -334,7 +334,7 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 				<span>«</span>
 			</Button>
 			<Button
-				label={ __( 'previous page' ) }
+				label={ __( 'Previous page' ) }
 				size="compact"
 				onClick={ () => setPage( page - 1 ) }
 				disabled={ page === 1 }
