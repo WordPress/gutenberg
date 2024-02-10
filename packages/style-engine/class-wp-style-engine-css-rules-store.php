@@ -109,7 +109,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		 * Gets a WP_Style_Engine_CSS_Rule object by its selector.
 		 * If the rule does not exist, it will be created.
 		 *
-		 * @param string|WP_Style_Engine_CSS_Rule $rule The CSS selector or a WP_Style_Engine_CSS_Rule object.
+		 * @param string|WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rules_Container $rule The CSS selector or a WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rules_Container object.
 		 *
 		 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 		 */
@@ -118,9 +118,13 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 				return;
 			}
 
-			if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+			$is_rules_object = $rule instanceof WP_Style_Engine_CSS_Rules_Container || $rule instanceof WP_Style_Engine_CSS_Rule;
+
+			if ( $is_rules_object ) {
 				$selector = $rule->get_selector();
-			} else {
+			}
+
+			if ( is_string( $rule ) ) {
 				$selector = trim( $rule );
 			}
 
@@ -128,11 +132,11 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 				return;
 			}
 
-			// Create the rule if it doesn't exist.
+			/*
+				Create a new WP_Style_Engine_CSS_Rule rule by default if it doesn't exist.
+			*/
 			if ( empty( $this->rules[ $selector ] ) ) {
-				if ( ! empty( $selector ) ) {
-					$this->rules[ $selector ] = $rule instanceof WP_Style_Engine_CSS_Rule ? $rule : new WP_Style_Engine_CSS_Rule( $selector );
-				}
+				$this->rules[ $selector ] = $is_rules_object ? $rule : new WP_Style_Engine_CSS_Rule( $selector );
 			}
 
 			return $this->rules[ $selector ];

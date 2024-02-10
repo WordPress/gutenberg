@@ -45,41 +45,6 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests adding nested rules with at-rules and returning compiled CSS rules.
-	 *
-	 * @covers ::add_rules
-	 * @covers ::get_css
-	 */
-	public function test_should_return_nested_rules_as_compiled_css() {
-		$a_nice_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nice-rule' );
-		$a_nice_css_rule->add_declarations(
-			array(
-				'color'            => 'var(--nice-color)',
-				'background-color' => 'purple',
-			)
-		);
-		$a_nice_css_rule->set_container( '@media (min-width: 80rem)' );
-
-		$a_nicer_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nicer-rule' );
-		$a_nicer_css_rule->add_declarations(
-			array(
-				'font-family'      => 'Nice sans',
-				'font-size'        => '1em',
-				'background-color' => 'purple',
-			)
-		);
-		$a_nicer_css_rule->set_container( '@layer nicety' );
-
-		$a_nice_processor = new WP_Style_Engine_Processor_Gutenberg();
-		$a_nice_processor->add_rules( array( $a_nice_css_rule, $a_nicer_css_rule ) );
-
-		$this->assertSame(
-			'@media (min-width: 80rem){.a-nice-rule{color:var(--nice-color);background-color:purple;}}@layer nicety{.a-nicer-rule{font-family:Nice sans;font-size:1em;background-color:purple;}}',
-			$a_nice_processor->get_css( array( 'prettify' => false ) )
-		);
-	}
-
-	/**
 	 * Tests compiling CSS rules and formatting them with new lines and indents.
 	 *
 	 * @covers ::get_css
@@ -143,7 +108,8 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_wonderful_css_rule->set_container( '@media (min-width: 80rem)' );
+		$a_wonderful_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media (min-width: 80rem)', $a_wonderful_css_rule );
+
 
 		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-very_wonderful-rule' );
 		$a_very_wonderful_css_rule->add_declarations(
@@ -152,10 +118,11 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_very_wonderful_css_rule->set_container( '@layer wonderfulness' );
+		$a_very_wonderful_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@layer wonderfulness', $a_very_wonderful_css_rule );
+
 
 		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
-		$a_wonderful_processor->add_rules( array( $a_wonderful_css_rule, $a_very_wonderful_css_rule ) );
+		$a_wonderful_processor->add_rules( array( $a_wonderful_css_container, $a_very_wonderful_css_container ) );
 
 		$expected = '@media (min-width: 80rem) {
 	.a-wonderful-rule {
@@ -394,17 +361,63 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_should_return_store_rules_with_css_containers() {
+	/**
+	 * Tests adding nested rules with at-rules and returning compiled CSS rules.
+	 *
+	 * @covers ::add_rules
+	 * @covers ::get_css
+	 */
+	public function test_should_return_nested_rules_as_compiled_css() {
+		$a_nice_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nice-rule' );
+		$a_nice_css_rule->add_declarations(
+			array(
+				'color'            => 'var(--nice-color)',
+				'background-color' => 'purple',
+			)
+		);
+		$a_nice_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@media (min-width: 80rem)', $a_nice_css_rule );
+
+		$a_nicer_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nicer-rule' );
+		$a_nicer_css_rule->add_declarations(
+			array(
+				'font-family'      => 'Nice sans',
+				'font-size'        => '1em',
+				'background-color' => 'purple',
+			)
+		);
+		$a_nicer_css_rule->set_container( '@layer nicety' );
+		$a_nicer_css_container = new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@layer nicety', $a_nicer_css_rule );
+
+		$a_nice_processor = new WP_Style_Engine_Processor_Gutenberg();
+		$a_nice_processor->add_rules( array( $a_nice_css_container, $a_nicer_css_container ) );
+
+		$this->assertSame(
+			'@media (min-width: 80rem){.a-nice-rule{color:var(--nice-color);background-color:purple;}}@layer nicety{.a-nicer-rule{font-family:Nice sans;font-size:1em;background-color:purple;}}',
+			$a_nice_processor->get_css( array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Tests that incoming CSS rules are optimized and merged with existing CSS rules.
+	 *
+	 * @covers ::add_rules
+	 * @covers ::get_rules
+	 */
+	public function test_should_return_compiled_css_with_nested_rules_last() {
 		$panda_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'panda' );
 		// Add a nested rule.
-		$panda_store_rule_1  = $panda_store->add_rule(  '.blueberry' )->set_container( '@container (width > 400px)' );
-		$panda_store_rule_1->add_declarations( array(
-			'background-color'  => 'blue',
-		) );
+		$panda_store->add_rule(
+			new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@container (width > 400px)', new WP_Style_Engine_CSS_Rule_Gutenberg(
+				'.blueberry',
+				array(
+					'background-color' => 'blue',
+				)
+			) ) );
+
 
 		// Add a regular rule.
-		$panda_store_rule_2  = $panda_store->add_rule(  '.wp-block-mushroom a:hover' );
-		$panda_store_rule_2->add_declarations( array(
+		$panda_store_rule = $panda_store->add_rule(  '.wp-block-mushroom a:hover' );
+		$panda_store_rule->add_declarations( array(
 			'padding' => '100px',
 		) );
 
@@ -417,16 +430,15 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			'Returns processed CSS rules with containers'
 		);
 
-		// Combine with a nested rule added directly to the processor.
-		$a_raspberry_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
+		// Combine existing nested rule with one added directly to the processor.
+		$a_panda_renderer->add_rules(
+			new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '@container (width > 400px)',
+				new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.raspberry',
-			array(
-				'background-color'  => 'red',
-			)
-		);
-		$a_raspberry_rule->set_container( '@container (width > 400px)' );
-
-		$a_panda_renderer->add_rules( $a_raspberry_rule );
+						array(
+							'background-color' => 'red',
+						)
+				) ) );
 
 		$this->assertSame(
 			'.wp-block-mushroom a:hover{padding:100px;}@container (width > 400px){.blueberry{background-color:blue;}.raspberry{background-color:red;}}',

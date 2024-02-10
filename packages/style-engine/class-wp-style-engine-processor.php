@@ -63,7 +63,7 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 		/**
 		 * Adds rules to be processed.
 		 *
-		 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+		 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[]|WP_Style_Engine_CSS_Rules_Container|WP_Style_Engine_CSS_Rules_Container[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
 		 *
 		 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 		 */
@@ -74,23 +74,26 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 			foreach ( $css_rules as $rule ) {
 				// Check for rules that need to be nested in containers.
-				$container = $rule->get_container();
 				$selector  = $rule->get_selector();
 
-				if ( ! empty( $container ) ) {
-					if ( isset( $this->css_containers[ $container ] ) ) {
-						$this->css_containers[ $container ]->add_rules( $rule );
+				if ( empty( $selector ) ) {
+					continue;
+				}
+
+				if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+					if ( isset( $this->css_rules[ $selector ] ) ) {
+						$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
 					} else {
-						$this->css_containers[ $container ] = new WP_Style_Engine_CSS_Rules_Container( $container, $rule );
+						$this->css_rules[ $selector ] = $rule;
 					}
 					continue;
 				}
 
-				if ( ! empty( $selector ) ) {
-					if ( isset( $this->css_rules[ $selector ] ) ) {
-						$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
+				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
+					if ( isset( $this->css_containers[ $selector ] ) ) {
+						$this->css_containers[ $selector ]->add_rules( $rule->get_rules() );
 					} else {
-						$this->css_rules[ $rule->get_selector() ] = $rule;
+						$this->css_containers[ $selector ] = $rule;
 					}
 				}
 			}

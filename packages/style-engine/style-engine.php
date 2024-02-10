@@ -65,7 +65,6 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		if ( $selector ) {
 			$new_rule = new WP_Style_Engine_CSS_Rule( $options['selector'], $css_declarations );
 			if ( $container ) {
-				$new_rule->set_container( $container );
 				$css_container = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
 				$styles_output['css'] = $css_container->get_css();
 			} else {
@@ -139,8 +138,11 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		}
 
 		$container = $css_rule['container'] ?? null;
-		$new_rule  = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
-		$new_rule->set_container( $container );
+		$new_rule = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+
+		if ( $container ) {
+			$new_rule = new WP_Style_Engine_CSS_Rules_Container( $container, $new_rule );
+		}
 
 		if ( ! empty( $options['context'] ) ) {
 			WP_Style_Engine::get_store( $options['context'] )->add_rule( $new_rule );
