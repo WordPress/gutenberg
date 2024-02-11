@@ -19,6 +19,8 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import BlockPopover from '../components/block-popover';
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -73,8 +75,8 @@ export default {
 			/>
 		);
 	},
-	toolBarControls: function DefaultLayoutToolbarControls() {
-		return null;
+	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
+		return <GridVisualizer clientId={ clientId } />;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -220,4 +222,56 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 			max={ 6 }
 		/>
 	);
+}
+
+// TODO:
+//  - Make the grid visualizer appear when a child item is selected as well
+//  - Add ResizeBox stuff so that can resize children
+
+function GridVisualizer( { clientId } ) {
+	const blockElement = useBlockElement( clientId );
+	const gridTemplateColumns = getComputedCSS(
+		blockElement,
+		'grid-template-columns'
+	);
+	const gridTemplateRows = getComputedCSS(
+		blockElement,
+		'grid-template-rows'
+	);
+	const gridGap = getComputedCSS( blockElement, 'grid-gap' );
+	const numColumns = gridTemplateColumns.split( ' ' ).length;
+	const numRows = gridTemplateRows.split( ' ' ).length;
+	const numItems = numColumns * numRows;
+	return (
+		<BlockPopover
+			className="block-editor-grid-visualizer"
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstablePopoverSlot="block-toolbar"
+		>
+			<div
+				className="block-editor-grid-visualizer__grid"
+				style={ {
+					display: 'grid',
+					gridTemplateColumns,
+					gridTemplateRows,
+					gridGap,
+					padding: getComputedCSS( blockElement, 'padding' ),
+				} }
+			>
+				{ Array.from( { length: numItems }, ( _, i ) => (
+					<div
+						key={ i }
+						className="block-editor-grid-visualizer__item"
+					/>
+				) ) }
+			</div>
+		</BlockPopover>
+	);
+}
+
+function getComputedCSS( element, property ) {
+	return element.ownerDocument.defaultView
+		.getComputedStyle( element )
+		.getPropertyValue( property );
 }

@@ -135,7 +135,12 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	return css;
 }
 
-function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
+function LayoutPanelPure( {
+	layout,
+	setAttributes,
+	clientId,
+	name: blockName,
+} ) {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
@@ -282,6 +287,7 @@ function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
+					clientId={ clientId }
 				/>
 			) }
 		</>
