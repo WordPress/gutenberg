@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+wp_enqueue_script_module( 'negation-operator-view' );
 ?>
+
 <div data-wp-interactive='{ "namespace": "negation-operator" }'>
 	<button
 		data-wp-on--click="actions.toggle"

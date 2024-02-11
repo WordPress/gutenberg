@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
+index b871ea4..7910311 100644
+--- a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
++++ b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
+@@ -1430,7 +1430,6 @@ function InternalTextInput(props: Props): React.Node {
+         ref={_setNativeRef}
+         {...otherProps}
+         {...eventHandlers}
+-        accessibilityState={_accessibilityState}
+         accessible={accessible}
+         submitBehavior={submitBehavior}
+         caretHidden={caretHidden}

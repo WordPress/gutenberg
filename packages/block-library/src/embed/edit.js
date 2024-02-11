@@ -127,16 +127,17 @@ const EmbedEdit = ( props ) => {
 	};
 
 	useEffect( () => {
-		if ( ! preview?.html || ! cannotEmbed || fetching ) {
+		if ( preview?.html || ! cannotEmbed || fetching ) {
 			return;
 		}
+
 		// At this stage, we're not fetching the preview and know it can't be embedded,
 		// so try removing any trailing slash, and resubmit.
 		const newURL = attributesUrl.replace( /\/$/, '' );
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributesUrl, cannotEmbed, fetching ] );
+	}, [ preview?.html, attributesUrl, cannotEmbed, fetching, setAttributes ] );
 
 	// Try a different provider in case the embed url is not supported.
 	useEffect( () => {

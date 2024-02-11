@@ -5,7 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -52,7 +51,11 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
+function BlockEditAnchorControlPure( {
+	name: blockName,
+	anchor,
+	setAttributes,
+} ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	const isWeb = Platform.OS === 'web';
@@ -79,7 +82,7 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 					) }
 				</>
 			}
-			value={ attributes.anchor || '' }
+			value={ anchor || '' }
 			placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
 			onChange={ ( nextValue ) => {
 				nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
@@ -116,31 +119,14 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 	);
 }
 
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning the anchor ID, if block supports anchor.
- *
- * @param {Component} BlockEdit Original component.
- *
- * @return {Component} Wrapped component.
- */
-export const withAnchorControls = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ props.isSelected &&
-					hasBlockSupport( props.name, 'anchor' ) && (
-						<BlockEditAnchorControl
-							blockName={ props.name }
-							attributes={ props.attributes }
-							setAttributes={ props.setAttributes }
-						/>
-					) }
-			</>
-		);
-	};
-}, 'withAnchorControls' );
+export default {
+	addSaveProps,
+	edit: BlockEditAnchorControlPure,
+	attributeKeys: [ 'anchor' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'anchor' );
+	},
+};
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -162,13 +148,3 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/anchor/with-inspector-controls',
-	withAnchorControls
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/editor/anchor/save-props',
-	addSaveProps
-);

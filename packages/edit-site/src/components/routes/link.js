@@ -15,11 +15,10 @@ import {
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export function useLink( params = {}, state, shouldReplace = false ) {
+export function useLink( params, state, shouldReplace = false ) {
 	const history = useHistory();
-
 	function onClick( event ) {
-		event.preventDefault();
+		event?.preventDefault();
 
 		if ( shouldReplace ) {
 			history.replace( params, state );

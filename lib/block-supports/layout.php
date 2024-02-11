@@ -639,7 +639,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	* for features like the enhanced pagination of the Query block.
 	*/
 	$container_class = gutenberg_incremental_id_per_prefix(
-		'wp-container-' . sanitize_title( $block['blockName'] ) . '-layout-'
+		'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
 	);
 
 	// Set the correct layout type for blocks using legacy content width.
@@ -819,7 +819,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			break;
 		}
 
-		if ( false !== strpos( $processor->get_attribute( 'class' ), $inner_block_wrapper_classes ) ) {
+		$class_attribute = $processor->get_attribute( 'class' );
+		if ( is_string( $class_attribute ) && str_contains( $class_attribute, $inner_block_wrapper_classes ) ) {
 			break;
 		}
 	} while ( $processor->next_tag() );
@@ -892,7 +893,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 			if ( $classes ) {
 				$classes = explode( ' ', $classes );
 				foreach ( $classes as $class_name ) {
-					if ( str_contains( $class_name, 'layout' ) ) {
+					if ( str_contains( $class_name, 'is-layout-' ) ) {
 						array_push( $layout_classes, $class_name );
 						$processor->remove_class( $class_name );
 					}

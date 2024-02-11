@@ -6,7 +6,6 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
-	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -19,7 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { backup, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
@@ -111,58 +110,6 @@ function GlobalStylesActionMenu() {
 					</>
 				) }
 			</DropdownMenu>
-		</GlobalStylesMenuFill>
-	);
-}
-
-function GlobalStylesRevisionsMenu() {
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const { revisionsCount } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			revisionsCount:
-				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
-		};
-	}, [] );
-	const { goTo } = useNavigator();
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
-	const isRevisionsOpened = useSelect(
-		( select ) =>
-			'global-styles-revisions' ===
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
-	const loadRevisions = () => {
-		setIsListViewOpened( false );
-
-		if ( ! isRevisionsOpened ) {
-			goTo( '/revisions' );
-			setEditorCanvasContainerView( 'global-styles-revisions' );
-		} else {
-			goTo( '/' );
-			setEditorCanvasContainerView( undefined );
-		}
-	};
-	const hasRevisions = revisionsCount > 0;
-
-	return (
-		<GlobalStylesMenuFill>
-			<Button
-				label={ __( 'Revisions' ) }
-				icon={ backup }
-				onClick={ loadRevisions }
-				disabled={ ! hasRevisions }
-				isPressed={ isRevisionsOpened }
-			/>
 		</GlobalStylesMenuFill>
 	);
 }
@@ -283,7 +230,7 @@ function GlobalStylesBlockLink() {
 }
 
 function GlobalStylesEditorCanvasContainerLink() {
-	const { goTo, location } = useNavigator();
+	const { goTo } = useNavigator();
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
@@ -294,25 +241,18 @@ function GlobalStylesEditorCanvasContainerLink() {
 	// to the appropriate screen. This effectively allows deep linking to the
 	// desired screens from outside the global styles navigation provider.
 	useEffect( () => {
-		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
-			// Switching to the revisions container view should
-			// redirect to the revisions screen.
-			goTo( '/revisions' );
-		} else if (
-			!! editorCanvasContainerView &&
-			location?.path === '/revisions'
-		) {
-			// Switching to any container other than revisions should
-			// redirect from the revisions screen to the root global styles screen.
-			goTo( '/' );
-		} else if ( editorCanvasContainerView === 'global-styles-css' ) {
-			goTo( '/css' );
+		switch ( editorCanvasContainerView ) {
+			case 'global-styles-revisions':
+			case 'global-styles-revisions:style-book':
+				goTo( '/revisions' );
+				break;
+			case 'global-styles-css':
+				goTo( '/css' );
+				break;
+			default:
+				goTo( '/' );
+				break;
 		}
-
-		// location?.path is not a dependency because we don't want to track it.
-		// Doing so will cause an infinite loop. We could abstract logic to avoid
-		// having to disable the check later.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ editorCanvasContainerView, goTo ] );
 }
 
@@ -403,7 +343,6 @@ function GlobalStylesUI() {
 				<GlobalStylesStyleBook />
 			) }
 
-			<GlobalStylesRevisionsMenu />
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />

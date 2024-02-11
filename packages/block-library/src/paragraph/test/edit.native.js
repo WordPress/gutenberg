@@ -4,6 +4,7 @@
 import {
 	act,
 	addBlock,
+	dismissModal,
 	getBlock,
 	typeInRichText,
 	fireEvent,
@@ -15,6 +16,7 @@ import {
 	within,
 	withFakeTimers,
 	waitForElementToBeRemoved,
+	waitForModalVisible,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
@@ -685,6 +687,118 @@ describe( 'Paragraph block', () => {
 		<p>A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should show the expected font sizes values', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Open Font size settings
+		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
+		await waitFor( () => screen.getByLabelText( 'Selected: Default' ) );
+
+		// Assert
+		const modalContent = within( blockSettingsModal );
+		expect( modalContent.getByLabelText( 'Small' ) ).toBeVisible();
+		expect( modalContent.getByText( '14px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Medium' ) ).toBeVisible();
+		expect( modalContent.getByText( '17px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Large' ) ).toBeVisible();
+		expect( modalContent.getByText( '30px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Extra Large' ) ).toBeVisible();
+		expect( modalContent.getByText( '40px' ) ).toBeVisible();
+		expect(
+			modalContent.getByLabelText( 'Extra Extra Large' )
+		).toBeVisible();
+		expect( modalContent.getByText( '52px' ) ).toBeVisible();
+	} );
+
+	it( 'should set a font size value', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Open Font size settings
+		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
+
+		// Tap one font size
+		fireEvent.press( screen.getByLabelText( 'Large' ) );
+
+		// Dismiss the Block Settings modal.
+		await dismissModal( blockSettingsModal );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should set a line height value', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		const lineHeightControl = screen.getByLabelText( /Line Height/ );
+		fireEvent.press(
+			within( lineHeightControl ).getByText( '1.5', { hidden: true } )
+		);
+		const lineHeightTextInput = within(
+			lineHeightControl
+		).getByDisplayValue( '1.5', { hidden: true } );
+		fireEvent.changeText( lineHeightTextInput, '1.8' );
+
+		// Dismiss the Block Settings modal.
+		await dismissModal( blockSettingsModal );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'should focus on the previous Paragraph block when backspacing in an empty Paragraph block', async () => {

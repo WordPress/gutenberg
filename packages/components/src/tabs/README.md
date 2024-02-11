@@ -163,9 +163,9 @@ The children elements, which should be a series of `Tabs.TabPanel` components.
 
 ##### Props
 
-###### `id`: `string`
+###### `tabId`: `string`
 
-The id of the tab, which is prepended with the `Tabs` instance ID.
+A unique identifier for the tab, which is used to generate a unique id for the underlying element. The value of this prop should match with the value of the `tabId` prop on the corresponding `Tabs.TabPanel` component.
 
 - Required: Yes
 
@@ -198,9 +198,9 @@ The children elements, generally the content to display on the tabpanel.
 
 - Required: No
 
-###### `id`: `string`
+###### `tabId`: `string`
 
-The id of the tabpanel, which is combined with the `Tabs` instance ID and the suffix `-view`
+A unique identifier for the tabpanel, which is used to generate an instanced id for the underlying element. The value of this prop should match with the value of the `tabId` prop on the corresponding `Tabs.Tab` component.
 
 - Required: Yes
 

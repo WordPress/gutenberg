@@ -83,6 +83,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *     Required. A collection of CSS rules.
  *
  *     @type array ...$0 {
+ *         @type string   $at_rule      A CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
  *         @type string   $selector     A CSS selector.
  *         @type string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
  *     }
@@ -116,11 +117,13 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 			continue;
 		}
 
+		$at_rule = ! empty( $css_rule['at_rule'] ) ? $css_rule['at_rule'] : '';
+
 		if ( ! empty( $options['context'] ) ) {
-			WP_Style_Engine::store_css_rule( $options['context'], $css_rule['selector'], $css_rule['declarations'] );
+			WP_Style_Engine::store_css_rule( $options['context'], $css_rule['selector'], $css_rule['declarations'], $at_rule );
 		}
 
-		$css_rule_objects[] = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+		$css_rule_objects[] = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'], $at_rule );
 	}
 
 	if ( empty( $css_rule_objects ) ) {

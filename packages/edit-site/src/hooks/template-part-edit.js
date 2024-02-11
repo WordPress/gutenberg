@@ -43,7 +43,7 @@ function EditTemplatePartMenuItem( { attributes } ) {
 			canvas: 'edit',
 		},
 		{
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || templatePart?.id,
 		}
 	);
 
@@ -52,16 +52,14 @@ function EditTemplatePartMenuItem( { attributes } ) {
 	}
 
 	return (
-		<BlockControls group="other">
-			<ToolbarButton
-				{ ...linkProps }
-				onClick={ ( event ) => {
-					linkProps.onClick( event );
-				} }
-			>
-				{ __( 'Edit' ) }
-			</ToolbarButton>
-		</BlockControls>
+		<ToolbarButton
+			{ ...linkProps }
+			onClick={ ( event ) => {
+				linkProps.onClick( event );
+			} }
+		>
+			{ __( 'Edit' ) }
+		</ToolbarButton>
 	);
 }
 
@@ -72,9 +70,11 @@ export const withEditBlockControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				{ isDisplayed && (
-					<EditTemplatePartMenuItem attributes={ attributes } />
+					<BlockControls group="other">
+						<EditTemplatePartMenuItem attributes={ attributes } />
+					</BlockControls>
 				) }
 			</>
 		);

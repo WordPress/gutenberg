@@ -40,6 +40,7 @@ export default function PostSchedulePanel() {
 					contentClassName="editor-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
+							__next40pxDefaultSize
 							className="editor-post-schedule__dialog-toggle"
 							variant="tertiary"
 							onClick={ onToggle }
@@ -49,7 +50,7 @@ export default function PostSchedulePanel() {
 								label
 							) }
 							label={ fullLabel }
-							showTooltip
+							showTooltip={ label !== fullLabel }
 							aria-expanded={ isOpen }
 						>
 							{ label }

@@ -66,6 +66,10 @@ class AztecView extends Component {
 		this.focus = this.focus.bind( this );
 	}
 
+	componentWillUnmount() {
+		AztecInputState.blurOnUnmount( this.aztecViewRef.current );
+	}
+
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(

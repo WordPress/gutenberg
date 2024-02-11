@@ -73,6 +73,13 @@
 				"type": "string"
 			}
 		},
+		"allowedBlocks": {
+			"type": "array",
+			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
+			"items": {
+				"type": "string"
+			}
+		},
 		"icon": {
 			"type": "string",
 			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts)."
@@ -114,6 +121,7 @@
 										"object",
 										"array",
 										"string",
+										"rich-text",
 										"integer",
 										"number"
 									]
@@ -159,6 +167,7 @@
 							"enum": [
 								"attribute",
 								"text",
+								"rich-text",
 								"html",
 								"raw",
 								"query",
@@ -314,6 +323,11 @@
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
 					"properties": {
+						"aspectRatio": {
+							"type": "boolean",
+							"description": "Allow blocks to define an aspect ratio value.",
+							"default": false
+						},
 						"minHeight": {
 							"type": "boolean",
 							"description": "Allow blocks to define a minimum height value.",
@@ -340,6 +354,11 @@
 				"inserter": {
 					"type": "boolean",
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
+					"default": true
+				},
+				"renaming": {
+					"type": "boolean",
+					"description": "By default, a block can be renamed by a user from the block 'Options' dropdown or the 'Advanced' panel. To disable this behavior, set renaming to false.",
 					"default": true
 				},
 				"layout": {
@@ -536,6 +555,17 @@
 						}
 					}
 				},
+				"shadow": {
+					"description": "Allow blocks to define a box shadow.",
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "object"
+						}
+					]
+				},
 				"typography": {
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific typography property, its attributes definition is extended to include the style attribute.",
@@ -607,6 +637,7 @@
 							"type": "object",
 							"properties": {
 								"root": { "type": "string" },
+								"aspectRatio": { "type": "string" },
 								"minHeight": { "type": "string" }
 							}
 						}
@@ -650,6 +681,31 @@
 							}
 						}
 					]
+				},
+				"interactivity": {
+					"description": "Indicates if the block is using Interactivity API features.",
+					"oneOf": [
+						{
+							"type": "boolean",
+							"description": "Indicates whether the block is using the Interactivity API directives.",
+							"default": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"clientNavigation": {
+									"type": "boolean",
+									"description": "Indicates whether a block is compatible with the Interactivity API client-side navigation.\n\nSet it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.",
+									"default": false
+								},
+								"interactive": {
+									"type": "boolean",
+									"description": "Indicates whether the block is using the Interactivity API directives.",
+									"default": false
+								}
+							}
+						}
+					]
 				}
 			}
 		},
@@ -689,7 +745,7 @@
 				},
 				"innerBlocks": {
 					"type": "array",
-					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this: \n\n [ [ 'core/heading', { content: 'This is an Example' }, [] ] ]\n\n Where each block itself is an array that contains the block name, the block attributes, and the blocks inner blocks."
+					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this:\n\n[ { \"name\": \"core/heading\", \"attributes\": { \"content\": \"This is an Example\" } } ]\n\nWhere each block itself is an object that contains the block name, the block attributes, and the blocks inner blocks."
 				}
 			}
 		},
@@ -761,6 +817,20 @@
 		},
 		"style": {
 			"description": "Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"viewStyle": {
+			"description": "Block type frontend style definition. It will be enqueued only when viewing the content on the front of the site.",
 			"oneOf": [
 				{
 					"type": "string"

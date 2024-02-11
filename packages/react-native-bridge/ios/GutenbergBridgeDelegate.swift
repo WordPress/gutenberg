@@ -30,7 +30,6 @@ public enum Capabilities: String {
     case layoutGridBlock
     case tiledGalleryBlock
     case videoPressBlock
-    case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
@@ -283,6 +282,8 @@ public protocol GutenbergBridgeDelegate: AnyObject {
     func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
     
     func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
+
+    func gutenbergDidRequestConnectionStatus() -> Bool
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

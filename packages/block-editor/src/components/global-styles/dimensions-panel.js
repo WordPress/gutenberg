@@ -23,10 +23,11 @@ import { useCallback, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
+import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 
@@ -39,6 +40,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
 	return (
@@ -49,6 +51,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasMargin ||
 			hasGap ||
 			hasMinHeight ||
+			hasAspectRatio ||
 			hasChildLayout )
 	);
 }
@@ -75,6 +78,10 @@ function useHasGap( settings ) {
 
 function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
+}
+
+function useHasAspectRatio( settings ) {
+	return settings?.dimensions?.aspectRatio;
 }
 
 function useHasChildLayout( settings ) {
@@ -178,6 +185,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -191,6 +199,7 @@ const DEFAULT_CONTROLS = {
 	margin: true,
 	blockGap: true,
 	minHeight: true,
+	aspectRatio: true,
 	childLayout: true,
 };
 
@@ -345,14 +354,42 @@ export default function DimensionsPanel( {
 	const showMinHeightControl = useHasMinHeight( settings );
 	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
 	const setMinHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'minHeight' ],
+			newValue
+		);
+		// Apply min-height, while removing any applied aspect ratio.
 		onChange(
-			setImmutably( value, [ 'dimensions', 'minHeight' ], newValue )
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
 		);
 	};
 	const resetMinHeightValue = () => {
 		setMinHeightValue( undefined );
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
+
+	// Aspect Ratio
+	const showAspectRatioControl = useHasAspectRatio( settings );
+	const aspectRatioValue = decodeValue(
+		inheritedValue?.dimensions?.aspectRatio
+	);
+	const setAspectRatioValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'aspectRatio' ],
+			newValue
+		);
+		// Apply aspect-ratio, while removing any applied min-height.
+		onChange(
+			setImmutably( tempValue, [ 'dimensions', 'minHeight' ], undefined )
+		);
+	};
+	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
 
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
@@ -396,6 +433,7 @@ export default function DimensionsPanel( {
 			dimensions: {
 				...previousValue?.dimensions,
 				minHeight: undefined,
+				aspectRatio: undefined,
 			},
 		};
 	}, [] );
@@ -602,7 +640,7 @@ export default function DimensionsPanel( {
 			{ showMinHeightControl && (
 				<ToolsPanelItem
 					hasValue={ hasMinHeightValue }
-					label={ __( 'Min. height' ) }
+					label={ __( 'Minimum height' ) }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={
 						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
@@ -610,11 +648,23 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<HeightControl
-						label={ __( 'Min. height' ) }
+						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
 					/>
 				</ToolsPanelItem>
+			) }
+			{ showAspectRatioControl && (
+				<AspectRatioTool
+					hasValue={ hasAspectRatioValue }
+					value={ aspectRatioValue }
+					onChange={ setAspectRatioValue }
+					panelId={ panelId }
+					isShownByDefault={
+						defaultControls.aspectRatio ??
+						DEFAULT_CONTROLS.aspectRatio
+					}
+				/>
 			) }
 			{ showChildLayoutControl && (
 				<VStack

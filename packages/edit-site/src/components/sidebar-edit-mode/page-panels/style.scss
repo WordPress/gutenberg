@@ -1,37 +1,7 @@
-.edit-site-swap-template-modal {
-	z-index: z-index(".edit-site-swap-template-modal");
-}
+
 
 .edit-site-page-panels__swap-template__confirm-modal__actions {
 	margin-top: $grid-unit-30;
-}
-
-.edit-site-page-panels__swap-template__modal-content .block-editor-block-patterns-list {
-	column-count: 2;
-	column-gap: $grid-unit-30;
-
-	// Small top padding required to avoid cutting off the visible outline when hovering items
-	padding-top: $border-width-focus-fallback;
-
-	@include break-medium() {
-		column-count: 3;
-	}
-
-	@include break-wide() {
-		column-count: 4;
-	}
-
-	.block-editor-block-patterns-list__list-item {
-		break-inside: avoid-column;
-	}
-
-	.block-editor-block-patterns-list__item {
-		// Avoid to override the BlockPatternList component
-		// default hover and focus styles.
-		&:not(:focus):not(:hover) .block-editor-block-preview__container {
-			box-shadow: 0 0 0 1px $gray-300;
-		}
-	}
 }
 
 .edit-site-change-status__content {
@@ -68,15 +38,4 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-.edit-site-page-panels-edit-template__dropdown {
-	.components-popover__content {
-		min-width: 240px;
-	}
-	.components-button.is-pressed,
-	.components-button.is-pressed:hover {
-		background: inherit;
-		color: inherit;
-	}
 }

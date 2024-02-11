@@ -114,8 +114,8 @@ function GridItem( { categoryId, item, ...props } ) {
 		const json = {
 			__file: item.type,
 			title: item.title || item.name,
-			content: item.patternBlock.content.raw,
-			syncStatus: item.patternBlock.wp_pattern_sync_status,
+			content: item.patternPost.content.raw,
+			syncStatus: item.patternPost.wp_pattern_sync_status,
 		};
 
 		return downloadBlob(
@@ -171,8 +171,6 @@ function GridItem( { categoryId, item, ...props } ) {
 		<li className={ patternClassNames }>
 			<button
 				className={ previewClassNames }
-				// Even though still incomplete, passing ids helps performance.
-				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
 				type="button"
 				{ ...props }
@@ -200,6 +198,7 @@ function GridItem( { categoryId, item, ...props } ) {
 					<BlockPreview
 						blocks={ item.blocks }
 						additionalStyles={ additionalStyles }
+						viewportWidth={ item.viewportWidth }
 					/>
 				) }
 			</button>

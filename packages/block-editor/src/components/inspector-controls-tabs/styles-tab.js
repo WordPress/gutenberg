@@ -11,8 +11,11 @@ import { __ } from '@wordpress/i18n';
 import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import InspectorControls from '../inspector-controls';
+import { getBorderPanelLabel } from '../../hooks/border';
 
 const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
+	const borderPanelLabel = getBorderPanelLabel( { blockName } );
+
 	return (
 		<>
 			{ hasBlockStyles && (
@@ -45,7 +48,7 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
-			<InspectorControls.Slot group="border" label={ __( 'Border' ) } />
+			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
 			<InspectorControls.Slot group="styles" />
 		</>
 	);

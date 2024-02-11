@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+wp_enqueue_script_module( 'directive-class-view' );
 ?>
+
 <div data-wp-interactive='{"namespace": "directive-class"}'>
 	<button
 		data-wp-on--click="actions.toggleTrueValue"

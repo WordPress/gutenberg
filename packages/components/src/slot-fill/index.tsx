@@ -55,9 +55,12 @@ export function UnforwardedSlot(
 }
 export const Slot = forwardRef( UnforwardedSlot );
 
-export function Provider( { children }: SlotFillProviderProps ) {
+export function Provider( {
+	children,
+	passthrough = false,
+}: SlotFillProviderProps ) {
 	const parent = useContext( SlotFillContext );
-	if ( ! parent.isDefault ) {
+	if ( ! parent.isDefault && passthrough ) {
 		return <>{ children }</>;
 	}
 	return (

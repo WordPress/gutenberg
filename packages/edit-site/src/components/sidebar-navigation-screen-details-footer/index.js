@@ -42,7 +42,7 @@ export default function SidebarNavigationScreenDetailsFooter( {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-details-footer">
 			<SidebarNavigationItem
-				label={ __( 'Revisions' ) }
+				aria-label={ __( 'Revisions' ) }
 				{ ...hrefProps }
 				{ ...otherProps }
 			>

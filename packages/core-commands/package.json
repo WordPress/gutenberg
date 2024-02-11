@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "0.15.0",
+	"version": "0.20.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,6 +29,7 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/commands": "file:../commands",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",

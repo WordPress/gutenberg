@@ -84,6 +84,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
  */
 export function FocalPointPicker( {
 	__nextHasNoMarginBottom,
+	__next40pxDefaultSize = false,
 	autoPlay = true,
 	className,
 	help,
@@ -216,8 +217,8 @@ export function FocalPointPicker( {
 	};
 
 	const focalPointPosition = {
-		left: x * bounds.width,
-		top: y * bounds.height,
+		left: x !== undefined ? x * bounds.width : 0.5 * bounds.width,
+		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
 	const classes = classnames(
@@ -273,6 +274,7 @@ export function FocalPointPicker( {
 			</MediaWrapper>
 			<Controls
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {

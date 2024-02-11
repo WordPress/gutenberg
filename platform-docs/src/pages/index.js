@@ -12,6 +12,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
  * Internal dependencies
  */
 import styles from './index.module.css';
+import HomepageTrustedBy from '../components/HomepageTrustedBy';
 
 function HomepageHeader() {
 	const { siteConfig } = useDocusaurusContext();
@@ -43,6 +44,7 @@ export default function Home() {
 			<HomepageHeader />
 			<main>
 				<HomepageFeatures />
+				<HomepageTrustedBy />
 			</main>
 		</Layout>
 	);

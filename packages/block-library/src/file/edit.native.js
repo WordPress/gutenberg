@@ -97,7 +97,7 @@ export class FileEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { downloadButtonText } = attributes;
 
-		if ( downloadButtonText === undefined || downloadButtonText === '' ) {
+		if ( RichText.isEmpty( downloadButtonText ) ) {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );

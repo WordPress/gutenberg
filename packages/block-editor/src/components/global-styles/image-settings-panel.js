@@ -8,6 +8,11 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+
 export function useHasImageSettingsPanel( name, value, inheritedValue ) {
 	// Note: If lightbox `value` exists, that means it was
 	// defined via the the Global Styles UI and will NOT
@@ -47,6 +52,7 @@ export default function ImageSettingsPanel( {
 				label={ _x( 'Settings', 'Image settings' ) }
 				resetAll={ resetLightbox }
 				panelId={ panelId }
+				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 			>
 				<ToolsPanelItem
 					// We use the `userSettings` prop instead of `settings`, because `settings`

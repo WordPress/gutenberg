@@ -16,7 +16,7 @@
  *
  * @return string The search block markup.
  */
-function render_block_core_search( $attributes, $content, $block ) {
+function render_block_core_search( $attributes ) {
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
@@ -36,7 +36,6 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$show_button         = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
 	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
-	$button_behavior     = ( ! empty( $attributes['buttonBehavior'] ) ) ? $attributes['buttonBehavior'] : 'default';
 	$button              = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
@@ -78,28 +77,29 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$input->set_attribute( 'value', get_search_query() );
 		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
 
-		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
+		// If it's interactive, enqueue the script module and add the directives.
+		$is_expandable_searchfield = 'button-only' === $button_position;
 		if ( $is_expandable_searchfield ) {
+			$suffix = wp_scripts_get_suffix();
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/search',
+				isset( $module_url ) ? $module_url : includes_url( "blocks/search/view{$suffix}.js" ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
+			wp_enqueue_script_module( '@wordpress/block-library/search' );
+
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'state.tabindex' );
-			// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
+
+			// Adding these attributes manually is needed until the Interactivity API
+			// SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
-		}
-
-		// If the script already exists, there is no point in removing it from viewScript.
-		$view_js_file = 'wp-block-search-view';
-		if ( ! wp_script_is( $view_js_file ) ) {
-			$script_handles = $block->block_type->view_script_handles;
-
-			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-			if ( ! $is_expandable_searchfield && in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-			}
-			// If the script is needed, but it was previously removed, add it again.
-			if ( $is_expandable_searchfield && ! in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-			}
 		}
 	}
 
@@ -144,13 +144,15 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
-			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
+			if ( 'button-only' === $attributes['buttonPosition'] ) {
 				$button->set_attribute( 'data-wp-bind--aria-label', 'state.ariaLabel' );
 				$button->set_attribute( 'data-wp-bind--aria-controls', 'state.ariaControls' );
 				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.isSearchInputVisible' );
 				$button->set_attribute( 'data-wp-bind--type', 'state.type' );
 				$button->set_attribute( 'data-wp-on--click', 'actions.openSearchInput' );
-				// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
+
+				// Adding these attributes manually is needed until the Interactivity
+				// API SSR logic is added to core.
 				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
@@ -172,6 +174,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 		array( 'class' => $classnames )
 	);
 	$form_directives      = '';
+
+	// If it's interactive, add the directives.
 	if ( $is_expandable_searchfield ) {
 		$aria_label_expanded  = __( 'Submit Search' );
 		$aria_label_collapsed = __( 'Expand search field' );
@@ -207,25 +211,6 @@ function register_block_core_search() {
 add_action( 'init', 'register_block_core_search' );
 
 /**
- * Ensure that the view script has the `wp-interactivity` dependency.
- *
- * @since 6.4.0
- *
- * @global WP_Scripts $wp_scripts
- */
-function block_core_search_ensure_interactivity_dependency() {
-	global $wp_scripts;
-	if (
-		isset( $wp_scripts->registered['wp-block-search-view'] ) &&
-		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-search-view']->deps, true )
-	) {
-		$wp_scripts->registered['wp-block-search-view']->deps[] = 'wp-interactivity';
-	}
-}
-
-add_action( 'wp_print_scripts', 'block_core_search_ensure_interactivity_dependency' );
-
-/**
  * Builds the correct top level classnames for the 'core/search' block.
  *
  * @param array $attributes The block attributes.
@@ -249,10 +234,7 @@ function classnames_for_block_core_search( $attributes ) {
 		}
 
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
-			$classnames[] = 'wp-block-search__button-only';
-			if ( ! empty( $attributes['buttonBehavior'] ) && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search__searchfield-hidden';
-			}
+			$classnames[] = 'wp-block-search__button-only wp-block-search__searchfield-hidden';
 		}
 	}
 

@@ -1,16 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN } from '../dataviews/constants';
+import {
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+	LAYOUT_GRID,
+	OPERATOR_IN,
+} from '../../utils/constants';
+
+export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
+	[ LAYOUT_GRID ]: {
+		mediaField: 'featured-image',
+		primaryField: 'title',
+	},
+	[ LAYOUT_LIST ]: {
+		primaryField: 'title',
+		mediaField: 'featured-image',
+	},
+};
 
 const DEFAULT_PAGE_BASE = {
-	type: 'list',
+	type: LAYOUT_TABLE,
 	search: '',
 	filters: [],
 	page: 1,
@@ -22,13 +41,15 @@ const DEFAULT_PAGE_BASE = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'date', 'featured-image' ],
-	layout: {},
+	layout: {
+		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_TABLE ],
+	},
 };
 
-const DEFAULT_VIEWS = {
+export const DEFAULT_VIEWS = {
 	page: [
 		{
-			title: __( 'All' ),
+			title: _x( 'All', 'pages' ),
 			slug: 'all',
 			view: DEFAULT_PAGE_BASE,
 		},
@@ -55,5 +76,3 @@ const DEFAULT_VIEWS = {
 		},
 	],
 };
-
-export default DEFAULT_VIEWS;

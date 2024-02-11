@@ -3,13 +3,17 @@
  * HTML for testing the hydration of the serialized store.
  *
  * @package gutenberg-test-interactive-blocks
+ *
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
+
+wp_enqueue_script_module( 'store-tag-view' );
 
 // These variables simulates SSR.
 $test_store_tag_counter = 'ok' === $attributes['condition'] ? 3 : 0;
 $test_store_tag_double  = $test_store_tag_counter * 2;
 ?>
+
 <div data-wp-interactive='{ "namespace": "store-tag" }'>
 	<div>
 		Counter:
@@ -45,7 +49,7 @@ $test_store_tag_double  = $test_store_tag_counter * 2;
 if ( 'missing' !== $attributes['condition'] ) {
 
 	if ( 'ok' === $attributes['condition'] ) {
-		$test_store_tag_json = '{ "store-tag": { "counter": { "value": 3 } } }';
+		$test_store_tag_json = '{ "state": { "store-tag": { "counter": { "value": 3 } } } }';
 	}
 
 	if ( 'corrupted-json' === $attributes['condition'] ) {
@@ -57,7 +61,7 @@ if ( 'missing' !== $attributes['condition'] ) {
 	}
 
 	echo <<<HTML
-	<script type="application/json" id="wp-interactivity-initial-state">
+	<script type="application/json" id="wp-interactivity-data">
 		$test_store_tag_json
 	</script>
 HTML;

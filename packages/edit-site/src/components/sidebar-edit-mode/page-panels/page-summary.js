@@ -6,13 +6,13 @@ import {
 	PostAuthorPanel,
 	PostURLPanel,
 	PostSchedulePanel,
+	PostTemplatePanel,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PageStatus from './page-status';
-import EditTemplate from './edit-template';
 
 export default function PageSummary( {
 	status,
@@ -31,7 +31,7 @@ export default function PageSummary( {
 				postType={ postType }
 			/>
 			<PostSchedulePanel />
-			<EditTemplate />
+			<PostTemplatePanel />
 			<PostURLPanel />
 			<PostAuthorPanel />
 		</VStack>

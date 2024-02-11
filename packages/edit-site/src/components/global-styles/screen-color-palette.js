@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TabPanel } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,6 +10,9 @@ import { TabPanel } from '@wordpress/components';
 import ColorPalettePanel from './color-palette-panel';
 import GradientPalettePanel from './gradients-palette-panel';
 import ScreenHeader from './header';
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 function ScreenColorPalette( { name } ) {
 	return (
@@ -20,31 +23,18 @@ function ScreenColorPalette( { name } ) {
 					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
 				) }
 			/>
-			<TabPanel
-				tabs={ [
-					{
-						name: 'solid',
-						title: 'Solid',
-						value: 'solid',
-					},
-					{
-						name: 'gradient',
-						title: 'Gradient',
-						value: 'gradient',
-					},
-				] }
-			>
-				{ ( tab ) => (
-					<>
-						{ tab.value === 'solid' && (
-							<ColorPalettePanel name={ name } />
-						) }
-						{ tab.value === 'gradient' && (
-							<GradientPalettePanel name={ name } />
-						) }
-					</>
-				) }
-			</TabPanel>
+			<Tabs>
+				<Tabs.TabList>
+					<Tabs.Tab tabId="solid">Solid</Tabs.Tab>
+					<Tabs.Tab tabId="gradient">Gradient</Tabs.Tab>
+				</Tabs.TabList>
+				<Tabs.TabPanel tabId="solid" focusable={ false }>
+					<ColorPalettePanel name={ name } />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="gradient" focusable={ false }>
+					<GradientPalettePanel name={ name } />
+				</Tabs.TabPanel>
+			</Tabs>
 		</>
 	);
 }

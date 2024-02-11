@@ -8,41 +8,24 @@ import classnames from 'classnames';
  */
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	__unstableGetBlockProps as getBlockProps,
-	getBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { BlockListBlockContext } from '../block-list-block-context';
+import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockEditContext } from '../../block-edit/context';
-import { useBlockClassNames } from './use-block-class-names';
-import { useBlockDefaultClassName } from './use-block-default-class-name';
-import { useBlockCustomClassName } from './use-block-custom-class-name';
-import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
-import { store as blockEditorStore } from '../../../store';
-import useBlockOverlayActive from '../../block-content-overlay';
-import { unlock } from '../../../lock-unlock';
-
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
+import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -92,81 +75,51 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		className,
 		wrapperProps = {},
 		isAligned,
-	} = useContext( BlockListBlockContext );
-	const {
 		index,
 		mode,
 		name,
 		blockApiVersion,
 		blockTitle,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
+		isSelected,
 		isSubtreeDisabled,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getBlockIndex,
-				getBlockMode,
-				getBlockName,
-				isTyping,
-				getGlobalBlockCount,
-				isBlockSelected,
-				isBlockMultiSelected,
-				isAncestorMultiSelected,
-				isFirstMultiSelectedBlock,
-				isBlockSubtreeDisabled,
-			} = unlock( select( blockEditorStore ) );
-			const { getActiveBlockVariation } = select( blocksStore );
-			const isSelected = isBlockSelected( clientId );
-			const isPartOfMultiSelection =
-				isBlockMultiSelected( clientId ) ||
-				isAncestorMultiSelected( clientId );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
-
-			return {
-				index: getBlockIndex( clientId ),
-				mode: getBlockMode( clientId ),
-				name: blockName,
-				blockApiVersion: blockType?.apiVersion || 1,
-				blockTitle: match?.title || blockType?.title,
-				isPartOfSelection: isSelected || isPartOfMultiSelection,
-				adjustScrolling:
-					isSelected || isFirstMultiSelectedBlock( clientId ),
-				enableAnimation:
-					! isTyping() &&
-					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const hasOverlay = useBlockOverlayActive( clientId );
+		isOutlineEnabled,
+		hasOverlay,
+		initialPosition,
+		blockEditingMode,
+		isHighlighted,
+		isMultiSelected,
+		isPartiallySelected,
+		isReusable,
+		isDragging,
+		hasChildSelected,
+		removeOutline,
+		isBlockMovingMode,
+		canInsertMovingBlock,
+		isEditingDisabled,
+		hasEditableOutline,
+		isTemporarilyEditingAsBlocks,
+		defaultClassName,
+		templateLock,
+	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		props.ref,
-		useFocusFirstElement( clientId ),
+		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useEventHandlers( clientId ),
+		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered(),
+		useIsHovered( { isEnabled: isOutlineEnabled } ),
 		useIntersectionObserver(),
-		useMovingAnimation( {
-			isSelected: isPartOfSelection,
-			adjustScrolling,
-			enableAnimation,
-			triggerAnimationOnChange: index,
-		} ),
+		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
+		useFlashEditableBlocks( {
+			clientId,
+			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
+		} ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -178,7 +131,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	}
 
 	return {
-		tabIndex: 0,
+		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
@@ -190,18 +143,30 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: classnames(
-			// The wp-block className is important for editor styles.
-			classnames( 'block-editor-block-list__block', {
+			'block-editor-block-list__block',
+			{
+				// The wp-block className is important for editor styles.
 				'wp-block': ! isAligned,
 				'has-block-overlay': hasOverlay,
-			} ),
+				'is-selected': isSelected,
+				'is-highlighted': isHighlighted,
+				'is-multi-selected': isMultiSelected,
+				'is-partially-selected': isPartiallySelected,
+				'is-reusable': isReusable,
+				'is-dragging': isDragging,
+				'has-child-selected': hasChildSelected,
+				'remove-outline': removeOutline,
+				'is-block-moving-mode': isBlockMovingMode,
+				'can-insert-moving-block': canInsertMovingBlock,
+				'is-editing-disabled': isEditingDisabled,
+				'has-editable-outline': hasEditableOutline,
+				'is-content-locked-temporarily-editing-as-blocks':
+					isTemporarilyEditingAsBlocks,
+			},
 			className,
 			props.className,
 			wrapperProps.className,
-			useBlockClassNames( clientId ),
-			useBlockDefaultClassName( clientId ),
-			useBlockCustomClassName( clientId ),
-			useBlockMovingModeClassNames( clientId )
+			defaultClassName
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

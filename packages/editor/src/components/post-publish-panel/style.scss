@@ -152,7 +152,9 @@
 	}
 
 	input[readonly] {
-		padding: $grid-unit-20;
+		// Do not increase top and bottom padding otherwise Firefox won't show the text overflow ellipsis.
+		// See https://github.com/WordPress/gutenberg/pull/57310
+		padding: $grid-unit-15;
 		background: $gray-100;
 		border-color: $gray-400;
 		overflow: hidden;

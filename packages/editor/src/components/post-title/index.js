@@ -168,7 +168,7 @@ function PostTitle( _, forwardedRef ) {
 	const { ref: richTextRef } = useRichText( {
 		value: title,
 		onChange,
-		decodedPlaceholder,
+		placeholder: decodedPlaceholder,
 		selectionStart: selection.start,
 		selectionEnd: selection.end,
 		onSelectionChange( newStart, newEnd ) {

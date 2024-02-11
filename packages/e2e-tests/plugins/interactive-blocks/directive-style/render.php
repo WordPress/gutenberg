@@ -5,6 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+wp_enqueue_script_module( 'directive-style-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-style" }'>

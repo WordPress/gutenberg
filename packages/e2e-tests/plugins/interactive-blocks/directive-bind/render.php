@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+wp_enqueue_script_module( 'directive-bind-view' );
 ?>
+
 <div data-wp-interactive='{ "namespace": "directive-bind" }'>
 	<a
 		data-wp-bind--href="state.url"

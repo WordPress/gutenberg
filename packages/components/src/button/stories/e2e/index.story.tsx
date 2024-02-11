@@ -40,6 +40,12 @@ export const VariantStates: StoryFn< typeof Button > = (
 				>
 					<Button { ...props } variant={ variant } />
 					<Button { ...props } variant={ variant } disabled />
+					<Button
+						{ ...props }
+						variant={ variant }
+						disabled
+						__experimentalIsFocusable
+					/>
 					<Button { ...props } variant={ variant } isBusy />
 					<Button { ...props } variant={ variant } isDestructive />
 					<Button { ...props } variant={ variant } isPressed />
