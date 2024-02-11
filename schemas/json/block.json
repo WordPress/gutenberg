@@ -558,7 +558,16 @@
 				"shadow": {
 					"type": "boolean",
 					"description": "Allow blocks to define a box shadow.",
-					"default": false
+					"oneOf": [
+						{
+							"type": "boolean",
+							"description": "Defines whether a box shadow is enabled or not.",
+							"default": false
+						},
+						{
+							"type": "object"
+						}
+					]
 				},
 				"typography": {
 					"type": "object",
