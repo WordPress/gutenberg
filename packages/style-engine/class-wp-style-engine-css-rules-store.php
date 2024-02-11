@@ -118,36 +118,26 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 				return;
 			}
 
-			$is_rules_object = $rule instanceof WP_Style_Engine_CSS_Rules_Container || $rule instanceof WP_Style_Engine_CSS_Rule;
-
-			if ( $is_rules_object ) {
-				$selector = $rule->get_selector();
-			}
-
 			if ( is_string( $rule ) ) {
 				$selector = trim( $rule );
+				/*
+					Create a new WP_Style_Engine_CSS_Rule rule by default if it doesn't exist.
+				*/
+				if ( ! isset( $this->rules[ $selector ] ) ) {
+					$rule = new WP_Style_Engine_CSS_Rule( $selector );
+				} else {
+					return $this->rules[ $selector ];
+				}
 			}
 
-			if ( empty( $selector ) ) {
-				return;
-			}
-
-			/*
-				Create a new WP_Style_Engine_CSS_Rule rule by default if it doesn't exist.
-			*/
+			$selector = $rule->get_selector();
 			if ( isset( $this->rules[ $selector ] ) ) {
-				// @TODO Create a unit test to check if an incoming rule is a container too. Don't overwrite existing containers?
-				// @TODO Maybe have a helper function on the class to check if the rule is a container?
-				// Or store them in the store in different containers?
-				// Or an ->merge() method?
-				if ( $this->rules[ $selector ] instanceof WP_Style_Engine_CSS_Rules_Container && $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
+				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container && $this->rules[ $selector ] instanceof WP_Style_Engine_CSS_Rules_Container ) {
 					$this->rules[ $selector ]->add_rules( $rule->get_rules() );
 				}
-				if ( $is_rules_object ) {
-					$this->rules[ $selector ]->add_declarations( $rule->get_declarations() );
-				}
+				$this->rules[ $selector ]->add_declarations( $rule->get_declarations() );
 			} else {
-				$this->rules[ $selector ] = $is_rules_object ? $rule : new WP_Style_Engine_CSS_Rule( $selector );
+				$this->rules[ $selector ] = $rule;
 			}
 
 			return $this->rules[ $selector ];

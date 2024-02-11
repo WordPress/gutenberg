@@ -141,6 +141,65 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests separation of stores.
+	 *
+	 * @covers ::add_rule
+	 * @covers ::get_store
+	 */
+	public function test_should_add_rules_to_separate_stores() {
+		$store_one           = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'one' );
+		$store_one_rule      = $store_one->add_rule( '.one' );
+		$store_one_container = $store_one->add_rule( new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '.one_container' ) );
+
+		$store_two      = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'two' );
+		$store_rule_two = $store_two->add_rule( '.two' );
+
+		$this->assertSame(
+			array(
+				'.one'           => $store_one_rule,
+				'.one_container' => $store_one_container,
+			),
+			WP_Style_Engine_Gutenberg::get_store( 'one' )->get_all_rules(),
+			'get_all_rules() does not return expected array of rules for store one.'
+		);
+
+		$this->assertSame(
+			array(
+				'.two' => $store_rule_two,
+			),
+			WP_Style_Engine_Gutenberg::get_store( 'two' )->get_all_rules(),
+			'get_all_rules() does not return expected array of rules for store two.'
+		);
+	}
+
+	/**
+	 * Tests adding identical selectors.
+	 *
+	 * @covers ::add_rule
+	 */
+	public function test_should_not_overwrite_existing_rules() {
+		$store_one           = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'one' );
+		$store_one_container = $store_one->add_rule( new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '.one' ) );
+		$store_one_rule      = $store_one->add_rule( '.one' );
+
+		$store_two           = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'two' );
+		$store_rule_two      = $store_two->add_rule( '.two' );
+		$store_two_container = $store_two->add_rule( new WP_Style_Engine_CSS_Rules_Container_Gutenberg( '.two' ) );
+
+		$this->assertSame(
+			$store_one_rule,
+			$store_one_container,
+			'add_rule() does not return already existing return .one rule.'
+		);
+
+		$this->assertSame(
+			$store_two_container,
+			$store_rule_two,
+			'add_rule() does not return already existing return .two rule.'
+		);
+	}
+
+	/**
 	 * Tests adding rules to an existing store.
 	 *
 	 * @covers ::add_rule

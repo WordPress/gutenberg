@@ -80,6 +80,11 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 					continue;
 				}
 
+				/*
+				 * Merge existing rule and container objects or create new ones.
+				 * Containers and rules are stored in separate arrays to allow for
+				 * separate processing.
+				 */
 				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
 					if ( isset( $this->css_containers[ $selector ] ) ) {
 						$this->css_containers[ $selector ]->add_rules( $rule->get_rules() );
