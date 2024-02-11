@@ -887,20 +887,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$this->assertSame( '.foo{background-color:red;@media (orientation: landscape){background-color:blue;}@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
 	}
 
-	/*
-	.foo {
-  display: grid;
-
-  @media (orientation: landscape) {
-    grid-auto-flow: column;
-
-    @media (min-width > 1024px) {
-      max-inline-size: 1024px;
-    }
-  }
-}
-	 */
-
 	/**
 	 * Tests that incoming styles are deduped and merged.
 	 *
