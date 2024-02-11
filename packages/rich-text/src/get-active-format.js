@@ -15,11 +15,13 @@ import { getActiveFormats } from './get-active-formats';
  * @param {RichTextValue} value      Value to inspect.
  * @param {string}        formatType Format type to look for.
  *
+ * @param {number}        startIndex Start index.
+ * @param {number}        endIndex   End index.
  * @return {RichTextFormat|undefined} Active format object of the specified
  *                                    type, or undefined.
  */
-export function getActiveFormat( value, formatType ) {
-	return getActiveFormats( value ).find(
+export function getActiveFormat( value, formatType, startIndex, endIndex ) {
+	return getActiveFormats( value, [], startIndex, endIndex ).find(
 		( { type } ) => type === formatType
 	);
 }

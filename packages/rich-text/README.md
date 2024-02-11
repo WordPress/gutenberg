@@ -188,6 +188,8 @@ _Parameters_
 
 -   _value_ `RichTextValue`: Value to inspect.
 -   _formatType_ `string`: Format type to look for.
+-   _startIndex_ `number`: Start index.
+-   _endIndex_ `number`: End index.
 
 _Returns_
 
@@ -201,6 +203,8 @@ _Parameters_
 
 -   _value_ `RichTextValue`: Value to inspect.
 -   _EMPTY_ACTIVE_FORMATS_ `Array`: Array to return if there are no active formats.
+-   _startIndex_ `number`: Start index.
+-   _endIndex_ `number`: End index.
 
 _Returns_
 
@@ -419,6 +423,8 @@ _Parameters_
 
 -   _value_ `RichTextValue`: Value to modify.
 -   _format_ `RichTextFormat`: Format to apply or remove.
+-   _startIndex_ `number`: Start index.
+-   _endIndex_ `number`: End index.
 
 _Returns_
 

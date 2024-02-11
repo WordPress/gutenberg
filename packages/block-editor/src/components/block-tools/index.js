@@ -20,6 +20,7 @@ import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
+import { useRichTextTools } from './rich-text-tools';
 
 function selector( select ) {
 	const {
@@ -103,9 +104,12 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
+	const richTextTools = useRichTextTools();
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
+
+		richTextTools.onKeyDown?.( event );
 
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -209,6 +213,7 @@ export default function BlockTools( {
 					/>
 				) }
 				{ children }
+				{ richTextTools.children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
 					name="__unstable-block-tools-after"

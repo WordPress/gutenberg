@@ -13,10 +13,19 @@ import { isFormatEqual } from './is-format-equal';
  * @param {Array}         EMPTY_ACTIVE_FORMATS Array to return if there are no
  *                                             active formats.
  *
+ * @param {number}        startIndex           Start index.
+ * @param {number}        endIndex             End index.
  * @return {RichTextFormatList} Active format objects.
  */
-export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
-	const { formats, start, end, activeFormats } = value;
+export function getActiveFormats(
+	value,
+	EMPTY_ACTIVE_FORMATS = [],
+	startIndex = value.start,
+	endIndex = value.end
+) {
+	const { formats, activeFormats } = value;
+	const start = startIndex;
+	const end = endIndex;
 	if ( start === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
