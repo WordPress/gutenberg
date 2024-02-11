@@ -14,6 +14,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
+	Icon,
 	link as linkIcon,
 	image,
 	page,
@@ -342,9 +343,7 @@ const ImageURLInputUI = ( {
 					) }
 					{ ! url && ! isEditingLink && lightboxEnabled && (
 						<div className="block-editor-url-popover__expand-on-click">
-							<div className="fullscreen-icon">
-								{ fullscreen }
-							</div>
+							<Icon icon={ fullscreen } />
 							<div className="text">
 								<p>{ __( 'Expand on click' ) }</p>
 								<p className="description">
@@ -355,7 +354,6 @@ const ImageURLInputUI = ( {
 							</div>
 							<Button
 								icon={ linkOff }
-								className="remove-link"
 								label={ __( 'Disable expand on click' ) }
 								onClick={ () => {
 									onSetLightbox( false );

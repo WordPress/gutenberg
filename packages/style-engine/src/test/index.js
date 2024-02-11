@@ -229,6 +229,7 @@ describe( 'getCSSRules', () => {
 							source: 'file',
 							url: 'https://example.com/image.jpg',
 						},
+						backgroundPosition: '50% 50%',
 						backgroundRepeat: 'no-repeat',
 						backgroundSize: '300px',
 					},
@@ -383,6 +384,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'backgroundImage',
 				value: "url( 'https://example.com/image.jpg' )",
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundPosition',
+				value: '50% 50%',
 			},
 			{
 				selector: '.some-selector',

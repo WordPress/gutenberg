@@ -7,9 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
@@ -24,19 +23,37 @@ import { store as blockEditorStore } from '../../store';
  */
 export const ZWNBSP = '\ufeff';
 
-export function DefaultBlockAppender( {
-	isLocked,
-	onAppend,
-	showPrompt,
-	placeholder,
-	rootClientId,
-} ) {
+export default function DefaultBlockAppender( { rootClientId } ) {
+	const { showPrompt, isLocked, placeholder } = useSelect(
+		( select ) => {
+			const { getBlockCount, getSettings, getTemplateLock } =
+				select( blockEditorStore );
+
+			const isEmpty = ! getBlockCount( rootClientId );
+			const { bodyPlaceholder } = getSettings();
+
+			return {
+				showPrompt: isEmpty,
+				isLocked: !! getTemplateLock( rootClientId ),
+				placeholder: bodyPlaceholder,
+			};
+		},
+		[ rootClientId ]
+	);
+
+	const { insertDefaultBlock, startTyping } = useDispatch( blockEditorStore );
+
 	if ( isLocked ) {
 		return null;
 	}
 
 	const value =
 		decodeEntities( placeholder ) || __( 'Type / to choose a block' );
+
+	const onAppend = () => {
+		insertDefaultBlock( undefined, rootClientId );
+		startTyping();
+	};
 
 	return (
 		<div
@@ -76,32 +93,3 @@ export function DefaultBlockAppender( {
 		</div>
 	);
 }
-
-export default compose(
-	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getSettings, getTemplateLock } =
-			select( blockEditorStore );
-
-		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const { bodyPlaceholder } = getSettings();
-
-		return {
-			showPrompt: isEmpty,
-			isLocked: !! getTemplateLock( ownProps.rootClientId ),
-			placeholder: bodyPlaceholder,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { insertDefaultBlock, startTyping } =
-			dispatch( blockEditorStore );
-
-		return {
-			onAppend() {
-				const { rootClientId } = ownProps;
-
-				insertDefaultBlock( undefined, rootClientId );
-				startTyping();
-			},
-		};
-	} )
-)( DefaultBlockAppender );

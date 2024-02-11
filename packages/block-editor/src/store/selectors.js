@@ -10,6 +10,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
+	getHookedBlocks,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -1936,9 +1937,16 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
+
+		const ignoredHookedBlocks = [
+			...new Set( Object.values( getHookedBlocks( id ) ).flat() ),
+		];
+
 		return {
 			...blockItemBase,
-			initialAttributes: {},
+			initialAttributes: ignoredHookedBlocks.length
+				? { metadata: { ignoredHookedBlocks } }
+				: {},
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,

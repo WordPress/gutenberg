@@ -1,45 +1,54 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
+	Dropdown,
 	Button,
-	privateApis as componentsPrivateApis,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	FlexItem,
+	SelectControl,
+	Tooltip,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { Children, Fragment } from '@wordpress/element';
+import { useRef, createInterpolateElement } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
+import SearchWidget from './search-widget';
 import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
-import { unlock } from './lock-unlock';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
-
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
-} = unlock( componentsPrivateApis );
 
 const FilterText = ( { activeElement, filterInView, filter } ) => {
 	if ( activeElement === undefined ) {
 		return filter.name;
 	}
 
+	const filterTextWrappers = {
+		Span1: <span className="dataviews-filter-summary__filter-text-name" />,
+		Span2: <span className="dataviews-filter-summary__filter-text-value" />,
+	};
+
 	if (
 		activeElement !== undefined &&
 		filterInView?.operator === OPERATOR_IN
 	) {
-		return sprintf(
-			/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is Admin". */
-			__( '%1$s is %2$s' ),
-			filter.name,
-			activeElement.label
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is Admin". */
+				__( '<Span1>%1$s </Span1><Span2>is %2$s</Span2>' ),
+				filter.name,
+				activeElement.label
+			),
+			filterTextWrappers
 		);
 	}
 
@@ -47,11 +56,14 @@ const FilterText = ( { activeElement, filterInView, filter } ) => {
 		activeElement !== undefined &&
 		filterInView?.operator === OPERATOR_NOT_IN
 	) {
-		return sprintf(
-			/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not Admin". */
-			__( '%1$s is not %2$s' ),
-			filter.name,
-			activeElement.label
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not Admin". */
+				__( '<Span1>%1$s </Span1><Span2>is not %2$s</Span2>' ),
+				filter.name,
+				activeElement.label
+			),
+			filterTextWrappers
 		);
 	}
 
@@ -62,127 +74,208 @@ const FilterText = ( { activeElement, filterInView, filter } ) => {
 	);
 };
 
-function WithSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
+function OperatorSelector( { filter, view, onChangeView } ) {
+	const operatorOptions = filter.operators?.map( ( operator ) => ( {
+		value: operator,
+		label: OPERATORS[ operator ]?.label,
+	} ) );
+	const currentFilter = view.filters.find(
+		( _filter ) => _filter.field === filter.field
+	);
+	const value = currentFilter?.operator || filter.operators[ 0 ];
+	return (
+		operatorOptions.length > 1 && (
+			<HStack
+				spacing={ 2 }
+				justify="flex-start"
+				className="dataviews-filter-summary__operators-container"
+			>
+				<FlexItem className="dataviews-filter-summary__operators-filter-name">
+					{ filter.name }
+				</FlexItem>
+
+				<SelectControl
+					label={ __( 'Conditions' ) }
+					value={ value }
+					options={ operatorOptions }
+					onChange={ ( newValue ) => {
+						const newFilters = currentFilter
+							? [
+									...view.filters.map( ( _filter ) => {
+										if ( _filter.field === filter.field ) {
+											return {
+												..._filter,
+												operator: newValue,
+											};
+										}
+										return _filter;
+									} ),
+							  ]
+							: [
+									...view.filters,
+									{
+										field: filter.field,
+										operator: newValue,
+									},
+							  ];
+						onChangeView( {
+							...view,
+							page: 1,
+							filters: newFilters,
+						} );
+					} }
+					size="small"
+					__nextHasNoMarginBottom
+					hideLabelFromVision
+				/>
+			</HStack>
+		)
+	);
 }
 
-export default function FilterSummary( { filter, view, onChangeView } ) {
-	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
-	const otherFilters = view.filters.filter(
-		( f ) => f.field !== filter.field
+function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
+	const isDisabled =
+		filter.isPrimary &&
+		view.filters.find( ( _filter ) => _filter.field === filter.field )
+			?.value === undefined;
+	return (
+		<div className="dataviews-filter-summary__reset">
+			<Button
+				disabled={ isDisabled }
+				__experimentalIsFocusable
+				size="compact"
+				variant="tertiary"
+				style={ { justifyContent: 'center', width: '100%' } }
+				onClick={ () => {
+					onChangeView( {
+						...view,
+						page: 1,
+						filters: view.filters.filter(
+							( _filter ) => _filter.field !== filter.field
+						),
+					} );
+					// If the filter is not primary and can be removed, it will be added
+					// back to the available filters from `Add filter` component.
+					if ( ! filter.isPrimary ) {
+						addFilterRef.current?.focus();
+					}
+				} }
+			>
+				{ filter.isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
+			</Button>
+		</div>
 	);
+}
+
+export default function FilterSummary( {
+	addFilterRef,
+	openedFilter,
+	...commonProps
+} ) {
+	const toggleRef = useRef();
+	const { filter, view, onChangeView } = commonProps;
+	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
 	);
-	const activeOperator = filterInView?.operator || filter.operators[ 0 ];
-
+	const isPrimary = filter.isPrimary;
+	const hasValues = filterInView?.value !== undefined;
+	const canResetOrRemove = ! isPrimary || hasValues;
 	return (
-		<DropdownMenu
-			key={ filter.field }
-			trigger={
-				<Button variant="tertiary" size="compact" label={ filter.name }>
-					<FilterText
-						activeElement={ activeElement }
-						filterInView={ filterInView }
-						filter={ filter }
-					/>
-					<Icon icon={ chevronDown } style={ { flexShrink: 0 } } />
-				</Button>
-			}
-		>
-			<WithSeparators>
-				<DropdownMenuGroup>
-					{ filter.elements.map( ( element ) => {
-						const isActive = activeElement?.value === element.value;
-						return (
-							<DropdownMenuRadioItemCustom
-								key={ element.value }
-								name={ `filter-summary-${ filter.field }` }
-								value={ element.value }
-								checked={ isActive }
-								onClick={ () =>
+		<Dropdown
+			defaultOpen={ openedFilter === filter.field }
+			contentClassName="dataviews-filter-summary__popover"
+			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
+			onClose={ () => {
+				toggleRef.current?.focus();
+			} }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<div className="dataviews-filter-summary__chip-container">
+					<Tooltip
+						text={ sprintf(
+							/* translators: 1: Filter name. */
+							__( 'Filter by: %1$s' ),
+							filter.name.toLowerCase()
+						) }
+						placement="top"
+					>
+						<div
+							className={ classnames(
+								'dataviews-filter-summary__chip',
+								{
+									'has-reset': canResetOrRemove,
+									'has-values': hasValues,
+								}
+							) }
+							role="button"
+							tabIndex={ 0 }
+							onClick={ onToggle }
+							onKeyDown={ ( event ) => {
+								if (
+									[ ENTER, SPACE ].includes( event.keyCode )
+								) {
+									onToggle();
+									event.preventDefault();
+								}
+							} }
+							aria-pressed={ isOpen }
+							aria-expanded={ isOpen }
+							ref={ toggleRef }
+						>
+							<FilterText
+								activeElement={ activeElement }
+								filterInView={ filterInView }
+								filter={ filter }
+							/>
+						</div>
+					</Tooltip>
+					{ canResetOrRemove && (
+						<Tooltip
+							text={ isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
+							placement="top"
+						>
+							<button
+								className={ classnames(
+									'dataviews-filter-summary__chip-remove',
+									{ 'has-values': hasValues }
+								) }
+								onClick={ () => {
 									onChangeView( {
 										...view,
 										page: 1,
-										filters: [
-											...otherFilters,
-											{
-												field: filter.field,
-												operator: activeOperator,
-												value: isActive
-													? undefined
-													: element.value,
-											},
-										],
-									} )
-								}
+										filters: view.filters.filter(
+											( _filter ) =>
+												_filter.field !== filter.field
+										),
+									} );
+									// If the filter is not primary and can be removed, it will be added
+									// back to the available filters from `Add filter` component.
+									if ( ! isPrimary ) {
+										addFilterRef.current?.focus();
+									} else {
+										// If is primary, focus the toggle button.
+										toggleRef.current?.focus();
+									}
+								} }
 							>
-								<DropdownMenuItemLabel>
-									{ element.label }
-								</DropdownMenuItemLabel>
-								{ !! element.description && (
-									<DropdownMenuItemHelpText>
-										{ element.description }
-									</DropdownMenuItemHelpText>
-								) }
-							</DropdownMenuRadioItemCustom>
-						);
-					} ) }
-				</DropdownMenuGroup>
-				{ filter.operators.length > 1 && (
-					<DropdownMenu
-						trigger={
-							<DropdownMenuItem
-								suffix={
-									<span aria-hidden="true">
-										{ OPERATORS[ activeOperator ]?.label }
-									</span>
-								}
-							>
-								<DropdownMenuItemLabel>
-									{ __( 'Conditions' ) }
-								</DropdownMenuItemLabel>
-							</DropdownMenuItem>
-						}
-					>
-						{ Object.entries( OPERATORS ).map(
-							( [ operator, { label, key } ] ) => (
-								<DropdownMenuRadioItemCustom
-									key={ key }
-									name={ `filter-summary-${ filter.field }-conditions` }
-									value={ operator }
-									checked={ activeOperator === operator }
-									onChange={ ( e ) => {
-										onChangeView( {
-											...view,
-											page: 1,
-											filters: [
-												...otherFilters,
-												{
-													field: filter.field,
-													operator: e.target.value,
-													value: filterInView?.value,
-												},
-											],
-										} );
-									} }
-								>
-									<DropdownMenuItemLabel>
-										{ label }
-									</DropdownMenuItemLabel>
-								</DropdownMenuRadioItemCustom>
-							)
-						) }
-					</DropdownMenu>
-				) }
-			</WithSeparators>
-		</DropdownMenu>
+								<Icon icon={ closeSmall } />
+							</button>
+						</Tooltip>
+					) }
+				</div>
+			) }
+			renderContent={ () => {
+				return (
+					<VStack spacing={ 0 } justify="flex-start">
+						<OperatorSelector { ...commonProps } />
+						<SearchWidget { ...commonProps } />
+						<ResetFilter
+							{ ...commonProps }
+							addFilterRef={ addFilterRef }
+						/>
+					</VStack>
+				);
+			} }
+		/>
 	);
 }

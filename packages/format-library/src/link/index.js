@@ -48,6 +48,17 @@ function Edit( {
 			return;
 		}
 
+		// Close the Link popover if there is no active selection
+		// after the link was added - this can happen if the user
+		// adds a link without any text selected.
+		// We assume that if there is no active selection after
+		// link insertion there are no active formats.
+		if ( ! value.activeFormats ) {
+			editableContentElement.focus();
+			setAddingLink( false );
+			return;
+		}
+
 		function handleClick( event ) {
 			// There is a situation whereby there is an existing link in the rich text
 			// and the user clicks on the leftmost edge of that link and fails to activate
@@ -67,7 +78,7 @@ function Edit( {
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
 		};
-	}, [ contentRef, isActive ] );
+	}, [ contentRef, isActive, addingLink, value ] );
 
 	function addLink( target ) {
 		const text = getTextContent( slice( value ) );

@@ -38,6 +38,7 @@ export default function PostTrash() {
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="editor-post-trash"
 				isDestructive
 				variant="secondary"

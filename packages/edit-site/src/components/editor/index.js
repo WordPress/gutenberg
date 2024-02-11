@@ -84,6 +84,9 @@ const blockRemovalRules = {
 	'core/post-template': __(
 		'Post Template displays each post or page in a Query Loop.'
 	),
+	'bindings/core/pattern-overrides': __(
+		'Blocks from synced patterns that can have overriden content.'
+	),
 };
 
 export default function Editor( { isLoading } ) {

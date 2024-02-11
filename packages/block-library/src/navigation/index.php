@@ -16,19 +16,6 @@ class WP_Navigation_Block_Renderer {
 	private static $has_submenus = false;
 
 	/**
-	 * Used to determine which blocks are wrapped in an <li>.
-	 *
-	 * @var array
-	 */
-	private static $nav_blocks_wrapped_in_list_item = array(
-		'core/navigation-link',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
-
-	/**
 	 * Used to determine which blocks need an <li> wrapper.
 	 *
 	 * @var array
@@ -117,7 +104,23 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not a block needs a list item wrapper.
 	 */
 	private static function does_block_need_a_list_item_wrapper( $block ) {
-		return in_array( $block->name, static::$needs_list_item_wrapper, true );
+
+		/**
+		 * Filter the list of blocks that need a list item wrapper.
+		 *
+		 * Affords the ability to customize which blocks need a list item wrapper when rendered
+		 * within a core/navigation block.
+		 * This is useful for blocks that are not list items but should be wrapped in a list
+		 * item when used as a child of a navigation block.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $needs_list_item_wrapper The list of blocks that need a list item wrapper.
+		 * @return array The list of blocks that need a list item wrapper.
+		 */
+		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_listable_blocks', static::$needs_list_item_wrapper );
+
+		return in_array( $block->name, $needs_list_item_wrapper, true );
 	}
 
 	/**
@@ -161,7 +164,9 @@ class WP_Navigation_Block_Renderer {
 		$is_list_open      = false;
 
 		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, static::$nav_blocks_wrapped_in_list_item, true );
+			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
+			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item       = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -176,7 +181,7 @@ class WP_Navigation_Block_Renderer {
 				$inner_blocks_html .= '</ul>';
 			}
 
-			$inner_blocks_html .= static::get_markup_for_inner_block( $inner_block );
+			$inner_blocks_html .= $inner_block_markup;
 		}
 
 		if ( $is_list_open ) {
@@ -588,6 +593,17 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
+			$suffix = wp_scripts_get_suffix();
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/navigation',
+				isset( $module_url ) ? $module_url : includes_url( "blocks/navigation/view{$suffix}.js" ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
 			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
 		}
 	}
@@ -1097,17 +1113,6 @@ function register_block_core_navigation() {
 			'render_callback' => 'render_block_core_navigation',
 		)
 	);
-
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
-	}
-
-	wp_register_script_module(
-		'@wordpress/block-library/navigation',
-		isset( $module_url ) ? $module_url : includes_url( 'blocks/navigation/view.min.js' ),
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-	);
 }
 
 add_action( 'init', 'register_block_core_navigation' );
@@ -1440,9 +1445,14 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	}
 }
 
+// Before adding our filter, we verify if it's already added in Core.
+// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+$rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ignore_hooked_blocks_meta';
+
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
-if ( function_exists( 'get_hooked_block_markup' ) ) {
+if ( function_exists( 'get_hooked_block_markup' ) && ! has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
@@ -1472,8 +1482,13 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	return $response;
 }
 
+// Before adding our filter, we verify if it's already added in Core.
+// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+$rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_hooked_blocks_into_rest_response';
+
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
-if ( function_exists( 'get_hooked_block_markup' ) ) {
+if ( function_exists( 'get_hooked_block_markup' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }

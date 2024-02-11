@@ -29,6 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -131,6 +132,16 @@ function applyInitialContentValuesToInnerBlocks(
 	} );
 }
 
+function isAttributeEqual( attribute1, attribute2 ) {
+	if (
+		attribute1 instanceof RichTextData &&
+		attribute2 instanceof RichTextData
+	) {
+		return attribute1.toString() === attribute2.toString();
+	}
+	return attribute1 === attribute2;
+}
+
 function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
@@ -145,10 +156,14 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 		const attributes = getOverridableAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				! isAttributeEqual(
+					block.attributes[ attributeKey ],
+					defaultValues[ blockId ][ attributeKey ]
+				)
 			) {
-				content[ blockId ] ??= { values: {} };
+				content[ blockId ] ??= { values: {}, blockName: block.name };
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				content[ blockId ].values[ attributeKey ] =
 					block.attributes[ attributeKey ] === undefined
 						? // TODO: We use an empty string to represent undefined for now until
@@ -212,7 +227,7 @@ export default function ReusableBlockEdit( {
 		innerBlocks,
 		userCanEdit,
 		getBlockEditingMode,
-		getPostLinkProps,
+		onNavigateToEntityRecord,
 		editingMode,
 	} = useSelect(
 		( select ) => {
@@ -230,19 +245,13 @@ export default function ReusableBlockEdit( {
 				innerBlocks: blocks,
 				userCanEdit: canEdit,
 				getBlockEditingMode: _getBlockEditingMode,
-				getPostLinkProps: getSettings().getPostLinkProps,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
 				editingMode: _getBlockEditingMode( patternClientId ),
 			};
 		},
 		[ patternClientId, ref ]
 	);
-
-	const editOriginalProps = getPostLinkProps
-		? getPostLinkProps( {
-				postId: ref,
-				postType: 'wp_block',
-		  } )
-		: {};
 
 	// Sync the editing mode of the pattern block with the inner blocks.
 	useEffect( () => {
@@ -342,8 +351,11 @@ export default function ReusableBlockEdit( {
 		}, blockEditorStore );
 	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
-	const handleEditOriginal = ( event ) => {
-		editOriginalProps.onClick( event );
+	const handleEditOriginal = () => {
+		onNavigateToEntityRecord( {
+			postId: ref,
+			postType: 'wp_block',
+		} );
 	};
 
 	const resetContent = () => {
@@ -380,13 +392,10 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
+			{ userCanEdit && onNavigateToEntityRecord && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							href={ editOriginalProps.href }
-							onClick={ handleEditOriginal }
-						>
+						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
