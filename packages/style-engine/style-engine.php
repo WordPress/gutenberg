@@ -148,7 +148,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		$new_rule  = null;
 
 		if ( $selector ) {
-			$new_rule  = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
+			$new_rule = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
 		}
 
 		if ( $container ) {

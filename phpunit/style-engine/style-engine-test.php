@@ -601,7 +601,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 			array(
 				'context'   => 'block-supports',
-				'container' => 'main'
+				'container' => 'main',
 			)
 		);
 
@@ -619,7 +619,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			array(
 				'context'   => 'block-supports',
 				'selector'  => '& .container',
-				'container' => 'main'
+				'container' => 'main',
 			)
 		);
 
