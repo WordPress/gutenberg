@@ -628,7 +628,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$container_query_value = $container_query_value . $parent_column_unit;
 
 		$child_layout_styles[] = array(
-			'at_rule'      => "@container (max-width: $container_query_value )",
+			'container'    => "@container (max-width: $container_query_value )",
 			'selector'     => ".$container_content_class",
 			'declarations' => array(
 				'grid-column' => '1/-1',
