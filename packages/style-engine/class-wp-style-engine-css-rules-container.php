@@ -15,22 +15,6 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Container' ) ) {
 	 */
 	class WP_Style_Engine_CSS_Rules_Container extends WP_Style_Engine_CSS_Rule {
 		/**
-		 * A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`
-		 *
-		 * @var string
-		 */
-		protected $selector;
-
-		/**
-		 * The selector declarations.
-		 *
-		 * Contains a WP_Style_Engine_CSS_Declarations object.
-		 *
-		 * @var WP_Style_Engine_CSS_Declarations
-		 */
-		protected $declarations;
-
-		/**
 		 * The container declarations.
 		 *
 		 * Contains a WP_Style_Engine_CSS_Rule object.
