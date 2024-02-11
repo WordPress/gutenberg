@@ -121,7 +121,6 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 			$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
 			$css_declarations = ! empty( $this->declarations ) ? $this->declarations->get_declarations_string( $should_prettify, $declarations_indent ) : '';
 
-
 			if ( empty( $css_declarations ) ) {
 				return '';
 			}
