@@ -108,7 +108,7 @@ _Returns_
 
 Useful for when you wish to compile a bespoke set of CSS rules from a series of selector + declaration items.
 
-The Style Engine will return a sanitized and optimized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+The Style Engine will return a sanitized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
 
 You can call `wp_style_engine_get_stylesheet_from_css_rules()` multiple times, and, so long as your styles use the same `context` identifier, they will be stored together.
 

@@ -8,7 +8,13 @@ import {
 	PlainText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	Disabled,
+	ToolbarGroup,
+	VisuallyHidden,
+} from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,9 +23,14 @@ import Preview from './preview';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const isDisabled = useContext( Disabled.Context );
+	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
+	const blockProps = useBlockProps( {
+		className: 'block-library-html__edit',
+		'aria-describedby': attributes.isPreview ? instanceId : undefined,
+	} );
 
 	return (
-		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
+		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -27,7 +38,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 						isPressed={ ! attributes.isPreview }
 						onClick={ () => setAttributes( { isPreview: false } ) }
 					>
-						{ __( 'HTML' ) }
+						{ __( 'Edit' ) }
 					</ToolbarButton>
 					<ToolbarButton
 						className="components-tab-button"
@@ -39,10 +50,17 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				</ToolbarGroup>
 			</BlockControls>
 			{ attributes.isPreview || isDisabled ? (
-				<Preview
-					content={ attributes.content }
-					isSelected={ isSelected }
-				/>
+				<>
+					<Preview
+						content={ attributes.content }
+						isSelected={ isSelected }
+					/>
+					<VisuallyHidden id={ instanceId }>
+						{ __(
+							'HTML preview is not yet fully accessible. Please switch screen reader to virtualized mode to navigate the below iFrame.'
+						) }
+					</VisuallyHidden>
+				</>
 			) : (
 				<PlainText
 					value={ attributes.content }

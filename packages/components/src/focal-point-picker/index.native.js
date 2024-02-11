@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, PanResponder, View } from 'react-native';
+import { Animated, PanResponder, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -164,7 +164,7 @@ function FocalPointPicker( props ) {
 		},
 	];
 	const FOCAL_POINT_SIZE = 50;
-	const focalPointStyles = [
+	const focalPointStyles = StyleSheet.flatten( [
 		styles.focalPoint,
 		{
 			height: FOCAL_POINT_SIZE,
@@ -172,7 +172,7 @@ function FocalPointPicker( props ) {
 			marginTop: -( FOCAL_POINT_SIZE / 2 ),
 			width: FOCAL_POINT_SIZE,
 		},
-	];
+	] );
 
 	const onTooltipPress = () => setTooltipVisible( false );
 	const onMediaLayout = ( event ) => {
@@ -243,9 +243,10 @@ function FocalPointPicker( props ) {
 									yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
 								/>
 								<FocalPoint
-									height={ styles.focalPoint?.height }
+									height={ focalPointStyles.height }
 									style={ focalPointStyles }
-									width={ styles.focalPoint?.width }
+									testID="focal-point-picker-handle"
+									width={ focalPointStyles.width }
 								/>
 							</Animated.View>
 						) }

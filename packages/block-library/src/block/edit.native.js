@@ -27,8 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,
@@ -36,6 +36,7 @@ import {
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -77,7 +78,7 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { hasResolved, isEditing, isMissing, innerBlockCount } = useSelect(
+	const { hasResolved, isEditing, isMissing } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -103,6 +104,11 @@ export default function ReusableBlockEdit( {
 		},
 		[ ref, clientId ]
 	);
+	const hostAppNamespace = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().hostAppNamespace,
+		[]
+	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
@@ -126,12 +132,8 @@ export default function ReusableBlockEdit( {
 	}
 
 	const onConvertToRegularBlocks = useCallback( () => {
-		const successNotice =
-			innerBlockCount > 1
-				? /* translators: %s: name of the reusable block */
-				  __( '%s converted to regular blocks' )
-				: /* translators: %s: name of the reusable block */
-				  __( '%s converted to regular block' );
+		/* translators: %s: name of the synced block */
+		const successNotice = __( '%s detached' );
 		createSuccessNotice( sprintf( successNotice, title ) );
 
 		clearSelectedBlock();
@@ -143,11 +145,19 @@ export default function ReusableBlockEdit( {
 	function renderSheet() {
 		const infoTitle =
 			Platform.OS === 'android'
-				? __(
-						'Editing reusable blocks is not yet supported on WordPress for Android'
+				? sprintf(
+						/* translators: %s: name of the host app (e.g. WordPress) */
+						__(
+							'Editing synced patterns is not yet supported on %s for Android'
+						),
+						hostAppNamespace
 				  )
-				: __(
-						'Editing reusable blocks is not yet supported on WordPress for iOS'
+				: sprintf(
+						/* translators: %s: name of the host app (e.g. WordPress) */
+						__(
+							'Editing synced patterns is not yet supported on %s for iOS'
+						),
+						hostAppNamespace
 				  );
 
 		return (
@@ -166,20 +176,12 @@ export default function ReusableBlockEdit( {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ innerBlockCount > 1
-							? __(
-									'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
-							  )
-							: __(
-									'Alternatively, you can detach and edit this block separately by tapping “Convert to regular block”.'
-							  ) }
+						{ __(
+							'Alternatively, you can detach and edit this block separately by tapping “Detach”.'
+						) }
 					</Text>
 					<TextControl
-						label={
-							innerBlockCount > 1
-								? __( 'Convert to regular blocks' )
-								: __( 'Convert to regular block' )
-						}
+						label={ __( 'Detach' ) }
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }

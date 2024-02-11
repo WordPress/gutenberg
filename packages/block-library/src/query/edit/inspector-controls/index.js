@@ -12,7 +12,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 
@@ -24,6 +24,9 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import EnhancedPaginationControl from './enhanced-pagination-control';
+import CreateNewPostLink from './create-new-post-link';
+import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -31,13 +34,14 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../../../utils/constants';
 
-export default function QueryInspectorControls( {
-	attributes,
-	setQuery,
-	setDisplayLayout,
-} ) {
-	const { query, displayLayout } = attributes;
+const { BlockInfo } = unlock( blockEditorPrivateApis );
+
+export default function QueryInspectorControls( props ) {
+	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+		props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -97,7 +101,7 @@ export default function QueryInspectorControls( {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const showColumnsControl = displayLayout?.type === 'flex';
+	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
@@ -127,146 +131,154 @@ export default function QueryInspectorControls( {
 
 	return (
 		<>
+			<BlockInfo>
+				<CreateNewPostLink { ...props } />
+			</BlockInfo>
 			{ showSettingsPanel && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
-						{ showInheritControl && (
-							<ToggleControl
-								label={ __( 'Inherit query from template' ) }
-								help={ __(
-									'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-								) }
-								checked={ !! inherit }
+				<PanelBody title={ __( 'Settings' ) }>
+					{ showInheritControl && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Inherit query from template' ) }
+							help={ __(
+								'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
+							) }
+							checked={ !! inherit }
+							onChange={ ( value ) =>
+								setQuery( { inherit: !! value } )
+							}
+						/>
+					) }
+					{ showPostTypeControl && (
+						<SelectControl
+							__nextHasNoMarginBottom
+							options={ postTypesSelectOptions }
+							value={ postType }
+							label={ __( 'Post type' ) }
+							onChange={ onPostTypeChange }
+							help={ __(
+								'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+							) }
+						/>
+					) }
+					{ showColumnsControl && (
+						<>
+							<RangeControl
+								__nextHasNoMarginBottom
+								label={ __( 'Columns' ) }
+								value={ displayLayout.columns }
 								onChange={ ( value ) =>
-									setQuery( { inherit: !! value } )
+									setDisplayLayout( {
+										columns: value,
+									} )
 								}
+								min={ 2 }
+								max={ Math.max( 6, displayLayout.columns ) }
 							/>
-						) }
-						{ showPostTypeControl && (
-							<SelectControl
-								options={ postTypesSelectOptions }
-								value={ postType }
-								label={ __( 'Post type' ) }
-								onChange={ onPostTypeChange }
-								help={ __(
-									'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
-								) }
-							/>
-						) }
-						{ showColumnsControl && (
-							<>
-								<RangeControl
-									__nextHasNoMarginBottom
-									label={ __( 'Columns' ) }
-									value={ displayLayout.columns }
-									onChange={ ( value ) =>
-										setDisplayLayout( { columns: value } )
-									}
-									min={ 2 }
-									max={ Math.max( 6, displayLayout.columns ) }
-								/>
-								{ displayLayout.columns > 6 && (
-									<Notice
-										status="warning"
-										isDismissible={ false }
-									>
-										{ __(
-											'This column count exceeds the recommended amount and may cause visual breakage.'
-										) }
-									</Notice>
-								) }
-							</>
-						) }
-						{ showOrderControl && (
-							<OrderControl
-								{ ...{ order, orderBy } }
-								onChange={ setQuery }
-							/>
-						) }
-						{ showStickyControl && (
-							<StickyControl
-								value={ sticky }
-								onChange={ ( value ) =>
-									setQuery( { sticky: value } )
-								}
-							/>
-						) }
-					</PanelBody>
-				</InspectorControls>
+							{ displayLayout.columns > 6 && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'This column count exceeds the recommended amount and may cause visual breakage.'
+									) }
+								</Notice>
+							) }
+						</>
+					) }
+					{ showOrderControl && (
+						<OrderControl
+							{ ...{ order, orderBy } }
+							onChange={ setQuery }
+						/>
+					) }
+					{ showStickyControl && (
+						<StickyControl
+							value={ sticky }
+							onChange={ ( value ) =>
+								setQuery( { sticky: value } )
+							}
+						/>
+					) }
+					<EnhancedPaginationControl
+						enhancedPagination={ enhancedPagination }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</PanelBody>
 			) }
 			{ ! inherit && showFiltersPanel && (
-				<InspectorControls>
-					<ToolsPanel
-						className="block-library-query-toolspanel__filters"
-						label={ __( 'Filters' ) }
-						resetAll={ () => {
-							setQuery( {
-								author: '',
-								parents: [],
-								search: '',
-								taxQuery: null,
-							} );
-							setQuerySearch( '' );
-						} }
-					>
-						{ showTaxControl && (
-							<ToolsPanelItem
-								label={ __( 'Taxonomies' ) }
-								hasValue={ () =>
-									Object.values( taxQuery || {} ).some(
-										( terms ) => !! terms.length
-									)
-								}
-								onDeselect={ () =>
-									setQuery( { taxQuery: null } )
-								}
-							>
-								<TaxonomyControls
-									onChange={ setQuery }
-									query={ query }
-								/>
-							</ToolsPanelItem>
-						) }
-						{ showAuthorControl && (
-							<ToolsPanelItem
-								hasValue={ () => !! authorIds }
-								label={ __( 'Authors' ) }
-								onDeselect={ () => setQuery( { author: '' } ) }
-							>
-								<AuthorControl
-									value={ authorIds }
-									onChange={ setQuery }
-								/>
-							</ToolsPanelItem>
-						) }
-						{ showSearchControl && (
-							<ToolsPanelItem
-								hasValue={ () => !! querySearch }
+				<ToolsPanel
+					className="block-library-query-toolspanel__filters"
+					label={ __( 'Filters' ) }
+					resetAll={ () => {
+						setQuery( {
+							author: '',
+							parents: [],
+							search: '',
+							taxQuery: null,
+						} );
+						setQuerySearch( '' );
+					} }
+					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				>
+					{ showTaxControl && (
+						<ToolsPanelItem
+							label={ __( 'Taxonomies' ) }
+							hasValue={ () =>
+								Object.values( taxQuery || {} ).some(
+									( terms ) => !! terms.length
+								)
+							}
+							onDeselect={ () => setQuery( { taxQuery: null } ) }
+						>
+							<TaxonomyControls
+								onChange={ setQuery }
+								query={ query }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showAuthorControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! authorIds }
+							label={ __( 'Authors' ) }
+							onDeselect={ () => setQuery( { author: '' } ) }
+						>
+							<AuthorControl
+								value={ authorIds }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showSearchControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! querySearch }
+							label={ __( 'Keyword' ) }
+							onDeselect={ () => setQuerySearch( '' ) }
+						>
+							<TextControl
+								__nextHasNoMarginBottom
 								label={ __( 'Keyword' ) }
-								onDeselect={ () => setQuerySearch( '' ) }
-							>
-								<TextControl
-									label={ __( 'Keyword' ) }
-									value={ querySearch }
-									onChange={ setQuerySearch }
-								/>
-							</ToolsPanelItem>
-						) }
-						{ showParentControl && (
-							<ToolsPanelItem
-								hasValue={ () => !! parents?.length }
-								label={ __( 'Parents' ) }
-								onDeselect={ () => setQuery( { parents: [] } ) }
-							>
-								<ParentControl
-									parents={ parents }
-									postType={ postType }
-									onChange={ setQuery }
-								/>
-							</ToolsPanelItem>
-						) }
-					</ToolsPanel>
-				</InspectorControls>
+								value={ querySearch }
+								onChange={ setQuerySearch }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showParentControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! parents?.length }
+							label={ __( 'Parents' ) }
+							onDeselect={ () => setQuery( { parents: [] } ) }
+						>
+							<ParentControl
+								parents={ parents }
+								postType={ postType }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+				</ToolsPanel>
 			) }
 		</>
 	);

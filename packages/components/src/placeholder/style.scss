@@ -1,9 +1,9 @@
 // This needs specificity to override individual block styles.
 .components-placeholder.components-placeholder {
+	font-size: $default-font-size;
 	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
-	min-height: 200px;
 	width: 100%;
 	text-align: left;
 	margin: 0;
@@ -17,7 +17,7 @@
 	@supports (position: sticky) {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: top;
 		align-items: flex-start;
 	}
 
@@ -34,6 +34,11 @@
 .components-placeholder__fieldset {
 	font-family: $default-font;
 	font-size: $default-font-size;
+	// Global Styles can affect this so we are resetting.
+	letter-spacing: initial;
+	line-height: initial;
+	text-transform: none;
+	font-weight: normal;
 }
 
 .components-placeholder__label {
@@ -70,18 +75,6 @@
 	p {
 		font-family: $default-font;
 		font-size: $default-font-size;
-	}
-}
-
-// Overrides for browser and editor fieldset styles.
-.components-placeholder__fieldset.components-placeholder__fieldset {
-	border: none;
-	padding: 0;
-
-	.components-placeholder__instructions {
-		padding: 0;
-		font-weight: normal;
-		font-size: 1em;
 	}
 }
 
@@ -175,7 +168,6 @@
 	color: inherit;
 	display: flex;
 	box-shadow: none;
-	min-width: 100px;
 
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
@@ -220,7 +212,7 @@
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
 	@include placeholder-style();
-	overflow: hidden;
+	overflow: auto;
 }
 
 // Position the spinner.

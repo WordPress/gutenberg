@@ -2,37 +2,51 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useReducer } from '@wordpress/element';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external } from '@wordpress/icons';
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
-import { ActionItem, MoreMenuDropdown } from '@wordpress/interface';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import {
+	ActionItem,
+	MoreMenuDropdown,
+	store as interfaceStore,
+} from '@wordpress/interface';
+import {
+	PreferenceToggleMenuItem,
+	store as preferencesStore,
+} from '@wordpress/preferences';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import KeyboardShortcutHelpModal from '../../keyboard-shortcut-help-modal';
-import EditSitePreferencesModal from '../../preferences-modal';
+import {
+	KEYBOARD_SHORTCUT_HELP_MODAL_NAME,
+	default as KeyboardShortcutHelpModal,
+} from '../../keyboard-shortcut-help-modal';
+import {
+	PREFERENCES_MODAL_NAME,
+	default as EditSitePreferencesModal,
+} from '../../preferences-modal';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
+import { store as editSiteStore } from '../../../store';
 
 export default function MoreMenu( { showIconLabels } ) {
-	const [ isModalActive, toggleModal ] = useReducer(
-		( isActive ) => ! isActive,
-		false
-	);
+	const { openModal } = useDispatch( interfaceStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme().is_block_theme;
+	}, [] );
 
-	const [ isPreferencesModalActive, togglePreferencesModal ] = useReducer(
-		( isActive ) => ! isActive,
-		false
-	);
+	const { toggleDistractionFree } = useDispatch( editSiteStore );
 
-	useShortcut( 'core/edit-site/keyboard-shortcuts', toggleModal );
+	const turnOffDistractionFree = () => {
+		setPreference( 'core', 'distractionFree', false );
+	};
 
 	return (
 		<>
@@ -46,8 +60,9 @@ export default function MoreMenu( { showIconLabels } ) {
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="fixedToolbar"
+								onToggle={ turnOffDistractionFree }
 								label={ __( 'Top toolbar' ) }
 								info={ __(
 									'Access all block and document tools in a single place'
@@ -60,7 +75,24 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
+								name="distractionFree"
+								label={ __( 'Distraction free' ) }
+								info={ __( 'Write with calmness' ) }
+								handleToggling={ false }
+								onToggle={ toggleDistractionFree }
+								messageActivated={ __(
+									'Distraction free mode activated'
+								) }
+								messageDeactivated={ __(
+									'Distraction free mode deactivated'
+								) }
+								shortcut={ displayShortcut.primaryShift(
+									'\\'
+								) }
+							/>
+							<PreferenceToggleMenuItem
+								scope="core"
 								name="focusMode"
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }
@@ -71,18 +103,22 @@ export default function MoreMenu( { showIconLabels } ) {
 									'Spotlight mode deactivated'
 								) }
 							/>
-							<ModeSwitcher />
-							<ActionItem.Slot
-								name="core/edit-site/plugin-more-menu"
-								label={ __( 'Plugins' ) }
-								as={ MenuGroup }
-								fillProps={ { onClick: onClose } }
-							/>
 						</MenuGroup>
+						<ModeSwitcher />
+						<ActionItem.Slot
+							name="core/edit-site/plugin-more-menu"
+							label={ __( 'Plugins' ) }
+							as={ MenuGroup }
+							fillProps={ { onClick: onClose } }
+						/>
 						<MenuGroup label={ __( 'Tools' ) }>
-							<SiteExport />
+							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
-								onClick={ toggleModal }
+								onClick={ () =>
+									openModal(
+										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
+									)
+								}
 								shortcut={ displayShortcut.access( 'h' ) }
 							>
 								{ __( 'Keyboard shortcuts' ) }
@@ -93,7 +129,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								icon={ external }
 								role="menuitem"
 								href={ __(
-									'https://wordpress.org/support/article/site-editor/'
+									'https://wordpress.org/documentation/article/site-editor/'
 								) }
 								target="_blank"
 								rel="noopener noreferrer"
@@ -111,21 +147,19 @@ export default function MoreMenu( { showIconLabels } ) {
 							/>
 						</MenuGroup>
 						<MenuGroup>
-							<MenuItem onClick={ togglePreferencesModal }>
+							<MenuItem
+								onClick={ () =>
+									openModal( PREFERENCES_MODAL_NAME )
+								}
+							>
 								{ __( 'Preferences' ) }
 							</MenuItem>
 						</MenuGroup>
 					</>
 				) }
 			</MoreMenuDropdown>
-			<KeyboardShortcutHelpModal
-				isModalActive={ isModalActive }
-				toggleModal={ toggleModal }
-			/>
-			<EditSitePreferencesModal
-				isModalActive={ isPreferencesModalActive }
-				toggleModal={ togglePreferencesModal }
-			/>
+			<KeyboardShortcutHelpModal />
+			<EditSitePreferencesModal />
 		</>
 	);
 }

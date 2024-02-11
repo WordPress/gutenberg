@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues, mergeWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
@@ -28,21 +23,30 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 			return schema;
 		}
 
-		return mapValues( schema, ( value ) => {
-			let attributes = value.attributes || [];
-			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-			if ( hasAnchorSupport ) {
-				attributes = [ ...attributes, 'id' ];
-			}
-			return {
-				...value,
-				attributes,
-				isMatch: isMatch ? isMatch : undefined,
-			};
-		} );
+		if ( ! schema ) {
+			return {};
+		}
+
+		return Object.fromEntries(
+			Object.entries( schema ).map( ( [ key, value ] ) => {
+				let attributes = value.attributes || [];
+				// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+				if ( hasAnchorSupport ) {
+					attributes = [ ...attributes, 'id' ];
+				}
+				return [
+					key,
+					{
+						...value,
+						attributes,
+						isMatch: isMatch ? isMatch : undefined,
+					},
+				];
+			} )
+		);
 	} );
 
-	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
+	function mergeTagNameSchemaProperties( objValue, srcValue, key ) {
 		switch ( key ) {
 			case 'children': {
 				if ( objValue === '*' || srcValue === '*' ) {
@@ -68,7 +72,30 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				};
 			}
 		}
-	} );
+	}
+
+	// A tagName schema is an object with children, attributes, require, and
+	// isMatch properties.
+	function mergeTagNameSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	// A schema is an object with tagName schemas by tag name.
+	function mergeSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemas( a[ key ], b[ key ] )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	return schemas.reduce( mergeSchemas, {} );
 }
 
 /**

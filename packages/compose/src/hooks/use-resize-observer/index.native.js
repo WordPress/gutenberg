@@ -24,7 +24,6 @@ import { useState, useCallback } from '@wordpress/element';
  * 	);
  * };
  * ```
- *
  */
 const useResizeObserver = () => {
 	const [ measurements, setMeasurements ] = useState( null );

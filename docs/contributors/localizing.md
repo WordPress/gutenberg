@@ -1,6 +1,6 @@
-# Localizing Gutenberg Plugin
+# Localizing Gutenberg
 
-The Gutenberg plugin is translated via the general plugin translation system (GlotPress) at https://translate.wordpress.org. Review the [GlotPress translation process documentation] (https://make.wordpress.org/polyglots/handbook/tools/glotpress-translate-wordpress-org/) for additional information.
+The Gutenberg plugin is translated via the general plugin translation system (GlotPress) at https://translate.wordpress.org. Review the [GlotPress translation process documentation](https://make.wordpress.org/polyglots/handbook/tools/glotpress-translate-wordpress-org/) for additional information.
 
 To translate Gutenberg in your locale or language, [select your locale here](https://translate.wordpress.org/projects/wp-plugins/gutenberg) and translate *Development* (which contains the plugin's string) and/or *Development Readme* (please translate what you see in the Details tab of the [plugin page](https://wordpress.org/plugins/gutenberg/)).
 

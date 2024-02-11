@@ -5,7 +5,7 @@ The following guide is for setting up your local environment to contribute to th
 ## Prerequisites
 
 -   Node.js
-    Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using Node.js v14, and npm v6. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
+    Gutenberg is a JavaScript project that requires [Node.js](https://nodejs.org/). The project is currently built using Node.js v20 and npm v10. Though best efforts are made to always use the Active LTS version of Node.js, this will not always be the case. For more details, please refer to the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule).
 
 We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/devenv/README.md#development-tools) or the Nodejs site for additional installation instructions.
 
@@ -126,7 +126,7 @@ Port: {MYSQL_PORT_NUMBER}
 
 **Please note**: the MySQL port number will change each time `wp-env` restarts. If you find you can no longer access your database, simply repeat the steps above to find the new port number and restore your connection.
 
-**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://wordpress.org/support/article/creating-database-for-wordpress/).
+**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://wordpress.org/documentation/article/creating-database-for-wordpress/).
 
 #### Troubleshooting
 
@@ -183,7 +183,7 @@ If so, you need to instruct Apache to allow following such links:
 
 Tools like MAMP tend to configure MySQL to use ports other than the default 3306, often preferring 8889. This may throw off WP-CLI, which will fail after trying to connect to the database. To remedy this, edit `wp-config.php` and change the `DB_HOST` constant from `define( 'DB_HOST', 'localhost' )` to `define( 'DB_HOST', '127.0.0.1:8889' )`.
 
-### On A Remote Server
+### On a remote server
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
@@ -203,7 +203,7 @@ You can launch Storybook by running `npm run storybook:dev` locally. It will ope
 
 You can also test Storybook for the current `trunk` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
-## Developer Tools
+## Developer tools
 
 We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
 

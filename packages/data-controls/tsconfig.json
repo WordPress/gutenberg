@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ]
+	},
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../data" },
+		{ "path": "../deprecated" }
+	],
+	"include": [ "src/**/*" ]
+}

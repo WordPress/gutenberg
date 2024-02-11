@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { group, row, stack } from '@wordpress/icons';
+import { group, row, stack, grid } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -43,5 +43,18 @@ const variations = [
 		icon: stack,
 	},
 ];
+
+if ( window?.__experimentalEnableGroupGridVariation ) {
+	variations.push( {
+		name: 'group-grid',
+		title: __( 'Grid' ),
+		description: __( 'Arrange blocks in a grid.' ),
+		attributes: { layout: { type: 'grid' } },
+		scope: [ 'block', 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) =>
+			blockAttributes.layout?.type === 'grid',
+		icon: grid,
+	} );
+}
 
 export default variations;

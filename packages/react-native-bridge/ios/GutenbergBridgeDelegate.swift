@@ -1,3 +1,5 @@
+import React
+
 public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?
@@ -5,14 +7,20 @@ public struct MediaInfo: Encodable {
     public let title: String?
     public let caption: String?
     public let alt: String?
+    public let metadata: [String: Any]
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil) {
+    private enum CodingKeys: String, CodingKey {
+        case id, url, type, title, caption, alt
+    }
+
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil, metadata: [String: Any] = [:]) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
         self.title = title
         self.alt = alt
+        self.metadata = metadata
     }
 }
 
@@ -21,7 +29,7 @@ public enum Capabilities: String {
     case contactInfoBlock
     case layoutGridBlock
     case tiledGalleryBlock
-    case mediaFilesCollectionBlock
+    case videoPressBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
@@ -133,7 +141,7 @@ extension RCTLogLevel {
     }
 }
 
-public protocol GutenbergBridgeDelegate: class {
+public protocol GutenbergBridgeDelegate: AnyObject {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
     ///
@@ -198,12 +206,19 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func editorDidAutosave()
 
-    /// Tells the delegate that the editor needs to perform a network request.
+    /// Tells the delegate that the editor needs to perform a GET request.
     /// The paths given to perform the request are from the WP ORG REST API.
     /// https://developer.wordpress.org/rest-api/reference/
     /// - Parameter path: The path to perform the request.
     /// - Parameter completion: Completion handler to be called with the result or an error.
-    func gutenbergDidRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+    func gutenbergDidGetRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+    
+    /// Tells the delegate that the editor needs to perform a POST request.
+    /// The paths given to perform the request are from the WP ORG REST API.
+    /// https://developer.wordpress.org/rest-api/reference/
+    /// - Parameter path: The path to perform the request.
+    /// - Parameter completion: Completion handler to be called with the result or an error.
+    func gutenbergDidPostRequestFetch(path: String, data: [String: AnyObject]?, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
 
     /// Tells the delegate to display a fullscreen image from a given URL
     ///
@@ -263,6 +278,12 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate the editor requested sending an event
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
+    
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
+
+    func gutenbergDidRequestConnectionStatus() -> Bool
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

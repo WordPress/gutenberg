@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
+import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { memo, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 
 /**
@@ -12,20 +12,19 @@ import { Disabled } from '@wordpress/components';
 import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
-import { __unstablePresetDuotoneFilter as PresetDuotoneFilter } from '../../components/duotone';
 import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
 const MAX_HEIGHT = 2000;
+const EMPTY_ADDITIONAL_STYLES = [];
 
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
-	__experimentalPadding,
-	__experimentalMinHeight,
-	__experimentalStyles,
+	minHeight,
+	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 } ) {
 	if ( ! viewportWidth ) {
 		viewportWidth = containerWidth;
@@ -33,12 +32,10 @@ function ScaledBlockPreview( {
 
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const { styles, assets, duotone } = useSelect( ( select ) => {
+	const { styles } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
 			styles: settings.styles,
-			assets: settings.__unstableResolvedAssets,
-			duotone: settings.__experimentalFeatures?.color?.duotone,
 		};
 	}, [] );
 
@@ -47,39 +44,40 @@ function ScaledBlockPreview( {
 		if ( styles ) {
 			return [
 				...styles,
-				...__experimentalStyles,
 				{
-					css: 'body{height:auto;overflow:hidden;}',
+					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
 					__unstableType: 'presets',
 				},
+				...additionalStyles,
 			];
 		}
 
 		return styles;
-	}, [ styles, __experimentalStyles ] );
-
-	const svgFilters = useMemo( () => {
-		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
-	}, [ duotone ] );
+	}, [ styles, additionalStyles ] );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
-	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
+	MemoizedBlockList = MemoizedBlockList || memo( BlockList );
 
 	const scale = containerWidth / viewportWidth;
+	const aspectRatio = contentHeight
+		? containerWidth / ( contentHeight * scale )
+		: 0;
 	return (
 		<Disabled
 			className="block-editor-block-preview__content"
 			style={ {
 				transform: `scale(${ scale })`,
-				height: contentHeight * scale,
+				// Using width + aspect-ratio instead of height here triggers browsers' native
+				// handling of scrollbar's visibility. It prevents the flickering issue seen
+				// in https://github.com/WordPress/gutenberg/issues/52027.
+				// See https://github.com/WordPress/gutenberg/pull/52921 for more info.
+				aspectRatio,
 				maxHeight:
 					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
-				minHeight: __experimentalMinHeight,
+				minHeight,
 			} }
 		>
 			<Iframe
-				head={ <EditorStyles styles={ editorStyles } /> }
-				assets={ assets }
 				contentRef={ useRefEffect( ( bodyElement ) => {
 					const {
 						ownerDocument: { documentElement },
@@ -89,7 +87,6 @@ function ScaledBlockPreview( {
 					);
 					documentElement.style.position = 'absolute';
 					documentElement.style.width = '100%';
-					bodyElement.style.padding = __experimentalPadding + 'px';
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
@@ -107,21 +104,13 @@ function ScaledBlockPreview( {
 					// See: https://github.com/WordPress/gutenberg/pull/38175.
 					maxHeight: MAX_HEIGHT,
 					minHeight:
-						scale !== 0 && scale < 1 && __experimentalMinHeight
-							? __experimentalMinHeight / scale
-							: __experimentalMinHeight,
+						scale !== 0 && scale < 1 && minHeight
+							? minHeight / scale
+							: minHeight,
 				} }
 			>
+				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				{
-					/* Filters need to be rendered before children to avoid Safari rendering issues. */
-					svgFilters.map( ( preset ) => (
-						<PresetDuotoneFilter
-							preset={ preset }
-							key={ preset.slug }
-						/>
-					) )
-				}
 				<MemoizedBlockList renderAppender={ false } />
 			</Iframe>
 		</Disabled>

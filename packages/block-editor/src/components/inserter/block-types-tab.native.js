@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -66,6 +67,7 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 			sections={ sections }
 			onSelect={ handleSelect }
 			listProps={ listProps }
+			label={ __( 'Blocks menu' ) }
 		/>
 	);
 }

@@ -1,15 +1,20 @@
 /**
  * WordPress dependencies
  */
+import {
+	__experimentalTreeGridRow as TreeGridRow,
+	__experimentalTreeGridCell as TreeGridCell,
+} from '@wordpress/components';
 import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { Appender } from './appender';
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
-import { isClientIdSelected } from './utils';
+import { getDragDisplacementValues, isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 
@@ -93,6 +98,7 @@ function ListViewBranch( props ) {
 		parentId,
 		shouldShowInnerBlocks = true,
 		isSyncedBranch = false,
+		showAppender: showAppenderProp = true,
 	} = props;
 
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
@@ -103,25 +109,30 @@ function ListViewBranch( props ) {
 			if ( ! parentId ) {
 				return true;
 			}
-
-			const isContentLocked =
-				select( blockEditorStore ).getTemplateLock( parentId ) ===
-				'contentOnly';
-			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
-
-			return isContentLocked ? false : canEdit;
+			return select( blockEditorStore ).canEditBlock( parentId );
 		},
 		[ parentId ]
 	);
 
-	const { expandedState, draggedClientIds } = useListViewContext();
+	const {
+		blockDropPosition,
+		blockDropTargetIndex,
+		firstDraggedBlockIndex,
+		blockIndexes,
+		expandedState,
+		draggedClientIds,
+	} = useListViewContext();
 
 	if ( ! canParentExpand ) {
 		return null;
 	}
 
+	// Only show the appender at the first level.
+	const showAppender = showAppenderProp && level === 1;
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
+	// The appender means an extra row in List View, so add 1 to the row count.
+	const rowCount = showAppender ? blockCount + 1 : blockCount;
 	let nextPosition = listPosition;
 
 	return (
@@ -138,6 +149,21 @@ function ListViewBranch( props ) {
 					);
 				}
 
+				const isDragged = !! draggedClientIds?.includes( clientId );
+
+				// Determine the displacement of the block while dragging. This
+				// works out whether the current block should be displaced up or
+				// down, relative to the dragged blocks and the drop target.
+				const { displacement, isAfterDraggedBlocks, isNesting } =
+					getDragDisplacementValues( {
+						blockIndexes,
+						blockDropTargetIndex,
+						blockDropPosition,
+						clientId,
+						firstDraggedBlockIndex,
+						isDragged,
+					} );
+
 				const { itemInView } = fixedListWindow;
 				const blockInView = itemInView( nextPosition );
 
@@ -153,10 +179,6 @@ function ListViewBranch( props ) {
 						? expandedState[ clientId ] ?? isExpanded
 						: undefined;
 
-				const isDragged = !! draggedClientIds?.includes( clientId );
-
-				const showBlock = isDragged || blockInView;
-
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
 				const isSelected = isClientIdSelected(
@@ -165,6 +187,17 @@ function ListViewBranch( props ) {
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
+
+				// To avoid performance issues, we only render blocks that are in view,
+				// or blocks that are selected or dragged. If a block is selected,
+				// it is only counted if it is the first of the block selection.
+				// This prevents the entire tree from being rendered when a branch is
+				// selected, or a user selects all blocks, while still enabling scroll
+				// into view behavior when selecting a block or opening the list view.
+				const showBlock =
+					isDragged ||
+					blockInView ||
+					( isSelected && clientId === selectedClientIds[ 0 ] );
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
@@ -176,14 +209,17 @@ function ListViewBranch( props ) {
 								isDragged={ isDragged }
 								level={ level }
 								position={ position }
-								rowCount={ blockCount }
+								rowCount={ rowCount }
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
-								isExpanded={ shouldExpand }
+								isExpanded={ isDragged ? false : shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
 								isSyncedBranch={ syncedBranch }
+								displacement={ displacement }
+								isAfterDraggedBlocks={ isAfterDraggedBlocks }
+								isNesting={ isNesting }
 							/>
 						) }
 						{ ! showBlock && (
@@ -210,6 +246,25 @@ function ListViewBranch( props ) {
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ showAppender && (
+				<TreeGridRow
+					level={ level }
+					setSize={ rowCount }
+					positionInSet={ rowCount }
+					isExpanded={ true }
+				>
+					<TreeGridCell>
+						{ ( treeGridCellProps ) => (
+							<Appender
+								clientId={ parentId }
+								nestingLevel={ level }
+								blockCount={ blockCount }
+								{ ...treeGridCellProps }
+							/>
+						) }
+					</TreeGridCell>
+				</TreeGridRow>
+			) }
 		</>
 	);
 }

@@ -14,7 +14,6 @@ import {
 	PanelBody,
 	Spinner,
 	Placeholder,
-	ToolbarButton,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -24,17 +23,14 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	MediaReplaceFlow,
-	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { video as icon, caption as captionIcon } from '@wordpress/icons';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -44,6 +40,7 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
+import { Caption } from '../utils/caption';
 
 // Much of this description is duplicated from MediaPlaceholder.
 const placeholder = ( content ) => {
@@ -66,7 +63,7 @@ const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
-	isSelected,
+	isSelected: isSingleSelected,
 	attributes,
 	className,
 	setAttributes,
@@ -76,20 +73,15 @@ function VideoEdit( {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
-	const { id, caption, controls, poster, src, tracks } = attributes;
-	const prevCaption = usePrevious( caption );
-	const [ showCaption, setShowCaption ] = useState( !! caption );
+	const { id, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { getSettings } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 			if ( file ) {
-				mediaUpload( {
+				getSettings().mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectVideo( media ),
 					onError: onUploadError,
@@ -105,30 +97,6 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
-
-	// We need to show the caption when changes come from
-	// history navigation(undo/redo).
-	useEffect( () => {
-		if ( caption && ! prevCaption ) {
-			setShowCaption( true );
-		}
-	}, [ caption, prevCaption ] );
-
-	// Focus the caption when we click to add one.
-	const captionRef = useCallback(
-		( node ) => {
-			if ( node && ! caption ) {
-				node.focus();
-			}
-		},
-		[ caption ]
-	);
-
-	useEffect( () => {
-		if ( ! isSelected && ! caption ) {
-			setShowCaption( false );
-		}
-	}, [ isSelected, caption ] );
 
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -214,42 +182,29 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<ToolbarButton
-					onClick={ () => {
-						setShowCaption( ! showCaption );
-						if ( showCaption && caption ) {
-							setAttributes( { caption: undefined } );
-						}
-					} }
-					icon={ captionIcon }
-					isPressed={ showCaption }
-					label={
-						showCaption
-							? __( 'Remove caption' )
-							: __( 'Add caption' )
-					}
-				/>
-			</BlockControls>
-			<BlockControls>
-				<TracksEditor
-					tracks={ tracks }
-					onChange={ ( newTracks ) => {
-						setAttributes( { tracks: newTracks } );
-					} }
-				/>
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="video/*"
-					onSelect={ onSelectVideo }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ isSingleSelected && (
+				<>
+					<BlockControls>
+						<TracksEditor
+							tracks={ tracks }
+							onChange={ ( newTracks ) => {
+								setAttributes( { tracks: newTracks } );
+							} }
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ src }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="video/*"
+							onSelect={ onSelectVideo }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+						/>
+					</BlockControls>
+				</>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
@@ -313,7 +268,7 @@ function VideoEdit( {
 					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }
@@ -324,29 +279,14 @@ function VideoEdit( {
 					</video>
 				</Disabled>
 				{ isTemporaryVideo && <Spinner /> }
-				{ showCaption &&
-					( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							identifier="caption"
-							tagName="figcaption"
-							className={ __experimentalGetElementClassName(
-								'caption'
-							) }
-							aria-label={ __( 'Video caption text' ) }
-							ref={ captionRef }
-							placeholder={ __( 'Add caption' ) }
-							value={ caption }
-							onChange={ ( value ) =>
-								setAttributes( { caption: value } )
-							}
-							inlineToolbar
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
-								)
-							}
-						/>
-					) }
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Video caption text' ) }
+					showToolbarButton={ isSingleSelected }
+				/>
 			</figure>
 		</>
 	);

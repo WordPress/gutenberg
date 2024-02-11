@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
 		"appearanceTools": false,
@@ -11,6 +12,8 @@
 		},
 		"color": {
 			"background": true,
+			"button": true,
+			"caption": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
@@ -121,6 +124,7 @@
 					"slug": "midnight"
 				}
 			],
+			"heading": true,
 			"link": false,
 			"palette": [
 				{
@@ -187,157 +191,34 @@
 			"text": true
 		},
 		"shadow": {
-			"palette": [
+			"defaultPresets": true,
+			"presets": [
 				{
 					"name": "Natural",
 					"slug": "natural",
-					"shadow": "0 .2rem .3rem 0 rgba(0,0,0, 0.3), 0 .5rem .6rem 0 rgba(0,0,0, 0.4)"
+					"shadow": "6px 6px 9px rgba(0, 0, 0, 0.2)"
+				},
+				{
+					"name": "Deep",
+					"slug": "deep",
+					"shadow": "12px 12px 50px rgba(0, 0, 0, 0.4)"
 				},
 				{
 					"name": "Sharp",
 					"slug": "sharp",
-					"shadow": ".5rem .5rem 0 0 rgba(0,0,0, 0.4)"
+					"shadow": "6px 6px 0px rgba(0, 0, 0, 0.2)"
+				},
+				{
+					"name": "Outlined",
+					"slug": "outlined",
+					"shadow": "6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1)"
+				},
+				{
+					"name": "Crisp",
+					"slug": "crisp",
+					"shadow": "6px 6px 0px rgba(0, 0, 0, 1)"
 				}
 			]
-		},
-		"layout": {
-			"definitions": {
-				"default": {
-					"name": "default",
-					"slug": "flow",
-					"className": "is-layout-flow",
-					"baseStyles": [
-						{
-							"selector": " > .alignleft",
-							"rules": {
-								"float": "left",
-								"margin-inline-start": "0",
-								"margin-inline-end": "2em"
-							}
-						},
-						{
-							"selector": " > .alignright",
-							"rules": {
-								"float": "right",
-								"margin-inline-start": "2em",
-								"margin-inline-end": "0"
-							}
-						},
-						{
-							"selector": " > .aligncenter",
-							"rules": {
-								"margin-left": "auto !important",
-								"margin-right": "auto !important"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": " > *",
-							"rules": {
-								"margin-block-start": "0",
-								"margin-block-end": "0"
-							}
-						},
-						{
-							"selector": " > * + *",
-							"rules": {
-								"margin-block-start": null,
-								"margin-block-end": "0"
-							}
-						}
-					]
-				},
-				"constrained": {
-					"name": "constrained",
-					"slug": "constrained",
-					"className": "is-layout-constrained",
-					"baseStyles": [
-						{
-							"selector": " > .alignleft",
-							"rules": {
-								"float": "left",
-								"margin-inline-start": "0",
-								"margin-inline-end": "2em"
-							}
-						},
-						{
-							"selector": " > .alignright",
-							"rules": {
-								"float": "right",
-								"margin-inline-start": "2em",
-								"margin-inline-end": "0"
-							}
-						},
-						{
-							"selector": " > .aligncenter",
-							"rules": {
-								"margin-left": "auto !important",
-								"margin-right": "auto !important"
-							}
-						},
-						{
-							"selector": " > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-							"rules": {
-								"max-width": "var(--wp--style--global--content-size)",
-								"margin-left": "auto !important",
-								"margin-right": "auto !important"
-							}
-						},
-						{
-							"selector": " > .alignwide",
-							"rules": {
-								"max-width": "var(--wp--style--global--wide-size)"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": " > *",
-							"rules": {
-								"margin-block-start": "0",
-								"margin-block-end": "0"
-							}
-						},
-						{
-							"selector": " > * + *",
-							"rules": {
-								"margin-block-start": null,
-								"margin-block-end": "0"
-							}
-						}
-					]
-				},
-				"flex": {
-					"name": "flex",
-					"slug": "flex",
-					"className": "is-layout-flex",
-					"displayMode": "flex",
-					"baseStyles": [
-						{
-							"selector": "",
-							"rules": {
-								"flex-wrap": "wrap",
-								"align-items": "center"
-							}
-						},
-						{
-							"selector": " > *",
-							"rules": {
-								"margin": "0"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": "",
-							"rules": {
-								"gap": null
-							}
-						}
-					]
-				}
-			}
 		},
 		"spacing": {
 			"blockGap": null,
@@ -382,13 +263,20 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
-			"textTransform": true
+			"textTransform": true,
+			"writingMode": false
 		},
 		"blocks": {
 			"core/button": {
 				"border": {
 					"radius": true
+				}
+			},
+			"core/image": {
+				"lightbox": {
+					"allowEditing": true
 				}
 			},
 			"core/pullquote": {

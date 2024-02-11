@@ -35,4 +35,4 @@ The path of the screen to navigate to. The value of this prop needs to be [a val
 
 ### Inherited props
 
-`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.
+`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.

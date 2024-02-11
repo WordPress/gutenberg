@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Tooltip } from './styles/range-control-styles';
 
 import type { TooltipProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export default function SimpleTooltip(
 	props: WordPressComponentProps< TooltipProps, 'span' >

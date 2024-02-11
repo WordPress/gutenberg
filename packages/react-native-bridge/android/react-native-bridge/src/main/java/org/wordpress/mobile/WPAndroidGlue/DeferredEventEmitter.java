@@ -15,6 +15,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_IS_CONNECTED;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL;
@@ -30,6 +31,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
     private static final int MEDIA_UPLOAD_STATE_RESET = 4;
+    private static final int MEDIA_UPLOAD_STATE_PAUSED = 11;
 
     private static final int MEDIA_SAVE_STATE_SAVING = 5;
     private static final int MEDIA_SAVE_STATE_SUCCEEDED = 6;
@@ -44,9 +46,13 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
 
     private static final String EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED = "featuredImageIdNativeUpdated";
 
+    private static final String EVENT_CONNECTION_STATUS_CHANGE = "connectionStatusChange";
+
     private static final String MAP_KEY_MEDIA_FILE_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS = "progress";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_SERVER_ID = "mediaServerId";
+    private static final String MAP_KEY_MEDIA_FILE_METADATA = "metadata";
+
     private static final String MAP_KEY_UPDATE_CAPABILITIES = "updateCapabilities";
 
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
@@ -99,15 +105,20 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
-        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN);
+        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN, new WritableNativeMap());
     }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
+        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, mediaServerId, new WritableNativeMap());
+    }
+
+    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId, WritableNativeMap metadata) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_STATE, state);
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS, progress);
+        writableMap.putMap(MAP_KEY_MEDIA_FILE_METADATA, metadata);
         if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
             writableMap.putInt(MAP_KEY_MEDIA_FILE_MEDIA_SERVER_ID, mediaServerId);
         }
@@ -161,13 +172,18 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     @Override
-    public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
+    public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId, WritableNativeMap metadata) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId, metadata);
     }
 
     @Override
     public void onMediaFileUploadFailed(int mediaId) {
         setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+    }
+
+    @Override
+    public void onMediaFileUploadPaused(int mediaId) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_PAUSED, mediaId, null, 0);
     }
 
     // Media file save events emitter
@@ -213,6 +229,12 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_FEATURED_IMAGE_ID, mediaId);
         queueActionToJS(EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED, writableMap);
+    }
+
+    public void onConnectionStatusChange(boolean isConnected) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putBoolean(MAP_KEY_IS_CONNECTED, isConnected);
+        queueActionToJS(EVENT_CONNECTION_STATUS_CHANGE, writableMap);
     }
 
     @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {

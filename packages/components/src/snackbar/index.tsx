@@ -8,7 +8,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { useEffect, forwardRef, renderToString } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	forwardRef,
+	renderToString,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
@@ -16,8 +22,9 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import Button from '../button';
-import type { NoticeAction, SnackbarProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { SnackbarProps } from './types';
+import type { NoticeAction } from '../notice/types';
+import type { WordPressComponentProps } from '../context';
 
 const NOTICE_TIMEOUT = 10000;
 
@@ -25,8 +32,8 @@ const NOTICE_TIMEOUT = 10000;
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param  message    Message to announce.
- * @param  politeness Politeness to announce.
+ * @param message    Message to announce.
+ * @param politeness Politeness to announce.
  */
 function useSpokenMessage(
 	message: SnackbarProps[ 'spokenMessage' ],
@@ -73,7 +80,7 @@ function UnforwardedSnackbar(
 	}
 
 	function onActionClick(
-		event: MouseEvent,
+		event: MouseEvent< HTMLButtonElement >,
 		onClick: NoticeAction[ 'onClick' ]
 	) {
 		event.stopPropagation();
@@ -87,17 +94,24 @@ function UnforwardedSnackbar(
 
 	useSpokenMessage( spokenMessage, politeness );
 
-	// Only set up the timeout dismiss if we're not explicitly dismissing.
+	// The `onDismiss/onRemove` can have unstable references,
+	// trigger side-effect cleanup, and reset timers.
+	const callbackRefs = useRef( { onDismiss, onRemove } );
+	useLayoutEffect( () => {
+		callbackRefs.current = { onDismiss, onRemove };
+	} );
+
 	useEffect( () => {
+		// Only set up the timeout dismiss if we're not explicitly dismissing.
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				onDismiss?.();
-				onRemove?.();
+				callbackRefs.current.onDismiss?.();
+				callbackRefs.current.onRemove?.();
 			}
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ onDismiss, onRemove, explicitDismiss ] );
+	}, [ explicitDismiss ] );
 
 	const classes = classnames( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
@@ -105,7 +119,7 @@ function UnforwardedSnackbar(
 	if ( actions && actions.length > 1 ) {
 		// We need to inform developers that snackbar only accepts 1 action.
 		warning(
-			'Snackbar can only have 1 action, use Notice if your message require many messages'
+			'Snackbar can only have one action. Use Notice if your message requires many actions.'
 		);
 		// return first element only while keeping it inside an array
 		actions = [ actions[ 0 ] ];
@@ -139,9 +153,9 @@ function UnforwardedSnackbar(
 							key={ index }
 							href={ url }
 							variant="tertiary"
-							onClick={ ( event: MouseEvent ) =>
-								onActionClick( event, onClick )
-							}
+							onClick={ (
+								event: MouseEvent< HTMLButtonElement >
+							) => onActionClick( event, onClick ) }
 							className="components-snackbar__action"
 						>
 							{ label }

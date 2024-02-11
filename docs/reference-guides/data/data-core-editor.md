@@ -26,8 +26,7 @@ _Returns_
 
 ### didPostSaveRequestFail
 
-Returns true if a previous post save was attempted but failed, or false
-otherwise.
+Returns true if a previous post save was attempted but failed, or false otherwise.
 
 _Parameters_
 
@@ -39,8 +38,7 @@ _Returns_
 
 ### didPostSaveRequestSucceed
 
-Returns true if a previous post save was attempted successfully, or false
-otherwise.
+Returns true if a previous post save was attempted successfully, or false otherwise.
 
 _Parameters_
 
@@ -72,8 +70,7 @@ _Related_
 
 > **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package and access properties on the returned autosave object using getPostRawValue.
 
-Returns an attribute value of the current autosave revision for a post, or
-null if there is no autosave for the post.
+Returns an attribute value of the current autosave revision for a post, or null if there is no autosave for the post.
 
 _Parameters_
 
@@ -188,9 +185,7 @@ _Related_
 
 ### getCurrentPost
 
-Returns the post currently being edited in its last known saved state, not
-including unsaved edits. Returns an object containing relevant default post
-values if the post has not yet been saved.
+Returns the post currently being edited in its last known saved state, not including unsaved edits. Returns an object containing relevant default post values if the post has not yet been saved.
 
 _Parameters_
 
@@ -215,8 +210,7 @@ _Returns_
 
 ### getCurrentPostId
 
-Returns the ID of the post currently being edited, or null if the post has
-not yet been saved.
+Returns the ID of the post currently being edited, or null if the post has not yet been saved.
 
 _Parameters_
 
@@ -228,8 +222,7 @@ _Returns_
 
 ### getCurrentPostLastRevisionId
 
-Returns the last revision ID of the post currently being edited,
-or null if the post has no revisions.
+Returns the last revision ID of the post currently being edited, or null if the post has no revisions.
 
 _Parameters_
 
@@ -263,11 +256,33 @@ _Returns_
 
 -   `string`: Post type.
 
+### getCurrentTemplateId
+
+Returns the template ID currently being rendered/edited
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string?`: Template ID.
+
+### getDeviceType
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 ### getEditedPostAttribute
 
-Returns a single attribute of the post being edited, preferring the unsaved
-edit if one exists, but falling back to the attribute for the last known
-saved state of the post.
+Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
 
 _Parameters_
 
@@ -300,13 +315,11 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Preview Link.
+-   `string | undefined`: Preview Link.
 
 ### getEditedPostSlug
 
-Returns the slug for the post being edited, preferring a manually edited
-value if one exists, then a sanitized version of the current post title, and
-finally the post ID.
+Returns the slug for the post being edited, preferring a manually edited value if one exists, then a sanitized version of the current post title, and finally the post ID.
 
 _Parameters_
 
@@ -318,9 +331,7 @@ _Returns_
 
 ### getEditedPostVisibility
 
-Returns the current visibility of the post being edited, preferring the
-unsaved value if different than the saved post. The return value is one of
-"private", "password", or "public".
+Returns the current visibility of the post being edited, preferring the unsaved value if different than the saved post. The return value is one of "private", "password", or "public".
 
 _Parameters_
 
@@ -462,8 +473,7 @@ _Returns_
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix,
-the postName, and the suffix.
+Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
 
 _Parameters_
 
@@ -475,8 +485,7 @@ _Returns_
 
 ### getPostEdits
 
-Returns any post values which have been changed in the editor but not yet
-been saved.
+Returns any post values which have been changed in the editor but not yet been saved.
 
 _Parameters_
 
@@ -516,6 +525,18 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
+### getRenderingMode
+
+Returns the post editor's rendering mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Rendering mode.
+
 ### getSelectedBlock
 
 _Related_
@@ -544,18 +565,11 @@ _Related_
 
 > **Deprecated** since Gutenberg 9.7.0.
 
-Returns state object prior to a specified optimist transaction ID, or `null`
-if the transaction corresponding to the given ID cannot be found.
+Returns state object prior to a specified optimist transaction ID, or `null` if the transaction corresponding to the given ID cannot be found.
 
 ### getSuggestedPostFormat
 
-Returns a suggested post format for the current post, inferred only if there
-is a single block within the post and it is of a type known to match a
-default post format. Returns null if the format cannot be determined.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
+Returns a suggested post format for the current post, inferred only if there is a single block within the post and it is of a type known to match a default post format. Returns null if the format cannot be determined.
 
 _Returns_
 
@@ -587,8 +601,7 @@ _Returns_
 
 ### hasEditorRedo
 
-Returns true if any future editor history snapshots exist, or false
-otherwise.
+Returns true if any future editor history snapshots exist, or false otherwise.
 
 _Parameters_
 
@@ -624,8 +637,7 @@ _Related_
 
 ### hasNonPostEntityChanges
 
-Returns true if there are unsaved edits for entities other than
-the editor's post, and false otherwise.
+Returns true if there are unsaved edits for entities other than the editor's post, and false otherwise.
 
 _Parameters_
 
@@ -651,8 +663,7 @@ _Related_
 
 > **Deprecated** since Gutenberg 9.7.0.
 
-Returns true if an optimistic transaction is pending commit, for which the
-before state satisfies the given predicate function.
+Returns true if an optimistic transaction is pending commit, for which the before state satisfies the given predicate function.
 
 ### isAncestorMultiSelected
 
@@ -710,8 +721,7 @@ _Related_
 
 ### isCleanNewPost
 
-Returns true if there are no unsaved values for the current edit session and
-if the currently edited post is new (has never been saved before).
+Returns true if there are no unsaved values for the current edit session and if the currently edited post is new (has never been saved before).
 
 _Parameters_
 
@@ -785,8 +795,7 @@ _Returns_
 
 ### isEditedPostBeingScheduled
 
-Return true if the post being edited is being scheduled. Preferring the
-unsaved status values.
+Return true if the post being edited is being scheduled. Preferring the unsaved status values.
 
 _Parameters_
 
@@ -798,13 +807,9 @@ _Returns_
 
 ### isEditedPostDateFloating
 
-Returns whether the current post should be considered to have a "floating"
-date (i.e. that it would publish "Immediately" rather than at a set time).
+Returns whether the current post should be considered to have a "floating" date (i.e. that it would publish "Immediately" rather than at a set time).
 
-Unlike in the PHP backend, the REST API returns a full date string for posts
-where the 0000-00-00T00:00:00 placeholder is present in the database. To
-infer that a post is set to publish "Immediately" we check whether the date
-and modified date are the same.
+Unlike in the PHP backend, the REST API returns a full date string for posts where the 0000-00-00T00:00:00 placeholder is present in the database. To infer that a post is set to publish "Immediately" we check whether the date and modified date are the same.
 
 _Parameters_
 
@@ -816,8 +821,7 @@ _Returns_
 
 ### isEditedPostDirty
 
-Returns true if there are unsaved values for the current edit session, or
-false if the editing state matches the saved or new post.
+Returns true if there are unsaved values for the current edit session, or false if the editing state matches the saved or new post.
 
 _Parameters_
 
@@ -829,9 +833,7 @@ _Returns_
 
 ### isEditedPostEmpty
 
-Returns true if the edited post has content. A post has content if it has at
-least one saveable block or otherwise has a non-empty content property
-assigned.
+Returns true if the edited post has content. A post has content if it has at least one saveable block or otherwise has a non-empty content property assigned.
 
 _Parameters_
 
@@ -843,8 +845,7 @@ _Returns_
 
 ### isEditedPostNew
 
-Returns true if the currently edited post is yet to be saved, or false if
-the post has been saved.
+Returns true if the currently edited post is yet to be saved, or false if the post has been saved.
 
 _Parameters_
 
@@ -868,8 +869,7 @@ _Returns_
 
 ### isEditedPostSaveable
 
-Returns true if the post can be saved, or false otherwise. A post must
-contain a title, an excerpt, or non-empty content to be valid for save.
+Returns true if the post can be saved, or false otherwise. A post must contain a title, an excerpt, or non-empty content to be valid for save.
 
 _Parameters_
 
@@ -879,11 +879,74 @@ _Returns_
 
 -   `boolean`: Whether the post can be saved.
 
+### isEditorPanelEnabled
+
+Returns true if the given panel is enabled, or false otherwise. Panels are enabled by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is enabled.
+
+### isEditorPanelOpened
+
+Returns true if the given panel is open, or false otherwise. Panels are closed by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is open.
+
+### isEditorPanelRemoved
+
+Returns true if the given panel was programmatically removed, or false otherwise. All panels are not removed by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is removed.
+
 ### isFirstMultiSelectedBlock
 
 _Related_
 
 -   isFirstMultiSelectedBlock in core/block-editor store.
+
+### isInserterOpened
+
+Returns true if the inserter is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
+
+### isListViewOpened
+
+Returns true if the list view is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the list view is opened.
 
 ### isMultiSelecting
 
@@ -977,8 +1040,7 @@ _Returns_
 
 ### isPublishSidebarEnabled
 
-Returns whether the pre-publish panel should be shown
-or skipped when the user clicks the "publish" button.
+Returns whether the pre-publish panel should be shown or skipped when the user clicks the "publish" button.
 
 _Returns_
 
@@ -1034,10 +1096,7 @@ _Related_
 
 ### autosave
 
-Action that autosaves the current post. This
-includes server-side autosaving (default) and client-side (a.k.a. local)
-autosaving (e.g. on the Web, the post might be committed to Session
-Storage).
+Action that autosaves the current post. This includes server-side autosaving (default) and client-side (a.k.a. local) autosaving (e.g. on the Web, the post might be committed to Session Storage).
 
 _Parameters_
 
@@ -1061,8 +1120,7 @@ Disables the publish sidebar.
 
 ### editPost
 
-Returns an action object used in signalling that attributes of the post have
-been edited.
+Returns an action object used in signalling that attributes of the post have been edited.
 
 _Parameters_
 
@@ -1231,6 +1289,18 @@ _Related_
 
 -   removeBlocks in core/block-editor store.
 
+### removeEditorPanel
+
+Returns an action object used to remove a panel from the editor.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to remove.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### replaceBlock
 
 _Related_
@@ -1262,8 +1332,7 @@ _Parameters_
 
 > **Deprecated** Since WordPress 6.0.
 
-Returns an action object used in signalling that the latest version of the
-post has been received, either by initialization or save.
+Returns an action object used in signalling that the latest version of the post has been received, either by initialization or save.
 
 ### savePost
 
@@ -1279,6 +1348,69 @@ _Related_
 
 -   selectBlock in core/block-editor store.
 
+### setDeviceType
+
+Action that changes the width of the editing canvas.
+
+_Parameters_
+
+-   _deviceType_ `string`:
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setEditedPost
+
+Returns an action that sets the current post Type and post ID.
+
+_Parameters_
+
+-   _postType_ `string`: Post Type.
+-   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsInserterOpened
+
+Returns an action object used to open/close the inserter.
+
+_Parameters_
+
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
+-   _value.rootClientId_ `string`: The root client ID to insert at.
+-   _value.insertionIndex_ `number`: The index to insert at.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsListViewOpened
+
+Returns an action object used to open/close the list view.
+
+_Parameters_
+
+-   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setRenderingMode
+
+Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+
+-   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
+-   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+-   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+
+_Parameters_
+
+-   _mode_ `string`: Mode (one of 'post-only', 'template-locked' or 'all').
+
 ### setTemplateValidity
 
 _Related_
@@ -1287,8 +1419,7 @@ _Related_
 
 ### setupEditor
 
-Returns an action generator used in signalling that editor has initialized with
-the specified post object and editor settings.
+Returns an action generator used in signalling that editor has initialized with the specified post object and editor settings.
 
 _Parameters_
 
@@ -1298,16 +1429,13 @@ _Parameters_
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening
-an editor.
+> **Deprecated**
+
+Setup the editor state.
 
 _Parameters_
 
 -   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### showInsertionPoint
 
@@ -1350,6 +1478,26 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
+
+### toggleEditorPanelEnabled
+
+Returns an action object used to enable or disable a panel in the editor.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to enable or disable.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### toggleEditorPanelOpened
+
+Opens a closed panel and closes an open panel.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to open or close.
 
 ### toggleSelection
 
@@ -1425,8 +1573,7 @@ Undocumented declaration.
 
 > **Deprecated** since Gutenberg 9.7.0.
 
-Returns an action object used in signalling that a patch of updates for the
-latest version of the post have been received.
+Returns an action object used in signalling that a patch of updates for the latest version of the post have been received.
 
 _Returns_
 

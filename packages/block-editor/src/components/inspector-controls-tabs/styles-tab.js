@@ -11,8 +11,11 @@ import { __ } from '@wordpress/i18n';
 import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import InspectorControls from '../inspector-controls';
+import { getBorderPanelLabel } from '../../hooks/border';
 
 const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
+	const borderPanelLabel = getBorderPanelLabel( { blockName } );
+
 	return (
 		<>
 			{ hasBlockStyles && (
@@ -28,22 +31,25 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 				</div>
 			) }
 			<InspectorControls.Slot
-				__experimentalGroup="color"
+				group="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
 			/>
 			<InspectorControls.Slot
-				__experimentalGroup="typography"
+				group="background"
+				label={ __( 'Background' ) }
+			/>
+			<InspectorControls.Slot group="filter" />
+			<InspectorControls.Slot
+				group="typography"
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot
-				__experimentalGroup="dimensions"
+				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
-			<InspectorControls.Slot
-				__experimentalGroup="border"
-				label={ __( 'Border' ) }
-			/>
+			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+			<InspectorControls.Slot group="styles" />
 		</>
 	);
 };

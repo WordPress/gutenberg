@@ -1,17 +1,9 @@
 /**
  * Internal dependencies
  */
-import {
-	OBJECT_REPLACEMENT_CHARACTER,
-	LINE_SEPARATOR,
-} from './special-characters';
+import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-
-const pattern = new RegExp(
-	`[${ OBJECT_REPLACEMENT_CHARACTER }${ LINE_SEPARATOR }]`,
-	'g'
-);
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Get the textual content of a Rich Text value. This is similar to
@@ -22,7 +14,5 @@ const pattern = new RegExp(
  * @return {string} The text content.
  */
 export function getTextContent( { text } ) {
-	return text.replace( pattern, ( c ) =>
-		c === OBJECT_REPLACEMENT_CHARACTER ? '' : '\n'
-	);
+	return text.replace( OBJECT_REPLACEMENT_CHARACTER, '' );
 }

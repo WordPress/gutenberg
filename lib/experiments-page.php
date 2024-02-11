@@ -5,26 +5,28 @@
  * @package gutenberg
  */
 
-/**
- * The main entry point for the Gutenberg experiments page.
- *
- * @since 6.3.0
- */
-function the_gutenberg_experiments() {
-	?>
-	<div
-		id="experiments-editor"
-		class="wrap"
-	>
-	<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
-	<?php settings_errors(); ?>
-	<form method="post" action="options.php">
-		<?php settings_fields( 'gutenberg-experiments' ); ?>
-		<?php do_settings_sections( 'gutenberg-experiments' ); ?>
-		<?php submit_button(); ?>
-	</form>
-	</div>
-	<?php
+if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
+	/**
+	 * The main entry point for the Gutenberg experiments page.
+	 *
+	 * @since 6.3.0
+	 */
+	function the_gutenberg_experiments() {
+		?>
+		<div
+			id="experiments-editor"
+			class="wrap"
+		>
+		<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
+		<?php settings_errors(); ?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'gutenberg-experiments' ); ?>
+			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<?php submit_button(); ?>
+		</form>
+		</div>
+		<?php
+	}
 }
 
 /**
@@ -42,6 +44,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-sync-collaboration',
+		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
+			'id'    => 'gutenberg-sync-collaboration',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-zoomed-out-view',
 		__( 'Zoomed out view ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -54,14 +68,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-off-canvas-navigation-editor',
-		__( 'Off canvas navigation editor ', 'gutenberg' ),
+		'gutenberg-dataviews',
+		__( 'New admin views', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new "off canvas" editor for navigation block using the block inspector and a tree view of the current menu', 'gutenberg' ),
-			'id'    => 'gutenberg-off-canvas-navigation-editor',
+			'label' => __( 'Test the new views for different entities like pages.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews',
 		)
 	);
 
@@ -76,32 +90,39 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-color-randomizer',
 		)
 	);
-
 	add_settings_field(
-		'gutenberg-block-inspector-tabs',
-		__( 'Block inspector tabs ', 'gutenberg' ),
+		'gutenberg-form-blocks',
+		__( 'Form and input blocks ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new block inspector view splitting settings and appearance controls into tabs', 'gutenberg' ),
-			'id'    => 'gutenberg-block-inspector-tabs',
+			'label' => __( 'Test new blocks to allow building forms (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-form-blocks',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-global-styles-custom-css',
-		__( 'Global styles custom css ', 'gutenberg' ),
+		'gutenberg-group-grid-variation',
+		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => sprintf(
-				/* translators: %s: WordPress documentation for roles and capabilities. */
-				__( 'Test the Global Styles custom CSS field in the site editor. This requires a user to have <a href="%s">unfiltered html capabilities</a>.', 'gutenberg' ),
-				'https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html'
-			),
-			'id'    => 'gutenberg-global-styles-custom-css',
+			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
+			'id'    => 'gutenberg-group-grid-variation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-no-tinymce',
+		__( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+			'id'    => 'gutenberg-no-tinymce',
 		)
 	);
 

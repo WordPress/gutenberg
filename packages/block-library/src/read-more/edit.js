@@ -19,8 +19,9 @@ export default function ReadMore( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open in new tab' ) }
 						onChange={ ( value ) =>
 							setAttributes( {

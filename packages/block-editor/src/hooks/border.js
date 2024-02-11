@@ -6,66 +6,28 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
-import {
-	__experimentalBorderBoxControl as BorderBoxControl,
-	__experimentalHasSplitBorders as hasSplitBorders,
-	__experimentalIsDefinedBorder as isDefinedBorder,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { Platform } from '@wordpress/element';
+import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
+import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
-	BorderRadiusEdit,
-	hasBorderRadiusValue,
-	resetBorderRadius,
-} from './border-radius';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import useSetting from '../components/use-setting';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	useHasBorderPanel,
+	BorderPanel as StylesBorderPanel,
+} from '../components/global-styles';
+import { store as blockEditorStore } from '../store';
+import { __ } from '@wordpress/i18n';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
-
-const borderSides = [ 'top', 'right', 'bottom', 'left' ];
-
-const hasBorderValue = ( props ) => {
-	const { borderColor, style } = props.attributes;
-	return isDefinedBorder( style?.border ) || !! borderColor;
-};
-
-// The border color, style, and width are omitted so they get undefined. The
-// border radius is separate and must retain its selection.
-const resetBorder = ( { attributes = {}, setAttributes } ) => {
-	const { style } = attributes;
-	setAttributes( {
-		borderColor: undefined,
-		style: {
-			...style,
-			border: cleanEmptyObject( {
-				radius: style?.border?.radius,
-			} ),
-		},
-	} );
-};
-
-const resetBorderFilter = ( newAttributes ) => ( {
-	...newAttributes,
-	borderColor: undefined,
-	style: {
-		...newAttributes.style,
-		border: {
-			radius: newAttributes.style?.border?.radius,
-		},
-	},
-} );
+export const SHADOW_SUPPORT_KEY = 'shadow';
 
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
@@ -103,51 +65,6 @@ export const getMultiOriginColor = ( { colors, namedColor, customColor } ) => {
 	return colorObject ? colorObject : { color: customColor };
 };
 
-const getBorderObject = ( attributes, colors ) => {
-	const { borderColor, style } = attributes;
-	const { border: borderStyles } = style || {};
-
-	// If we have a named color for a flat border. Fetch that color object and
-	// apply that color's value to the color property within the style object.
-	if ( borderColor ) {
-		const { color } = getMultiOriginColor( {
-			colors,
-			namedColor: borderColor,
-		} );
-
-		return color ? { ...borderStyles, color } : borderStyles;
-	}
-
-	// Individual side border color slugs are stored within the border style
-	// object. If we don't have a border styles object we have nothing further
-	// to hydrate.
-	if ( ! borderStyles ) {
-		return borderStyles;
-	}
-
-	// If we have named colors for the individual side borders, retrieve their
-	// related color objects and apply the real color values to the split
-	// border objects.
-	const hydratedBorderStyles = { ...borderStyles };
-	borderSides.forEach( ( side ) => {
-		const colorSlug = getColorSlugFromVariable(
-			hydratedBorderStyles[ side ]?.color
-		);
-		if ( colorSlug ) {
-			const { color } = getMultiOriginColor( {
-				colors,
-				namedColor: colorSlug,
-			} );
-			hydratedBorderStyles[ side ] = {
-				...hydratedBorderStyles[ side ],
-				color,
-			};
-		}
-	} );
-
-	return hydratedBorderStyles;
-};
-
 function getColorSlugFromVariable( value ) {
 	const namedColor = /var:preset\|color\|(.+)/.exec( value );
 	if ( namedColor && namedColor[ 1 ] ) {
@@ -156,150 +73,108 @@ function getColorSlugFromVariable( value ) {
 	return null;
 }
 
-export function BorderPanel( props ) {
-	const { attributes, clientId, setAttributes } = props;
-	const { style } = attributes;
-	const { colors } = useMultipleOriginColorsAndGradients();
+function styleToAttributes( style ) {
+	if ( hasSplitBorders( style?.border ) ) {
+		return {
+			style,
+			borderColor: undefined,
+		};
+	}
 
-	const isSupported = hasBorderSupport( props.name );
-	const isColorSupported =
-		useSetting( 'border.color' ) && hasBorderSupport( props.name, 'color' );
-	const isRadiusSupported =
-		useSetting( 'border.radius' ) &&
-		hasBorderSupport( props.name, 'radius' );
-	const isStyleSupported =
-		useSetting( 'border.style' ) && hasBorderSupport( props.name, 'style' );
-	const isWidthSupported =
-		useSetting( 'border.width' ) && hasBorderSupport( props.name, 'width' );
+	const borderColorValue = style?.border?.color;
+	const borderColorSlug = borderColorValue?.startsWith( 'var:preset|color|' )
+		? borderColorValue.substring( 'var:preset|color|'.length )
+		: undefined;
+	const updatedStyle = { ...style };
+	updatedStyle.border = {
+		...updatedStyle.border,
+		color: borderColorSlug ? undefined : borderColorValue,
+	};
+	return {
+		style: cleanEmptyObject( updatedStyle ),
+		borderColor: borderColorSlug,
+	};
+}
 
-	const isDisabled = [
-		! isColorSupported,
-		! isRadiusSupported,
-		! isStyleSupported,
-		! isWidthSupported,
-	].every( Boolean );
+function attributesToStyle( attributes ) {
+	if ( hasSplitBorders( attributes.style?.border ) ) {
+		return attributes.style;
+	}
+	return {
+		...attributes.style,
+		border: {
+			...attributes.style?.border,
+			color: attributes.borderColor
+				? 'var:preset|color|' + attributes.borderColor
+				: attributes.style?.border?.color,
+		},
+	};
+}
 
-	if ( isDisabled || ! isSupported ) {
+function BordersInspectorControl( { label, children, resetAllFilter } ) {
+	const attributesResetAllFilter = useCallback(
+		( attributes ) => {
+			const existingStyle = attributesToStyle( attributes );
+			const updatedStyle = resetAllFilter( existingStyle );
+			return {
+				...attributes,
+				...styleToAttributes( updatedStyle ),
+			};
+		},
+		[ resetAllFilter ]
+	);
+
+	return (
+		<InspectorControls
+			group="border"
+			resetAllFilter={ attributesResetAllFilter }
+			label={ label }
+		>
+			{ children }
+		</InspectorControls>
+	);
+}
+
+export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+	const isEnabled = useHasBorderPanel( settings );
+	function selector( select ) {
+		const { style, borderColor } =
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+		return { style, borderColor };
+	}
+	const { style, borderColor } = useSelect( selector, [ clientId ] );
+	const value = useMemo( () => {
+		return attributesToStyle( { style, borderColor } );
+	}, [ style, borderColor ] );
+
+	const onChange = ( newStyle ) => {
+		setAttributes( styleToAttributes( newStyle ) );
+	};
+
+	if ( ! isEnabled ) {
 		return null;
 	}
 
-	const defaultBorderControls = getBlockSupport( props.name, [
-		BORDER_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
-
-	const showBorderByDefault =
-		defaultBorderControls?.color || defaultBorderControls?.width;
-
-	const onBorderChange = ( newBorder ) => {
-		// Filter out named colors and apply them to appropriate block
-		// attributes so that CSS classes can be used to apply those colors.
-		// e.g. has-primary-border-top-color.
-
-		let newBorderStyles = { ...newBorder };
-		let newBorderColor;
-
-		if ( hasSplitBorders( newBorder ) ) {
-			// For each side check if the side has a color value set
-			// If so, determine if it belongs to a named color, in which case
-			// we update the color property.
-			//
-			// This deliberately overwrites `newBorderStyles` to avoid mutating
-			// the passed object which causes problems otherwise.
-			newBorderStyles = {
-				top: { ...newBorder.top },
-				right: { ...newBorder.right },
-				bottom: { ...newBorder.bottom },
-				left: { ...newBorder.left },
-			};
-
-			borderSides.forEach( ( side ) => {
-				if ( newBorder[ side ]?.color ) {
-					const colorObject = getMultiOriginColor( {
-						colors,
-						customColor: newBorder[ side ]?.color,
-					} );
-
-					if ( colorObject.slug ) {
-						newBorderStyles[
-							side
-						].color = `var:preset|color|${ colorObject.slug }`;
-					}
-				}
-			} );
-		} else if ( newBorder?.color ) {
-			// We have a flat border configuration. Apply named color slug to
-			// `borderColor` attribute and clear color style property if found.
-			const customColor = newBorder?.color;
-			const colorObject = getMultiOriginColor( { colors, customColor } );
-
-			if ( colorObject.slug ) {
-				newBorderColor = colorObject.slug;
-				newBorderStyles.color = undefined;
-			}
-		}
-
-		// Ensure previous border radius styles are maintained and clean
-		// overall result for empty objects or properties.
-		const newStyle = cleanEmptyObject( {
-			...style,
-			border: { radius: style?.border?.radius, ...newBorderStyles },
-		} );
-
-		setAttributes( {
-			style: newStyle,
-			borderColor: newBorderColor,
-		} );
+	const defaultControls = {
+		...getBlockSupport( name, [
+			BORDER_SUPPORT_KEY,
+			'__experimentalDefaultControls',
+		] ),
+		...getBlockSupport( name, [
+			SHADOW_SUPPORT_KEY,
+			'__experimentalDefaultControls',
+		] ),
 	};
 
-	const hydratedBorder = getBorderObject( attributes, colors );
-
 	return (
-		<InspectorControls __experimentalGroup="border">
-			{ ( isWidthSupported || isColorSupported ) && (
-				<ToolsPanelItem
-					hasValue={ () => hasBorderValue( props ) }
-					label={ __( 'Border' ) }
-					onDeselect={ () => resetBorder( props ) }
-					isShownByDefault={ showBorderByDefault }
-					resetAllFilter={ resetBorderFilter }
-					panelId={ clientId }
-				>
-					<BorderBoxControl
-						colors={ colors }
-						enableAlpha={ true }
-						enableStyle={ isStyleSupported }
-						onChange={ onBorderChange }
-						popoverOffset={ 40 }
-						popoverPlacement="left-start"
-						size="__unstable-large"
-						value={ hydratedBorder }
-						__experimentalIsRenderedInSidebar={ true }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ isRadiusSupported && (
-				<ToolsPanelItem
-					hasValue={ () => hasBorderRadiusValue( props ) }
-					label={ __( 'Radius' ) }
-					onDeselect={ () => resetBorderRadius( props ) }
-					isShownByDefault={ defaultBorderControls?.radius }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						style: {
-							...newAttributes.style,
-							border: {
-								...newAttributes.style?.border,
-								radius: undefined,
-							},
-						},
-					} ) }
-					panelId={ clientId }
-				>
-					<BorderRadiusEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-		</InspectorControls>
+		<StylesBorderPanel
+			as={ BordersInspectorControl }
+			panelId={ clientId }
+			settings={ settings }
+			value={ value }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
+		/>
 	);
 }
 
@@ -332,6 +207,38 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 	}
 
 	return !! support?.[ feature ];
+}
+
+/**
+ * Determine whether there is block support for shadow properties.
+ *
+ * @param {string} blockName Block name.
+ *
+ * @return {boolean} Whether there is support.
+ */
+export function hasShadowSupport( blockName ) {
+	return hasBlockSupport( blockName, SHADOW_SUPPORT_KEY );
+}
+
+export function getBorderPanelLabel( {
+	blockName,
+	hasBorderControl,
+	hasShadowControl,
+} = {} ) {
+	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
+		hasBorderControl = hasBorderSupport( blockName );
+		hasShadowControl = hasShadowSupport( blockName );
+	}
+
+	if ( hasBorderControl && hasShadowControl ) {
+		return __( 'Border & Shadow' );
+	}
+
+	if ( hasShadowControl ) {
+		return __( 'Shadow' );
+	}
+
+	return __( 'Border' );
 }
 
 /**
@@ -386,16 +293,16 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject border color.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type definition.
- * @param {Object} attributes Block's attributes.
+ * @param {Object}        props           Additional props applied to save element.
+ * @param {Object|string} blockNameOrType Block type definition.
+ * @param {Object}        attributes      Block's attributes.
  *
  * @return {Object} Filtered props to apply to save element.
  */
-function addSaveProps( props, blockType, attributes ) {
+function addSaveProps( props, blockNameOrType, attributes ) {
 	if (
-		! hasBorderSupport( blockType, 'color' ) ||
-		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
+		! hasBorderSupport( blockNameOrType, 'color' ) ||
+		shouldSkipSerialization( blockNameOrType, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return props;
 	}
@@ -428,121 +335,63 @@ export function getBorderClasses( attributes ) {
 	} );
 }
 
-/**
- * Filters the registered block settings to apply border color styles and
- * classnames to the block edit wrapper.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-function addEditProps( settings ) {
+function useBlockProps( { name, borderColor, style } ) {
+	const { colors } = useMultipleOriginColorsAndGradients();
+
 	if (
-		! hasBorderSupport( settings, 'color' ) ||
-		shouldSkipSerialization( settings, BORDER_SUPPORT_KEY, 'color' )
+		! hasBorderSupport( name, 'color' ) ||
+		shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
 	) {
-		return settings;
+		return {};
 	}
 
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
+	const { color: borderColorValue } = getMultiOriginColor( {
+		colors,
+		namedColor: borderColor,
+	} );
+	const { color: borderTopColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
+	} );
+	const { color: borderRightColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
+	} );
 
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
+	const { color: borderBottomColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.bottom?.color ),
+	} );
+	const { color: borderLeftColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
+	} );
 
-		return addSaveProps( props, settings, attributes );
+	const extraStyles = {
+		borderTopColor: borderTopColor || borderColorValue,
+		borderRightColor: borderRightColor || borderColorValue,
+		borderBottomColor: borderBottomColor || borderColorValue,
+		borderLeftColor: borderLeftColor || borderColorValue,
 	};
 
-	return settings;
+	return addSaveProps(
+		{ style: cleanEmptyObject( extraStyles ) || {} },
+		name,
+		{ borderColor, style }
+	);
 }
 
-/**
- * This adds inline styles for color palette colors.
- * Ideally, this is not needed and themes should load their palettes on the editor.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withBorderColorPaletteStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { borderColor, style } = attributes;
-		const { colors } = useMultipleOriginColorsAndGradients();
-
-		if (
-			! hasBorderSupport( name, 'color' ) ||
-			shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
-		) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		const { color: borderColorValue } = getMultiOriginColor( {
-			colors,
-			namedColor: borderColor,
-		} );
-		const { color: borderTopColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
-		} );
-		const { color: borderRightColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
-		} );
-
-		const { color: borderBottomColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable(
-				style?.border?.bottom?.color
-			),
-		} );
-		const { color: borderLeftColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
-		} );
-
-		const extraStyles = {
-			borderTopColor: borderTopColor || borderColorValue,
-			borderRightColor: borderRightColor || borderColorValue,
-			borderBottomColor: borderBottomColor || borderColorValue,
-			borderLeftColor: borderLeftColor || borderColorValue,
-		};
-
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = {
-			...props.wrapperProps,
-			style: {
-				...props.wrapperProps?.style,
-				...extraStyles,
-			},
-		};
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
-);
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'borderColor', 'style' ],
+	hasSupport( name ) {
+		return hasBorderSupport( name, 'color' );
+	},
+};
 
 addFilter(
 	'blocks.registerBlockType',
 	'core/border/addAttributes',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/border/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/border/addEditProps',
-	addEditProps
-);
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/border/with-border-color-palette-styles',
-	withBorderColorPaletteStyles
 );

@@ -12,16 +12,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { name as buttonBlockName } from '../button';
-
-const ALLOWED_BLOCKS = [ buttonBlockName ];
+import { store as blocksStore } from '@wordpress/blocks';
 
 const DEFAULT_BLOCK = {
-	name: buttonBlockName,
+	name: 'core/button',
 	attributesToCopy: [
 		'backgroundColor',
 		'border',
@@ -36,31 +30,38 @@ const DEFAULT_BLOCK = {
 };
 
 function ButtonsEdit( { attributes, className } ) {
-	const { fontSize, layout = {}, style } = attributes;
+	const { fontSize, layout, style } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
-	const preferredStyle = useSelect( ( select ) => {
+	const { preferredStyle, hasButtonVariations } = useSelect( ( select ) => {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
+		const buttonVariations = select( blocksStore ).getBlockVariations(
+			'core/button',
+			'inserter'
+		);
+		return {
+			preferredStyle: preferredStyleVariations?.value?.[ 'core/button' ],
+			hasButtonVariations: buttonVariations.length > 0,
+		};
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
+		defaultBlock: DEFAULT_BLOCK,
+		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
+		directInsert: ! hasButtonVariations,
 		template: [
 			[
-				buttonBlockName,
+				'core/button',
 				{ className: preferredStyle && `is-style-${ preferredStyle }` },
 			],
 		],
-		__experimentalLayout: layout,
 		templateInsertUpdatesSelection: true,
+		orientation: layout?.orientation ?? 'horizontal',
 	} );
 
 	return <div { ...innerBlocksProps } />;

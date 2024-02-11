@@ -17,6 +17,20 @@
 	}
 }
 
+
+// Hide selections on this element, otherwise Safari will include it stacked
+// under your actual selection.
+// This uses a CSS hack to show the rules to Safari only. Failing here is okay,
+// it just makes the selection indication slightly less precise. That makes this
+// hack a progressive enhancement. Stylelint is disabled to allow the hack to work.
+/* stylelint-disable */
+_::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
+_::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
+	background-color: transparent;
+}
+/* stylelint-enable */
+
+
 // Note to developers refactoring this, please test navigation mode, and
 // multi selection and hovering the block switcher to highlight the block.
 // Also be sure to test partial selections in Safari, as it draws the
@@ -24,22 +38,14 @@
 .block-editor-block-list__layout {
 	position: relative;
 
-	// Hide selections on this element, otherwise Safari will include it stacked
-	// under your actual selection.
-	&::selection {
-		background: transparent;
-	}
-
-	.has-multi-selection &::selection {
-		background: transparent;
-	}
-
 	// Block multi selection
-	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
-		// Apply a rounded radius to the entire block.
+	// Apply a rounded radius to the entire block when multi selected, but with low specificity
+	// so explicit radii set by tools are preserved.
+	&:where(.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected)) {
 		border-radius: $radius-block-ui;
-		overflow: hidden;
+	}
 
+	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
 		// Hide the native selection indicator, for the selection, and children.
 		&::selection,
 		& ::selection {
@@ -68,25 +74,22 @@
 			// Show outline in high contrast mode.
 			outline: 2px solid transparent;
 		}
+
+		// Don't show the highlight focus style when multi selected.
+		&.is-highlighted::after {
+			box-shadow: none;
+		}
 	}
 
-	// Block highlight, and navigation mode, not focus.
-	// By not using a pseudo element, we can limit ourselves to only
-	// using ::after, leaving ::before free. Otherwise, highlight + multi-select
-	// would require the opacity-changing overlay to be on ::before.
+	// Block highlight, and navigation mode, and focus.
+	// This piece of code has gone back and forth between using a pseudo element
+	// vs. styling the block directly. Ultimately we likely need a pseudo element
+	// (unless styles like focus and selection overlay can be rendered as separate elements),
+	// since things like border-radius need to be able to be set on the block itself.
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
-		border-radius: $radius-block-ui;
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-		// Show outline in high contrast mode.
-		outline: 2px solid transparent;
-	}
-
-	// Block focus.
-	.block-editor-block-list__block:not([contenteditable]):focus {
+	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 
 		// We're using a pseudo element to overflow placeholder borders
@@ -113,8 +116,6 @@
 
 	// Moving blocks using keyboard (Ellipsis > Move).
 	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
-		box-shadow: none;
-		outline: none;
 
 		&::after {
 			content: "";
@@ -130,6 +131,8 @@
 			top: -$default-block-margin * 0.5;
 			border-radius: $radius-block-ui;
 			border-top: 4px solid $gray-400;
+			bottom: auto;
+			box-shadow: none;
 		}
 	}
 
@@ -161,15 +164,6 @@
 	padding: 0;
 }
 
-.is-content-locked {
-	.block-editor-block-list__block {
-		pointer-events: none;
-	}
-	.is-content-block {
-		pointer-events: initial;
-	}
-}
-
 .block-editor-block-list__layout .block-editor-block-list__block {
 	// With `position: static`, Safari marks a full-width selection rectangle, including margins.
 	// With `position: relative`, Safari marks an inline selection rectangle, similar to that of
@@ -178,11 +172,16 @@
 	// We choose relative, as that matches the multi-selection, which is limited to the block footprint.
 	position: relative;
 
-	// Re-enable text-selection on editable blocks.
-	user-select: text;
-
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
+
+	pointer-events: auto;
+	user-select: text;
+
+	&.is-editing-disabled {
+		pointer-events: none;
+		user-select: none;
+	}
 
 	.reusable-block-edit-panel * {
 		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
@@ -200,9 +199,6 @@
 		width: 100%;
 
 		.components-notice {
-			margin-left: 0;
-			margin-right: 0;
-
 			.components-notice__content {
 				font-size: $default-font-size;
 			}
@@ -301,6 +297,33 @@
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui;
 		}
+	}
+}
+
+@keyframes block-editor-has-editable-outline__fade-out-animation {
+	from {
+		border-color: rgba(var(--wp-admin-theme-color--rgb), 1);
+	}
+	to {
+		border-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+	}
+}
+
+.is-root-container:not([inert]) .block-editor-block-list__block.has-editable-outline {
+	&::after {
+		content: "";
+		position: absolute;
+		pointer-events: none;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border: 1px dotted rgba(var(--wp-admin-theme-color--rgb), 1);
+		border-radius: $radius-block-ui;
+		animation: block-editor-has-editable-outline__fade-out-animation 0.3s ease-out;
+		animation-delay: 1s;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
 	}
 }
 
@@ -431,7 +454,6 @@
 }
 
 .block-editor-iframe__body {
-	background-color: $white;
 	transition: all 0.3s;
 	transform-origin: top center;
 }

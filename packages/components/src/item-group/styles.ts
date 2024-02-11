@@ -6,26 +6,42 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG, COLORS, font } from '../utils';
 
-export const unstyledButton = css`
-	appearance: none;
-	border: 1px solid transparent;
-	cursor: pointer;
-	background: none;
-	text-align: start;
+export const unstyledButton = ( as: 'a' | 'button' ) => {
+	return css`
+		font-size: ${ font( 'default.fontSize' ) };
+		font-family: inherit;
+		appearance: none;
+		border: 1px solid transparent;
+		cursor: pointer;
+		background: none;
+		text-align: start;
+		text-decoration: ${ as === 'a' ? 'none' : undefined };
 
-	&:hover {
-		color: ${ COLORS.ui.theme };
-	}
+		svg,
+		path {
+			fill: currentColor;
+		}
 
-	&:focus {
-		background-color: transparent;
-		color: ${ COLORS.ui.theme };
-		border-color: ${ COLORS.ui.theme };
-		outline: 3px solid transparent;
-	}
-`;
+		&:hover {
+			color: ${ COLORS.theme.accent };
+		}
+
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus-visible {
+			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+				${ COLORS.theme.accent };
+			// Windows high contrast mode.
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+	`;
+};
 
 export const itemWrapper = css`
 	width: 100%;
@@ -33,6 +49,7 @@ export const itemWrapper = css`
 `;
 
 export const item = css`
+	box-sizing: border-box;
 	width: 100%;
 	display: block;
 	margin: 0;

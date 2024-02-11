@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { SelectControl } from '@wordpress/components';
@@ -12,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 
 export default function FontFamilyControl( {
 	value = '',
@@ -20,12 +15,12 @@ export default function FontFamilyControl( {
 	fontFamilies,
 	...props
 } ) {
-	const blockLevelFontFamilies = useSetting( 'typography.fontFamilies' );
+	const [ blockLevelFontFamilies ] = useSettings( 'typography.fontFamilies' );
 	if ( ! fontFamilies ) {
 		fontFamilies = blockLevelFontFamilies;
 	}
 
-	if ( isEmpty( fontFamilies ) ) {
+	if ( ! fontFamilies || fontFamilies.length === 0 ) {
 		return null;
 	}
 

@@ -36,16 +36,13 @@ import {
 } from './styles/range-control-styles';
 
 import type { RangeControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { space } from '../utils/space';
 
 const noop = () => {};
 
-function UnforwardedRangeControl< IconProps = unknown >(
-	props: WordPressComponentProps<
-		RangeControlProps< IconProps >,
-		'input',
-		false
-	>,
+function UnforwardedRangeControl(
+	props: WordPressComponentProps< RangeControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
@@ -54,7 +51,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		allowReset = false,
 		beforeIcon,
 		className,
-		color: colorProp = COLORS.ui.theme,
+		color: colorProp = COLORS.theme.accent,
 		currentInput,
 		disabled = false,
 		help,
@@ -73,6 +70,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
+		__next40pxDefaultSize = false,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
@@ -212,7 +210,6 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
-
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
@@ -222,7 +219,10 @@ function UnforwardedRangeControl< IconProps = unknown >(
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root className="components-range-control__root">
+			<Root
+				className="components-range-control__root"
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+			>
 				{ beforeIcon && (
 					<BeforeIconWrapper>
 						<Icon icon={ beforeIcon } />
@@ -269,7 +269,11 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
+					<ThumbWrapper
+						className="components-range-control__thumb-wrapper"
+						style={ offsetStyle }
+						disabled={ disabled }
+					>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
@@ -305,6 +309,14 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
+						size={
+							__next40pxDefaultSize
+								? '__unstable-large'
+								: 'default'
+						}
+						__unstableInputWidth={
+							__next40pxDefaultSize ? space( 20 ) : space( 16 )
+						}
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
@@ -316,7 +328,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 							className="components-range-control__reset"
 							disabled={ disabled || value === undefined }
 							variant="secondary"
-							isSmall
+							size="small"
 							onClick={ handleOnReset }
 						>
 							{ __( 'Reset' ) }

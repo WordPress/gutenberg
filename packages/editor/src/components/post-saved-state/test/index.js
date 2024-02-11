@@ -15,8 +15,6 @@ import { useSelect } from '@wordpress/data';
  */
 import PostSavedState from '../';
 
-jest.useFakeTimers();
-
 const mockSavePost = jest.fn();
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
@@ -53,7 +51,9 @@ describe( 'PostSavedState', () => {
 
 		render( <PostSavedState /> );
 
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {
@@ -62,16 +62,6 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
-		} ) );
-
-		render( <PostSavedState /> );
-
-		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
-	} );
-
-	it( 'returns a switch to draft link if the post is published', () => {
-		useSelect.mockImplementation( () => ( {
-			isPublished: true,
 		} ) );
 
 		render( <PostSavedState /> );
@@ -96,9 +86,7 @@ describe( 'PostSavedState', () => {
 	} );
 
 	it( 'should return Save button if edits to be saved', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isDirty: true,

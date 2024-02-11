@@ -10,6 +10,25 @@ Namespace: `core/customize-widgets`.
 
 Returns true if the inserter is opened.
 
+_Usage_
+
+```js
+import { store as customizeWidgetsStore } from '@wordpress/customize-widgets';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { isInserterOpened } = useSelect(
+		( select ) => select( customizeWidgetsStore ),
+		[]
+	);
+
+	return isInserterOpened()
+		? __( 'Inserter is open' )
+		: __( 'Inserter is closed.' );
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -27,6 +46,32 @@ _Returns_
 ### setIsInserterOpened
 
 Returns an action object used to open/close the inserter.
+
+_Usage_
+
+```js
+import { useState } from 'react';
+import { store as customizeWidgetsStore } from '@wordpress/customize-widgets';
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const { setIsInserterOpened } = useDispatch( customizeWidgetsStore );
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	return (
+		<Button
+			onClick={ () => {
+				setIsInserterOpened( ! isOpen );
+				setIsOpen( ! isOpen );
+			} }
+		>
+			{ __( 'Open/close inserter' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

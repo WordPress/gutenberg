@@ -4,39 +4,54 @@
 import { render, screen } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PostStickyCheck } from '../check';
+import PostStickyCheck from '../check';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test.
+	const mock = jest.fn();
+	return mock;
+} );
+
+function setupUseSelectMock( { hasStickyAction, postType } ) {
+	useSelect.mockImplementation( ( cb ) => {
+		return cb( () => ( {
+			getCurrentPostType: () => postType,
+			getCurrentPost: () => ( {
+				_links: {
+					'wp:action-sticky': hasStickyAction,
+				},
+			} ),
+		} ) );
+	} );
+}
 
 describe( 'PostSticky', () => {
 	it( 'should not render anything if the post type is not "post"', () => {
-		render(
-			<PostStickyCheck postType="page" hasStickyAction={ true }>
-				Can Toggle Sticky
-			</PostStickyCheck>
-		);
+		setupUseSelectMock( { hasStickyAction: true, postType: 'page' } );
+		render( <PostStickyCheck>Can Toggle Sticky</PostStickyCheck> );
 		expect(
 			screen.queryByText( 'Can Toggle Sticky' )
 		).not.toBeInTheDocument();
 	} );
 
 	it( "should not render anything if post doesn't support stickying", () => {
-		render(
-			<PostStickyCheck postType="post" hasStickyAction={ false }>
-				Can Toggle Sticky
-			</PostStickyCheck>
-		);
+		setupUseSelectMock( { hasStickyAction: false, postType: 'post' } );
+		render( <PostStickyCheck>Can Toggle Sticky</PostStickyCheck> );
 		expect(
 			screen.queryByText( 'Can Toggle Sticky' )
 		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if the post supports stickying', () => {
-		render(
-			<PostStickyCheck postType="post" hasStickyAction={ true }>
-				Can Toggle Sticky
-			</PostStickyCheck>
-		);
+		setupUseSelectMock( { hasStickyAction: true, postType: 'post' } );
+		render( <PostStickyCheck>Can Toggle Sticky</PostStickyCheck> );
 		expect( screen.getByText( 'Can Toggle Sticky' ) ).toBeVisible();
 	} );
 } );

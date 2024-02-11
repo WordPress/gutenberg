@@ -29,6 +29,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -162,7 +163,7 @@ class VideoEdit extends Component {
 	onSelectURL( url ) {
 		const { createErrorNotice, onReplace, setAttributes } = this.props;
 
-		if ( isURL( url ) ) {
+		if ( isURL( url ) && /^https?:/.test( getProtocol( url ) ) ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url },
@@ -172,7 +173,7 @@ class VideoEdit extends Component {
 				return;
 			}
 
-			setAttributes( { id: url, src: url } );
+			setAttributes( { src: url, id: undefined, poster: undefined } );
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
@@ -211,7 +212,7 @@ class VideoEdit extends Component {
 	render() {
 		const { setAttributes, attributes, isSelected, wasBlockJustInserted } =
 			this.props;
-		const { id, src } = attributes;
+		const { id, src, guid } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -235,7 +236,10 @@ class VideoEdit extends Component {
 			></MediaUpload>
 		);
 
-		if ( ! id ) {
+		// NOTE: `guid` is not part of the block's attribute definition. This case
+		// handled here is a temporary fix until a we find a better approach.
+		const isSourcePresent = src || ( guid && id );
+		if ( ! isSourcePresent ) {
 			return (
 				<View style={ { flex: 1 } }>
 					<MediaPlaceholder
@@ -366,7 +370,7 @@ class VideoEdit extends Component {
 					<BlockCaption
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							! caption
+							RichText.isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(

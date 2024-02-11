@@ -11,8 +11,7 @@ import { store as blockEditorStore } from '../../store';
 
 export function useMarkPersistent( { html, value } ) {
 	const previousText = useRef();
-	const hasActiveFormats =
-		value.activeFormats && !! value.activeFormats.length;
+	const hasActiveFormats = !! value.activeFormats?.length;
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 

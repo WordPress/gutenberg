@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "5.1.0",
+	"version": "5.28.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -46,12 +46,15 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/url": "file:../url",
 		"@wordpress/widgets": "file:../widgets",
-		"classnames": "^2.3.1"
+		"classnames": "^2.3.1",
+		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

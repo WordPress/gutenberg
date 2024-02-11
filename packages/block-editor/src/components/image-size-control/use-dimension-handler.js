@@ -47,13 +47,14 @@ export default function useDimensionHandler(
 	}, [ customWidth, customHeight ] );
 
 	const updateDimension = ( dimension, value ) => {
+		const parsedValue = value === '' ? undefined : parseInt( value, 10 );
 		if ( dimension === 'width' ) {
-			setCurrentWidth( value );
+			setCurrentWidth( parsedValue );
 		} else {
-			setCurrentHeight( value );
+			setCurrentHeight( parsedValue );
 		}
 		onChange( {
-			[ dimension ]: value === '' ? undefined : parseInt( value, 10 ),
+			[ dimension ]: parsedValue,
 		} );
 	};
 

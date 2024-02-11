@@ -9,13 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import SelectControl from '..';
 
-jest.useFakeTimers();
-
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
-
 describe( 'SelectControl', () => {
 	it( 'should not render when no options or children are provided', () => {
 		render( <SelectControl /> );
@@ -25,7 +18,7 @@ describe( 'SelectControl', () => {
 	} );
 
 	it( 'should not render its children', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const handleChangeMock = jest.fn();
 
 		render(
@@ -54,7 +47,7 @@ describe( 'SelectControl', () => {
 	} );
 
 	it( 'should not render its options', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const handleChangeMock = jest.fn();
 
 		render(

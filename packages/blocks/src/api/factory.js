@@ -211,14 +211,6 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	if (
-		transform.usingMobileTransformations &&
-		isWildcardBlockTransform( transform ) &&
-		! isContainerGroupBlock( sourceBlock.name )
-	) {
-		return false;
-	}
-
 	return true;
 };
 
@@ -286,9 +278,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 		.flat();
 
 	// Map block names to block types.
-	return blockNames.map( ( name ) =>
-		name === '*' ? name : getBlockType( name )
-	);
+	return blockNames.map( getBlockType );
 };
 
 /**
@@ -481,7 +471,8 @@ export function switchToBlockType( blocks, name ) {
 			transformationsTo,
 			( t ) =>
 				t.type === 'block' &&
-				t.blocks.indexOf( name ) !== -1 &&
+				( isWildcardBlockTransform( t ) ||
+					t.blocks.indexOf( name ) !== -1 ) &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
@@ -547,12 +538,6 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	// When unwrapping blocks (`switchToBlockType( wrapperblocks, '*' )`), do
-	// not run filters on the unwrapped blocks. They shoud remain as they are.
-	if ( name === '*' ) {
-		return transformationResults;
-	}
-
 	const hasSwitchedBlock = transformationResults.some(
 		( result ) => result.name === name
 	);
@@ -595,11 +580,19 @@ export function switchToBlockType( blocks, name ) {
  * @return {Object} block.
  */
 export const getBlockFromExample = ( name, example ) => {
-	return createBlock(
-		name,
-		example.attributes,
-		( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
-			getBlockFromExample( innerBlock.name, innerBlock )
-		)
-	);
+	try {
+		return createBlock(
+			name,
+			example.attributes,
+			( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
+				getBlockFromExample( innerBlock.name, innerBlock )
+			)
+		);
+	} catch {
+		return createBlock( 'core/missing', {
+			originalName: name,
+			originalContent: '',
+			originalUndelimitedContent: '',
+		} );
+	}
 };

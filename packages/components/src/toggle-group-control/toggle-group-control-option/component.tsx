@@ -11,7 +11,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 

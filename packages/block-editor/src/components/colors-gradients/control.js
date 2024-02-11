@@ -2,23 +2,24 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
-	TabPanel,
 	ColorPalette,
 	GradientPicker,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -27,18 +28,7 @@ const colorsAndGradientKeys = [
 	'disableCustomGradients',
 ];
 
-const TAB_COLOR = {
-	name: 'color',
-	title: 'Solid',
-	value: 'color',
-};
-const TAB_GRADIENT = {
-	name: 'gradient',
-	title: 'Gradient',
-	value: 'gradient',
-};
-
-const TABS_SETTINGS = [ TAB_COLOR, TAB_GRADIENT ];
+const TAB_IDS = { color: 'color', gradient: 'gradient' };
 
 function ColorGradientControlInner( {
 	colors,
@@ -55,19 +45,21 @@ function ColorGradientControlInner( {
 	clearable,
 	showTitle = true,
 	enableAlpha,
+	headingLevel,
 } ) {
 	const canChooseAColor =
-		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
+		onColorChange &&
+		( ( colors && colors.length > 0 ) || ! disableCustomColors );
 	const canChooseAGradient =
 		onGradientChange &&
-		( ! isEmpty( gradients ) || ! disableCustomGradients );
+		( ( gradients && gradients.length > 0 ) || ! disableCustomGradients );
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;
 	}
 
 	const tabPanels = {
-		[ TAB_COLOR.value ]: (
+		[ TAB_IDS.color ]: (
 			<ColorPalette
 				value={ colorValue }
 				onChange={
@@ -84,11 +76,11 @@ function ColorGradientControlInner( {
 				}
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
+				headingLevel={ headingLevel }
 			/>
 		),
-		[ TAB_GRADIENT.value ]: (
+		[ TAB_IDS.gradient ]: (
 			<GradientPicker
-				__nextHasNoMargin
 				value={ gradientValue }
 				onChange={
 					canChooseAColor
@@ -103,6 +95,7 @@ function ColorGradientControlInner( {
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
+				headingLevel={ headingLevel }
 			/>
 		),
 	};
@@ -112,6 +105,11 @@ function ColorGradientControlInner( {
 			{ tabPanels[ type ] }
 		</div>
 	);
+
+	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
+	// object, due to circular dependencies.
+	// See https://github.com/WordPress/gutenberg/issues/52692
+	const { Tabs } = unlock( componentsPrivateApis );
 
 	return (
 		<BaseControl
@@ -133,22 +131,46 @@ function ColorGradientControlInner( {
 						</legend>
 					) }
 					{ canChooseAColor && canChooseAGradient && (
-						<TabPanel
-							className="block-editor-color-gradient-control__tabs"
-							tabs={ TABS_SETTINGS }
-							initialTabName={
-								gradientValue
-									? TAB_GRADIENT.value
-									: !! canChooseAColor && TAB_COLOR.value
-							}
-						>
-							{ ( tab ) => renderPanelType( tab.value ) }
-						</TabPanel>
+						<div>
+							<Tabs
+								initialTabId={
+									gradientValue
+										? TAB_IDS.gradient
+										: !! canChooseAColor && TAB_IDS.color
+								}
+							>
+								<Tabs.TabList>
+									<Tabs.Tab tabId={ TAB_IDS.color }>
+										{ __( 'Solid' ) }
+									</Tabs.Tab>
+									<Tabs.Tab tabId={ TAB_IDS.gradient }>
+										{ __( 'Gradient' ) }
+									</Tabs.Tab>
+								</Tabs.TabList>
+								<Tabs.TabPanel
+									tabId={ TAB_IDS.color }
+									className={
+										'block-editor-color-gradient-control__panel'
+									}
+									focusable={ false }
+								>
+									{ tabPanels.color }
+								</Tabs.TabPanel>
+								<Tabs.TabPanel
+									tabId={ TAB_IDS.gradient }
+									className={
+										'block-editor-color-gradient-control__panel'
+									}
+									focusable={ false }
+								>
+									{ tabPanels.gradient }
+								</Tabs.TabPanel>
+							</Tabs>
+						</div>
 					) }
-					{ ! canChooseAGradient &&
-						renderPanelType( TAB_COLOR.value ) }
-					{ ! canChooseAColor &&
-						renderPanelType( TAB_GRADIENT.value ) }
+
+					{ ! canChooseAGradient && renderPanelType( TAB_IDS.color ) }
+					{ ! canChooseAColor && renderPanelType( TAB_IDS.gradient ) }
 				</VStack>
 			</fieldset>
 		</BaseControl>
@@ -156,17 +178,20 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const colorGradientSettings = {};
-	colorGradientSettings.colors = useSetting( 'color.palette' );
-	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
-	colorGradientSettings.disableCustomGradients = ! useSetting(
+	const [ colors, gradients, customColors, customGradients ] = useSettings(
+		'color.palette',
+		'color.gradients',
+		'color.custom',
 		'color.customGradient'
 	);
 
 	return (
 		<ColorGradientControlInner
-			{ ...{ ...colorGradientSettings, ...props } }
+			colors={ colors }
+			gradients={ gradients }
+			disableCustomColors={ ! customColors }
+			disableCustomGradients={ ! customGradients }
+			{ ...props }
 		/>
 	);
 }

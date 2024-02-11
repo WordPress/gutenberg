@@ -4,12 +4,10 @@
 	font-size: $default-font-size;
 	background-color: $white;
 	border-left: 4px solid $components-color-accent;
-	margin: 5px 15px 2px;
 	padding: 8px 12px;
 	align-items: center;
 
 	&.is-dismissible {
-		padding-right: 36px;
 		position: relative;
 	}
 

@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`iframed masonry block should load script and dependencies in iframe 1`] = `
-"<!-- wp:test/iframed-masonry-block -->
-<div class=\\"wp-block-test-iframed-masonry-block\\"><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--width2 grid-item--height2\\"></div><div class=\\"grid-item grid-item--height3\\"></div><div class=\\"grid-item grid-item--height2\\"></div><div class=\\"grid-item grid-item--width3\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--height2\\"></div><div class=\\"grid-item grid-item--width2 grid-item--height3\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--height2\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--width2 grid-item--height2\\"></div><div class=\\"grid-item grid-item--width2\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--height2\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--height3\\"></div><div class=\\"grid-item grid-item--height2\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item\\"></div><div class=\\"grid-item grid-item--height2\\"></div></div>
-<!-- /wp:test/iframed-masonry-block -->"
-`;

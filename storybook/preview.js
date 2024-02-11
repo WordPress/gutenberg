@@ -1,4 +1,16 @@
 /**
+ * External dependencies
+ */
+import {
+	ArgsTable,
+	Description,
+	Primary,
+	Stories,
+	Subtitle,
+	Title,
+} from '@storybook/blocks';
+
+/**
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
@@ -6,7 +18,6 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
-import './style.scss';
 
 export const globalTypes = {
 	direction: {
@@ -31,7 +42,7 @@ export const globalTypes = {
 				{ value: 'default', title: 'Default' },
 				{ value: 'darkBg', title: 'Dark (background)' },
 				{ value: 'lightGrayBg', title: 'Light gray (background)' },
-				{ value: 'modern', title: 'Modern (accent)' },
+				{ value: 'classic', title: 'Classic (accent)' },
 			],
 		},
 	},
@@ -88,13 +99,47 @@ export const decorators = [
 ];
 
 export const parameters = {
+	// For @geometricpanda/storybook-addon-badges
+	badgesConfig: {
+		private: {
+			title: '🔒 Private',
+			tooltip: {
+				title: 'Component is locked as a private API',
+				desc: 'We do not yet recommend using this outside of the Gutenberg codebase.',
+				links: [
+					{
+						title: 'About @wordpress/private-apis',
+						href: 'https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/',
+					},
+				],
+			},
+		},
+		wip: {
+			title: '🚧 WIP',
+			styles: { backgroundColor: '#FFF0BD' },
+			tooltip: {
+				title: 'Component is a work in progress',
+				desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
+			},
+		},
+	},
 	controls: {
 		sort: 'requiredFirst',
 	},
-	knobs: {
-		// Knobs are deprecated, and new stories should use addon-controls.
-		// Will be enabled on a per-story basis until migration is complete.
-		disable: true,
+	docs: {
+		// Flips the order of the description and the primary component story
+		// so the component is always visible before the fold.
+		page: () => (
+			<>
+				<Title />
+				<Subtitle />
+				<Primary />
+				<Description />
+				{ /* `story="^"` enables Controls for the primary props table */ }
+				<ArgsTable story="^" />
+				<Stories includePrimary={ false } />
+			</>
+		),
 	},
 	options: {
 		storySort: {

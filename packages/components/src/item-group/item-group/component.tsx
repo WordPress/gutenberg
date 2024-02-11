@@ -6,13 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';
 import type { ItemGroupProps } from '../types';
 
-function ItemGroup(
+function UnconnectedItemGroup(
 	props: WordPressComponentProps< ItemGroupProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -40,4 +41,26 @@ function ItemGroup(
 	);
 }
 
-export default contextConnect( ItemGroup, 'ItemGroup' );
+/**
+ * `ItemGroup` displays a list of `Item`s grouped and styled together.
+ *
+ * ```jsx
+ * import {
+ *   __experimentalItemGroup as ItemGroup,
+ *   __experimentalItem as Item,
+ * } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ItemGroup>
+ *       <Item>Code</Item>
+ *       <Item>is</Item>
+ *       <Item>Poetry</Item>
+ *     </ItemGroup>
+ *   );
+ * }
+ * ```
+ */
+export const ItemGroup = contextConnect( UnconnectedItemGroup, 'ItemGroup' );
+
+export default ItemGroup;

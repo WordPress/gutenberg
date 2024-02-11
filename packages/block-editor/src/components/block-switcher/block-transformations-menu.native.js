@@ -75,6 +75,7 @@ const BlockTransformationsMenu = ( {
 
 	return (
 		<Picker
+			testID="block-transformations-menu"
 			ref={ pickerRef }
 			options={ pickerOptions() }
 			onChange={ onPickerSelect }

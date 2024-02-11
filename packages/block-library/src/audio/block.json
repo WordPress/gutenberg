@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/audio",
 	"title": "Audio",
 	"category": "media",
@@ -16,8 +16,8 @@
 			"__experimentalRole": "content"
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "figcaption",
 			"__experimentalRole": "content"
 		},
@@ -49,7 +49,14 @@
 		"align": true,
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-audio-editor",

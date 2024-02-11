@@ -15,8 +15,6 @@ import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
-jest.useFakeTimers();
-
 const noop = () => {};
 
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
@@ -62,6 +60,13 @@ describe( 'CheckboxControl', () => {
 			expect( label ).toBeInTheDocument();
 		} );
 
+		it( 'should not render label element if label is not set', () => {
+			render( <CheckboxControl /> );
+
+			const label = screen.queryByRole( 'label' );
+			expect( label ).not.toBeInTheDocument();
+		} );
+
 		it( 'should render a checkbox in an indeterminate state', () => {
 			render( <CheckboxControl indeterminate /> );
 			expect( getInput() ).toHaveProperty( 'indeterminate', true );
@@ -85,9 +90,7 @@ describe( 'CheckboxControl', () => {
 
 	describe( 'Value', () => {
 		it( 'should flip the checked property when clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = false;
 			const setState = jest.fn(

@@ -2,6 +2,70 @@
 
 ## Unreleased
 
+## 5.28.0 (2024-02-09)
+
+## 5.27.0 (2024-01-24)
+
+## 5.26.0 (2024-01-10)
+
+## 5.25.0 (2023-12-13)
+
+## 5.24.0 (2023-11-29)
+
+## 5.23.0 (2023-11-16)
+
+## 5.22.0 (2023-11-02)
+
+## 5.21.0 (2023-10-18)
+
+## 5.20.0 (2023-10-05)
+
+## 5.19.0 (2023-09-20)
+
+## 5.18.0 (2023-08-31)
+
+## 5.17.0 (2023-08-16)
+
+## 5.16.0 (2023-08-10)
+
+## 5.15.0 (2023-07-20)
+
+## 5.14.0 (2023-07-05)
+
+## 5.13.0 (2023-06-23)
+
+### Enhancements
+-   Site editor sidebar: add home template details and controls [#51223](https://github.com/WordPress/gutenberg/pull/51223).
+-   Site editor sidebar: add footer to template part and ensure nested template areas display [#51669](https://github.com/WordPress/gutenberg/pull/51669).
+-   Global styles: split styles menus into revisions and other styles actions ([#51318](https://github.com/WordPress/gutenberg/pull/51318)).
+
+## 5.12.0 (2023-06-07)
+
+## 5.11.0 (2023-05-24)
+
+## 5.10.0 (2023-05-10)
+
+## 5.9.0 (2023-04-26)
+
+## 5.8.0 (2023-04-12)
+
+## 5.7.0 (2023-03-29)
+
+## 5.6.0 (2023-03-15)
+
+## 5.5.0 (2023-03-01)
+
+## 5.4.0 (2023-02-15)
+
+## 5.3.0 (2023-02-01)
+
+### Bug Fix
+
+-   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
+-   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
+
+## 5.2.0 (2023-01-11)
+
 ## 5.1.0 (2023-01-02)
 
 ## 5.0.0 (2022-12-14)

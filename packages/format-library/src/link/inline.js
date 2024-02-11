@@ -1,23 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { withSpokenMessages, Popover } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
+import { Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchor,
 	removeFormat,
 	slice,
 	replace,
+	split,
+	concat,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
+	useCachedTruthy,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -26,15 +30,21 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
-import useLinkInstanceKey from './use-link-instance-key';
+
+const LINK_SETTINGS = [
+	...LinkControl.DEFAULT_LINK_SETTINGS,
+	{
+		id: 'nofollow',
+		title: __( 'Mark as nofollow' ),
+	},
+];
 
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
-	addingLink,
 	value,
 	onChange,
-	speak,
+	onFocusOutside,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -42,16 +52,6 @@ function InlineLinkUI( {
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
-
-	/**
-	 * Pending settings to be applied to the next link. When inserting a new
-	 * link, toggle values cannot be applied immediately, because there is not
-	 * yet a link for them to apply to. Thus, they are maintained in a state
-	 * value until the time that the link can be inserted or edited.
-	 *
-	 * @type {[Object|undefined,Function]}
-	 */
-	const [ nextLinkValue, setNextLinkValue ] = useState();
 
 	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -63,14 +63,24 @@ function InlineLinkUI( {
 		};
 	}, [] );
 
-	const linkValue = {
-		url: activeAttributes.url,
-		type: activeAttributes.type,
-		id: activeAttributes.id,
-		opensInNewTab: activeAttributes.target === '_blank',
-		title: richTextText,
-		...nextLinkValue,
-	};
+	const linkValue = useMemo(
+		() => ( {
+			url: activeAttributes.url,
+			type: activeAttributes.type,
+			id: activeAttributes.id,
+			opensInNewTab: activeAttributes.target === '_blank',
+			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
+			title: richTextText,
+		} ),
+		[
+			activeAttributes.id,
+			activeAttributes.rel,
+			activeAttributes.target,
+			activeAttributes.type,
+			activeAttributes.url,
+			richTextText,
+		]
+	);
 
 	function removeLink() {
 		const newValue = removeFormat( value, 'core/link' );
@@ -80,32 +90,14 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// Merge with values from state, both for the purpose of assigning the
-		// next state value, and for use in constructing the new link format if
-		// the link is ready to be applied.
+		const hasLink = linkValue?.url;
+		const isNewLink = ! hasLink;
+
+		// Merge the next value with the current link value.
 		nextValue = {
-			...nextLinkValue,
+			...linkValue,
 			...nextValue,
 		};
-
-		// LinkControl calls `onChange` immediately upon the toggling a setting.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			linkValue.url === nextValue.url;
-
-		// If change handler was called as a result of a settings change during
-		// link insertion, it must be held in state until the link is ready to
-		// be applied.
-		const didToggleSettingForNewLink =
-			didToggleSetting && nextValue.url === undefined;
-
-		// If link will be assigned, the state value can be considered flushed.
-		// Otherwise, persist the pending changes.
-		setNextLinkValue( didToggleSettingForNewLink ? nextValue : undefined );
-
-		if ( didToggleSettingForNewLink ) {
-			return;
-		}
 
 		const newUrl = prependHTTP( nextValue.url );
 		const linkFormat = createLinkFormat( {
@@ -116,56 +108,74 @@ function InlineLinkUI( {
 					? String( nextValue.id )
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
+			nofollow: nextValue.nofollow,
 		} );
 
 		const newText = nextValue.title || newUrl;
+
+		// Scenario: we have any active text selection or an active format.
+		let newValue;
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
-			const toInsert = applyFormat(
-				create( { text: newText } ),
+			const inserted = insert( value, newText );
+
+			newValue = applyFormat(
+				inserted,
 				linkFormat,
-				0,
-				newText.length
+				value.start,
+				value.end + newText.length
 			);
-			onChange( insert( value, toInsert ) );
+		} else if ( newText === richTextText ) {
+			newValue = applyFormat( value, linkFormat );
 		} else {
-			// Scenario: we have any active text selection or an active format.
-			let newValue;
+			// Scenario: Editing an existing link.
 
-			if ( newText === richTextText ) {
-				// If we're not updating the text then ignore.
-				newValue = applyFormat( value, linkFormat );
-			} else {
-				// Create new RichText value for the new text in order that we
-				// can apply formats to it.
-				newValue = create( { text: newText } );
+			// Create new RichText value for the new text in order that we
+			// can apply formats to it.
+			newValue = create( { text: newText } );
+			// Apply the new Link format to this new text value.
+			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
 
-				// Apply the new Link format to this new text value.
-				newValue = applyFormat(
-					newValue,
-					linkFormat,
-					0,
-					newText.length
-				);
+			// Get the boundaries of the active link format.
+			const boundary = getFormatBoundary( value, {
+				type: 'core/link',
+			} );
 
-				// Update the original (full) RichTextValue replacing the
-				// target text with the *new* RichTextValue containing:
-				// 1. The new text content.
-				// 2. The new link format.
-				// Note original formats will be lost when applying this change.
-				// That is expected behaviour.
-				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
-				newValue = replace( value, richTextText, newValue );
-			}
+			// Split the value at the start of the active link format.
+			// Passing "start" as the 3rd parameter is required to ensure
+			// the second half of the split value is split at the format's
+			// start boundary and avoids relying on the value's "end" property
+			// which may not correspond correctly.
+			const [ valBefore, valAfter ] = split(
+				value,
+				boundary.start,
+				boundary.start
+			);
 
-			newValue.start = newValue.end;
-			newValue.activeFormats = [];
-			onChange( newValue );
+			// Update the original (full) RichTextValue replacing the
+			// target text with the *new* RichTextValue containing:
+			// 1. The new text content.
+			// 2. The new link format.
+			// As "replace" will operate on the first match only, it is
+			// run only against the second half of the value which was
+			// split at the active format's boundary. This avoids a bug
+			// with incorrectly targetted replacements.
+			// See: https://github.com/WordPress/gutenberg/issues/41771.
+			// Note original formats will be lost when applying this change.
+			// That is expected behaviour.
+			// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
+			const newValAfter = replace( valAfter, richTextText, newValue );
+
+			newValue = concat( valBefore, newValAfter );
 		}
 
-		// Focus should only be shifted back to the formatted segment when the
-		// URL is submitted.
-		if ( ! didToggleSetting ) {
+		onChange( newValue );
+
+		// Focus should only be returned to the rich text on submit if this link is not
+		// being created for the first time. If it is then focus should remain within the
+		// Link UI because it should remain open for the user to modify the link they have
+		// just created.
+		if ( ! isNewLink ) {
 			stopAddingLink();
 		}
 
@@ -185,19 +195,27 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		value,
 		settings,
 	} );
 
-	// Generate a string based key that is unique to this anchor reference.
-	// This is used to force re-mount the LinkControl component to avoid
-	// potential stale state bugs caused by the component not being remounted
-	// See https://github.com/WordPress/gutenberg/pull/34742.
-	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
+	//  As you change the link by interacting with the Link UI
+	//  the return value of document.getSelection jumps to the field you're editing,
+	//  not the highlighted text. Given that useAnchor uses document.getSelection,
+	//  it will return null, since it can't find the <mark> element within the Link UI.
+	//  This caches the last truthy value of the selection anchor reference.
+	// This ensures the Popover is positioned correctly on initial submission of the link.
+	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
 
-	// The focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
+	// If the link is not active (i.e. it is a new link) then we need to
+	// override the getBoundingClientRect method on the anchor element
+	// to return the cached value of the selection represented by the text
+	// that the user selected to be linked.
+	// If the link is active (i.e. it is an existing link) then we allow
+	// the default behaviour of the popover anchor to be used. This will get
+	// the anchor based on the `<a>` element in the rich text.
+	if ( ! isActive ) {
+		popoverAnchor.getBoundingClientRect = () => cachedRect;
+	}
 
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
@@ -218,7 +236,7 @@ function InlineLinkUI( {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
-				__( 'Create Page: <mark>%s</mark>' ),
+				__( 'Create page: <mark>%s</mark>' ),
 				searchTerm
 			),
 			{ mark: <mark /> }
@@ -228,22 +246,31 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
-			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
+			onFocusOutside={ onFocusOutside }
 			placement="bottom"
+			offset={ 10 }
 			shift
 		>
 			<LinkControl
-				key={ forceRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
-				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
+				settings={ LINK_SETTINGS }
+				showInitialSuggestions={ true }
+				suggestionsQuery={ {
+					// always show Pages as initial suggestions
+					initialSuggestionsSearchOptions: {
+						type: 'post',
+						subtype: 'page',
+						perPage: 20,
+					},
+				} }
 			/>
 		</Popover>
 	);
@@ -273,4 +300,4 @@ function getRichTextValueFromSelection( value, isActive ) {
 	return slice( value, textStart, textEnd );
 }
 
-export default withSpokenMessages( InlineLinkUI );
+export default InlineLinkUI;

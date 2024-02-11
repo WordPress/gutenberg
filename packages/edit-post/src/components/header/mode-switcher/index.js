@@ -29,38 +29,49 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const {
-		shortcut,
-		isRichEditingEnabled,
-		isCodeEditingEnabled,
-		isEditingTemplate,
-		mode,
-	} = useSelect(
-		( select ) => ( {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled:
-				select( editorStore ).getEditorSettings().richEditingEnabled,
-			isCodeEditingEnabled:
-				select( editorStore ).getEditorSettings().codeEditingEnabled,
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
-			mode: select( editPostStore ).getEditorMode(),
-		} ),
-		[]
-	);
+	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } =
+		useSelect(
+			( select ) => ( {
+				shortcut: select(
+					keyboardShortcutsStore
+				).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
+				isRichEditingEnabled:
+					select( editorStore ).getEditorSettings()
+						.richEditingEnabled,
+				isCodeEditingEnabled:
+					select( editorStore ).getEditorSettings()
+						.codeEditingEnabled,
+				mode: select( editPostStore ).getEditorMode(),
+			} ),
+			[]
+		);
 	const { switchEditorMode } = useDispatch( editPostStore );
 
-	if ( isEditingTemplate ) {
-		return null;
+	let selectedMode = mode;
+	if ( ! isRichEditingEnabled && mode === 'visual' ) {
+		selectedMode = 'text';
 	}
-
-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
-		return null;
+	if ( ! isCodeEditingEnabled && mode === 'text' ) {
+		selectedMode = 'visual';
 	}
 
 	const choices = MODES.map( ( choice ) => {
-		if ( choice.value !== mode ) {
+		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+			};
+		}
+		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: __(
+					'You can enable the visual editor in your profile settings.'
+				),
+			};
+		}
+		if ( choice.value !== selectedMode && ! choice.disabled ) {
 			return { ...choice, shortcut };
 		}
 		return choice;
@@ -70,7 +81,7 @@ function ModeSwitcher() {
 		<MenuGroup label={ __( 'Editor' ) }>
 			<MenuItemsChoice
 				choices={ choices }
-				value={ mode }
+				value={ selectedMode }
 				onSelect={ switchEditorMode }
 			/>
 		</MenuGroup>

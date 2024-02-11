@@ -51,6 +51,12 @@ const registerGutenberg = ( {
 			// Initialize editor
 			this.editorComponent = setup();
 
+			// Apply optional setup configuration, enabling modification via hooks.
+			if ( __DEV__ && typeof require.context === 'function' ) {
+				const req = require.context( './', false, /setup-local\.js$/ );
+				req.keys().forEach( ( key ) => req( key ).default() );
+			}
+
 			// Dispatch pre-render hooks.
 			doAction( 'native.pre-render', parentProps );
 
@@ -58,11 +64,6 @@ const registerGutenberg = ( {
 				'native.block_editor_props',
 				parentProps
 			);
-		}
-
-		componentDidMount() {
-			// Dispatch post-render hooks.
-			doAction( 'native.render', this.filteredProps );
 		}
 
 		render() {

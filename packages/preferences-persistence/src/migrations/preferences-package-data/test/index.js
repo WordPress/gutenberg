@@ -41,38 +41,39 @@ describe( 'convertPreferencesPackageData', () => {
 	it( 'converts data to the expected format', () => {
 		expect( convertPreferencesPackageData( input ) )
 			.toMatchInlineSnapshot( `
-		Object {
-		  "core/customize-widgets": Object {
-		    "fixedToolbar": true,
-		    "welcomeGuide": false,
-		  },
-		  "core/edit-post": Object {
+		{
+		  "core": {
 		    "editorMode": "visual",
 		    "fixedToolbar": true,
-		    "fullscreenMode": false,
-		    "hiddenBlockTypes": Array [
+		    "hiddenBlockTypes": [
 		      "core/audio",
 		      "core/cover",
 		    ],
-		    "inactivePanels": Array [],
-		    "openPanels": Array [
+		    "inactivePanels": [],
+		    "openPanels": [
 		      "post-status",
 		    ],
-		    "pinnedItems": Object {
+		  },
+		  "core/customize-widgets": {
+		    "fixedToolbar": true,
+		    "welcomeGuide": false,
+		  },
+		  "core/edit-post": {
+		    "fullscreenMode": false,
+		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
 		    },
-		    "preferredStyleVariations": Object {
+		    "preferredStyleVariations": {
 		      "core/quote": "large",
 		    },
 		    "welcomeGuide": false,
 		  },
-		  "core/edit-site": Object {
-		    "fixedToolbar": true,
+		  "core/edit-site": {
 		    "isComplementaryAreaVisible": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },
-		  "core/edit-widgets": Object {
+		  "core/edit-widgets": {
 		    "fixedToolbar": true,
 		    "isComplementaryAreaVisible": true,
 		    "showBlockBreadcrumbs": false,

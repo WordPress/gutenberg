@@ -6,12 +6,195 @@
  */
 
 /**
+ * Returns layout definitions, keyed by layout type.
+ *
+ * Provides a common definition of slugs, classnames, base styles, and spacing styles for each layout type.
+ * When making changes or additions to layout definitions, the corresponding JavaScript definitions should
+ * also be updated.
+ *
+ * @return array[] Layout definitions.
+ */
+function gutenberg_get_layout_definitions() {
+	$layout_definitions = array(
+		'default'     => array(
+			'name'          => 'default',
+			'slug'          => 'flow',
+			'className'     => 'is-layout-flow',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > .alignleft',
+					'rules'    => array(
+						'float'               => 'left',
+						'margin-inline-start' => '0',
+						'margin-inline-end'   => '2em',
+					),
+				),
+				array(
+					'selector' => ' > .alignright',
+					'rules'    => array(
+						'float'               => 'right',
+						'margin-inline-start' => '2em',
+						'margin-inline-end'   => '0',
+					),
+				),
+				array(
+					'selector' => ' > .aligncenter',
+					'rules'    => array(
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => ' > :first-child:first-child',
+					'rules'    => array(
+						'margin-block-start' => '0',
+					),
+				),
+				array(
+					'selector' => ' > :last-child:last-child',
+					'rules'    => array(
+						'margin-block-end' => '0',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin-block-start' => null,
+						'margin-block-end'   => '0',
+					),
+				),
+			),
+		),
+		'constrained' => array(
+			'name'          => 'constrained',
+			'slug'          => 'constrained',
+			'className'     => 'is-layout-constrained',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > .alignleft',
+					'rules'    => array(
+						'float'               => 'left',
+						'margin-inline-start' => '0',
+						'margin-inline-end'   => '2em',
+					),
+				),
+				array(
+					'selector' => ' > .alignright',
+					'rules'    => array(
+						'float'               => 'right',
+						'margin-inline-start' => '2em',
+						'margin-inline-end'   => '0',
+					),
+				),
+				array(
+					'selector' => ' > .aligncenter',
+					'rules'    => array(
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+				array(
+					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull))',
+					'rules'    => array(
+						'max-width'    => 'var(--wp--style--global--content-size)',
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+				array(
+					'selector' => ' > .alignwide',
+					'rules'    => array(
+						'max-width' => 'var(--wp--style--global--wide-size)',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => ' > :first-child:first-child',
+					'rules'    => array(
+						'margin-block-start' => '0',
+					),
+				),
+				array(
+					'selector' => ' > :last-child:last-child',
+					'rules'    => array(
+						'margin-block-end' => '0',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin-block-start' => null,
+						'margin-block-end'   => '0',
+					),
+				),
+			),
+		),
+		'flex'        => array(
+			'name'          => 'flex',
+			'slug'          => 'flex',
+			'className'     => 'is-layout-flex',
+			'displayMode'   => 'flex',
+			'baseStyles'    => array(
+				array(
+					'selector' => '',
+					'rules'    => array(
+						'flex-wrap'   => 'wrap',
+						'align-items' => 'center',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin' => '0',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => '',
+					'rules'    => array(
+						'gap' => null,
+					),
+				),
+			),
+		),
+		'grid'        => array(
+			'name'          => 'grid',
+			'slug'          => 'grid',
+			'className'     => 'is-layout-grid',
+			'displayMode'   => 'grid',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin' => '0',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => '',
+					'rules'    => array(
+						'gap' => null,
+					),
+				),
+			),
+		),
+	);
+
+	return $layout_definitions;
+}
+
+/**
  * Registers the layout block attribute for block types that support it.
  *
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_layout_support( $block_type ) {
-	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -39,7 +222,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * @return string CSS styles on success. Else, empty string.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
-	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$layout_type   = $layout['type'] ?? 'default';
 	$layout_styles = array();
 
 	if ( 'default' === $layout_type ) {
@@ -83,9 +266,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
 
 		// Make sure there is a single CSS rule, and all tags are stripped for security.
-		// TODO: Use `safecss_filter_attr` instead when the minimum required WP version is >= 6.1.
-		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
-		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
+		$all_max_width_value  = safecss_filter_attr( explode( ';', $all_max_width_value )[0] );
+		$wide_max_width_value = safecss_filter_attr( explode( ';', $wide_max_width_value )[0] );
 
 		$margin_left  = 'left' === $justify_content ? '0 !important' : 'auto !important';
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
@@ -200,7 +382,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
-			$justify_content_options += array( 'space-between' => 'space-between' );
+			$justify_content_options    += array( 'space-between' => 'space-between' );
+			$vertical_alignment_options += array( 'stretch' => 'stretch' );
+		} else {
+			$justify_content_options    += array( 'stretch' => 'stretch' );
+			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
@@ -215,7 +401,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
 
 			foreach ( $gap_sides as $gap_side ) {
-				$process_value = is_string( $gap_value ) ? $gap_value : _wp_array_get( $gap_value, array( $gap_side ), $fallback_gap_value );
+				$process_value = $gap_value;
+				if ( is_array( $gap_value ) ) {
+					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
 					$index_to_splice = strrpos( $process_value, '|' ) + 1;
@@ -269,6 +458,53 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'align-items' => 'flex-start' ),
 				);
 			}
+			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
+				);
+			}
+		}
+	} elseif ( 'grid' === $layout_type ) {
+		if ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+			);
+		}
+
+		if ( $has_block_gap_support && isset( $gap_value ) ) {
+			$combined_gap_value = '';
+			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
+
+			foreach ( $gap_sides as $gap_side ) {
+				$process_value = $gap_value;
+				if ( is_array( $gap_value ) ) {
+					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+				}
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $process_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
+					$process_value   = "var(--wp--preset--spacing--$slug)";
+				}
+				$combined_gap_value .= "$process_value ";
+			}
+			$gap_value = trim( $combined_gap_value );
+
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'gap' => $gap_value ),
+				);
+			}
 		}
 	}
 
@@ -292,20 +528,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
- * Gets classname from last tag in a string of HTML.
+ * Generates an incremental ID that is independent per each different prefix.
  *
- * @param string $html markup to be processed.
- * @return string String of inner wrapper classnames.
+ * It is similar to `wp_unique_id`, but each prefix has it's own internal ID
+ * counter to make each prefix independent from each other. The ID starts at 1
+ * and increments on each call. The returned value is not universally unique,
+ * but it is unique across the life of the PHP process and it's stable per
+ * prefix.
+ *
+ * @param  string $prefix Prefix for the returned ID.
+ * @return string         Incremental ID per prefix.
  */
-function gutenberg_get_classnames_from_last_tag( $html ) {
-	$tags            = new WP_HTML_Tag_Processor( $html );
-	$last_classnames = '';
-
-	while ( $tags->next_tag() ) {
-		$last_classnames = $tags->get_attribute( 'class' );
+function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
+	static $id_counters = array();
+	if ( ! array_key_exists( $prefix, $id_counters ) ) {
+			$id_counters[ $prefix ] = 0;
 	}
-
-	return (string) $last_classnames;
+	return $prefix . (string) ++$id_counters[ $prefix ];
 }
 
 /**
@@ -316,24 +555,22 @@ function gutenberg_get_classnames_from_last_tag( $html ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout   = block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$has_child_layout = isset( $block['attrs']['style']['layout']['selfStretch'] );
+	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
 
-	if ( ! $support_layout
-	&& ! $has_child_layout ) {
+	if ( ! $block_supports_layout && ! $layout_from_parent ) {
 		return $block_content;
 	}
 
 	$outer_class_names = array();
 
-	if ( $has_child_layout && ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] || 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) ) {
-
+	if ( 'fixed' === $layout_from_parent || 'fill' === $layout_from_parent ) {
 		$container_content_class = wp_unique_id( 'wp-container-content-' );
 
 		$child_layout_styles = array();
 
-		if ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+		if ( 'fixed' === $layout_from_parent && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
 			$child_layout_styles[] = array(
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
@@ -341,7 +578,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 					'box-sizing' => 'border-box',
 				),
 			);
-		} elseif ( 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) {
+		} elseif ( 'fill' === $layout_from_parent ) {
 			$child_layout_styles[] = array(
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
@@ -359,45 +596,60 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		);
 
 		$outer_class_names[] = $container_content_class;
-
 	}
 
-	// Return early if only child layout exists.
-	if ( ! $support_layout && ! empty( $outer_class_names ) ) {
-		$content = new WP_HTML_Tag_Processor( $block_content );
-		$content->next_tag();
-		$content->add_class( implode( ' ', $outer_class_names ) );
-		return (string) $content;
-	}
+	// Prep the processor for modifying the block output.
+	$processor = new WP_HTML_Tag_Processor( $block_content );
 
-	$global_settings               = gutenberg_get_global_settings();
-	$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
-	$has_block_gap_support         = isset( $block_gap );
-	$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
-	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
-
-	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
-
-	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
+	// Having no tags implies there are no tags onto which to add class names.
+	if ( ! $processor->next_tag() ) {
 		return $block_content;
 	}
 
+	/*
+	 * A block may not support layout but still be affected by a parent block's layout.
+	 *
+	 * In these cases add the appropriate class names and then return early; there's
+	 * no need to investigate on this block whether additional layout constraints apply.
+	 */
+	if ( ! $block_supports_layout && ! empty( $outer_class_names ) ) {
+		foreach ( $outer_class_names as $class_name ) {
+			$processor->add_class( $class_name );
+		}
+		return $processor->get_updated_html();
+	} elseif ( ! $block_supports_layout ) {
+		// Ensure layout classnames are not injected if there is no layout support.
+		return $block_content;
+	}
+
+	$global_settings = gutenberg_get_global_settings();
+	$fallback_layout = $block_type->supports['layout']['default'] ?? array();
+	if ( empty( $fallback_layout ) ) {
+		$fallback_layout = $block_type->supports['__experimentalLayout']['default'] ?? array();
+	}
+	$used_layout = $block['attrs']['layout'] ?? $fallback_layout;
+
 	$class_names        = array();
-	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$container_class    = wp_unique_id( 'wp-container-' );
-	$layout_classname   = '';
+	$layout_definitions = gutenberg_get_layout_definitions();
+
+	/*
+	* We use an incremental ID that is independent per prefix to make sure that
+	* rendering different numbers of blocks doesn't affect the IDs of other
+	* blocks. We need this to make the CSS class names stable across paginations
+	* for features like the enhanced pagination of the Query block.
+	*/
+	$container_class = gutenberg_incremental_id_per_prefix(
+		'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
+	);
 
 	// Set the correct layout type for blocks using legacy content width.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
 		$used_layout['type'] = 'constrained';
 	}
 
-	if (
-		$root_padding_aware_alignments &&
-		isset( $used_layout['type'] ) &&
-		'constrained' === $used_layout['type']
-	) {
+	$root_padding_aware_alignments = $global_settings['useRootPaddingAwareAlignments'] ?? false;
+
+	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) && 'constrained' === $used_layout['type'] ) {
 		$class_names[] = 'has-global-padding';
 	}
 
@@ -421,9 +673,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Get classname for layout type.
 	if ( isset( $used_layout['type'] ) ) {
-		$layout_classname = _wp_array_get( $layout_definitions, array( $used_layout['type'], 'className' ), '' );
+		$layout_classname = $layout_definitions[ $used_layout['type'] ]['className'] ?? '';
 	} else {
-		$layout_classname = _wp_array_get( $layout_definitions, array( 'default', 'className' ), '' );
+		$layout_classname = $layout_definitions['default']['className'] ?? '';
 	}
 
 	if ( $layout_classname && is_string( $layout_classname ) ) {
@@ -436,7 +688,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 */
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
-		$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+		$gap_value = $block['attrs']['style']['spacing']['blockGap'] ?? null;
 
 		/*
 		 * Skip if gap value contains unsupported characters.
@@ -451,14 +703,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 		}
 
-		$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
-		$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
+		$fallback_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? '0.5em';
+		$block_spacing      = $block['attrs']['style']['spacing'] ?? null;
 
 		/*
 		 * If a block's block.json skips serialization for spacing or spacing.blockGap,
 		 * don't apply the user-defined value to the styles.
 		 */
-		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+
+		$block_gap             = $global_settings['spacing']['blockGap'] ?? null;
+		$has_block_gap_support = isset( $block_gap );
 
 		$style = gutenberg_get_layout_style(
 			".$container_class.$container_class",
@@ -476,39 +731,106 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	$content_with_outer_classnames = '';
+	// Add combined layout and block classname for global styles to hook onto.
+	$split_block_name = explode( '/', $block['blockName'] );
+	$full_block_name  = 'core' === $split_block_name[0] ? end( $split_block_name ) : implode( '-', $split_block_name );
+	$class_names[]    = 'wp-block-' . $full_block_name . '-' . $layout_classname;
 
+	// Add classes to the outermost HTML tag if necessary.
 	if ( ! empty( $outer_class_names ) ) {
-		$content_with_outer_classnames = new WP_HTML_Tag_Processor( $block_content );
-		$content_with_outer_classnames->next_tag();
 		foreach ( $outer_class_names as $outer_class_name ) {
-			$content_with_outer_classnames->add_class( $outer_class_name );
+			$processor->add_class( $outer_class_name );
 		}
-
-		$content_with_outer_classnames = (string) $content_with_outer_classnames;
 	}
 
 	/**
-	* The first chunk of innerContent contains the block markup up until the inner blocks start.
-	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
-	*/
-	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
-
-	$content = $content_with_outer_classnames ? new WP_HTML_Tag_Processor( $content_with_outer_classnames ) : new WP_HTML_Tag_Processor( $block_content );
-
-	if ( $inner_content_classnames ) {
-		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
-		foreach ( $class_names as $class_name ) {
-			$content->add_class( $class_name );
-		}
-	} else {
-		$content->next_tag();
-		foreach ( $class_names as $class_name ) {
-			$content->add_class( $class_name );
+	 * Attempts to refer to the inner-block wrapping element by its class attribute.
+	 *
+	 * When examining a block's inner content, if a block has inner blocks, then
+	 * the first content item will likely be a text (HTML) chunk immediately
+	 * preceding the inner blocks. The last HTML tag in that chunk would then be
+	 * an opening tag for an element that wraps the inner blocks.
+	 *
+	 * There's no reliable way to associate this wrapper in $block_content because
+	 * it may have changed during the rendering pipeline (as inner contents is
+	 * provided before rendering) and through previous filters. In many cases,
+	 * however, the `class` attribute will be a good-enough identifier, so this
+	 * code finds the last tag in that chunk and stores the `class` attribute
+	 * so that it can be used later when working through the rendered block output
+	 * to identify the wrapping element and add the remaining class names to it.
+	 *
+	 * It's also possible that no inner block wrapper even exists. If that's the
+	 * case this code could apply the class names to an invalid element.
+	 *
+	 * Example:
+	 *
+	 *     $block['innerBlocks']  = array( $list_item );
+	 *     $block['innerContent'] = array( '<ul class="list-wrapper is-unordered">', null, '</ul>' );
+	 *
+	 *     // After rendering, the initial contents may have been modified by other renderers or filters.
+	 *     $block_content = <<<HTML
+	 *         <figure>
+	 *             <ul class="annotated-list list-wrapper is-unordered">
+	 *                 <li>Code</li>
+	 *             </ul><figcaption>It's a list!</figcaption>
+	 *         </figure>
+	 *     HTML;
+	 *
+	 * Although it is possible that the original block-wrapper classes are changed in $block_content
+	 * from how they appear in $block['innerContent'], it's likely that the original class attributes
+	 * are still present in the wrapper as they are in this example. Frequently, additional classes
+	 * will also be present; rarely should classes be removed.
+	 *
+	 * @TODO: Find a better way to match the first inner block. If it's possible to identify where the
+	 *        first inner block starts, then it will be possible to find the last tag before it starts
+	 *        and then that tag, if an opening tag, can be solidly identified as a wrapping element.
+	 *        Can some unique value or class or ID be added to the inner blocks when they process
+	 *        so that they can be extracted here safely without guessing? Can the block rendering function
+	 *        return information about where the rendered inner blocks start?
+	 *
+	 * @var string|null
+	 */
+	$inner_block_wrapper_classes = null;
+	$first_chunk                 = $block['innerContent'][0] ?? null;
+	if ( is_string( $first_chunk ) && count( $block['innerContent'] ) > 1 ) {
+		$first_chunk_processor = new WP_HTML_Tag_Processor( $first_chunk );
+		while ( $first_chunk_processor->next_tag() ) {
+			$class_attribute = $first_chunk_processor->get_attribute( 'class' );
+			if ( is_string( $class_attribute ) && ! empty( $class_attribute ) ) {
+				$inner_block_wrapper_classes = $class_attribute;
+			}
 		}
 	}
 
-	return (string) $content;
+	/*
+	 * If necessary, advance to what is likely to be an inner block wrapper tag.
+	 *
+	 * This advances until it finds the first tag containing the original class
+	 * attribute from above. If none is found it will scan to the end of the block
+	 * and fail to add any class names.
+	 *
+	 * If there is no block wrapper it won't advance at all, in which case the
+	 * class names will be added to the first and outermost tag of the block.
+	 * For cases where this outermost tag is the only tag surrounding inner
+	 * blocks then the outer wrapper and inner wrapper are the same.
+	 */
+	do {
+		if ( ! $inner_block_wrapper_classes ) {
+			break;
+		}
+
+		$class_attribute = $processor->get_attribute( 'class' );
+		if ( is_string( $class_attribute ) && str_contains( $class_attribute, $inner_block_wrapper_classes ) ) {
+			break;
+		}
+	} while ( $processor->next_tag() );
+
+	// Add the remaining class names.
+	foreach ( $class_names as $class_name ) {
+		$processor->add_class( $class_name );
+	}
+
+	return $processor->get_updated_html();
 }
 
 // Register the block support. (overrides core one).
@@ -542,22 +864,68 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	if (
 		wp_theme_has_theme_json() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
-		( isset( $block['attrs']['layout']['type'] ) && 'flex' === $block['attrs']['layout']['type'] )
+		( isset( $block['attrs']['layout']['type'] ) && ( 'flex' === $block['attrs']['layout']['type'] || 'grid' === $block['attrs']['layout']['type'] ) )
 	) {
 		return $block_content;
 	}
 
-	$replace_regex   = sprintf(
+	/**
+	 * This filter runs after the layout classnames have been added to the block, so they
+	 * have to be removed from the outer wrapper and then added to the inner.
+	*/
+	$layout_classes = array();
+	$processor      = new WP_HTML_Tag_Processor( $block_content );
+
+	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
+		if ( method_exists( $processor, 'class_list' ) ) {
+			foreach ( $processor->class_list() as $class_name ) {
+				if ( str_contains( $class_name, 'layout' ) ) {
+					array_push( $layout_classes, $class_name );
+					$processor->remove_class( $class_name );
+				}
+			}
+		} else {
+			/**
+			* The class_list method was only added in 6.4 so this needs a temporary fallback.
+			* This fallback should be removed when the minimum supported version is 6.4.
+			*/
+			$classes = $processor->get_attribute( 'class' );
+			if ( $classes ) {
+				$classes = explode( ' ', $classes );
+				foreach ( $classes as $class_name ) {
+					if ( str_contains( $class_name, 'is-layout-' ) ) {
+						array_push( $layout_classes, $class_name );
+						$processor->remove_class( $class_name );
+					}
+				}
+			}
+		}
+	}
+
+	$content_without_layout_classes = $processor->get_updated_html();
+	$replace_regex                  = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
 		preg_quote( $tag_name, '/' )
 	);
-	$updated_content = preg_replace_callback(
+	$updated_content                = preg_replace_callback(
 		$replace_regex,
-		function( $matches ) {
+		static function ( $matches ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
 		},
-		$block_content
+		$content_without_layout_classes
 	);
+
+	// Add layout classes to inner wrapper.
+	if ( ! empty( $layout_classes ) ) {
+		$processor = new WP_HTML_Tag_Processor( $updated_content );
+		if ( $processor->next_tag( array( 'class_name' => 'wp-block-group__inner-container' ) ) ) {
+			foreach ( $layout_classes as $class_name ) {
+				$processor->add_class( $class_name );
+			}
+		}
+		$updated_content = $processor->get_updated_html();
+	}
+
 	return $updated_content;
 }
 

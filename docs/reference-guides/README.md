@@ -18,7 +18,7 @@
 
 ## [Hooks Reference](/docs/reference-guides/filters/README.md)
 
--   [Block Hooks](/docs/reference-guides/filters/block-filters.md)
+-   [Block Filters](/docs/reference-guides/filters/block-filters.md)
 -   [Editor Hooks](/docs/reference-guides/filters/editor-filters.md)
 -   [i18n Hooks](/docs/reference-guides/filters/i18n-filters.md)
 -   [Parser Hooks](/docs/reference-guides/filters/parser-filters.md)
@@ -63,6 +63,7 @@
     -   [**core/editor**: The Post Editor’s Data](/docs/reference-guides/data/data-core-editor.md)
     -   [**core/keyboard-shortcuts**: The Keyboard Shortcuts Data](/docs/reference-guides/data/data-core-keyboard-shortcuts.md)
     -   [**core/notices**: Notices Data](/docs/reference-guides/data/data-core-notices.md)
+    -   [**core/nux**: The NUX (New User Experience) Data](/docs/reference-guides/data/data-core-nux.md)
     -   [**core/preferences**: Preferences](/docs/reference-guides/data/data-core-preferences.md)
     -   [**core/reusable-blocks**: Reusable blocks](/docs/reference-guides/data/data-core-reusable-blocks.md)
     -   [**core/rich-text**: Rich Text](/docs/reference-guides/data/data-core-rich-text.md)

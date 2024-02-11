@@ -2,77 +2,71 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { motion, MotionProps } from 'framer-motion';
-import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import {
-	useReducedMotion,
-	useMergeRefs,
-	usePrevious,
-} from '@wordpress/compose';
-import { isRTL } from '@wordpress/i18n';
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useId,
+} from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { isRTL as isRTLFn } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
+import * as styles from '../styles';
 import type { NavigatorScreenProps } from '../types';
 
-const animationEnterDelay = 0;
-const animationEnterDuration = 0.14;
-const animationExitDuration = 0.14;
-const animationExitDelay = 0;
-
-// Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
-// as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
-type Props = Omit<
-	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
-	keyof MotionProps
->;
-
 function UnconnectedNavigatorScreen(
-	props: Props,
+	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
-	const prefersReducedMotion = useReducedMotion();
-	const { location } = useContext( NavigatorContext );
-	const isMatch = location.path === escapeAttribute( path );
+	const { location, match, addScreen, removeScreen } =
+		useContext( NavigatorContext );
+	const isMatch = match === screenId;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
-	const previousLocation = usePrevious( location );
+	useEffect( () => {
+		const screen = {
+			id: screenId,
+			path: escapeAttribute( path ),
+		};
+		addScreen( screen );
+		return () => removeScreen( screen );
+	}, [ screenId, path, addScreen, removeScreen ] );
 
+	const isRTL = isRTLFn();
+	const { isInitial, isBack } = location;
 	const cx = useCx();
 	const classes = useMemo(
 		() =>
 			cx(
-				css( {
-					// Ensures horizontal overflow is visually accessible.
-					overflowX: 'auto',
-					// In case the root has a height, it should not be exceeded.
-					maxHeight: '100%',
+				styles.navigatorScreen( {
+					isInitial,
+					isBack,
+					isRTL,
 				} ),
 				className
 			),
-		[ className, cx ]
+		[ className, cx, isInitial, isBack, isRTL ]
 	);
 
 	const locationRef = useRef( location );
@@ -89,11 +83,13 @@ function UnconnectedNavigatorScreen(
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
 		// - if focus hasn't already been restored for the current location
+		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
 		if (
 			isInitialLocation ||
 			! isMatch ||
 			! wrapperRef.current ||
-			locationRef.current.hasRestoredFocus
+			locationRef.current.hasRestoredFocus ||
+			location.skipFocus
 		) {
 			return;
 		}
@@ -110,9 +106,9 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && previousLocation?.focusTargetSelector ) {
+		if ( location.isBack && location?.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
-				previousLocation.focusTargetSelector
+				location.focusTargetSelector
 			);
 		}
 
@@ -131,72 +127,17 @@ function UnconnectedNavigatorScreen(
 		isInitialLocation,
 		isMatch,
 		location.isBack,
-		previousLocation?.focusTargetSelector,
+		location.focusTargetSelector,
+		location.skipFocus,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
-	if ( ! isMatch ) {
-		return null;
-	}
-
-	if ( prefersReducedMotion ) {
-		return (
-			<View
-				ref={ mergedWrapperRef }
-				className={ classes }
-				{ ...otherProps }
-			>
-				{ children }
-			</View>
-		);
-	}
-
-	const animate = {
-		opacity: 1,
-		transition: {
-			delay: animationEnterDelay,
-			duration: animationEnterDuration,
-			ease: 'easeInOut',
-		},
-		x: 0,
-	};
-	const initial = {
-		opacity: 0,
-		x:
-			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
-				? 50
-				: -50,
-	};
-	const exit = {
-		delay: animationExitDelay,
-		opacity: 0,
-		x:
-			( ! isRTL() && location.isBack ) || ( isRTL() && ! location.isBack )
-				? 50
-				: -50,
-		transition: {
-			duration: animationExitDuration,
-			ease: 'easeInOut',
-		},
-	};
-
-	const animatedProps = {
-		animate,
-		exit,
-		initial,
-	};
-
-	return (
-		<motion.div
-			ref={ mergedWrapperRef }
-			className={ classes }
-			{ ...otherProps }
-			{ ...animatedProps }
-		>
+	return isMatch ? (
+		<View ref={ mergedWrapperRef } className={ classes } { ...otherProps }>
 			{ children }
-		</motion.div>
-	);
+		</View>
+	) : null;
 }
 
 /**

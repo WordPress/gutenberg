@@ -64,16 +64,16 @@ const linkOptions = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const allowedBlocks = [ 'core/image' ];
-const LAYOUT = { type: 'default', alignments: [] };
 
 const PLACEHOLDER_TEXT = Platform.isNative
-	? __( 'ADD MEDIA' )
+	? __( 'Add media' )
 	: __( 'Drag images, upload new ones or select files from your library.' );
 
 const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
+
+const EMPTY_ARRAY = [];
 
 function GalleryEdit( props ) {
 	const {
@@ -83,44 +83,60 @@ function GalleryEdit( props ) {
 		clientId,
 		isSelected,
 		insertBlocksAfter,
+		isContentLocked,
+		onFocus,
 	} = props;
 
-	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
+	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
+		attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
 		selectBlock,
-		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const preferredStyleVariations =
-			settings.__experimentalPreferredStyleVariations;
-		return {
-			getBlock: select( blockEditorStore ).getBlock,
-			getSettings: select( blockEditorStore ).getSettings,
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
-		};
-	}, [] );
-
-	const innerBlockImages = useSelect(
+	const {
+		getBlock,
+		getSettings,
+		preferredStyle,
+		innerBlockImages,
+		blockWasJustInserted,
+		multiGallerySelection,
+	} = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
-		},
-		[ clientId ]
-	);
+			const {
+				getBlockName,
+				getMultiSelectedBlockClientIds,
+				getSettings: _getSettings,
+				getBlock: _getBlock,
+				wasBlockJustInserted,
+			} = select( blockEditorStore );
+			const preferredStyleVariations =
+				_getSettings().__experimentalPreferredStyleVariations;
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
-	const wasBlockJustInserted = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).wasBlockJustInserted(
-				clientId,
-				'inserter_menu'
-			);
+			return {
+				getBlock: _getBlock,
+				getSettings: _getSettings,
+				preferredStyle:
+					preferredStyleVariations?.value?.[ 'core/image' ],
+				innerBlockImages:
+					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
+				blockWasJustInserted: wasBlockJustInserted(
+					clientId,
+					'inserter_menu'
+				),
+				multiGallerySelection:
+					multiSelectedClientIds.length &&
+					multiSelectedClientIds.every(
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/gallery'
+					),
+			};
 		},
 		[ clientId ]
 	);
@@ -151,9 +167,6 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
-		if ( newImages?.length > 0 ) {
-			clearSelectedBlock();
-		}
 	}, [ newImages ] );
 
 	const imageSizeOptions = useImageSizes(
@@ -308,10 +321,6 @@ function GalleryEdit( props ) {
 			} );
 		} );
 
-		if ( newBlocks?.length > 0 ) {
-			selectBlock( newBlocks[ 0 ].clientId );
-		}
-
 		replaceInnerBlocks(
 			clientId,
 			existingImageBlocks
@@ -322,6 +331,11 @@ function GalleryEdit( props ) {
 						newOrderMap[ b.attributes.id ]
 				)
 		);
+
+		// Select the first block to scroll into view when new blocks are added.
+		if ( newBlocks?.length > 0 ) {
+			selectBlock( newBlocks[ 0 ].clientId );
+		}
 	}
 
 	function onUploadError( message ) {
@@ -368,10 +382,8 @@ function GalleryEdit( props ) {
 		setAttributes( { imageCrop: ! imageCrop } );
 	}
 
-	function getImageCropHelp( checked ) {
-		return checked
-			? __( 'Thumbnails are cropped to align.' )
-			: __( 'Thumbnails are not cropped.' );
+	function toggleRandomOrder() {
+		setAttributes( { randomOrder: ! randomOrder } );
 	}
 
 	function toggleOpenInNewTab( openInNewTab ) {
@@ -462,7 +474,8 @@ function GalleryEdit( props ) {
 				( hasImages && ! isSelected ) || imagesUploading,
 			value: hasImageIds ? images : {},
 			autoOpenMediaUpload:
-				! hasImages && isSelected && wasBlockJustInserted,
+				! hasImages && isSelected && blockWasJustInserted,
+			onFocus,
 		},
 	} );
 	const mediaPlaceholder = (
@@ -486,11 +499,15 @@ function GalleryEdit( props ) {
 		className: classnames( className, 'has-nested-images' ),
 	} );
 
+	const nativeInnerBlockProps = Platform.isNative && {
+		marginHorizontal: 0,
+		marginVertical: 0,
+	};
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
-		__experimentalLayout: LAYOUT,
+		...nativeInnerBlockProps,
 	} );
 
 	if ( ! hasImages ) {
@@ -522,41 +539,56 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
+							__next40pxDefaultSize
 						/>
 					) }
-					<ToggleControl
-						label={ __( 'Crop images' ) }
-						checked={ !! imageCrop }
-						onChange={ toggleImageCrop }
-						help={ getImageCropHelp }
-					/>
+					{ imageSizeOptions?.length > 0 && (
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __( 'Resolution' ) }
+							help={ __(
+								'Select the size of the source images.'
+							) }
+							value={ sizeSlug }
+							options={ imageSizeOptions }
+							onChange={ updateImagesSize }
+							hideCancelButton={ true }
+							size="__unstable-large"
+						/>
+					) }
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
 						hideCancelButton={ true }
+						size="__unstable-large"
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Crop images to fit' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Randomize order' ) }
+						checked={ !! randomOrder }
+						onChange={ toggleRandomOrder }
 					/>
 					{ hasLinkTo && (
 						<ToggleControl
-							label={ __( 'Open in new tab' ) }
+							__nextHasNoMarginBottom
+							label={ __( 'Open images in new tab' ) }
 							checked={ linkTarget === '_blank' }
 							onChange={ toggleOpenInNewTab }
-						/>
-					) }
-					{ imageSizeOptions?.length > 0 && (
-						<SelectControl
-							label={ __( 'Image size' ) }
-							value={ sizeSlug }
-							options={ imageSizeOptions }
-							onChange={ updateImagesSize }
-							hideCancelButton={ true }
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
-								{ __( 'Image size' ) }
+								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
 							<View className={ 'gallery-image-sizes__loading' }>
 								<Spinner />
@@ -566,28 +598,33 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					handleUpload={ false }
-					onSelect={ updateImages }
-					name={ __( 'Add' ) }
-					multiple={ true }
-					mediaIds={ images
-						.filter( ( image ) => image.id )
-						.map( ( image ) => image.id ) }
-					addToGallery={ hasImageIds }
-				/>
-			</BlockControls>
 			{ Platform.isWeb && (
-				<GapStyles
-					blockGap={ attributes.style?.spacing?.blockGap }
-					clientId={ clientId }
-				/>
+				<>
+					{ ! multiGallerySelection && (
+						<BlockControls group="other">
+							<MediaReplaceFlow
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								accept="image/*"
+								handleUpload={ false }
+								onSelect={ updateImages }
+								name={ __( 'Add' ) }
+								multiple={ true }
+								mediaIds={ images
+									.filter( ( image ) => image.id )
+									.map( ( image ) => image.id ) }
+								addToGallery={ hasImageIds }
+							/>
+						</BlockControls>
+					) }
+					<GapStyles
+						blockGap={ attributes.style?.spacing?.blockGap }
+						clientId={ clientId }
+					/>
+				</>
 			) }
 			<Gallery
 				{ ...props }
+				isContentLocked={ isContentLocked }
 				images={ images }
 				mediaPlaceholder={
 					! hasImages || Platform.isNative
@@ -596,6 +633,7 @@ function GalleryEdit( props ) {
 				}
 				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
+				multiGallerySelection={ multiGallerySelection }
 			/>
 		</>
 	);

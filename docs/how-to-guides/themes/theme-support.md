@@ -136,16 +136,16 @@ The colors will be shown in order on the palette, and there's no limit to how ma
 Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color", "background-color", and "border-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the classes itself. The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
 ```css
-.has-strong-magenta-background-color {
-	background-color: #a156b4;
-}
-
 .has-strong-magenta-color {
 	color: #a156b4;
 }
 
+.has-strong-magenta-background-color {
+	background-color: #a156b4;
+}
+
 .has-strong-magenta-border-color {
-	color: #a156b4;
+	border-color: #a156b4;
 }
 ```
 
@@ -315,7 +315,7 @@ Themes can opt out of generated block layout styles that provide default structu
 add_theme_support( 'disable-layout-styles' );
 ```
 
-For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
+For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/global-settings-and-styles.md#what-is-blockgap-and-how-can-i-use-it).
 
 ### Supporting custom line heights
 
@@ -434,7 +434,7 @@ add_theme_support( 'custom-spacing' );
 
 ## Link color control
 
-Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](./theme-json.md):
+Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](/docs/how-to-guides/curating-the-editor-experience/theme-json.md):
 
 ```json
 {
@@ -472,9 +472,27 @@ Use this setting to enable the following Global Styles settings:
 - color: link
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- dimensions: aspectRatio, minHeight
+- position: sticky
 
 ```php
 add_theme_support( 'appearance-tools' );
+```
+
+## Border
+
+Use this to enable all border settings:
+
+```php
+add_theme_support( 'border' );
+```
+
+## Link color
+
+Use this to enable the link color setting:
+
+```php
+add_theme_support( 'link-color' );
 ```
 
 ## Block Based Template Parts

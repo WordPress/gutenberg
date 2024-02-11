@@ -76,6 +76,7 @@ export default function PostFormat() {
 		<PostFormatCheck>
 			<div className="editor-post-format">
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Post Format' ) }
 					value={ postFormat }
 					onChange={ ( format ) => onUpdatePostFormat( format ) }

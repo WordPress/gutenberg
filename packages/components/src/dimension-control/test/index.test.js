@@ -14,8 +14,6 @@ import { plus } from '@wordpress/icons';
  */
 import { DimensionControl } from '../';
 
-jest.useFakeTimers();
-
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
 	const instanceId = 1;
@@ -90,9 +88,7 @@ describe( 'DimensionControl', () => {
 
 	describe( 'callbacks', () => {
 		it( 'should call onChange handler with correct args on size change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<DimensionControl
@@ -114,9 +110,7 @@ describe( 'DimensionControl', () => {
 		} );
 
 		it( 'should call onChange handler with undefined value when no size is provided on change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<DimensionControl

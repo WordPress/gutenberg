@@ -17,7 +17,9 @@ export async function loginUser(
 	password = WP_PASSWORD
 ) {
 	if ( ! isCurrentURL( 'wp-login.php' ) ) {
+		const waitForLoginPageNavigation = page.waitForNavigation();
 		await page.goto( createURL( 'wp-login.php' ) );
+		await waitForLoginPageNavigation;
 	}
 
 	await page.focus( '#user_login' );
@@ -28,7 +30,7 @@ export async function loginUser(
 	await page.type( '#user_pass', password );
 
 	await Promise.all( [
-		page.waitForNavigation(),
 		page.click( '#wp-submit' ),
+		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 	] );
 }

@@ -6,128 +6,111 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
+import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
-	ToolSelector,
-	__experimentalPreviewOptions as PreviewOptions,
-	NavigableToolbar,
+	BlockToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
-import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+import { next, previous } from '@wordpress/icons';
 import {
 	Button,
-	ToolbarItem,
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
+	__unstableMotion as motion,
+	Popover,
 } from '@wordpress/components';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	DocumentBar,
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
 import SaveButton from '../save-button';
-import UndoButton from './undo-redo/undo';
-import RedoButton from './undo-redo/redo';
-import DocumentActions from './document-actions';
+import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
-import { useHasStyleBook } from '../style-book';
+import {
+	getEditorCanvasContainerTitle,
+	useHasEditorCanvasContainer,
+} from '../editor-canvas-container';
+import { unlock } from '../../lock-unlock';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const preventDefault = ( event ) => {
-	event.preventDefault();
-};
+const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
-	const inserterButton = useRef();
 	const {
-		deviceType,
 		templateType,
-		isInserterOpen,
-		isListViewOpen,
-		listViewShortcut,
-		isVisualMode,
+		isDistractionFree,
 		blockEditorMode,
-		homeUrl,
+		blockSelectionStart,
 		showIconLabels,
+		editorCanvasView,
+		hasFixedToolbar,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const {
-			__experimentalGetPreviewDeviceType,
-			getEditedPostType,
-			isInserterOpened,
-			isListViewOpened,
-			getEditorMode,
-		} = select( editSiteStore );
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
-
-		const postType = getEditedPostType();
-
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
+		const { getEditedPostType } = select( editSiteStore );
+		const { getBlockSelectionStart, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const { get: getPreference } = select( preferencesStore );
+		const { getDeviceType } = select( editorStore );
 
 		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
-			templateType: postType,
-			isInserterOpen: isInserterOpened(),
-			isListViewOpen: isListViewOpened(),
-			listViewShortcut: getShortcutRepresentation(
-				'core/edit-site/toggle-list-view'
-			),
-			isVisualMode: getEditorMode() === 'visual',
+			deviceType: getDeviceType(),
+			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
-			homeUrl: getUnstableBase()?.home,
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
-				'showIconLabels'
-			),
+			blockSelectionStart: getBlockSelectionStart(),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
+			editorCanvasView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			isDistractionFree: getPreference( 'core', 'distractionFree' ),
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setIsInserterOpened,
-		setIsListViewOpened,
-	} = useDispatch( editSiteStore );
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
-
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
+	const blockToolbarRef = useRef();
+	const disableMotion = useReducedMotion();
 
-	const openInserter = useCallback( () => {
-		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover.
-			inserterButton.current.focus();
-		} else {
-			setIsInserterOpened( true );
-		}
-	}, [ isInserterOpen, setIsInserterOpened ] );
+	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
-	const toggleListView = useCallback(
-		() => setIsListViewOpened( ! isListViewOpen ),
-		[ setIsListViewOpened, isListViewOpen ]
-	);
+	const isFocusMode = FOCUSABLE_ENTITIES.includes( templateType );
 
-	const hasStyleBook = useHasStyleBook();
-
-	const isFocusMode = templateType === 'wp_template_part';
-
-	/* translators: button label text should, if possible, be under 16 characters. */
-	const longLabel = _x(
-		'Toggle block inserter',
-		'Generic label for block inserter button'
-	);
-	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
-
-	const isZoomedOutViewExperimentEnabled =
-		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
+
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+
+	const hasBlockSelected = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
+
+	const toolbarVariants = {
+		isDistractionFree: { y: '-50px' },
+		isDistractionFreeHovering: { y: 0 },
+		view: { y: 0 },
+		edit: { y: 0 },
+	};
+
+	const toolbarTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : 0.2,
+		ease: 'easeOut',
+	};
 
 	return (
 		<div
@@ -135,131 +118,100 @@ export default function HeaderEditMode() {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
-				<NavigableToolbar
+			{ hasDefaultEditorCanvasView && (
+				<motion.div
 					className="edit-site-header-edit-mode__start"
-					aria-label={ __( 'Document tools' ) }
+					variants={ toolbarVariants }
+					transition={ toolbarTransition }
 				>
-					<div className="edit-site-header-edit-mode__toolbar">
-						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-site-header-edit-mode__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpen }
-							onMouseDown={ preventDefault }
-							onClick={ openInserter }
-							disabled={ ! isVisualMode }
-							icon={ plus }
-							label={ showIconLabels ? shortLabel : longLabel }
-							showTooltip={ ! showIconLabels }
-						/>
-						{ isLargeViewport && (
-							<>
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
+					<DocumentTools
+						blockEditorMode={ blockEditorMode }
+						isDistractionFree={ isDistractionFree }
+					/>
+					{ isTopToolbar && (
+						<>
+							<div
+								className={ classnames(
+									'selected-block-tools-wrapper',
+									{
+										'is-collapsed': isBlockToolsCollapsed,
 									}
-									disabled={ ! isVisualMode }
-								/>
-								<ToolbarItem
-									as={ UndoButton }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								<ToolbarItem
-									as={ RedoButton }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								<ToolbarItem
-									as={ Button }
-									className="edit-site-header-edit-mode__list-view-toggle"
-									disabled={
-										! isVisualMode || isZoomedOutView
-									}
-									icon={ listView }
-									isPressed={ isListViewOpen }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'List View' ) }
-									onClick={ toggleListView }
-									shortcut={ listViewShortcut }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								{ isZoomedOutViewExperimentEnabled && (
-									<ToolbarItem
-										as={ Button }
-										className="edit-site-header-edit-mode__zoom-out-view-toggle"
-										icon={ chevronUpDown }
-										isPressed={ isZoomedOutView }
-										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'Zoom-out View' ) }
-										onClick={ () => {
-											setPreviewDeviceType( 'desktop' );
-											__unstableSetEditorMode(
-												isZoomedOutView
-													? 'edit'
-													: 'zoom-out'
-											);
-										} }
-									/>
 								) }
-							</>
-						) }
-					</div>
-				</NavigableToolbar>
+							>
+								<BlockToolbar hideDragHandle />
+							</div>
+							<Popover.Slot
+								ref={ blockToolbarRef }
+								name="block-toolbar"
+							/>
+							{ hasBlockSelected && (
+								<Button
+									className="edit-site-header-edit-mode__block-tools-toggle"
+									icon={
+										isBlockToolsCollapsed ? next : previous
+									}
+									onClick={ () => {
+										setIsBlockToolsCollapsed(
+											( collapsed ) => ! collapsed
+										);
+									} }
+									label={
+										isBlockToolsCollapsed
+											? __( 'Show block tools' )
+											: __( 'Hide block tools' )
+									}
+								/>
+							) }
+						</>
+					) }
+				</motion.div>
 			) }
 
-			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
-			</div>
+			{ ! isDistractionFree && (
+				<div
+					className={ classnames(
+						'edit-site-header-edit-mode__center',
+						{
+							'is-collapsed':
+								! isBlockToolsCollapsed && isLargeViewport,
+						}
+					) }
+				>
+					{ ! hasDefaultEditorCanvasView ? (
+						getEditorCanvasContainerTitle( editorCanvasView )
+					) : (
+						<DocumentBar />
+					) }
+				</div>
+			) }
 
 			<div className="edit-site-header-edit-mode__end">
-				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && ! hasStyleBook && (
+				<motion.div
+					className="edit-site-header-edit-mode__actions"
+					variants={ toolbarVariants }
+					transition={ toolbarTransition }
+				>
+					{ isLargeViewport && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }
 						>
-							<PreviewOptions
-								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								viewLabel={ __( 'View' ) }
-							>
-								<MenuGroup>
-									<MenuItem
-										href={ homeUrl }
-										target="_blank"
-										icon={ external }
-									>
-										{ __( 'View site' ) }
-										<VisuallyHidden as="span">
-											{
-												/* translators: accessibility text */
-												__( '(opens in a new tab)' )
-											}
-										</VisuallyHidden>
-									</MenuItem>
-								</MenuGroup>
-							</PreviewOptions>
+							<PreviewDropdown
+								disabled={
+									isFocusMode || ! hasDefaultEditorCanvasView
+								}
+							/>
 						</div>
 					) }
+					<PostViewLink />
 					<SaveButton />
-					<PinnedItems.Slot scope="core/edit-site" />
+					{ ! isDistractionFree && (
+						<PinnedItems.Slot scope="core/edit-site" />
+					) }
 					<MoreMenu showIconLabels={ showIconLabels } />
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);

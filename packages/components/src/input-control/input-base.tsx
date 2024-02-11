@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +22,13 @@ import {
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
-import { ContextSystemProvider, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import {
+	ContextSystemProvider,
+	contextConnect,
+	useContextSystem,
+} from '../context';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -59,8 +65,11 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 }
 
 export function InputBase(
-	{
-		__next36pxDefaultSize,
+	props: WordPressComponentProps< InputBaseProps, 'div' >,
+	ref: ForwardedRef< HTMLDivElement >
+) {
+	const {
+		__next40pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
@@ -68,21 +77,23 @@ export function InputBase(
 		hideLabelFromVision = false,
 		labelPosition,
 		id: idProp,
+		isBorderless = false,
 		isFocused = false,
 		label,
 		prefix,
 		size = 'default',
 		suffix,
-		...props
-	}: WordPressComponentProps< InputBaseProps, 'div' >,
-	ref: ForwardedRef< HTMLDivElement >
-) {
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp(
+		useContextSystem( props, 'InputBase' )
+	);
+
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
 	const { paddingLeft, paddingRight } = getSizeConfig( {
 		inputSize: size,
-		__next36pxDefaultSize,
+		__next40pxDefaultSize,
 	} );
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
@@ -94,7 +105,7 @@ export function InputBase(
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
-			{ ...props }
+			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
 			className={ className }
 			gap={ 2 }
@@ -130,10 +141,14 @@ export function InputBase(
 						</Suffix>
 					) }
 				</ContextSystemProvider>
-				<Backdrop disabled={ disabled } isFocused={ isFocused } />
+				<Backdrop
+					disabled={ disabled }
+					isBorderless={ isBorderless }
+					isFocused={ isFocused }
+				/>
 			</Container>
 		</Root>
 	);
 }
 
-export default forwardRef( InputBase );
+export default contextConnect( InputBase, 'InputBase' );

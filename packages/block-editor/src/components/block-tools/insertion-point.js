@@ -24,6 +24,8 @@ export const InsertionPointOpenRef = createContext();
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
+	operation = 'insert',
+	nearestSide = 'right',
 } ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
@@ -138,9 +140,14 @@ function InbetweenInsertionPointPopover( {
 		return null;
 	}
 
+	const orientationClassname =
+		orientation === 'horizontal' || operation === 'group'
+			? 'is-horizontal'
+			: 'is-vertical';
+
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
-		'is-' + orientation
+		orientationClassname
 	);
 
 	return (
@@ -149,6 +156,8 @@ function InbetweenInsertionPointPopover( {
 			nextClientId={ nextClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			operation={ operation }
+			nearestSide={ nearestSide }
 		>
 			<motion.div
 				layout={ ! disableMotion }
@@ -198,16 +207,30 @@ function InbetweenInsertionPointPopover( {
 }
 
 export default function InsertionPoint( props ) {
-	const { insertionPoint, isVisible } = useSelect( ( select ) => {
-		const { getBlockInsertionPoint, isBlockInsertionPointVisible } =
-			select( blockEditorStore );
-		return {
-			insertionPoint: getBlockInsertionPoint(),
-			isVisible: isBlockInsertionPointVisible(),
-		};
-	}, [] );
+	const { insertionPoint, isVisible, isBlockListEmpty } = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const blockInsertionPoint = getBlockInsertionPoint();
+			return {
+				insertionPoint: blockInsertionPoint,
+				isVisible: isBlockInsertionPointVisible(),
+				isBlockListEmpty:
+					getBlockCount( blockInsertionPoint?.rootClientId ) === 0,
+			};
+		},
+		[]
+	);
 
-	if ( ! isVisible ) {
+	if (
+		! isVisible ||
+		// Don't render the insertion point if the block list is empty.
+		// The insertion point will be represented by the appender instead.
+		isBlockListEmpty
+	) {
 		return null;
 	}
 
@@ -222,6 +245,10 @@ export default function InsertionPoint( props ) {
 			{ ...props }
 		/>
 	) : (
-		<InbetweenInsertionPointPopover { ...props } />
+		<InbetweenInsertionPointPopover
+			operation={ insertionPoint.operation }
+			nearestSide={ insertionPoint.nearestSide }
+			{ ...props }
+		/>
 	);
 }

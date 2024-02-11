@@ -3,7 +3,7 @@
 $swatch-size: 28px;
 $swatch-gap: 12px;
 
-$popover-width: $sidebar-width;
+$popover-width: 260px;
 $popover-padding: $grid-unit-20;
 
 $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
@@ -24,11 +24,6 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
 		gap: $swatch-gap;
 		justify-content: space-between;
 	}
-}
-
-.block-editor-duotone-control__description {
-	margin: $grid-unit-20 0;
-	font-size: $helptext-font-size;
 }
 
 .block-editor-duotone-control__unset-indicator {

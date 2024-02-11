@@ -3,6 +3,11 @@
  */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import RCTAztecView from '@wordpress/react-native-aztec';
+
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
 const isAndroid = Platform.OS === 'android';
@@ -65,6 +70,13 @@ export function subscribeUpdateHtml( callback ) {
 export function subscribeFeaturedImageIdNativeUpdated( callback ) {
 	return gutenbergBridgeEvents.addListener(
 		'featuredImageIdNativeUpdated',
+		callback
+	);
+}
+
+export function subscribePostSaveEvent( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'postHasBeenJustSaved',
 		callback
 	);
 }
@@ -170,6 +182,25 @@ export function subscribeShowEditorHelp( callback ) {
 	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
 }
 
+export function subscribeOnUndoPressed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onUndoPressed', callback );
+}
+
+export function subscribeOnRedoPressed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onRedoPressed', callback );
+}
+
+export function subscribeConnectionStatus( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'connectionStatusChange',
+		callback
+	);
+}
+
+export function requestConnectionStatus( callback ) {
+	return RNReactNativeGutenbergBridge.requestConnectionStatus( callback );
+}
+
 /**
  * Request media picker for the given media source.
  *
@@ -190,7 +221,7 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
 }
 
 /**
- * Request to render an unsuported block.
+ * Request to render an unsupported block.
  *
  * A way to show unsupported blocks to the user is to render it on a web view.
  *
@@ -283,6 +314,18 @@ export function requestImageFullscreenPreview(
 	);
 }
 
+export function requestEmbedFullscreenPreview( content, title ) {
+	if ( isIOS ) {
+		/* eslint-disable-next-line no-console */
+		console.warn( 'requestEmbedFullscreenPreview is not supported on iOS' );
+		return;
+	}
+	return RNReactNativeGutenbergBridge.requestEmbedFullscreenPreview(
+		content,
+		title
+	);
+}
+
 export function requestMediaEditor( mediaUrl, callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaEditor(
 		mediaUrl,
@@ -295,6 +338,10 @@ export function fetchRequest( path, enableCaching = true ) {
 		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
 	}
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
+}
+
+export function postRequest( path, data = {} ) {
+	return RNReactNativeGutenbergBridge.postRequest( path, data );
 }
 
 export function showUserSuggestions() {
@@ -437,10 +484,49 @@ export function sendEventToHost( eventName, properties ) {
 }
 
 /**
+ * Shows Android's soft keyboard if there's a TextInput focused and
+ * the keyboard is hidden.
+ *
+ * @return {void}
+ */
+export function showAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	const hasFocusedTextInput = RCTAztecView.InputState.isFocused();
+
+	if ( hasFocusedTextInput ) {
+		RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+	}
+}
+
+/**
+ * Hides Android's soft keyboard.
+ *
+ * @return {void}
+ */
+export function hideAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.hideAndroidSoftKeyboard();
+}
+
+/**
  * Generate haptic feedback.
  */
 export function generateHapticFeedback() {
 	RNReactNativeGutenbergBridge.generateHapticFeedback();
+}
+
+export function toggleUndoButton( isDisabled ) {
+	RNReactNativeGutenbergBridge.toggleUndoButton( isDisabled );
+}
+
+export function toggleRedoButton( isDisabled ) {
+	RNReactNativeGutenbergBridge.toggleRedoButton( isDisabled );
 }
 
 export default RNReactNativeGutenbergBridge;

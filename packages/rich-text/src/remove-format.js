@@ -4,7 +4,7 @@
 
 import { normaliseFormats } from './normalise-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Remove any format object from a Rich Text value by type from the given

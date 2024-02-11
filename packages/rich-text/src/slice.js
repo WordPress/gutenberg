@@ -1,4 +1,4 @@
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Slice a Rich Text value from `startIndex` to `endIndex`. Indices are

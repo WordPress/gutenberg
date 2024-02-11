@@ -14,7 +14,7 @@ import type { BaseControlProps } from './types';
  *
  * Namely, it takes care of generating a unique `id`, properly associating it with the `label` and `help` elements.
  *
- * @param  props
+ * @param props
  */
 export function useBaseControlProps(
 	props: Omit< BaseControlProps, 'children' >

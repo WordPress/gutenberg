@@ -7,8 +7,8 @@
 ### `withFocusReturn`
 
 ```jsx
+import { useState } from 'react';
 import { withFocusReturn, TextControl, Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const EnhancedComponent = withFocusReturn( () => (
 	<div>

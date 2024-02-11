@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { forwardRef, Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -31,20 +31,25 @@ const defaultRenderToggle = ( {
 	toggleProps = {},
 	prioritizePatterns,
 } ) => {
-	let label;
-	if ( hasSingleBlockType ) {
+	const {
+		as: Wrapper = Button,
+		label: labelProp,
+		onClick,
+		...rest
+	} = toggleProps;
+
+	let label = labelProp;
+	if ( ! label && hasSingleBlockType ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
-	} else if ( prioritizePatterns ) {
+	} else if ( ! label && prioritizePatterns ) {
 		label = __( 'Add pattern' );
-	} else {
+	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
-
-	const { onClick, ...rest } = toggleProps;
 
 	// Handle both onClick functions from the toggle and the parent component.
 	function handleClick( event ) {
@@ -57,7 +62,7 @@ const defaultRenderToggle = ( {
 	}
 
 	return (
-		<Button
+		<Wrapper
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
@@ -71,7 +76,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class Inserter extends Component {
+class PrivateInserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -97,7 +102,7 @@ class Inserter extends Component {
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
 	 *
-	 * @return {WPElement} Dropdown toggle element.
+	 * @return {Element} Dropdown toggle element.
 	 */
 	renderToggle( { onToggle, isOpen } ) {
 		const {
@@ -130,7 +135,7 @@ class Inserter extends Component {
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
 	 *
-	 * @return {WPElement} Dropdown content element.
+	 * @return {Element} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
 		const {
@@ -181,7 +186,6 @@ class Inserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
-				prioritizePatterns={ prioritizePatterns }
 			/>
 		);
 	}
@@ -207,7 +211,7 @@ class Inserter extends Component {
 					'block-editor-inserter__popover',
 					{ 'is-quick': isQuick }
 				) }
-				position={ position }
+				popoverProps={ { position, shift: true } }
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
@@ -219,14 +223,14 @@ class Inserter extends Component {
 	}
 }
 
-export default compose( [
+export const ComposedPrivateInserter = compose( [
 	withSelect(
 		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
 			const {
 				getBlockRootClientId,
 				hasInserterItems,
-				__experimentalGetAllowedBlocks,
-				__experimentalGetDirectInsertBlock,
+				getAllowedBlocks,
+				getDirectInsertBlock,
 				getSettings,
 			} = select( blockEditorStore );
 
@@ -235,12 +239,10 @@ export default compose( [
 			rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
 
-			const allowedBlocks =
-				__experimentalGetAllowedBlocks( rootClientId );
+			const allowedBlocks = getAllowedBlocks( rootClientId );
 
 			const directInsertBlock =
-				shouldDirectInsert &&
-				__experimentalGetDirectInsertBlock( rootClientId );
+				shouldDirectInsert && getDirectInsertBlock( rootClientId );
 
 			const settings = getSettings();
 
@@ -417,4 +419,10 @@ export default compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( Inserter );
+] )( PrivateInserter );
+
+const Inserter = forwardRef( ( props, ref ) => {
+	return <ComposedPrivateInserter ref={ ref } { ...props } />;
+} );
+
+export default Inserter;

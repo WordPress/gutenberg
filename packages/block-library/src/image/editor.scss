@@ -10,7 +10,7 @@
 		border: none;
 
 		// Disable any duotone filter applied in the selected state.
-		filter: none;
+		filter: none !important;
 
 		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
 		border-radius: $radius-block-ui;
@@ -27,6 +27,12 @@
 			opacity: 0;
 		}
 	}
+	.block-bindings-media-placeholder-message {
+		opacity: 0;
+	}
+	&.is-selected .block-bindings-media-placeholder-message {
+		opacity: 1;
+	}
 
 	// Remove the transition while we still have a legacy placeholder style.
 	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
@@ -37,7 +43,6 @@
 		transition: none;
 	}
 }
-
 
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
@@ -141,6 +146,7 @@ figure.wp-block-image:not(.wp-block) {
 	// smoother UX.
 	.reactEasyCrop_Container .reactEasyCrop_Image {
 		border: none;
+		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
 	}
 }
 

@@ -1,5 +1,6 @@
 {
-	"version": 1,
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 2,
 	"settings": {
 		"color": {
 			"palette": [

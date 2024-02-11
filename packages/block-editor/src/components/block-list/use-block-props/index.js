@@ -8,40 +8,24 @@ import classnames from 'classnames';
  */
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	__unstableGetBlockProps as getBlockProps,
-	getBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { BlockListBlockContext } from '../block';
+import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockEditContext } from '../../block-edit/context';
-import { useBlockClassNames } from './use-block-class-names';
-import { useBlockDefaultClassName } from './use-block-default-class-name';
-import { useBlockCustomClassName } from './use-block-custom-class-name';
-import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
-import { store as blockEditorStore } from '../../../store';
-import useBlockOverlayActive from '../../block-content-overlay';
-
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
+import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -51,6 +35,32 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * will pass to the component through the props it returns. Optionally, you can
  * also pass any other props through this hook, and they will be merged and
  * returned.
+ *
+ * Use of this hook on the outermost element of a block is required if using API >= v2.
+ *
+ * @example
+ * ```js
+ * import { useBlockProps } from '@wordpress/block-editor';
+ *
+ * export default function Edit() {
+ *
+ *   const blockProps = useBlockProps(
+ *     className: 'my-custom-class',
+ *     style: {
+ *       color: '#222222',
+ *       backgroundColor: '#eeeeee'
+ *     }
+ *   )
+ *
+ *   return (
+ *	    <div { ...blockProps }>
+ *
+ *     </div>
+ *   )
+ * }
+ *
+ * ```
+ *
  *
  * @param {Object}  props                    Optional. Props to pass to the element. Must contain
  *                                           the ref if one is defined.
@@ -65,78 +75,51 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		className,
 		wrapperProps = {},
 		isAligned,
-	} = useContext( BlockListBlockContext );
-	const {
 		index,
 		mode,
 		name,
 		blockApiVersion,
 		blockTitle,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getBlockIndex,
-				getBlockMode,
-				getBlockName,
-				isTyping,
-				getGlobalBlockCount,
-				isBlockSelected,
-				isBlockMultiSelected,
-				isAncestorMultiSelected,
-				isFirstMultiSelectedBlock,
-			} = select( blockEditorStore );
-			const { getActiveBlockVariation } = select( blocksStore );
-			const isSelected = isBlockSelected( clientId );
-			const isPartOfMultiSelection =
-				isBlockMultiSelected( clientId ) ||
-				isAncestorMultiSelected( clientId );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
-
-			return {
-				index: getBlockIndex( clientId ),
-				mode: getBlockMode( clientId ),
-				name: blockName,
-				blockApiVersion: blockType?.apiVersion || 1,
-				blockTitle: match?.title || blockType?.title,
-				isPartOfSelection: isSelected || isPartOfMultiSelection,
-				adjustScrolling:
-					isSelected || isFirstMultiSelectedBlock( clientId ),
-				enableAnimation:
-					! isTyping() &&
-					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			};
-		},
-		[ clientId ]
-	);
-
-	const hasOverlay = useBlockOverlayActive( clientId );
+		isSelected,
+		isSubtreeDisabled,
+		isOutlineEnabled,
+		hasOverlay,
+		initialPosition,
+		blockEditingMode,
+		isHighlighted,
+		isMultiSelected,
+		isPartiallySelected,
+		isReusable,
+		isDragging,
+		hasChildSelected,
+		removeOutline,
+		isBlockMovingMode,
+		canInsertMovingBlock,
+		isEditingDisabled,
+		hasEditableOutline,
+		isTemporarilyEditingAsBlocks,
+		defaultClassName,
+		templateLock,
+	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		props.ref,
-		useFocusFirstElement( clientId ),
+		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useEventHandlers( clientId ),
+		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered(),
+		useIsHovered( { isEnabled: isOutlineEnabled } ),
 		useIntersectionObserver(),
-		useMovingAnimation( {
-			isSelected: isPartOfSelection,
-			adjustScrolling,
-			enableAnimation,
-			triggerAnimationOnChange: index,
-		} ),
+		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
+		useFlashEditableBlocks( {
+			clientId,
+			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
+		} ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -148,7 +131,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	}
 
 	return {
-		tabIndex: 0,
+		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
@@ -158,19 +141,32 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
+		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: classnames(
-			// The wp-block className is important for editor styles.
-			classnames( 'block-editor-block-list__block', {
+			'block-editor-block-list__block',
+			{
+				// The wp-block className is important for editor styles.
 				'wp-block': ! isAligned,
 				'has-block-overlay': hasOverlay,
-			} ),
+				'is-selected': isSelected,
+				'is-highlighted': isHighlighted,
+				'is-multi-selected': isMultiSelected,
+				'is-partially-selected': isPartiallySelected,
+				'is-reusable': isReusable,
+				'is-dragging': isDragging,
+				'has-child-selected': hasChildSelected,
+				'remove-outline': removeOutline,
+				'is-block-moving-mode': isBlockMovingMode,
+				'can-insert-moving-block': canInsertMovingBlock,
+				'is-editing-disabled': isEditingDisabled,
+				'has-editable-outline': hasEditableOutline,
+				'is-content-locked-temporarily-editing-as-blocks':
+					isTemporarilyEditingAsBlocks,
+			},
 			className,
 			props.className,
 			wrapperProps.className,
-			useBlockClassNames( clientId ),
-			useBlockDefaultClassName( clientId ),
-			useBlockCustomClassName( clientId ),
-			useBlockMovingModeClassNames( clientId )
+			defaultClassName
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

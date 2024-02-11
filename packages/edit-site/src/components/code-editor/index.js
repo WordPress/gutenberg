@@ -1,50 +1,56 @@
 /**
+ * External dependencies
+ */
+import Textarea from 'react-autosize-textarea';
+
+/**
  * WordPress dependencies
  */
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
-import { useEntityBlockEditor, useEntityProp } from '@wordpress/core-data';
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import CodeEditorTextArea from './code-editor-text-area';
 
 export default function CodeEditor() {
-	const { templateType, shortcut } = useSelect( ( select ) => {
-		const { getEditedPostType } = select( editSiteStore );
+	const instanceId = useInstanceId( CodeEditor );
+	const { shortcut, content, blocks, type, id } = useSelect( ( select ) => {
+		const { getEditedEntityRecord } = select( coreStore );
+		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const _type = getEditedPostType();
+		const _id = getEditedPostId();
+		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
+
 		return {
-			templateType: getEditedPostType(),
 			shortcut: getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
+			content: editedRecord?.content,
+			blocks: editedRecord?.blocks,
+			type: _type,
+			id: _id,
 		};
 	}, [] );
-	const [ contentStructure, setContent ] = useEntityProp(
-		'postType',
-		templateType,
-		'content'
-	);
-	const [ blocks, , onChange ] = useEntityBlockEditor(
-		'postType',
-		templateType
-	);
-
+	const { editEntityRecord } = useDispatch( coreStore );
 	// Replicates the logic found in getEditedPostContent().
-	let content;
-	if ( contentStructure instanceof Function ) {
-		content = contentStructure( { blocks } );
-	} else if ( blocks ) {
-		// If we have parsed blocks already, they should be our source of truth.
-		// Parsing applies block deprecations and legacy block conversions that
-		// unparsed content will not have.
-		content = __unstableSerializeAndClean( blocks );
-	} else {
-		content = contentStructure;
-	}
+	const realContent = useMemo( () => {
+		if ( content instanceof Function ) {
+			return content( { blocks } );
+		} else if ( blocks ) {
+			// If we have parsed blocks already, they should be our source of truth.
+			// Parsing applies block deprecations and legacy block conversions that
+			// unparsed content will not have.
+			return __unstableSerializeAndClean( blocks );
+		}
+		return content;
+	}, [ content, blocks ] );
 
 	const { switchEditorMode } = useDispatch( editSiteStore );
 	return (
@@ -60,14 +66,26 @@ export default function CodeEditor() {
 				</Button>
 			</div>
 			<div className="edit-site-code-editor__body">
-				<CodeEditorTextArea
-					value={ content }
-					onChange={ ( newContent ) => {
-						onChange( parse( newContent ), {
+				<VisuallyHidden
+					as="label"
+					htmlFor={ `code-editor-text-area-${ instanceId }` }
+				>
+					{ __( 'Type text or HTML' ) }
+				</VisuallyHidden>
+				<Textarea
+					autoComplete="off"
+					dir="auto"
+					value={ realContent }
+					onChange={ ( event ) => {
+						editEntityRecord( 'postType', type, id, {
+							content: event.target.value,
+							blocks: undefined,
 							selection: undefined,
 						} );
 					} }
-					onInput={ setContent }
+					className="edit-site-code-editor-text-area"
+					id={ `code-editor-text-area-${ instanceId }` }
+					placeholder={ __( 'Start writing with text or HTML' ) }
 				/>
 			</div>
 		</div>

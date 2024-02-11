@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, isEmpty, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -105,17 +100,10 @@ function GalleryEdit( props ) {
 					}
 					const image = getMedia( id );
 					const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-						const defaultUrl = get( image, [
-							'sizes',
-							size.slug,
-							'url',
-						] );
-						const mediaDetailsUrl = get( image, [
-							'media_details',
-							'sizes',
-							size.slug,
-							'source_url',
-						] );
+						const defaultUrl = image?.sizes?.[ size.slug ]?.url;
+						const mediaDetailsUrl =
+							image?.media_details?.sizes?.[ size.slug ]
+								?.source_url;
 						return {
 							...currentSizes,
 							[ size.slug ]: defaultUrl || mediaDetailsUrl,
@@ -148,7 +136,7 @@ function GalleryEdit( props ) {
 				...newAttrs,
 				// Unlike images[ n ].id which is a string, always ensure the
 				// ids array contains numbers as per its attribute type.
-				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
+				ids: newAttrs.images.map( ( { id } ) => parseInt( id, 10 ) ),
 			};
 		}
 
@@ -298,23 +286,20 @@ function GalleryEdit( props ) {
 
 	function getImagesSizeOptions() {
 		const resizedImageSizes = Object.values( resizedImages );
-		return map(
-			imageSizes.filter( ( { slug } ) =>
+		return imageSizes
+			.filter( ( { slug } ) =>
 				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
+			)
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
-		const updatedImages = map( images, ( image ) => {
+		const updatedImages = ( images ?? [] ).map( ( image ) => {
 			if ( ! image.id ) {
 				return image;
 			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
-				newSizeSlug,
-			] );
+			const url =
+				resizedImages[ parseInt( image.id, 10 ) ]?.[ newSizeSlug ];
 			return {
 				...image,
 				...( url && { url } ),
@@ -331,7 +316,7 @@ function GalleryEdit( props ) {
 			images.length > 0 &&
 			images.every( ( { url } ) => isBlobURL( url ) )
 		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			const filesList = images.map( ( { url } ) => getBlobByURL( url ) );
 			images.forEach( ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
 				filesList,
@@ -395,7 +380,7 @@ function GalleryEdit( props ) {
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = hasImages && imageSizeOptions.length > 0;
 
 	return (
 		<>
@@ -414,12 +399,14 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -428,6 +415,7 @@ function GalleryEdit( props ) {
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }

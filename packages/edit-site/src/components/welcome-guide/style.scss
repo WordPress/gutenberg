@@ -1,8 +1,22 @@
 .edit-site-welcome-guide {
 	width: 312px;
 
-	&__image {
+	&.guide-editor .edit-site-welcome-guide__image
+	&.guide-styles .edit-site-welcome-guide__image {
 		background: #00a0d2;
+	}
+
+	&.guide-page .edit-site-welcome-guide__video {
+		border-right: #3858e9 $grid-unit-20 solid;
+		border-top: #3858e9 $grid-unit-20 solid;
+	}
+
+	&.guide-template .edit-site-welcome-guide__video {
+		border-left: #3858e9 $grid-unit-20 solid;
+		border-top: #3858e9 $grid-unit-20 solid;
+	}
+
+	&__image {
 		margin: 0 0 $grid-unit-20;
 		> img {
 			display: block;
