@@ -9,7 +9,7 @@ import { dispatch } from '@wordpress/data';
 import { unlock } from '../lock-unlock';
 import patternOverrides from './pattern-overrides';
 import postMeta from './post-meta';
-import entity from './entity';
+import entity from './post-entity';
 
 const { registerBlockBindingsSource } = unlock( dispatch( blockEditorStore ) );
 registerBlockBindingsSource( patternOverrides );
