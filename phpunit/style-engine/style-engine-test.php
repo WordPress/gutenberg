@@ -856,6 +856,52 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests returning a generated stylesheet from a set of nested rules.
+	 */
+	public function test_should_return_stylesheet_with_nested_at_rules() {
+		$css_rules = array(
+			array(
+				'container'    => '.foo',
+				'declarations' => array(
+					'background-color' => 'red',
+				),
+			),
+			array(
+				'container'    => '.foo',
+				'selector'     => '@media (orientation: landscape)',
+				'declarations' => array(
+					'background-color' => 'blue',
+				),
+			),
+			array(
+				'container'    => '.foo',
+				'selector'     => '@media (min-width > 1024px)',
+				'declarations' => array(
+					'background-color' => 'cotton-blue',
+				),
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+
+		$this->assertSame( '.foo{background-color:red;@media (orientation: landscape){background-color:blue;}@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
+	}
+
+	/*
+	.foo {
+  display: grid;
+
+  @media (orientation: landscape) {
+    grid-auto-flow: column;
+
+    @media (min-width > 1024px) {
+      max-inline-size: 1024px;
+    }
+  }
+}
+	 */
+
+	/**
 	 * Tests that incoming styles are deduped and merged.
 	 *
 	 * @ticket 58811
