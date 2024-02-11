@@ -136,7 +136,11 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 				Create a new WP_Style_Engine_CSS_Rule rule by default if it doesn't exist.
 			*/
 			if ( isset( $this->rules[ $selector ] ) ) {
-				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
+				// @TODO Create a unit test to check if an incoming rule is a container too. Don't overwrite existing containers?
+				// @TODO Maybe have a helper function on the class to check if the rule is a container?
+				// Or store them in the store in different containers?
+				// Or an ->merge() method?
+				if ( $this->rules[ $selector ] instanceof WP_Style_Engine_CSS_Rules_Container && $rule instanceof WP_Style_Engine_CSS_Rules_Container ) {
 					$this->rules[ $selector ]->add_rules( $rule->get_rules() );
 				}
 				if ( $is_rules_object ) {
