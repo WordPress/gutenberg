@@ -6,7 +6,6 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
 import { space } from '../utils/space';
@@ -14,17 +13,8 @@ import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
-import {
-	BackdropUI,
-	Container as InputControlContainer,
-} from '../input-control/styles/input-control-styles';
+import { BackdropUI } from '../input-control/styles/input-control-styles';
 import CONFIG from '../utils/config-values';
-
-export const NumberControlWrapper = styled( NumberControl )`
-	${ InputControlContainer } {
-		width: ${ space( 24 ) };
-	}
-`;
 
 export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };

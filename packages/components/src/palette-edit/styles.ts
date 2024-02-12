@@ -14,11 +14,7 @@ import { space } from '../utils/space';
 import { COLORS, CONFIG, font } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';
-import {
-	Container as InputControlContainer,
-	Input,
-	BackdropUI as InputBackdropUI,
-} from '../input-control/styles/input-control-styles';
+import { BackdropUI as InputBackdropUI } from '../input-control/styles/input-control-styles';
 import ColorIndicator from '../color-indicator';
 
 export const IndicatorStyled = styled( ColorIndicator )`
@@ -30,16 +26,11 @@ export const IndicatorStyled = styled( ColorIndicator )`
 `;
 
 export const NameInputControl = styled( InputControl )`
-	${ InputControlContainer } {
-		background: ${ COLORS.gray[ 100 ] };
-		border-radius: ${ CONFIG.controlBorderRadius };
-		${ Input }${ Input }${ Input }${ Input } {
-			height: ${ space( 8 ) };
-		}
-		${ InputBackdropUI }${ InputBackdropUI }${ InputBackdropUI } {
-			border-color: transparent;
-			box-shadow: none;
-		}
+	--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
+
+	&& ${ InputBackdropUI } {
+		border-color: transparent;
+		box-shadow: none;
 	}
 `;
 

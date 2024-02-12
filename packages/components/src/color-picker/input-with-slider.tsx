@@ -5,9 +5,10 @@ import { HStack } from '../h-stack';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../utils/space';
-import { RangeControl, NumberControlWrapper } from './styles';
+import { RangeControl } from './styles';
 import { COLORS } from '../utils/colors-values';
 import type { InputWithSliderProps } from './types';
+import NumberControl from '../number-control';
 
 export const InputWithSlider = ( {
 	min,
@@ -31,7 +32,8 @@ export const InputWithSlider = ( {
 
 	return (
 		<HStack spacing={ 4 }>
-			<NumberControlWrapper
+			<NumberControl
+				__unstableInputWidth={ space( 24 ) }
 				min={ min }
 				max={ max }
 				label={ label }

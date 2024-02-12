@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import InputBase from '../input-control/input-base';
-import { Container as InputControlContainer } from '../input-control/styles/input-control-styles';
 
 type BackCompatMinWidthProps = {
 	__nextUnconstrainedWidth: boolean;
@@ -17,7 +16,7 @@ type BackCompatMinWidthProps = {
 const backCompatMinWidth = ( props: BackCompatMinWidthProps ) =>
 	! props.__nextUnconstrainedWidth
 		? css`
-				${ InputControlContainer } {
+				.components-input-control__container {
 					min-width: 130px;
 				}
 		  `

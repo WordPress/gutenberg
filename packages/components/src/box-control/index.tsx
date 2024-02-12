@@ -144,7 +144,6 @@ function BoxControl( {
 		...inputProps,
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
-		isLinked,
 		units,
 		selectedUnits,
 		setSelectedUnits,

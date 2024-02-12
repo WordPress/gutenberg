@@ -30,7 +30,9 @@ const htmlArrowStyles = ( { hideHTMLArrows }: { hideHTMLArrows: boolean } ) => {
 	`;
 };
 
-export const Input = styled( InputControl )`
+export const Input = styled( InputControl, {
+	shouldForwardProp: ( prop ) => prop !== 'hideHTMLArrows',
+} )`
 	${ htmlArrowStyles };
 `;
 

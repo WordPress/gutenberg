@@ -9,10 +9,7 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
-import {
-	Input,
-	BackdropUI,
-} from '../../input-control/styles/input-control-styles';
+import { BackdropUI } from '../../input-control/styles/input-control-styles';
 import NumberControl from '../../number-control';
 
 export const Wrapper = styled.div`
@@ -36,7 +33,7 @@ export const TimeWrapper = styled.div`
 `;
 
 const baseInput = css`
-	&&& ${ Input } {
+	&&& input {
 		padding-left: ${ space( 2 ) };
 		padding-right: ${ space( 2 ) };
 		text-align: center;
@@ -48,7 +45,7 @@ export const HoursInput = styled( NumberControl )`
 
 	width: ${ space( 9 ) };
 
-	&&& ${ Input } {
+	&&& input {
 		padding-right: 0;
 	}
 
@@ -73,7 +70,7 @@ export const MinutesInput = styled( NumberControl )`
 
 	width: ${ space( 9 ) };
 
-	&&& ${ Input } {
+	&&& input {
 		padding-left: 0;
 	}
 
