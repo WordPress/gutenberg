@@ -55,21 +55,21 @@ const useSource = ( blockProps, sourceArgs ) => {
 		[ nameFromContext, nameFromArgs ]
 	);
 
-	const [ value, setValue ] = useEntityProp( kind, name, prop, id );
+	const [ value, updateValue ] = useEntityProp( kind, name, prop, id );
 
-	function setValueHandler( nextEntityPropValue ) {
+	function updateValueHandler( nextEntityPropValue ) {
 		// Ensure the value is a string.
 		if ( typeof nextEntityPropValue !== 'string' ) {
 			return;
 		}
 
-		setValue( nextEntityPropValue );
+		updateValue( nextEntityPropValue );
 	}
 
 	return {
 		placeholder: null,
 		value,
-		setValue: setValueHandler,
+		updateValue: updateValueHandler,
 	};
 };
 
