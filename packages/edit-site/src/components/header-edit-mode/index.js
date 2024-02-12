@@ -44,7 +44,7 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
-const { useHasAnyBlockControls } = unlock( blockEditorPrivateApis );
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 export default function HeaderEditMode() {
 	const {
@@ -92,7 +92,7 @@ export default function HeaderEditMode() {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasBlockControls = useHasAnyBlockControls();
+	const hasBlockControls = useCanBlockToolbarBeFocused();
 	const hasBlockToolbar = !! blockSelectionStart && hasBlockControls;
 
 	useEffect( () => {
