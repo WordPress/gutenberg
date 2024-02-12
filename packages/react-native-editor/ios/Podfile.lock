@@ -1097,7 +1097,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNGestureHandler (2.14.0):
+  - RNGestureHandler (2.14.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1106,9 +1106,10 @@ PODS:
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - ReactCommon/turbomodule/core
-  - RNScreens (3.22.0):
+  - RNScreens (3.29.0):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
     - React-Core
-    - React-RCTImage
   - RNSVG (14.0.0):
     - React-Core
   - RNTAztecView (1.112.0):
@@ -1400,9 +1401,9 @@ SPEC CHECKSUMS:
   RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCMaskedView: f7c74478c83c4fdfc5cf4df51f80c0dd5cf125c6
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
-  RNGestureHandler: a426f2b9134a10ac56ff78593fb068541e68f0e7
+  RNGestureHandler: 28bdf9a766c081e603120f79e925b72817c751c6
   RNReanimated: 6936b41d8afb97175e7c0ab40425b53103f71046
-  RNScreens: 68fd1060f57dd1023880bf4c05d74784b5392789
+  RNScreens: 2b73f5eb2ac5d94fbd61fa4be0bfebd345716825
   RNSVG: 255767813dac22db1ec2062c8b7e7b856d4e5ae6
   RNTAztecView: 74c676c87e4a9db79104fcdad9624c1e5c02fe15
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
