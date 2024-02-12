@@ -20,15 +20,14 @@ const useSource = ( blockProps, sourceArgs ) => {
 		throw new Error( 'The "args" argument is required.' );
 	}
 
-	if ( ! sourceArgs?.prop ) {
-		throw new Error( 'The "prop" argument is required.' );
+	if ( ! sourceArgs?.name ) {
+		throw new Error( 'The "name" argument is required.' );
 	}
 
 	const { context } = blockProps;
 	const { postType: contextPostType } = context;
 
-	const { prop: entityPropName, entity: entityType = 'postType' } =
-		sourceArgs;
+	const { name: entityName, entity: entityType = 'postType' } = sourceArgs;
 
 	const postType = useSelect(
 		( select ) => {
@@ -39,21 +38,21 @@ const useSource = ( blockProps, sourceArgs ) => {
 		[ contextPostType ]
 	);
 
-	const [ entityPropValue, setEntityPropValue ] = useEntityProp(
+	const [ entityValue, setEntityValue ] = useEntityProp(
 		entityType,
 		postType,
-		entityPropName
+		entityName
 	);
 
 	return {
 		placeholder: null,
 		useValue: [
-			entityPropValue,
+			entityValue,
 			( nextEntityPropValue ) => {
 				if ( typeof nextEntityPropValue !== 'string' ) {
 					return;
 				}
-				setEntityPropValue( nextEntityPropValue );
+				setEntityValue( nextEntityPropValue );
 			},
 		],
 	};
@@ -65,7 +64,7 @@ const useSource = ( blockProps, sourceArgs ) => {
  *
  * source ID: `core/post-entity`
  * args:
- * - prop: The name of the post entity property to bind.
+ * - name: The name of the entity to bind.
  *
  * example:
  * The following metadata will bind the post title
@@ -77,7 +76,7 @@ const useSource = ( blockProps, sourceArgs ) => {
  *     content: {
  *       source: 'core/post-entity',
  *       args: {
- *         prop: 'title',
+ *         name: 'title',
  *       },
  *    },
  * },
@@ -85,7 +84,7 @@ const useSource = ( blockProps, sourceArgs ) => {
  */
 export default {
 	name: 'core/post-entity',
-	label: __( 'Core Post Entity block binding source' ),
+	label: __( 'Post Entity block-binding source handler' ),
 	useSource,
 	lockAttributesEditing: false,
 };
