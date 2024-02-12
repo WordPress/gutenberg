@@ -17,6 +17,7 @@ import { store as editorStore } from '../../store';
  * @param {string} sourceArgs.kind - Kind of the entity. Default is `postType`.
  * @param {string} sourceArgs.name - Name of the entity.
  * @param {string} sourceArgs.prop - The prop to bind.
+ * @param {string} sourceArgs.id   - An entity ID to use instead of the context-provided one. Optional.
  * @return {Object} The source value and setter.
  */
 const useSource = ( blockProps, sourceArgs ) => {
