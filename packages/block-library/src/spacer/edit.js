@@ -93,9 +93,13 @@ const SpacerEdit = ( {
 		return editorSettings?.disableCustomSpacingSizes;
 	} );
 	const { orientation } = context;
-	const { orientation: parentOrientation, type } = parentLayout || {};
+	const {
+		orientation: parentOrientation,
+		type,
+		default: { type: defaultType } = {},
+	} = parentLayout || {};
 	// Check if the spacer is inside a flex container.
-	const isFlexLayout = type === 'flex';
+	const isFlexLayout = type === 'flex' || defaultType === 'flex';
 	// If the spacer is inside a flex container, it should either inherit the orientation
 	// of the parent or use the flex default orientation.
 	const inheritedOrientation =
