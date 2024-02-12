@@ -22,6 +22,7 @@ export default function SaveButton( {
 	showTooltip = true,
 	defaultLabel,
 	icon,
+	size,
 	__next40pxDefaultSize = false,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen, previewingThemeName } =
@@ -119,7 +120,7 @@ export default function SaveButton( {
 			showTooltip={ showTooltip }
 			icon={ icon }
 			__next40pxDefaultSize={ __next40pxDefaultSize }
-			size="compact"
+			size={ size }
 		>
 			{ label }
 		</Button>
