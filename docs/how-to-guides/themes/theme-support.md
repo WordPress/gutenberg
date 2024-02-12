@@ -52,6 +52,8 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 
 Core blocks include default structural styles. These are loaded in both the editor and the front end by default. An example of these styles is the CSS that powers the columns block. Without these rules, the block would result in a broken layout containing no columns at all.
 
+### Opinionated block styles
+
 The block editor allows themes to opt-in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in a classic theme, add theme support for `wp-block-styles`:
 
 ```php
