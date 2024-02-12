@@ -35,7 +35,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		/**
 		 * An array of CSS Rules objects assigned to the store.
 		 *
-		 * @var Array<WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rules_Group>
+		 * @var WP_Style_Engine_CSS_Rule[]
 		 */
 		protected $rules = array();
 
@@ -109,35 +109,25 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		 * Gets a WP_Style_Engine_CSS_Rule object by its selector.
 		 * If the rule does not exist, it will be created.
 		 *
-		 * @param string $selector   The CSS selector.
-		 * @param string $rule_group A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`..
+		 * @param string $selector    The CSS selector.
+		 * @param string $rules_group A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`..
 		 *
 		 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 		 */
-		public function add_rule( $selector, $rule_group = '' ) {
-			$selector   = $selector ? trim( $selector ) : '';
-			$rule_group = $rule_group ? trim( $rule_group ) : '';
+		public function add_rule( $selector, $rules_group = '' ) {
+			$selector    = trim( $selector );
+			$rules_group = trim( $rules_group );
 
 			// Bail early if there is no selector.
 			if ( empty( $selector ) ) {
 				return;
 			}
 
-			if ( ! empty( $rule_group ) ) {
-				if ( empty( $this->rules[ $rule_group ] ) ) {
-					$this->rules[ $rule_group ] = new WP_Style_Engine_CSS_Rules_Group( $rule_group );
+			if ( ! empty( $rules_group ) ) {
+				if ( empty( $this->rules[ "$rules_group $selector" ] ) ) {
+					$this->rules[ "$rules_group $selector" ] = new WP_Style_Engine_CSS_Rule( $selector, array(), $rules_group );
 				}
-
-				if ( $this->rules[ $rule_group ] instanceof WP_Style_Engine_CSS_Rules_Group ) {
-					if ( $this->rules[ $rule_group ]->get_rule( $selector ) ) {
-						return $this->rules[ $rule_group ]->get_rule( $selector );
-					}
-
-					$nested_rule = new WP_Style_Engine_CSS_Rule( $selector );
-					$nested_rule->set_rule_group( $rule_group );
-					$this->rules[ $rule_group ]->add_rules( $nested_rule );
-					return $this->rules[ $rule_group ]->get_rule( $selector );
-				}
+				return $this->rules[ "$rules_group $selector" ];
 			}
 
 			// Create the rule if it doesn't exist.
