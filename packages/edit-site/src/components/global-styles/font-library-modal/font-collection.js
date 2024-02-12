@@ -211,7 +211,7 @@ function FontCollection( { slug } ) {
 				isDisabled={ fontsToInstall.length === 0 }
 			/>
 		);
-	} else if ( ! renderConfirmDialog ) {
+	} else if ( ! renderConfirmDialog && totalPages > 1 ) {
 		footerComponent = (
 			<PaginationFooter
 				page={ page }
