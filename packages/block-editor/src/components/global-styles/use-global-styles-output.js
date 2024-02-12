@@ -683,9 +683,8 @@ export const getNodesWithStyles = ( tree, blockSelectors, rootSelector ) => {
 							pickStyleKeys( variation );
 
 						const variationSelector =
-							blockSelectors[ blockName ].styleVariationSelectors[
-								variationName
-							];
+							blockSelectors[ blockName ]
+								.styleVariationSelectors?.[ variationName ];
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
