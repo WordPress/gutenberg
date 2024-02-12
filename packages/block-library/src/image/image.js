@@ -803,22 +803,15 @@ export default function Image( {
 			{ ! temporaryURL && controls }
 			{ img }
 
-			{ lockCaption && (
-				<figcaption>{ attributes.caption?.toHTMLString() }</figcaption>
-			) }
-
-			{ ! lockCaption && (
-				<Caption
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSingleSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					label={ __( 'Image caption text' ) }
-					showToolbarButton={
-						isSingleSelected && hasNonContentControls
-					}
-				/>
-			) }
+			<Caption
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSingleSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				label={ __( 'Image caption text' ) }
+				showToolbarButton={ isSingleSelected && hasNonContentControls }
+				disableEditing={ lockCaption }
+			/>
 		</>
 	);
 }
