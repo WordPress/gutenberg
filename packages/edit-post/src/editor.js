@@ -49,44 +49,41 @@ function Editor( {
 		onNavigateToPreviousEntityRecord,
 	} = useNavigateToEntityRecord( initialPostId, initialPostType );
 
-	const { hasInlineToolbar, post, preferredStyleVariations, template } =
-		useSelect(
-			( select ) => {
-				const { isFeatureActive, getEditedPostTemplate } =
-					select( editPostStore );
-				const { getEntityRecord, getPostType, canUser } =
-					select( coreStore );
-				const { getEditorSettings } = select( editorStore );
+	const { post, preferredStyleVariations, template } = useSelect(
+		( select ) => {
+			const { getEditedPostTemplate } = select( editPostStore );
+			const { getEntityRecord, getPostType, canUser } =
+				select( coreStore );
+			const { getEditorSettings } = select( editorStore );
 
-				const postObject = getEntityRecord(
-					'postType',
-					currentPost.postType,
-					currentPost.postId
-				);
+			const postObject = getEntityRecord(
+				'postType',
+				currentPost.postType,
+				currentPost.postId
+			);
 
-				const supportsTemplateMode =
-					getEditorSettings().supportsTemplateMode;
-				const isViewable =
-					getPostType( currentPost.postType )?.viewable ?? false;
-				const canEditTemplate = canUser( 'create', 'templates' );
-				return {
-					hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-					preferredStyleVariations: select( preferencesStore ).get(
-						'core/edit-post',
-						'preferredStyleVariations'
-					),
-					template:
-						supportsTemplateMode &&
-						isViewable &&
-						canEditTemplate &&
-						currentPost.postType !== 'wp_template'
-							? getEditedPostTemplate()
-							: null,
-					post: postObject,
-				};
-			},
-			[ currentPost.postType, currentPost.postId ]
-		);
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
+			const isViewable =
+				getPostType( currentPost.postType )?.viewable ?? false;
+			const canEditTemplate = canUser( 'create', 'templates' );
+			return {
+				preferredStyleVariations: select( preferencesStore ).get(
+					'core/edit-post',
+					'preferredStyleVariations'
+				),
+				template:
+					supportsTemplateMode &&
+					isViewable &&
+					canEditTemplate &&
+					currentPost.postType !== 'wp_template'
+						? getEditedPostTemplate()
+						: null,
+				post: postObject,
+			};
+		},
+		[ currentPost.postType, currentPost.postId ]
+	);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
 
@@ -100,11 +97,9 @@ function Editor( {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
 			},
-			hasInlineToolbar,
 		} ),
 		[
 			settings,
-			hasInlineToolbar,
 			preferredStyleVariations,
 			updatePreferredStyleVariations,
 			onNavigateToEntityRecord,

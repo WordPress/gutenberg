@@ -52,7 +52,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'gradients',
 	'generateAnchors',
 	'onNavigateToEntityRecord',
-	'hasInlineToolbar',
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
