@@ -29,7 +29,7 @@ const EMPTY_ARRAY = [];
  * Module constants
  */
 const MAX_TERMS_SUGGESTIONS = 20;
-const DEFAULT_QUERY = applyFilters( 'editor.FlatTermSelector.query', {
+const DEFAULT_QUERY = applyFilters( 'editor.FlatTermSelector.queryArgs', {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	_fields: 'id,name',
 	context: 'view',
