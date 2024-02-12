@@ -6,8 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	Button,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
@@ -31,6 +32,7 @@ import {
 	useBlockCommands,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
@@ -50,6 +52,7 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import SiteIcon from '../site-icon';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -73,15 +76,21 @@ export default function Layout() {
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
+		dashboardLink,
 		previousShortcut,
 		nextShortcut,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
 		);
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		const { getCanvasMode, getSettings } = unlock(
+			select( editSiteStore )
+		);
+
 		return {
 			canvasMode: getCanvasMode(),
+			dashboardLink:
+				getSettings().__experimentalDashboardLink || 'index.php',
 			previousShortcut: getAllShortcutKeyCombinations(
 				'core/edit-site/previous-region'
 			),
@@ -126,6 +135,48 @@ export default function Layout() {
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { setDeviceType } = useDispatch( editorStore );
+	const siteIconButtonProps =
+		canvasMode === 'view'
+			? {
+					href: dashboardLink,
+					label: __( 'Go to the Dashboard' ),
+			  }
+			: {
+					href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
+					role: 'button',
+					label: __( 'Open Navigation' ),
+					onClick: ( event ) => {
+						event.preventDefault();
+						if ( canvasMode === 'edit' ) {
+							clearSelectedBlock();
+							setDeviceType( 'Desktop' );
+							setCanvasMode( 'view' );
+						}
+					},
+			  };
+
+	const toggleVariants = {
+		view: {
+			width: 48,
+			height: 48,
+			top: [ 0, 30, 22 ],
+			left: 16,
+			borderRadius: '4px',
+			boxShadow: '0px 6px 15px rgba(0,0,0,.3)',
+		},
+		edit: {
+			width: 60,
+			height: 60,
+			top: [ 22, 30, 0 ],
+			left: 0,
+			borderRadius: '0px',
+			boxShadow: 'none',
+		},
+	};
+
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
 	// which prevents any animations due to potential canvasMode value change.
@@ -159,6 +210,19 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
+					<motion.div
+						className="edit-site-layout__view-mode-toggle"
+						variants={ toggleVariants }
+						animate={ canvasMode }
+						transition={ {
+							duration: ANIMATION_DURATION,
+							type: 'sprint',
+						} }
+					>
+						<Button { ...siteIconButtonProps } as={ motion.button }>
+							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+						</Button>
+					</motion.div>
 					<NavigableRegion
 						ariaLabel={ __( 'Navigation' ) }
 						className="edit-site-layout__sidebar-region"
