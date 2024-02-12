@@ -83,13 +83,8 @@ add_action( 'init', 'register_block_core_footnotes' );
  *
  * @since 6.5.0
  */
-function wp_register_footnotes_post_meta() {
-	$post_types = get_post_types(
-		array(
-			'show_in_rest' => true,
-			'public'       => true,
-		)
-	);
+function register_block_core_footnotes_post_meta() {
+	$post_types = get_post_types( array( 'show_in_rest' => true ) );
 	foreach ( $post_types as $post_type ) {
 		// Only register the meta field if the post type supports the editor, custom fields, and revisions.
 		if (
@@ -111,7 +106,7 @@ function wp_register_footnotes_post_meta() {
 	}
 }
 // Use a priority of 20 to be higher than the default of 10 the priority with which most post types are registered.
-add_action( 'init', 'wp_register_footnotes_post_meta', 20 );
+add_action( 'init', 'register_block_core_footnotes_post_meta', 20 );
 
 /**
  * Adds the footnotes field to the revisions display.
