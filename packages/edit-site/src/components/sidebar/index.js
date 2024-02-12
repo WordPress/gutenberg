@@ -33,6 +33,7 @@ import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+import SiteHub from '../site-hub';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -99,6 +100,7 @@ function Sidebar() {
 
 	return (
 		<>
+			<SiteHub className="edit-site-layout__hub" />
 			<NavigatorProvider
 				className="edit-site-sidebar__content"
 				initialPath={ initialPath.current }

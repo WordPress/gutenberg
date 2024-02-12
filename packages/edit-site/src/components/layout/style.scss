@@ -7,23 +7,8 @@
 }
 
 .edit-site-layout__hub {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: calc(100vw - #{$canvas-padding * 2});
 	height: $header-height;
 	z-index: z-index(".edit-site-layout__hub");
-
-	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$grid-unit-30});
-	}
-
-	.edit-site-layout.is-full-canvas & {
-		padding-right: 0;
-		border-radius: 0;
-		width: $header-height;
-		box-shadow: none;
-	}
 }
 
 .edit-site-layout__header-container {
@@ -34,17 +19,13 @@
 	height: $header-height;
 	display: flex;
 	z-index: z-index(".edit-site-layout__header");
-
-	// This is only necessary for the exit animation
-	.edit-site-layout:not(.is-full-canvas) & {
-		position: fixed;
-		width: 100vw;
-	}
 }
 
 .edit-site-layout__content {
 	height: 100%;
 	flex-grow: 1;
+	padding: $canvas-padding;
+	gap: $canvas-padding;
 	display: flex;
 }
 
@@ -57,18 +38,11 @@
 		width: $nav-sidebar-width;
 	}
 
-	// This is only necessary for the exit animation
-	.edit-site-layout.is-full-canvas & {
-		position: fixed !important;
-		height: 100vh;
-		left: 0;
-		top: 0;
-	}
-
 	.edit-site-layout__sidebar {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		padding: 0 $grid-unit-10;
 	}
 
 	.resizable-editor__drag-handle {
@@ -106,7 +80,7 @@
 	top: 0;
 	left: 0;
 	bottom: 0;
-	width: 100%;
+	right: 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -120,10 +94,6 @@
 	}
 
 	@include break-medium {
-		top: $canvas-padding;
-		bottom: $canvas-padding;
-		width: calc(100% - #{$canvas-padding});
-
 		& > div {
 			border-radius: $radius-block-ui * 4;
 			// Not sure why this is necessary.
@@ -136,10 +106,6 @@
 	}
 
 	.edit-site-layout.is-full-canvas & {
-		top: 0;
-		bottom: 0;
-		width: 100%;
-
 		& > div {
 			border-radius: 0;
 		}
@@ -161,8 +127,8 @@
 	position: relative;
 	color: $white;
 	border-radius: 0;
-	height: $header-height;
-	width: $header-height;
+	height: 36px;
+	width: 36px;
 	overflow: hidden;
 	padding: 0;
 	display: flex;
@@ -268,19 +234,12 @@
 		}
 	}
 
-	.edit-site-site-hub,
 	.edit-site-layout__header {
 		position: absolute;
 		top: 0;
 		z-index: z-index(".edit-site-layout__header");
-	}
-	.edit-site-site-hub {
-		z-index: z-index(".edit-site-layout__hub");
-	}
-	.edit-site-layout__header {
 		width: 100%;
 	}
-
 }
 
 .edit-site-layout__area {

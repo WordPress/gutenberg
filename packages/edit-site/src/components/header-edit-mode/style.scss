@@ -10,7 +10,17 @@ $header-toolbar-min-width: 335px;
 	width: 100%;
 	justify-content: space-between;
 	border-bottom: $border-width solid $gray-200;
-	padding-left: $header-height;
+
+	.edit-site-header-edit-mode__toggle {
+		width: $header-height;
+		height: $header-height;
+		border-right: 1px solid $gray-100;
+		&:focus {
+			border: none;
+			box-shadow: none;
+			border-right: 1px solid $gray-100;
+		}
+	}
 
 	.edit-site-header-edit-mode__start {
 		display: flex;

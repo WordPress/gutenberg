@@ -47,7 +47,7 @@ const icons = {
 	wp_navigation: navigationIcon,
 };
 
-export default function DocumentBar() {
+export default function DocumentBar( { isNaked = false } ) {
 	const { postType, postId, onNavigateToPreviousEntityRecord } = useSelect(
 		( select ) => {
 			const {
@@ -76,6 +76,7 @@ export default function DocumentBar() {
 		<BaseDocumentActions
 			postType={ postType }
 			postId={ postId }
+			isNaked={ isNaked }
 			onBack={
 				onNavigateToPreviousEntityRecord ? handleOnBack : undefined
 			}
@@ -83,7 +84,7 @@ export default function DocumentBar() {
 	);
 }
 
-function BaseDocumentActions( { postType, postId, onBack } ) {
+function BaseDocumentActions( { postType, postId, onBack, isNaked } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const { editedRecord: doc, isResolving } = useEntityRecord(
 		'postType',
@@ -128,6 +129,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 				'has-back-button': !! onBack,
 				'is-animated': isAnimated,
 				'is-global': isGlobalEntity,
+				'is-naked': isNaked,
 			} ) }
 		>
 			{ onBack && (

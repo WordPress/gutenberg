@@ -39,9 +39,7 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import Sidebar from '../sidebar';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
-import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../lock-unlock';
@@ -57,7 +55,7 @@ const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.4;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -114,27 +112,6 @@ export default function Layout() {
 		useState( false );
 	const { areas, widths } = useLayoutAreas();
 
-	// This determines which animation variant should apply to the header.
-	// There is also a `isDistractionFreeHovering` state that gets priority
-	// when hovering the `edit-site-layout__header-container` in distraction
-	// free mode. It's set via framer and trickles down to all the children
-	// so they can use this variant state too.
-	//
-	// TODO: The issue with this is we want to have the hover state stick when hovering
-	// a popover opened via the header. We'll probably need to lift this state to
-	// handle it ourselves. Also, focusWithin the header needs to be handled.
-	let headerAnimationState;
-
-	if ( canvasMode === 'view' ) {
-		// We need 'view' to always take priority so 'isDistractionFree'
-		// doesn't bleed over into the view (sidebar) state
-		headerAnimationState = 'view';
-	} else if ( isDistractionFree ) {
-		headerAnimationState = 'isDistractionFree';
-	} else {
-		headerAnimationState = canvasMode; // edit, view, init
-	}
-
 	// Sets the right context for the command palette
 	let commandContext = 'site-editor';
 
@@ -177,75 +154,6 @@ export default function Layout() {
 					}
 				) }
 			>
-				<motion.div
-					className="edit-site-layout__header-container"
-					variants={ {
-						isDistractionFree: {
-							opacity: 0,
-							transition: {
-								type: 'tween',
-								delay: 0.8,
-								delayChildren: 0.8,
-							}, // How long to wait before the header exits
-						},
-						isDistractionFreeHovering: {
-							opacity: 1,
-							transition: {
-								type: 'tween',
-								delay: 0.2,
-								delayChildren: 0.2,
-							}, // How long to wait before the header shows
-						},
-						view: { opacity: 1 },
-						edit: { opacity: 1 },
-					} }
-					whileHover={
-						isDistractionFree
-							? 'isDistractionFreeHovering'
-							: undefined
-					}
-					animate={ headerAnimationState }
-				>
-					<SiteHub
-						isTransparent={ isResizableFrameOversized }
-						className="edit-site-layout__hub"
-					/>
-
-					<AnimatePresence initial={ false }>
-						{ canvasMode === 'edit' && (
-							<NavigableRegion
-								key="header"
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								variants={ {
-									isDistractionFree: { opacity: 0, y: 0 },
-									isDistractionFreeHovering: {
-										opacity: 1,
-										y: 0,
-									},
-									view: { opacity: 1, y: '-100%' },
-									edit: { opacity: 1, y: 0 },
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								initial={ {
-									opacity: isDistractionFree ? 1 : 0,
-									y: isDistractionFree ? 0 : '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
-									ease: 'easeOut',
-								} }
-							>
-								<Header />
-							</NavigableRegion>
-						) }
-					</AnimatePresence>
-				</motion.div>
-
 				<div className="edit-site-layout__content">
 					{ /*
 						The NavigableRegion must always be rendered and not use
@@ -296,19 +204,6 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
-									whileHover={
-										canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration: disableMotion
-															? 0
-															: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
 									initial={ false }
 									layout="position"
 									className={ classnames(
@@ -318,6 +213,13 @@ export default function Layout() {
 												isResizableFrameOversized,
 										}
 									) }
+									animate={ {
+										left: canvasMode === 'edit' ? -392 : 0,
+										right: canvasMode === 'edit' ? -16 : 0,
+										top: canvasMode === 'edit' ? -16 : 0,
+										bottom: canvasMode === 'edit' ? -16 : 0,
+										opacity: 1,
+									} }
 									transition={ {
 										type: 'tween',
 										duration: disableMotion
@@ -333,9 +235,7 @@ export default function Layout() {
 												canvasMode === 'edit'
 											}
 											defaultSize={ {
-												width:
-													canvasSize.width -
-													24 /* $canvas-padding */,
+												width: canvasSize.width,
 												height: canvasSize.height,
 											} }
 											isOversized={

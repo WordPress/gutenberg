@@ -23,6 +23,7 @@
 
 .edit-site-resizable-frame__inner-content {
 	position: absolute;
+	overflow: hidden;
 	z-index: 0;
 	inset: 0;
 }
