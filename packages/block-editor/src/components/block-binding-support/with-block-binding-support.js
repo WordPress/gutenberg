@@ -17,21 +17,42 @@ import { unlock } from '../../../../editor/src/lock-unlock';
 /**
  * Conponent to bind an attribute to a prop.
  *
- * @param {Object}   props                   - The component props.
- * @param {any}      props.attrValue         - The attribute value.
- * @param {Function} props.onPropValueChange - The function to call when the prop value changes.
- * @param {Function} props.useSource         - The custom hook to use the source.
- * @return {null}                              This is a data-handling component.
+ * @param {Object}   props           - The component props.
+ * @param {string}   props.attrName  - The attribute name.
+ * @param {any}      props.attrValue - The attribute value.
+ * @param {Function} props.useSource - The custom hook to use the source.
+ * @param {Object}   props.props     - The block props with bound attributes.
+ * @param {Object}   props.args      - The arguments to pass to the source.
+ * @return {null}                      This is a data-handling component. Render nothing.
  */
 const BlockBindingConnector = ( {
+	attrName,
 	attrValue,
-	onPropValueChange = () => {},
 	useSource,
+	props: blockProps,
+	args,
 } ) => {
 	const lastPropValue = useRef();
 	const lastAttrValue = useRef();
-	const { value, updateValue } = useSource();
+	const { value, updateValue } = useSource( blockProps, args );
 
+	const setAttributes = blockProps.setAttributes;
+
+	const onPropValueChange = useCallback(
+		( newAttrValue ) => {
+			setAttributes( {
+				[ attrName ]: newAttrValue,
+			} );
+		},
+		[ attrName, setAttributes ]
+	);
+
+	/*
+	 * From Source Prop => Block Attribute
+	 *
+	 * Detect changes in source prop value,
+	 * and update the attribute value accordingly.
+	 */
 	useEffect( () => {
 		if ( value === lastPropValue.current ) {
 			return;
@@ -41,6 +62,12 @@ const BlockBindingConnector = ( {
 		onPropValueChange( value );
 	}, [ onPropValueChange, value ] );
 
+	/*
+	 * From Block Attribute => Source Prop
+	 *
+	 * Detect changes in block attribute value,
+	 * and update the source prop value accordingly.
+	 */
 	useEffect( () => {
 		if ( attrValue === lastAttrValue.current ) {
 			return;
@@ -82,16 +109,11 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				BindingConnectorInstances.push(
 					<BlockBindingConnector
 						key={ key }
+						attrName={ attrName }
 						attrValue={ attrValue }
-						onPropValueChange={ useCallback(
-							( newAttrValue ) => {
-								props.setAttributes( {
-									[ attrName ]: newAttrValue,
-								} );
-							},
-							[ attrName ]
-						) }
 						useSource={ useSource }
+						props={ props }
+						args={ settings.args }
 					/>
 				);
 			}
