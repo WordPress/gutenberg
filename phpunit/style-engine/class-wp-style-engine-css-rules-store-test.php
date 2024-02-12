@@ -182,7 +182,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			'.one .tony',
-			"{$store_one_rule->get_rule_group()} {$store_one_rule->get_selector()}",
+			"{$store_one_rule->get_rules_group()} {$store_one_rule->get_selector()}",
 			'add_rule() does not return already existing return .one rule.'
 		);
 	}

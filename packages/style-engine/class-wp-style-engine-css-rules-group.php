@@ -19,7 +19,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Group' ) ) {
 		 *
 		 * @var string
 		 */
-		protected $rule_group;
+		protected $rules_group;
 
 		/**
 		 * The container declarations.
@@ -33,34 +33,34 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Group' ) ) {
 		/**
 		 * Constructor
 		 *
-		 * @param string                                              $rule_group A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
-		 *                                                                        such as `@media (min-width: 80rem)` or `@layer module`.
-		 * @param WP_Style_Engine_CSS_Rule[]|WP_Style_Engine_CSS_Rule $rules      Optional. A WP_Style_Engine_CSS_Rule object.
+		 * @param string                                              $rules_group A parent CSS selector in the case of nested CSS, or a CSS nested @rule,
+		 *                                                                         such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param WP_Style_Engine_CSS_Rule[]|WP_Style_Engine_CSS_Rule $rules       Optional. A WP_Style_Engine_CSS_Rule object.
 		 */
-		public function __construct( $rule_group, $rules = array() ) {
-			$this->set_rule_group( $rule_group );
+		public function __construct( $rules_group, $rules = array() ) {
+			$this->set_rules_group( $rules_group );
 			$this->add_rules( $rules );
 		}
 
 		/**
-		 * Sets the rule group.
+		 * Sets the rules group.
 		 *
-		 * @param string $rule_group The group's CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string $rules_group The group's CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 		 */
-		public function set_rule_group( $rule_group ) {
-			$this->rule_group = $rule_group;
+		public function set_rules_group( $rules_group ) {
+			$this->rules_group = $rules_group;
 			return $this;
 		}
 
 		/**
-		 * Gets the rule group.
+		 * Gets the rules group.
 		 *
 		 * @return string
 		 */
-		public function get_rule_group() {
-			return $this->rule_group;
+		public function get_rules_group() {
+			return $this->rules_group;
 		}
 
 		/**
@@ -108,7 +108,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Group' ) ) {
 					continue;
 				}
 
-				if ( $this->rule_group !== $rule->get_rule_group() ) {
+				if ( $this->rules_group !== $rule->get_rules_group() ) {
 					continue;
 				}
 
@@ -149,7 +149,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Group' ) ) {
 				return $css;
 			}
 
-			return "{$this->rule_group}{$spacer}{{$new_line}{$css}}";
+			return "{$this->rules_group}{$spacer}{{$new_line}{$css}}";
 		}
 	}
 }

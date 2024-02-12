@@ -28,9 +28,7 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 			),
 			$rules_group
 		);
-		$group = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group, $css_rule );
-
-		$this->assertSame( $rules_group, $group->get_rule_group(), 'Return value of get_selector() does not match value passed to constructor.' );
+		$group       = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group, $css_rule );
 
 		$expected = "$rules_group{{$css_rule->get_css()}}";
 
@@ -44,13 +42,13 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 	 * @covers ::get_rules
 	 */
 	public function test_cannot_add_empty_values() {
-		$css_container = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( '@media not all and (hover: hover)' );
+		$rules_group = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( '@media not all and (hover: hover)' );
 
-		$css_container->add_rules( '' );
-		$this->assertEmpty( $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when empty string added.' );
+		$rules_group->add_rules( '' );
+		$this->assertEmpty( $rules_group->get_rules(), 'Return value of get_rules() does not match expected rules when empty string added.' );
 
-		$css_container->add_rules( array() );
-		$this->assertEmpty( $css_container->get_rules(), 'Return value of get_rules() does not match expected rules when array() added.' );
+		$rules_group->add_rules( array() );
+		$this->assertEmpty( $rules_group->get_rules(), 'Return value of get_rules() does not match expected rules when array() added.' );
 	}
 
 	/**
@@ -60,30 +58,30 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_merge_existing_rule_declarations() {
-		$rule_group    = '@media not all and (hover: hover)';
-		$css_container = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rule_group );
-		$selector      = '.goanna';
-		$css_rule_1    = new WP_Style_Engine_CSS_Rule_Gutenberg(
+		$rules_group        = '@media not all and (hover: hover)';
+		$rules_group_object = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group );
+		$selector           = '.goanna';
+		$css_rule_1         = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			$selector,
 			array(
 				'font-size' => '2rem',
 			),
-			$rule_group
+			$rules_group
 		);
-		$css_container->add_rules( $css_rule_1 );
+		$rules_group_object->add_rules( $css_rule_1 );
 
-		$this->assertSame( '@media not all and (hover: hover){.goanna{font-size:2rem;}}', $css_container->get_css(), 'Return value of get_css() does not match expected CSS container CSS.' );
+		$this->assertSame( '@media not all and (hover: hover){.goanna{font-size:2rem;}}', $rules_group_object->get_css(), 'Return value of get_css() does not match expected CSS container CSS.' );
 
 		$css_rule_2 = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			$selector,
 			array(
 				'font-size' => '4px',
 			),
-			$rule_group
+			$rules_group
 		);
-		$css_container->add_rules( $css_rule_2 );
+		$rules_group_object->add_rules( $css_rule_2 );
 
-		$this->assertSame( '@media not all and (hover: hover){.goanna{font-size:4px;}}', $css_container->get_css(), 'Return value of get_css() does not match expected value with overwritten rule declaration.' );
+		$this->assertSame( '@media not all and (hover: hover){.goanna{font-size:4px;}}', $rules_group_object->get_css(), 'Return value of get_css() does not match expected value with overwritten rule declaration.' );
 	}
 
 	/**
@@ -94,8 +92,8 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_add_rules_to_existing_containers() {
-		$rules_group = '@media screen, print';
-		$css_container = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group );
+		$rules_group        = '@media screen, print';
+		$rules_group_object = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group );
 
 		$css_rule_1 = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'body',
@@ -104,7 +102,7 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 			),
 			$rules_group
 		);
-		$css_container->add_rules( $css_rule_1 );
+		$rules_group_object->add_rules( $css_rule_1 );
 
 		$css_rule_2 = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'p',
@@ -113,28 +111,29 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 			),
 			$rules_group
 		);
-		$css_container->add_rules( $css_rule_2 );
+		$rules_group_object->add_rules( $css_rule_2 );
 
-		$this->assertEquals( $css_rule_2, $css_container->get_rule( 'p' ), 'Return value of get_rule() does not match expected value.' );
+		$this->assertEquals( $css_rule_2, $rules_group_object->get_rule( 'p' ), 'Return value of get_rule() does not match expected value.' );
 
 		$expected = '@media screen, print{body{line-height:0.1;}p{line-height:0.9;}}';
 
-		$this->assertSame( $expected, $css_container->get_css(), 'Return value of get_css() does not match expected value.' );
+		$this->assertSame( $expected, $rules_group_object->get_css(), 'Return value of get_css() does not match expected value.' );
 	}
 
 	/**
-	 * Tests setting a selector to a container.
+	 * Tests setting and getting a rules group.
 	 *
-	 * @covers ::set_selector
+	 * @covers ::set_rules_group
+	 * @covers ::get_rules_group
 	 */
-	public function test_should_set_rule_group() {
-		$css_container = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( '@layer state' );
+	public function test_should_set_rules_group() {
+		$rules_group_object = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( '@layer state' );
 
-		$this->assertSame( '@layer state', $css_container->get_rule_group(), 'Return value of get_selector() does not match value passed to constructor.' );
+		$this->assertSame( '@layer state', $rules_group_object->get_rules_group(), 'Return value of get_rules_group() does not match value passed to constructor.' );
 
-		$css_container->set_rule_group( '@layer pony' );
+		$rules_group_object->set_rules_group( '@layer pony' );
 
-		$this->assertSame( '@layer pony', $css_container->get_rule_group(), 'Return value of get_selector() does not match value passed to set_selector().' );
+		$this->assertSame( '@layer pony', $rules_group_object->get_rules_group(), 'Return value of get_rules_group() does not match value passed to set_rules_group().' );
 	}
 
 	/**
@@ -151,10 +150,10 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$css_rule           = new WP_Style_Engine_CSS_Rule_Gutenberg( $selector, $css_declarations, $rules_group );
-		$css_container      = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group, $css_rule );
+		$rules_group_object = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group, $css_rule );
 		$expected           = "{$rules_group}{{$selector}{{$css_declarations->get_declarations_string()}}}";
 
-		$this->assertSame( $expected, $css_container->get_css() );
+		$this->assertSame( $expected, $rules_group_object->get_css() );
 	}
 
 	/**
@@ -167,9 +166,9 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 		$input_declarations = array();
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$css_rule           = new WP_Style_Engine_CSS_Rule_Gutenberg( $selector, $css_declarations );
-		$css_container      = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( '@layer coolio', $css_rule );
+		$rules_group_object = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( '@layer coolio', $css_rule );
 
-		$this->assertSame( '', $css_container->get_css() );
+		$this->assertSame( '', $rules_group_object->get_css() );
 	}
 
 	/**
@@ -192,8 +191,8 @@ class WP_Style_Engine_CSS_Rules_Group_Test extends WP_UnitTestCase {
 		font-family: Detective Sans;
 	}
 }';
-		$css_container      = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group, $css_rule );
+		$rules_group_object = new WP_Style_Engine_CSS_Rules_Group_Gutenberg( $rules_group, $css_rule );
 
-		$this->assertSame( $expected, $css_container->get_css( true ) );
+		$this->assertSame( $expected, $rules_group_object->get_css( true ) );
 	}
 }

@@ -73,7 +73,7 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			}
 
 			foreach ( $css_rules as $rule ) {
-				$rule_group = $rule->get_rule_group();
+				$rules_group = $rule->get_rules_group();
 
 				/*
 				 * Merge existing rule and container objects or create new ones.
@@ -81,10 +81,10 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 				 * separate processing.
 				 */
 				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Group ) {
-					if ( isset( $this->css_containers[ $rule_group ] ) ) {
-						$this->css_containers[ $rule_group ]->add_rules( $rule->get_rules() );
+					if ( isset( $this->css_containers[ $rules_group ] ) ) {
+						$this->css_containers[ $rules_group ]->add_rules( $rule->get_rules() );
 					} else {
-						$this->css_containers[ $rule_group ] = $rule;
+						$this->css_containers[ $rules_group ] = $rule;
 					}
 					continue;
 				}
@@ -92,12 +92,12 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 				if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
 					$selector = $rule->get_selector();
 					// incoming new rule has a parent rule group
-					if ( $rule_group ) {
+					if ( $rules_group ) {
 						// if not it's already stored
-						if ( ! isset( $this->css_containers[ $rule_group ] ) ) {
-							$this->css_containers[ $rule_group ] = new WP_Style_Engine_CSS_Rules_Group( $rule_group );
+						if ( ! isset( $this->css_containers[ $rules_group ] ) ) {
+							$this->css_containers[ $rules_group ] = new WP_Style_Engine_CSS_Rules_Group( $rules_group );
 						}
-						$this->css_containers[ $rule_group ]->add_rules( $rule );
+						$this->css_containers[ $rules_group ]->add_rules( $rule );
 						continue;
 					}
 

@@ -115,7 +115,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 		 */
 		public function add_rule( $selector, $rules_group = '' ) {
-			$selector    = $selector? trim( $selector ) : '';
+			$selector    = $selector ? trim( $selector ) : '';
 			$rules_group = $rules_group ? trim( $rules_group ) : '';
 
 			// Bail early if there is no selector.
