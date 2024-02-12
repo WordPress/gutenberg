@@ -82,7 +82,10 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				 * Pick the prop value and setter
 				 * from the source custom hook.
 				 */
-				const { value, setValue } = useSource( props, settings.args );
+				const { value, updateValue } = useSource(
+					props,
+					settings.args
+				);
 
 				// Create a unique key for the connector instance
 				const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
@@ -102,9 +105,9 @@ const withBlockBindingSupport = createHigherOrderComponent(
 						attrValue={ attrValue }
 						onAttributeChange={ useCallback(
 							( newPropValue ) => {
-								setValue?.( newPropValue );
+								updateValue?.( newPropValue );
 							},
-							[ setValue ]
+							[ updateValue ]
 						) }
 					/>
 				);
