@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { useDrag } from '@use-gesture/react';
+import classnames from 'classnames';
 import type {
 	SyntheticEvent,
 	ChangeEvent,
@@ -21,10 +22,10 @@ import { forwardRef, useRef } from '@wordpress/element';
  */
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
-import * as styles from './styles/input-control-styles';
+// import * as styles from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
-import { useCx } from '../utils';
+// import { useCx } from '../utils';
 
 const noop = () => {};
 
@@ -215,17 +216,21 @@ function InputField(
 		};
 	}
 
-	const cx = useCx();
-	const classes = cx(
-		styles.input,
-		styles.inputDragStyles( { isDragging, dragCursor } ),
-		styles.inputDisabledStyles( disabled ),
-		styles.fontSizeStyles( { inputSize: size } ),
-		styles.inputSizeStyles( { inputSize: size, __next40pxDefaultSize } ),
-		styles.inputCustomPaddings( { hasPrefix, hasSuffix } ),
-		className,
-		'components-input-control__input'
-	);
+	// const cx = useCx();
+	// const classes = cx(
+	// 	styles.input,
+	// 	styles.inputDragStyles( { isDragging, dragCursor } ),
+	// 	styles.inputDisabledStyles( disabled ),
+	// 	styles.fontSizeStyles( { inputSize: size } ),
+	// 	styles.inputSizeStyles( { inputSize: size, __next40pxDefaultSize } ),
+	// 	styles.inputCustomPaddings( { hasPrefix, hasSuffix } ),
+	// 	className,
+	// 	'components-input-control__input'
+	// );
+
+	const classes = classnames( 'components-input-control__input', className, {
+		'is-dragging': isDragging,
+	} );
 
 	return (
 		<input
@@ -243,6 +248,7 @@ function InputField(
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.
 			// See https://github.com/WordPress/gutenberg/pull/47250 for details.
 			value={ value ?? '' }
+			style={ { '--drag-cursor': dragCursor } as React.CSSProperties }
 			type={ type }
 		/>
 	);
