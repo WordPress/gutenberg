@@ -23,6 +23,7 @@ import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
+import { useHideBlocksFromInserter } from './use-hide-bocks-from-inserter';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -228,6 +229,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
+		useHideBlocksFromInserter( post.type );
 
 		if ( ! isReady ) {
 			return null;
