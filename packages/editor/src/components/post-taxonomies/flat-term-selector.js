@@ -10,6 +10,7 @@ import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { applyFilters } from '@wordpress/hooks';
+
 /**
  * Internal dependencies
  */
