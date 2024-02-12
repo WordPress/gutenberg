@@ -33,9 +33,9 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 		/**
 		 * The set of rules group with nested CSS rules that this processor will work on.
 		 *
-		 * @var WP_Style_Engine_CSS_Rules_Container[]
+		 * @var WP_Style_Engine_CSS_Rules_Group[]
 		 */
-		protected $css_containers = array();
+		protected $css_rules_groups = array();
 
 
 		/**
@@ -76,15 +76,15 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 				$rules_group = $rule->get_rules_group();
 
 				/*
-				 * Merge existing rule and container objects or create new ones.
-				 * Containers and rules are stored in separate arrays to allow for
-				 * separate processing.
+				 * Merge existing rule and rules groups objects or create new ones.
+				 * Rules groups and rules are stored in separate arrays to allow for
+				 * unique processing.
 				 */
 				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Group ) {
-					if ( isset( $this->css_containers[ $rules_group ] ) ) {
-						$this->css_containers[ $rules_group ]->add_rules( $rule->get_rules() );
+					if ( isset( $this->css_rules_groups[ $rules_group ] ) ) {
+						$this->css_rules_groups[ $rules_group ]->add_rules( $rule->get_rules() );
 					} else {
-						$this->css_containers[ $rules_group ] = $rule;
+						$this->css_rules_groups[ $rules_group ] = $rule;
 					}
 					continue;
 				}
@@ -94,10 +94,10 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 					// incoming new rule has a parent rule group
 					if ( $rules_group ) {
 						// if not it's already stored
-						if ( ! isset( $this->css_containers[ $rules_group ] ) ) {
-							$this->css_containers[ $rules_group ] = new WP_Style_Engine_CSS_Rules_Group( $rules_group );
+						if ( ! isset( $this->css_rules_groups[ $rules_group ] ) ) {
+							$this->css_rules_groups[ $rules_group ] = new WP_Style_Engine_CSS_Rules_Group( $rules_group );
 						}
-						$this->css_containers[ $rules_group ]->add_rules( $rule );
+						$this->css_rules_groups[ $rules_group ]->add_rules( $rule );
 						continue;
 					}
 
@@ -145,7 +145,7 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			// Build the CSS.
 			$css = '';
 			// Merge the rules and containers. Containers come last.
-			$merged_rules = array_merge( $this->css_rules, $this->css_containers );
+			$merged_rules = array_merge( $this->css_rules, $this->css_rules_groups );
 
 			foreach ( $merged_rules as $rule ) {
 				$css .= $rule->get_css( $options['prettify'] );
