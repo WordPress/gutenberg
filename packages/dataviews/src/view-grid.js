@@ -14,13 +14,21 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
+
+function useHasAPossibleBulkAction( actions, item ) {
+	return useMemo( () => {
+		return actions.some( ( action ) => {
+			return action.supportsBulk && action.isEligible( item );
+		} );
+	}, [ actions, item ] );
+}
 
 function GridItem( {
 	selection,
@@ -34,6 +42,7 @@ function GridItem( {
 	visibleFields,
 } ) {
 	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	return (
@@ -45,7 +54,7 @@ function GridItem( {
 				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
 			onMouseDown={ ( event ) => {
-				if ( event.ctrlKey || event.metaKey ) {
+				if ( hasBulkAction && ( event.ctrlKey || event.metaKey ) ) {
 					setHasNoPointerEvents( true );
 					if ( ! isSelected ) {
 						onSelectionChange(
@@ -83,6 +92,7 @@ function GridItem( {
 				justify="space-between"
 				className="dataviews-view-grid__title-actions"
 			>
+				{ hasBulkAction && (
 				<SingleSelectionCheckbox
 					id={ id }
 					item={ item }
@@ -92,6 +102,7 @@ function GridItem( {
 					data={ data }
 					primaryField={ primaryField }
 				/>
+				) }
 				<HStack className="dataviews-view-grid__primary-field">
 					{ primaryField?.render( { item } ) }
 				</HStack>
