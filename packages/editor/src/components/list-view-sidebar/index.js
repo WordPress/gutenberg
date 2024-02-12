@@ -130,12 +130,6 @@ export default function ListViewSidebar() {
 				initialTabId="list-view"
 			>
 				<div className="edit-post-editor__document-overview-panel__header">
-					<Button
-						className="editor-list-view-sidebar__close-button"
-						icon={ closeSmall }
-						label={ __( 'Close' ) }
-						onClick={ closeListView }
-					/>
 					<Tabs.TabList
 						className="editor-list-view-sidebar__tabs-tablist"
 						ref={ tabsRef }
@@ -153,6 +147,12 @@ export default function ListViewSidebar() {
 							{ _x( 'Outline', 'Post overview' ) }
 						</Tabs.Tab>
 					</Tabs.TabList>
+					<Button
+						className="editor-list-view-sidebar__close-button"
+						icon={ closeSmall }
+						label={ __( 'Close' ) }
+						onClick={ closeListView }
+					/>
 				</div>
 
 				<Tabs.TabPanel
