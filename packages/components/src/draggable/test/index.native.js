@@ -112,7 +112,7 @@ describe( 'Draggable', () => {
 		] );
 		// TODO(jest-console): Fix the warning and remove the expect below.
 		expect( console ).toHaveWarnedWith(
-			'[Reanimated] You can not use setGestureState in non-worklet function.'
+			'[Reanimated] setGestureState() cannot be used with Jest.'
 		);
 
 		expect( onDragStart ).toHaveBeenCalledTimes( 1 );
