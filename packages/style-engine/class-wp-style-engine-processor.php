@@ -31,6 +31,14 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 		protected $css_rules = array();
 
 		/**
+		 * The set of rules group with nested CSS rules that this processor will work on.
+		 *
+		 * @var WP_Style_Engine_CSS_Rules_Container[]
+		 */
+		protected $css_containers = array();
+
+
+		/**
 		 * Add a store to the processor.
 		 *
 		 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
@@ -55,7 +63,7 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 		/**
 		 * Adds rules to be processed.
 		 *
-		 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+		 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[]|WP_Style_Engine_CSS_Rules_Group|WP_Style_Engine_CSS_Rules_Group[] $css_rules A single, or an array of, rule objects from a store or otherwise.
 		 *
 		 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 		 */
@@ -65,29 +73,40 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			}
 
 			foreach ( $css_rules as $rule ) {
-				$selector = $rule->get_selector();
-				$at_rule  = $rule->get_at_rule();
+				$rule_group = $rule->get_rule_group();
 
-				/**
-				 * If there is an at_rule and it already exists in the css_rules array,
-				 * add the rule to it.
-				 * Otherwise, create a new entry for the at_rule
+				/*
+				 * Merge existing rule and container objects or create new ones.
+				 * Containers and rules are stored in separate arrays to allow for
+				 * separate processing.
 				 */
-				if ( ! empty( $at_rule ) ) {
-					if ( isset( $this->css_rules[ "$at_rule $selector" ] ) ) {
-						$this->css_rules[ "$at_rule $selector" ]->add_declarations( $rule->get_declarations() );
+				if ( $rule instanceof WP_Style_Engine_CSS_Rules_Group ) {
+					if ( isset( $this->css_containers[ $rule_group ] ) ) {
+						$this->css_containers[ $rule_group ]->add_rules( $rule->get_rules() );
+					} else {
+						$this->css_containers[ $rule_group ] = $rule;
+					}
+					continue;
+				}
+
+				if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+					$selector = $rule->get_selector();
+					// incoming new rule has a parent rule group
+					if ( $rule_group ) {
+						// if not it's already stored
+						if ( ! isset( $this->css_containers[ $rule_group ] ) ) {
+							$this->css_containers[ $rule_group ] = new WP_Style_Engine_CSS_Rules_Group( $rule_group );
+						}
+						$this->css_containers[ $rule_group ]->add_rules( $rule );
 						continue;
 					}
-					$this->css_rules[ "$at_rule $selector" ] = $rule;
-					continue;
-				}
 
-				// If the selector already exists, add the declarations to it.
-				if ( isset( $this->css_rules[ $selector ] ) ) {
-					$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
-					continue;
+					if ( isset( $this->css_rules[ $selector ] ) ) {
+						$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
+					} else {
+						$this->css_rules[ $selector ] = $rule;
+					}
 				}
-				$this->css_rules[ $rule->get_selector() ] = $rule;
 			}
 			return $this;
 		}
@@ -125,11 +144,14 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 			// Build the CSS.
 			$css = '';
-			foreach ( $this->css_rules as $rule ) {
-				// See class WP_Style_Engine_CSS_Rule for the get_css method.
+			// Merge the rules and containers. Containers come last.
+			$merged_rules = array_merge( $this->css_rules, $this->css_containers );
+
+			foreach ( $merged_rules as $rule ) {
 				$css .= $rule->get_css( $options['prettify'] );
 				$css .= $options['prettify'] ? "\n" : '';
 			}
+
 			return $css;
 		}
 

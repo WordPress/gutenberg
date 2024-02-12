@@ -44,6 +44,7 @@ const bundledPackagesPhpConfig = [
 		replaceClasses: [
 			'WP_Style_Engine_CSS_Declarations',
 			'WP_Style_Engine_CSS_Rules_Store',
+			'WP_Style_Engine_CSS_Rules_Group',
 			'WP_Style_Engine_CSS_Rule',
 			'WP_Style_Engine_Processor',
 			'WP_Style_Engine',

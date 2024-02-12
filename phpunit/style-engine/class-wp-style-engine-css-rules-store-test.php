@@ -170,4 +170,59 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $new_pizza_store->get_all_rules(), 'Return value for get_all_rules() does not match expectations after adding new rules to store.' );
 	}
+
+	/**
+	 * Tests that rules with rule groups defined are stored as WP_Style_Engine_CSS_Rules_Group.
+	 *
+	 * @covers ::add_rule
+	 * @covers ::get_store
+	 */
+	public function test_should_add_rules_according_to_rule_groups() {
+		$store_one             = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'one' );
+		$store_one_rule        = $store_one->add_rule( '.one' );
+		$store_one_rules_group = $store_one->add_rule( '.one', '.one_container' );
+
+		$this->assertInstanceOf(
+			'WP_Style_Engine_CSS_Rules_Group_Gutenberg',
+			$store_one->get_all_rules()[ $store_one_rules_group->get_rule_group() ],
+			'$store_one_container is not an instance of WP_Style_Engine_CSS_Rules_Group_Gutenberg.'
+		);
+
+		$this->assertSame(
+			array(
+				'.one'           => $store_one_rule,
+				'.one_container' => $store_one->get_all_rules()[ $store_one_rules_group->get_rule_group() ],
+			),
+			WP_Style_Engine_Gutenberg::get_store( 'one' )->get_all_rules(),
+			'get_all_rules() does not return expected array of rules for store one.'
+		);
+
+		$store_two_rules_group = $store_one->add_rule( '.two', '.one_container' );
+
+		$this->assertSame(
+			array(
+				'.one' => $store_one_rules_group,
+				'.two' => $store_two_rules_group,
+			),
+			$store_one->get_all_rules()[ $store_two_rules_group->get_rule_group() ]->get_rules(),
+			'get_all_rules() does not return expected array of rules for store one.'
+		);
+	}
+
+	/**
+	 * Tests adding identical selectors.
+	 *
+	 * @covers ::add_rule
+	 */
+	public function test_should_not_overwrite_existing_rules() {
+		$store_one           = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'one' );
+		$store_one_container = $store_one->add_rule( '.tony', '.one' );
+		$store_one_rule      = $store_one->add_rule( '.one' );
+
+		$this->assertSame(
+			$store_one_rule,
+			$store_one_container,
+			'add_rule() does not return already existing return .one rule.'
+		);
+	}
 }

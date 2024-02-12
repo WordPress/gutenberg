@@ -58,7 +58,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_css_rule->set_at_rule( '@media (min-width: 80rem)' );
+		$a_nice_css_rule->set_rule_group( '@media (min-width: 80rem)' );
 
 		$a_nicer_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nicer-rule' );
 		$a_nicer_css_rule->add_declarations(
@@ -68,7 +68,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nicer_css_rule->set_at_rule( '@layer nicety' );
+		$a_nicer_css_rule->set_rule_group( '@layer nicety' );
 
 		$a_nice_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_nice_processor->add_rules( array( $a_nice_css_rule, $a_nicer_css_rule ) );
@@ -143,7 +143,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_wonderful_css_rule->set_at_rule( '@media (min-width: 80rem)' );
+		$a_wonderful_css_rule->set_rule_group( '@media (min-width: 80rem)' );
 
 		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-very_wonderful-rule' );
 		$a_very_wonderful_css_rule->add_declarations(
@@ -152,7 +152,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_very_wonderful_css_rule->set_at_rule( '@layer wonderfulness' );
+		$a_very_wonderful_css_rule->set_rule_group( '@layer wonderfulness' );
 
 		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_wonderful_processor->add_rules( array( $a_wonderful_css_rule, $a_very_wonderful_css_rule ) );
@@ -391,6 +391,86 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				)
 			),
 			'Return value of get_css() does not match expectations when combining 4 CSS rules'
+		);
+	}
+
+	/**
+	 * Tests that incoming CSS rules are merged with existing CSS rules and that containers appear at the end of the CSS output.
+	 *
+	 * @covers ::add_rules
+	 * @covers ::get_rules
+	 */
+	public function test_should_return_compiled_css_with_nested_rules_last() {
+		$rules_group = '@container (width > 400px)';
+		$panda_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'panda' );
+		// Add a nested rule.
+		$panda_store->add_rule( '.blueberry', $rules_group )->add_declarations(
+			array(
+				'background-color' => 'blue'
+			)
+		);
+
+		// Add a regular rule.
+		$panda_store_rule = $panda_store->add_rule( '.wp-block-mushroom a:hover' );
+		$panda_store_rule->add_declarations(
+			array(
+				'padding' => '100px',
+			)
+		);
+
+		$a_panda_renderer = new WP_Style_Engine_Processor_Gutenberg();
+		$a_panda_renderer->add_store( $panda_store );
+		$this->assertSame(
+			'.wp-block-mushroom a:hover{padding:100px;}@container (width > 400px){.blueberry{background-color:blue;}}',
+			$a_panda_renderer->get_css( array( 'prettify' => false ) ),
+			'Returns processed CSS rules with containers and containers at the end of the CSS output.'
+		);
+
+		// Combine existing nested rule with one added directly to the processor.
+		$a_panda_renderer->add_rules(
+			new WP_Style_Engine_CSS_Rules_Group_Gutenberg(
+				$rules_group,
+				array(
+					new WP_Style_Engine_CSS_Rule_Gutenberg(
+						'.raspberry',
+						array(
+							'background-color' => 'red',
+						),
+						$rules_group
+					),
+					new WP_Style_Engine_CSS_Rule_Gutenberg(
+						'.blueberry',
+						array(
+							'background-color' => 'kinda-blue',
+						),
+						$rules_group
+					),
+				)
+			)
+		);
+
+		$this->assertSame(
+			'.wp-block-mushroom a:hover{padding:100px;}@container (width > 400px){.blueberry{background-color:kinda-blue;}.raspberry{background-color:red;}}',
+			$a_panda_renderer->get_css( array( 'prettify' => false ) ),
+			'Returns processed CSS rules with rules added to containers.'
+		);
+
+		$expected_prettified = '.wp-block-mushroom a:hover {
+	padding: 100px;
+}
+@container (width > 400px) {
+	.blueberry {
+		background-color: kinda-blue;
+	}
+	.raspberry {
+		background-color: red;
+	}
+}
+';
+		$this->assertSame(
+			$expected_prettified,
+			$a_panda_renderer->get_css( array( 'prettify' => true ) ),
+			'Returns prettified processed CSS rules and nested rules'
 		);
 	}
 }
