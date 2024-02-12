@@ -1,7 +1,4 @@
 /**
- * External dependencies
- */
-/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
@@ -19,8 +16,15 @@ import { store as editorStore } from '../../store';
  * @return {Object} The source value and setter.
  */
 const useSource = ( blockProps, sourceArgs ) => {
-	const { context } = blockProps;
+	if ( typeof sourceArgs === 'undefined' ) {
+		throw new Error( 'The "args" argument is required.' );
+	}
 
+	if ( ! sourceArgs?.prop ) {
+		throw new Error( 'The "prop" argument is required.' );
+	}
+
+	const { context } = blockProps;
 	const { postType: contextPostType } = context;
 
 	const { prop: entityPropName, entity: entityType = 'postType' } =
@@ -59,19 +63,21 @@ const useSource = ( blockProps, sourceArgs ) => {
  * Create the product-entity
  * block binding source handler.
  *
- * source ID:
- * `woo/product-entity`
+ * source ID: `core/post-entity`
  * args:
- * - prop: The name of the entity property to bind.
+ * - prop: The name of the post entity property to bind.
  *
  * example:
+ * The following metadata will bind the post title
+ * to the `content` attribute of the block.
+ *
  * ```
  * metadata: {
  *   bindings: {
  *     content: {
- *       source: 'woo/product-entity',
+ *       source: 'core/post-entity',
  *       args: {
- *         prop: 'short_description',
+ *         prop: 'title',
  *       },
  *    },
  * },
@@ -79,7 +85,7 @@ const useSource = ( blockProps, sourceArgs ) => {
  */
 export default {
 	name: 'core/post-entity',
-	label: __( 'Core Entity' ),
+	label: __( 'Core Post Entity block binding source' ),
 	useSource,
 	lockAttributesEditing: false,
 };
