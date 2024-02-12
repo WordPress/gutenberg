@@ -29,11 +29,11 @@ const EMPTY_ARRAY = [];
  * Module constants
  */
 const MAX_TERMS_SUGGESTIONS = 20;
-const DEFAULT_QUERY = applyFilters( 'editor.FlatTermSelector.queryArgs', {
+const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	_fields: 'id,name',
 	context: 'view',
-} );
+};
 
 const isSameTermName = ( termA, termB ) =>
 	unescapeString( termA ).toLowerCase() ===
@@ -71,7 +71,11 @@ export function FlatTermSelector( { slug } ) {
 				: EMPTY_ARRAY;
 
 			const query = {
-				...DEFAULT_QUERY,
+				...applyFilters(
+					'editor.FlatTermSelector.queryArgs',
+					DEFAULT_QUERY,
+					slug
+				),
 				include: _termIds.join( ',' ),
 				per_page: -1,
 			};
@@ -109,7 +113,11 @@ export function FlatTermSelector( { slug } ) {
 			return {
 				searchResults: !! search
 					? getEntityRecords( 'taxonomy', slug, {
-							...DEFAULT_QUERY,
+							...applyFilters(
+								'editor.FlatTermSelector.queryArgs',
+								DEFAULT_QUERY,
+								slug
+							),
 							search,
 					  } )
 					: EMPTY_ARRAY,
