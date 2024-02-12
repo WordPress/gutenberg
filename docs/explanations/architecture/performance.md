@@ -77,7 +77,7 @@ Gutenberg supports only two WP versions, this impacts the performance job in two
 
  - The base WP version used to run the performance job needs to be updated, when the minimum version supported by Gutenberg changes. In order to do that, we rely on the `Tested up to` flag of the plugin's `readme.txt` file. So each time that flag is changed, the version used for the performance job is changed as well.
 
- - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the "Tested up to" flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `.github/workflows/performance.yml`. 
+ - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the `Tested up to` flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `.github/workflows/performance.yml`. 
 
 The new reference commit hash that is chosen needs to meet the following requirements:
 
