@@ -21,7 +21,6 @@ import {
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
-	useCachedTruthy,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -195,27 +194,8 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		settings,
+		settings: { ...settings, isActive },
 	} );
-
-	//  As you change the link by interacting with the Link UI
-	//  the return value of document.getSelection jumps to the field you're editing,
-	//  not the highlighted text. Given that useAnchor uses document.getSelection,
-	//  it will return null, since it can't find the <mark> element within the Link UI.
-	//  This caches the last truthy value of the selection anchor reference.
-	// This ensures the Popover is positioned correctly on initial submission of the link.
-	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
-
-	// If the link is not active (i.e. it is a new link) then we need to
-	// override the getBoundingClientRect method on the anchor element
-	// to return the cached value of the selection represented by the text
-	// that the user selected to be linked.
-	// If the link is active (i.e. it is an existing link) then we allow
-	// the default behaviour of the popover anchor to be used. This will get
-	// the anchor based on the `<a>` element in the rich text.
-	if ( ! isActive ) {
-		popoverAnchor.getBoundingClientRect = () => cachedRect;
-	}
 
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
