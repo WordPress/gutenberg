@@ -46,7 +46,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
 
 	// WordPress 6.6 compat.
-	require_once __DIR__ . '/compat/wordpress-6.6/class-wp-rest-media-search-handler-gutenberg.php';
+	require_once __DIR__ . '/compat/wordpress-6.6/rest-api/search/class-wp-rest-media-search-handler.php';
 	require_once __DIR__ . '/compat/wordpress-6.6/rest-api.php';
 
 	// Plugin specific code.
