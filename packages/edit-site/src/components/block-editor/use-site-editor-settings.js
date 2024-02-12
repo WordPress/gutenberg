@@ -144,7 +144,9 @@ export function useSpecificEditorSettings() {
 		[]
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
+	const defaultRenderingMode = postWithTemplate
+		? 'template-locked'
+		: 'post-only';
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {

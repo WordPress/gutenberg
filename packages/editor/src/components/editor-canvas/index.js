@@ -110,7 +110,7 @@ function EditorCanvas( {
 
 		if ( postTypeSlug === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
-		} else if ( ! _renderingMode === 'post-only' ) {
+		} else if ( _renderingMode === 'post-only' ) {
 			_wrapperBlockName = 'core/post-content';
 		}
 
