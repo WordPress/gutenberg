@@ -29,23 +29,35 @@ const useSource = ( blockProps, sourceArgs ) => {
 	}
 
 	const { context } = blockProps;
-	const { prop, kind = 'postType', id } = sourceArgs;
+	const {
+		kind = 'postType',
+		name: nameFromArgs = 'post',
+		prop,
+		id,
+	} = sourceArgs;
 
 	// Let's define `postType` as the default kind.
 	const { postType: nameFromContext } = context;
 
 	/*
-	 * Since the `postType` is the default kind,
-	 * Let's try to pick the name from the context
-	 * and from the editor store (post, page, etc).
+	 * Entity prop name:
+	 * - If `name` is provided in the source args, use it.
+	 * - If `name` is not provided in the source args, use the `postType` from the context.
+	 * - Otherwise, try to get the current post type from the editor store.
 	 */
 	const name = useSelect(
 		( select ) => {
-			return nameFromContext
-				? nameFromContext
-				: select( editorStore ).getCurrentPostType();
+			if ( nameFromArgs ) {
+				return nameFromArgs;
+			}
+
+			if ( nameFromContext ) {
+				return nameFromContext;
+			}
+
+			return select( editorStore ).getCurrentPostType();
 		},
-		[ nameFromContext ]
+		[ nameFromContext, nameFromArgs ]
 	);
 
 	const [ value, setValue ] = useEntityProp( kind, name, prop, id );
