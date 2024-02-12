@@ -116,6 +116,8 @@ function FontCollection( { slug } ) {
 		[ collectionFonts, filters ]
 	);
 
+	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
+	// The hight of each font family item is 61px
 	const pageSize = Math.floor( ( window.innerHeight - 417 ) / 61 );
 	const totalPages = Math.ceil( fonts.length / pageSize );
 	const itemsStart = ( page - 1 ) * pageSize;
