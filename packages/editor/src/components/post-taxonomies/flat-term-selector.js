@@ -9,7 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-
+import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
@@ -29,11 +29,11 @@ const EMPTY_ARRAY = [];
  * Module constants
  */
 const MAX_TERMS_SUGGESTIONS = 20;
-const DEFAULT_QUERY = {
+const DEFAULT_QUERY = applyFilters( 'editor.FlatTermSelector.query', {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	_fields: 'id,name',
 	context: 'view',
-};
+} );
 
 const isSameTermName = ( termA, termB ) =>
 	unescapeString( termA ).toLowerCase() ===
