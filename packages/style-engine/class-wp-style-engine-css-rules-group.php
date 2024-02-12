@@ -137,8 +137,6 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Group' ) ) {
 			$indent_count = $should_prettify ? $indent_count + 1 : $indent_count;
 			$new_line     = $should_prettify ? "\n" : '';
 			$spacer       = $should_prettify ? ' ' : '';
-			$css         .= ! empty( $this->declarations ) ? $this->declarations->get_declarations_string( $should_prettify, $indent_count ) : '';
-			$css         .= $should_prettify && $css ? "\n" : '';
 
 			foreach ( $this->rules as $rule ) {
 				$css .= $rule->get_css( $should_prettify, $indent_count );
