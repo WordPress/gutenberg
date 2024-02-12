@@ -91,7 +91,7 @@ const DEFAULT_VIEW = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview', 'source' ],
+	hiddenFields: [ 'preview' ],
 	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
@@ -271,12 +271,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		} ) );
 	}, [ records ] );
 
-	const sources = useMemo( () => ( {
-		theme: __( 'Theme' ),
-		plugin: __( 'Plugin' ),
-		user: __( 'User' ),
-	} ) );
-
 	const fields = useMemo( () => {
 		const _fields = [
 			{
@@ -344,27 +338,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			elements: authors,
 			width: '1%',
 		} );
-		_fields.push( {
-			header: __( 'Source' ),
-			id: 'source',
-			getValue: ( { item } ) => item.original_source,
-			render: ( { item } ) => {
-				return (
-					<span className="page-templates-source">
-						{ sources[ item.original_source ] }
-					</span>
-				);
-			},
-			type: ENUMERATION_TYPE,
-			elements: Object.entries( sources ).map( ( [ value, label ] ) => ( {
-				value,
-				label,
-			} ) ),
-			enableHiding: false,
-			enableSorting: false,
-		} );
 		return _fields;
-	}, [ postType, authors, sources, view.type ] );
+	}, [ postType, authors, view.type ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		if ( ! records ) {
