@@ -22,7 +22,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -52,15 +52,22 @@ function InlineLinkUI( {
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
 
-	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const _settings = getSettings();
+	const { selectionChange } = useDispatch( blockEditorStore );
 
-		return {
-			createPageEntity: _settings.__experimentalCreatePageEntity,
-			userCanCreatePages: _settings.__experimentalUserCanCreatePages,
-		};
-	}, [] );
+	const { createPageEntity, userCanCreatePages, selectionStart } = useSelect(
+		( select ) => {
+			const { getSettings, getSelectionStart } =
+				select( blockEditorStore );
+			const _settings = getSettings();
+
+			return {
+				createPageEntity: _settings.__experimentalCreatePageEntity,
+				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
+				selectionStart: getSelectionStart(),
+			};
+		},
+		[]
+	);
 
 	const linkValue = useMemo(
 		() => ( {
@@ -122,8 +129,23 @@ function InlineLinkUI( {
 				inserted,
 				linkFormat,
 				value.start,
-				value.end + newText.length
+				value.start + newText.length
 			);
+
+			onChange( newValue );
+
+			// Close the Link UI.
+			stopAddingLink();
+
+			// Move the selection to the end of the inserted link outside of the format boundary
+			// so the user can continue typing after the link.
+			selectionChange( {
+				clientId: selectionStart.clientId,
+				identifier: selectionStart.attributeKey,
+				start: value.start + newText.length + 1,
+			} );
+
+			return;
 		} else if ( newText === richTextText ) {
 			newValue = applyFormat( value, linkFormat );
 		} else {
