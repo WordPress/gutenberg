@@ -160,17 +160,17 @@ export default function Layout() {
 
 	const toggleVariants = {
 		view: {
-			width: 48,
-			height: 48,
-			top: [ 0, 30, 22 ],
-			left: 16,
+			width: 32,
+			height: 32,
+			top: [ 0, 38, 30 ],
+			left: 24,
 			borderRadius: '4px',
 			boxShadow: '0px 6px 15px rgba(0,0,0,.3)',
 		},
 		edit: {
 			width: 60,
 			height: 60,
-			top: [ 22, 30, 0 ],
+			top: [ 30, 38, 0 ],
 			left: 0,
 			borderRadius: '0px',
 			boxShadow: 'none',

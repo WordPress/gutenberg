@@ -8,7 +8,7 @@
 
 .edit-site-layout__hub {
 	height: $header-height;
-	padding-left: $header-height + $grid-unit-05;
+	padding-left: $grid-unit-60;
 	flex-shrink: 0;
 	z-index: z-index(".edit-site-layout__hub");
 }
