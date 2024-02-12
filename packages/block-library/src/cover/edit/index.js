@@ -318,7 +318,19 @@ function CoverEdit( {
 	const blockProps = useBlockProps( { ref } );
 
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const [
+		fontSizes,
+		customColors,
+		themeColors,
+		defaultColors,
+		defaultPaletteEnabled,
+	] = useSettings(
+		'typography.fontSizes',
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.defaultPalette'
+	);
 	const hasFontSizes = fontSizes?.length > 0;
 	const innerBlocksTemplate = getInnerBlocksTemplate( {
 		fontSize: hasFontSizes ? 'large' : undefined,
@@ -337,6 +349,18 @@ function CoverEdit( {
 			templateLock,
 			dropZoneElement: ref.current,
 		}
+	);
+
+	// Only show the default colors if the default palette is enabled and no theme colors are set.
+	const colors = useMemo(
+		() => [
+			...( customColors || [] ),
+			...( themeColors || [] ),
+			...( defaultColors && defaultPaletteEnabled && ! themeColors?.length
+				? defaultColors
+				: [] ),
+		],
+		[ customColors, themeColors, defaultColors, defaultPaletteEnabled ]
 	);
 
 	const mediaElement = useRef();
@@ -464,6 +488,7 @@ function CoverEdit( {
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
+								colors={ colors }
 								disableCustomColors={ true }
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
