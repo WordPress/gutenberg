@@ -38,4 +38,3 @@ if ( ! function_exists( 'wp_api_template_revision_args' ) ) {
 	}
 }
 add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
-
