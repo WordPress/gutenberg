@@ -179,12 +179,20 @@ function render_block_core_search( $attributes ) {
 	if ( $is_expandable_searchfield ) {
 		$aria_label_expanded  = __( 'Submit Search' );
 		$aria_label_collapsed = __( 'Expand search field' );
+		$form_context         = data_wp_context(
+			array(
+				'isSearchInputVisible' => $open_by_default,
+				'inputId'              => $input_id,
+				'ariaLabelExpanded'    => $aria_label_expanded,
+				'ariaLabelCollapsed'   => $aria_label_collapsed,
+			)
+		);
 		$form_directives      = '
-			data-wp-interactive=\'{ "namespace": "core/search" }\'
-			data-wp-context=\'{ "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '", "ariaLabelExpanded": "' . $aria_label_expanded . '", "ariaLabelCollapsed": "' . $aria_label_collapsed . '" }\'
-			data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
-			data-wp-on--keydown="actions.handleSearchKeydown"
-			data-wp-on--focusout="actions.handleSearchFocusout"
+		 data-wp-interactive=\'{ "namespace": "core/search" }\''
+		. $form_context .
+		'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
+		 data-wp-on--keydown="actions.handleSearchKeydown"
+		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
 	}
 
