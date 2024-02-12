@@ -148,7 +148,7 @@ $styles = array(
     ),
     array(
         'rules_group'  => '@media (min-width: 80rem)',
-        'selector'     => '@container (width > 400px) and (height > 400px)',
+        'selector'     => '.wp-tomato',
         'declarations' => array( 'color' => 'red' )
     ),
 );
