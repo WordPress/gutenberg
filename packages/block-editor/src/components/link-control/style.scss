@@ -340,13 +340,6 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
-.block-editor-link-control__drawer {
-	display: flex; // allow for ordering.
-	order: 30;
-	flex-direction: column;
-	flex-basis: 100%; // occupy full width.
-}
-
 // Inner div required to avoid padding/margin
 // causing janky animation.
 .block-editor-link-control__drawer-inner {
