@@ -77,26 +77,23 @@ function _gutenberg_get_search_result_label_field( $result_object, $field_name, 
  * @internal
  */
 function _gutenberg_register_search_result_additional_fields() {
-	global $wp_rest_additional_fields;
-
-	if ( isset( $wp_rest_additional_fields['search-result']['label'] ) ) {
-		return;
+	$search_controller = new WP_REST_Search_Controller( array() );
+	if ( ! isset( $search_controller->get_item_schema()['property']['label'] ) ) {
+		register_rest_field(
+			'search-result',
+			'label',
+			array(
+				'get_callback'    => '_gutenberg_get_search_result_label_field',
+				'update_callback' => null,
+				'schema'          => array(
+					'description' => __( 'Object human readable subtype.', 'gutenberg' ),
+					'type'        => 'string',
+					'readonly'    => true,
+					'context'     => array( 'view', 'embed' ),
+				),
+			)
+		);
 	}
-
-	register_rest_field(
-		'search-result',
-		'label',
-		array(
-			'get_callback'    => '_gutenberg_get_search_result_label_field',
-			'update_callback' => null,
-			'schema'          => array(
-				'description' => __( 'Object human readable subtype.', 'gutenberg' ),
-				'type'        => 'string',
-				'readonly'    => true,
-				'context'     => array( 'view', 'embed' ),
-			),
-		)
-	);
 }
 
 add_action( 'rest_api_init', '_gutenberg_register_search_result_additional_fields' );
@@ -109,8 +106,16 @@ add_action( 'rest_api_init', '_gutenberg_register_search_result_additional_field
  * @return array
  */
 function _gutenberg_register_media_search_handler( $handlers ) {
-	if ( class_exists( 'WP_REST_Media_Search_Handler_Gutenberg' ) ) {
-		$handlers[] = new WP_REST_Media_Search_Handler_Gutenberg();
+	$should_load_media_search_handler = true;
+	foreach ( $handlers as $handler ) {
+		if ( $handler instanceof WP_REST_Media_Search_Handler ) {
+			$should_load_media_search_handler = false;
+			break;
+		}
+	}
+
+	if ( $should_load_media_search_handler ) {
+		$handlers[] = new WP_REST_Media_Search_Handler();
 	}
 
 	return $handlers;
