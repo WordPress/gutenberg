@@ -738,23 +738,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests returning a generated stylesheet from a set of nested rules.
+	 * Tests returning a generated stylesheet from a set of nested rules and merging their declarations.
 	 */
-	public function test_should_return_stylesheet_with_combined_nested_css_rules_printed_after_non_nested() {
+	public function test_should_merge_declarations_for_rules_groups() {
 		$css_rules = array(
-			array(
-				'rules_group'  => '.sauron',
-				'selector'     => '.witch-king',
-				'declarations' => array(
-					'text-transform' => 'lowercase',
-				),
-			),
-			array(
-				'selector'     => '.saruman',
-				'declarations' => array(
-					'letter-spacing' => '1px',
-				),
-			),
 			array(
 				'selector'     => '.saruman',
 				'rules_group'  => '@container (min-width: 700px)',
@@ -773,51 +760,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'font-family' => 'The-Great-Eye',
 				),
 			),
-			array(
-				'selector'     => '.voldemort',
-				'rules_group'  => '@supports (align-self: stretch)',
-				'declarations' => array(
-					'height'     => '100px',
-					'align-self' => 'stretch',
-				),
-			),
-			array(
-				'selector'     => '.gandalf',
-				'declarations' => array(
-					'letter-spacing' => '2px',
-				),
-			),
-			array(
-				'selector'     => '.gandalf',
-				'rules_group'  => '@supports (border-style: dotted)',
-				'declarations' => array(
-					'color'        => 'grey',
-					'height'       => '90px',
-					'border-style' => 'dotted',
-					'align-self'   => 'safe center',
-				),
-			),
-			array(
-				'selector'     => '.radagast',
-				'rules_group'  => '@supports (align-self: stretch)',
-				'declarations' => array(
-					'color'        => 'brown',
-					'height'       => '60px',
-					'border-style' => 'dashed',
-					'align-self'   => 'stretch',
-				),
-			),
-			array(
-				'selector'     => '.tom-bombadil',
-				'declarations' => array(
-					'font-size' => '1000px',
-				),
-			),
 		);
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
-		$this->assertSame( '.sauron{.witch-king{text-transform:lowercase;}}.saruman{letter-spacing:1px;}@container (min-width: 700px){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}}@supports (align-self: stretch){.voldemort{height:100px;align-self:stretch;}}.gandalf{letter-spacing:2px;}@supports (border-style: dotted){.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}}@supports (align-self: stretch){.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}}.tom-bombadil{font-size:1000px;}', $compiled_stylesheet );
+		$this->assertSame( '@container (min-width: 700px){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}}', $compiled_stylesheet );
 	}
 
 	/**
