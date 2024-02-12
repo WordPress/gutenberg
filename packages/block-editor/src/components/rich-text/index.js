@@ -348,7 +348,6 @@ export function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					editableContentElement={ anchorRef.current }
-					value={ value }
 				/>
 			) }
 			<TagName
