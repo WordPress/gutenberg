@@ -408,6 +408,7 @@ export default function Image( {
 		lockHrefControls = false,
 		lockAltControls = false,
 		lockTitleControls = false,
+		lockCaption = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
@@ -440,6 +441,10 @@ export default function Image( {
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
+				lockCaption:
+					// Disable editing the caption if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the caption on the frontend.
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
@@ -797,14 +802,23 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={ isSingleSelected && hasNonContentControls }
-			/>
+
+			{ lockCaption && (
+				<figcaption>{ attributes.caption?.toHTMLString() }</figcaption>
+			) }
+
+			{ ! lockCaption && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
+				/>
+			) }
 		</>
 	);
 }
