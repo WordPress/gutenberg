@@ -139,6 +139,25 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 
 			$this->sources[ $source_name ] = $source;
 
+			// Add `uses_context` defined by block bindings sources.
+			add_filter(
+				'register_block_type_args',
+				function ( $args, $block_name ) use ( $source ) {
+					$allowed_blocks = $this->allowed_blocks;
+
+					if ( empty( $allowed_blocks[ $block_name ] ) || empty( $source->uses_context ) ) {
+						return $args;
+					}
+					$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
+					// Use array_values to reset the array keys.
+					$args['uses_context'] = array_values( array_unique( array_merge( $original_use_context, $source->uses_context ) ) );
+
+					return $args;
+				},
+				10,
+				2
+			);
+
 			return $source;
 		}
 
