@@ -62,17 +62,19 @@ const useSource = ( blockProps, sourceArgs ) => {
 
 	const [ value, setValue ] = useEntityProp( kind, name, prop, id );
 
+	function setValueHandler( nextEntityPropValue ) {
+		// Ensure the value is a string.
+		if ( typeof nextEntityPropValue !== 'string' ) {
+			return;
+		}
+
+		setValue( nextEntityPropValue );
+	}
+
 	return {
 		placeholder: null,
-		useValue: [
-			value,
-			( nextEntityPropValue ) => {
-				if ( typeof nextEntityPropValue !== 'string' ) {
-					return;
-				}
-				setValue( nextEntityPropValue );
-			},
-		],
+		value,
+		setValue: setValueHandler,
 	};
 };
 

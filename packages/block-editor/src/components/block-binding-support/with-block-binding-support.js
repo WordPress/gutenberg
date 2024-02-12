@@ -12,6 +12,7 @@ import { useEffect, useCallback, useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { useSelect } from '@wordpress/data';
+import { unlock } from '../../../../editor/src/lock-unlock';
 
 /**
  * Conponent to bind an attribute to a prop.
@@ -58,7 +59,9 @@ const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { attributes, name } = props;
 
-		const { getBlockBindingsSource } = useSelect( blockEditorStore );
+		const { getBlockBindingsSource } = unlock(
+			useSelect( blockEditorStore )
+		);
 
 		// Bail early if there are no bindings.
 		const bindings = attributes?.metadata?.bindings;
@@ -79,8 +82,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				 * Pick the prop value and setter
 				 * from the source custom hook.
 				 */
-				const { useValue: [ propValue, setPropValue ] = [] } =
-					useSource( props, settings.args );
+				const { value, setValue } = useSource( props, settings.args );
 
 				// Create a unique key for the connector instance
 				const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
@@ -88,7 +90,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				BindingConnectorInstances.push(
 					<BlockBindingConnector
 						key={ key }
-						propValue={ propValue }
+						propValue={ value }
 						onPropValueChange={ useCallback(
 							( newAttrValue ) => {
 								props.setAttributes( {
@@ -100,9 +102,9 @@ const withBlockBindingSupport = createHigherOrderComponent(
 						attrValue={ attrValue }
 						onAttributeChange={ useCallback(
 							( newPropValue ) => {
-								setPropValue?.( newPropValue );
+								setValue?.( newPropValue );
 							},
-							[ setPropValue ]
+							[ setValue ]
 						) }
 					/>
 				);
