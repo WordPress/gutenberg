@@ -246,7 +246,7 @@
 		"semver": "7.5.4",
 		"simple-git": "3.5.0",
 		"snapshot-diff": "0.10.0",
-		"source-map-loader": "3.0.0",
+		"source-map-loader": "4.0.2",
 		"sprintf-js": "1.1.1",
 		"storybook": "7.2.2",
 		"storybook-source-link": "2.0.9",
