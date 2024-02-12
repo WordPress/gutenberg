@@ -19,19 +19,19 @@ import { unlock } from '../../../../editor/src/lock-unlock';
  * The app creates an instance of this component for each
  * pair of block-attribute/source-property.
  *
- * @param {Object}   props           - The component props.
- * @param {string}   props.attrName  - The attribute name.
- * @param {any}      props.attrValue - The attribute value.
- * @param {Function} props.useSource - The custom hook to use the source.
- * @param {Object}   props.props     - The block props with bound attributes.
- * @param {Object}   props.args      - The arguments to pass to the source.
+ * @param {Object}   props            - The component props.
+ * @param {string}   props.attrName   - The attribute name.
+ * @param {any}      props.attrValue  - The attribute value.
+ * @param {Function} props.useSource  - The custom hook to use the source.
+ * @param {Object}   props.blockProps - The block props with bound attributes.
+ * @param {Object}   props.args       - The arguments to pass to the source.
  * @return {null}                      This is a data-handling component. Render nothing.
  */
 const BlockBindingConnector = ( {
 	attrName,
 	attrValue,
 	useSource,
-	props: blockProps,
+	blockProps,
 	args,
 } ) => {
 	const lastPropValue = useRef();
@@ -114,7 +114,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 						attrName={ attrName }
 						attrValue={ attrValue }
 						useSource={ useSource }
-						props={ props }
+						blockProps={ props }
 						args={ settings.args }
 					/>
 				);
