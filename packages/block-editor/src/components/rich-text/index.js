@@ -146,27 +146,13 @@ export function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		// Disable Rich Text editing if block bindings specify that, or if there are block bindings
-		// but rich text attribute is not included in the bindings.
+		// Disable Rich Text editing if block bindings specify that.
 		let shouldDisableEditing = false;
 		if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
 			const blockTypeAttributes = getBlockType( blockName ).attributes;
-
-			for ( const [ attributeName, attributeValue ] of Object.entries(
-				blockTypeAttributes
-			) ) {
-				if (
-					attributeValue.source === 'rich-text' &&
-					! Object.keys( blockBindings ).includes( attributeName )
-				) {
-					shouldDisableEditing = true;
-				}
-			}
-
 			const { getBlockBindingsSource } = unlock(
 				select( blockEditorStore )
 			);
-
 			for ( const [ attribute, args ] of Object.entries(
 				blockBindings
 			) ) {
