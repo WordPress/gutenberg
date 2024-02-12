@@ -148,7 +148,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 			$selector         = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
 			$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
 			$rules_group      = $this->get_rules_group();
-			$has_rules_group      = ! empty( $rules_group );
+			$has_rules_group  = ! empty( $rules_group );
 			$css_declarations = $this->declarations->get_declarations_string( $should_prettify, $has_rules_group ? $nested_declarations_indent : $declarations_indent );
 
 			if ( empty( $css_declarations ) ) {

@@ -65,8 +65,8 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			}
 
 			foreach ( $css_rules as $rule ) {
-				$selector = $rule->get_selector();
-				$rules_group  = $rule->get_rules_group();
+				$selector    = $rule->get_selector();
+				$rules_group = $rule->get_rules_group();
 
 				/**
 				 * If there is an at_rule and it already exists in the css_rules array,
