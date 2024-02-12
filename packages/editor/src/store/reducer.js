@@ -266,7 +266,7 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export function renderingMode( state = 'all', action ) {
+export function renderingMode( state = 'post-only', action ) {
 	switch ( action.type ) {
 		case 'SET_RENDERING_MODE':
 			return action.mode;
