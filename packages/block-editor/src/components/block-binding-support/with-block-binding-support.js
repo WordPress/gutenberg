@@ -1,7 +1,4 @@
 /**
- * External dependencies
- */
-/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -15,7 +12,12 @@ import { useSelect } from '@wordpress/data';
 import { unlock } from '../../../../editor/src/lock-unlock';
 
 /**
- * Conponent to bind an attribute to a prop.
+ * This component is responsible detecting and
+ * propagating data changes between block attribute and
+ * the block-binding source property.
+ *
+ * The app creates an instance of this component for each
+ * pair of block-attribute/source-property.
  *
  * @param {Object}   props           - The component props.
  * @param {string}   props.attrName  - The attribute name.
@@ -48,7 +50,7 @@ const BlockBindingConnector = ( {
 	);
 
 	/*
-	 * From Source Prop => Block Attribute
+	 * Source Prop => Block Attribute
 	 *
 	 * Detect changes in source prop value,
 	 * and update the attribute value accordingly.
@@ -63,7 +65,7 @@ const BlockBindingConnector = ( {
 	}, [ onPropValueChange, value ] );
 
 	/*
-	 * From Block Attribute => Source Prop
+	 * Block Attribute => Source Prop
 	 *
 	 * Detect changes in block attribute value,
 	 * and update the source prop value accordingly.
