@@ -78,7 +78,7 @@ const useSource = ( blockProps, sourceArgs ) => {
  * ```
  */
 export default {
-	name: 'core/entity',
+	name: 'core/post-entity',
 	label: __( 'Core Entity' ),
 	useSource,
 	lockAttributesEditing: false,
