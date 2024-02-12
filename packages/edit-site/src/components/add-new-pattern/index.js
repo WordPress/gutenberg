@@ -25,10 +25,11 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
-import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { CreatePatternModal } = unlock( editPatternsPrivateApis );
+const { CreatePatternModal, usePatternCategoriesMap } = unlock(
+	editPatternsPrivateApis
+);
 
 export default function AddNewPattern() {
 	const history = useHistory();
@@ -43,7 +44,7 @@ export default function AddNewPattern() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const { patternCategories } = usePatternCategories();
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -97,6 +98,31 @@ export default function AddNewPattern() {
 		title: __( 'Import pattern from JSON' ),
 	} );
 
+	const categoryMap = usePatternCategoriesMap();
+	async function createPatternCategory( existingTerm ) {
+		try {
+			// Since we have an existing core category we need to match the new user category to the
+			// correct slug rather than autogenerating it to prevent duplicates, eg. the core `Headers`
+			// category uses the singular `header` as the slug.
+			const termData = {
+				name: existingTerm.label,
+				slug: existingTerm.name,
+			};
+			const newTerm = await saveEntityRecord(
+				'taxonomy',
+				'wp_pattern_category',
+				termData,
+				{ throwOnError: true }
+			);
+			invalidateResolution( 'getUserPatternCategories' );
+			return newTerm.id;
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+			return error.data.term_id;
+		}
+	}
 	return (
 		<>
 			<DropdownMenu
@@ -132,12 +158,23 @@ export default function AddNewPattern() {
 					const file = event.target.files?.[ 0 ];
 					if ( ! file ) return;
 					try {
-						const currentCategoryId =
-							params.categoryType !== TEMPLATE_PART_POST_TYPE &&
-							patternCategories.find(
-								( category ) =>
-									category.name === params.categoryId
-							)?.id;
+						let currentCategoryId;
+						// When we're not handling template parts, we should
+						// add or create the proper pattern category.
+						if ( params.categoryType !== TEMPLATE_PART_POST_TYPE ) {
+							const currentCategory = categoryMap
+								.values()
+								.find(
+									( term ) => term.name === params.categoryId
+								);
+							if ( !! currentCategory ) {
+								currentCategoryId =
+									currentCategory.id ||
+									( await createPatternCategory(
+										currentCategory
+									) );
+							}
+						}
 						const pattern = await createPatternFromFile(
 							file,
 							currentCategoryId
@@ -146,8 +183,12 @@ export default function AddNewPattern() {
 						);
 
 						// Navigate to the All patterns category for the newly created pattern
-						// if we're not on that page already.
-						if ( ! currentCategoryId ) {
+						// if we're not on that page already and if we're not in the `my-patterns`
+						// category.
+						if (
+							! currentCategoryId &&
+							params.categoryId !== 'my-patterns'
+						) {
 							history.push( {
 								path: `/patterns`,
 								categoryType: PATTERN_TYPES.theme,

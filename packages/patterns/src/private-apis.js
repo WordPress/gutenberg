@@ -15,6 +15,7 @@ import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
 import PartialSyncingControls from './components/partial-syncing-controls';
 import ResetOverridesControl from './components/reset-overrides-control';
+import { usePatternCategoriesMap } from './private-hooks';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
@@ -35,6 +36,7 @@ lock( privateApis, {
 	RenamePatternCategoryModal,
 	PartialSyncingControls,
 	ResetOverridesControl,
+	usePatternCategoriesMap,
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
