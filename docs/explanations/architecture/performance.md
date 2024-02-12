@@ -8,7 +8,7 @@ To ensure the block editor stays performant across releases and development, we 
 
 Some of the main important metrics are:
 
-- **Loading Time:** The time it takes to load an editor page. This includes time the server takes to respond, times to first paint, first contentful paint, DOM content load complete, load complete and first block render. (both in post and site)
+- **Loading Time:** The time it takes to load an editor page. This includes time the server takes to respond, times to first paint, first contentful paint, DOM content load complete, load complete and first block render (both in post and site).
 - **Typing Time:** The time it takes for the browser to respond while typing on the editor.
 - **Block Selection Time:** The time it takes for the browser to respond after a user selects block. (Inserting a block is also equivalent to selecting a block. Monitoring the selection is sufficient to cover both metrics).
 
@@ -73,13 +73,13 @@ Our performance job runs Github CI which means that we can't trust the consisten
 
 ### Update the reference commit
 
-Gutenberg supports only two WP versions, this has two impacts on the performance job:
+Gutenberg supports only two WP versions, this impacts the performance job in two ways:
 
- - The base WP version used to run the performance job need to be updated, when the minimum version supported by Gutenberg changes. In order to do that, we rely on the `Tested up to` flag of the plugin's `readme.txt` file. So each time that flag is changed, the version used for the performance job is changed as well.
+ - The base WP version used to run the performance job needs to be updated, when the minimum version supported by Gutenberg changes. In order to do that, we rely on the `Tested up to` flag of the plugin's `readme.txt` file. So each time that flag is changed, the version used for the performance job is changed as well.
 
  - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the "Tested up to" flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `.github/workflows/performance.yml`. 
 
-The new reference commit hash that is chosen need to meet the following requirements:
+The new reference commit hash that is chosen needs to meet the following requirements:
 
  - Be compatible with the new WP version used in the "Tested up to" flag.
  - Is already tracked on "codevitals.run" for all existing metrics.
