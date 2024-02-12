@@ -89,15 +89,13 @@ function Editor( {
 		);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
-	const defaultRenderingMode =
-		currentPost.postType === 'wp_template' ? 'all' : 'post-only';
 
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode,
+			defaultRenderingMode: 'post-only',
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -111,7 +109,6 @@ function Editor( {
 			updatePreferredStyleVariations,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode,
 		]
 	);
 
