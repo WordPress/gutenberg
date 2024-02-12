@@ -35,7 +35,7 @@ test.describe( 'Site editor block removal prompt', () => {
 		// Expect the block removal prompt to have appeared
 		await expect(
 			page.getByText(
-				'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.'
+				'Post or page content may not be displayed correctly if you delete these blocks:'
 			)
 		).toBeVisible();
 	} );
@@ -59,7 +59,7 @@ test.describe( 'Site editor block removal prompt', () => {
 		// Expect the block removal prompt to have appeared
 		await expect(
 			page.getByText(
-				'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.'
+				'Post or page content may not be displayed correctly if you delete this block:'
 			)
 		).toBeVisible();
 	} );
