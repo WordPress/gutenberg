@@ -30,14 +30,8 @@ const useSource = ( blockProps, sourceArgs ) => {
 	}
 
 	const { context } = blockProps;
-	const {
-		kind = 'postType',
-		name: nameFromArgs = 'post',
-		prop,
-		id,
-	} = sourceArgs;
+	const { kind = 'postType', name: nameFromArgs, prop, id } = sourceArgs;
 
-	// Let's define `postType` as the default kind.
 	const { postType: nameFromContext } = context;
 
 	/*
