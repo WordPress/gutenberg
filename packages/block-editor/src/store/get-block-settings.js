@@ -100,16 +100,8 @@ const removeCustomPrefixes = ( path ) => {
  * @return {Array} Array of merged items
  */
 export function mergeOrigins( value ) {
-	let result = mergeCache.get( value );
-	if ( ! result ) {
-		result = [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => value[ key ] ?? []
-		);
-		mergeCache.set( value, result );
-	}
-	return result;
+	return value.custom ?? value.theme ?? value.default;
 }
-const mergeCache = new WeakMap();
 
 /**
  * For settings like `color.palette`, which have a value that is an object
