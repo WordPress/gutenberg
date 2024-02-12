@@ -10,6 +10,7 @@ import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	BlockToolbar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -43,6 +44,7 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const { useHasAnyBlockControls } = unlock( blockEditorPrivateApis );
 
 export default function HeaderEditMode() {
 	const {
@@ -90,14 +92,23 @@ export default function HeaderEditMode() {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasBlockSelected = !! blockSelectionStart;
+	const hasBlockControls = useHasAnyBlockControls();
+	const hasBlockToolbar = !! blockSelectionStart && hasBlockControls;
 
 	useEffect( () => {
+		// If we don't have block controls, collapse the block tools.
+		// There are times where there is a block selected, but the block
+		// doesn't have any toolbars. In these instances, we want to make
+		// sure to show the central command area.
+		// https://github.com/WordPress/gutenberg/issues/57288
+		if ( ! hasBlockControls ) {
+			setIsBlockToolsCollapsed( true );
+		}
 		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
+		else if ( blockSelectionStart ) {
 			setIsBlockToolsCollapsed( false );
 		}
-	}, [ blockSelectionStart ] );
+	}, [ blockSelectionStart, hasBlockControls ] );
 
 	const toolbarVariants = {
 		isDistractionFree: { y: '-50px' },
@@ -144,7 +155,7 @@ export default function HeaderEditMode() {
 								ref={ blockToolbarRef }
 								name="block-toolbar"
 							/>
-							{ hasBlockSelected && (
+							{ hasBlockToolbar && (
 								<Button
 									className="edit-site-header-edit-mode__block-tools-toggle"
 									icon={
