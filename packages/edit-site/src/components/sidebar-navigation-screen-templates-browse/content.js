@@ -40,7 +40,7 @@ export default function DataviewsTemplatesSidebarContent( {
 				if ( ! obj[ src ] ) {
 					obj[ src ] = {
 						count: 0,
-						slug: template.author_text,
+						text: template.author_text,
 					};
 				}
 				obj[ src ].count++;
@@ -62,33 +62,33 @@ export default function DataviewsTemplatesSidebarContent( {
 			/>
 			{ sources?.theme && (
 				<DataViewItem
-					slug={ sources.theme.slug }
+					slug={ `theme:${ sources.theme.text }` }
 					title={ __( 'Theme' ) }
 					icon={ themeIcon }
-					isActive={ activeView === sources.theme.slug }
+					isActive={ activeView.startsWith( 'theme:' ) }
 					isCustom="false"
 					suffix={ <span>{ sources.theme.count }</span> }
 				/>
 			) }
 			{ sources?.user && (
 				<DataViewItem
-					slug={ sources.user.slug }
+					slug="user"
 					title={ __( 'Custom' ) }
 					icon={ customIcon }
-					isActive={ activeView === sources.user.slug }
+					isActive={ activeView === 'user' }
 					isCustom="false"
 					suffix={ <span>{ sources.user.count }</span> }
 				/>
 			) }
 			{ sources?.plugin &&
 				Object.entries( sources.plugin ).map(
-					( [ key, { count, slug } ] ) => (
+					( [ key, { count, text } ] ) => (
 						<DataViewItem
 							key={ key }
-							slug={ slug }
-							title={ slug }
+							slug={ `plugin:${ text }` }
+							title={ text }
 							icon={ pluginIcon }
-							isActive={ activeView === slug }
+							isActive={ activeView === `plugin:${ text }` }
 							isCustom="false"
 							suffix={ <span>{ count }</span> }
 						/>

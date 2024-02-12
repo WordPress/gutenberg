@@ -91,7 +91,7 @@ const DEFAULT_VIEW = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
+	hiddenFields: [ 'preview', 'original_source' ],
 	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
@@ -188,6 +188,34 @@ function Preview( { item, viewType } ) {
 	);
 }
 
+function computeFilters( activeView ) {
+	// activeView takes values such as:
+	// - 'all'
+	// - 'user'
+	// - 'theme:Twenty Twenty-Four'
+	// - 'plugin:My Plugin'
+	switch ( activeView ) {
+		case 'all':
+			return [];
+
+		case 'user':
+			return [
+				{ field: 'original_source', operator: 'in', value: 'user' },
+			];
+
+		default: {
+			const value = activeView.substr( activeView.indexOf( ':' ) + 1 );
+			return [
+				{
+					field: 'author',
+					operator: 'in',
+					value,
+				},
+			];
+		}
+	}
+}
+
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
@@ -199,32 +227,14 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			...DEFAULT_VIEW,
 			type: usedType,
 			layout: defaultConfigPerViewType[ usedType ],
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'in',
-								value: activeView,
-							},
-					  ]
-					: [],
+			filters: computeFilters( activeView ),
 		};
 	}, [ layout, activeView ] );
 	const [ view, setView ] = useState( defaultView );
 	useEffect( () => {
 		setView( ( currentView ) => ( {
 			...currentView,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'in',
-								value: activeView,
-							},
-					  ]
-					: [],
+			filters: computeFilters( activeView ),
 		} ) );
 	}, [ activeView ] );
 
@@ -329,6 +339,21 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			elements: authors,
 			width: '1%',
 		} );
+		if ( postType === TEMPLATE_POST_TYPE ) {
+			_fields.push( {
+				header: __( 'Source' ),
+				id: 'original_source',
+				getValue: ( { item } ) => item.original_source,
+				type: ENUMERATION_TYPE,
+				elements: [
+					{ value: 'theme', label: __( 'Theme' ) },
+					{ value: 'plugin', label: __( 'Plugin' ) },
+					{ value: 'user', label: __( 'User' ) },
+				],
+				enableHiding: false,
+				enableSorting: false,
+			} );
+		}
 		return _fields;
 	}, [ postType, authors, view.type ] );
 
@@ -362,7 +387,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				if (
 					filter.field === 'author' &&
 					filter.operator === OPERATOR_IN &&
-					!! filter.value
+					filter.value
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text === filter.value;
@@ -370,10 +395,26 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				} else if (
 					filter.field === 'author' &&
 					filter.operator === OPERATOR_NOT_IN &&
-					!! filter.value
+					filter.value
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text !== filter.value;
+					} );
+				} else if (
+					filter.field === 'original_source' &&
+					filter.operator === OPERATOR_IN &&
+					filter.value
+				) {
+					filteredData = filteredData.filter( ( item ) => {
+						return item.original_source === filter.value;
+					} );
+				} else if (
+					filter.field === 'original_source' &&
+					filter.operator === OPERATOR_NOT_IN &&
+					filter.value
+				) {
+					filteredData = filteredData.filter( ( item ) => {
+						return item.original_source !== filter.value;
 					} );
 				}
 			} );
