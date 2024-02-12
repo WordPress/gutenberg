@@ -92,23 +92,13 @@ export default function HeaderEditMode() {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasBlockControls = useCanBlockToolbarBeFocused();
-	const hasBlockToolbar = !! blockSelectionStart && hasBlockControls;
+	const hasBlockToolbar = useCanBlockToolbarBeFocused();
 
 	useEffect( () => {
-		// If we don't have block controls, collapse the block tools.
-		// There are times where there is a block selected, but the block
-		// doesn't have any toolbars. In these instances, we want to make
-		// sure to show the central command area.
-		// https://github.com/WordPress/gutenberg/issues/57288
-		if ( ! hasBlockControls ) {
-			setIsBlockToolsCollapsed( true );
-		}
-		// If we have a new block selection, show the block tools
-		else if ( blockSelectionStart ) {
+		if ( blockSelectionStart ) {
 			setIsBlockToolsCollapsed( false );
 		}
-	}, [ blockSelectionStart, hasBlockControls ] );
+	}, [ blockSelectionStart ] );
 
 	const toolbarVariants = {
 		isDistractionFree: { y: '-50px' },
@@ -139,7 +129,7 @@ export default function HeaderEditMode() {
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
 					/>
-					{ isTopToolbar && (
+					{ isTopToolbar && hasBlockToolbar && (
 						<>
 							<div
 								className={ classnames(
@@ -155,24 +145,20 @@ export default function HeaderEditMode() {
 								ref={ blockToolbarRef }
 								name="block-toolbar"
 							/>
-							{ hasBlockToolbar && (
-								<Button
-									className="edit-site-header-edit-mode__block-tools-toggle"
-									icon={
-										isBlockToolsCollapsed ? next : previous
-									}
-									onClick={ () => {
-										setIsBlockToolsCollapsed(
-											( collapsed ) => ! collapsed
-										);
-									} }
-									label={
-										isBlockToolsCollapsed
-											? __( 'Show block tools' )
-											: __( 'Hide block tools' )
-									}
-								/>
-							) }
+							<Button
+								className="edit-site-header-edit-mode__block-tools-toggle"
+								icon={ isBlockToolsCollapsed ? next : previous }
+								onClick={ () => {
+									setIsBlockToolsCollapsed(
+										( collapsed ) => ! collapsed
+									);
+								} }
+								label={
+									isBlockToolsCollapsed
+										? __( 'Show block tools' )
+										: __( 'Hide block tools' )
+								}
+							/>
 						</>
 					) }
 				</motion.div>
@@ -184,7 +170,14 @@ export default function HeaderEditMode() {
 						'edit-site-header-edit-mode__center',
 						{
 							'is-collapsed':
-								! isBlockToolsCollapsed && isLargeViewport,
+								! isBlockToolsCollapsed &&
+								isLargeViewport &&
+								isTopToolbar &&
+								// There are times where there is a block selected, but the block
+								// doesn't have any toolbars. In these instances, we want to make
+								// sure to show the central command area.
+								// https://github.com/WordPress/gutenberg/issues/57288
+								hasBlockToolbar,
 						}
 					) }
 				>
