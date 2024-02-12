@@ -810,7 +810,8 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
-				disableEditing={ lockCaption }
+				contentEditable={ ! lockCaption }
+				aria-readonly={ lockCaption }
 			/>
 		</>
 	);

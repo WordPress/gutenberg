@@ -109,7 +109,6 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
-		disableEditing,
 		...props
 	},
 	forwardedRef
@@ -148,7 +147,7 @@ export function RichTextWrapper(
 		}
 
 		// Disable Rich Text editing if block bindings specify that.
-		let disableBoundBlocks = false;
+		let shouldDisableEditing = false;
 		if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
 			const blockTypeAttributes = getBlockType( blockName ).attributes;
 			const { getBlockBindingsSource } = unlock(
@@ -171,7 +170,7 @@ export function RichTextWrapper(
 					! blockBindingsSource ||
 					blockBindingsSource.lockAttributesEditing
 				) {
-					disableBoundBlocks = true;
+					shouldDisableEditing = true;
 					break;
 				}
 			}
@@ -181,18 +180,16 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			disableBoundBlocks,
+			shouldDisableEditing,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, disableBoundBlocks } =
+	const { selectionStart, selectionEnd, isSelected, shouldDisableEditing } =
 		useSelect( selector, [
 			clientId,
 			identifier,
 			originalIsSelected,
 			isBlockSelected,
 		] );
-
-	const shouldDisableEditing = disableEditing || disableBoundBlocks;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -367,6 +364,7 @@ export function RichTextWrapper(
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
 				aria-readonly={ shouldDisableEditing }
+				contentEditable={ ! shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
@@ -421,7 +419,6 @@ export function RichTextWrapper(
 					useFirefoxCompat(),
 					anchorRef,
 				] ) }
-				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
