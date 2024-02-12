@@ -19,29 +19,27 @@ import { unlock } from '../../../../editor/src/lock-unlock';
  *
  * @param {Object}   props                   - The component props.
  * @param {any}      props.attrValue         - The attribute value.
- * @param {Function} props.onAttributeChange - The function to call when the attribute changes.
- * @param {any}      props.propValue         - The prop value.
  * @param {Function} props.onPropValueChange - The function to call when the prop value changes.
- * @return {null} The component.
+ * @param {Function} props.useSource         - The custom hook to use the source.
+ * @return {null}                              This is a data-handling component.
  */
 const BlockBindingConnector = ( {
-	propValue,
-	onPropValueChange = () => {},
-
 	attrValue,
-	onAttributeChange,
+	onPropValueChange = () => {},
+	useSource,
 } ) => {
 	const lastPropValue = useRef();
 	const lastAttrValue = useRef();
+	const { value, updateValue } = useSource();
 
 	useEffect( () => {
-		if ( propValue === lastPropValue.current ) {
+		if ( value === lastPropValue.current ) {
 			return;
 		}
 
-		lastPropValue.current = propValue;
-		onPropValueChange( propValue );
-	}, [ onPropValueChange, propValue ] );
+		lastPropValue.current = value;
+		onPropValueChange( value );
+	}, [ onPropValueChange, value ] );
 
 	useEffect( () => {
 		if ( attrValue === lastAttrValue.current ) {
@@ -49,8 +47,8 @@ const BlockBindingConnector = ( {
 		}
 
 		lastAttrValue.current = attrValue;
-		onAttributeChange( attrValue );
-	}, [ onAttributeChange, attrValue ] );
+		updateValue( attrValue );
+	}, [ updateValue, attrValue ] );
 
 	return null;
 };
@@ -78,22 +76,13 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				const { useSource } = source;
 				const attrValue = attributes[ attrName ];
 
-				/*
-				 * Pick the prop value and setter
-				 * from the source custom hook.
-				 */
-				const { value, updateValue } = useSource(
-					props,
-					settings.args
-				);
-
 				// Create a unique key for the connector instance
 				const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
 
 				BindingConnectorInstances.push(
 					<BlockBindingConnector
 						key={ key }
-						propValue={ value }
+						attrValue={ attrValue }
 						onPropValueChange={ useCallback(
 							( newAttrValue ) => {
 								props.setAttributes( {
@@ -102,13 +91,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 							},
 							[ attrName ]
 						) }
-						attrValue={ attrValue }
-						onAttributeChange={ useCallback(
-							( newPropValue ) => {
-								updateValue?.( newPropValue );
-							},
-							[ updateValue ]
-						) }
+						useSource={ useSource }
 					/>
 				);
 			}
