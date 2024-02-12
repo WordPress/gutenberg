@@ -14,13 +14,8 @@ import { useMemo } from '@wordpress/element';
  */
 import Backdrop from './backdrop';
 import Label from './label';
-import {
-	Container,
-	Root,
-	Prefix,
-	Suffix,
-	getSizeConfig,
-} from './styles/input-control-styles';
+import { getSizeConfig } from './styles/input-control-styles';
+import * as styles from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
 import {
@@ -29,6 +24,8 @@ import {
 	useContextSystem,
 } from '../context';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { Flex } from '../flex';
+import { useCx } from '../utils';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -89,7 +86,6 @@ export function InputBase(
 	);
 
 	const id = useUniqueId( idProp );
-	const hideLabel = hideLabelFromVision || ! label;
 
 	const { paddingLeft, paddingRight } = getSizeConfig( {
 		inputSize: size,
@@ -102,15 +98,29 @@ export function InputBase(
 		};
 	}, [ paddingLeft, paddingRight ] );
 
+	const cx = useCx();
+	const rootClasses = cx(
+		styles.inputBase,
+		styles.inputBaseFocusedStyles( isFocused ),
+		className
+	);
+	const containerClasses = cx(
+		styles.inputBaseContainer,
+		styles.inputBaseContainerDisabledStyles( disabled ),
+		styles.inputBaseContainerWidthStyles( {
+			__unstableInputWidth,
+			labelPosition,
+		} ),
+		'components-input-control__container'
+	);
+
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
-		<Root
+		<Flex
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
-			className={ className }
+			className={ rootClasses }
 			gap={ 2 }
-			isFocused={ isFocused }
-			labelPosition={ labelPosition }
 			ref={ ref }
 		>
 			<Label
@@ -121,24 +131,28 @@ export function InputBase(
 			>
 				{ label }
 			</Label>
-			<Container
-				__unstableInputWidth={ __unstableInputWidth }
-				className="components-input-control__container"
-				disabled={ disabled }
-				hideLabel={ hideLabel }
-				labelPosition={ labelPosition }
-			>
+			<div className={ containerClasses }>
 				<ContextSystemProvider value={ prefixSuffixContextValue }>
 					{ prefix && (
-						<Prefix className="components-input-control__prefix">
+						<span
+							className={ cx(
+								styles.prefix,
+								'components-input-control__prefix'
+							) }
+						>
 							{ prefix }
-						</Prefix>
+						</span>
 					) }
 					{ children }
 					{ suffix && (
-						<Suffix className="components-input-control__suffix">
+						<span
+							className={ cx(
+								styles.suffix,
+								'components-input-control__suffix'
+							) }
+						>
 							{ suffix }
-						</Suffix>
+						</span>
 					) }
 				</ContextSystemProvider>
 				<Backdrop
@@ -146,8 +160,8 @@ export function InputBase(
 					isBorderless={ isBorderless }
 					isFocused={ isFocused }
 				/>
-			</Container>
-		</Root>
+			</div>
+		</Flex>
 	);
 }
 

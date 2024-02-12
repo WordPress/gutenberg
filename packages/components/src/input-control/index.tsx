@@ -16,7 +16,6 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
-import { space } from '../utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
@@ -100,15 +99,14 @@ export function UnforwardedInputControl(
 					{ ...restProps }
 					{ ...helpProp }
 					__next40pxDefaultSize={ __next40pxDefaultSize }
-					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
 					isFocused={ isFocused }
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
-					paddingInlineStart={ prefix ? space( 2 ) : undefined }
-					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					hasPrefix={ !! prefix }
+					hasSuffix={ !! suffix }
 					ref={ ref }
 					setIsFocused={ setIsFocused }
 					size={ size }

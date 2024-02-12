@@ -10,39 +10,26 @@ import type { CSSProperties, ReactNode } from 'react';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../../context';
-import { Flex, FlexItem } from '../../flex';
+import { FlexItem } from '../../flex';
 import { Text } from '../../text';
-import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
+import { baseLabelTypography, COLORS, CONFIG } from '../../utils';
 import type { LabelPosition, Size } from '../types';
 import { space } from '../../utils/space';
 
-type ContainerProps = {
-	disabled?: boolean;
-	hideLabel?: boolean;
-	__unstableInputWidth?: CSSProperties[ 'width' ];
-	labelPosition?: LabelPosition;
-};
-
-type RootProps = {
-	isFocused?: boolean;
-	labelPosition?: LabelPosition;
-};
-
-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
+export const inputBaseFocusedStyles = ( isFocused?: boolean ) => {
 	if ( ! isFocused ) return '';
 
 	return css( { zIndex: 1 } );
 };
 
-export const Root = styled( Flex )< RootProps >`
+export const inputBase = css`
 	box-sizing: border-box;
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;
-	${ rootFocusedStyles }
 `;
 
-const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+export const inputBaseContainerDisabledStyles = ( disabled?: boolean ) => {
 	const backgroundColor = disabled
 		? COLORS.ui.backgroundDisabled
 		: COLORS.ui.background;
@@ -50,10 +37,13 @@ const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
 	return css( { backgroundColor } );
 };
 
-const containerWidthStyles = ( {
+export const inputBaseContainerWidthStyles = ( {
 	__unstableInputWidth,
 	labelPosition,
-}: ContainerProps ) => {
+}: {
+	__unstableInputWidth?: CSSProperties[ 'width' ];
+	labelPosition?: LabelPosition;
+} ) => {
 	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
 
 	if ( labelPosition === 'side' ) return '';
@@ -67,29 +57,21 @@ const containerWidthStyles = ( {
 	return css( { width: __unstableInputWidth } );
 };
 
-export const Container = styled.div< ContainerProps >`
+export const inputBaseContainer = css`
 	align-items: center;
 	box-sizing: border-box;
 	border-radius: inherit;
 	display: flex;
 	flex: 1;
 	position: relative;
-
-	${ containerDisabledStyles }
-	${ containerWidthStyles }
 `;
 
-type InputProps = {
+type InputSizeProps = {
 	__next40pxDefaultSize?: boolean;
-	disabled?: boolean;
 	inputSize?: Size;
-	isDragging?: boolean;
-	dragCursor?: CSSProperties[ 'cursor' ];
-	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
-	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 };
 
-const disabledStyles = ( { disabled }: InputProps ) => {
+export const inputDisabledStyles = ( disabled?: boolean ) => {
 	if ( ! disabled ) return '';
 
 	return css( {
@@ -97,7 +79,7 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 	} );
 };
 
-export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+export const fontSizeStyles = ( { inputSize: size }: InputSizeProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
@@ -122,7 +104,7 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 export const getSizeConfig = ( {
 	inputSize: size,
 	__next40pxDefaultSize,
-}: InputProps ) => {
+}: InputSizeProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
@@ -162,18 +144,32 @@ export const getSizeConfig = ( {
 	return sizes[ size as Size ] || sizes.default;
 };
 
-const sizeStyles = ( props: InputProps ) => {
+export const inputSizeStyles = (
+	props: Parameters< typeof getSizeConfig >[ 0 ]
+) => {
 	return css( getSizeConfig( props ) );
 };
 
-const customPaddings = ( {
-	paddingInlineStart,
-	paddingInlineEnd,
-}: InputProps ) => {
-	return css( { paddingInlineStart, paddingInlineEnd } );
+export const inputCustomPaddings = ( {
+	hasPrefix,
+	hasSuffix,
+}: {
+	hasPrefix: boolean;
+	hasSuffix: boolean;
+} ) => {
+	return css( {
+		paddingInlineStart: hasPrefix ? space( 2 ) : undefined,
+		paddingInlineEnd: hasSuffix ? space( 2 ) : undefined,
+	} );
 };
 
-const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
+export const inputDragStyles = ( {
+	isDragging,
+	dragCursor,
+}: {
+	isDragging?: boolean;
+	dragCursor?: CSSProperties[ 'cursor' ];
+} ) => {
 	let defaultArrowStyles: SerializedStyles | undefined;
 	let activeDragCursorStyles: SerializedStyles | undefined;
 
@@ -206,8 +202,7 @@ const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
 
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
-
-export const Input = styled.input< InputProps >`
+export const input = css`
 	&&& {
 		background-color: transparent;
 		box-sizing: border-box;
@@ -219,12 +214,6 @@ export const Input = styled.input< InputProps >`
 		margin: 0;
 		outline: none;
 		width: 100%;
-
-		${ dragStyles }
-		${ disabledStyles }
-		${ fontSizeStyles }
-		${ sizeStyles }
-		${ customPaddings }
 
 		&::-webkit-input-placeholder {
 			line-height: normal;
@@ -308,22 +297,22 @@ export const BackdropUI = styled.div< BackdropProps >`
 		left: 0;
 		margin: 0;
 		padding: 0;
+		padding-inline-start: 2px;
 		pointer-events: none;
 		position: absolute;
 		right: 0;
 		top: 0;
 
 		${ backdropFocusedStyles }
-		${ rtl( { paddingLeft: 2 } ) }
 	}
 `;
 
-export const Prefix = styled.span`
+export const prefix = css`
 	box-sizing: border-box;
 	display: block;
 `;
 
-export const Suffix = styled.span`
+export const suffix = css`
 	align-items: center;
 	align-self: stretch;
 	box-sizing: border-box;

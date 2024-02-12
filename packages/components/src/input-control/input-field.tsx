@@ -21,17 +21,22 @@ import { forwardRef, useRef } from '@wordpress/element';
  */
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
-import { Input } from './styles/input-control-styles';
+import * as styles from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
+import { useCx } from '../utils';
 
 const noop = () => {};
 
 function InputField(
 	{
+		__next40pxDefaultSize,
+		className,
 		disabled = false,
 		dragDirection = 'n',
 		dragThreshold = 10,
+		hasPrefix,
+		hasSuffix,
 		id,
 		isDragEnabled = false,
 		isFocused,
@@ -210,14 +215,24 @@ function InputField(
 		};
 	}
 
+	const cx = useCx();
+	const classes = cx(
+		styles.input,
+		styles.inputDragStyles( { isDragging, dragCursor } ),
+		styles.inputDisabledStyles( disabled ),
+		styles.fontSizeStyles( { inputSize: size } ),
+		styles.inputSizeStyles( { inputSize: size, __next40pxDefaultSize } ),
+		styles.inputCustomPaddings( { hasPrefix, hasSuffix } ),
+		className,
+		'components-input-control__input'
+	);
+
 	return (
-		<Input
+		<input
 			{ ...props }
 			{ ...dragProps }
-			className="components-input-control__input"
+			className={ classes }
 			disabled={ disabled }
-			dragCursor={ dragCursor }
-			isDragging={ isDragging }
 			id={ id }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
@@ -225,7 +240,6 @@ function InputField(
 			onKeyDown={ handleOnKeyDown }
 			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
-			inputSize={ size }
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.
 			// See https://github.com/WordPress/gutenberg/pull/47250 for details.
 			value={ value ?? '' }
