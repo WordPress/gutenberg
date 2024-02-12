@@ -99,7 +99,7 @@ const SpacerEdit = ( {
 		default: { type: defaultType } = {},
 	} = parentLayout || {};
 	// Check if the spacer is inside a flex container.
-	const isFlexLayout = type === 'flex' || defaultType === 'flex';
+	const isFlexLayout = type === 'flex' || ( ! type && defaultType === 'flex' );
 	// If the spacer is inside a flex container, it should either inherit the orientation
 	// of the parent or use the flex default orientation.
 	const inheritedOrientation =
