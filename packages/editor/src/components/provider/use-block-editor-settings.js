@@ -22,9 +22,6 @@ import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const selectBlockPatterns = ( select ) =>
-	select( coreStore ).getBlockPatterns();
-
 const EMPTY_BLOCKS_LIST = [];
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -251,8 +248,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			[ unlock( privateApis ).selectBlockPatternsKey ]:
-				selectBlockPatterns,
+			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
+				unlock( select( coreStore ) ).getBlockPatternsForPostType(
+					postType
+				),
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
