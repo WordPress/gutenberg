@@ -103,7 +103,7 @@
 	}
 
 	.dataviews-pagination {
-		z-index: 2;
+		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
 	}
 }
 
