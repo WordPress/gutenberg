@@ -18,6 +18,7 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 } from '@wordpress/compose';
+import { Icon, home } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
@@ -162,18 +163,44 @@ export default function Layout() {
 		view: {
 			width: 32,
 			height: 32,
-			top: [ 0, 38, 30 ],
+			top: [ 0, 58, 30 ],
 			left: 24,
 			borderRadius: '4px',
 			boxShadow: '0px 6px 15px rgba(0,0,0,.3)',
+			transition: {
+				duration: 0.7,
+				type: 'spring',
+				bounce: 0.4,
+			},
 		},
 		edit: {
 			width: 60,
 			height: 60,
-			top: [ 30, 38, 0 ],
+			top: [ 30, 0 ],
 			left: 0,
 			borderRadius: '0px',
 			boxShadow: 'none',
+			transition: {
+				delay: 0.2,
+				duration: 0.2,
+				type: 'tween',
+				stiffness: 400,
+			},
+		},
+		hover: {
+			scale: canvasMode === 'edit' ? 0.7 : 1,
+			borderRadius: '4px',
+		},
+	};
+
+	const toggleHomeIconVariants = {
+		initial: {
+			opacity: 0,
+			scale: 0.5,
+		},
+		hover: {
+			opacity: 1,
+			scale: 1.2,
 		},
 	};
 
@@ -214,14 +241,20 @@ export default function Layout() {
 						className="edit-site-layout__view-mode-toggle"
 						variants={ toggleVariants }
 						animate={ canvasMode }
-						transition={ {
-							duration: ANIMATION_DURATION,
-							type: 'sprint',
-						} }
+						initial="initial"
+						whileHover="hover"
 					>
 						<Button { ...siteIconButtonProps } as={ motion.button }>
 							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>
+						{ canvasMode === 'edit' && (
+							<motion.div
+								className="edit-site-layout__home-icon"
+								variants={ toggleHomeIconVariants }
+							>
+								<Icon icon={ home } />
+							</motion.div>
+						) }
 					</motion.div>
 					<NavigableRegion
 						ariaLabel={ __( 'Navigation' ) }
