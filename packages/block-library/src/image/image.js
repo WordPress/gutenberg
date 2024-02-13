@@ -423,23 +423,32 @@ export default function Image( {
 			} = metadata?.bindings || {};
 			const hasParentPattern =
 				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
+			const urlBindingSource = getBlockBindingsSource(
+				urlBinding?.source
+			);
+			const altBindingSource = getBlockBindingsSource(
+				altBinding?.source
+			);
+			const titleBindingSource = getBlockBindingsSource(
+				titleBinding?.source
+			);
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					getBlockBindingsSource( urlBinding?.source )
-						?.lockAttributesEditing === true,
+					( ! urlBindingSource ||
+						urlBindingSource?.lockAttributesEditing ),
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					getBlockBindingsSource( altBinding?.source )
-						?.lockAttributesEditing === true,
+					( ! altBindingSource ||
+						altBindingSource?.lockAttributesEditing ),
 				lockTitleControls:
 					!! titleBinding &&
-					getBlockBindingsSource( titleBinding?.source )
-						?.lockAttributesEditing === true,
+					( ! titleBindingSource ||
+						titleBindingSource?.lockAttributesEditing ),
 			};
 		},
 		[ clientId, isSingleSelected, metadata?.bindings ]

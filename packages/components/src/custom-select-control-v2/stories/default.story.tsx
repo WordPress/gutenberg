@@ -11,10 +11,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect, CustomSelectItem } from '..';
+import CustomSelect from '../default-component';
+import { CustomSelectItem } from '..';
 
 const meta: Meta< typeof CustomSelect > = {
-	title: 'Components (Experimental)/CustomSelectControl v2',
+	title: 'Components (Experimental)/CustomSelectControl v2/Default',
 	component: CustomSelect,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -22,7 +23,6 @@ const meta: Meta< typeof CustomSelect > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
-		renderSelectedValue: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {
@@ -30,7 +30,6 @@ const meta: Meta< typeof CustomSelect > = {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
-			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
 		},
 	},
@@ -49,15 +48,11 @@ const meta: Meta< typeof CustomSelect > = {
 export default meta;
 
 const Template: StoryFn< typeof CustomSelect > = ( props ) => {
-	return <CustomSelect { ...props } />;
-};
-
-const ControlledTemplate: StoryFn< typeof CustomSelect > = ( props ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
 		<CustomSelect
 			{ ...props }
-			onChange={ ( nextValue ) => {
+			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
 				props.onChange?.( nextValue );
 			} }
@@ -68,14 +63,18 @@ const ControlledTemplate: StoryFn< typeof CustomSelect > = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	label: 'Label',
+	label: 'Label text',
+	defaultValue: 'Select a color...',
 	children: (
 		<>
-			<CustomSelectItem value="Small">
-				<span style={ { fontSize: '75%' } }>Small</span>
+			<CustomSelectItem value="Blue">
+				<span style={ { color: 'blue' } }>Blue</span>
 			</CustomSelectItem>
-			<CustomSelectItem value="Something bigger">
-				<span style={ { fontSize: '200%' } }>Something bigger</span>
+			<CustomSelectItem value="Purple">
+				<span style={ { color: 'purple' } }>Purple</span>
+			</CustomSelectItem>
+			<CustomSelectItem value="Pink">
+				<span style={ { color: 'deeppink' } }>Pink</span>
 			</CustomSelectItem>
 		</>
 	),
@@ -83,21 +82,13 @@ Default.args = {
 
 /**
  * Multiple selection can be enabled by using an array for the `value` and
- * `defaultValue` props. The argument of the `onChange` function will also
+ * `defaultValue` props. The argument type of the `onChange` function will also
  * change accordingly.
  */
-export const MultiSelect = Template.bind( {} );
-MultiSelect.args = {
-	defaultValue: [ 'lavender', 'tangerine' ],
+export const MultipleSelection = Template.bind( {} );
+MultipleSelection.args = {
 	label: 'Select Colors',
-	renderSelectedValue: ( currentValue: string | string[] ) => {
-		if ( ! Array.isArray( currentValue ) ) {
-			return currentValue;
-		}
-		if ( currentValue.length === 0 ) return 'No colors selected';
-		if ( currentValue.length === 1 ) return currentValue[ 0 ];
-		return `${ currentValue.length } colors selected`;
-	},
+	defaultValue: [ 'lavender', 'tangerine' ],
 	children: (
 		<>
 			{ [
@@ -116,32 +107,34 @@ MultiSelect.args = {
 	),
 };
 
-const renderControlledValue = ( gravatar: string | string[] ) => {
+const renderItem = ( gravatar: string | string[] ) => {
 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
 		<div style={ { display: 'flex', alignItems: 'center' } }>
 			<img
 				style={ { maxHeight: '75px', marginRight: '10px' } }
-				key={ avatar }
 				src={ avatar }
 				alt=""
-				aria-hidden="true"
 			/>
 			<span>{ gravatar }</span>
 		</div>
 	);
 };
 
-export const Controlled = ControlledTemplate.bind( {} );
-Controlled.args = {
+/**
+ * The `renderSelectedValue` prop can be used to customize how the selected value
+ * is rendered in the dropdown trigger.
+ */
+export const CustomSelectedValue = Template.bind( {} );
+CustomSelectedValue.args = {
 	label: 'Default Gravatars',
-	renderSelectedValue: renderControlledValue,
+	renderSelectedValue: renderItem,
 	children: (
 		<>
 			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
 				( option ) => (
 					<CustomSelectItem key={ option } value={ option }>
-						{ renderControlledValue( option ) }
+						{ renderItem( option ) }
 					</CustomSelectItem>
 				)
 			) }

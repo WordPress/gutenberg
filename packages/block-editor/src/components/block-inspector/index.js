@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
@@ -21,7 +20,6 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
-import DefaultStylePicker from '../default-style-picker';
 import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
@@ -275,15 +273,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						<div>
 							<PanelBody title={ __( 'Styles' ) }>
 								<BlockStyles clientId={ clientId } />
-								{ hasBlockSupport(
-									blockName,
-									'defaultStylePicker',
-									true
-								) && (
-									<DefaultStylePicker
-										blockName={ blockName }
-									/>
-								) }
 							</PanelBody>
 						</div>
 					) }

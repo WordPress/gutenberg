@@ -46,7 +46,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 							settings.source
 						);
 
-						if ( source ) {
+						if ( source && source.useSource ) {
 							// Second argument (`updateMetaValue`) will be used to update the value in the future.
 							const {
 								placeholder,

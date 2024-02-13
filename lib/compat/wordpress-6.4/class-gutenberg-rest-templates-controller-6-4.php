@@ -1,19 +1,19 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Template_Revision_Count class
+ * REST API: Gutenberg_REST_Templates_Controller_6_4 class
  *
  * @package    gutenberg
  */
 
 /**
- * Gutenberg_REST_Template_Revision_Count class
+ * Gutenberg_REST_Templates_Controller_6_4 class
  *
  * Template revision changes are waiting on a core change to be merged.
  * See: https://github.com/WordPress/gutenberg/pull/45215#issuecomment-1592704026
  * When merging into core, prepare_revision_links() should be merged with
  * WP_REST_Templates_Controller::prepare_links().
  */
-class Gutenberg_REST_Template_Revision_Count extends WP_REST_Templates_Controller {
+class Gutenberg_REST_Templates_Controller_6_4 extends WP_REST_Templates_Controller {
 	/**
 	 * Add revisions to the response.
 	 *
