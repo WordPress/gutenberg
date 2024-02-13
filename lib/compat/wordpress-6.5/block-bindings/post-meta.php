@@ -8,8 +8,9 @@
 /**
  * Gets value for Post Meta source.
  *
- * @param array $source_args Array containing source arguments used to look up the override value.
- *                           Example: array( "key" => "foo" ).
+ * @param array    $source_args    Array containing source arguments used to look up the override value.
+ *                                 Example: array( "key" => "foo" ).
+ * @param WP_Block $block_instance The block instance.
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_instance ) {
