@@ -163,7 +163,7 @@ export default function Layout() {
 		view: {
 			width: 32,
 			height: 32,
-			top: [ 0, 58, 30 ],
+			top: 30,
 			left: 24,
 			borderRadius: '4px',
 			boxShadow: '0px 6px 15px rgba(0,0,0,.3)',
@@ -174,33 +174,37 @@ export default function Layout() {
 			},
 		},
 		edit: {
-			width: 60,
-			height: 60,
-			top: [ 30, 0 ],
+			width: [ 32, 32, 60 ],
+			height: [ 32, 32, 60 ],
+			top: [ 30, 40, 0 ],
 			left: 0,
 			borderRadius: '0px',
 			boxShadow: 'none',
 			transition: {
-				delay: 0.2,
-				duration: 0.2,
+				delay: 0,
+				duration: 0.4,
 				type: 'tween',
 				stiffness: 400,
 			},
 		},
 		hover: {
-			scale: canvasMode === 'edit' ? 0.7 : 1,
+			scale: canvasMode === 'edit' ? 0.6 : 1,
 			borderRadius: '4px',
 		},
 	};
 
 	const toggleHomeIconVariants = {
-		initial: {
+		view: {
+			opacity: 0,
+			scale: 0.5,
+		},
+		edit: {
 			opacity: 0,
 			scale: 0.5,
 		},
 		hover: {
 			opacity: 1,
-			scale: 1.2,
+			scale: 1.3,
 		},
 	};
 
@@ -241,7 +245,7 @@ export default function Layout() {
 						className="edit-site-layout__view-mode-toggle"
 						variants={ toggleVariants }
 						animate={ canvasMode }
-						initial="initial"
+						initial={ canvasMode }
 						whileHover="hover"
 					>
 						<Button { ...siteIconButtonProps } as={ motion.button }>
