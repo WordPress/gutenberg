@@ -80,7 +80,7 @@ export default function HeaderEditMode() {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { showFixedToolbar } = useShowBlockTools();
-	const isTopToolbar =
+	const hasTopToolbar =
 		! isZoomOutMode &&
 		hasFixedToolbar &&
 		isLargeViewport &&
@@ -133,7 +133,7 @@ export default function HeaderEditMode() {
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
 					/>
-					{ isTopToolbar && (
+					{ hasTopToolbar && (
 						<>
 							<div
 								className={ classnames(
@@ -178,7 +178,7 @@ export default function HeaderEditMode() {
 							'is-collapsed':
 								! isBlockToolsCollapsed &&
 								isLargeViewport &&
-								isTopToolbar,
+								hasTopToolbar,
 						}
 					) }
 				>
