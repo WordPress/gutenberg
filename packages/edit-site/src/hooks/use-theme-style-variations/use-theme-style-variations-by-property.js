@@ -67,7 +67,7 @@ export default function useThemeStyleVariationsByProperty( {
 
 		let processedStyleVariations = variations.map( ( variation ) => {
 			let result = {
-				...filterObjectByProperty( variation, property ),
+				...filterObjectByProperty( cloneDeep( variation ), property ),
 				title: variation?.title,
 				description: variation?.description,
 			};

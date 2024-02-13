@@ -455,6 +455,43 @@ describe( 'useThemeStyleVariationsByProperty', () => {
 		expect( falsyResult.current ).toEqual( null );
 	} );
 
+	it( 'should return new, unreferenced object', () => {
+		const variations = [
+			{
+				title: 'hey',
+				description: 'ho',
+				joe: {
+					where: {
+						you: 'going with that unit test in your hand',
+					},
+				},
+			},
+		];
+		const { result } = renderHook( () =>
+			useThemeStyleVariationsByProperty( {
+				variations,
+				property: 'where',
+			} )
+		);
+
+		expect( result.current ).toEqual( [
+			{
+				title: 'hey',
+				description: 'ho',
+				joe: {
+					where: {
+						you: 'going with that unit test in your hand',
+					},
+				},
+			},
+		] );
+
+		expect( result.current[ 0 ].joe.where ).not.toBe(
+			variations[ 0 ].joe.where
+		);
+		expect( result.current[ 0 ].joe ).not.toBe( variations[ 0 ].joe );
+	} );
+
 	it( "should return the variation's typography properties", () => {
 		const { result } = renderHook( () =>
 			useThemeStyleVariationsByProperty( {
