@@ -33,6 +33,19 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		private static $instance = null;
 
 		/**
+		 * Supported blocks that can use the block bindings API.
+		 *
+		 * @since 6.5.0
+		 * @var array
+		 */
+		private $supported_blocks = array(
+			'core/paragraph',
+			'core/heading',
+			'core/image',
+			'core/button',
+		);
+
+		/**
 		 * Registers a new block bindings source.
 		 *
 		 * Sources are used to override block's original attributes with a value
@@ -48,18 +61,19 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 * @param array    $source_properties {
 		 *     The array of arguments that are used to register a source.
 		 *
-		 *     @type string   $label              The label of the source.
-		 *     @type callback $get_value_callback A callback executed when the source is processed during block rendering.
-		 *                                        The callback should have the following signature:
+		 *     @type string   $label                  The label of the source.
+		 *     @type callback $get_value_callback     A callback executed when the source is processed during block rendering.
+		 *                                            The callback should have the following signature:
 		 *
-		 *                                        `function ($source_args, $block_instance,$attribute_name): mixed`
-		 *                                            - @param array    $source_args    Array containing source arguments
-		 *                                                                              used to look up the override value,
-		 *                                                                              i.e. {"key": "foo"}.
-		 *                                            - @param WP_Block $block_instance The block instance.
-		 *                                            - @param string   $attribute_name The name of the target attribute.
-		 *                                        The callback has a mixed return type; it may return a string to override
-		 *                                        the block's original value, null, false to remove an attribute, etc.
+		 *                                            `function ($source_args, $block_instance,$attribute_name): mixed`
+		 *                                                - @param array    $source_args    Array containing source arguments
+		 *                                                                                  used to look up the override value,
+		 *                                                                                  i.e. {"key": "foo"}.
+		 *                                                - @param WP_Block $block_instance The block instance.
+		 *                                                - @param string   $attribute_name The name of the target attribute.
+		 *                                            The callback has a mixed return type; it may return a string to override
+		 *                                            the block's original value, null, false to remove an attribute, etc.
+		 *     @type array   $uses_context (optional) Array of values to add to block `uses_context` needed by the source.
 		 * }
 		 * @return WP_Block_Bindings_Source|false Source when the registration was successful, or `false` on failure.
 		 */
@@ -132,6 +146,16 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
+			// Validate that the uses_context parameter is an array.
+			if ( isset( $source_properties['uses_context'] ) && ! is_array( $source_properties['uses_context'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The "uses_context" parameter must be an array.' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
 			$source = new WP_Block_Bindings_Source(
 				$source_name,
 				$source_properties
@@ -140,24 +164,41 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			$this->sources[ $source_name ] = $source;
 
 			// Add `uses_context` defined by block bindings sources.
-			add_filter(
-				'register_block_type_args',
-				function ( $args, $block_name ) use ( $source ) {
-					$allowed_blocks = $this->allowed_blocks;
+			// If `get_uses_context` exists (from WP 6.5), use its filter because it is more reliable.
+			if ( method_exists( 'WP_Block_Type', 'get_uses_context' ) ) {
+				add_filter(
+					'get_block_type_uses_context',
+					function ( $uses_context, $block_type ) use ( $source ) {
+						if ( ! in_array( $block_type->name, $this->supported_blocks, true ) || empty( $source->uses_context ) ) {
+							return $uses_context;
+						}
+						// Use array_values to reset the array keys.
+						$merged_uses_context = array_values( array_unique( array_merge( $uses_context, $source->uses_context ) ) );
 
-					if ( empty( $allowed_blocks[ $block_name ] ) || empty( $source->uses_context ) ) {
+						return $merged_uses_context;
+					},
+					10,
+					2
+				);
+			} else {
+				add_filter(
+					'register_block_type_args',
+					function ( $args, $block_name ) use ( $source ) {
+						$allowed_blocks = $this->allowed_blocks;
+
+						if ( empty( $allowed_blocks[ $block_name ] ) || empty( $source->uses_context ) ) {
+							return $args;
+						}
+						$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
+						// Use array_values to reset the array keys.
+						$args['uses_context'] = array_values( array_unique( array_merge( $original_use_context, $source->uses_context ) ) );
+
 						return $args;
-					}
-					$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
-					// Use array_values to reset the array keys.
-					$args['uses_context'] = array_values( array_unique( array_merge( $original_use_context, $source->uses_context ) ) );
-
-					return $args;
-				},
-				10,
-				2
-			);
-
+					},
+					10,
+					2
+				);
+			}
 			return $source;
 		}
 
