@@ -84,6 +84,13 @@ function gutenberg_create_initial_post_types() {
 	);
 }
 
+/**
+ * Maps the meta capabilities for modifying font face files.
+ *
+ * @param array  $caps The primitive capabilities for the given capability.
+ * @param string $cap  The capability being checked.
+ * @return array The modified primitive capabilities for the given capability.
+ */
 function gutenberg_map_meta_caps_font_faces( $caps, $cap ) {
 	if ( 'install_fonts' !== $cap ) {
 		return $caps;
@@ -101,7 +108,6 @@ function gutenberg_map_meta_caps_font_faces( $caps, $cap ) {
 	return $caps;
 }
 add_filter( 'map_meta_cap', 'gutenberg_map_meta_caps_font_faces', 10, 2 );
-
 
 /**
  * Initializes REST routes.
