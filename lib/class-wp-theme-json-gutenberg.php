@@ -860,12 +860,6 @@ class WP_Theme_JSON_Gutenberg {
 		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
 		$block_style_variation_styles['elements'] = $schema_styles_elements;
 
-		// Generate schema for shared block style variations i.e. those that can
-		// be reused across block types and live under `styles.blocks.variations`.
-		$unique_variations = array_unique(
-			call_user_func_array( 'array_merge', array_values( $valid_variations ) )
-		);
-
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
