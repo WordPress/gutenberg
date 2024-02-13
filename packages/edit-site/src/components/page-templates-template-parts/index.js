@@ -189,29 +189,12 @@ function Preview( { item, viewType } ) {
 }
 
 function computeFilters( activeView ) {
-	// activeView takes values such as:
-	// - 'all'
-	// - 'user'
-	// - 'theme'
-	// - 'plugin:My Plugin'
 	switch ( activeView ) {
 		case 'all':
 			return [];
 
-		case 'user':
-		case 'theme':
-			return [ { field: 'source', operator: 'in', value: activeView } ];
-
-		default: {
-			const idx = activeView.indexOf( ':' );
-			const source = activeView.substring( 0, idx );
-			const author = activeView.substring( idx + 1 );
-			const filters = [
-				{ field: 'source', operator: 'in', value: source },
-				{ field: 'author', operator: 'in', value: author },
-			];
-			return filters;
-		}
+		default:
+			return [ { field: 'author', operator: 'in', value: activeView } ];
 	}
 }
 
@@ -383,22 +366,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text !== filter.value;
-					} );
-				} else if (
-					filter.field === 'source' &&
-					filter.operator === OPERATOR_IN &&
-					filter.value
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return item.original_source === filter.value;
-					} );
-				} else if (
-					filter.field === 'source' &&
-					filter.operator === OPERATOR_NOT_IN &&
-					filter.value
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return item.original_source !== filter.value;
 					} );
 				}
 			} );

@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,7 +13,6 @@ import { __ } from '@wordpress/i18n';
 import DataViewItem from '../sidebar-dataviews/dataview-item';
 import {
 	file as fileIcon,
-	layout as themeIcon,
 	commentAuthorAvatar as customIcon,
 	plugins as pluginIcon,
 } from '@wordpress/icons';
@@ -26,29 +26,43 @@ export default function DataviewsTemplatesSidebarContent( {
 		per_page: -1,
 	} );
 
-	const sources = useMemo( () => {
+	// TODO: Can we avoid the delay and rerendering stemming from this call by
+	// preloading '/wp/v2/users/me'?
+	const currentUserId = useSelect(
+		( select ) => select( coreStore ).getCurrentUser()?.id,
+		[]
+	);
+
+	const counts = useMemo( () => {
 		if ( records ) {
-			const _sources = {
-				theme: undefined,
-				user: undefined,
-				plugin: {},
-			};
+			const user = { count: 0, name: undefined };
+			const plugins = {};
 
 			for ( const template of records ) {
-				const src = template.original_source;
-				const obj = src === 'plugin' ? _sources.plugin : _sources;
-				if ( ! obj[ src ] ) {
-					obj[ src ] = {
-						count: 0,
-						value: template.author_text,
-					};
+				switch ( template.original_source ) {
+					case 'user':
+						if ( template.author === currentUserId ) {
+							if ( ! user.name ) {
+								user.name = template.author_text;
+							}
+							user.count++;
+						}
+						break;
+					case 'plugin':
+						if ( ! plugins[ template.theme ] ) {
+							plugins[ template.theme ] = {
+								count: 0,
+								name: template.author_text,
+							};
+						}
+						plugins[ template.theme ].count++;
+						break;
 				}
-				obj[ src ].count++;
 			}
 
-			return _sources;
+			return { user, plugins };
 		}
-	}, [ records ] );
+	}, [ records, currentUserId ] );
 
 	return (
 		<ItemGroup>
@@ -60,35 +74,26 @@ export default function DataviewsTemplatesSidebarContent( {
 				isCustom="false"
 				suffix={ <span>{ records?.length }</span> }
 			/>
-			{ sources?.theme && (
+			{ counts && (
 				<DataViewItem
-					slug="theme"
-					title={ __( 'Theme' ) }
-					icon={ themeIcon }
-					isActive={ activeView === 'theme' }
-					isCustom="false"
-					suffix={ <span>{ sources.theme.count }</span> }
-				/>
-			) }
-			{ sources?.user && (
-				<DataViewItem
-					slug="user"
-					title={ __( 'User' ) }
+					key="user"
+					slug={ counts.user.name }
+					title={ __( 'My templates' ) }
 					icon={ customIcon }
-					isActive={ activeView === 'user' }
+					isActive={ activeView === counts.user.name }
 					isCustom="false"
-					suffix={ <span>{ sources.user.count }</span> }
+					suffix={ <span>{ counts.user.count }</span> }
 				/>
 			) }
-			{ sources?.plugin &&
-				Object.entries( sources.plugin ).map(
-					( [ key, { count, value } ] ) => (
+			{ counts &&
+				Object.entries( counts?.plugins ).map(
+					( [ key, { count, name } ] ) => (
 						<DataViewItem
 							key={ key }
-							slug={ `plugin:${ value }` }
-							title={ value }
+							slug={ name }
+							title={ name }
 							icon={ pluginIcon }
-							isActive={ activeView === `plugin:${ value }` }
+							isActive={ activeView === name }
 							isCustom="false"
 							suffix={ <span>{ count }</span> }
 						/>
