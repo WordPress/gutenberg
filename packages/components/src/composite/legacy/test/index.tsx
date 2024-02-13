@@ -275,7 +275,7 @@ describe.each( [
 		const { item2 } = getOneDimensionalItems();
 
 		await press.Tab();
-		expect( item2 ).toHaveFocus();
+		await waitFor( () => expect( item2 ).toHaveFocus() );
 	} );
 } );
 
