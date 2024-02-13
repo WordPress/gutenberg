@@ -17,7 +17,7 @@
 class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends WP_REST_Global_Styles_Revisions_Controller {
 
 
-	protected $parent_post_type = 'wp_global_styles';
+	protected $parent_post_type;
 
 	/**
 	 * Prepares the revision for the REST response.
