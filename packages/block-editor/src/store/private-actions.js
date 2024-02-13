@@ -131,12 +131,28 @@ export const privateRemoveBlocks =
 			// corresponding to "important" blocks, i.e. blocks that require a
 			// removal prompt.
 			const queue = [ ...clientIds ];
+			let messageType = 'templates';
 			while ( queue.length ) {
 				const clientId = queue.shift();
 				const blockName = select.getBlockName( clientId );
 				if ( rules[ blockName ] ) {
 					blockNamesForPrompt.add( blockName );
 				}
+
+				if ( rules[ 'bindings/core/pattern-overrides' ] ) {
+					const blockAttributes =
+						select.getBlockAttributes( clientId );
+					if (
+						blockAttributes?.metadata?.bindings &&
+						JSON.stringify(
+							blockAttributes.metadata.bindings
+						).includes( 'core/pattern-overrides' )
+					) {
+						blockNamesForPrompt.add( blockName );
+						messageType = 'patternOverrides';
+					}
+				}
+
 				const innerBlocks = select.getBlockOrder( clientId );
 				queue.push( ...innerBlocks );
 			}
@@ -148,7 +164,8 @@ export const privateRemoveBlocks =
 					displayBlockRemovalPrompt(
 						clientIds,
 						selectPrevious,
-						Array.from( blockNamesForPrompt )
+						Array.from( blockNamesForPrompt ),
+						messageType
 					)
 				);
 				return;
@@ -211,19 +228,22 @@ export const ensureDefaultBlock =
  * @param {string[]}        blockNamesForPrompt Names of the blocks that
  *                                              triggered the need for
  *                                              confirmation before removal.
+ * @param {string}          messageType         The type of message to display.
  *
  * @return {Object} Action object.
  */
 function displayBlockRemovalPrompt(
 	clientIds,
 	selectPrevious,
-	blockNamesForPrompt
+	blockNamesForPrompt,
+	messageType
 ) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
 		blockNamesForPrompt,
+		messageType,
 	};
 }
 
@@ -368,5 +388,27 @@ export function registerBlockBindingsSource( source ) {
 		sourceLabel: source.label,
 		useSource: source.useSource,
 		lockAttributesEditing: source.lockAttributesEditing,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has begun to drag.
+ *
+ * @return {Object} Action object.
+ */
+export function startDragging() {
+	return {
+		type: 'START_DRAGGING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped dragging.
+ *
+ * @return {Object} Action object.
+ */
+export function stopDragging() {
+	return {
+		type: 'STOP_DRAGGING',
 	};
 }

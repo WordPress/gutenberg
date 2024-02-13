@@ -7,7 +7,9 @@ import { dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import patternOverrides from './pattern-overrides';
 import postMeta from './post-meta';
 
 const { registerBlockBindingsSource } = unlock( dispatch( blockEditorStore ) );
+registerBlockBindingsSource( patternOverrides );
 registerBlockBindingsSource( postMeta );

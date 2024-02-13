@@ -23,6 +23,7 @@ import {
 	isPointWithinTopAndBottomBoundariesOfRect,
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const THRESHOLD_DISTANCE = 30;
 const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
@@ -308,9 +309,14 @@ export default function useBlockDropZone( {
 		getDraggedBlockClientIds,
 		getBlockNamesByClientId,
 		getAllowedBlocks,
-	} = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } =
-		useDispatch( blockEditorStore );
+		isDragging,
+	} = unlock( useSelect( blockEditorStore ) );
+	const {
+		showInsertionPoint,
+		hideInsertionPoint,
+		startDragging,
+		stopDragging,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const onBlockDrop = useOnBlockDrop(
 		dropTarget.operation === 'before' || dropTarget.operation === 'after'
@@ -325,6 +331,11 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
+				if ( ! isDragging() ) {
+					// When dragging from the desktop, no drag start event is fired.
+					// So, ensure that the drag state is set when the user drags over a drop zone.
+					startDragging();
+				}
 				const allowedBlocks = getAllowedBlocks( targetRootClientId );
 				const targetBlockName = getBlockNamesByClientId( [
 					targetRootClientId,
@@ -423,6 +434,8 @@ export default function useBlockDropZone( {
 				getBlockIndex,
 				registry,
 				showInsertionPoint,
+				isDragging,
+				startDragging,
 			]
 		),
 		200
@@ -444,6 +457,7 @@ export default function useBlockDropZone( {
 		},
 		onDragEnd() {
 			throttled.cancel();
+			stopDragging();
 			hideInsertionPoint();
 		},
 	} );

@@ -10,10 +10,11 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import withSpokenMessages from '../../higher-order/with-spoken-messages';
 import { useNavigationMenuContext } from './context';
 import { useNavigationContext } from '../context';
-import { MenuTitleSearchUI } from '../styles/navigation-styles';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
 import type { NavigationMenuTitleSearchProps } from '../types';
+import SearchControl from '../../search-control';
+import { MenuTitleSearchControlWrapper } from '../styles/navigation-styles';
 
 function MenuTitleSearch( {
 	debouncedSpeak,
@@ -80,9 +81,9 @@ function MenuTitleSearch( {
 	).trim();
 
 	return (
-		<div className="components-navigation__menu-title-search">
-			<MenuTitleSearchUI
-				autoComplete="off"
+		<MenuTitleSearchControlWrapper>
+			<SearchControl
+				__nextHasNoMarginBottom
 				className="components-navigation__menu-search-input"
 				id={ inputId }
 				onChange={ ( value ) => onSearch?.( value ) }
@@ -90,10 +91,9 @@ function MenuTitleSearch( {
 				placeholder={ placeholder }
 				onClose={ onClose }
 				ref={ inputRef }
-				type="search"
 				value={ search }
 			/>
-		</div>
+		</MenuTitleSearchControlWrapper>
 	);
 }
 

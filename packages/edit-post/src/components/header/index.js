@@ -55,7 +55,7 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( { setEntitiesSavedStatesCallback } ) {
+function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
@@ -76,7 +76,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
+			hasHistory:
+				!! select( editorStore ).getEditorSettings()
+					.onNavigateToPreviousEntityRecord,
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
@@ -101,7 +103,10 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					variants={ slideX }
 					transition={ { type: 'tween', delay: 0.8 } }
 				>
-					<FullscreenModeClose showTooltip />
+					<FullscreenModeClose
+						showTooltip
+						initialPost={ initialPost }
+					/>
 				</motion.div>
 			</MainDashboardButton.Slot>
 			<motion.div

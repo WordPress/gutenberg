@@ -171,8 +171,6 @@ function GridItem( { categoryId, item, ...props } ) {
 		<li className={ patternClassNames }>
 			<button
 				className={ previewClassNames }
-				// Even though still incomplete, passing ids helps performance.
-				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
 				type="button"
 				{ ...props }

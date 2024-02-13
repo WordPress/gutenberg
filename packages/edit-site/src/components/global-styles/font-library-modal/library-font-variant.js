@@ -45,21 +45,23 @@ function LibraryFontVariant( { face, font } ) {
 	);
 
 	return (
-		<label
-			className="font-library-modal__library-font-variant"
-			htmlFor={ checkboxId }
-		>
+		<div className="font-library-modal__library-font-variant">
 			<Flex justify="flex-start" align="center" gap="1rem">
 				<CheckboxControl
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
 					id={ checkboxId }
-					label={ false }
 				/>
-				<FontFaceDemo fontFace={ face } text={ displayName } />
+				<label htmlFor={ checkboxId }>
+					<FontFaceDemo
+						fontFace={ face }
+						text={ displayName }
+						onClick={ handleToggleActivation }
+					/>
+				</label>
 			</Flex>
-		</label>
+		</div>
 	);
 }
 
