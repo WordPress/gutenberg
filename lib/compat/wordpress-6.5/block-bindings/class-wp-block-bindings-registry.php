@@ -184,9 +184,9 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				add_filter(
 					'register_block_type_args',
 					function ( $args, $block_name ) use ( $source ) {
-						$allowed_blocks = $this->allowed_blocks;
+						$supported_blocks = $this->supported_blocks;
 
-						if ( empty( $allowed_blocks[ $block_name ] ) || empty( $source->uses_context ) ) {
+						if ( empty( $supported_blocks[ $block_name ] ) || empty( $source->uses_context ) ) {
 							return $args;
 						}
 						$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
