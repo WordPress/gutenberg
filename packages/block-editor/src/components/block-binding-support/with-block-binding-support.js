@@ -28,19 +28,19 @@ import { unlock } from '../../../../editor/src/lock-unlock';
  * @return {null}                       This is a data-handling component. Render nothing.
  */
 const BlockBindingConnector = ( {
+	args,
 	attrName,
 	attrValue,
-	useSource,
 	blockProps,
-	args,
+	useSource,
 } ) => {
-	const lastPropValue = useRef();
-	const lastAttrValue = useRef();
-	const { value, updateValue } = useSource( blockProps, args );
-
+	const { value: propValue, updateValue: updatePropValue } = useSource(
+		blockProps,
+		args
+	);
 	const setAttributes = blockProps.setAttributes;
 
-	const onPropValueChange = useCallback(
+	const updateBoundAttibute = useCallback(
 		( newAttrValue ) => {
 			setAttributes( {
 				[ attrName ]: newAttrValue,
@@ -49,35 +49,40 @@ const BlockBindingConnector = ( {
 		[ attrName, setAttributes ]
 	);
 
+	// Store a reference to the last value and attribute value.
+	const lastPropValue = useRef();
+	const lastAttrValue = useRef();
+
 	/*
-	 * Source Prop => Block Attribute
-	 *
-	 * Detect changes in source prop value,
-	 * and update the attribute value accordingly.
+	 * Sync data.
+	 * This effect will run every time
+	 * the attribute value or the prop value changes.
+	 * It will sync them in both directions.
 	 */
 	useEffect( () => {
-		if ( value === lastPropValue.current ) {
+		/*
+		 * Source Prop => Block Attribute
+		 *
+		 * Detect changes in source prop value,
+		 * and update the attribute value accordingly.
+		 */
+		if ( propValue !== lastPropValue.current ) {
+			lastPropValue.current = propValue;
+			updateBoundAttibute( propValue );
 			return;
 		}
 
-		lastPropValue.current = value;
-		onPropValueChange( value );
-	}, [ onPropValueChange, value ] );
-
-	/*
-	 * Block Attribute => Source Prop
-	 *
-	 * Detect changes in block attribute value,
-	 * and update the source prop value accordingly.
-	 */
-	useEffect( () => {
-		if ( attrValue === lastAttrValue.current ) {
-			return;
+		/*
+		 * Block Attribute => Source Prop
+		 *
+		 * Detect changes in block attribute value,
+		 * and update the source prop value accordingly.
+		 */
+		if ( attrValue !== lastAttrValue.current ) {
+			lastAttrValue.current = attrValue;
+			updatePropValue( attrValue );
 		}
-
-		lastAttrValue.current = attrValue;
-		updateValue( attrValue );
-	}, [ updateValue, attrValue ] );
+	}, [ updateBoundAttibute, propValue, attrValue, updatePropValue ] );
 
 	return null;
 };
