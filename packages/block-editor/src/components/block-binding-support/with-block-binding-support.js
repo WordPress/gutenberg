@@ -23,9 +23,9 @@ import { unlock } from '../../../../editor/src/lock-unlock';
  * @param {string}   props.attrName   - The attribute name.
  * @param {any}      props.attrValue  - The attribute value.
  * @param {Function} props.useSource  - The custom hook to use the source.
- * @param {Object}   props.blockProps - The block props with bound attributes.
+ * @param {Object}   props.blockProps - The block props with bound attribute.
  * @param {Object}   props.args       - The arguments to pass to the source.
- * @return {null}                      This is a data-handling component. Render nothing.
+ * @return {null}                       This is a data-handling component. Render nothing.
  */
 const BlockBindingConnector = ( {
 	attrName,
