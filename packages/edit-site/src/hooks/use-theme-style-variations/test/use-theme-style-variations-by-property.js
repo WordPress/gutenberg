@@ -11,6 +11,7 @@ import useThemeStyleVariationsByProperty, {
 } from '../use-theme-style-variations-by-property';
 
 describe( 'filterObjectByProperty', () => {
+	const noop = () => {};
 	test.each( [
 		{
 			object: {
@@ -35,6 +36,32 @@ describe( 'filterObjectByProperty', () => {
 			expected: {},
 		},
 		{
+			object: {
+				dig: {
+					deeper: {
+						null: null,
+					},
+				},
+			},
+			property: 'null',
+			expected: {
+				dig: {
+					deeper: {
+						null: null,
+					},
+				},
+			},
+		},
+		{
+			object: {
+				function: noop,
+			},
+			property: 'function',
+			expected: {
+				function: noop,
+			},
+		},
+		{
 			object: [],
 			property: 'something',
 			expected: {},
@@ -47,15 +74,14 @@ describe( 'filterObjectByProperty', () => {
 		{
 			object: {
 				'nested-object': {
-					foo: 'bar',
+					'nested-object-foo': 'bar',
 					array: [ 1, 3, 4 ],
 				},
 			},
-			property: 'nested-object',
+			property: 'nested-object-foo',
 			expected: {
 				'nested-object': {
-					foo: 'bar',
-					array: [ 1, 3, 4 ],
+					'nested-object-foo': 'bar',
 				},
 			},
 		},
