@@ -12,6 +12,7 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useResourcePermissions } from '@wordpress/core-data';
 import { useContext, useState } from '@wordpress/element';
 
 /**
@@ -30,6 +31,7 @@ const { ProgressBar } = unlock( componentsPrivateApis );
 function UploadFonts() {
 	const { installFont, notice, setNotice } = useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
+	const { canCreate } = useResourcePermissions( 'font-families' );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -171,41 +173,43 @@ function UploadFonts() {
 	};
 
 	return (
-		<TabPanelLayout notice={ notice }>
-			<DropZone onFilesDrop={ handleDropZone } />
-			<VStack className="font-library-modal__local-fonts">
-				{ isUploading && (
-					<FlexItem>
-						<div className="font-library-modal__upload-area">
-							<ProgressBar />
-						</div>
-					</FlexItem>
-				) }
-				{ ! isUploading && (
-					<FormFileUpload
-						accept={ ALLOWED_FILE_EXTENSIONS.map(
-							( ext ) => `.${ ext }`
-						).join( ',' ) }
-						multiple={ true }
-						onChange={ onFilesUpload }
-						render={ ( { openFileDialog } ) => (
-							<Button
-								className="font-library-modal__upload-area"
-								onClick={ openFileDialog }
-							>
-								{ __( 'Upload font' ) }
-							</Button>
-						) }
-					/>
-				) }
-				<Spacer margin={ 2 } />
-				<Text className="font-library-modal__upload-area__text">
-					{ __(
-						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .tff, .otf, .woff, and .woff2.'
+		canCreate && (
+			<TabPanelLayout notice={ notice }>
+				<DropZone onFilesDrop={ handleDropZone } />
+				<VStack className="font-library-modal__local-fonts">
+					{ isUploading && (
+						<FlexItem>
+							<div className="font-library-modal__upload-area">
+								<ProgressBar />
+							</div>
+						</FlexItem>
 					) }
-				</Text>
-			</VStack>
-		</TabPanelLayout>
+					{ ! isUploading && (
+						<FormFileUpload
+							accept={ ALLOWED_FILE_EXTENSIONS.map(
+								( ext ) => `.${ ext }`
+							).join( ',' ) }
+							multiple={ true }
+							onChange={ onFilesUpload }
+							render={ ( { openFileDialog } ) => (
+								<Button
+									className="font-library-modal__upload-area"
+									onClick={ openFileDialog }
+								>
+									{ __( 'Upload font' ) }
+								</Button>
+							) }
+						/>
+					) }
+					<Spacer margin={ 2 } />
+					<Text className="font-library-modal__upload-area__text">
+						{ __(
+							'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .tff, .otf, .woff, and .woff2.'
+						) }
+					</Text>
+				</VStack>
+			</TabPanelLayout>
+		)
 	);
 }
 

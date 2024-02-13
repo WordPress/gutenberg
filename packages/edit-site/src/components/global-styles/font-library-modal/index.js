@@ -6,6 +6,7 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useResourcePermissions } from '@wordpress/core-data';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -24,6 +25,9 @@ const DEFAULT_TABS = [
 		id: 'installed-fonts',
 		title: __( 'Library' ),
 	},
+];
+
+const UPLOAD_TABS = [
 	{
 		id: 'upload-fonts',
 		title: __( 'Upload' ),
@@ -44,10 +48,12 @@ function FontLibraryModal( {
 	initialTabId = 'installed-fonts',
 } ) {
 	const { collections, setNotice } = useContext( FontLibraryContext );
+	const { canCreate } = useResourcePermissions( 'font-families' );
 
 	const tabs = [
 		...DEFAULT_TABS,
-		...tabsFromCollections( collections || [] ),
+		...( canCreate ? UPLOAD_TABS : [] ),
+		...( canCreate ? tabsFromCollections( collections || [] ) : [] ),
 	];
 
 	// Reset notice when new tab is selected.
