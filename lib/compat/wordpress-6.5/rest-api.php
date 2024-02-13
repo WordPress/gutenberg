@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers the Global Styles Revisions REST API routes.
  */
 function gutenberg_register_global_styles_revisions_endpoints() {
-	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_5();
+	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_5( 'wp_global_styles' );
 	$global_styles_revisions_controller->register_routes();
 }
 
