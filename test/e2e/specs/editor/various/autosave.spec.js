@@ -170,6 +170,7 @@ test.describe( 'Autosave', () => {
 
 	test( "shouldn't clear local autosave if remote autosave fails", async ( {
 		editor,
+		context,
 		page,
 		pageUtils,
 	} ) => {
@@ -194,12 +195,7 @@ test.describe( 'Autosave', () => {
 		).toBeGreaterThanOrEqual( 1 );
 
 		// Intercept autosave request and abort it.
-		await page.route(
-			( url ) => url.href.includes( 'autosave' ),
-			async ( route ) => {
-				await route.abort( 'internetdisconnected' );
-			}
-		);
+		await context.setOffline( true );
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave()
 		);
@@ -243,6 +239,7 @@ test.describe( 'Autosave', () => {
 
 	test( "shouldn't clear local autosave if save fails", async ( {
 		editor,
+		context,
 		page,
 		pageUtils,
 	} ) => {
@@ -268,15 +265,7 @@ test.describe( 'Autosave', () => {
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBeGreaterThanOrEqual( 1 );
 
-		await page.route(
-			( url ) =>
-				url.href.includes(
-					`rest_route=${ encodeURIComponent( '/wp/v2/posts/' ) }`
-				),
-			async ( route ) => {
-				await route.abort( 'internetdisconnected' );
-			}
-		);
+		await context.setOffline( true );
 		await pageUtils.pressKeys( 'primary+s' );
 
 		await expect(
