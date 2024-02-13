@@ -97,7 +97,7 @@ function gutenberg_map_meta_caps_font_faces( $caps, $cap ) {
 	}
 
 	// Remove the install fonts capability as it's not a primitive.
-	$caps = array_diff( $caps, array( 'install_fonts' ) );
+	$caps   = array_diff( $caps, array( 'install_fonts' ) );
 	$caps[] = 'edit_theme_options';
 
 	// Only allow font uploads on systems with file mods enabled.
