@@ -1,17 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { useContext, useMemo } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import cloneDeep from '../../utils/clone-deep';
 import { mergeBaseAndUserConfigs } from '../../components/global-styles/global-styles-provider';
+import cloneDeep from '../../utils/clone-deep';
+
 /**
  * Returns a new object with only the properties specified in `properties`.
  *
@@ -39,88 +36,53 @@ export const filterObjectByProperty = ( object, property ) => {
 };
 
 /**
- * Removes all instances of a property from an object.
+ * Returns a new object with only the properties specified in `properties`.
  *
- * @param {Object} object
- * @param {string} property
- * @return {Object} The modified object.
+ * @param {Object}   props                 Object of hook args.
+ * @param {Object[]} props.styleVariations The theme style variations to filter.
+ * @param {string}   props.styleProperty   The property to filter by.
+ * @param {Function} props.filter          Optional. The filter function to apply to the variations.
+ * @param {Object}   props.baseVariation   Optional. Base or user settings to be updated with variation properties.
+ * @return {Object[]} The merged object.
  */
-const removePropertyFromObject = ( object, property ) => {
-	for ( const key in object ) {
-		if ( key === property ) {
-			delete object[ key ];
-		} else if ( typeof object[ key ] === 'object' ) {
-			removePropertyFromObject( object[ key ], property );
+export default function useThemeStyleVariationsByProperty( {
+	styleVariations,
+	styleProperty,
+	filter,
+	baseVariation,
+} ) {
+	return useMemo( () => {
+		if ( ! styleProperty || styleVariations?.length === 0 ) {
+			return styleVariations;
 		}
-	}
-	return object;
-};
 
-/**
- * Return style variations with all properties removed except for the one specified in `type`.
- *
- * @param {Object} user       The user variation.
- * @param {Array}  variations The other style variations.
- * @param {string} property   The property to filter by.
- *
- * @return {Array} The style variation with only the specified property filtered.
- */
-export const getVariationsByProperty = ( user, variations, property ) => {
-	const userSettingsWithoutProperty = removePropertyFromObject(
-		cloneDeep( user ),
-		property
-	);
-
-	const variationsWithOnlyProperty = variations.map( ( variation ) => {
-		return {
-			...filterObjectByProperty( variation, property ),
+		let processedStyleVariations = styleVariations.map( ( variation ) => ( {
+			...filterObjectByProperty( variation, styleProperty ),
 			// Add variation title and description to every variation item.
 			title: variation?.title,
 			description: variation?.description,
-		};
-	} );
+		} ) );
 
-	return variationsWithOnlyProperty.map( ( variation ) =>
-		mergeBaseAndUserConfigs( userSettingsWithoutProperty, variation )
-	);
-};
-
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-
-export default function useThemeStyleVariationsByProperty( {
-	styleProperty,
-	filter,
-} ) {
-	const variations = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeGlobalStylesVariations();
-	}, [] );
-
-	const { user } = useContext( GlobalStylesContext );
-
-	return useMemo( () => {
-		if ( ! styleProperty || ! variations.length ) {
-			return [];
+		if (
+			typeof baseVariation === 'object' &&
+			Object.keys( baseVariation ).length > 0
+		) {
+			/*
+			 * Overwrites all baseVariation object `styleProperty` properties
+			 * with the theme variation `styleProperty` properties.
+			 */
+			const clonedBaseVariation = cloneDeep( baseVariation );
+			processedStyleVariations = processedStyleVariations.map(
+				( variation ) =>
+					mergeBaseAndUserConfigs( clonedBaseVariation, variation )
+			);
 		}
-		/*
-		   @TODO:
-			For colors, should also get filter?
-			Memoize/cache all this better? E.g., should we memoize the variations?
-			Test with empty theme
-			Test with 2022 - typography font families bork for some reason
-
-		 */
-		let styleVariations = getVariationsByProperty(
-			user,
-			variations,
-			styleProperty
-		);
 
 		if ( 'function' === typeof filter ) {
-			styleVariations = styleVariations.filter( filter );
+			processedStyleVariations =
+				processedStyleVariations.filter( filter );
 		}
 
-		return styleVariations;
-	}, [ styleProperty, variations, filter ] );
+		return processedStyleVariations;
+	}, [ styleVariations, styleProperty, baseVariation, filter ] );
 }
