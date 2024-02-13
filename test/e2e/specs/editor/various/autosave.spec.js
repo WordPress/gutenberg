@@ -308,6 +308,22 @@ test.describe( 'Autosave', () => {
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave()
 		);
+
+		await expect
+			.poll( async () => {
+				return await page.evaluate( () => {
+					const postId = window.wp.data
+						.select( 'core/editor' )
+						.getCurrentPostId();
+					const autosaves = window.wp.data
+						.select( 'core' )
+						.getAutosaves( 'post', postId );
+
+					return autosaves?.length ?? 0;
+				} );
+			} )
+			.toBeGreaterThanOrEqual( 1 );
+
 		// Force conflicting local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
