@@ -13,11 +13,11 @@
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_instance ) {
-	if ( ! isset( $source_attrs['key'] ) ) {
+	if ( empty( $source_attrs['key'] ) ) {
 		return null;
 	}
 
-	if ( ! isset( $block_instance->context['postId'] ) ) {
+	if ( empty( $block_instance->context['postId'] ) ) {
 		return null;
 	}
 	$post_id = $block_instance->context['postId'];
