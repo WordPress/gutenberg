@@ -32,12 +32,12 @@ function gutenberg_create_initial_post_types() {
 		'capabilities'                   => array(
 			'read'                   => 'edit_theme_options',
 			'read_private_posts'     => 'edit_theme_options',
-			'create_posts'           => 'edit_theme_options',
+			'create_posts'           => 'install_fonts',
 			'publish_posts'          => 'edit_theme_options',
 			'edit_posts'             => 'edit_theme_options',
 			'edit_others_posts'      => 'edit_theme_options',
 			'edit_published_posts'   => 'edit_theme_options',
-			'delete_posts'           => 'edit_theme_options',
+			'delete_posts'           => 'install_fonts', // Just one reason not to merge this.
 			'delete_others_posts'    => 'edit_theme_options',
 			'delete_published_posts' => 'edit_theme_options',
 		),
@@ -64,12 +64,12 @@ function gutenberg_create_initial_post_types() {
 			'capabilities'                   => array(
 				'read'                   => 'edit_theme_options',
 				'read_private_posts'     => 'edit_theme_options',
-				'create_posts'           => 'edit_theme_options',
+				'create_posts'           => 'install_fonts',
 				'publish_posts'          => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',
 				'edit_others_posts'      => 'edit_theme_options',
 				'edit_published_posts'   => 'edit_theme_options',
-				'delete_posts'           => 'edit_theme_options',
+				'delete_posts'           => 'install_fonts', // Just one reason not to merge this.
 				'delete_others_posts'    => 'edit_theme_options',
 				'delete_published_posts' => 'edit_theme_options',
 			),
@@ -83,6 +83,22 @@ function gutenberg_create_initial_post_types() {
 		)
 	);
 }
+
+function gutenberg_map_meta_caps_font_faces( $caps, $cap, $user_id, $args ) {
+	if ( 'install_fonts' !== $cap ) {
+		return $caps;
+	}
+
+	$caps[] = 'edit_theme_options';
+
+	// Only allow font uploads on systems with file mods enabled.
+	if ( ! wp_is_file_mod_allowed( 'can_install_font_faces' ) ) {
+		$caps[] = 'do_not_allow';
+	}
+
+	return $caps;
+}
+
 
 /**
  * Initializes REST routes.
