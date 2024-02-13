@@ -36,7 +36,7 @@ export const filterObjectByProperty = ( object, property ) => {
 };
 
 /**
- * Returns a new object with only the properties specified in `properties`.
+ * Returns a new object with only the properties specified in `property`.
  *
  * @param {Object}   props               Object of hook args.
  * @param {Object[]} props.variations    The theme style variations to filter.
