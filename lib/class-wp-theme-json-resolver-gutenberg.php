@@ -339,6 +339,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				);
 			}
 
+			// Disable shadow support for themes without theme.json.
+			$theme_support_data['settings']['shadow'] = false;
+
 			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
 			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
