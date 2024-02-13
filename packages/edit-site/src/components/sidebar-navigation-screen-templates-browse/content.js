@@ -73,7 +73,7 @@ export default function DataviewsTemplatesSidebarContent( {
 			{ sources?.user && (
 				<DataViewItem
 					slug="user"
-					title={ __( 'Custom' ) }
+					title={ __( 'User' ) }
 					icon={ customIcon }
 					isActive={ activeView === 'user' }
 					isCustom="false"
