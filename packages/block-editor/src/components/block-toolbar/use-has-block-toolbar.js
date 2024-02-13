@@ -35,9 +35,14 @@ export function useHasBlockToolbar() {
 				blockType &&
 				hasBlockSupport( blockType, '__experimentalToolbar', true );
 
-			return (
-				isToolbarEnabled && isDefaultEditingMode && hasAnyBlockControls
-			);
+			if (
+				! isToolbarEnabled ||
+				( ! isDefaultEditingMode && ! hasAnyBlockControls )
+			) {
+				return false;
+			}
+
+			return true;
 		},
 		[ hasAnyBlockControls ]
 	);

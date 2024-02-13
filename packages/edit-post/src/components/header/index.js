@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	BlockToolbar,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -40,6 +41,7 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const { useShowBlockTools } = unlock( blockEditorPrivateApis );
 const { DocumentTools, PostViewLink, PreviewDropdown } =
 	unlock( editorPrivateApis );
 
@@ -86,6 +88,10 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		};
 	}, [] );
 
+	const { showFixedToolbar } = useShowBlockTools();
+	const hasTopToolbar =
+		hasFixedToolbar && isLargeViewport && showFixedToolbar;
+
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 	const hasBlockSelection = !! blockSelectionStart;
@@ -116,7 +122,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				className="edit-post-header__toolbar"
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
-				{ hasFixedToolbar && isLargeViewport && (
+				{ hasTopToolbar && (
 					<>
 						<div
 							className={ classnames(
@@ -134,32 +140,28 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ hasBlockSelection && (
-							<Button
-								className="edit-post-header__block-tools-toggle"
-								icon={ isBlockToolsCollapsed ? next : previous }
-								onClick={ () => {
-									setIsBlockToolsCollapsed(
-										( collapsed ) => ! collapsed
-									);
-								} }
-								label={
-									isBlockToolsCollapsed
-										? __( 'Show block tools' )
-										: __( 'Hide block tools' )
-								}
-							/>
-						) }
+						<Button
+							className="edit-post-header__block-tools-toggle"
+							icon={ isBlockToolsCollapsed ? next : previous }
+							onClick={ () => {
+								setIsBlockToolsCollapsed(
+									( collapsed ) => ! collapsed
+								);
+							} }
+							label={
+								isBlockToolsCollapsed
+									? __( 'Show block tools' )
+									: __( 'Hide block tools' )
+							}
+						/>
 					</>
 				) }
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
 							hasHistory &&
-							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
-							hasFixedToolbar &&
-							isLargeViewport,
+							hasTopToolbar,
 					} ) }
 				>
 					{ hasHistory && <DocumentBar /> }

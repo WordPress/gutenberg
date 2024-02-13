@@ -176,9 +176,7 @@ export default function HeaderEditMode() {
 						'edit-site-header-edit-mode__center',
 						{
 							'is-collapsed':
-								! isBlockToolsCollapsed &&
-								isLargeViewport &&
-								hasTopToolbar,
+								! isBlockToolsCollapsed && hasTopToolbar,
 						}
 					) }
 				>
