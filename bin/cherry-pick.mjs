@@ -334,6 +334,11 @@ function reportSummaryNextSteps( successes, failures ) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
 		nextSteps.push( `Remove the ${ LABEL } label` );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			nextSteps.push( 'Add the "Backported to WP Core" label' );
+		}
+
 		nextSteps.push( 'Request a backport to wordpress-develop if required' );
 		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
 	}
@@ -363,6 +368,17 @@ function GHcommentAndRemoveLabel( pr ) {
 	try {
 		cli( 'gh', [ 'pr', 'comment', number, '--body', comment ] );
 		cli( 'gh', [ 'pr', 'edit', number, '--remove-label', LABEL ] );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			cli( 'gh', [
+				'pr',
+				'edit',
+				number,
+				'--add-label',
+				'Backported to WP Core',
+			] );
+		}
+
 		console.log( `✅ ${ number }: ${ comment }` );
 	} catch ( e ) {
 		console.log( `❌ ${ number }. ${ comment } ` );
