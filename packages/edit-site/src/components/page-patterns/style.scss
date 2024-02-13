@@ -101,6 +101,10 @@
 		text-overflow: ellipsis;
 		color: inherit;
 	}
+
+	.dataviews-pagination {
+		z-index: 2;
+	}
 }
 
 .dataviews-action-modal__duplicate-pattern {
