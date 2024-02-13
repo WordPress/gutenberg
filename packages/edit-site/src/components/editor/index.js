@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Notice,
 	__unstableMotion as motion,
@@ -61,6 +61,7 @@ import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import Header from '../header-edit-mode';
+import EditOverlay from '../edit-overlay';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 const {
@@ -157,6 +158,8 @@ export default function Editor( { isLoading } ) {
 		};
 	}, [] );
 
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
@@ -201,15 +204,26 @@ export default function Editor( { isLoading } ) {
 
 	return (
 		<>
-			<AnimatePresence initial={ false }>
-				<NavigableRegion
-					key="header"
-					className="edit-site-layout__header"
-					ariaLabel={ __( 'Editor top bar' ) }
-					as={ motion.div }
-				>
-					<Header />
-				</NavigableRegion>
+			{ ! isLoading && canvasMode !== 'edit' && (
+				<EditOverlay
+					label="Click your site preview to edit"
+					onClick={ () => setCanvasMode( 'edit' ) }
+				/>
+			) }
+			<AnimatePresence>
+				{ ! isLoading && (
+					<NavigableRegion
+						key="header"
+						className="edit-site-layout__header"
+						ariaLabel={ __( 'Editor top bar' ) }
+						as={ motion.div }
+						animate={ {
+							marginTop: canvasMode === 'edit' ? 0 : -60,
+						} }
+					>
+						<Header />
+					</NavigableRegion>
+				) }
 			</AnimatePresence>
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }

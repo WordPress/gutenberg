@@ -1,0 +1,40 @@
+.edit-site-layout__edit-overlay {
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	padding-bottom: $grid-unit-40;
+	color: $white;
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4) 100%);
+
+	.edit-site-layout__edit-overlay-button {
+		position: relative;
+		z-index: 10;
+		background: rgba(255, 255, 255, 0.6);
+		color: $gray-900;
+		border: 0;
+		border-radius: 999px;
+		cursor: pointer;
+		transition: background-color ease 0.1s;
+		box-shadow: 0 2px 4px rgba($black, 0.1);
+
+		&:hover {
+			background-color: $gray-100;
+		}
+	}
+
+	.edit-site-layout__edit-overlay-backdrop {
+		z-index: 5;
+		opacity: 0.7;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+}
