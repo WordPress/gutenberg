@@ -48,7 +48,7 @@ function CollectionFontDetails( {
 					/>
 				) ) }
 			</VStack>
-			<Spacer margin={ 8 } />
+			<Spacer margin={ 16 } />
 		</>
 	);
 }
