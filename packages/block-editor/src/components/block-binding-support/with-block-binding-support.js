@@ -65,7 +65,7 @@ const BlockBindingConnector = ( {
 		 * Detect changes in source prop value,
 		 * and update the attribute value accordingly.
 		 */
-		if ( propValue !== lastPropValue.current ) {
+		if ( propValue && propValue !== lastPropValue.current ) {
 			lastPropValue.current = propValue;
 			updateBoundAttibute( propValue );
 			return;
@@ -77,7 +77,11 @@ const BlockBindingConnector = ( {
 		 * Detect changes in block attribute value,
 		 * and update the source prop value accordingly.
 		 */
-		if ( attrValue !== lastAttrValue.current && updatePropValue ) {
+		if (
+			attrValue &&
+			attrValue !== lastAttrValue.current && // only update if the value has changed
+			updatePropValue // check whether update value handler is available
+		) {
 			lastAttrValue.current = attrValue;
 			updatePropValue( attrValue );
 		}
