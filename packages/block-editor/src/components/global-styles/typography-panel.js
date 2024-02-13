@@ -168,7 +168,6 @@ export default function TypographyPanel( {
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamilies = settings?.typography?.fontFamilies ?? {};
 	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
-
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(

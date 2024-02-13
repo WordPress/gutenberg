@@ -1,50 +1,269 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
 	"settings": {
 		"appearanceTools": true,
+		"color": {
+			"background": true,
+			"custom": true,
+			"customDuotone": true,
+			"customGradient": true,
+			"defaultDuotone": false,
+			"defaultGradients": false,
+			"defaultPalette": false,
+			"duotone": [],
+			"gradients": [],
+			"palette": [],
+			"text": true
+		},
 		"layout": {
-			"contentSize": "840px",
-			"wideSize": "1100px"
+			"contentSize": "620px",
+			"wideSize": "1000px"
+		},
+		"shadow": {
+			"defaultPresets": true,
+			"presets": []
+		},
+		"spacing": {
+			"customSpacingSize": true,
+			"spacingScale": {
+				"increment": 1.5,
+				"mediumStep": 1.5,
+				"operator": "*",
+				"steps": 7,
+				"unit": "rem"
+			},
+			"spacingSizes": [],
+			"units": [ "%", "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
+			"customFontSize": true,
+			"dropCap": true,
+			"fluid": true,
+			"fontFamilies": [
+				{
+					"fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
+					"name": "System Font",
+					"slug": "system-font"
+				},
+				{
+					"fontFace": [
+						{
+							"fontFamily": "Barlow",
+							"fontStyle": "italic",
+							"fontWeight": "700",
+							"src": [
+								"file:./assets/fonts/barlow_italic_700.ttf"
+							]
+						},
+						{
+							"fontFamily": "Barlow",
+							"fontStyle": "normal",
+							"fontWeight": "700",
+							"src": [
+								"file:./assets/fonts/barlow_normal_700.ttf"
+							]
+						},
+						{
+							"fontFamily": "Barlow",
+							"fontStyle": "italic",
+							"fontWeight": "600",
+							"src": [
+								"file:./assets/fonts/barlow_italic_600.ttf"
+							]
+						},
+						{
+							"fontFamily": "Barlow",
+							"fontStyle": "normal",
+							"fontWeight": "600",
+							"src": [
+								"file:./assets/fonts/barlow_normal_600.ttf"
+							]
+						},
+						{
+							"fontFamily": "Barlow",
+							"fontStyle": "italic",
+							"fontWeight": "400",
+							"src": [
+								"file:./assets/fonts/barlow_italic_400.ttf"
+							]
+						},
+						{
+							"fontFamily": "Barlow",
+							"fontStyle": "normal",
+							"fontWeight": "400",
+							"src": [
+								"file:./assets/fonts/barlow_normal_400.ttf"
+							]
+						}
+					],
+					"fontFamily": "Barlow",
+					"slug": "barlow"
+				}
+			],
 			"fontSizes": [
 				{
-					"size": "0.5rem",
-					"slug": "caption",
-					"name": "Caption"
+					"name": "Display xl",
+					"slug": "Display-xl",
+					"size": "96px",
+					"fluid": {
+						"max": "96px",
+						"min": "52px"
+					}
 				},
 				{
-					"size": "1rem",
-					"slug": "x-small",
-					"name": "XS"
+					"name": "Display lg",
+					"slug": "Display-lg",
+					"size": "72px",
+					"fluid": {
+						"max": "72px",
+						"min": "46px"
+					}
 				},
 				{
-					"size": "2rem",
-					"slug": "small",
-					"name": "S"
+					"name": "Display md",
+					"slug": "Display-md",
+					"size": "60px",
+					"fluid": {
+						"max": "60px",
+						"min": "42px"
+					}
 				},
 				{
-					"size": "3rem",
-					"slug": "medium",
-					"name": "M"
+					"name": "Display sm",
+					"slug": "Display-sm",
+					"size": "52px",
+					"fluid": {
+						"max": "52px",
+						"min": "40px"
+					}
 				},
 				{
-					"size": "4rem",
-					"slug": "large",
-					"name": "L"
+					"name": "Heading 1",
+					"slug": "Heading-1",
+					"size": "48px",
+					"fluid": {
+						"max": "48px",
+						"min": "36px"
+					}
 				},
 				{
-					"size": "5rem",
-					"slug": "x-large",
-					"name": "XL"
+					"name": "Heading 2",
+					"slug": "Heading-2",
+					"size": "36px",
+					"fluid": {
+						"max": "36px",
+						"min": "30px"
+					}
 				},
 				{
-					"size": "6rem",
-					"slug": "xx-large",
-					"name": "XXL"
+					"name": "Heading 3",
+					"slug": "Heading-3",
+					"size": "28px",
+					"fluid": {
+						"max": "28px",
+						"min": "26px"
+					}
+				},
+				{
+					"name": "Heading 4",
+					"slug": "Heading-4",
+					"size": "24px",
+					"fluid": {
+						"max": "24px",
+						"min": "22px"
+					}
+				},
+				{
+					"name": "Heading 5",
+					"slug": "Heading-5",
+					"size": "20px",
+					"fluid": {
+						"max": "20px",
+						"min": "19px"
+					}
+				},
+				{
+					"name": "Heading 6",
+					"slug": "Heading-6",
+					"size": "18px",
+					"fluid": {
+						"max": "18px",
+						"min": "17px"
+					}
+				},
+				{
+					"name": "Paragraph lg",
+					"slug": "paragraph-lg",
+					"size": "18px",
+					"fluid": {
+						"max": "18px",
+						"min": "17px"
+					}
+				},
+				{
+					"name": "Paragraph base",
+					"slug": "paragraph-base",
+					"size": "16px",
+					"fluid": {
+						"max": "16px",
+						"min": "16px"
+					}
+				},
+				{
+					"name": "Paragraph sm",
+					"slug": "paragraph-sm",
+					"size": "14px",
+					"fluid": {
+						"max": "14px",
+						"min": "14px"
+					}
+				},
+				{
+					"name": "Info md",
+					"slug": "Info-md",
+					"size": "12px",
+					"fluid": {
+						"max": "12px",
+						"min": "12px"
+					}
+				},
+				{
+					"name": "Info sm",
+					"slug": "Info-sm",
+					"size": "10px",
+					"fluid": {
+						"max": "10px",
+						"min": "10px"
+					}
 				}
-			]
+			],
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"textDecoration": true,
+			"textTransform": true
+		},
+		"useRootPaddingAwareAlignments": true
+	},
+	"styles": {
+		"spacing": {
+			"padding": {
+				"bottom": "0px",
+				"left": "16px",
+				"right": "16px",
+				"top": "0px"
+			}
 		}
-	}
+	},
+	"templateParts": [
+		{
+			"area": "header",
+			"name": "header"
+		},
+		{
+			"area": "footer",
+			"name": "footer"
+		}
+	],
+	"version": 2,
+	"$schema": "https://schemas.wp.org/trunk/theme.json"
 }
