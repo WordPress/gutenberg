@@ -93,6 +93,7 @@ function EditorCanvas( {
 		wrapperUniqueId,
 		deviceType,
 		showEditorPadding,
+		isViewablePostType,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -130,6 +131,7 @@ function EditorCanvas( {
 		return {
 			renderingMode: _renderingMode,
 			postContentAttributes: editorSettings.postContentAttributes,
+			isViewablePostType: postType?.viewable,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -164,7 +166,7 @@ function EditorCanvas( {
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
 	const fallbackLayout = useMemo( () => {
-		if ( renderingMode !== 'post-only' ) {
+		if ( renderingMode !== 'post-only' || ! isViewablePostType ) {
 			return { type: 'default' };
 		}
 
@@ -175,7 +177,12 @@ function EditorCanvas( {
 		}
 		// Set default layout for classic themes so all alignments are supported.
 		return { type: 'default' };
-	}, [ renderingMode, themeSupportsLayout, globalLayoutSettings ] );
+	}, [
+		renderingMode,
+		themeSupportsLayout,
+		globalLayoutSettings,
+		isViewablePostType,
+	] );
 
 	const newestPostContentAttributes = useMemo( () => {
 		if (
@@ -318,7 +325,8 @@ function EditorCanvas( {
 		>
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
-				renderingMode === 'post-only' && (
+				renderingMode === 'post-only' &&
+				isViewablePostType && (
 					<>
 						<LayoutStyle
 							selector=".editor-editor-canvas__post-title-wrapper"
@@ -337,7 +345,7 @@ function EditorCanvas( {
 						) }
 					</>
 				) }
-			{ renderingMode === 'post-only' && (
+			{ renderingMode === 'post-only' && isViewablePostType && (
 				<div
 					className={ classnames(
 						'editor-editor-canvas__post-title-wrapper',
@@ -367,7 +375,7 @@ function EditorCanvas( {
 					className={ classnames(
 						className,
 						'is-' + deviceType.toLowerCase() + '-preview',
-						renderingMode !== 'post-only'
+						renderingMode !== 'post-only' || ! isViewablePostType
 							? 'wp-site-blocks'
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
