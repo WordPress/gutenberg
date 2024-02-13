@@ -41,6 +41,17 @@ const {
 const noop = () => {};
 
 /**
+ * These post types have a special editor where they don't allow you to fill the title
+ * and they don't apply the layout styles.
+ */
+const DESIGN_POST_TYPES = [
+	'wp_block',
+	'wp_template',
+	'wp_navigation',
+	'wp_template_part',
+];
+
+/**
  * Given an array of nested blocks, find the first Post Content
  * block inside it, recursing through any nesting levels,
  * and return its attributes.
@@ -93,7 +104,7 @@ function EditorCanvas( {
 		wrapperUniqueId,
 		deviceType,
 		showEditorPadding,
-		isViewablePostType,
+		isDesignPostType,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -131,7 +142,7 @@ function EditorCanvas( {
 		return {
 			renderingMode: _renderingMode,
 			postContentAttributes: editorSettings.postContentAttributes,
-			isViewablePostType: postType?.viewable,
+			isDesignPostType: DESIGN_POST_TYPES.includes( postTypeSlug ),
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -166,7 +177,7 @@ function EditorCanvas( {
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
 	const fallbackLayout = useMemo( () => {
-		if ( renderingMode !== 'post-only' || ! isViewablePostType ) {
+		if ( renderingMode !== 'post-only' || isDesignPostType ) {
 			return { type: 'default' };
 		}
 
@@ -181,7 +192,7 @@ function EditorCanvas( {
 		renderingMode,
 		themeSupportsLayout,
 		globalLayoutSettings,
-		isViewablePostType,
+		isDesignPostType,
 	] );
 
 	const newestPostContentAttributes = useMemo( () => {
@@ -326,7 +337,7 @@ function EditorCanvas( {
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
 				renderingMode === 'post-only' &&
-				isViewablePostType && (
+				! isDesignPostType && (
 					<>
 						<LayoutStyle
 							selector=".editor-editor-canvas__post-title-wrapper"
@@ -345,7 +356,7 @@ function EditorCanvas( {
 						) }
 					</>
 				) }
-			{ renderingMode === 'post-only' && isViewablePostType && (
+			{ renderingMode === 'post-only' && ! isDesignPostType && (
 				<div
 					className={ classnames(
 						'editor-editor-canvas__post-title-wrapper',
@@ -375,7 +386,7 @@ function EditorCanvas( {
 					className={ classnames(
 						className,
 						'is-' + deviceType.toLowerCase() + '-preview',
-						renderingMode !== 'post-only' || ! isViewablePostType
+						renderingMode !== 'post-only' || isDesignPostType
 							? 'wp-site-blocks'
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
