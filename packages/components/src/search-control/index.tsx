@@ -8,43 +8,16 @@ import classnames from 'classnames';
  */
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Icon, search, closeSmall } from '@wordpress/icons';
 import { forwardRef, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
 import type { WordPressComponentProps } from '../context/wordpress-component';
-import type { SearchControlProps, SuffixItemProps } from './types';
+import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
-import { StyledInputControl, SuffixItemWrapper } from './styles';
-
-function SuffixItem( {
-	searchRef,
-	value,
-	onChange,
-	onClose,
-}: SuffixItemProps ) {
-	if ( ! onClose && ! value ) {
-		return <Icon icon={ search } />;
-	}
-
-	const onReset = () => {
-		onChange( '' );
-		searchRef.current?.focus();
-	};
-
-	return (
-		<Button
-			size="small"
-			icon={ closeSmall }
-			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
-			onClick={ onClose ?? onReset }
-		/>
-	);
-}
+import InputControl from '../input-control';
 
 function UnforwardedSearchControl(
 	{
@@ -89,7 +62,7 @@ function UnforwardedSearchControl(
 
 	return (
 		<ContextSystemProvider value={ contextValue }>
-			<StyledInputControl
+			<InputControl
 				__next40pxDefaultSize
 				id={ instanceId }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -101,22 +74,22 @@ function UnforwardedSearchControl(
 					'components-search-control',
 					className
 				) }
-				onChange={ ( nextValue?: string ) =>
-					onChange( nextValue ?? '' )
-				}
+				// onChange={ ( nextValue?: string ) =>
+				// 	onChange( nextValue ?? '' )
+				// }
 				autoComplete="off"
 				placeholder={ placeholder }
 				value={ value ?? '' }
-				suffix={
-					<SuffixItemWrapper size={ size }>
-						<SuffixItem
-							searchRef={ searchRef }
-							value={ value }
-							onChange={ onChange }
-							onClose={ onClose }
-						/>
-					</SuffixItemWrapper>
-				}
+				// suffix={
+				// 	<SuffixItemWrapper size={ size }>
+				// 		<SuffixItem
+				// 			searchRef={ searchRef }
+				// 			value={ value }
+				// 			onChange={ onChange }
+				// 			onClose={ onClose }
+				// 		/>
+				// 	</SuffixItemWrapper>
+				// }
 				{ ...restProps }
 			/>
 		</ContextSystemProvider>

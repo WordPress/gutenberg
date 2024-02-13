@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,8 +56,6 @@ export function UnforwardedInputControl(
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
 
-	const [ isFocused, setIsFocused ] = useState( false );
-
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
@@ -86,7 +84,6 @@ export function UnforwardedInputControl(
 				gap={ 3 }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isFocused={ isFocused }
 				justify="left"
 				label={ label }
 				labelPosition={ labelPosition }
@@ -101,14 +98,12 @@ export function UnforwardedInputControl(
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 					disabled={ disabled }
 					id={ id }
-					isFocused={ isFocused }
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
 					hasPrefix={ !! prefix }
 					hasSuffix={ !! suffix }
 					ref={ ref }
-					setIsFocused={ setIsFocused }
 					size={ size }
 					stateReducer={ stateReducer }
 					{ ...draftHookProps }

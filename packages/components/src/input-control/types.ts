@@ -47,14 +47,6 @@ interface BaseProps {
 	 */
 	hideLabelFromVision?: boolean;
 	/**
-	 * Whether the component should be in a focused state.
-	 * Used to coordinate focus states when the actual focused element and the component handling
-	 * visual focus are separate.
-	 *
-	 * @default false
-	 */
-	isFocused: boolean;
-	/**
 	 * The position of the label.
 	 *
 	 * @default 'top'
@@ -111,7 +103,6 @@ export interface InputFieldProps
 		nextValue: string,
 		event?: SyntheticEvent< HTMLInputElement >
 	) => void;
-	setIsFocused: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
 	/**
 	 * The current value of the input.
@@ -197,17 +188,12 @@ export interface InputControlProps
 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
 		 * with an unresolvable type.
 		 *
-		 * `isFocused`, `setIsFocused`, `hasPrefix`, and `hasSuffix` are managed internally by
+		 * `hasPrefix`, and `hasSuffix` are managed internally by
 		 * the InputControl, but the rest of the props for InputField are passed through.
 		 */
 		Omit<
 			WordPressComponentProps< InputFieldProps, 'input', false >,
-			| 'stateReducer'
-			| 'prefix'
-			| 'hasPrefix'
-			| 'hasSuffix'
-			| 'isFocused'
-			| 'setIsFocused'
+			'stateReducer' | 'prefix' | 'hasPrefix' | 'hasSuffix'
 		> {
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }

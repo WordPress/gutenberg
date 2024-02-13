@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -55,7 +55,7 @@ function UnforwardedSelectControl(
 		__nextHasNoMarginBottom = false,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp( props );
-	const [ isFocused, setIsFocused ] = useState( false );
+	// const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
@@ -64,12 +64,12 @@ function UnforwardedSelectControl(
 
 	const handleOnBlur = ( event: React.FocusEvent< HTMLSelectElement > ) => {
 		onBlur( event );
-		setIsFocused( false );
+		// setIsFocused( false );
 	};
 
 	const handleOnFocus = ( event: React.FocusEvent< HTMLSelectElement > ) => {
 		onFocus( event );
-		setIsFocused( true );
+		// setIsFocused( true );
 	};
 
 	const handleOnChange = (
@@ -100,7 +100,7 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isFocused={ isFocused }
+				// isFocused={ isFocused }
 				label={ label }
 				size={ size }
 				suffix={

@@ -6,14 +6,11 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Backdrop from './backdrop';
-import Label from './label';
 import { getSizeConfig } from './styles/input-control-styles';
 import * as styles from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
@@ -24,15 +21,14 @@ import {
 	useContextSystem,
 } from '../context';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { Flex } from '../flex';
 import { useCx } from '../utils';
 
-function useUniqueId( idProp?: string ) {
-	const instanceId = useInstanceId( InputBase );
-	const id = `input-base-control-${ instanceId }`;
+// function useUniqueId( idProp?: string ) {
+// 	const instanceId = useInstanceId( InputBase );
+// 	const id = `input-base-control-${ instanceId }`;
 
-	return idProp || id;
-}
+// 	return idProp || id;
+// }
 
 // Adapter to map props for the new ui/flex component.
 function getUIFlexProps( labelPosition?: LabelPosition ) {
@@ -75,7 +71,6 @@ export function InputBase(
 		labelPosition,
 		id: idProp,
 		isBorderless = false,
-		isFocused = false,
 		label,
 		prefix,
 		size = 'default',
@@ -85,7 +80,7 @@ export function InputBase(
 		useContextSystem( props, 'InputBase' )
 	);
 
-	const id = useUniqueId( idProp );
+	// const id = useUniqueId( idProp );
 
 	const { paddingLeft, paddingRight } = getSizeConfig( {
 		inputSize: size,
@@ -101,36 +96,35 @@ export function InputBase(
 	const cx = useCx();
 	const rootClasses = cx(
 		styles.inputBase,
-		styles.inputBaseFocusedStyles( isFocused ),
+		// styles.inputBaseFocusedStyles( isFocused ),
 		className
 	);
 	const containerClasses = cx(
 		styles.inputBaseContainer,
-		styles.inputBaseContainerDisabledStyles( disabled ),
-		styles.inputBaseContainerWidthStyles( {
-			__unstableInputWidth,
-			labelPosition,
-		} ),
+		// styles.inputBaseContainerDisabledStyles( disabled ),
+		// styles.inputBaseContainerWidthStyles( {
+		// 	__unstableInputWidth,
+		// 	labelPosition,
+		// } ),
 		'components-input-control__container'
 	);
 
 	return (
-		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
-		<Flex
+		<div
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
 			className={ rootClasses }
-			gap={ 2 }
+			// gap={ 2 }
 			ref={ ref }
 		>
-			<Label
+			{ /* <Label
 				className="components-input-control__label"
 				hideLabelFromVision={ hideLabelFromVision }
 				labelPosition={ labelPosition }
 				htmlFor={ id }
 			>
 				{ label }
-			</Label>
+			</Label> */ }
 			<div className={ containerClasses }>
 				<ContextSystemProvider value={ prefixSuffixContextValue }>
 					{ prefix && (
@@ -155,13 +149,13 @@ export function InputBase(
 						</span>
 					) }
 				</ContextSystemProvider>
-				<Backdrop
+				{ /* <Backdrop
 					disabled={ disabled }
 					isBorderless={ isBorderless }
 					isFocused={ isFocused }
-				/>
+				/> */ }
 			</div>
-		</Flex>
+		</div>
 	);
 }
 
