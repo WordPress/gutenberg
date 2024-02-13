@@ -6,7 +6,67 @@ import { renderHook } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import useThemeStyleVariationsByProperty from '../use-theme-style-variations-by-property';
+import useThemeStyleVariationsByProperty, {
+	filterObjectByProperty,
+} from '../use-theme-style-variations-by-property';
+
+describe( 'filterObjectByProperty', () => {
+	test.each( [
+		{
+			object: {
+				foo: 'bar',
+				array: [ 1, 3, 4 ],
+			},
+			property: 'array',
+			expected: { array: [ 1, 3, 4 ] },
+		},
+		{
+			object: {
+				foo: 'bar',
+			},
+			property: 'does-not-exist',
+			expected: {},
+		},
+		{
+			object: {
+				foo: 'bar',
+			},
+			property: false,
+			expected: {},
+		},
+		{
+			object: [],
+			property: 'something',
+			expected: {},
+		},
+		{
+			object: {},
+			property: undefined,
+			expected: {},
+		},
+		{
+			object: {
+				'nested-object': {
+					foo: 'bar',
+					array: [ 1, 3, 4 ],
+				},
+			},
+			property: 'nested-object',
+			expected: {
+				'nested-object': {
+					foo: 'bar',
+					array: [ 1, 3, 4 ],
+				},
+			},
+		},
+	] )(
+		'should filter object by $property',
+		( { expected, object, property } ) => {
+			const result = filterObjectByProperty( object, property );
+			expect( result ).toEqual( expected );
+		}
+	);
+} );
 
 describe( 'useThemeStyleVariationsByProperty', () => {
 	const mockVariations = [
