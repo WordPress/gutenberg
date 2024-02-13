@@ -38,26 +38,26 @@ export const filterObjectByProperty = ( object, property ) => {
 /**
  * Returns a new object with only the properties specified in `properties`.
  *
- * @param {Object}   props                 Object of hook args.
- * @param {Object[]} props.styleVariations The theme style variations to filter.
- * @param {string}   props.styleProperty   The property to filter by.
- * @param {Function} props.filter          Optional. The filter function to apply to the variations.
- * @param {Object}   props.baseVariation   Optional. Base or user settings to be updated with variation properties.
- * @return {Object[]} The merged object.
+ * @param {Object}   props               Object of hook args.
+ * @param {Object[]} props.variations    The theme style variations to filter.
+ * @param {string}   props.property      The property to filter by.
+ * @param {Function} props.filter        Optional. The filter function to apply to the variations.
+ * @param {Object}   props.baseVariation Optional. Base or user settings to be updated with variation properties.
+ * @return {Object[]|*} The merged object.
  */
 export default function useThemeStyleVariationsByProperty( {
-	styleVariations,
-	styleProperty,
+	variations,
+	property,
 	filter,
 	baseVariation,
 } ) {
 	return useMemo( () => {
-		if ( ! styleProperty || styleVariations?.length === 0 ) {
-			return styleVariations;
+		if ( ! property || ! variations || variations?.length === 0 ) {
+			return variations;
 		}
 
-		let processedStyleVariations = styleVariations.map( ( variation ) => ( {
-			...filterObjectByProperty( variation, styleProperty ),
+		let processedStyleVariations = variations.map( ( variation ) => ( {
+			...filterObjectByProperty( variation, property ),
 			// Add variation title and description to every variation item.
 			title: variation?.title,
 			description: variation?.description,
@@ -84,5 +84,5 @@ export default function useThemeStyleVariationsByProperty( {
 		}
 
 		return processedStyleVariations;
-	}, [ styleVariations, styleProperty, baseVariation, filter ] );
+	}, [ variations, property, baseVariation, filter ] );
 }

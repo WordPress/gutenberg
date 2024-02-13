@@ -338,11 +338,42 @@ describe( 'useThemeStyleVariationsByProperty', () => {
 		},
 	};
 
+	it( 'should return variations if property is falsy', () => {
+		const { result } = renderHook( () =>
+			useThemeStyleVariationsByProperty( {
+				variations: mockVariations,
+				property: '',
+			} )
+		);
+
+		expect( result.current ).toEqual( mockVariations );
+	} );
+
+	it( 'should return variations if variations is empty or falsy', () => {
+		const { result: emptyResult } = renderHook( () =>
+			useThemeStyleVariationsByProperty( {
+				variations: [],
+				property: 'layout',
+			} )
+		);
+
+		expect( emptyResult.current ).toEqual( [] );
+
+		const { result: falsyResult } = renderHook( () =>
+			useThemeStyleVariationsByProperty( {
+				variations: null,
+				property: 'layout',
+			} )
+		);
+
+		expect( falsyResult.current ).toEqual( null );
+	} );
+
 	it( "should return the variation's typography properties", () => {
 		const { result } = renderHook( () =>
 			useThemeStyleVariationsByProperty( {
-				styleVariations: mockVariations,
-				styleProperty: 'typography',
+				variations: mockVariations,
+				property: 'typography',
 			} )
 		);
 
@@ -452,8 +483,8 @@ describe( 'useThemeStyleVariationsByProperty', () => {
 	it( "should return the variation's color properties", () => {
 		const { result } = renderHook( () =>
 			useThemeStyleVariationsByProperty( {
-				styleVariations: mockVariations,
-				styleProperty: 'color',
+				variations: mockVariations,
+				property: 'color',
 			} )
 		);
 
@@ -623,9 +654,9 @@ describe( 'useThemeStyleVariationsByProperty', () => {
 	it( 'should merge the user styles and settings with the supplied variation, but only for the specified property', () => {
 		const { result } = renderHook( () =>
 			useThemeStyleVariationsByProperty( {
-				styleVariations: [ mockVariations[ 0 ] ],
-				styleProperty: 'typography',
-				mergeWith: mockBaseVariation,
+				variations: [ mockVariations[ 0 ] ],
+				property: 'typography',
+				baseVariation: mockBaseVariation,
 			} )
 		);
 
@@ -742,8 +773,8 @@ describe( 'useThemeStyleVariationsByProperty', () => {
 	it( 'should filter the output and return only variations that match filter', () => {
 		const { result } = renderHook( () =>
 			useThemeStyleVariationsByProperty( {
-				styleVariations: mockVariations,
-				styleProperty: 'typography',
+				variations: mockVariations,
+				property: 'typography',
 				filter: ( variation ) =>
 					!! variation?.settings?.typography?.fontFamilies?.theme
 						?.length,
