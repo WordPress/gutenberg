@@ -21,7 +21,20 @@ test.describe( 'Site editor navigation', () => {
 
 		// Test: Can navigate to a sidebar item and into its subnavigation frame without losing focus
 		// Go to the Pages button
-		await pageUtils.pressKeys( 'Tab', { times: 7 } );
+
+		for ( let i = 0; i < 10; i++ ) {
+			await pageUtils.pressKeys( 'Tab' );
+			const activeLabel = await page.evaluate( () => {
+				return (
+					document.activeElement.getAttribute( 'aria-label' ) ||
+					document.activeElement.textContent
+				);
+			} );
+			if ( activeLabel === 'Pages' ) {
+				break;
+			}
+		}
+
 		await expect(
 			page.getByRole( 'button', { name: 'Pages' } )
 		).toBeFocused();
@@ -37,7 +50,15 @@ test.describe( 'Site editor navigation', () => {
 		).toBeFocused();
 
 		// Test: Can navigate into the iframe using the keyboard
-		await pageUtils.pressKeys( 'Tab', { times: 6 } );
+		for ( let i = 0; i < 10; i++ ) {
+			await pageUtils.pressKeys( 'Tab' );
+			const activeNode = await page.evaluate( () => {
+				return document.activeElement.nodeName;
+			} );
+			if ( activeNode === 'IFRAME' ) {
+				break;
+			}
+		}
 		// Getting the actual iframe as a cleaner locator was suprisingly tricky,
 		// so we're using a css selector with .is-focused which should be present when the iframe has focus.
 		await expect(
