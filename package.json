@@ -93,6 +93,7 @@
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
 		"es-module-shims": "^1.8.2",
+		"esbuild": "0.19.11",
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
