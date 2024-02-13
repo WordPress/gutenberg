@@ -8,11 +8,16 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import {
+	mergeOrigins,
+	overrideOrigins,
+	hasOriginValue,
+} from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -52,16 +57,13 @@ export function useHasTypographyPanel( settings ) {
 
 function useHasFontSizeControl( settings ) {
 	return (
-		[ 'default', 'theme', 'custom' ].some(
-			( key ) => settings?.typography?.fontSizes?.[ key ]?.length
-		) || settings?.typography?.customFontSize
+		hasOriginValue( settings?.typography?.fontSizes ) ||
+		settings?.typography?.customFontSize
 	);
 }
 
 function useHasFontFamilyControl( settings ) {
-	return [ 'default', 'theme', 'custom' ].some(
-		( key ) => settings?.typography?.fontFamilies?.[ key ]?.length
-	);
+	return hasOriginValue( settings?.typography?.fontFamilies );
 }
 
 function useHasLineHeightControl( settings ) {
@@ -104,11 +106,9 @@ function useHasTextColumnsControl( settings ) {
 
 function getUniqueFontSizesBySlug( settings ) {
 	const fontSizes = settings?.typography?.fontSizes ?? {};
-	const mergedFontSizes = [ 'default', 'theme', 'custom' ].flatMap(
-		( key ) => fontSizes?.[ key ] ?? []
-	);
+	const overriddenFontSizes = fontSizes ? overrideOrigins( fontSizes ) : [];
 	const uniqueSizes = [];
-	for ( const currentSize of mergedFontSizes ) {
+	for ( const currentSize of overriddenFontSizes ) {
 		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
 			uniqueSizes.push( currentSize );
 		}
@@ -166,12 +166,9 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies;
-	const mergedFontFamilies = useMemo( () => {
-		return [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => fontFamilies[ key ] ?? []
-		);
-	}, [ fontFamilies ] );
+	const fontFamilies = settings?.typography?.fontFamilies ?? {};
+	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
+
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(

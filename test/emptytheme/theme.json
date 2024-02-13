@@ -6,14 +6,45 @@
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
+		},
+		"typography": {
+			"fontSizes": [
+				{
+					"size": "0.5rem",
+					"slug": "caption",
+					"name": "Caption"
+				},
+				{
+					"size": "1rem",
+					"slug": "x-small",
+					"name": "XS"
+				},
+				{
+					"size": "2rem",
+					"slug": "small",
+					"name": "S"
+				},
+				{
+					"size": "3rem",
+					"slug": "medium",
+					"name": "M"
+				},
+				{
+					"size": "4rem",
+					"slug": "large",
+					"name": "L"
+				},
+				{
+					"size": "5rem",
+					"slug": "x-large",
+					"name": "XL"
+				},
+				{
+					"size": "6rem",
+					"slug": "xx-large",
+					"name": "XXL"
+				}
+			]
 		}
-	},
-	"customTemplates": [
-		{
-			"name": "custom-template",
-			"title": "Custom",
-			"postTypes": [ "post" ]
-		}
-	],
-	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
+	}
 }
