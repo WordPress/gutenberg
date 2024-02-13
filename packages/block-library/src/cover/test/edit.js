@@ -92,6 +92,78 @@ describe( 'Cover block', () => {
 			);
 		} );
 
+		test( 'placeholder color picker shows only those colors coming from the theme', async () => {
+			const themeColorSettings = {
+				...defaultSettings,
+				__experimentalFeatures: {
+					...defaultSettings.__experimentalFeatures,
+					color: {
+						...defaultSettings.__experimentalFeatures.color,
+						palette: {
+							...defaultSettings.__experimentalFeatures.color
+								.palette,
+							theme: [
+								{
+									name: 'Green',
+									slug: 'green',
+									color: '#00FF00',
+								},
+							],
+						},
+					},
+				},
+			};
+			await setup( undefined, true, themeColorSettings );
+			expect(
+				screen.queryByRole( 'option', {
+					name: 'Color: Black',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'option', {
+					name: 'Color: Green',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		test( 'placeholder color picker shows default colors', async () => {
+			await setup( undefined, true, defaultSettings );
+			expect(
+				screen.getByRole( 'option', {
+					name: 'Color: Black',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'option', {
+					name: 'Color: White',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		test( 'placeholder shows no default colors', async () => {
+			const defaultPaletteFalseSettings = {
+				...defaultSettings,
+				__experimentalFeatures: {
+					...defaultSettings.__experimentalFeatures,
+					color: {
+						...defaultSettings.__experimentalFeatures.color,
+						defaultPalette: false,
+					},
+				},
+			};
+			await setup( undefined, true, defaultPaletteFalseSettings );
+			expect(
+				screen.queryByRole( 'option', {
+					name: 'Color: Black',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'option', {
+					name: 'Color: White',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
 		test( 'can have the title edited', async () => {
 			await setup();
 

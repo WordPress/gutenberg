@@ -317,7 +317,7 @@ function CoverEdit( {
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
-	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
+	// Gather settings for font sizes and color palette values.
 	const [
 		fontSizes,
 		customColors,
@@ -331,6 +331,7 @@ function CoverEdit( {
 		'color.palette.default',
 		'color.defaultPalette'
 	);
+	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
 	const hasFontSizes = fontSizes?.length > 0;
 	const innerBlocksTemplate = getInnerBlocksTemplate( {
 		fontSize: hasFontSizes ? 'large' : undefined,
@@ -351,6 +352,7 @@ function CoverEdit( {
 		}
 	);
 
+	// Set the colors to be used by the placeholder state's color picker.
 	// Only show the default colors if the default palette is enabled and no theme colors are set.
 	const colors = useMemo(
 		() => [
