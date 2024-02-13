@@ -28,7 +28,7 @@ export function Caption( {
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
 	className,
-	...props
+	disableEditing,
 } ) {
 	const caption = attributes[ key ];
 	const prevCaption = usePrevious( caption );
@@ -102,7 +102,7 @@ export function Caption( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
-						{ ...props }
+						disableEditing={ disableEditing }
 					/>
 				) }
 		</>
