@@ -8,16 +8,44 @@ import classnames from 'classnames';
  */
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Icon, search, closeSmall } from '@wordpress/icons';
 import { forwardRef, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import Button from '../button';
 import type { WordPressComponentProps } from '../context/wordpress-component';
-import type { SearchControlProps } from './types';
+import type { SearchControlProps, SuffixItemProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
+import { SuffixItemWrapper } from './styles';
 import InputControl from '../input-control';
+
+function SuffixItem( {
+	searchRef,
+	value,
+	onChange,
+	onClose,
+}: SuffixItemProps ) {
+	if ( ! onClose && ! value ) {
+		return <Icon icon={ search } />;
+	}
+
+	const onReset = () => {
+		onChange( '' );
+		searchRef.current?.focus();
+	};
+
+	return (
+		<Button
+			size="small"
+			icon={ closeSmall }
+			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+			onClick={ onClose ?? onReset }
+		/>
+	);
+}
 
 function UnforwardedSearchControl(
 	{
@@ -80,16 +108,16 @@ function UnforwardedSearchControl(
 				autoComplete="off"
 				placeholder={ placeholder }
 				value={ value ?? '' }
-				// suffix={
-				// 	<SuffixItemWrapper size={ size }>
-				// 		<SuffixItem
-				// 			searchRef={ searchRef }
-				// 			value={ value }
-				// 			onChange={ onChange }
-				// 			onClose={ onClose }
-				// 		/>
-				// 	</SuffixItemWrapper>
-				// }
+				suffix={
+					<SuffixItemWrapper size={ size }>
+						<SuffixItem
+							searchRef={ searchRef }
+							value={ value }
+							onChange={ onChange }
+							onClose={ onClose }
+						/>
+					</SuffixItemWrapper>
+				}
 				{ ...restProps }
 			/>
 		</ContextSystemProvider>
