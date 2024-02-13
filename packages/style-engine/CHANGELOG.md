@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancement
+-   Style engine: add support for nested CSS rules to wp_style_engine_get_stylesheet_from_css_rule() ([#58918](https://github.com/WordPress/gutenberg/pull/58918)).
+
 ## 1.34.0 (2024-02-09)
 
 ## 1.33.0 (2024-01-24)

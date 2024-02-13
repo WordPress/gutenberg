@@ -126,9 +126,30 @@ $styles = array(
         'selector'     => '.wp-tomato',
         'declarations' => array( 'padding' => '100px' )
     ),
+);
+
+$stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+    $styles,
     array(
-        'selector'     => '.wp-kumquat',
+        'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
+    )
+);
+print_r( $stylesheet ); // .wp-pumpkin{color:orange}.wp-tomato{color:red;padding:100px}
+```
+
+It's also possible to build simple, nested CSS rules using the `rules_group` key.
+
+```php
+$styles = array(
+    array(
+        'rules_group'  => '@media (min-width: 80rem)',
+        'selector'     => '.wp-carrot',
         'declarations' => array( 'color' => 'orange' )
+    ),
+    array(
+        'rules_group'  => '@media (min-width: 80rem)',
+        'selector'     => '.wp-tomato',
+        'declarations' => array( 'color' => 'red' )
     ),
 );
 
@@ -138,7 +159,7 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
         'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
     )
 );
-print_r( $stylesheet ); // .wp-pumpkin,.wp-kumquat{color:orange}.wp-tomato{color:red;padding:100px}
+print_r( $stylesheet ); // @media (min-width: 80rem){.wp-carrot{color:orange}.wp-tomato{color:red;}}
 ```
 
 ### wp_style_engine_get_stylesheet_from_context()
