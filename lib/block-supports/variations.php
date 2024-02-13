@@ -78,7 +78,7 @@ function gutenberg_render_variation_support_styles( $pre_render, $block ) {
 	$theme_json     = $tree->get_raw_data();
 	$variation_data = $theme_json['styles']['blocks'][ $block['blockName'] ]['variations'][ $variation ] ?? array();
 
-	if ( empty( $variation_data['elements'] ) && empty( $variation_data['blocks'] ) ) {
+	if ( empty( $variation_data ) ) {
 		return null;
 	}
 
