@@ -239,46 +239,15 @@ export const togglePinnedPluginItem =
 /**
  * Returns an action object used in signaling that a style should be auto-applied when a block is created.
  *
- * @param {string}  blockName  Name of the block.
- * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
+ * @deprecated
  */
-export const updatePreferredStyleVariations =
-	( blockName, blockStyle ) =>
-	( { registry } ) => {
-		if ( ! blockName ) {
-			return;
-		}
-
-		const existingVariations =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
-
-		// When the blockStyle is omitted, remove the block's preferred variation.
-		if ( ! blockStyle ) {
-			const updatedVariations = {
-				...existingVariations,
-			};
-
-			delete updatedVariations[ blockName ];
-
-			registry
-				.dispatch( preferencesStore )
-				.set(
-					'core/edit-post',
-					'preferredStyleVariations',
-					updatedVariations
-				);
-		} else {
-			// Else add the variation.
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core/edit-post', 'preferredStyleVariations', {
-					...existingVariations,
-					[ blockName ]: blockStyle,
-				} );
-		}
-	};
+export function updatePreferredStyleVariations() {
+	deprecated( "dispatch( 'core/edit-post' ).updatePreferredStyleVariations", {
+		since: '6.6',
+		hint: 'Preferred Style Variations are not supported anymore.',
+	} );
+	return { type: 'NOTHING' };
+}
 
 /**
  * Update the provided block types to be visible.

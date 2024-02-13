@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	ErrorBoundary,
 	PostLockedModal,
@@ -11,7 +11,6 @@ import {
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -49,7 +48,7 @@ function Editor( {
 		onNavigateToPreviousEntityRecord,
 	} = useNavigateToEntityRecord( initialPostId, initialPostType );
 
-	const { post, preferredStyleVariations, template } = useSelect(
+	const { post, template } = useSelect(
 		( select ) => {
 			const { getEditedPostTemplate } = select( editPostStore );
 			const { getEntityRecord, getPostType, canUser } =
@@ -68,10 +67,6 @@ function Editor( {
 				getPostType( currentPost.postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 			return {
-				preferredStyleVariations: select( preferencesStore ).get(
-					'core/edit-post',
-					'preferredStyleVariations'
-				),
 				template:
 					supportsTemplateMode &&
 					isViewable &&
@@ -85,26 +80,14 @@ function Editor( {
 		[ currentPost.postType, currentPost.postId ]
 	);
 
-	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
-
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode: 'post-only',
-			__experimentalPreferredStyleVariations: {
-				value: preferredStyleVariations,
-				onChange: updatePreferredStyleVariations,
-			},
 		} ),
-		[
-			settings,
-			preferredStyleVariations,
-			updatePreferredStyleVariations,
-			onNavigateToEntityRecord,
-			onNavigateToPreviousEntityRecord,
-		]
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
 
 	if ( ! post ) {
