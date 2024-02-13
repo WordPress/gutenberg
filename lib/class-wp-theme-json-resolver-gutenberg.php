@@ -214,10 +214,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the theme's data.
 	 *
 	 * Data from theme.json will be backfilled from existing
-	 * theme supports and block style variations, if any.
-	 *
-	 * Note that if the same data is present in theme.json and in theme supports
-	 * or registered block styles, the theme.json takes precedence.
+	 * theme supports, if any. Note that if the same data
+	 * is present in theme.json and in theme supports,
+	 * the theme.json takes precedence.
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Theme supports have been inlined and the `$theme_support_data` argument removed.
@@ -229,8 +228,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @param array $options {
 	 *     Options arguments.
 	 *
-	 *     @type bool $with_supports         Whether to include theme supports in the data. Default true.
-	 *     @type bool $with_style_variations Whether to include block style variations in the data. Default true.
+	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
 	 * }
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
@@ -239,13 +237,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __METHOD__, '5.9.0' );
 		}
 
-		$options = wp_parse_args(
-			$options,
-			array(
-				'with_supports'               => true,
-				'with_block_style_variations' => true,
-			)
-		);
+		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
 
 		if ( null === static::$theme || ! static::has_same_registered_blocks( 'theme' ) ) {
 			$wp_theme        = wp_get_theme();
@@ -293,135 +285,75 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		}
 
-		if ( ! $options['with_supports'] && ! $options['with_block_style_variations'] ) {
+		if ( ! $options['with_supports'] ) {
 			return static::$theme;
 		}
 
-		$theme_support_data = array(
-			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings' => array(),
-		);
-
-		if ( $options['with_supports'] ) {
-			/*
-			 * We want the presets and settings declared in theme.json
-			 * to override the ones declared via theme supports.
-			 * So we take theme supports, transform it to theme.json shape
-			 * and merge any block style variations from WP_Block_Styles_Registry
-			 * before merging the static::$theme upon that.
-			 */
-			$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
-			if ( ! wp_theme_has_theme_json() ) {
-				if ( ! isset( $theme_support_data['settings']['color'] ) ) {
-					$theme_support_data['settings']['color'] = array();
-				}
-
-				$default_palette = false;
-				if ( current_theme_supports( 'default-color-palette' ) ) {
-					$default_palette = true;
-				}
-				if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
-					// If the theme does not have any palette, we still want to show the core one.
-					$default_palette = true;
-				}
-				$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
-
-				$default_gradients = false;
-				if ( current_theme_supports( 'default-gradient-presets' ) ) {
-					$default_gradients = true;
-				}
-				if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
-					// If the theme does not have any gradients, we still want to show the core ones.
-					$default_gradients = true;
-				}
-				$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
-
-				// Allow themes to enable all border settings via theme_support.
-				if ( current_theme_supports( 'border' ) ) {
-					$theme_support_data['settings']['border']['color']  = true;
-					$theme_support_data['settings']['border']['radius'] = true;
-					$theme_support_data['settings']['border']['style']  = true;
-					$theme_support_data['settings']['border']['width']  = true;
-				}
-
-				// Allow themes to enable link colors via theme_support.
-				if ( current_theme_supports( 'link-color' ) ) {
-					$theme_support_data['settings']['color']['link'] = true;
-				}
-				if ( current_theme_supports( 'experimental-link-color' ) ) {
-					_doing_it_wrong(
-						current_theme_supports( 'experimental-link-color' ),
-						__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
-						'6.3.0'
-					);
-				}
-
-				// BEGIN EXPERIMENTAL.
-				// Allow themes to enable appearance tools via theme_support.
-				// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
-				// and then reverted as of https://core.trac.wordpress.org/ticket/57649
-				// Not to backport until the issues are resolved.
-				if ( current_theme_supports( 'appearance-tools' ) ) {
-					$theme_support_data['settings']['appearanceTools'] = true;
-				}
-				// END EXPERIMENTAL.
+		/*
+		 * We want the presets and settings declared in theme.json
+		 * to override the ones declared via theme supports.
+		 * So we take theme supports, transform it to theme.json shape
+		 * and merge any block style variations from WP_Block_Styles_Registry
+		 * before merging the static::$theme upon that.
+		 */
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		if ( ! wp_theme_has_theme_json() ) {
+			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
+				$theme_support_data['settings']['color'] = array();
 			}
+
+			$default_palette = false;
+			if ( current_theme_supports( 'default-color-palette' ) ) {
+				$default_palette = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
+				// If the theme does not have any palette, we still want to show the core one.
+				$default_palette = true;
+			}
+			$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
+
+			$default_gradients = false;
+			if ( current_theme_supports( 'default-gradient-presets' ) ) {
+				$default_gradients = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
+				// If the theme does not have any gradients, we still want to show the core ones.
+				$default_gradients = true;
+			}
+			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+
+			// Allow themes to enable all border settings via theme_support.
+			if ( current_theme_supports( 'border' ) ) {
+				$theme_support_data['settings']['border']['color']  = true;
+				$theme_support_data['settings']['border']['radius'] = true;
+				$theme_support_data['settings']['border']['style']  = true;
+				$theme_support_data['settings']['border']['width']  = true;
+			}
+
+			// Allow themes to enable link colors via theme_support.
+			if ( current_theme_supports( 'link-color' ) ) {
+				$theme_support_data['settings']['color']['link'] = true;
+			}
+			if ( current_theme_supports( 'experimental-link-color' ) ) {
+				_doing_it_wrong(
+					current_theme_supports( 'experimental-link-color' ),
+					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
+					'6.3.0'
+				);
+			}
+
+			// BEGIN EXPERIMENTAL.
+			// Allow themes to enable appearance tools via theme_support.
+			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
+			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
+			// Not to backport until the issues are resolved.
+			if ( current_theme_supports( 'appearance-tools' ) ) {
+				$theme_support_data['settings']['appearanceTools'] = true;
+			}
+			// END EXPERIMENTAL.
 		}
 
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
-
-		if ( $options['with_block_style_variations'] ) {
-			// Absorb block style variations that were registered with a style object.
-			$block_style_variations_data = WP_Theme_JSON_Gutenberg::get_from_block_styles_registry();
-
-			if ( $block_style_variations_data ) {
-				$with_block_style_variations = new WP_Theme_JSON_Gutenberg( $block_style_variations_data );
-				$with_theme_supports->merge( $with_block_style_variations );
-			}
-
-			// Resolve shared block style variations that were bundled in the
-			// theme via standalone theme.json files.
-			$shared_block_style_variations = static::get_style_variations( '/block-styles' );
-			$variations_data               = array();
-			$registry                      = WP_Block_Styles_Registry::get_instance();
-
-			foreach ( $shared_block_style_variations as $variation ) {
-				if ( empty( $variation['supportedBlockTypes'] ) || empty( $variation['styles'] ) ) {
-					continue;
-				}
-
-				$variation_slug = _wp_to_kebab_case( $variation['title'] );
-
-				// If it proves desirable, block style variations could include
-				// custom settings which can be included here.
-				foreach ( $variation['supportedBlockTypes'] as $block_type ) {
-					// Automatically register the block style variation if it
-					// hasn't been already.
-					$registered_styles = $registry->get_registered_styles_for_block( $block_type );
-					if ( ! array_key_exists( $variation_slug, $registered_styles ) ) {
-						gutenberg_register_block_style(
-							$block_type,
-							array(
-								'name'  => $variation_slug,
-								'label' => $variation['title'],
-							)
-						);
-					}
-
-					$path = array( $block_type, 'variations', $variation_slug );
-					_wp_array_set( $variations_data, $path, $variation['styles'] );
-				}
-			}
-
-			if ( ! empty( $variations_data ) ) {
-				$variations_theme_json_data = array(
-					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-					'styles'  => array( 'blocks' => $variations_data ),
-				);
-				$with_shared_variations     = new WP_Theme_JSON_Gutenberg( $variations_theme_json_data );
-				$with_theme_supports->merge( $with_shared_variations );
-			}
-		}
 
 		$with_theme_supports->merge( static::$theme );
 
@@ -791,6 +723,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 6.5.0 Added configurable directory to allow block style variations
 	 *              to reside in a different directory to theme style variations.
 	 *
+	 * @param string $dir Directory to search for variation partials.
 	 * @return array
 	 */
 	public static function get_style_variations( $dir = 'styles' ) {

@@ -866,13 +866,6 @@ class WP_Theme_JSON_Gutenberg {
 			call_user_func_array( 'array_merge', array_values( $valid_variations ) )
 		);
 
-		// Shared block style variations have an additional property to those
-		// defined under individual block types so they can specify eligible
-		// block types.
-		$shared_variation_styles                        = $block_style_variation_styles;
-		$shared_variation_styles['supportedBlockTypes'] = null;
-		$schema_shared_style_variations                 = array_fill_keys( $unique_variations, $shared_variation_styles );
-
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
@@ -897,11 +890,14 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema['styles']                                 = static::VALID_STYLES;
 		$schema['styles']['blocks']                       = $schema_styles_blocks;
-		$schema['styles']['blocks']['variations']         = $schema_shared_style_variations;
 		$schema['styles']['elements']                     = $schema_styles_elements;
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
+
+		// Shared block style variations can be registered from the theme.json data so we can't
+		// validate them against pre-registered block style variations.
+		$schema['styles']['blocks']['variations'] = null;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -3998,38 +3994,5 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return implode( ',', $result );
-	}
-
-	/**
-	 * Converts block styles registered through the `WP_Block_Styles_Registry`
-	 * with a style object, into theme.json format.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return array|null Styles configuration adhering to the theme.json schema.
-	 */
-	public static function get_from_block_styles_registry() {
-		$variations_data = array();
-		$registry        = WP_Block_Styles_Registry::get_instance();
-		$styles          = $registry->get_all_registered();
-
-		foreach ( $styles as $block_name => $variations ) {
-			foreach ( $variations as $variation_name => $variation ) {
-				if ( ! empty( $variation['style_data'] ) ) {
-					$variations_data[ $block_name ]['variations'][ $variation_name ] = $variation['style_data'];
-				}
-			}
-		}
-
-		if ( empty( $variations_data ) ) {
-			return null;
-		}
-
-		return array(
-			'version' => static::LATEST_SCHEMA,
-			'styles'  => array(
-				'blocks' => $variations_data,
-			),
-		);
 	}
 }
