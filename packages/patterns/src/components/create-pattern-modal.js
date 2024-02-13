@@ -13,15 +13,14 @@ import { __, _x } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
 import { store as patternsStore } from '../store';
-import CategorySelector, { CATEGORY_SLUG } from './category-selector';
-import { usePatternCategoriesMap } from '../private-hooks';
+import CategorySelector from './category-selector';
+import { useAddPatternCategory } from '../private-hooks';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
@@ -56,10 +55,9 @@ export function CreatePatternModalContents( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const categoryMap = usePatternCategoriesMap();
+	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 
 	async function onCreate( patternTitle, sync ) {
 		if ( ! title || isSaving ) {
@@ -97,38 +95,6 @@ export function CreatePatternModalContents( {
 		}
 	}
 
-	/**
-	 * @param {string} term
-	 * @return {Promise<number>} The pattern category id.
-	 */
-	async function findOrCreateTerm( term ) {
-		try {
-			const existingTerm = categoryMap.get( term.toLowerCase() );
-			if ( existingTerm && existingTerm.id ) {
-				return existingTerm.id;
-			}
-			// If we have an existing core category we need to match the new user category to the
-			// correct slug rather than autogenerating it to prevent duplicates, eg. the core `Headers`
-			// category uses the singular `header` as the slug.
-			const termData = existingTerm
-				? { name: existingTerm.label, slug: existingTerm.name }
-				: { name: term };
-			const newTerm = await saveEntityRecord(
-				'taxonomy',
-				CATEGORY_SLUG,
-				termData,
-				{ throwOnError: true }
-			);
-			invalidateResolution( 'getUserPatternCategories' );
-			return newTerm.id;
-		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
-				throw error;
-			}
-
-			return error.data.term_id;
-		}
-	}
 	return (
 		<form
 			onSubmit={ ( event ) => {

@@ -27,7 +27,7 @@ import {
 } from '../../utils/constants';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { CreatePatternModal, usePatternCategoriesMap } = unlock(
+const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
 
@@ -44,7 +44,6 @@ export default function AddNewPattern() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -98,31 +97,7 @@ export default function AddNewPattern() {
 		title: __( 'Import pattern from JSON' ),
 	} );
 
-	const categoryMap = usePatternCategoriesMap();
-	async function createPatternCategory( existingTerm ) {
-		try {
-			// Since we have an existing core category we need to match the new user category to the
-			// correct slug rather than autogenerating it to prevent duplicates, eg. the core `Headers`
-			// category uses the singular `header` as the slug.
-			const termData = {
-				name: existingTerm.label,
-				slug: existingTerm.name,
-			};
-			const newTerm = await saveEntityRecord(
-				'taxonomy',
-				'wp_pattern_category',
-				termData,
-				{ throwOnError: true }
-			);
-			invalidateResolution( 'getUserPatternCategories' );
-			return newTerm.id;
-		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
-				throw error;
-			}
-			return error.data.term_id;
-		}
-	}
+	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 	return (
 		<>
 			<DropdownMenu
@@ -170,8 +145,8 @@ export default function AddNewPattern() {
 							if ( !! currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||
-									( await createPatternCategory(
-										currentCategory
+									( await findOrCreateTerm(
+										currentCategory.label
 									) );
 							}
 						}
