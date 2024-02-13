@@ -105,10 +105,10 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		/**
 		 * Gets the rules group.
 		 *
-		 * @return string|null
+		 * @return string
 		 */
 		public function get_rules_group() {
-			return $this->rules_group ?? null;
+			return $this->rules_group;
 		}
 
 		/**

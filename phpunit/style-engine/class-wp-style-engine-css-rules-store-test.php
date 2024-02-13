@@ -172,7 +172,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests adding identical selectors.
+	 * Tests adding rules group keys to store.
 	 *
 	 * @covers ::add_rule
 	 */
