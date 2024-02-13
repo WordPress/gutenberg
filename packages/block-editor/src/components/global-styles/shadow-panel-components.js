@@ -19,13 +19,13 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 import classNames from 'classnames';
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
-	const defaultShadows = settings?.shadow?.presets?.default;
-	const themeShadows = settings?.shadow?.presets?.theme;
+	const defaultShadows = settings?.shadow?.presets?.default || [];
+	const themeShadows = settings?.shadow?.presets?.theme || [];
 	const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
 
 	const shadows = [
 		...( defaultPresetsEnabled ? defaultShadows : [] ),
-		...( themeShadows || [] ),
+		...themeShadows,
 	];
 
 	return (
