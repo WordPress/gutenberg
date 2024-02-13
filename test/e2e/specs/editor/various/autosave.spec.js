@@ -13,8 +13,14 @@ test.describe( 'Autosave', () => {
 		await page.evaluate( () => window.sessionStorage.clear() );
 	} );
 
-	test( 'should save to sessionStorage', async ( { page, pageUtils } ) => {
-		await page.keyboard.press( 'Enter' );
+	test( 'should save to sessionStorage', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
 		await page
@@ -50,7 +56,9 @@ test.describe( 'Autosave', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
 		await page
@@ -91,10 +99,13 @@ test.describe( 'Autosave', () => {
 
 	test( "shouldn't contaminate other posts", async ( {
 		admin,
+		editor,
 		page,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
 		await page
@@ -124,10 +135,13 @@ test.describe( 'Autosave', () => {
 	} );
 
 	test( 'should clear local autosave after successful remote autosave', async ( {
+		editor,
 		page,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
 		await page
@@ -155,10 +169,13 @@ test.describe( 'Autosave', () => {
 	} );
 
 	test( "shouldn't clear local autosave if remote autosave fails", async ( {
+		editor,
 		page,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
 		await page
@@ -225,6 +242,7 @@ test.describe( 'Autosave', () => {
 	} );
 
 	test( "shouldn't clear local autosave if save fails", async ( {
+		editor,
 		page,
 		pageUtils,
 	} ) => {
@@ -232,7 +250,9 @@ test.describe( 'Autosave', () => {
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Draft saved' } );
 
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
 		await notice.waitFor();
@@ -272,7 +292,9 @@ test.describe( 'Autosave', () => {
 		editor,
 		page,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'before save' );
 		await editor.publishPost();
 
