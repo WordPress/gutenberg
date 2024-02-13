@@ -109,14 +109,14 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			if ( $this->is_registered( $source_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					/* translators: %s: Block bindings source name. */
+					// translators: %s: Block bindings source name.
 					sprintf( __( 'Block bindings source "%s" already registered.' ), $source_name ),
 					'6.5.0'
 				);
 				return false;
 			}
 
-			/* Validate that the source properties contain the label */
+			// Validate that the source properties contain the label.
 			if ( ! isset( $source_properties['label'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -126,7 +126,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
-			/* Validate that the source properties contain the get_value_callback */
+			// Validate that the source properties contain the get_value_callback.
 			if ( ! isset( $source_properties['get_value_callback'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -136,7 +136,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
-			/* Validate that the get_value_callback is a valid callback */
+			// Validate that the get_value_callback is a valid callback.
 			if ( ! is_callable( $source_properties['get_value_callback'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -212,7 +212,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			if ( ! $this->is_registered( $source_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					/* translators: %s: Block bindings source name. */
+					// translators: %s: Block bindings source name.
 					sprintf( __( 'Block binding "%s" not found.' ), $source_name ),
 					'6.5.0'
 				);
