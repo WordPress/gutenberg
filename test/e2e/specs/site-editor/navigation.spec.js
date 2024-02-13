@@ -109,10 +109,9 @@ class EditorNavigationUtils {
 				);
 			} );
 			if ( activeLabel === label ) {
-				return activeLabel;
+				return;
 			}
 		}
-		return null;
 	}
 
 	async tabToNode( nodeName, { times = 10 } ) {
@@ -122,9 +121,8 @@ class EditorNavigationUtils {
 				return document.activeElement.nodeName;
 			} );
 			if ( activeNode === nodeName ) {
-				break;
+				return;
 			}
 		}
-		return null;
 	}
 }
