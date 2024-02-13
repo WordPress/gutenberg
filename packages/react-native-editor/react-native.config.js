@@ -3,7 +3,12 @@
  */
 const path = require( 'path' );
 
-// Currently all native libraries are linked manually for both platforms.
+/**
+ * The `null` value for the Android `platform` below disables auto-linking, as
+ * we manually link these library binaries to avoid a Node.js dependency
+ * using binaries from the React Native Libraries Publisher repository
+ * in the host WordPress Android app.
+ */
 module.exports = {
 	dependencies: {
 		'@wordpress/react-native-bridge': {
