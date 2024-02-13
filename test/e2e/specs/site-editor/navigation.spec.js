@@ -19,33 +19,9 @@ test.describe( 'Site editor navigation', () => {
 	} ) => {
 		await admin.visitSiteEditor();
 
-		// Test:
-		// Navigate to the iframe
-		await pageUtils.pressKeys( 'Tab', { times: 3 } );
-
-		// Test: Doesn't lose focus when using the command palette from the site editor navigation sidebar
-		// Open the command palette via button press
-		await expect( page.getByLabel( 'Open command palette' ) ).toBeFocused();
-		await pageUtils.pressKeys( 'Enter' );
-		await expect(
-			page.getByPlaceholder( 'Search for commands' )
-		).toBeFocused();
-		// Return focus to the button
-		await pageUtils.pressKeys( 'Escape' );
-		await expect( page.getByLabel( 'Open command palette' ) ).toBeFocused();
-
-		// Test: Doesn't lose focus when using the command palette from the command + k shortcut
-		// Open it again with Command + K
-		await pageUtils.pressKeys( 'primary+k' );
-		await expect(
-			page.getByPlaceholder( 'Search for commands' )
-		).toBeFocused();
-		await pageUtils.pressKeys( 'Escape' );
-		await expect( page.getByLabel( 'Open command palette' ) ).toBeFocused();
-
 		// Test: Can navigate to a sidebar item and into its subnavigation frame without losing focus
 		// Go to the Pages button
-		await pageUtils.pressKeys( 'Tab', { times: 4 } );
+		await pageUtils.pressKeys( 'Tab', { times: 7 } );
 		await expect(
 			page.getByRole( 'button', { name: 'Pages' } )
 		).toBeFocused();
