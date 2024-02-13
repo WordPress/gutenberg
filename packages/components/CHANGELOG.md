@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.0.1 (2024-02-13)
+
 ### Bug Fix
 
 -   `Popover`: Fix positioning in nested iframes by upgrading Floating UI packages to their latest versions ([#58932](https://github.com/WordPress/gutenberg/pull/58932)).
