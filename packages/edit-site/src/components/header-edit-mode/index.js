@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	BlockToolbar,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -42,6 +43,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
+const { useShowBlockTools } = unlock( blockEditorPrivateApis );
 const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
@@ -77,7 +79,12 @@ export default function HeaderEditMode() {
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
+	const { showFixedToolbar } = useShowBlockTools();
+	const isTopToolbar =
+		! isZoomOutMode &&
+		hasFixedToolbar &&
+		isLargeViewport &&
+		showFixedToolbar;
 	const blockToolbarRef = useRef();
 	const disableMotion = useReducedMotion();
 
@@ -89,8 +96,6 @@ export default function HeaderEditMode() {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-
-	const hasBlockSelected = !! blockSelectionStart;
 
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
@@ -146,24 +151,20 @@ export default function HeaderEditMode() {
 								ref={ blockToolbarRef }
 								name="block-toolbar"
 							/>
-							{ hasBlockSelected && (
-								<Button
-									className="edit-site-header-edit-mode__block-tools-toggle"
-									icon={
-										isBlockToolsCollapsed ? next : previous
-									}
-									onClick={ () => {
-										setIsBlockToolsCollapsed(
-											( collapsed ) => ! collapsed
-										);
-									} }
-									label={
-										isBlockToolsCollapsed
-											? __( 'Show block tools' )
-											: __( 'Hide block tools' )
-									}
-								/>
-							) }
+							<Button
+								className="edit-site-header-edit-mode__block-tools-toggle"
+								icon={ isBlockToolsCollapsed ? next : previous }
+								onClick={ () => {
+									setIsBlockToolsCollapsed(
+										( collapsed ) => ! collapsed
+									);
+								} }
+								label={
+									isBlockToolsCollapsed
+										? __( 'Show block tools' )
+										: __( 'Hide block tools' )
+								}
+							/>
 						</>
 					) }
 				</motion.div>
@@ -175,7 +176,9 @@ export default function HeaderEditMode() {
 						'edit-site-header-edit-mode__center',
 						{
 							'is-collapsed':
-								! isBlockToolsCollapsed && isLargeViewport,
+								! isBlockToolsCollapsed &&
+								isLargeViewport &&
+								isTopToolbar,
 						}
 					) }
 				>

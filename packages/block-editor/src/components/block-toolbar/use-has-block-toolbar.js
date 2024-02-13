@@ -15,7 +15,8 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
  * @return {boolean} Whether the block toolbar component will be rendered.
  */
 export function useHasBlockToolbar() {
-	const { isDefaultEditingMode, isToolbarEnabled } = useSelect(
+	const hasAnyBlockControls = useHasAnyBlockControls();
+	return useSelect(
 		( select ) => {
 			const {
 				getBlockEditingMode,
@@ -25,21 +26,19 @@ export function useHasBlockToolbar() {
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const _isDefaultEditingMode =
+			const isDefaultEditingMode =
 				getBlockEditingMode( selectedBlockClientId ) === 'default';
 			const blockType =
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) );
+			const isToolbarEnabled =
+				blockType &&
+				hasBlockSupport( blockType, '__experimentalToolbar', true );
 
-			return {
-				isDefaultEditingMode: _isDefaultEditingMode,
-				isToolbarEnabled:
-					blockType &&
-					hasBlockSupport( blockType, '__experimentalToolbar', true ),
-			};
-		}
+			return (
+				isToolbarEnabled && isDefaultEditingMode && hasAnyBlockControls
+			);
+		},
+		[ hasAnyBlockControls ]
 	);
-	const hasAnyBlockControls = useHasAnyBlockControls();
-
-	return isToolbarEnabled || ( isDefaultEditingMode && hasAnyBlockControls );
 }

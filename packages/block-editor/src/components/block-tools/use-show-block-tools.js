@@ -63,9 +63,7 @@ export function useShowBlockTools() {
 					! isEmptyDefaultBlock &&
 					! maybeShowBreadcrumb,
 				showFixedToolbar:
-					hasBlockToolbar &&
-					!! clientId &&
-					getSettings().hasFixedToolbar,
+					hasBlockToolbar && getSettings().hasFixedToolbar,
 			};
 		},
 		[ hasBlockToolbar ]
