@@ -10,7 +10,10 @@ import { mergeBaseAndUserConfigs } from '../../components/global-styles/global-s
 import cloneDeep from '../../utils/clone-deep';
 
 /**
- * Returns a new object with only the properties specified in `properties`.
+ * Returns a new object, with properties specified in `property`,
+ * maintain the original object tree structure.
+ * The function is recursive, so it will perform a deep search for the given property.
+ * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the property is `test`.
  *
  * @param {Object} object   The object to filter
  * @param {Object} property The property to filter by
