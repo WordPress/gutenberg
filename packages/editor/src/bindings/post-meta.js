@@ -19,6 +19,7 @@ export default {
 		const postType = context.postType
 			? context.postType
 			: getCurrentPostType();
+
 		const [ meta, setMeta ] = useEntityProp(
 			'postType',
 			context.postType,
@@ -33,9 +34,11 @@ export default {
 		const updateMetaValue = ( newValue ) => {
 			setMeta( { ...meta, [ metaKey ]: newValue } );
 		};
+
 		return {
 			placeholder: metaKey,
-			useValue: [ metaValue, updateMetaValue ],
+			value: metaValue,
+			updateValue: updateMetaValue,
 		};
 	},
 };
