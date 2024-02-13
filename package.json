@@ -128,7 +128,7 @@
 		"@storybook/theming": "7.6.15",
 		"@testing-library/jest-dom": "5.16.5",
 		"@testing-library/react": "14.0.0",
-		"@testing-library/react-native": "12.1.2",
+		"@testing-library/react-native": "12.4.3",
 		"@testing-library/user-event": "14.4.3",
 		"@types/eslint": "7.28.0",
 		"@types/estree": "0.0.50",
