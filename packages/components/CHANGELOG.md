@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.0.1 (2024-02-13)
+
 ### Bug Fix
 
 -   `Modal`: Add `box-sizing` reset style ([#58905](https://github.com/WordPress/gutenberg/pull/58905)).
