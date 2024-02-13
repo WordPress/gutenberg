@@ -34,10 +34,9 @@ const BlockBindingConnector = ( {
 	blockProps,
 	useSource,
 } ) => {
-	const { value: propValue, updateValue: updatePropValue } = useSource(
-		blockProps,
-		args
-	);
+	const { value: propValue, updateValue: updatePropValue } =
+		useSource( blockProps, args ) || {};
+
 	const setAttributes = blockProps.setAttributes;
 
 	const updateBoundAttibute = useCallback(
@@ -78,7 +77,7 @@ const BlockBindingConnector = ( {
 		 * Detect changes in block attribute value,
 		 * and update the source prop value accordingly.
 		 */
-		if ( attrValue !== lastAttrValue.current ) {
+		if ( attrValue !== lastAttrValue.current && updatePropValue ) {
 			lastAttrValue.current = attrValue;
 			updatePropValue( attrValue );
 		}
