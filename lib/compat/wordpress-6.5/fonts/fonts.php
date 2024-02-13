@@ -84,7 +84,7 @@ function gutenberg_create_initial_post_types() {
 	);
 }
 
-function gutenberg_map_meta_caps_font_faces( $caps, $cap, $user_id, $args ) {
+function gutenberg_map_meta_caps_font_faces( $caps, $cap ) {
 	if ( 'install_fonts' !== $cap ) {
 		return $caps;
 	}
@@ -98,6 +98,7 @@ function gutenberg_map_meta_caps_font_faces( $caps, $cap, $user_id, $args ) {
 
 	return $caps;
 }
+add_filter( 'map_meta_cap', 'gutenberg_map_meta_caps_font_faces', 10, 2 );
 
 
 /**
