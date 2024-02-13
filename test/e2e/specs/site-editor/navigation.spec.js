@@ -19,8 +19,11 @@ test.describe( 'Site editor navigation', () => {
 	} ) => {
 		await admin.visitSiteEditor();
 
+		// Test:
 		// Navigate to the iframe
 		await pageUtils.pressKeys( 'Tab', { times: 3 } );
+
+		// Test: Doesn't lose focus when using the command palette from the site editor navigation sidebar
 		// Open the command palette via button press
 		await expect( page.getByLabel( 'Open command palette' ) ).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
@@ -30,6 +33,8 @@ test.describe( 'Site editor navigation', () => {
 		// Return focus to the button
 		await pageUtils.pressKeys( 'Escape' );
 		await expect( page.getByLabel( 'Open command palette' ) ).toBeFocused();
+
+		// Test: Doesn't lose focus when using the command palette from the command + k shortcut
 		// Open it again with Command + K
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
@@ -37,6 +42,8 @@ test.describe( 'Site editor navigation', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'Escape' );
 		await expect( page.getByLabel( 'Open command palette' ) ).toBeFocused();
+
+		// Test: Can navigate to a sidebar item and into its subnavigation frame without losing focus
 		// Go to the Pages button
 		await pageUtils.pressKeys( 'Tab', { times: 4 } );
 		await expect(
@@ -52,18 +59,39 @@ test.describe( 'Site editor navigation', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Pages' } )
 		).toBeFocused();
+
+		// Test: Can navigate into the iframe using the keyboard
 		await pageUtils.pressKeys( 'Tab', { times: 6 } );
 		// Getting the actual iframe as a cleaner locator was suprisingly tricky,
 		// so we're using a css selector with .is-focused which should be present when the iframe has focus.
 		await expect(
 			page.locator( 'iframe[name="editor-canvas"].is-focused' )
 		).toBeFocused();
-
-		// Enter into editing mode
+		// Enter into the site editor frame
 		await pageUtils.pressKeys( 'Enter' );
+		// Focus should still be on the iframe.
+		await expect(
+			page.locator( 'iframe[name="editor-canvas"]' )
+		).toBeFocused();
+		// But did it do anything?
+		// Test to make sure a Tab keypress works as expected.
+		// As of this writing, we are in select mode and a tab
+		/// keypress will reveal the header template select mode
+		// button. This test is not documenting that we _want_
+		// that action, but checking that we are within the site
+		// editor and keypresses work as intened.
+		await pageUtils.pressKeys( 'Tab' );
+		await expect(
+			page.getByRole( 'button', {
+				name: 'Template Part Block. Row 1. header',
+			} )
+		).toBeFocused();
 
-		// We should now be in editing mode
-		await pageUtils.pressKeys( 'Shift+Tab', { times: 9 } );
+		// Test: We can go back to the main navigation from the editor frame
+		// Move to the document toolbar
+		await pageUtils.pressKeys( 'alt+F10' );
+		// Go to the open navigation button
+		await pageUtils.pressKeys( 'shift+Tab' );
 
 		// Open the sidebar again
 		await expect(
@@ -73,6 +101,7 @@ test.describe( 'Site editor navigation', () => {
 			} )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'Enter' );
+
 		await expect(
 			page.getByLabel( 'Go to the Dashboard' ).first()
 		).toBeFocused();
