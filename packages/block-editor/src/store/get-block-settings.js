@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__EXPERIMENTAL_PATHS_WITH_OVERRIDE as PATHS_WITH_OVERRIDE,
+	__DEPRECATED_PATHS_WITH_OVERRIDE as PATHS_WITH_OVERRIDE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
@@ -12,6 +12,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { getValueFromObjectPath } from '../utils/object';
 import { getBlockName, getSettings, getBlockAttributes } from './selectors';
+import deprecated from '@wordpress/deprecated';
 
 const blockedPaths = [
 	'color',
@@ -215,6 +216,11 @@ export function getBlockSettings( state, clientId, ...paths ) {
 		// Return if the setting was found in either the block instance or the store.
 		if ( result !== undefined ) {
 			if ( PATHS_WITH_OVERRIDE[ normalizedPath ] ) {
+				deprecated( 'getBlockSettings paths with override', {
+					since: '6.6.0',
+					alternative: `${ path }.default, ${ path }.theme, and ${ path }.custom values directly`,
+					hint: 'The default, theme, and custom values can be overridden the same way with overrideOrigins( { default, theme, custom } ) if needed.',
+				} );
 				return overrideOrigins( result );
 			}
 			return result;

@@ -271,10 +271,13 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	cite: 'cite',
 };
 
-// These paths may have three origins, custom, theme, and default,
-// and are expected to override other origins with custom, theme,
-// and default priority.
-export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
+/**
+ * Paths that existed before origins were introduced and need to be overridden
+ * for backwards compatibility of getBlockSettings.
+ *
+ * @type {Object}
+ */
+export const __DEPRECATED_PATHS_WITH_OVERRIDE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,

@@ -162,5 +162,5 @@ export { default as node } from './node';
 export {
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS,
-	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
+	__DEPRECATED_PATHS_WITH_OVERRIDE,
 } from './constants';
