@@ -28,6 +28,7 @@ import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
+import './block-binding-support';
 // import './use-bindings-attributes';
 
 createBlockEditFilter(
