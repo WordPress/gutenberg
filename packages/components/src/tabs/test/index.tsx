@@ -1319,6 +1319,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
+				await sleep();
 				await press.Tab();
 				await waitFor( async () =>
 					expect(
