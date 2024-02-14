@@ -463,6 +463,20 @@ _Returns_
 
 -   `V | undefined`: The value corresponding to the map key requested.
 
+### useNetworkConnectivity
+
+Returns the current network connectivity status provided by the native bridge.
+
+_Usage_
+
+```jsx
+const { isConnected } = useNetworkConnectivity();
+```
+
+_Returns_
+
+-   `NetworkInformation`: Network information.
+
 ### usePrevious
 
 Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.
