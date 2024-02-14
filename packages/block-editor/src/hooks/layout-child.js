@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
-import GridVisualizer from '../components/grid-visualizer';
+import { GridVisualizer, GridItemResizer } from '../components/grid-visualizer';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
@@ -95,7 +95,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	return { className: `wp-container-content-${ id }` };
 }
 
-function ChildLayoutControlsPure( { clientId } ) {
+function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	const parentLayout = useLayout() || {};
 	const rootClientId = useSelect(
 		( select ) => {
@@ -106,7 +106,26 @@ function ChildLayoutControlsPure( { clientId } ) {
 	if ( parentLayout.type !== 'grid' ) {
 		return null;
 	}
-	return <GridVisualizer clientId={ rootClientId } />;
+	return (
+		<>
+			<GridVisualizer clientId={ rootClientId } />
+			<GridItemResizer
+				clientId={ clientId }
+				onChange={ ( { rowSpan, columnSpan } ) => {
+					setAttributes( {
+						style: {
+							...style,
+							layout: {
+								...style?.layout,
+								rowSpan,
+								columnSpan,
+							},
+						},
+					} );
+				} }
+			/>
+		</>
+	);
 }
 
 export default {
