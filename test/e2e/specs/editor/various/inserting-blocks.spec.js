@@ -393,7 +393,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( '/tag cloud' );
 
 		await expect(
@@ -413,7 +415,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## Heading' );
@@ -465,7 +469,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await editor.insertBlock( { name: 'core/image' } );
 
@@ -567,14 +573,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			} )
 			.click();
 
-		const searchBox = page.getByRole( 'searchbox', {
-			name: 'Search for blocks and patterns',
-		} );
-
-		await searchBox.fill( 'Verse' );
+		await page
+			.getByRole( 'searchbox', {
+				name: 'Search for blocks and patterns',
+			} )
+			.fill( 'Verse' );
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 
-		await expect( searchBox ).toHaveValue( 'Verse' );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Block Library' } )
+				.getByRole( 'searchbox', {
+					name: 'Search for blocks and patterns',
+				} )
+		).toHaveValue( 'Verse' );
 		await expect(
 			page.getByRole( 'listbox', { name: 'Blocks' } )
 		).toHaveCount( 1 );

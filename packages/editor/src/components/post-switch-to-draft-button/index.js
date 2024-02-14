@@ -46,6 +46,7 @@ export default function PostSwitchToDraftButton() {
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="editor-post-switch-to-draft"
 				onClick={ () => {
 					if ( ! isDisabled ) {

@@ -414,20 +414,6 @@ supports: {
 }
 ```
 
-## defaultStylePicker
-
--   Type: `boolean`
--   Default value: `true`
-
-When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
-
-```js
-supports: {
-	// Remove the Default Style picker.
-	defaultStylePicker: false
-}
-```
-
 ## dimensions
 
 _**Note:** Since WordPress 6.2._

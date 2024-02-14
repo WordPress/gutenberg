@@ -156,12 +156,19 @@ export function RichTextWrapper(
 			for ( const [ attribute, args ] of Object.entries(
 				blockBindings
 			) ) {
-				// If any of the attributes with source "rich-text" is part of the bindings,
-				// has a source with `lockAttributesEditing`, disable it.
 				if (
-					blockTypeAttributes?.[ attribute ]?.source ===
-						'rich-text' &&
-					getBlockBindingsSource( args.source )?.lockAttributesEditing
+					blockTypeAttributes?.[ attribute ]?.source !== 'rich-text'
+				) {
+					break;
+				}
+
+				// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+				const blockBindingsSource = getBlockBindingsSource(
+					args.source
+				);
+				if (
+					! blockBindingsSource ||
+					blockBindingsSource.lockAttributesEditing
 				) {
 					shouldDisableEditing = true;
 					break;
@@ -348,7 +355,6 @@ export function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					editableContentElement={ anchorRef.current }
-					value={ value }
 				/>
 			) }
 			<TagName

@@ -49,7 +49,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
-			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
+			$p->set_attribute( 'data-wp-interactive', 'core/query' );
 			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
 			$p->set_attribute( 'data-wp-init', 'callbacks.setQueryRef' );
 			$p->set_attribute( 'data-wp-context', '{}' );
@@ -137,11 +137,8 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				}
 
 				if ( isset( $dirty_enhanced_queries[ $block['attrs']['queryId'] ] ) ) {
-					$p = new WP_HTML_Tag_Processor( $content );
-					if ( $p->next_tag() ) {
-						$p->set_attribute( 'data-wp-navigation-disabled', 'true' );
-					}
-					$content = $p->get_updated_html();
+					// Disable navigation in the router store config.
+					wp_interactivity_config( 'core/router', array( 'clientNavigationDisabled' => true ) );
 					$dirty_enhanced_queries[ $block['attrs']['queryId'] ] = null;
 				}
 
