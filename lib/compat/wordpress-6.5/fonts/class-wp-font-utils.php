@@ -25,7 +25,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * Adds surrounding quotes to font family names that contain special characters.
 		 *
 		 * It follows the recommendations from the CSS Fonts Module Level 4.
-		 * https://www.w3.org/TR/css-fonts-4/#font-family-prop
+		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
 		 *
 		 * @since 6.5.0
 		 * @access private
@@ -54,7 +54,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * - Adds surrounding quotes to names that special
 		 *
 		 * It follows the recommendations from the CSS Fonts Module Level 4.
-		 * https://www.w3.org/TR/css-fonts-4/#font-family-prop
+		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
 		 *
 		 * @since 6.5.0
 		 * @access private
