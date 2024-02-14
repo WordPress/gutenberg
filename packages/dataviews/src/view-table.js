@@ -33,7 +33,10 @@ import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
 import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
-import { useHasAPossibleBulkAction } from './bulk-actions';
+import {
+	useSomeItemHasAPossibleBulkAction,
+	useHasAPossibleBulkAction,
+} from './bulk-actions';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -207,6 +210,82 @@ function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
 	);
 }
 
+function TableRow( {
+	hasBulkActions,
+	item,
+	actions,
+	id,
+	visibleFields,
+	primaryField,
+	selection,
+	getItemId,
+	onSelectionChange,
+	data,
+} ) {
+	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
+	return (
+		<tr
+			className={ classnames( 'dataviews-view-table__row', {
+				'is-selected':
+					hasPossibleBulkAction && selection.includes( id ),
+			} ) }
+		>
+			{ hasBulkActions && (
+				<td
+					className="dataviews-view-table__checkbox-column"
+					style={ {
+						width: 20,
+						minWidth: 20,
+					} }
+				>
+					<div className="dataviews-view-table__cell-content-wrapper">
+						{ hasPossibleBulkAction && (
+							<SingleSelectionCheckbox
+								id={ id }
+								item={ item }
+								selection={ selection }
+								onSelectionChange={ onSelectionChange }
+								getItemId={ getItemId }
+								data={ data }
+								primaryField={ primaryField }
+							/>
+						) }
+					</div>
+				</td>
+			) }
+			{ visibleFields.map( ( field ) => (
+				<td
+					key={ field.id }
+					style={ {
+						width: field.width || undefined,
+						minWidth: field.minWidth || undefined,
+						maxWidth: field.maxWidth || undefined,
+					} }
+				>
+					<div
+						className={ classnames(
+							'dataviews-view-table__cell-content-wrapper',
+							{
+								'dataviews-view-table__primary-field':
+									primaryField?.id === field.id,
+							}
+						) }
+					>
+						{ field.render( {
+							item,
+						} ) }
+					</div>
+				</td>
+			) ) }
+			{ !! actions?.length && (
+				<td className="dataviews-view-table__actions-column">
+					<ItemActions item={ item } actions={ actions } />
+				</td>
+			) }
+		</tr>
+	);
+}
+
 function ViewTable( {
 	view,
 	onChangeView,
@@ -223,7 +302,7 @@ function ViewTable( {
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
-	const hasBulkActions = useHasAPossibleBulkAction( actions, data );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -348,78 +427,19 @@ function ViewTable( {
 				<tbody>
 					{ hasData &&
 						usedData.map( ( item, index ) => (
-							<tr
+							<TableRow
 								key={ getItemId( item ) }
-								className={ classnames(
-									'dataviews-view-table__row',
-									{
-										'is-selected': selection.includes(
-											getItemId( item ) || index
-										),
-									}
-								) }
-							>
-								{ hasBulkActions && (
-									<td
-										className="dataviews-view-table__checkbox-column"
-										style={ {
-											width: 20,
-											minWidth: 20,
-										} }
-									>
-										<div className="dataviews-view-table__cell-content-wrapper">
-											<SingleSelectionCheckbox
-												id={
-													getItemId( item ) || index
-												}
-												item={ item }
-												selection={ selection }
-												onSelectionChange={
-													onSelectionChange
-												}
-												getItemId={ getItemId }
-												data={ data }
-												primaryField={ primaryField }
-											/>
-										</div>
-									</td>
-								) }
-								{ visibleFields.map( ( field ) => (
-									<td
-										key={ field.id }
-										style={ {
-											width: field.width || undefined,
-											minWidth:
-												field.minWidth || undefined,
-											maxWidth:
-												field.maxWidth || undefined,
-										} }
-									>
-										<div
-											className={ classnames(
-												'dataviews-view-table__cell-content-wrapper',
-												{
-													'dataviews-view-table__primary-field':
-														primaryField?.id ===
-														field.id,
-												}
-											) }
-										>
-											{ field.render( {
-												item,
-											} ) }
-										</div>
-									</td>
-								) ) }
-								{ !! actions?.length && (
-									<td className="dataviews-view-table__actions-column">
-										<ItemActions
-											item={ item }
-											actions={ actions }
-										/>
-									</td>
-								) }
-							</tr>
+								item={ item }
+								hasBulkActions={ hasBulkActions }
+								actions={ actions }
+								id={ getItemId( item ) || index }
+								visibleFields={ visibleFields }
+								primaryField={ primaryField }
+								selection={ selection }
+								getItemId={ getItemId }
+								onSelectionChange={ onSelectionChange }
+								data={ data }
+							/>
 						) ) }
 				</tbody>
 			</table>

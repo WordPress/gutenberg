@@ -29,6 +29,16 @@ export function useHasAPossibleBulkAction( actions, item ) {
 	}, [ actions, item ] );
 }
 
+export function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
+
 function ActionWithModal( {
 	action,
 	selectedItems,
@@ -118,6 +128,12 @@ export default function BulkActions( {
 	const areAllSelected = selection && selection.length === data.length;
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
+	const numberSelectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return bulkActions.some( ( action ) => action.isEligible( item ) );
+		} ).length;
+	}, [ data, bulkActions ] );
+
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
 			selection.includes( getItemId( item ) )
@@ -167,7 +183,7 @@ export default function BulkActions( {
 						onClick={ () => {
 							onSelectionChange( data );
 						} }
-						suffix={ data.length }
+						suffix={ numberSelectableItems }
 					>
 						{ __( 'Select all' ) }
 					</DropdownMenuItem>
