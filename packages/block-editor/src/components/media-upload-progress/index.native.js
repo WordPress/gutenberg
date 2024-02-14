@@ -8,7 +8,9 @@ import { ActivityIndicator, View } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Icon } from '@wordpress/components';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
+import { offline as offlineIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -160,7 +162,7 @@ export class MediaUploadProgress extends Component {
 			this.state.uploadState === MEDIA_UPLOAD_STATE_PAUSED &&
 			this.props.enablePausedUploads
 		) {
-			return __( 'Waiting for connection' );
+			return;
 		}
 
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
@@ -170,7 +172,11 @@ export class MediaUploadProgress extends Component {
 	render() {
 		const { renderContent = () => null } = this.props;
 		const { isUploadInProgress, isUploadFailed, uploadState } = this.state;
-		const showSpinner = isUploadInProgress;
+		const isUploadPaused =
+			uploadState === MEDIA_UPLOAD_STATE_PAUSED &&
+			this.props.enablePausedUploads;
+		const showSpinner =
+			isUploadInProgress && ! isUploadPaused && ! isUploadFailed;
 		const retryMessage = this.getRetryMessage();
 
 		return (
@@ -182,18 +188,27 @@ export class MediaUploadProgress extends Component {
 				pointerEvents="box-none"
 				testID="progress-container"
 			>
+				{ isUploadPaused && (
+					<View style={ styles.iconContainer }>
+						<Icon
+							fill="#111"
+							size="20"
+							icon={ offlineIcon }
+							style={ styles.activityIndicator }
+						/>
+					</View>
+				) }
 				{ showSpinner && (
-					<ActivityIndicator
-						style={ styles.activityIndicator }
-						size="small"
-						color="#111111"
-						testID="spinner"
-					/>
+					<View style={ styles.iconContainer }>
+						<ActivityIndicator
+							style={ styles.activityIndicator }
+							size="small"
+							color="#111"
+						/>
+					</View>
 				) }
 				{ renderContent( {
-					isUploadPaused:
-						uploadState === MEDIA_UPLOAD_STATE_PAUSED &&
-						this.props.enablePausedUploads,
+					isUploadPaused,
 					isUploadInProgress,
 					isUploadFailed,
 					retryMessage,
