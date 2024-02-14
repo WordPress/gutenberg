@@ -9,6 +9,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
+import { useLayout } from '../components/block-list/layout';
+import GridVisualizer from '../components/grid-visualizer';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
@@ -93,8 +95,23 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	return { className: `wp-container-content-${ id }` };
 }
 
+function ChildLayoutControlsPure( { clientId } ) {
+	const parentLayout = useLayout() || {};
+	const rootClientId = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).getBlockRootClientId( clientId );
+		},
+		[ clientId ]
+	);
+	if ( parentLayout.type !== 'grid' ) {
+		return null;
+	}
+	return <GridVisualizer clientId={ rootClientId } />;
+}
+
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
+	edit: ChildLayoutControlsPure,
 	attributeKeys: [ 'style' ],
 	hasSupport() {
 		return true;

@@ -138,8 +138,8 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 function LayoutPanelPure( {
 	layout,
 	setAttributes,
-	clientId,
 	name: blockName,
+	clientId,
 } ) {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
@@ -271,6 +271,8 @@ function LayoutPanelPure( {
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ blockSupportAndThemeSettings }
+							name={ blockName }
+							clientId={ clientId }
 						/>
 					) }
 					{ constrainedType && displayControlsForLegacyLayouts && (
@@ -278,6 +280,8 @@ function LayoutPanelPure( {
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ blockSupportAndThemeSettings }
+							name={ blockName }
+							clientId={ clientId }
 						/>
 					) }
 				</PanelBody>
@@ -287,6 +291,7 @@ function LayoutPanelPure( {
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
+					name={ blockName }
 					clientId={ clientId }
 				/>
 			) }
