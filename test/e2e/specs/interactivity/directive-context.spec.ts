@@ -189,4 +189,14 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'async navigate' ).click();
 		await expect( element ).toHaveText( 'changed from async action' );
 	} );
+	test( 'should bail out if the context is not a default directive', async ( {
+		page,
+	} ) => {
+		// This test is to ensure that the context directive is only applied to the default directive
+		// and not to any other directive.
+		const defaultElement = page.getByTestId( 'default suffix context' );
+		await expect( defaultElement ).toHaveText( 'default' );
+		const element = page.getByTestId( 'non-default suffix context' );
+		await expect( element ).toHaveText( '' );
+	} );
 } );

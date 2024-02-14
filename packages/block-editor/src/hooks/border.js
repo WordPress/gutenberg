@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -24,8 +24,10 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
+import { __ } from '@wordpress/i18n';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
+export const SHADOW_SUPPORT_KEY = 'shadow';
 
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
@@ -109,7 +111,7 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function BordersInspectorControl( { children, resetAllFilter } ) {
+function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
 			const existingStyle = attributesToStyle( attributes );
@@ -126,6 +128,7 @@ function BordersInspectorControl( { children, resetAllFilter } ) {
 		<InspectorControls
 			group="border"
 			resetAllFilter={ attributesResetAllFilter }
+			label={ label }
 		>
 			{ children }
 		</InspectorControls>
@@ -152,10 +155,16 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		BORDER_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultControls = {
+		...getBlockSupport( name, [
+			BORDER_SUPPORT_KEY,
+			'__experimentalDefaultControls',
+		] ),
+		...getBlockSupport( name, [
+			SHADOW_SUPPORT_KEY,
+			'__experimentalDefaultControls',
+		] ),
+	};
 
 	return (
 		<StylesBorderPanel
@@ -198,6 +207,38 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 	}
 
 	return !! support?.[ feature ];
+}
+
+/**
+ * Determine whether there is block support for shadow properties.
+ *
+ * @param {string} blockName Block name.
+ *
+ * @return {boolean} Whether there is support.
+ */
+export function hasShadowSupport( blockName ) {
+	return hasBlockSupport( blockName, SHADOW_SUPPORT_KEY );
+}
+
+export function getBorderPanelLabel( {
+	blockName,
+	hasBorderControl,
+	hasShadowControl,
+} = {} ) {
+	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
+		hasBorderControl = hasBorderSupport( blockName );
+		hasShadowControl = hasShadowSupport( blockName );
+	}
+
+	if ( hasBorderControl && hasShadowControl ) {
+		return __( 'Border & Shadow' );
+	}
+
+	if ( hasShadowControl ) {
+		return __( 'Shadow' );
+	}
+
+	return __( 'Border' );
 }
 
 /**

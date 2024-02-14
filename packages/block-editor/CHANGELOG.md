@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 12.19.0 (2024-02-09)
+
+-   `FontSizePicker`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58702](https://github.com/WordPress/gutenberg/pull/58702)).
+
 ## 12.18.0 (2024-01-24)
 
 - Deprecated `__experimentalRecursionProvider` and `__experimentalUseHasRecursion` in favor of their new stable counterparts `RecursionProvider` and `useHasRecursion`.
