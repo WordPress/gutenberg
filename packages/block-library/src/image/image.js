@@ -9,6 +9,7 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
+	ToolbarDropdownMenu,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -177,6 +178,7 @@ export default function Image( {
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -512,6 +514,88 @@ export default function Image( {
 							label={ __( 'Upload to Media Library' ) }
 						/>
 					</ToolbarGroup>
+				</BlockControls>
+			) }
+			{ isContentOnlyMode && (
+				// Add some extra controls for content attributes when content only mode is active.
+				// With content only mode active, the inspector is hidden, so users need another way
+				// to edit these attributes.
+				<BlockControls group="other">
+					<ToolbarDropdownMenu
+						label={ __( 'Alt' ) }
+						text={ __( 'Alt' ) }
+						icon={ null }
+						popoverProps={ { position: 'bottom right' } }
+					>
+						{ () => (
+							<TextareaControl
+								className="wp-block-image__toolbar_content_textarea"
+								label={ __( 'Alternative text' ) }
+								value={ alt || '' }
+								onChange={ updateAlt }
+								disabled={ lockAltControls }
+								help={
+									lockAltControls ? (
+										<>
+											{ __(
+												'Connected to a custom field'
+											) }
+										</>
+									) : (
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
+								}
+								__nextHasNoMarginBottom
+							/>
+						) }
+					</ToolbarDropdownMenu>
+					<ToolbarDropdownMenu
+						label={ __( 'Title' ) }
+						text={ __( 'Title' ) }
+						icon={ null }
+						popoverProps={ { position: 'bottom right' } }
+					>
+						{ () => (
+							<TextControl
+								className="wp-block-image__toolbar_content_textarea"
+								__nextHasNoMarginBottom
+								label={ __( 'Title attribute' ) }
+								value={ title || '' }
+								onChange={ onSetTitle }
+								disabled={ lockTitleControls }
+								help={
+									lockTitleControls ? (
+										<>
+											{ __(
+												'Connected to a custom field'
+											) }
+										</>
+									) : (
+										<>
+											{ __(
+												'Describe the role of this image on the page.'
+											) }
+											<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+												{ __(
+													'(Note: many devices and browsers do not display this text.)'
+												) }
+											</ExternalLink>
+										</>
+									)
+								}
+							/>
+						) }
+					</ToolbarDropdownMenu>
 				</BlockControls>
 			) }
 			<InspectorControls>
