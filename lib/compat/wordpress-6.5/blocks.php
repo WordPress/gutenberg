@@ -47,29 +47,29 @@ function gutenberg_register_metadata_attribute( $args ) {
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 /**
- * Replaces the HTML content of a block based on the provided source value.
+ * Depending on the block attribute name, replace its value in the HTML based on the value provided.
  *
- * @param string $block_content Block Content.
- * @param string $block_name The name of the block to process.
- * @param string $block_attr The attribute of the block we want to process.
- * @param string $source_value The value used to replace the HTML.
+ * @param string $block_content  Block Content.
+ * @param string $block_name     The name of the block to process.
+ * @param string $attribute_name The attribute name to replace.
+ * @param mixed  $source_value   The value used to replace in the HTML.
  * @return string The modified block content.
  */
-function gutenberg_block_bindings_replace_html( $block_content, $block_name, $block_attr, $source_value ) {
+function gutenberg_block_bindings_replace_html( $block_content, $block_name, string $attribute_name, $source_value ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-	if ( null === $block_type ) {
-		return;
+	if ( ! isset( $block_type->attributes[ $attribute_name ] ) ) {
+		return $block_content;
 	}
 
 	// Depending on the attribute source, the processing will be different.
-	switch ( $block_type->attributes[ $block_attr ]['source'] ) {
+	switch ( $block_type->attributes[ $attribute_name ]['source'] ) {
 		case 'html':
 		case 'rich-text':
 			$block_reader = new WP_HTML_Tag_Processor( $block_content );
 
 			// TODO: Support for CSS selectors whenever they are ready in the HTML API.
 			// In the meantime, support comma-separated selectors by exploding them into an array.
-			$selectors = explode( ',', $block_type->attributes[ $block_attr ]['selector'] );
+			$selectors = explode( ',', $block_type->attributes[ $attribute_name ]['selector'] );
 			// Add a bookmark to the first tag to be able to iterate over the selectors.
 			$block_reader->next_tag();
 			$block_reader->set_bookmark( 'iterate-selectors' );
@@ -133,12 +133,12 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, $bl
 			if ( ! $amended_content->next_tag(
 				array(
 					// TODO: build the query from CSS selector.
-					'tag_name' => $block_type->attributes[ $block_attr ]['selector'],
+					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
 				)
 			) ) {
 				return $block_content;
 			}
-			$amended_content->set_attribute( $block_type->attributes[ $block_attr ]['attribute'], esc_attr( $source_value ) );
+			$amended_content->set_attribute( $block_type->attributes[ $attribute_name ]['attribute'], $source_value );
 			return $amended_content->get_updated_html();
 		break;
 
@@ -153,21 +153,25 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, $bl
 	 * Process the block bindings attribute.
 	 *
 	 * @param string   $block_content Block Content.
-	 * @param array    $block Block attributes.
+	 * @param array    $parsed_block  The full block, including name and attributes.
 	 * @param WP_Block $block_instance The block instance.
 	 */
-function gutenberg_process_block_bindings( $block_content, $block, $block_instance ) {
+function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
 	// Allowed blocks that support block bindings.
 	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
 	$allowed_blocks = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
 		'core/image'     => array( 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text' ),
+		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
 	// If the block doesn't have the bindings property or isn't one of the allowed block types, return.
-	if ( ! isset( $block['attrs']['metadata']['bindings'] ) || ! isset( $allowed_blocks[ $block_instance->name ] ) ) {
+	if (
+		! isset( $allowed_blocks[ $block_instance->name ] ) ||
+		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
+		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
+	) {
 		return $block_content;
 	}
 
@@ -186,34 +190,31 @@ function gutenberg_process_block_bindings( $block_content, $block, $block_instan
 	 * }
 	 */
 
-	$block_bindings_sources = get_all_registered_block_bindings_sources();
 	$modified_block_content = $block_content;
-	foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
-		// If the attribute is not in the list, process next attribute.
-		if ( ! in_array( $binding_attribute, $allowed_blocks[ $block_instance->name ], true ) ) {
+	foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
+		// If the attribute is not in the allowed list, process next attribute.
+		if ( ! in_array( $attribute_name, $allowed_blocks[ $block_instance->name ], true ) ) {
 			continue;
 		}
 		// If no source is provided, or that source is not registered, process next attribute.
-		if ( ! isset( $binding_source['source'] ) || ! is_string( $binding_source['source'] ) || ! isset( $block_bindings_sources[ $binding_source['source'] ] ) ) {
+		if ( ! isset( $block_binding['source'] ) || ! is_string( $block_binding['source'] ) ) {
 			continue;
 		}
 
-		$source_callback = $block_bindings_sources[ $binding_source['source'] ]['get_value_callback'];
-		// Get the value based on the source.
-		if ( ! isset( $binding_source['args'] ) ) {
-			$source_args = array();
-		} else {
-			$source_args = $binding_source['args'];
-		}
-		$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
-		// If the value is null, process next attribute.
-		if ( is_null( $source_value ) ) {
+		$block_binding_source = get_block_bindings_source( $block_binding['source'] );
+		if ( null === $block_binding_source ) {
 			continue;
 		}
 
-		// Process the HTML based on the block and the attribute.
-		$modified_block_content = gutenberg_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_value );
+		$source_args  = ! empty( $block_binding['args'] ) && is_array( $block_binding['args'] ) ? $block_binding['args'] : array();
+		$source_value = $block_binding_source->get_value( $source_args, $block_instance, $attribute_name );
+
+		// If the value is not null, process the HTML based on the block and the attribute.
+		if ( ! is_null( $source_value ) ) {
+			$modified_block_content = gutenberg_block_bindings_replace_html( $modified_block_content, $block_instance->name, $attribute_name, $source_value );
+		}
 	}
+
 	return $modified_block_content;
 }
 

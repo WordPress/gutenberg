@@ -34,7 +34,7 @@ function GoogleFontsConfirmDialog() {
 					<Spacer margin={ 3 } />
 					<Text as="p">
 						{ __(
-							'You can alternatively upload files directly on the Library tab.'
+							'You can alternatively upload files directly on the Upload tab.'
 						) }
 					</Text>
 					<Spacer margin={ 6 } />

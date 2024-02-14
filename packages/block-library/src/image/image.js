@@ -25,6 +25,7 @@ import {
 	useSettings,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
@@ -404,6 +405,7 @@ export default function Image( {
 
 	const {
 		lockUrlControls = false,
+		lockHrefControls = false,
 		lockAltControls = false,
 		lockTitleControls = false,
 	} = useSelect(
@@ -412,50 +414,67 @@ export default function Image( {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const { getBlockBindingsSource, getBlockParentsByBlockName } =
+				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
+			const hasParentPattern =
+				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
+			const urlBindingSource = getBlockBindingsSource(
+				urlBinding?.source
+			);
+			const altBindingSource = getBlockBindingsSource(
+				altBinding?.source
+			);
+			const titleBindingSource = getBlockBindingsSource(
+				titleBinding?.source
+			);
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					getBlockBindingsSource( urlBinding?.source )
-						?.lockAttributesEditing === true,
+					( ! urlBindingSource ||
+						urlBindingSource?.lockAttributesEditing ),
+				lockHrefControls:
+					// Disable editing the link of the URL if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					getBlockBindingsSource( altBinding?.source )
-						?.lockAttributesEditing === true,
+					( ! altBindingSource ||
+						altBindingSource?.lockAttributesEditing ),
 				lockTitleControls:
 					!! titleBinding &&
-					getBlockBindingsSource( titleBinding?.source )
-						?.lockAttributesEditing === true,
+					( ! titleBindingSource ||
+						titleBindingSource?.lockAttributesEditing ),
 			};
 		},
-		[ isSingleSelected ]
+		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-					<ImageURLInputUI
-						url={ href || '' }
-						onChangeUrl={ onSetHref }
-						linkDestination={ linkDestination }
-						mediaUrl={ ( image && image.source_url ) || url }
-						mediaLink={ image && image.link }
-						linkTarget={ linkTarget }
-						linkClass={ linkClass }
-						rel={ rel }
-						showLightboxSetting={ showLightboxSetting }
-						lightboxEnabled={ lightboxChecked }
-						onSetLightbox={ onSetLightbox }
-					/>
-				) }
+				{ isSingleSelected &&
+					! isEditingImage &&
+					! lockHrefControls &&
+					! lockUrlControls && (
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ ( image && image.source_url ) || url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+							showLightboxSetting={ showLightboxSetting }
+							lightboxEnabled={ lightboxChecked }
+							onSetLightbox={ onSetLightbox }
+						/>
+					) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
@@ -490,7 +509,7 @@ export default function Image( {
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
-							label={ __( 'Upload image to media library' ) }
+							label={ __( 'Upload to Media Library' ) }
 						/>
 					</ToolbarGroup>
 				</BlockControls>
@@ -594,6 +613,7 @@ export default function Image( {
 	}
 
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
 	let img = (
@@ -620,6 +640,7 @@ export default function Image( {
 						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			/>
 			{ temporaryURL && <Spinner /> }

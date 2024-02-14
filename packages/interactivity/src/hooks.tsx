@@ -132,7 +132,7 @@ const namespaceStack: string[] = [];
  * @return The context content.
  */
 export const getContext = < T extends object >( namespace?: string ): T =>
-	getScope()?.context[ namespace || namespaceStack.slice( -1 )[ 0 ] ];
+	getScope()?.context[ namespace || getNamespace() ];
 
 /**
  * Retrieves a representation of the element where a function from the store
