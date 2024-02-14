@@ -6,8 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	Button,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
@@ -17,6 +18,7 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 } from '@wordpress/compose';
+import { Icon, home } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
@@ -31,6 +33,7 @@ import {
 	useBlockCommands,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
@@ -39,9 +42,7 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import Sidebar from '../sidebar';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
-import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../lock-unlock';
@@ -52,12 +53,13 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import SiteIcon from '../site-icon';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.4;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -75,15 +77,21 @@ export default function Layout() {
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
+		dashboardLink,
 		previousShortcut,
 		nextShortcut,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
 		);
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		const { getCanvasMode, getSettings } = unlock(
+			select( editSiteStore )
+		);
+
 		return {
 			canvasMode: getCanvasMode(),
+			dashboardLink:
+				getSettings().__experimentalDashboardLink || 'index.php',
 			previousShortcut: getAllShortcutKeyCombinations(
 				'core/edit-site/previous-region'
 			),
@@ -114,27 +122,6 @@ export default function Layout() {
 		useState( false );
 	const { areas, widths } = useLayoutAreas();
 
-	// This determines which animation variant should apply to the header.
-	// There is also a `isDistractionFreeHovering` state that gets priority
-	// when hovering the `edit-site-layout__header-container` in distraction
-	// free mode. It's set via framer and trickles down to all the children
-	// so they can use this variant state too.
-	//
-	// TODO: The issue with this is we want to have the hover state stick when hovering
-	// a popover opened via the header. We'll probably need to lift this state to
-	// handle it ourselves. Also, focusWithin the header needs to be handled.
-	let headerAnimationState;
-
-	if ( canvasMode === 'view' ) {
-		// We need 'view' to always take priority so 'isDistractionFree'
-		// doesn't bleed over into the view (sidebar) state
-		headerAnimationState = 'view';
-	} else if ( isDistractionFree ) {
-		headerAnimationState = 'isDistractionFree';
-	} else {
-		headerAnimationState = canvasMode; // edit, view, init
-	}
-
 	// Sets the right context for the command palette
 	let commandContext = 'site-editor';
 
@@ -148,6 +135,78 @@ export default function Layout() {
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
+
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { setDeviceType } = useDispatch( editorStore );
+	const siteIconButtonProps =
+		canvasMode === 'view'
+			? {
+					href: dashboardLink,
+					label: __( 'Go to the Dashboard' ),
+			  }
+			: {
+					href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
+					role: 'button',
+					label: __( 'Open Navigation' ),
+					onClick: ( event ) => {
+						event.preventDefault();
+						if ( canvasMode === 'edit' ) {
+							clearSelectedBlock();
+							setDeviceType( 'Desktop' );
+							setCanvasMode( 'view' );
+						}
+					},
+			  };
+
+	const toggleVariants = {
+		view: {
+			width: 32,
+			height: 32,
+			top: 30,
+			left: 24,
+			borderRadius: '4px',
+			boxShadow: '0px 6px 15px rgba(0,0,0,.3)',
+			transition: {
+				duration: 0.7,
+				type: 'spring',
+				bounce: 0.4,
+			},
+		},
+		edit: {
+			width: [ 32, 60 ],
+			height: [ 32, 60 ],
+			top: [ 30, 0 ],
+			left: 0,
+			borderRadius: '0px',
+			boxShadow: 'none',
+			transition: {
+				delay: 0.1,
+				duration: 0.2,
+				type: 'tween',
+				stiffness: 400,
+			},
+		},
+		hover: {
+			scale: canvasMode === 'edit' ? 0.6 : 1,
+			borderRadius: '4px',
+		},
+	};
+
+	const toggleHomeIconVariants = {
+		view: {
+			opacity: 0,
+			scale: 0.5,
+		},
+		edit: {
+			opacity: 0,
+			scale: 0.5,
+		},
+		hover: {
+			opacity: 1,
+			scale: 1.3,
+		},
+	};
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -177,80 +236,35 @@ export default function Layout() {
 					}
 				) }
 			>
-				<motion.div
-					className="edit-site-layout__header-container"
-					variants={ {
-						isDistractionFree: {
-							opacity: 0,
-							transition: {
-								type: 'tween',
-								delay: 0.8,
-								delayChildren: 0.8,
-							}, // How long to wait before the header exits
-						},
-						isDistractionFreeHovering: {
-							opacity: 1,
-							transition: {
-								type: 'tween',
-								delay: 0.2,
-								delayChildren: 0.2,
-							}, // How long to wait before the header shows
-						},
-						view: { opacity: 1 },
-						edit: { opacity: 1 },
-					} }
-					whileHover={
-						isDistractionFree
-							? 'isDistractionFreeHovering'
-							: undefined
-					}
-					animate={ headerAnimationState }
-				>
-					<SiteHub
-						isTransparent={ isResizableFrameOversized }
-						className="edit-site-layout__hub"
-					/>
-
-					<AnimatePresence initial={ false }>
-						{ canvasMode === 'edit' && (
-							<NavigableRegion
-								key="header"
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								variants={ {
-									isDistractionFree: { opacity: 0, y: 0 },
-									isDistractionFreeHovering: {
-										opacity: 1,
-										y: 0,
-									},
-									view: { opacity: 1, y: '-100%' },
-									edit: { opacity: 1, y: 0 },
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								initial={ {
-									opacity: isDistractionFree ? 1 : 0,
-									y: isDistractionFree ? 0 : '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
-									ease: 'easeOut',
-								} }
-							>
-								<Header />
-							</NavigableRegion>
-						) }
-					</AnimatePresence>
-				</motion.div>
-
 				<div className="edit-site-layout__content">
 					{ /*
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
+					<motion.div
+						className="edit-site-layout__view-mode-toggle"
+						variants={ toggleVariants }
+						animate={ canvasMode }
+						initial={ canvasMode }
+						whileHover="hover"
+					>
+						<Button
+							{ ...siteIconButtonProps }
+							as={ motion.button }
+							showTooltip
+							tooltipPosition={ 'middle right' }
+						>
+							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+						</Button>
+						{ canvasMode === 'edit' && (
+							<motion.div
+								className="edit-site-layout__home-icon"
+								variants={ toggleHomeIconVariants }
+							>
+								<Icon icon={ home } />
+							</motion.div>
+						) }
+					</motion.div>
 					<NavigableRegion
 						ariaLabel={ __( 'Navigation' ) }
 						className="edit-site-layout__sidebar-region"
@@ -296,19 +310,6 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
-									whileHover={
-										canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration: disableMotion
-															? 0
-															: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
 									initial={ false }
 									layout="position"
 									className={ classnames(
@@ -318,6 +319,13 @@ export default function Layout() {
 												isResizableFrameOversized,
 										}
 									) }
+									animate={ {
+										left: canvasMode === 'edit' ? -392 : 0,
+										right: canvasMode === 'edit' ? -16 : 0,
+										top: canvasMode === 'edit' ? -16 : 0,
+										bottom: canvasMode === 'edit' ? -16 : 0,
+										opacity: 1,
+									} }
 									transition={ {
 										type: 'tween',
 										duration: disableMotion
@@ -333,9 +341,7 @@ export default function Layout() {
 												canvasMode === 'edit'
 											}
 											defaultSize={ {
-												width:
-													canvasSize.width -
-													24 /* $canvas-padding */,
+												width: canvasSize.width,
 												height: canvasSize.height,
 											} }
 											isOversized={

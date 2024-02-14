@@ -8,9 +8,18 @@
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
-	background: $gray-100;
+	background-color: $gray-100;
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
+	transition: background-color 0.4s ease;
+
+	&.is-naked {
+		background-color: transparent;
+		pointer-events: none;
+		.editor-document-bar__shortcut {
+			opacity: 0;
+		}
+	}
 
 	&:hover {
 		background-color: $gray-200;

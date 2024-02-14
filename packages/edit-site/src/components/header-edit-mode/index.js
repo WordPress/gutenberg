@@ -18,8 +18,8 @@ import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import {
 	Button,
-	__unstableMotion as motion,
 	Popover,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -92,6 +92,14 @@ export default function HeaderEditMode() {
 
 	const hasBlockSelected = !! blockSelectionStart;
 
+	const { canvasMode } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
+
+		return {
+			canvasMode: getCanvasMode(),
+		};
+	}, [] );
+
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
 		if ( blockSelectionStart ) {
@@ -124,46 +132,54 @@ export default function HeaderEditMode() {
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
-					<DocumentTools
-						blockEditorMode={ blockEditorMode }
-						isDistractionFree={ isDistractionFree }
-					/>
-					{ isTopToolbar && (
-						<>
-							<div
-								className={ classnames(
-									'selected-block-tools-wrapper',
-									{
-										'is-collapsed': isBlockToolsCollapsed,
-									}
-								) }
-							>
-								<BlockToolbar hideDragHandle />
-							</div>
-							<Popover.Slot
-								ref={ blockToolbarRef }
-								name="block-toolbar"
-							/>
-							{ hasBlockSelected && (
-								<Button
-									className="edit-site-header-edit-mode__block-tools-toggle"
-									icon={
-										isBlockToolsCollapsed ? next : previous
-									}
-									onClick={ () => {
-										setIsBlockToolsCollapsed(
-											( collapsed ) => ! collapsed
-										);
-									} }
-									label={
-										isBlockToolsCollapsed
-											? __( 'Show block tools' )
-											: __( 'Hide block tools' )
-									}
+					<motion.div
+						animate={ { opacity: canvasMode === 'edit' ? 1 : 0 } }
+					>
+						<DocumentTools
+							blockEditorMode={ blockEditorMode }
+							isDistractionFree={ isDistractionFree }
+						/>
+
+						{ isTopToolbar && (
+							<>
+								<div
+									className={ classnames(
+										'selected-block-tools-wrapper',
+										{
+											'is-collapsed':
+												isBlockToolsCollapsed,
+										}
+									) }
+								>
+									<BlockToolbar hideDragHandle />
+								</div>
+								<Popover.Slot
+									ref={ blockToolbarRef }
+									name="block-toolbar"
 								/>
-							) }
-						</>
-					) }
+								{ hasBlockSelected && (
+									<Button
+										className="edit-site-header-edit-mode__block-tools-toggle"
+										icon={
+											isBlockToolsCollapsed
+												? next
+												: previous
+										}
+										onClick={ () => {
+											setIsBlockToolsCollapsed(
+												( collapsed ) => ! collapsed
+											);
+										} }
+										label={
+											isBlockToolsCollapsed
+												? __( 'Show block tools' )
+												: __( 'Hide block tools' )
+										}
+									/>
+								) }
+							</>
+						) }
+					</motion.div>
 				</motion.div>
 			) }
 
@@ -174,43 +190,49 @@ export default function HeaderEditMode() {
 						{
 							'is-collapsed':
 								! isBlockToolsCollapsed && isLargeViewport,
+							'is-view-mode': canvasMode === 'view',
 						}
 					) }
 				>
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
-						<DocumentBar />
+						<DocumentBar isNaked={ canvasMode === 'view' } />
 					) }
 				</div>
 			) }
 
 			<div className="edit-site-header-edit-mode__end">
 				<motion.div
-					className="edit-site-header-edit-mode__actions"
-					variants={ toolbarVariants }
-					transition={ toolbarTransition }
+					animate={ { opacity: canvasMode === 'edit' ? 1 : 0 } }
 				>
-					{ isLargeViewport && (
-						<div
-							className={ classnames(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
-						>
-							<PreviewDropdown
-								disabled={
-									isFocusMode || ! hasDefaultEditorCanvasView
-								}
-							/>
-						</div>
-					) }
-					<PostViewLink />
-					<SaveButton size="compact" />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/edit-site" />
-					) }
-					<MoreMenu showIconLabels={ showIconLabels } />
+					<motion.div
+						className="edit-site-header-edit-mode__actions"
+						variants={ toolbarVariants }
+						transition={ toolbarTransition }
+					>
+						{ isLargeViewport && (
+							<div
+								className={ classnames(
+									'edit-site-header-edit-mode__preview-options',
+									{ 'is-zoomed-out': isZoomedOutView }
+								) }
+							>
+								<PreviewDropdown
+									disabled={
+										isFocusMode ||
+										! hasDefaultEditorCanvasView
+									}
+								/>
+							</div>
+						) }
+						<PostViewLink />
+						<SaveButton size="compact" />
+						{ ! isDistractionFree && (
+							<PinnedItems.Slot scope="core/edit-site" />
+						) }
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</motion.div>
 				</motion.div>
 			</div>
 		</div>

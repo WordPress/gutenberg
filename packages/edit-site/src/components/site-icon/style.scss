@@ -3,21 +3,31 @@
 	// Matches SiteIcon motion, smoothing out the transition.
 	transition: padding 0.3s ease-out;
 	@include reduce-motion("transition");
+}
 
-	.edit-site-layout.is-full-canvas & {
-		// Make the WordPress icon not so big in full canvas.
-		padding: $grid-unit-15 * 0.5; // 6px.
-	}
+.edit-site-layout__view-mode-toggle {
+	overflow: hidden;
+	// border-radius: $radius-block-ui * 2;
 }
 
 .edit-site-site-icon__image {
 	width: 100%;
 	height: 100%;
-	border-radius: $radius-block-ui * 2;
 	object-fit: cover;
 	background: #333;
+}
 
-	.edit-site-layout.is-full-canvas & {
-		border-radius: 0;
-	}
+.edit-site-layout__home-icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	-webkit-backdrop-filter: saturate(180%) blur(15px);
+	backdrop-filter: saturate(180%) blur(15px);
+	background-color: hsla(0, 0%, 100%, 0.6);
+	pointer-events: none;
 }

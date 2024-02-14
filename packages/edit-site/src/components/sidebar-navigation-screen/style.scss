@@ -16,8 +16,6 @@
 }
 
 .edit-site-sidebar-navigation-screen__content {
-	padding: 0 $grid-unit-20;
-
 	.components-item-group {
 		margin-left: -$grid-unit-20;
 		margin-right: -$grid-unit-20;
@@ -60,7 +58,7 @@
 	position: sticky;
 	top: 0;
 	background: $gray-900;
-	padding-top: $grid-unit-60 + $header-height;
+	padding-top: $grid-unit-40;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");

@@ -6,8 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { Notice } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	Notice,
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -20,6 +24,7 @@ import {
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
+	NavigableRegion,
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
@@ -55,6 +60,8 @@ import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
+import Header from '../header-edit-mode';
+import EditOverlay from '../edit-overlay';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 const {
@@ -151,6 +158,8 @@ export default function Editor( { isLoading } ) {
 		};
 	}, [] );
 
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
@@ -195,6 +204,27 @@ export default function Editor( { isLoading } ) {
 
 	return (
 		<>
+			{ ! isLoading && canvasMode !== 'edit' && (
+				<EditOverlay
+					label="Click your site preview to edit"
+					onClick={ () => setCanvasMode( 'edit' ) }
+				/>
+			) }
+			<AnimatePresence>
+				{ ! isLoading && (
+					<NavigableRegion
+						key="header"
+						className="edit-site-layout__header"
+						ariaLabel={ __( 'Editor top bar' ) }
+						as={ motion.div }
+						animate={ {
+							marginTop: canvasMode === 'edit' ? 0 : -60,
+						} }
+					>
+						<Header />
+					</NavigableRegion>
+				) }
+			</AnimatePresence>
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
