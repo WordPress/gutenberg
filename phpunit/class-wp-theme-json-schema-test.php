@@ -120,7 +120,7 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 					'width'  => false,
 				),
 				'typography' => array(
-					'defaultFontSizes' => 'merge',
+					'defaultFontSizes' => false,
 					'fontStyle'        => false,
 					'fontWeight'       => false,
 					'letterSpacing'    => false,
@@ -293,7 +293,7 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 					'width'  => false,
 				),
 				'typography' => array(
-					'defaultFontSizes' => 'merge',
+					'defaultFontSizes' => false,
 					'fontStyle'        => false,
 					'fontWeight'       => false,
 					'letterSpacing'    => false,

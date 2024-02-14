@@ -22,7 +22,7 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { setImmutably, uniqByProperty } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -111,21 +111,6 @@ function useHasTextColumnsControl( settings ) {
  * @return {Array} The merged font sizes.
  */
 function getMergedFontSizes( settings ) {
-	/*
-	 * Backward compatibility for theme.json v2 is triggered by the 'merge'
-	 * value added during the migration process. The old behavior that didn't
-	 * match the other preset controls was to list the partially overridden
-	 * default font sizes. The new behavior either shows all the default font
-	 * sizes or none of them.
-	 */
-	if ( settings?.typography?.defaultFontSizes === 'merge' ) {
-		const fontSizes = settings?.typography?.fontSizes;
-		const mergedFontSizes = fontSizes
-			? mergeOrigins( fontSizes ).toReversed() // New array because mergeOrigins result is cached.
-			: [];
-		return uniqByProperty( mergedFontSizes, 'slug' ).reverse(); // In-place reverse to save memory.
-	}
-
 	const fontSizes = settings?.typography?.fontSizes;
 	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
 	return [

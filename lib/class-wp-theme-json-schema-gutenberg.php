@@ -116,7 +116,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		if ( ! isset( $old['settings']['typography'] ) ) {
 			$new['settings']['typography'] = array();
 		}
-		$new['settings']['typography']['defaultFontSizes'] = 'merge';
+		$new['settings']['typography']['defaultFontSizes'] = false;
 
 		// Set the new version.
 		$new['version'] = 3;
