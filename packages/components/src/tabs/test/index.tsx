@@ -1319,10 +1319,13 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
+				await sleep();
 				await press.Tab();
-				expect(
-					await screen.findByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
+				await waitFor( async () =>
+					expect(
+						await screen.findByRole( 'tab', { name: 'Beta' } )
+					).toHaveFocus()
+				);
 
 				// Arrow key should move focus but not automatically change the selected tab.
 				await press.ArrowRight();
