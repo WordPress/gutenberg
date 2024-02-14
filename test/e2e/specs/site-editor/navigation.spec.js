@@ -46,17 +46,22 @@ test.describe( 'Site editor navigation', () => {
 		).toBeFocused();
 
 		// Test: Can navigate into the iframe using the keyboard
-		await editorNavigationUtils.tabToNode( 'IFRAME', { times: 10 } );
-		await expect(
-			page.getByRole( 'button', { name: 'Editor Canvas' } )
-		).toBeFocused();
+		await editorNavigationUtils.tabToLabel( 'Editor Canvas', {
+			times: 10,
+		} );
+		const editorCanvasButton = page.getByRole( 'button', {
+			name: 'Editor Canvas',
+		} );
+		await expect( editorCanvasButton ).toBeFocused();
 		// Enter into the site editor frame
 		await pageUtils.pressKeys( 'Enter' );
-		// Focus should still be on the iframe.
+		// Focus should be on the iframe without the button role
 		await expect(
 			page.locator( 'iframe[name="editor-canvas"]' )
 		).toBeFocused();
-		// But did it do anything?
+		// The button role should have been removed from the iframe.
+		await expect( editorCanvasButton ).toBeHidden();
+
 		// Test to make sure a Tab keypress works as expected.
 		// As of this writing, we are in select mode and a tab
 		// keypress will reveal the header template select mode
@@ -88,6 +93,8 @@ test.describe( 'Site editor navigation', () => {
 		await expect(
 			page.getByLabel( 'Go to the Dashboard' ).first()
 		).toBeFocused();
+		// We should have our editor canvas button back
+		await expect( editorCanvasButton ).toBeVisible();
 	} );
 } );
 
@@ -107,18 +114,6 @@ class EditorNavigationUtils {
 				);
 			} );
 			if ( activeLabel === label ) {
-				return;
-			}
-		}
-	}
-
-	async tabToNode( nodeName, { times = 10 } ) {
-		for ( let i = 0; i < times; i++ ) {
-			await this.pageUtils.pressKeys( 'Tab' );
-			const activeNode = await this.page.evaluate( () => {
-				return document.activeElement.nodeName;
-			} );
-			if ( activeNode === nodeName ) {
 				return;
 			}
 		}
