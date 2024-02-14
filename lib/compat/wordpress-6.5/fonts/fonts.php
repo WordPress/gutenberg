@@ -32,12 +32,12 @@ function gutenberg_create_initial_post_types() {
 		'capabilities'                   => array(
 			'read'                   => 'edit_theme_options',
 			'read_private_posts'     => 'edit_theme_options',
-			'create_posts'           => 'install_fonts',
+			'create_posts'           => 'install_font_faces',
 			'publish_posts'          => 'edit_theme_options',
 			'edit_posts'             => 'edit_theme_options',
 			'edit_others_posts'      => 'edit_theme_options',
 			'edit_published_posts'   => 'edit_theme_options',
-			'delete_posts'           => 'install_fonts', // Just one reason not to merge this.
+			'delete_posts'           => 'delete_font_faces',
 			'delete_others_posts'    => 'edit_theme_options',
 			'delete_published_posts' => 'edit_theme_options',
 		),
@@ -64,12 +64,12 @@ function gutenberg_create_initial_post_types() {
 			'capabilities'                   => array(
 				'read'                   => 'edit_theme_options',
 				'read_private_posts'     => 'edit_theme_options',
-				'create_posts'           => 'install_fonts',
+				'create_posts'           => 'install_font_faces',
 				'publish_posts'          => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',
 				'edit_others_posts'      => 'edit_theme_options',
 				'edit_published_posts'   => 'edit_theme_options',
-				'delete_posts'           => 'install_fonts', // Just one reason not to merge this.
+				'delete_posts'           => 'delete_font_faces',
 				'delete_others_posts'    => 'edit_theme_options',
 				'delete_published_posts' => 'edit_theme_options',
 			),
@@ -92,16 +92,16 @@ function gutenberg_create_initial_post_types() {
  * @return array The modified primitive capabilities for the given capability.
  */
 function gutenberg_map_meta_caps_font_faces( $caps, $cap ) {
-	if ( 'install_fonts' !== $cap ) {
+	if ( ! in_array( $cap, array( 'install_font_faces', 'delete_font_faces' ), true ) ) {
 		return $caps;
 	}
 
-	// Remove the install fonts capability as it's not a primitive.
-	$caps   = array_diff( $caps, array( 'install_fonts' ) );
+	// Remove the font capability as it's not a primitive.
+	$caps   = array_diff( $caps, array( 'install_font_faces', 'delete_font_faces' ) );
 	$caps[] = 'edit_theme_options';
 
 	// Only allow font uploads on systems with file mods enabled.
-	if ( ! wp_is_file_mod_allowed( 'can_install_font_faces' ) ) {
+	if ( ! wp_is_file_mod_allowed( 'can_modify_font_faces' ) ) {
 		$caps[] = 'do_not_allow';
 	}
 
