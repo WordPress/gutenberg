@@ -52,7 +52,11 @@ export default ( ...fontSizeNames ) => {
 		compose( [
 			createHigherOrderComponent(
 				( WrappedComponent ) => ( props ) => {
-					const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+					const fontSizes = useSettings(
+						'typography.fontSizes.custom',
+						'typography.fontSizes.theme',
+						'typography.fontSizes.default'
+					).find( ( origin ) => origin !== undefined );
 					return (
 						<WrappedComponent
 							{ ...props }

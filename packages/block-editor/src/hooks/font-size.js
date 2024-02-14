@@ -98,7 +98,11 @@ export function FontSizeEdit( props ) {
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const fontSizes = useSettings(
+		'typography.fontSizes.custom',
+		'typography.fontSizes.theme',
+		'typography.fontSizes.default'
+	).find( ( origin ) => origin !== undefined );
 
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
@@ -142,7 +146,11 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const fontSizes = useSettings(
+		'typography.fontSizes.custom',
+		'typography.fontSizes.theme',
+		'typography.fontSizes.default'
+	).find( ( origin ) => origin !== undefined );
 	const hasFontSizes = !! fontSizes?.length;
 
 	return (
@@ -151,12 +159,18 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 }
 
 function useBlockProps( { name, fontSize, style } ) {
-	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
-		'typography.fontSizes',
-		'typography.fluid',
-		'layout'
+	const [ fluidTypographySettings, layoutSettings, ...fontSizesByOrigin ] =
+		useSettings(
+			'typography.fluid',
+			'layout',
+			'typography.fontSizes.custom',
+			'typography.fontSizes.theme',
+			'typography.fontSizes.default'
+		);
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const fontSizes = fontSizesByOrigin.find(
+		( origin ) => origin !== undefined
 	);
-
 	/*
 	 * Only add inline styles if the block supports font sizes,
 	 * doesn't skip serialization of font sizes,

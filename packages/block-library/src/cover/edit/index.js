@@ -318,7 +318,11 @@ function CoverEdit( {
 	const blockProps = useBlockProps( { ref } );
 
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const fontSizes = useSettings(
+		'typography.fontSizes.custom',
+		'typography.fontSizes.theme',
+		'typography.fontSizes.default'
+	).find( ( origin ) => origin !== undefined );
 	const hasFontSizes = fontSizes?.length > 0;
 	const innerBlocksTemplate = getInnerBlocksTemplate( {
 		fontSize: hasFontSizes ? 'large' : undefined,
