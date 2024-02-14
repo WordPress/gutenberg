@@ -30,22 +30,76 @@ function extractFontWeights( fontFaces ) {
 	return result;
 }
 
+/*
+ * Format the font family to use in the CSS font-family property of a CSS rule.
+ *
+ * The input can be a string with the font family name or a string with multiple font family names separated by commas.
+ * It follows the recommendations from the CSS Fonts Module Level 4.
+ * https://www.w3.org/TR/css-fonts-4/#font-family-prop
+ *
+ * @param {string} input - The font family.
+ * @return {string} The formatted font family.
+ *
+ * Example:
+ * formatFontFamily( "Open Sans, Font+Name, sans-serif" ) => '"Open Sans", "Font+Name", sans-serif'
+ * formatFontFamily( "'Open Sans', sans-serif" ) => '"Open Sans", sans-serif'
+ * formatFontFamily( "DotGothic16, Slabo 27px, serif" ) => '"DotGothic16","Slabo 27px",serif'
+ * formatFontFamily( "Mine's, Moe's Typography" ) => `"mine's","Moe's Typography"`
+ */
 export function formatFontFamily( input ) {
-	return input
-		.split( ',' )
-		.map( ( font ) => {
-			font = font.trim(); // Remove any leading or trailing white spaces
-			// If the font doesn't start with quotes and contains a space, then wrap in quotes.
-			// Check that string starts with a single or double quote and not a space
-			if (
-				! ( font.startsWith( '"' ) || font.startsWith( "'" ) ) &&
-				font.indexOf( ' ' ) !== -1
-			) {
-				return `"${ font }"`;
-			}
-			return font; // Return font as is if no transformation is needed
-		} )
-		.join( ', ' );
+	// Matchs any non alphabetic characters (a-zA-Z), dashes - , or parenthesis ()
+	const regex = /[^a-zA-Z\-()]+/;
+	const output = input.trim();
+
+	const formatItem = ( item ) => {
+		item = item.trim();
+		if ( item.match( regex ) ) {
+			// removes leading and trailing quotes.
+			item = item.replace( /^["']|["']$/g, '' );
+			return `"${ item }"`;
+		}
+		return item;
+	};
+
+	if ( output.includes( ',' ) ) {
+		return output
+			.split( ',' )
+			.map( formatItem )
+			.filter( ( item ) => item !== '' )
+			.join( ', ' );
+	}
+
+	return formatItem( output );
+}
+
+/*
+ * Format the font face name to use in the font-family property of a font face.
+ *
+ * The input can be a string with the font face name or a string with multiple font face names separated by commas.
+ * It removes the leading and trailing quotes from the font face name.
+ *
+ * @param {string} input - The font face name.
+ * @return {string} The formatted font face name.
+ *
+ * Example:
+ * formatFontFaceName("Open Sans") => "Open Sans"
+ * formatFontFaceName("'Open Sans', sans-serif") => "Open Sans"
+ * formatFontFaceName("'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
+ */
+export function formatFontFaceName( input ) {
+	const output = input.trim();
+	if ( output.includes( ',' ) ) {
+		return (
+			output
+				.split( ',' )
+				.find( ( item ) => item.trim() !== '' )
+				.trim()
+				// removes leading and trailing quotes.
+				.replace( /^["']|["']$/g, '' )
+		);
+	}
+	// removes leading and trailing quotes.
+	return output.replace( /^["']|["']$/g, '' );
 }
 
 export function getFamilyPreviewStyle( family ) {

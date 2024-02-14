@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { getFamilyPreviewStyle, formatFontFamily } from '../preview-styles';
+import {
+	getFamilyPreviewStyle,
+	formatFontFamily,
+	formatFontFaceName,
+} from '../preview-styles';
 
 describe( 'getFamilyPreviewStyle', () => {
 	it( 'should return default fontStyle and fontWeight if fontFace is not provided', () => {
@@ -139,7 +143,7 @@ describe( 'formatFontFamily', () => {
 				"Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif"
 			)
 		).toBe(
-			"Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif"
+			'Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans", source-sans-pro, sans-serif'
 		);
 	} );
 
@@ -153,9 +157,37 @@ describe( 'formatFontFamily', () => {
 		);
 	} );
 
-	it( 'should wrap only those font names with spaces which are not already quoted', () => {
-		expect( formatFontFamily( 'Baloo Bhai 2, Arial' ) ).toBe(
-			'"Baloo Bhai 2", Arial'
+	it( 'should wrap names with special characters in quotes', () => {
+		expect(
+			formatFontFamily(
+				'Font+Name, Font*Name, _Font_Name_, generic(kai), sans-serif'
+			)
+		).toBe(
+			'"Font+Name", "Font*Name", "_Font_Name_", generic(kai), sans-serif'
+		);
+	} );
+
+	it( 'should fix empty wrong formatted font family', () => {
+		expect( formatFontFamily( ', Abril Fatface,Times,serif' ) ).toBe(
+			'"Abril Fatface", Times, serif'
+		);
+	} );
+} );
+
+describe( 'formatFontFaceName', () => {
+	it( 'should remove leading and trailing quotes', () => {
+		expect( formatFontFaceName( '"Open Sans"' ) ).toBe( 'Open Sans' );
+	} );
+
+	it( 'should remove leading and trailing quotes from multiple font face names', () => {
+		expect(
+			formatFontFaceName( "'Open Sans', 'Helvetica Neue', sans-serif" )
+		).toBe( 'Open Sans' );
+	} );
+
+	it( 'should remove leading and trailing quotes even from names with spaces and special characters', () => {
+		expect( formatFontFaceName( "'Font+Name 24', sans-serif" ) ).toBe(
+			'Font+Name 24'
 		);
 	} );
 } );
