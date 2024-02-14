@@ -27,6 +27,7 @@ import PostPublishButtonOrToggle from '../post-publish-button/post-publish-butto
 import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
+import OfflineStatus from '../offline-status';
 import { store as editorStore } from '../../store';
 
 const toolbarVariations = {
@@ -125,6 +126,7 @@ function Header( {
 				transition={ { type: 'tween' } }
 				className="editor-header__settings"
 			>
+				<OfflineStatus />
 				{ ! customSaveButton && ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
