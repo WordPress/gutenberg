@@ -871,9 +871,7 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
 
-		if ( ! wp_theme_has_theme_json() ) {
-			$schema['settings']['shadow'] = null;
-		}
+		// $schema['settings']['shadow'] = null;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -1079,7 +1077,13 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
-				unset( $tree[ $key ] );
+				// special case for shadow, it can either be boolean or object
+				if ( 'shadow' === $key && ! $tree[ $key ] ) {
+					// Do not unset
+				} else {
+					// If the schema is an array and the value is not, remove the key.
+					unset( $tree[ $key ] );
+				}
 			}
 		}
 
