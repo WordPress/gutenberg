@@ -1012,10 +1012,7 @@ class WP_Theme_JSON_Gutenberg {
 
 					foreach ( $registered_styles[ $block_name ] as $block_style ) {
 						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
-							$style_selectors[ $block_style['name'] ] = static::append_to_selector(
-								'.is-style-' . $block_style['name'],
-								$block_metadata['selector']
-							);
+							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
 						}
 					}
 
@@ -1065,7 +1062,7 @@ class WP_Theme_JSON_Gutenberg {
 			// Block style variations can be registered through the WP_Block_Styles_Registry as well as block.json.
 			$registered_styles = $style_registry->get_registered_styles_for_block( $block_name );
 			foreach ( $registered_styles as $style ) {
-				$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 			}
 
 			if ( ! empty( $style_selectors ) ) {
