@@ -81,7 +81,7 @@ class Gutenberg_REST_Templates_Controller_6_4 extends WP_REST_Templates_Controll
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		/*
 		 * Allow access to anyone who can edit posts.
 		 */
@@ -106,7 +106,7 @@ class Gutenberg_REST_Templates_Controller_6_4 extends WP_REST_Templates_Controll
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_item_permissions_check( $request ) {
+	public function get_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		/*
 		 * Allow access to anyone who can edit posts.
 		 */
