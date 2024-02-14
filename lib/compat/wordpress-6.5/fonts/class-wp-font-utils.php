@@ -70,16 +70,16 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			}
 
 			$output         = trim( sanitize_text_field( $font_family ) );
-			$formattedItems = array();
+			$formatted_items = array();
 			if ( str_contains( $output, ',' ) ) {
 				$items = explode( ',', $output );
 				foreach ( $items as $item ) {
-					$formattedItem = self::maybe_add_quotes( $item );
-					if ( $formattedItem !== '' ) {
-						$formattedItems[] = $formattedItem;
+					$formatted_item = self::maybe_add_quotes( $item );
+					if ( $formatted_item !== '' ) {
+						$formatted_items[] = $formatted_item;
 					}
 				}
-				return implode( ', ', $formattedItems );
+				return implode( ', ', $formatted_items );
 			}
 			return self::maybe_add_quotes( $output );
 		}
