@@ -93,9 +93,7 @@ export function formatFontFaceName( input ) {
 			.split( ',' )
 			// finds the first item that is not an empty string.
 			.find( ( item ) => item.trim() !== '' )
-			.trim()
-			// removes leading and trailing quotes.
-			.replace( /^["']|["']$/g, '' );
+			.trim();
 	}
 	// removes leading and trailing quotes.
 	output = output.replace( /^["']|["']$/g, '' );
