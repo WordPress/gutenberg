@@ -73,7 +73,7 @@ With directives, we can directly manage interactions related to things such as s
 
 #### `wp-interactive`
 
-The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). For the first version of the API it only includes a namespace to reference a specific store, so can be set as a `string` or an `object`.
+The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). The directive includes a namespace to reference a specific store, that can be set as a `string` or an `object`.
 
 ```html
 <!-- Let's make this element and its children interactive and set the namespace -->
@@ -87,7 +87,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   </div>
 </div>
 ```html
-<!-- This will also work, but using just the string is recommended. -->
+<!-- This is also valid -->
 <div
   data-wp-interactive='{ "namespace": "myPlugin" }'
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
