@@ -74,6 +74,7 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
+import * as playlist from './playlist';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
@@ -254,6 +255,10 @@ const getAllBlocks = () => {
 			) )
 	) {
 		blocks.push( classic );
+	}
+
+	if ( window?.__experimentalEnablePlaylistBlock ) {
+		blocks.push( playlist );
 	}
 
 	return blocks.filter( Boolean );
