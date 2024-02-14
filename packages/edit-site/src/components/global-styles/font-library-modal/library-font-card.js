@@ -20,7 +20,7 @@ function LibraryFontCard( { font, ...props } ) {
 		font.source
 	).length;
 	const variantsText = sprintf(
-		/* translators: %1$d: Active font variants, %2$d: Total font variants */
+		/* translators: 1: Active font variants, 2: Total font variants. */
 		__( '%1$s/%2$s variants active' ),
 		variantsActive,
 		variantsInstalled

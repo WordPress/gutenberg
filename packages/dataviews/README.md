@@ -201,6 +201,7 @@ Example:
 -   `enableHiding`: whether the field can be hidden. True by default.
 -   `filterBy`: configuration for the filters.
     - `operators`: the list of operators supported by the field.
+    - `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
 ## Actions
 

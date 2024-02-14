@@ -46,6 +46,7 @@ import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
+import { BLOCK_BINDINGS_ALLOWED_BLOCKS } from '../../hooks/use-bindings-attributes';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -147,7 +148,7 @@ export function RichTextWrapper(
 
 		// Disable Rich Text editing if block bindings specify that.
 		let shouldDisableEditing = false;
-		if ( blockBindings ) {
+		if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
 			const blockTypeAttributes = getBlockType( blockName ).attributes;
 			const { getBlockBindingsSource } = unlock(
 				select( blockEditorStore )
@@ -155,13 +156,19 @@ export function RichTextWrapper(
 			for ( const [ attribute, args ] of Object.entries(
 				blockBindings
 			) ) {
-				// If any of the attributes with source "rich-text" is part of the bindings,
-				// has a source with `lockAttributesEditing`, disable it.
 				if (
-					blockTypeAttributes?.[ attribute ]?.source ===
-						'rich-text' &&
-					getBlockBindingsSource( args.source.name )
-						?.lockAttributesEditing
+					blockTypeAttributes?.[ attribute ]?.source !== 'rich-text'
+				) {
+					break;
+				}
+
+				// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+				const blockBindingsSource = getBlockBindingsSource(
+					args.source
+				);
+				if (
+					! blockBindingsSource ||
+					blockBindingsSource.lockAttributesEditing
 				) {
 					shouldDisableEditing = true;
 					break;
@@ -348,7 +355,6 @@ export function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					editableContentElement={ anchorRef.current }
-					value={ value }
 				/>
 			) }
 			<TagName
@@ -356,6 +362,7 @@ export function RichTextWrapper(
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
+				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [

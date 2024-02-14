@@ -69,13 +69,16 @@ async function getDecFile( packagePath ) {
 
 async function typecheckDeclarations( file ) {
 	return new Promise( ( resolve, reject ) => {
-		exec( `npx tsc --noEmit ${ file }`, ( error, stdout, stderr ) => {
-			if ( error ) {
-				reject( { file, error, stderr, stdout } );
-			} else {
-				resolve( { file, stdout } );
+		exec(
+			`npx tsc --target esnext --moduleResolution node --noEmit ${ file }`,
+			( error, stdout, stderr ) => {
+				if ( error ) {
+					reject( { file, error, stderr, stdout } );
+				} else {
+					resolve( { file, stdout } );
+				}
 			}
-		} );
+		);
 	} );
 }
 

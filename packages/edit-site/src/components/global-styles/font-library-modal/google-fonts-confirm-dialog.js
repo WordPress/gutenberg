@@ -14,7 +14,7 @@ function GoogleFontsConfirmDialog() {
 	const handleConfirm = () => {
 		// eslint-disable-next-line no-undef
 		window.localStorage.setItem(
-			'wp-font-library-default-font-collection-permission',
+			'wp-font-library-google-fonts-permission',
 			'true'
 		);
 		window.dispatchEvent( new Event( 'storage' ) );
@@ -34,7 +34,7 @@ function GoogleFontsConfirmDialog() {
 					<Spacer margin={ 3 } />
 					<Text as="p">
 						{ __(
-							'You can alternatively upload files directly on the Library tab.'
+							'You can alternatively upload files directly on the Upload tab.'
 						) }
 					</Text>
 					<Spacer margin={ 6 } />

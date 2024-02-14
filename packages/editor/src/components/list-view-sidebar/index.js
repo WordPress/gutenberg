@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
-import { Button, TabPanel } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
@@ -18,6 +21,8 @@ import { ESCAPE } from '@wordpress/keycodes';
 import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
@@ -51,7 +56,7 @@ export default function ListViewSidebar() {
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
 	// This ref refers to the tab panel.
-	const tabPanelRef = useRef();
+	const tabsRef = useRef();
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
 
@@ -71,7 +76,7 @@ export default function ListViewSidebar() {
 	 */
 	function handleSidebarFocus( currentTab ) {
 		// Tab panel focus.
-		const tabPanelFocus = focus.tabbable.find( tabPanelRef.current )[ 0 ];
+		const tabPanelFocus = focus.tabbable.find( tabsRef.current )[ 0 ];
 		// List view tab is selected.
 		if ( currentTab === 'list-view' ) {
 			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
@@ -108,22 +113,6 @@ export default function ListViewSidebar() {
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
 
-	/**
-	 * Render tab content for a given tab name.
-	 *
-	 * @param {string} tabName The name of the tab to render.
-	 */
-	function renderTabContent( tabName ) {
-		if ( tabName === 'list-view' ) {
-			return (
-				<div className="editor-list-view-sidebar__list-view-panel-content">
-					<ListView dropZoneElement={ dropZoneElement } />
-				</div>
-			);
-		}
-		return <ListViewOutline />;
-	}
-
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -131,39 +120,63 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<Button
-				className="editor-list-view-sidebar__close-button"
-				icon={ closeSmall }
-				label={ __( 'Close' ) }
-				onClick={ closeListView }
-			/>
-			<TabPanel
-				className="editor-list-view-sidebar__tab-panel"
-				ref={ tabPanelRef }
+			<Tabs
 				onSelect={ ( tabName ) => setTab( tabName ) }
 				selectOnMove={ false }
-				tabs={ [
-					{
-						name: 'list-view',
-						title: _x( 'List View', 'Post overview' ),
-						className: 'editor-list-view-sidebar__panel-tab',
-					},
-					{
-						name: 'outline',
-						title: _x( 'Outline', 'Post overview' ),
-						className: 'editor-list-view-sidebar__panel-tab',
-					},
-				] }
+				// The initial tab value is set explicitly to avoid an initial
+				// render where no tab is selected. This ensures that the
+				// tabpanel height is correct so the relevant scroll container
+				// can be rendered internally.
+				initialTabId="list-view"
 			>
-				{ ( currentTab ) => (
-					<div
-						className="editor-list-view-sidebar__list-view-container"
-						ref={ listViewContainerRef }
+				<div className="edit-post-editor__document-overview-panel__header">
+					<Button
+						className="editor-list-view-sidebar__close-button"
+						icon={ closeSmall }
+						label={ __( 'Close' ) }
+						onClick={ closeListView }
+					/>
+					<Tabs.TabList
+						className="editor-list-view-sidebar__tabs-tablist"
+						ref={ tabsRef }
 					>
-						{ renderTabContent( currentTab.name ) }
+						<Tabs.Tab
+							className="editor-list-view-sidebar__tabs-tab"
+							tabId="list-view"
+						>
+							{ _x( 'List View', 'Post overview' ) }
+						</Tabs.Tab>
+						<Tabs.Tab
+							className="editor-list-view-sidebar__tabs-tab"
+							tabId="outline"
+						>
+							{ _x( 'Outline', 'Post overview' ) }
+						</Tabs.Tab>
+					</Tabs.TabList>
+				</div>
+
+				<Tabs.TabPanel
+					ref={ listViewContainerRef }
+					className="editor-list-view-sidebar__tabs-tabpanel"
+					tabId="list-view"
+					focusable={ false }
+				>
+					<div className="editor-list-view-sidebar__list-view-container">
+						<div className="editor-list-view-sidebar__list-view-panel-content">
+							<ListView dropZoneElement={ dropZoneElement } />
+						</div>
 					</div>
-				) }
-			</TabPanel>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel
+					className="editor-list-view-sidebar__tabs-tabpanel"
+					tabId="outline"
+					focusable={ false }
+				>
+					<div className="editor-list-view-sidebar__list-view-container">
+						<ListViewOutline />
+					</div>
+				</Tabs.TabPanel>
+			</Tabs>
 		</div>
 	);
 }

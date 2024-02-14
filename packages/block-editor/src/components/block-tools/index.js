@@ -99,7 +99,6 @@ export default function BlockTools( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		clearSelectedBlock,
 		selectBlock,
 		moveBlocksUp,
 		moveBlocksDown,
@@ -157,21 +156,12 @@ export default function BlockTools( {
 			}
 
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if ( clientIds.length > 1 ) {
 				event.preventDefault();
-
 				// If there is more than one block selected, select the first
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
-				if ( clientIds.length > 1 ) {
-					selectBlock( clientIds[ 0 ] );
-				} else {
-					clearSelectedBlock();
-				}
-				event.target.ownerDocument.defaultView
-					.getSelection()
-					.removeAllRanges();
-				__unstableContentRef?.current.focus();
+				selectBlock( clientIds[ 0 ] );
 			}
 		}
 	}
