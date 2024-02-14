@@ -75,7 +75,7 @@ export default function SidebarNavigationScreenPagesDataViews() {
 
 	return (
 		<SidebarNavigationScreen
-			title={ __( 'Pages' ) }
+			title={ __( 'Manage pages' ) }
 			description={ __( 'Browse and manage pages.' ) }
 			content={ <DataViewsSidebarContent /> }
 			backPath="/page"

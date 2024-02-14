@@ -21,7 +21,7 @@ import DataviewsTemplatesSidebarContent from './content';
 
 const config = {
 	[ TEMPLATE_POST_TYPE ]: {
-		title: __( 'All templates' ),
+		title: __( 'Manage templates' ),
 		description: __(
 			'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 		),
