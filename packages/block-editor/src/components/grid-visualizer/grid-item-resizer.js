@@ -12,7 +12,6 @@ import BlockPopover from '../block-popover';
 import { getComputedCSS } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
-	const popoverRef = useRef();
 	const resizableRef = useRef();
 	const blockElement = useBlockElement( clientId );
 	if ( ! blockElement ) {
@@ -20,7 +19,6 @@ export function GridItemResizer( { clientId, onChange } ) {
 	}
 	return (
 		<BlockPopover
-			ref={ popoverRef }
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
