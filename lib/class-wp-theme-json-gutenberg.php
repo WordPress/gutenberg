@@ -1284,21 +1284,68 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The global styles custom CSS.
 	 */
 	public function get_custom_css() {
-		// Add the global styles root CSS.
-		$stylesheet = $this->theme_json['styles']['css'] ?? '';
+		$block_custom_css = '';
+		$block_nodes      = $this->get_block_custom_css_nodes();
+		foreach ( $block_nodes as $node ) {
+			$block_custom_css .= $this->get_block_custom_css( $node['css'], $node['selector'] );
+		}
+
+		return $this->get_base_custom_css() . $block_custom_css;
+	}
+
+	/**
+	 * Returns the global styles base custom CSS.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @return string The global styles base custom CSS.
+	 */
+	public function get_base_custom_css() {
+		return isset( $this->theme_json['styles']['css'] ) ? $this->theme_json['styles']['css'] : '';
+	}
+
+	/**
+	 * Returns the block nodes with custom CSS.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @return array The block nodes.
+	 */
+	public function get_block_custom_css_nodes() {
+		$block_nodes = array();
 
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
-				$custom_block_css = $this->theme_json['styles']['blocks'][ $name ]['css'] ?? null;
+				$custom_block_css = isset( $this->theme_json['styles']['blocks'][ $name ]['css'] )
+					? $this->theme_json['styles']['blocks'][ $name ]['css']
+					: null;
 				if ( $custom_block_css ) {
-					$selector    = static::$blocks_metadata[ $name ]['selector'];
-					$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
+					$block_nodes[] = array(
+						'name'     => $name,
+						'selector' => static::$blocks_metadata[ $name ]['selector'],
+						'css'      => $custom_block_css,
+					);
 				}
 			}
 		}
 
-		return $stylesheet;
+		return $block_nodes;
+	}
+
+
+	/**
+	 * Returns the global styles custom CSS for a single block.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array $css The block css node.
+	 * @param string $selector The block selector.
+	 *
+	 * @return string The global styles custom CSS for the block.
+	 */
+	public function get_block_custom_css( $css, $selector ) {
+		return $this->process_blocks_custom_css( $css, $selector );
 	}
 
 	/**

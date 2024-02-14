@@ -70,12 +70,26 @@ function gutenberg_enqueue_global_styles_custom_css() {
 	// Don't enqueue Customizer's custom CSS separately.
 	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
 
-	$custom_css  = wp_get_custom_css();
-	$custom_css .= gutenberg_get_global_styles_custom_css();
+	$custom_css = wp_get_custom_css();
+
+	if ( ! wp_should_load_separate_core_block_assets() ) {
+		/**
+		 * If loading all block assets together, add both
+		 * the base and block custom CSS at once. Else load
+		 * the base custom CSS only, and the block custom CSS
+		 * will be added to the inline CSS for each block in
+		 * gutenberg_add_global_styles_block_custom_css().
+		 */
+		$custom_css .= gutenberg_get_global_styles_custom_css();
+	} else {
+		$custom_css .= gutenberg_get_global_styles_base_custom_css();
+	}
 
 	if ( ! empty( $custom_css ) ) {
 		wp_add_inline_style( 'global-styles', $custom_css );
 	}
+
+	gutenberg_add_global_styles_block_custom_css();
 }
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles_custom_css' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_custom_css' );
