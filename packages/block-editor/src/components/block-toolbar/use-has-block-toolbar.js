@@ -10,7 +10,7 @@ import { store as blockEditorStore } from '../../store';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
 /**
- * Returns true if the block toolbar will be shown.
+ * Returns true if the block toolbar should be shown.
  *
  * @return {boolean} Whether the block toolbar component will be rendered.
  */
