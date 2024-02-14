@@ -222,7 +222,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 						'font_family_settings' => array(
 							'name'       => 'sanitize_text_field',
 							'slug'       => 'sanitize_title',
-							'fontFamily' => 'sanitize_text_field',
+							'fontFamily' => 'WP_Font_Utils::sanitize_font_family',
 							'preview'    => 'sanitize_url',
 							'fontFace'   => array(
 								array(
