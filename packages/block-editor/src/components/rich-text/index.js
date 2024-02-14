@@ -109,7 +109,7 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
-		disableEditing,
+		privateDisableEditing,
 		...props
 	},
 	forwardedRef
@@ -192,7 +192,7 @@ export function RichTextWrapper(
 			isBlockSelected,
 		] );
 
-	const shouldDisableEditing = disableEditing || disableBoundBlocks;
+	const shouldDisableEditing = privateDisableEditing || disableBoundBlocks;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -445,19 +445,38 @@ export function RichTextWrapper(
 	);
 }
 
-const ForwardedRichTextContainer = withDeprecations(
+// This is the private API for the ListView component.
+// It allows access to all props, not just the public ones.
+export const PrivateRichText = withDeprecations(
 	forwardRef( RichTextWrapper )
 );
 
-ForwardedRichTextContainer.Content = Content;
-ForwardedRichTextContainer.isEmpty = ( value ) => {
+PrivateRichText.Content = Content;
+PrivateRichText.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
 
+// This is the public API for the RichText component.
+// We wrap the PrivateRichText component to hide some props from the public API.
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-export default ForwardedRichTextContainer;
+const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+	return (
+		<PrivateRichText
+			ref={ ref }
+			{ ...props }
+			privateDisableEditing={ false }
+		/>
+	);
+} );
+
+PublicForwardedRichTextContainer.Content = Content;
+PublicForwardedRichTextContainer.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
+};
+
+export default PublicForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';
