@@ -354,7 +354,10 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/components/src/**' ],
-			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
 			rules: {
 				'no-restricted-syntax': [
 					'error',
@@ -368,6 +371,18 @@ module.exports = {
 							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
 						message:
 							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							'Literal[value=/var.+--wp-components-color-/]', // allow overriding definitions, but not access with var()
+						message:
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							'TemplateElement[value.cooked=/var.+--wp-components-color-/]', // allow overriding definitions, but not access with var()
+						message:
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
 				],
 			},
