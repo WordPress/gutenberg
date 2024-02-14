@@ -112,7 +112,11 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
-	const [ spacingSizes ] = useSettings( 'spacing.spacingSizes' );
+	const spacingSizes = useSettings(
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.theme',
+		'spacing.spacingSizes.default'
+	).find( ( origin ) => origin !== undefined );
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );

@@ -25,9 +25,14 @@ import { MIN_SPACER_SIZE } from './constants';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
-	const [ spacingSizes, spacingUnits ] = useSettings(
-		'spacing.spacingSizes',
-		'spacing.units'
+	const [ spacingUnits, spacingSizesByOrigin ] = useSettings(
+		'spacing.units',
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.theme',
+		'spacing.spacingSizes.default'
+	);
+	const spacingSizes = spacingSizesByOrigin.find(
+		( origin ) => origin !== undefined
 	);
 	// In most contexts the spacer size cannot meaningfully be set to a
 	// percentage, since this is relative to the parent container. This

@@ -11,7 +11,12 @@ import { useSettings } from '../../use-settings';
 export default function useSpacingSizes() {
 	const spacingSizes = [ { name: 0, slug: '0', size: 0 } ];
 
-	const [ settingsSizes ] = useSettings( 'spacing.spacingSizes' );
+	const settingsSizes = useSettings(
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.theme',
+		'spacing.spacingSizes.default'
+	).find( ( origin ) => origin !== undefined );
+
 	if ( settingsSizes ) {
 		spacingSizes.push( ...settingsSizes );
 	}
