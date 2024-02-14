@@ -10,6 +10,7 @@ import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useSelect } from '@wordpress/data';
 import { unlock } from '../../../../editor/src/lock-unlock';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * This component is responsible detecting and
@@ -34,8 +35,13 @@ const BlockBindingConnector = ( {
 	blockProps,
 	useSource,
 } ) => {
-	const { value: propValue, updateValue: updatePropValue } =
-		useSource( blockProps, args ) || {};
+	const {
+		placeholder,
+		value: propValue,
+		updateValue: updatePropValue,
+	} = useSource( blockProps, args );
+
+	const blockName = blockProps.name;
 
 	const setAttributes = blockProps.setAttributes;
 
@@ -65,10 +71,28 @@ const BlockBindingConnector = ( {
 		 * Detect changes in source prop value,
 		 * and update the attribute value accordingly.
 		 */
-		if ( propValue && propValue !== lastPropValue.current ) {
-			lastPropValue.current = propValue;
-			updateBoundAttibute( propValue );
-			return;
+		if ( typeof propValue !== 'undefined' ) {
+			if ( propValue !== lastPropValue.current ) {
+				lastPropValue.current = propValue;
+				updateBoundAttibute( propValue );
+				return;
+			}
+		} else if ( placeholder ) {
+			/*
+			 * If the attribute is `src` or `href`,
+			 * a placeholder can't be used because it is not a valid url.
+			 * Adding this workaround until
+			 * attributes and metadata fields types are improved and include `url`.
+			 */
+			const htmlAttribute =
+				getBlockType( blockName ).attributes[ attrName ].attribute;
+
+			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
+				updateBoundAttibute( null );
+				return;
+			}
+
+			updateBoundAttibute( placeholder );
 		}
 
 		/*
@@ -77,15 +101,19 @@ const BlockBindingConnector = ( {
 		 * Detect changes in block attribute value,
 		 * and update the source prop value accordingly.
 		 */
-		if (
-			attrValue &&
-			attrValue !== lastAttrValue.current && // only update if the value has changed
-			updatePropValue // check whether update value handler is available
-		) {
+		if ( attrValue !== lastAttrValue.current && updatePropValue ) {
 			lastAttrValue.current = attrValue;
 			updatePropValue( attrValue );
 		}
-	}, [ updateBoundAttibute, propValue, attrValue, updatePropValue ] );
+	}, [
+		updateBoundAttibute,
+		propValue,
+		attrValue,
+		updatePropValue,
+		placeholder,
+		blockName,
+		attrName,
+	] );
 
 	return null;
 };
