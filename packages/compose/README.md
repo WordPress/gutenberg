@@ -465,7 +465,7 @@ _Returns_
 
 ### useNetworkConnectivity
 
-Returns the current network connectivity status provided by the native bridge.
+Returns the current network connectivity status provided by `window.navigator`.
 
 _Usage_
 

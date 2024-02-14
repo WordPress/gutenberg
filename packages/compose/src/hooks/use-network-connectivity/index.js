@@ -10,7 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
  */
 
 /**
- * Returns the current network connectivity status provided by the native bridge.
+ * Returns the current network connectivity status provided by `window.navigator`.
  *
  * @example
  *
