@@ -35,7 +35,7 @@ export function Caption( {
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
 	className,
-	privateDisableEditing,
+	disableEditing,
 } ) {
 	const caption = attributes[ key ];
 	const prevCaption = usePrevious( caption );
@@ -109,7 +109,7 @@ export function Caption( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
-						privateDisableEditing={ privateDisableEditing }
+						disableEditing={ disableEditing }
 					/>
 				) }
 		</>

@@ -109,7 +109,7 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
-		privateDisableEditing,
+		disableEditing,
 		...props
 	},
 	forwardedRef
@@ -192,7 +192,7 @@ export function RichTextWrapper(
 			isBlockSelected,
 		] );
 
-	const shouldDisableEditing = privateDisableEditing || disableBoundBlocks;
+	const shouldDisableEditing = disableEditing || disableBoundBlocks;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -463,11 +463,7 @@ PrivateRichText.isEmpty = ( value ) => {
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 	return (
-		<PrivateRichText
-			ref={ ref }
-			{ ...props }
-			privateDisableEditing={ false }
-		/>
+		<PrivateRichText ref={ ref } { ...props } disableEditing={ false } />
 	);
 } );
 
