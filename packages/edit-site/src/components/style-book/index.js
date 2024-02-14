@@ -222,11 +222,7 @@ function StyleBook( {
 	);
 
 	const settings = useMemo(
-		() => ( {
-			...originalSettings,
-			focusMode: false, // Disable "Spotlight mode".
-			__unstableIsPreviewMode: true,
-		} ),
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
 
