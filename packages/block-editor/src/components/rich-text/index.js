@@ -445,7 +445,7 @@ export function RichTextWrapper(
 	);
 }
 
-// This is the private API for the ListView component.
+// This is the private API for the RichText component.
 // It allows access to all props, not just the public ones.
 export const PrivateRichText = withDeprecations(
 	forwardRef( RichTextWrapper )
