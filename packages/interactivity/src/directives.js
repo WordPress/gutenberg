@@ -123,33 +123,21 @@ export default () => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
-			const contextStack = useRef( null );
 			const defaultEntry = context.find(
 				( { suffix } ) => suffix === 'default'
 			);
 
-			currentValue.current = useMemo( () => {
-				if ( ! defaultEntry ) return null;
-				const { namespace, value } = defaultEntry;
-				const newValue = deepSignal( { [ namespace ]: value } );
-				mergeDeepSignals( currentValue.current, newValue, true );
-				return currentValue.current;
-			}, [ defaultEntry ] );
+			// No change should be made if `defaultEntry` does not exist.
+			const contextStack = useMemo( () => {
+				if ( defaultEntry ) {
+					const { namespace, value } = defaultEntry;
+					const newValue = deepSignal( { [ namespace ]: value } );
+					mergeDeepSignals( currentValue.current, newValue, true );
+				}
+				return contextProxy( currentValue.current, inheritedValue );
+			}, [ defaultEntry, inheritedValue ] );
 
-			contextStack.current = useMemo( () => {
-				return (
-					currentValue.current &&
-					contextProxy( currentValue.current, inheritedValue )
-				);
-			}, [ inheritedValue, currentValue.current ] );
-
-			if ( contextStack.current ) {
-				return (
-					<Provider value={ contextStack.current }>
-						{ children }
-					</Provider>
-				);
-			}
+			return <Provider value={ contextStack }>{ children }</Provider>;
 		},
 		{ priority: 5 }
 	);
