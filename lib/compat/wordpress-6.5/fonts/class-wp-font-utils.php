@@ -69,7 +69,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				return '';
 			}
 
-			$output         = trim( sanitize_text_field( $font_family ) );
+			$output          = trim( sanitize_text_field( $font_family ) );
 			$formatted_items = array();
 			if ( str_contains( $output, ',' ) ) {
 				$items = explode( ',', $output );
