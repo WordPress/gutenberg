@@ -180,7 +180,7 @@ function Layout( { initialPost } ) {
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
-			mode: select( editPostStore ).getEditorMode(),
+			mode: select( editorStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(

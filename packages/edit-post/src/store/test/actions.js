@@ -81,52 +81,6 @@ describe( 'actions', () => {
 		).toBe( false );
 	} );
 
-	describe( 'switchEditorMode', () => {
-		it( 'to visual', () => {
-			// Switch to text first, since the default is visual.
-			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
-			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
-				'text'
-			);
-			registry.dispatch( editPostStore ).switchEditorMode( 'visual' );
-			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
-				'visual'
-			);
-		} );
-
-		it( 'to text', () => {
-			// It defaults to visual.
-			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
-				'visual'
-			);
-			// Add a selected client id and make sure it's there.
-			const clientId = 'clientId_1';
-			registry.dispatch( blockEditorStore ).selectionChange( clientId );
-			expect(
-				registry.select( blockEditorStore ).getSelectedBlockClientId()
-			).toEqual( clientId );
-
-			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
-			expect(
-				registry.select( blockEditorStore ).getSelectedBlockClientId()
-			).toBeNull();
-			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
-				'text'
-			);
-		} );
-		it( 'should turn off distraction free mode when switching to code editor', () => {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', true );
-			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( false );
-		} );
-	} );
-
 	it( 'togglePinnedPluginItem', () => {
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		// Sidebars are pinned by default.
@@ -197,42 +151,6 @@ describe( 'actions', () => {
 			expect(
 				registry.select( editPostStore ).getHiddenBlockTypes()
 			).toEqual( expectedB );
-		} );
-	} );
-
-	describe( 'toggleDistractionFree', () => {
-		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
-			// Enable everything that shouldn't be enabled in distraction free mode.
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'fixedToolbar', true );
-			registry.dispatch( editorStore ).setIsListViewOpened( true );
-			registry
-				.dispatch( editPostStore )
-				.openGeneralSidebar( 'edit-post/block' );
-			// Initial state is falsy.
-			registry.dispatch( editPostStore ).toggleDistractionFree();
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'fixedToolbar' )
-			).toBe( true );
-			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
-				false
-			);
-			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
-				false
-			);
-			expect(
-				registry
-					.select( interfaceStore )
-					.getActiveComplementaryArea( editPostStore.name )
-			).toBeNull();
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( true );
 		} );
 	} );
 } );
