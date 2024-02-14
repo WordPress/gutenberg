@@ -28,10 +28,12 @@ const TouchEventType = {
 // For testing, we mock the "requestAnimationFrame" so it calls the callback passed instantly.
 let requestAnimationFrameCopy;
 beforeEach( () => {
+	jest.useFakeTimers();
 	requestAnimationFrameCopy = global.requestAnimationFrame;
 	global.requestAnimationFrame = ( callback ) => callback();
 } );
 afterEach( () => {
+	jest.useRealTimers();
 	global.requestAnimationFrame = requestAnimationFrameCopy;
 } );
 
@@ -58,6 +60,7 @@ describe( 'Draggable', () => {
 			{ oldState: State.BEGAN, state: State.ACTIVE },
 			{ state: State.ACTIVE },
 		] );
+		jest.runOnlyPendingTimers();
 
 		expect( onLongPress ).toHaveBeenCalledTimes( 1 );
 		expect( onLongPress ).toHaveBeenCalledWith( triggerId );
@@ -93,6 +96,7 @@ describe( 'Draggable', () => {
 			{ oldState: State.BEGAN, state: State.ACTIVE },
 			{ state: State.ACTIVE },
 		] );
+		jest.runOnlyPendingTimers();
 		fireGestureHandler( draggable, [
 			// TOUCHES_DOWN event is only received on ACTIVE state, so we have to fire it manually.
 			{ oldState: State.BEGAN, state: State.ACTIVE },
