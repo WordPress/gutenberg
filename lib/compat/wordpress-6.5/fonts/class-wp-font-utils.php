@@ -75,7 +75,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				$items = explode( ',', $output );
 				foreach ( $items as $item ) {
 					$formatted_item = self::maybe_add_quotes( $item );
-					if ( $formatted_item !== '' ) {
+					if ( !empty ( $formatted_item ) ) {
 						$formatted_items[] = $formatted_item;
 					}
 				}
