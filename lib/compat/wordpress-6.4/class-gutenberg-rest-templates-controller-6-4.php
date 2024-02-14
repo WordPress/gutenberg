@@ -74,13 +74,14 @@ class Gutenberg_REST_Templates_Controller_6_4 extends WP_REST_Templates_Controll
 	}
 
 	/**
-	 * Checks if a given request has access to read templates.
+	 * Checks if the user has permissions to make the request.
 	 *
 	 * @since 6.5
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check() {
+	protected function permissions_check( $request ) {
 		/*
 		 * Allow access to anyone who can edit posts.
 		 */
@@ -102,9 +103,10 @@ class Gutenberg_REST_Templates_Controller_6_4 extends WP_REST_Templates_Controll
 	 *
 	 * @since 6.5
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_item_permissions_check() {
+	public function get_items_permissions_check( $request ) {
 		/*
 		 * Allow access to anyone who can edit posts.
 		 */
