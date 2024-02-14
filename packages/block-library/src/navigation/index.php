@@ -1383,7 +1383,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
  * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
  */
-function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
+function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post, $callback = 'insert_hooked_blocks' ) {
 	$before_block_visitor = null;
 	$after_block_visitor  = null;
 	$hooked_blocks        = get_hooked_blocks();
@@ -1409,8 +1409,8 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 	$after_block_visitor      = null;
 
 	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
-		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post );
-		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post );
+		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, $callback );
+		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, $callback );
 	}
 
 	return traverse_and_serialize_block( $mock_anchor_parent_block, $before_block_visitor, $after_block_visitor );
@@ -1422,12 +1422,11 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	// We run the Block Hooks mechanism so it will return the list of ignored hooked blocks
-	// in the mock root Navigation block's metadata attribute.
-	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
-	// blocks inserted, whereas `$markup` will have them inserted twice.
-	$blocks                = parse_blocks( $post->post_content );
-	$markup                = block_core_navigation_insert_hooked_blocks( $blocks, $post );
+	// We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
+	// all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
+	$blocks = parse_blocks( $post->post_content );
+	$markup = block_core_navigation_insert_hooked_blocks( $blocks, $post, 'set_ignored_hooked_blocks_metadata' );)
+
 	$root_nav_block        = parse_blocks( $markup )[0];
 	$ignored_hooked_blocks = isset( $root_nav_block['attrs']['metadata']['ignoredHookedBlocks'] )
 		? $root_nav_block['attrs']['metadata']['ignoredHookedBlocks']
@@ -1441,6 +1440,10 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 		}
 		update_post_meta( $post->ID, '_wp_ignored_hooked_blocks', json_encode( $ignored_hooked_blocks ) );
 	}
+
+	// TODO: wp_update_post() to set the post_content to the updated markup (to include the ignoredHookedBlocks metadata).
+	// We need to remove the markup for the root Nav block wrapper like we do in block_core_navigation_insert_hooked_blocks_into_rest_response,
+	// or alternatively via serialize_blocks( $root_nav_block['innerBlocks'] ), but that's probably more expensive.
 }
 
 // Before adding our filter, we verify if it's already added in Core.
