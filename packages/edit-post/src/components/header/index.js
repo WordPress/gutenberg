@@ -65,7 +65,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		isTextEditor,
 		blockSelectionStart,
 		hasActiveMetaboxes,
-		hasFixedToolbar,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
@@ -83,14 +82,12 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 					.onNavigateToPreviousEntityRecord,
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
-			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 		};
 	}, [] );
 
 	const { showFixedToolbar } = useShowBlockTools();
-	const hasTopToolbar =
-		hasFixedToolbar && isLargeViewport && showFixedToolbar;
+	const hasTopToolbar = isLargeViewport && showFixedToolbar;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );

@@ -63,7 +63,9 @@ export function useShowBlockTools() {
 					! isEmptyDefaultBlock &&
 					! maybeShowBreadcrumb,
 				showFixedToolbar:
-					hasBlockToolbar && getSettings().hasFixedToolbar,
+					editorMode !== 'zoom-out' &&
+					hasBlockToolbar &&
+					getSettings().hasFixedToolbar,
 			};
 		},
 		[ hasBlockToolbar ]

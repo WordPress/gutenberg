@@ -54,8 +54,6 @@ export default function HeaderEditMode() {
 		blockSelectionStart,
 		showIconLabels,
 		editorCanvasView,
-		hasFixedToolbar,
-		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
@@ -72,19 +70,13 @@ export default function HeaderEditMode() {
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { showFixedToolbar } = useShowBlockTools();
-	const hasTopToolbar =
-		! isZoomOutMode &&
-		hasFixedToolbar &&
-		isLargeViewport &&
-		showFixedToolbar;
+	const hasTopToolbar = isLargeViewport && showFixedToolbar;
 	const blockToolbarRef = useRef();
 	const disableMotion = useReducedMotion();
 
