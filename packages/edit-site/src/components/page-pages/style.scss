@@ -1,30 +1,3 @@
-.edit-site-page-pages__media-wrapper {
-	width: $grid-unit-50;
-	height: $grid-unit-50;
-	display: block;
-	border-radius: $grid-unit-05;
-	position: relative;
-	background-color: $gray-100;
-	overflow: hidden;
-
-	.edit-site-page-pages__featured-image {
-		height: 100%;
-		object-fit: cover;
-		width: 100%;
-	}
-
-	&::after {
-		border-radius: 4px;
-		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-		content: "";
-		height: 100%;
-		left: 0;
-		position: absolute;
-		top: 0;
-		width: 100%;
-	}
-}
-
 .page-pages-preview-field__button {
 	box-shadow: none;
 	border: none;
@@ -41,5 +14,33 @@
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
+	}
+
+	&.edit-site-page-pages__media-wrapper {
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		display: block;
+		border-radius: $grid-unit-05;
+		position: relative;
+		background-color: $gray-100;
+		overflow: hidden;
+		flex-grow: 0 !important;
+
+		.edit-site-page-pages__featured-image {
+			height: 100%;
+			object-fit: cover;
+			width: 100%;
+		}
+
+		&::after {
+			border-radius: 4px;
+			box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+			content: "";
+			height: 100%;
+			left: 0;
+			position: absolute;
+			top: 0;
+			width: 100%;
+		}
 	}
 }

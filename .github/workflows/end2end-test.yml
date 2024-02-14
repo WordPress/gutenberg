@@ -41,7 +41,7 @@ jobs:
                   npx wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache"
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: failures-artifacts
@@ -49,7 +49,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: flaky-tests-report
@@ -92,7 +92,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: failures-artifacts
@@ -100,7 +100,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: flaky-tests-report
@@ -120,7 +120,7 @@ jobs:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: actions/download-artifact@v4.1.0
+            - uses: actions/download-artifact@v4.1.2
               id: download_artifact
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true

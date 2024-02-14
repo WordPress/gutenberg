@@ -84,6 +84,9 @@ const blockRemovalRules = {
 	'core/post-template': __(
 		'Post Template displays each post or page in a Query Loop.'
 	),
+	'bindings/core/pattern-overrides': __(
+		'Blocks from synced patterns that can have overriden content.'
+	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -102,13 +105,14 @@ export default function Editor( { isLoading } ) {
 		contextPost,
 		editorMode,
 		canvasMode,
-		renderingMode,
 		blockEditorMode,
 		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
+		isDistractionFree,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		postTypeLabel,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
@@ -117,7 +121,7 @@ export default function Editor( { isLoading } ) {
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { getRenderingMode, isInserterOpened, isListViewOpened } =
+		const { isInserterOpened, isListViewOpened, getPostTypeLabel } =
 			select( editorStore );
 		const _context = getEditedPostContext();
 
@@ -134,15 +138,16 @@ export default function Editor( { isLoading } ) {
 				: undefined,
 			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
-			renderingMode: getRenderingMode(),
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
+			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
 
@@ -150,6 +155,7 @@ export default function Editor( { isLoading } ) {
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
 	const shouldShowBlockBreadcrumbs =
+		! isDistractionFree &&
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -210,7 +216,7 @@ export default function Editor( { isLoading } ) {
 					<SidebarComplementaryAreaFills />
 					{ isEditMode && <StartTemplateOptions /> }
 					<InterfaceSkeleton
-						isDistractionFree={ true }
+						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }
 						className={ classnames(
 							'edit-site-editor__interface-skeleton',
@@ -267,12 +273,7 @@ export default function Editor( { isLoading } ) {
 						footer={
 							shouldShowBlockBreadcrumbs && (
 								<BlockBreadcrumb
-									rootLabelText={
-										postWithTemplate &&
-										renderingMode !== 'template-only'
-											? __( 'Page' )
-											: __( 'Template' )
-									}
+									rootLabelText={ postTypeLabel }
 								/>
 							)
 						}

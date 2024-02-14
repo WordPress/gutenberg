@@ -23,15 +23,20 @@ import { store as editorStore } from '../../store';
 const DEFAULT_TITLE = __( 'Custom Template' );
 
 export default function CreateNewTemplateModal( { onClose } ) {
-	const defaultBlockTemplate = useSelect(
-		( select ) =>
-			select( editorStore ).getEditorSettings().defaultBlockTemplate,
-		[]
+	const { defaultBlockTemplate, onNavigateToEntityRecord } = useSelect(
+		( select ) => {
+			const { getEditorSettings, getCurrentTemplateId } =
+				select( editorStore );
+			return {
+				defaultBlockTemplate: getEditorSettings().defaultBlockTemplate,
+				onNavigateToEntityRecord:
+					getEditorSettings().onNavigateToEntityRecord,
+				getTemplateId: getCurrentTemplateId,
+			};
+		}
 	);
 
-	const { createTemplate, setRenderingMode } = unlock(
-		useDispatch( editorStore )
-	);
+	const { createTemplate } = unlock( useDispatch( editorStore ) );
 
 	const [ title, setTitle ] = useState( '' );
 
@@ -86,15 +91,18 @@ export default function CreateNewTemplateModal( { onClose } ) {
 				),
 			] );
 
-		await createTemplate( {
+		const newTemplate = await createTemplate( {
 			slug: cleanForSlug( title || DEFAULT_TITLE ),
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
 		} );
 
 		setIsBusy( false );
+		onNavigateToEntityRecord( {
+			postId: newTemplate.id,
+			postType: 'wp_template',
+		} );
 		cancel();
-		setRenderingMode( 'template-only' );
 	};
 
 	return (

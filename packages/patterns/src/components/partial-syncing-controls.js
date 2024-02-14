@@ -19,10 +19,10 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 	const attributeSources = Object.keys( syncedAttributes ).map(
 		( attributeName ) =>
-			attributes.metadata?.bindings?.[ attributeName ]?.source?.name
+			attributes.metadata?.bindings?.[ attributeName ]?.source
 	);
 	const isConnectedToOtherSources = attributeSources.every(
-		( source ) => source && source !== 'pattern_attributes'
+		( source ) => source && source !== 'core/pattern-overrides'
 	);
 
 	// Render nothing if all supported attributes are connected to other sources.
@@ -38,8 +38,8 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		if ( ! isChecked ) {
 			for ( const attributeName of Object.keys( syncedAttributes ) ) {
 				if (
-					updatedBindings[ attributeName ]?.source?.name ===
-					'pattern_attributes'
+					updatedBindings[ attributeName ]?.source ===
+					'core/pattern-overrides'
 				) {
 					delete updatedBindings[ attributeName ];
 				}
@@ -59,9 +59,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		for ( const attributeName of Object.keys( syncedAttributes ) ) {
 			if ( ! updatedBindings[ attributeName ] ) {
 				updatedBindings[ attributeName ] = {
-					source: {
-						name: 'pattern_attributes',
-					},
+					source: 'core/pattern-overrides',
 				};
 			}
 		}
@@ -96,7 +94,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 					__nextHasNoMarginBottom
 					label={ __( 'Allow instance overrides' ) }
 					checked={ attributeSources.some(
-						( source ) => source === 'pattern_attributes'
+						( source ) => source === 'core/pattern-overrides'
 					) }
 					onChange={ ( isChecked ) => {
 						updateBindings( isChecked );

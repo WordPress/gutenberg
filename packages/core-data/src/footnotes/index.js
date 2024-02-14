@@ -64,7 +64,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			const richTextValue =
 				typeof value === 'string'
 					? RichTextData.fromHTMLString( value )
-					: value;
+					: new RichTextData( value );
 
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {

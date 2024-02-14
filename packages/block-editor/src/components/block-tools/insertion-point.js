@@ -81,11 +81,16 @@ function InbetweenInsertionPointPopover( {
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
+	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	const disableMotion = useReducedMotion();
 
 	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
+		if (
+			event.target === ref.current &&
+			nextClientId &&
+			getBlockEditingMode( nextClientId ) !== 'disabled'
+		) {
 			selectBlock( nextClientId, -1 );
 		}
 	}
