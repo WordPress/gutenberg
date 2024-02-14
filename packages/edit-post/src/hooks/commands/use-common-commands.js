@@ -13,6 +13,7 @@ import {
 	listView,
 	external,
 	formatListBullets,
+	image,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -67,9 +68,62 @@ export default function useCommonCommands() {
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { __unstableSaveForPreview, setIsListViewOpened } =
+	const { __unstableSaveForPreview, setIsListViewOpened, editPost } =
 		useDispatch( editorStore );
-	const { getCurrentPostId } = useSelect( editorStore );
+	const { getCurrentPostId, getEditedPostAttribute } =
+		useSelect( editorStore );
+
+	/**
+	 * Sets the featured image for the current post.
+	 *
+	 * @param {number} currentFeaturedImageId - The ID of the currently selected featured image.
+	 * @return {void}
+	 */
+	const setFeaturedImage = ( currentFeaturedImageId ) => {
+		const { wp } = window;
+		const frame = wp.media( {
+			title: __( 'Select Featured Image' ),
+			button: {
+				text: __( 'Use this image' ),
+			},
+			multiple: false,
+		} );
+
+		frame.on( 'open', () => {
+			// Get the selection object.
+			const selection = frame.state().get( 'selection' );
+
+			// If there's a previously selected featured image, pre-select it in the media modal.
+			if ( currentFeaturedImageId ) {
+				const attachment = wp.media.attachment(
+					currentFeaturedImageId
+				);
+				attachment.fetch();
+				selection.add( attachment ? [ attachment ] : [] );
+			}
+		} );
+
+		// When an image is selected, setting the featured image.
+		frame.on( 'select', () => {
+			const attachment = frame
+				.state()
+				.get( 'selection' )
+				.first()
+				.toJSON();
+
+			// If the selected image is different from the current featured image, update it.
+			if ( attachment.id !== currentFeaturedImageId ) {
+				// Update the featured image ID of the current post.
+				editPost( { featured_media: attachment.id } );
+			}
+
+			// Close the media modal.
+			frame.close();
+		} );
+
+		// Open the media uploader.
+		frame.open();
+	};
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -289,6 +343,18 @@ export default function useCommonCommands() {
 			const postId = getCurrentPostId();
 			const link = await __unstableSaveForPreview();
 			window.open( link, `wp-preview-${ postId }` );
+		},
+	} );
+
+	useCommand( {
+		name: 'core/open-featured-image-modal',
+		label: __( 'Select Featured Image' ),
+		icon: image,
+		callback: ( { close } ) => {
+			const currentFeaturedImageId =
+				getEditedPostAttribute( 'featured_media' );
+			setFeaturedImage( currentFeaturedImageId );
+			close();
 		},
 	} );
 }
