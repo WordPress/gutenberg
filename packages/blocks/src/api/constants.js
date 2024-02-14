@@ -271,11 +271,13 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	cite: 'cite',
 };
 
-export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
+// These paths may have three origins, custom, theme, and default,
+// and are expected to override other origins with custom, theme,
+// and default priority.
+export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
-	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
 	'spacing.spacingSizes': true,
 };
