@@ -55,8 +55,16 @@ const BlockBindingConnector = ( {
 	);
 
 	// Store a reference to the last value and attribute value.
-	const lastPropValue = useRef();
-	const lastAttrValue = useRef();
+	const lastPropValue = useRef( propValue );
+	const lastAttrValue = useRef( attrValue );
+
+	/*
+	 * Initially sync (first render / onMount ) attribute
+	 * value with the source prop value.
+	 */
+	useEffect( () => {
+		updateBoundAttibute( propValue );
+	}, [ propValue, updateBoundAttibute ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/*
 	 * Sync data.
