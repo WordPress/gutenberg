@@ -221,8 +221,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Theme supports have been inlined and the `$theme_support_data` argument removed.
 	 * @since 6.0.0 Added an `$options` parameter to allow the theme data to be returned without theme supports.
-	 * @since 6.5.0 Theme data will now also include block style variations that
-	 *              were registered with a style object or included via a standalone file.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
 	 * @param array $options {
@@ -293,8 +291,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * We want the presets and settings declared in theme.json
 		 * to override the ones declared via theme supports.
 		 * So we take theme supports, transform it to theme.json shape
-		 * and merge any block style variations from WP_Block_Styles_Registry
-		 * before merging the static::$theme upon that.
+		 * and merge the static::$theme upon that.
 		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
@@ -352,11 +349,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			// END EXPERIMENTAL.
 		}
-
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
-
 		$with_theme_supports->merge( static::$theme );
-
 		return $with_theme_supports;
 	}
 
