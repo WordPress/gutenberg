@@ -207,6 +207,12 @@ export default function CustomSelectControl( props ) {
 						describedBy: getDescribedBy(),
 					} ) }
 				>
+					{ selectedItem && selectedItem.icon && (
+						<Icon
+							style={ { verticalAlign: 'middle' } }
+							icon={ selectedItem.icon }
+						/>
+					) }
 					{ itemToString( selectedItem ) }
 					{ __experimentalShowSelectedHint &&
 						selectedItem.__experimentalHint && (
@@ -240,6 +246,8 @@ export default function CustomSelectControl( props ) {
 								style: item.style,
 							} ) }
 						>
+							{ ' ' }
+							{ item.icon && <Icon icon={ item.icon } /> }
 							{ item.name }
 							{ item.__experimentalHint && (
 								<span className="components-custom-select-control__item-hint">

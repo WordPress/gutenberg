@@ -77,9 +77,9 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId ]
 	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
+	const onChange = ( newAttributes ) => {
 		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
+			...cleanEmptyObject( newAttributes ),
 		} );
 	};
 
@@ -110,6 +110,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				onChange={ onChange }
 				defaultControls={ defaultControls }
 				onVisualize={ setVisualizedProperty }
+				clientId={ clientId }
 			/>
 			{ !! settings?.spacing?.padding && (
 				<PaddingVisualizer

@@ -1,0 +1,20 @@
+Width and height controls not working yet
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# interactive rebase in progress; onto 0bb25edda5a
+# Last commands done (5 commands done):
+#    pick 2a8d361eb6a Fix controls
+#    pick 6b34a087b79 Width and height controls not working yet
+# Next commands to do (28 remaining commands):
+#    pick 81b88364fe8 Functionality is half there
+#    pick 400cdf0c8e5 prevent error
+# You are currently rebasing branch 'try/second-layout-prototype' on '0bb25edda5a'.
+#
+# Changes to be committed:
+#	modified:   packages/block-editor/src/components/child-layout-control/index.js
+#	modified:   packages/block-editor/src/components/global-styles/dimensions-panel.js
+#	modified:   packages/block-editor/src/hooks/dimensions.js
+#	modified:   packages/block-editor/src/hooks/layout.js
+#

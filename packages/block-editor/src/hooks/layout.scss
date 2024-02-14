@@ -39,3 +39,35 @@
 .block-editor-hooks__toggle-control.block-editor-hooks__toggle-control {
 	margin-bottom: $grid-unit-20;
 }
+
+.components-tab-panel__tab-content .component-alignment-matrix-control {
+	border: 1px solid $gray-600;
+	width: 120px;
+	height: 120px;
+	grid-template-rows: repeat(3, calc(120px / 3));
+}
+
+
+// TODO: refactor this
+.layout-controls-alignment-select .components-custom-select-control__button {
+	display: flex !important;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+.block-layout-controls .components-base-control,
+.block-layout-controls .components-base-control:last-child {
+	margin-bottom: 0;
+}
+
+.layout-controls-inner-width-select {
+	.components-custom-select-control__item.has-hint {
+		flex-wrap: wrap;
+	}
+	.components-custom-select-control__item-hint {
+		line-height: 20px;
+		text-align: left;
+		order: 3;
+		width: 100%;
+	}
+}

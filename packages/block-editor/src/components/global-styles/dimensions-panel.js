@@ -85,20 +85,20 @@ function useHasAspectRatio( settings ) {
 }
 
 function useHasChildLayout( settings ) {
-	const {
-		type: parentLayoutType = 'default',
-		default: { type: defaultParentLayoutType = 'default' } = {},
-		allowSizingOnChildren = false,
-	} = settings?.parentLayout ?? {};
+	// const {
+	// 	type: parentLayoutType = 'default',
+	// 	default: { type: defaultParentLayoutType = 'default' } = {},
+	// 	allowSizingOnChildren = false,
+	// } = settings?.parentLayout ?? {};
 
-	const support =
-		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
-		allowSizingOnChildren;
+	// const support =
+	// 	( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+	// 	allowSizingOnChildren;
 
-	return !! settings?.layout && support;
+	return !! settings?.layout;
 }
 
-function useHasSpacingPresets( settings ) {
+export function useHasSpacingPresets( settings ) {
 	const {
 		custom,
 		theme,
@@ -148,7 +148,7 @@ function splitStyleValue( value ) {
 	return value;
 }
 
-function splitGapValue( value ) {
+export function splitGapValue( value ) {
 	// Check for shorthand value (a string value).
 	if ( value && typeof value === 'string' ) {
 		// If the value is a string, treat it as a single side (top) for the spacing controls.
@@ -212,12 +212,12 @@ export default function DimensionsPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	onVisualize = () => {},
+	clientId,
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 } ) {
 	const { dimensions, spacing } = settings;
-
 	const decodeValue = ( rawValue ) => {
 		if ( rawValue && typeof rawValue === 'object' ) {
 			return Object.keys( rawValue ).reduce( ( acc, key ) => {
@@ -252,13 +252,12 @@ export default function DimensionsPanel( {
 		useHasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'layout', 'contentSize' ],
-				newValue || undefined
-			)
+		const immutableValue = setImmutably(
+			value,
+			[ 'layout', 'contentSize' ],
+			newValue || undefined
 		);
+		onChange( { style: immutableValue } );
 	};
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
 	const resetContentSizeValue = () => setContentSizeValue( undefined );
@@ -268,13 +267,12 @@ export default function DimensionsPanel( {
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'layout', 'wideSize' ],
-				newValue || undefined
-			)
+		const immutableValue = setImmutably(
+			value,
+			[ 'layout', 'wideSize' ],
+			newValue || undefined
 		);
+		onChange( { style: immutableValue } );
 	};
 	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
 	const resetWideSizeValue = () => setWideSizeValue( undefined );
@@ -291,7 +289,12 @@ export default function DimensionsPanel( {
 		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setPaddingValues = ( newPaddingValues ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		onChange( setImmutably( value, [ 'spacing', 'padding' ], padding ) );
+		const immutableValue = setImmutably(
+			value,
+			[ 'spacing', 'padding' ],
+			padding
+		);
+		onChange( { style: immutableValue } );
 	};
 	const hasPaddingValue = () =>
 		!! value?.spacing?.padding &&
@@ -311,7 +314,12 @@ export default function DimensionsPanel( {
 		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setMarginValues = ( newMarginValues ) => {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
-		onChange( setImmutably( value, [ 'spacing', 'margin' ], margin ) );
+		const immutableValue = setImmutably(
+			value,
+			[ 'spacing', 'margin' ],
+			margin
+		);
+		onChange( { style: immutableValue } );
 	};
 	const hasMarginValue = () =>
 		!! value?.spacing?.margin &&
@@ -320,7 +328,7 @@ export default function DimensionsPanel( {
 	const onMouseOverMargin = () => onVisualize( 'margin' );
 
 	// Block Gap
-	const showGapControl = useHasGap( settings );
+	const showGapControl = false;
 	const gapValue = decodeValue( inheritedValue?.spacing?.blockGap );
 	const gapValues = splitGapValue( gapValue );
 	const gapSides = Array.isArray( settings?.spacing?.blockGap )
@@ -329,9 +337,12 @@ export default function DimensionsPanel( {
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setGapValue = ( newGapValue ) => {
-		onChange(
-			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
+		const immutableValue = setImmutably(
+			value,
+			[ 'spacing', 'blockGap' ],
+			newGapValue
 		);
+		onChange( { style: immutableValue } );
 	};
 	const setGapValues = ( nextBoxGapValue ) => {
 		if ( ! nextBoxGapValue ) {
@@ -360,13 +371,13 @@ export default function DimensionsPanel( {
 			newValue
 		);
 		// Apply min-height, while removing any applied aspect ratio.
-		onChange(
-			setImmutably(
+		onChange( {
+			style: setImmutably(
 				tempValue,
 				[ 'dimensions', 'aspectRatio' ],
 				undefined
-			)
-		);
+			),
+		} );
 	};
 	const resetMinHeightValue = () => {
 		setMinHeightValue( undefined );
@@ -393,23 +404,24 @@ export default function DimensionsPanel( {
 
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
-	const childLayout = inheritedValue?.layout;
+	// const childLayout = inheritedValue?.layout;
 	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
 	const childLayoutOrientationLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 	const setChildLayout = ( newChildLayout ) => {
-		onChange( {
-			...value,
-			layout: {
-				...value?.layout,
-				...newChildLayout,
-			},
-		} );
+		onChange( newChildLayout );
 	};
 	const resetChildLayoutValue = () => {
 		setChildLayout( {
-			selfStretch: undefined,
-			flexSize: undefined,
+			align: null,
+			style: {
+				layout: {
+					selfStretch: undefined,
+					flexSize: undefined,
+					height: undefined,
+					width: undefined,
+				},
+			},
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
@@ -423,6 +435,8 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				height: undefined,
+				width: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
@@ -508,6 +522,28 @@ export default function DimensionsPanel( {
 						</View>
 					</HStack>
 				</ToolsPanelItem>
+			) }
+
+			{ showChildLayoutControl && (
+				<VStack
+					as={ ToolsPanelItem }
+					spacing={ 2 }
+					hasValue={ hasChildLayoutValue }
+					label={ childLayoutOrientationLabel }
+					onDeselect={ resetChildLayoutValue }
+					isShownByDefault={
+						defaultControls.childLayout ??
+						DEFAULT_CONTROLS.childLayout
+					}
+					panelId={ panelId }
+				>
+					<ChildLayoutControl
+						value={ inheritedValue }
+						onChange={ setChildLayout }
+						parentLayout={ settings?.parentLayout }
+						clientId={ clientId }
+					/>
+				</VStack>
 			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
@@ -665,26 +701,6 @@ export default function DimensionsPanel( {
 						DEFAULT_CONTROLS.aspectRatio
 					}
 				/>
-			) }
-			{ showChildLayoutControl && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasChildLayoutValue }
-					label={ childLayoutOrientationLabel }
-					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={
-						defaultControls.childLayout ??
-						DEFAULT_CONTROLS.childLayout
-					}
-					panelId={ panelId }
-				>
-					<ChildLayoutControl
-						value={ childLayout }
-						onChange={ setChildLayout }
-						parentLayout={ settings?.parentLayout }
-					/>
-				</VStack>
 			) }
 		</Wrapper>
 	);

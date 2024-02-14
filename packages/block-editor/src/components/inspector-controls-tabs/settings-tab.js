@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+/**
  * Internal dependencies
  */
 import AdvancedControls from './advanced-controls-panel';
@@ -9,6 +13,10 @@ import SettingsTabHint from './settings-tab-hint';
 const SettingsTab = ( { showAdvancedControls = false } ) => (
 	<>
 		<InspectorControls.Slot />
+		<InspectorControls.Slot
+			group="dimensions"
+			label={ __( 'Dimensions' ) }
+		/>
 		<PositionControls />
 		{ showAdvancedControls && (
 			<div>
