@@ -49,7 +49,7 @@ const DEFAULT_PAGE_BASE = {
 export const DEFAULT_VIEWS = {
 	page: [
 		{
-			title: _x( 'All', 'pages' ),
+			title: _x( 'All pages', 'pages' ),
 			slug: 'all',
 			view: DEFAULT_PAGE_BASE,
 		},
