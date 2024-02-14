@@ -174,5 +174,3 @@ export { useBlockCommands } from './use-block-commands';
  * The following rename hint component can be removed in 6.4.
  */
 export { default as ReusableBlocksRenameHint } from './inserter/reusable-block-rename-hint';
-
-export { default as __experimentalExtendBlockWithBoundAttributes } from './block-binding-support/';
