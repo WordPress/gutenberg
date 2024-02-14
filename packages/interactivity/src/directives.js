@@ -15,7 +15,29 @@ import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
 const isObject = ( item ) =>
-	item && typeof item === 'object' && ! Array.isArray( item );
+	item && typeof item === 'object' && item.constructor === Object;
+
+const descriptor = Reflect.getOwnPropertyDescriptor;
+
+const contextProxy = ( context, stack = {} ) =>
+	new Proxy( context, {
+		get: ( target, k ) => {
+			if ( k in target || ! ( k in stack ) ) {
+				return isObject( peek( target, k ) )
+					? contextProxy( target[ k ], stack[ k ] )
+					: target[ k ];
+			}
+			return stack[ k ];
+		},
+		set: ( target, k, value ) =>
+			( ( k in target || ! ( k in stack ) ? target : stack )[ k ] =
+				value ),
+		ownKeys: ( target ) => [
+			...new Set( [ ...Object.keys( stack ), ...Object.keys( target ) ] ),
+		],
+		getOwnPropertyDescriptor: ( target, k ) =>
+			descriptor( target, k ) || descriptor( stack, k ),
+	} );
 
 const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
@@ -101,6 +123,7 @@ export default () => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
+			const contextStack = useRef( null );
 			const defaultEntry = context.find(
 				( { suffix } ) => suffix === 'default'
 			);
@@ -109,14 +132,20 @@ export default () => {
 				if ( ! defaultEntry ) return null;
 				const { namespace, value } = defaultEntry;
 				const newValue = deepSignal( { [ namespace ]: value } );
-				mergeDeepSignals( newValue, inheritedValue );
 				mergeDeepSignals( currentValue.current, newValue, true );
 				return currentValue.current;
-			}, [ inheritedValue, defaultEntry ] );
+			}, [ defaultEntry ] );
 
-			if ( currentValue.current ) {
+			contextStack.current = useMemo( () => {
 				return (
-					<Provider value={ currentValue.current }>
+					currentValue.current &&
+					contextProxy( currentValue.current, inheritedValue )
+				);
+			}, [ inheritedValue, currentValue.current ] );
+
+			if ( contextStack.current ) {
+				return (
+					<Provider value={ contextStack.current }>
 						{ children }
 					</Provider>
 				);
