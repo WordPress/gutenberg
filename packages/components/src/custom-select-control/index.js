@@ -83,11 +83,7 @@ export default function CustomSelectControl( props ) {
 		onFocus,
 		onBlur,
 		__experimentalShowSelectedHint = false,
-	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.CustomSelectControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const {
 		getLabelProps,

@@ -21,6 +21,7 @@ import {
 	ROOT_BLOCK_SELECTOR,
 	scopeSelector,
 	appendToSelector,
+	getBlockStyleVariationSelector,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import {
@@ -1077,7 +1078,10 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 		const styleVariationSelectors = {};
 		if ( blockStyleVariations?.length ) {
 			blockStyleVariations.forEach( ( variation ) => {
-				const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
+				const styleVariationSelector = getBlockStyleVariationSelector(
+					variation.name,
+					selector
+				);
 				styleVariationSelectors[ variation.name ] =
 					styleVariationSelector;
 			} );

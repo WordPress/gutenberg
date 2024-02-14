@@ -15,6 +15,7 @@ import { unlock } from '../lock-unlock';
 
 const {
 	PartialSyncingControls,
+	ResetOverridesControl,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 } = unlock( patternsPrivateApis );
@@ -54,12 +55,30 @@ function ControlsWithStoreSubscription( props ) {
 			select( editorStore ).getCurrentPostType() === PATTERN_TYPES.user,
 		[]
 	);
+	const bindings = props.attributes.metadata?.bindings;
+	const hasPatternBindings =
+		!! bindings &&
+		Object.values( bindings ).some(
+			( binding ) => binding.source === 'core/pattern-overrides'
+		);
+
+	const shouldShowPartialSyncingControls =
+		isEditingPattern && blockEditingMode === 'default';
+	const shouldShowResetOverridesControl =
+		! isEditingPattern &&
+		!! props.attributes.metadata?.id &&
+		blockEditingMode !== 'disabled' &&
+		hasPatternBindings;
 
 	return (
-		isEditingPattern &&
-		blockEditingMode === 'default' && (
-			<PartialSyncingControls { ...props } />
-		)
+		<>
+			{ shouldShowPartialSyncingControls && (
+				<PartialSyncingControls { ...props } />
+			) }
+			{ shouldShowResetOverridesControl && (
+				<ResetOverridesControl { ...props } />
+			) }
+		</>
 	);
 }
 

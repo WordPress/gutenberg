@@ -101,18 +101,18 @@
  *
  *  - Containers: ADDRESS, BLOCKQUOTE, DETAILS, DIALOG, DIV, FOOTER, HEADER, MAIN, MENU, SPAN, SUMMARY.
  *  - Custom elements: All custom elements are supported. :)
- *  - Form elements: BUTTON, DATALIST, FIELDSET, LABEL, LEGEND, METER, PROGRESS, SEARCH.
- *  - Formatting elements: B, BIG, CODE, EM, FONT, I, SMALL, STRIKE, STRONG, TT, U.
+ *  - Form elements: BUTTON, DATALIST, FIELDSET, INPUT, LABEL, LEGEND, METER, PROGRESS, SEARCH.
+ *  - Formatting elements: B, BIG, CODE, EM, FONT, I, PRE, SMALL, STRIKE, STRONG, TT, U, WBR.
  *  - Heading elements: H1, H2, H3, H4, H5, H6, HGROUP.
  *  - Links: A.
- *  - Lists: DD, DL, DT, LI, OL, LI.
- *  - Media elements: AUDIO, CANVAS, FIGCAPTION, FIGURE, IMG, MAP, PICTURE, VIDEO.
- *  - Paragraph: P.
- *  - Phrasing elements: ABBR, BDI, BDO, CITE, DATA, DEL, DFN, INS, MARK, OUTPUT, Q, SAMP, SUB, SUP, TIME, VAR.
- *  - Sectioning elements: ARTICLE, ASIDE, NAV, SECTION.
+ *  - Lists: DD, DL, DT, LI, OL, UL.
+ *  - Media elements: AUDIO, CANVAS, EMBED, FIGCAPTION, FIGURE, IMG, MAP, PICTURE, SOURCE, TRACK, VIDEO.
+ *  - Paragraph: BR, P.
+ *  - Phrasing elements: ABBR, AREA, BDI, BDO, CITE, DATA, DEL, DFN, INS, MARK, OUTPUT, Q, SAMP, SUB, SUP, TIME, VAR.
+ *  - Sectioning elements: ARTICLE, ASIDE, HR, NAV, SECTION.
  *  - Templating elements: SLOT.
  *  - Text decoration: RUBY.
- *  - Deprecated elements: ACRONYM, BLINK, CENTER, DIR, ISINDEX, MULTICOL, NEXTID, SPACER.
+ *  - Deprecated elements: ACRONYM, BLINK, CENTER, DIR, ISINDEX, KEYGEN, LISTING, MULTICOL, NEXTID, PARAM, SPACER.
  *
  * ### Supported markup
  *
@@ -148,17 +148,6 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @var int
 	 */
 	const MAX_BOOKMARKS = 100;
-
-	/**
-	 * Static query for instructing the Tag Processor to visit every token.
-	 *
-	 * @access private
-	 *
-	 * @since 6.4.0
-	 *
-	 * @var array
-	 */
-	const VISIT_EVERYTHING = array( 'tag_closers' => 'visit' );
 
 	/**
 	 * Holds the working state of the parser, including the stack of
@@ -425,6 +414,30 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
+	 * Ensures internal accounting is maintained for HTML semantic rules while
+	 * the underlying Tag Processor class is seeking to a bookmark.
+	 *
+	 * This doesn't currently have a way to represent non-tags and doesn't process
+	 * semantic rules for text nodes. For access to the raw tokens consider using
+	 * WP_HTML_Tag_Processor instead.
+	 *
+	 * @since 6.5.0 Added for internal support; do not use.
+	 *
+	 * @access private
+	 *
+	 * @return bool
+	 */
+	public function next_token() {
+		$found_a_token = parent::next_token();
+
+		if ( '#tag' === $this->get_token_type() ) {
+			$this->step( self::PROCESS_CURRENT_NODE );
+		}
+
+		return $found_a_token;
+	}
+
+	/**
 	 * Indicates if the currently-matched tag matches the given breadcrumbs.
 	 *
 	 * A "*" represents a single tag wildcard, where any tag matches, but not no tags.
@@ -500,7 +513,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			return false;
 		}
 
-		if ( self::PROCESS_NEXT_NODE === $node_to_process ) {
+		if ( self::REPROCESS_CURRENT_NODE !== $node_to_process ) {
 			/*
 			 * Void elements still hop onto the stack of open elements even though
 			 * there's no corresponding closing tag. This is important for managing
@@ -519,8 +532,12 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			if ( $top_node && self::is_void( $top_node->node_name ) ) {
 				$this->state->stack_of_open_elements->pop();
 			}
+		}
 
-			parent::next_tag( self::VISIT_EVERYTHING );
+		if ( self::PROCESS_NEXT_NODE === $node_to_process ) {
+			while ( parent::next_token() && '#tag' !== $this->get_token_type() ) {
+				continue;
+			}
 		}
 
 		// Finish stepping when there are no more tokens in the document.
@@ -531,7 +548,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 		$this->state->current_token = new WP_HTML_Token(
 			$this->bookmark_tag(),
 			$this->get_tag(),
-			$this->is_tag_closer(),
+			$this->has_self_closing_flag(),
 			$this->release_internal_bookmark_on_destruct
 		);
 
@@ -684,10 +701,12 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			case '-FOOTER':
 			case '-HEADER':
 			case '-HGROUP':
+			case '-LISTING':
 			case '-MAIN':
 			case '-MENU':
 			case '-NAV':
 			case '-OL':
+			case '-PRE':
 			case '-SEARCH':
 			case '-SECTION':
 			case '-SUMMARY':
@@ -730,6 +749,18 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 				}
 
 				$this->insert_html_element( $this->state->current_token );
+				return true;
+
+			/*
+			 * > A start tag whose tag name is one of: "pre", "listing"
+			 */
+			case '+PRE':
+			case '+LISTING':
+				if ( $this->state->stack_of_open_elements->has_p_in_button_scope() ) {
+					$this->close_a_p_element();
+				}
+				$this->insert_html_element( $this->state->current_token );
+				$this->state->frameset_ok = false;
 				return true;
 
 			/*
@@ -935,10 +966,63 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 				return true;
 
 			/*
+			 * > An end tag whose tag name is "br"
+			 * >   Parse error. Drop the attributes from the token, and act as described in the next
+			 * >   entry; i.e. act as if this was a "br" start tag token with no attributes, rather
+			 * >   than the end tag token that it actually is.
+			 */
+			case '-BR':
+				$this->last_error = self::ERROR_UNSUPPORTED;
+				throw new WP_HTML_Unsupported_Exception( 'Closing BR tags require unimplemented special handling.' );
+
+			/*
 			 * > A start tag whose tag name is one of: "area", "br", "embed", "img", "keygen", "wbr"
 			 */
+			case '+AREA':
+			case '+BR':
+			case '+EMBED':
 			case '+IMG':
+			case '+KEYGEN':
+			case '+WBR':
 				$this->reconstruct_active_formatting_elements();
+				$this->insert_html_element( $this->state->current_token );
+				$this->state->frameset_ok = false;
+				return true;
+
+			/*
+			 * > A start tag whose tag name is "input"
+			 */
+			case '+INPUT':
+				$this->reconstruct_active_formatting_elements();
+				$this->insert_html_element( $this->state->current_token );
+				$type_attribute = $this->get_attribute( 'type' );
+				/*
+				 * > If the token does not have an attribute with the name "type", or if it does,
+				 * > but that attribute's value is not an ASCII case-insensitive match for the
+				 * > string "hidden", then: set the frameset-ok flag to "not ok".
+				 */
+				if ( ! is_string( $type_attribute ) || 'hidden' !== strtolower( $type_attribute ) ) {
+					$this->state->frameset_ok = false;
+				}
+				return true;
+
+			/*
+			 * > A start tag whose tag name is "hr"
+			 */
+			case '+HR':
+				if ( $this->state->stack_of_open_elements->has_p_in_button_scope() ) {
+					$this->close_a_p_element();
+				}
+				$this->insert_html_element( $this->state->current_token );
+				$this->state->frameset_ok = false;
+				return true;
+
+			/*
+			 * > A start tag whose tag name is one of: "param", "source", "track"
+			 */
+			case '+PARAM':
+			case '+SOURCE':
+			case '+TRACK':
 				$this->insert_html_element( $this->state->current_token );
 				return true;
 		}
@@ -961,30 +1045,20 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 		 */
 		switch ( $tag_name ) {
 			case 'APPLET':
-			case 'AREA':
 			case 'BASE':
 			case 'BASEFONT':
 			case 'BGSOUND':
 			case 'BODY':
-			case 'BR':
 			case 'CAPTION':
 			case 'COL':
 			case 'COLGROUP':
-			case 'DD':
-			case 'DT':
-			case 'EMBED':
 			case 'FORM':
 			case 'FRAME':
 			case 'FRAMESET':
 			case 'HEAD':
-			case 'HR':
 			case 'HTML':
 			case 'IFRAME':
-			case 'INPUT':
-			case 'KEYGEN':
-			case 'LI':
 			case 'LINK':
-			case 'LISTING':
 			case 'MARQUEE':
 			case 'MATH':
 			case 'META':
@@ -993,12 +1067,9 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			case 'NOFRAMES':
 			case 'NOSCRIPT':
 			case 'OBJECT':
-			case 'OL':
 			case 'OPTGROUP':
 			case 'OPTION':
-			case 'PARAM':
 			case 'PLAINTEXT':
-			case 'PRE':
 			case 'RB':
 			case 'RP':
 			case 'RT':
@@ -1006,7 +1077,6 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			case 'SARCASM':
 			case 'SCRIPT':
 			case 'SELECT':
-			case 'SOURCE':
 			case 'STYLE':
 			case 'SVG':
 			case 'TABLE':
@@ -1019,9 +1089,6 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			case 'THEAD':
 			case 'TITLE':
 			case 'TR':
-			case 'TRACK':
-			case 'UL':
-			case 'WBR':
 			case 'XMP':
 				$this->last_error = self::ERROR_UNSUPPORTED;
 				throw new WP_HTML_Unsupported_Exception( "Cannot process {$tag_name} element." );
@@ -1675,14 +1742,19 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 		return (
 			'AREA' === $tag_name ||
 			'BASE' === $tag_name ||
+			'BASEFONT' === $tag_name || // Obsolete but still treated as void.
+			'BGSOUND' === $tag_name || // Obsolete but still treated as void.
 			'BR' === $tag_name ||
 			'COL' === $tag_name ||
 			'EMBED' === $tag_name ||
+			'FRAME' === $tag_name ||
 			'HR' === $tag_name ||
 			'IMG' === $tag_name ||
 			'INPUT' === $tag_name ||
+			'KEYGEN' === $tag_name || // Obsolete but still treated as void.
 			'LINK' === $tag_name ||
 			'META' === $tag_name ||
+			'PARAM' === $tag_name || // Obsolete but still treated as void.
 			'SOURCE' === $tag_name ||
 			'TRACK' === $tag_name ||
 			'WBR' === $tag_name
@@ -1710,6 +1782,15 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @var string
 	 */
 	const REPROCESS_CURRENT_NODE = 'reprocess-current-node';
+
+	/**
+	 * Indicates that the current HTML token should be processed without advancing the parser.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @var string
+	 */
+	const PROCESS_CURRENT_NODE = 'process-current-node';
 
 	/**
 	 * Indicates that the parser encountered unsupported markup and has bailed.

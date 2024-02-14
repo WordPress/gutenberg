@@ -31,17 +31,11 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 
 	const faceStyles = getFacePreviewStyle( fontFace );
 	const textDemoStyle = {
-		whiteSpace: 'nowrap',
-		flexShrink: 0,
 		fontSize: '18px',
+		lineHeight: 1,
 		opacity: isAssetLoaded ? '1' : '0',
-		transition: 'opacity 0.3s ease-in-out',
 		...faceStyles,
 		...style,
-	};
-	const imageDemoStyle = {
-		height: '23px',
-		width: 'auto',
 	};
 
 	useEffect( () => {
@@ -62,7 +56,7 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 			}
 		};
 		loadAsset();
-	}, [ fontFace, isIntersecting, loadFontFaceAsset ] );
+	}, [ fontFace, isIntersecting, loadFontFaceAsset, isPreviewImage ] );
 
 	return (
 		<div ref={ ref }>
@@ -71,10 +65,15 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 					src={ previewUrl }
 					loading="lazy"
 					alt={ text }
-					style={ imageDemoStyle }
+					className="font-library-modal__font-variant_demo-image"
 				/>
 			) : (
-				<Text style={ textDemoStyle }>{ text }</Text>
+				<Text
+					style={ textDemoStyle }
+					className="font-library-modal__font-variant_demo-text"
+				>
+					{ text }
+				</Text>
 			) }
 		</div>
 	);

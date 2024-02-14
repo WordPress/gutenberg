@@ -81,7 +81,6 @@ function ColorGradientControlInner( {
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
-				__nextHasNoMargin
 				value={ gradientValue }
 				onChange={
 					canChooseAColor

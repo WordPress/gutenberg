@@ -25,11 +25,6 @@
 }
 
 .font-library-modal__tabpanel-layout {
-
-	.font-library-modal__tabpanel-layout__main {
-		padding-bottom: $grid-unit-80;
-	}
-
 	.font-library-modal__tabpanel-layout__footer {
 		border-top: 1px solid $gray-300;
 		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
@@ -39,14 +34,10 @@
 		width: 100%;
 		background-color: $white;
 	}
-
 }
 
-.font-library-modal__fonts-grid {
-	.font-library-modal__fonts-grid__main {
-		display: flex;
-		flex-direction: column;
-	}
+.font-library-modal__tabpanel-layout .components-base-control__field {
+	margin-bottom: 0;
 }
 
 .font-library-modal__font-card {
@@ -69,6 +60,19 @@
 	border: 1px solid $gray-200;
 	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
+}
+
+.font-library-modal__font-variant_demo-image {
+	display: block;
+	height: $grid-unit-30;
+	width: auto;
+}
+
+.font-library-modal__font-variant_demo-text {
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: opacity 0.3s ease-in-out;
+	@include reduce-motion("transition");
 }
 
 .font-library-modal__font-variant {
@@ -106,27 +110,6 @@ button.font-library-modal__upload-area {
 
 	.font-library-modal__upload-area__text {
 		color: $gray-700;
-	}
-
-	.font-library-modal__upload-area__notice {
-		margin: 0;
-	}
-}
-
-.font-library-modal__font-variant_demo-wrapper {
-	white-space: nowrap;
-	overflow: hidden;
-	width: 100%;
-	position: relative;
-
-	&::after {
-		content: "";
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		width: 30vw;
-		height: 100%;
-		background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
 	}
 }
 

@@ -33,7 +33,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalUseShadowProps as useShadowProps,
+	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
@@ -238,16 +238,15 @@ function ButtonEdit( props ) {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
+			const blockBindingsSource = unlock(
 				select( blockEditorStore )
-			);
+			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource(
-						metadata?.bindings?.url?.source?.name
-					)?.lockAttributesEditing === true,
+					( ! blockBindingsSource ||
+						blockBindingsSource?.lockAttributesEditing ),
 			};
 		},
 		[ isSelected ]

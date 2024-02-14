@@ -4,6 +4,7 @@
  *
  * @package WordPress
  * @subpackage Interactivity API
+ * @since 6.5.0
  */
 
 if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
@@ -11,36 +12,59 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 	 * Class used to iterate over the tags of an HTML string and help process the
 	 * directive attributes.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @access private
 	 */
-	class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
+	final class WP_Interactivity_API_Directives_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 		/**
-		 * Returns the content between two balanced tags.
+		 * List of tags whose closer tag is not visited by the WP_HTML_Tag_Processor.
+		 *
+		 * @since 6.5.0
+		 * @var string[]
+		 */
+		const TAGS_THAT_DONT_VISIT_CLOSER_TAG = array(
+			'SCRIPT',
+			'IFRAME',
+			'NOEMBED',
+			'NOFRAMES',
+			'STYLE',
+			'TEXTAREA',
+			'TITLE',
+			'XMP',
+		);
+
+		/**
+		 * Returns the content between two balanced template tags.
+		 *
+		 * It positions the cursor in the closer tag of the balanced template tag,
+		 * if it exists.
+		 *
+		 * @since 6.5.0
 		 *
 		 * @access private
 		 *
-		 * @return string|null The content between the current opening and its matching closing tag or null if it doesn't
-		 *                     find the matching closing tag.
+		 * @return string|null The content between the current opener template tag and its matching closer tag or null if it
+		 *                     doesn't find the matching closing tag or the current tag is not a template opener tag.
 		 */
-		public function get_content_between_balanced_tags() {
-			$bookmarks = $this->get_balanced_tag_bookmarks();
-			if ( ! $bookmarks ) {
+		public function get_content_between_balanced_template_tags() {
+			if ( 'TEMPLATE' !== $this->get_tag() ) {
 				return null;
 			}
-			list( $start_name, $end_name ) = $bookmarks;
 
-			$start = $this->bookmarks[ $start_name ]->start + $this->bookmarks[ $start_name ]->length + 1;
-			$end   = $this->bookmarks[ $end_name ]->start;
+			$positions = $this->get_after_opener_tag_and_before_closer_tag_positions();
+			if ( ! $positions ) {
+				return null;
+			}
+			list( $after_opener_tag, $before_closer_tag ) = $positions;
 
-			$this->seek( $start_name );
-			$this->release_bookmark( $start_name );
-			$this->release_bookmark( $end_name );
-
-			return substr( $this->html, $start, $end - $start );
+			return substr( $this->html, $after_opener_tag, $before_closer_tag - $after_opener_tag );
 		}
 
 		/**
 		 * Sets the content between two balanced tags.
+		 *
+		 * @since 6.5.0
 		 *
 		 * @access private
 		 *
@@ -48,62 +72,135 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 		 * @return bool Whether the content was successfully replaced.
 		 */
 		public function set_content_between_balanced_tags( string $new_content ): bool {
-			$this->get_updated_html();
-
-			$bookmarks = $this->get_balanced_tag_bookmarks();
-			if ( ! $bookmarks ) {
+			$positions = $this->get_after_opener_tag_and_before_closer_tag_positions( true );
+			if ( ! $positions ) {
 				return false;
 			}
-			list( $start_name, $end_name ) = $bookmarks;
+			list( $after_opener_tag, $before_closer_tag ) = $positions;
 
-			$start = $this->bookmarks[ $start_name ]->start + $this->bookmarks[ $start_name ]->length + 1;
-			$end   = $this->bookmarks[ $end_name ]->start;
+			$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5(
+				$after_opener_tag,
+				$before_closer_tag - $after_opener_tag,
+				esc_html( $new_content )
+			);
 
-			$this->seek( $start_name );
-			$this->release_bookmark( $start_name );
-			$this->release_bookmark( $end_name );
-
-			$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $start, $end - $start, esc_html( $new_content ) );
 			return true;
 		}
 
 		/**
-		 * Returns a pair of bookmarks for the current opening tag and the matching
-		 * closing tag.
+		 * Appends content after the closing tag of a template tag.
+		 *
+		 * It positions the cursor in the closer tag of the balanced template tag,
+		 * if it exists.
+		 *
+		 * @access private
+		 *
+		 * @param string $new_content The string to append after the closing template tag.
+		 * @return bool Whether the content was successfully appended.
+		 */
+		public function append_content_after_template_tag_closer( string $new_content ): bool {
+			if ( empty( $new_content ) || 'TEMPLATE' !== $this->get_tag() || ! $this->is_tag_closer() ) {
+				return false;
+			}
+
+			// Flushes any changes.
+			$this->get_updated_html();
+
+			$bookmark = 'append_content_after_template_tag_closer';
+			$this->set_bookmark( $bookmark );
+			$after_closing_tag = $this->bookmarks[ $bookmark ]->start + $this->bookmarks[ $bookmark ]->length + 1;
+			$this->release_bookmark( $bookmark );
+
+			// Appends the new content.
+			$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $after_closing_tag, 0, $new_content );
+
+			return true;
+		}
+
+		/**
+		 * Gets the positions right after the opener tag and right before the closer
+		 * tag in a balanced tag.
+		 *
+		 * By default, it positions the cursor in the closer tag of the balanced tag.
+		 * If $rewind is true, it seeks back to the opener tag.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @access private
+		 *
+		 * @param bool $rewind Optional. Whether to seek back to the opener tag after finding the positions. Defaults to false.
+		 * @return array|null Start and end byte position, or null when no balanced tag bookmarks.
+		 */
+		private function get_after_opener_tag_and_before_closer_tag_positions( bool $rewind = false ) {
+			// Flushes any changes.
+			$this->get_updated_html();
+
+			$bookmarks = $this->get_balanced_tag_bookmarks();
+			if ( ! $bookmarks ) {
+				return null;
+			}
+			list( $opener_tag, $closer_tag ) = $bookmarks;
+
+			$after_opener_tag  = $this->bookmarks[ $opener_tag ]->start + $this->bookmarks[ $opener_tag ]->length + 1;
+			$before_closer_tag = $this->bookmarks[ $closer_tag ]->start;
+
+			if ( $rewind ) {
+				$this->seek( $opener_tag );
+			}
+
+			$this->release_bookmark( $opener_tag );
+			$this->release_bookmark( $closer_tag );
+
+			return array( $after_opener_tag, $before_closer_tag );
+		}
+
+		/**
+		 * Returns a pair of bookmarks for the current opener tag and the matching
+		 * closer tag.
+		 *
+		 * It positions the cursor in the closer tag of the balanced tag, if it
+		 * exists.
+		 *
+		 * @since 6.5.0
 		 *
 		 * @return array|null A pair of bookmarks, or null if there's no matching closing tag.
 		 */
 		private function get_balanced_tag_bookmarks() {
 			static $i   = 0;
-			$start_name = 'start_of_balanced_tag_' . ++$i;
+			$opener_tag = 'opener_tag_of_balanced_tag_' . ++$i;
 
-			$this->set_bookmark( $start_name );
-			if ( ! $this->next_balanced_closer() ) {
-				$this->release_bookmark( $start_name );
+			$this->set_bookmark( $opener_tag );
+			if ( ! $this->next_balanced_tag_closer_tag() ) {
+				$this->release_bookmark( $opener_tag );
 				return null;
 			}
 
-			$end_name = 'end_of_balanced_tag_' . ++$i;
-			$this->set_bookmark( $end_name );
+			$closer_tag = 'closer_tag_of_balanced_tag_' . ++$i;
+			$this->set_bookmark( $closer_tag );
 
-			return array( $start_name, $end_name );
+			return array( $opener_tag, $closer_tag );
 		}
 
 		/**
 		 * Finds the matching closing tag for an opening tag.
 		 *
 		 * When called while the processor is on an open tag, it traverses the HTML
-		 * until it finds the matching closing tag, respecting any in-between content,
+		 * until it finds the matching closer tag, respecting any in-between content,
 		 * including nested tags of the same name. Returns false when called on a
-		 * closing or void tag, or if no matching closing tag was found.
+		 * closer tag, a tag that doesn't have a closer tag (void), a tag that
+		 * doesn't visit the closer tag, or if no matching closing tag was found.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @access private
 		 *
 		 * @return bool Whether a matching closing tag was found.
 		 */
-		private function next_balanced_closer(): bool {
+		public function next_balanced_tag_closer_tag(): bool {
 			$depth    = 0;
 			$tag_name = $this->get_tag();
 
-			if ( $this->is_void() ) {
+			if ( ! $this->has_and_visits_its_closer_tag() ) {
 				return false;
 			}
 
@@ -129,15 +226,21 @@ if ( ! class_exists( 'WP_Interactivity_API_Directives_Processor' ) ) {
 		}
 
 		/**
-		 * Checks whether the current tag is void.
+		 * Checks whether the current tag has and will visit its matching closer tag.
+		 *
+		 * @since 6.5.0
 		 *
 		 * @access private
 		 *
-		 * @return bool Whether the current tag is void or not.
+		 * @return bool Whether the current tag has a closer tag.
 		 */
-		public function is_void(): bool {
+		public function has_and_visits_its_closer_tag(): bool {
 			$tag_name = $this->get_tag();
-			return Gutenberg_HTML_Processor_6_5::is_void( null !== $tag_name ? $tag_name : '' );
+
+			return null !== $tag_name && (
+			! Gutenberg_HTML_Processor_6_5::is_void( $tag_name ) &&
+			! in_array( $tag_name, self::TAGS_THAT_DONT_VISIT_CLOSER_TAG, true )
+			);
 		}
 	}
 }
