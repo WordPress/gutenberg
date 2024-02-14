@@ -22,6 +22,8 @@ import { TEMPLATE_POST_TYPE } from '../utils/constants';
 export const setCanvasMode =
 	( mode ) =>
 	( { registry, dispatch } ) => {
+		const isMediumOrBigger =
+			window.matchMedia( '(min-width: 782px)' ).matches;
 		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
 		dispatch( {
 			type: 'SET_CANVAS_MODE',
@@ -30,6 +32,7 @@ export const setCanvasMode =
 		// Check if the block list view should be open by default.
 		// If `distractionFree` mode is enabled, the block list view should not be open.
 		if (
+			isMediumOrBigger &&
 			mode === 'edit' &&
 			registry
 				.select( preferencesStore )
