@@ -48,11 +48,12 @@ const props = {
 	],
 };
 
-const ControlledCustomSelectControl = ( { options } ) => {
+const ControlledCustomSelectControl = ( { options, ...restProps } ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
 		<UncontrolledCustomSelectControl
-			{ ...props }
+			{ ...restProps }
+			options={ options }
 			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
 			value={ options.find( ( option ) => option.key === value.key ) }
 		/>
