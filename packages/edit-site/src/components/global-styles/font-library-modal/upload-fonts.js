@@ -12,7 +12,8 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useResourcePermissions } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useContext, useState } from '@wordpress/element';
 
 /**
@@ -31,7 +32,11 @@ const { ProgressBar } = unlock( componentsPrivateApis );
 function UploadFonts() {
 	const { installFont, notice, setNotice } = useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
-	const { canCreate } = useResourcePermissions( 'font-families' );
+
+	const canUserCreate = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
+		return canUser( 'create', 'font-families' );
+	} );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -173,7 +178,7 @@ function UploadFonts() {
 	};
 
 	return (
-		canCreate && (
+		canUserCreate && (
 			<TabPanelLayout notice={ notice }>
 				<DropZone onFilesDrop={ handleDropZone } />
 				<VStack className="font-library-modal__local-fonts">
