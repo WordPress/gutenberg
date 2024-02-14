@@ -41,6 +41,7 @@
 		// This border serves as a background color in Windows High Contrast mode.
 		border: 4px solid transparent;
 	}
+
 	&.is-selected {
 		border-radius: $radius-block-ui;
 
@@ -48,8 +49,25 @@
 		outline: 3px solid transparent;
 		outline-offset: -2px;
 
+		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
+		.edit-site-global-styles-screen-revisions__revision-button {
+			opacity: 1;
+		}
+
+		.edit-site-global-styles-screen-revisions__date {
+			color: var(--wp-admin-theme-color);
+		}
+
 		&::before {
 			background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		}
+
+		.edit-site-global-styles-screen-revisions__changes,
+		.edit-site-global-styles-screen-revisions__meta,
+		.edit-site-global-styles-screen-revisions__applied-text {
+			color: $gray-900;
 		}
 	}
 
@@ -81,17 +99,6 @@
 	}
 }
 
-.is-selected {
-	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-	background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-	.edit-site-global-styles-screen-revisions__revision-button {
-		opacity: 1;
-	}
-	.edit-site-global-styles-screen-revisions__date {
-		color: var(--wp-admin-theme-color);
-	}
-}
-
 .edit-site-global-styles-screen-revisions__apply-button.is-primary,
 .edit-site-global-styles-screen-revisions__applied-text {
 	align-self: flex-start;
@@ -99,10 +106,11 @@
 	margin: 0 $grid-unit-15 $grid-unit-15 $grid-unit-50;
 }
 
+.edit-site-global-styles-screen-revisions__changes,
+.edit-site-global-styles-screen-revisions__meta,
 .edit-site-global-styles-screen-revisions__applied-text {
-	color: $gray-600;
+	color: $gray-700;
 	font-size: 12px;
-	font-style: italic;
 }
 
 .edit-site-global-styles-screen-revisions__description {
@@ -119,12 +127,10 @@
 
 .edit-site-global-styles-screen-revisions__changes,
 .edit-site-global-styles-screen-revisions__meta {
-	color: $gray-600;
 	display: flex;
 	justify-content: start;
 	width: 100%;
 	align-items: flex-start;
-	font-size: 12px;
 	text-align: left;
 	img {
 		width: $grid-unit-20;

@@ -131,7 +131,7 @@ function useEditorStyles() {
 	] );
 }
 
-function Layout() {
+function Layout( { initialPost } ) {
 	useCommands();
 	useCommonCommands();
 	useBlockCommands();
@@ -196,7 +196,7 @@ function Layout() {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
-			hasHistory: !! getEditorSettings().goBack,
+			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 
@@ -304,6 +304,7 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						initialPost={ initialPost }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }

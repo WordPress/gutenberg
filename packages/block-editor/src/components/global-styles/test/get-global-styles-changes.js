@@ -171,7 +171,7 @@ describe( 'getGlobalStylesChanges', () => {
 		expect( resultA ).toEqual( [
 			'Colors',
 			'Typography',
-			'Test pumpkin flowers block',
+			'Test pumpkin flowers',
 			'H3 element',
 			'Caption element',
 			'H6 element',
@@ -191,8 +191,8 @@ describe( 'getGlobalStylesChanges', () => {
 		expect( resultA ).toEqual( [
 			'Colors',
 			'Typography',
-			'Test pumpkin flowers block',
-			'…and 5 more changes.',
+			'Test pumpkin flowers',
+			'…and 5 more changes',
 		] );
 	} );
 

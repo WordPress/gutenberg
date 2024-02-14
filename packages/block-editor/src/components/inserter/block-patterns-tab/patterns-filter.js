@@ -59,22 +59,16 @@ export function PatternsFilter( {
 		() => [
 			{
 				value: 'all',
-				label: _x( 'All', 'Option that shows all patterns' ),
+				label: _x( 'All', 'patterns' ),
 			},
 			{
 				value: INSERTER_SYNC_TYPES.full,
-				label: _x(
-					'Synced',
-					'Option that shows all synchronized patterns'
-				),
+				label: _x( 'Synced', 'patterns' ),
 				disabled: shouldDisableSyncFilter,
 			},
 			{
 				value: INSERTER_SYNC_TYPES.unsynced,
-				label: _x(
-					'Not synced',
-					'Option that shows all patterns that are not synchronized'
-				),
+				label: _x( 'Not synced', 'patterns' ),
 				disabled: shouldDisableSyncFilter,
 			},
 		],
@@ -85,7 +79,7 @@ export function PatternsFilter( {
 		() => [
 			{
 				value: 'all',
-				label: __( 'All' ),
+				label: _x( 'All', 'patterns' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{

@@ -36,10 +36,3 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
 export const HeaderHint = styled.span`
 	color: ${ COLORS.gray[ 700 ] };
 `;
-
-export const Controls = styled.div< {
-	__nextHasNoMarginBottom: boolean;
-} >`
-	${ ( props ) =>
-		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
-`;
