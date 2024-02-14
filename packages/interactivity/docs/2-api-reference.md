@@ -47,7 +47,7 @@ _Example of directives used in the HTML markup_
 
 ```html
 <div
-  data-wp-interactive='{ "namespace": "myPlugin" }'
+  data-wp-interactive="myPlugin"
   data-wp-context='{ "isOpen": false }'
   data-wp-watch="callbacks.logIsOpen"
 >
@@ -69,14 +69,25 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 ### List of Directives
 
-With directives, we can directly manage behavior related to things such as side effects, state, event handlers, attributes or content.
+With directives, we can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
 
 #### `wp-interactive`
 
-The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). It includes a namespace to reference a specific store.
+The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). For the first version of the API it only includes a namespace to reference a specific store, so can be set as a `string` or an `object`.
 
 ```html
 <!-- Let's make this element and its children interactive and set the namespace -->
+<div
+  data-wp-interactive="myPlugin"
+  data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
+>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <div>
+    <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
+  </div>
+</div>
+```html
+<!-- This will also work, but using just the string is recommended. -->
 <div
   data-wp-interactive='{ "namespace": "myPlugin" }'
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
@@ -725,7 +736,7 @@ Note that, by default, references point to properties in the current namespace, 
 In the example below, we get `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
 
 ```html
-<div data-wp-interactive='{ "namespace": "myPlugin" }'>
+<div data-wp-interactive="myPlugin">
   <div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
 		<iframe ...></iframe>
 	</div>
