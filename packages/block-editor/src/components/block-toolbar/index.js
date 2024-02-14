@@ -121,7 +121,8 @@ export function PrivateBlockToolbar( {
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
-	if ( ! useHasBlockToolbar() ) {
+	const hasBlockToolbar = useHasBlockToolbar();
+	if ( hasBlockToolbar ) {
 		return null;
 	}
 
