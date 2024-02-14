@@ -230,10 +230,11 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig( state: State, kind: string ): Array< any > {
-	return state.entities.config.filter( ( entity ) => entity.kind === kind );
-}
-
+export const getEntitiesConfig = createSelector(
+	( state: State, kind: string ): Array< any > =>
+		state.entities.config.filter( ( entity ) => entity.kind === kind ),
+	( state: State, kind: string ) => state.entities.config
+);
 /**
  * Returns the entity config given its kind and name.
  *

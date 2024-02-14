@@ -373,6 +373,12 @@ export const getAutosaveAttribute = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
@@ -592,6 +598,12 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
 			postType,

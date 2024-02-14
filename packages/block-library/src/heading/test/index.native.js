@@ -2,11 +2,12 @@
  * External dependencies
  */
 import {
+	addBlock,
 	fireEvent,
+	getBlock,
 	getEditorHtml,
 	initializeEditor,
-	addBlock,
-	getBlock,
+	screen,
 	typeInRichText,
 	waitFor,
 	within,
@@ -33,13 +34,13 @@ afterAll( () => {
 
 describe( 'Heading block', () => {
 	it( 'inserts block', async () => {
-		const screen = await initializeEditor();
+		await initializeEditor();
 
 		// Add block
 		await addBlock( screen, 'Heading' );
 
 		// Get block
-		const headingBlock = await getBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading' );
 		fireEvent.press( headingBlock );
 		expect( headingBlock ).toBeVisible();
 
@@ -48,7 +49,7 @@ describe( 'Heading block', () => {
 
 	it( 'should set a text color', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Heading' );
 
 		// Act
@@ -86,7 +87,7 @@ describe( 'Heading block', () => {
 
 	it( 'should set a background color', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Heading' );
 
 		// Act
@@ -120,9 +121,9 @@ describe( 'Heading block', () => {
 
 	it( 'change level dropdown displays active selection', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Heading' );
-		const headingBlock = await getBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading' );
 
 		// Act
 		fireEvent.press( headingBlock );
@@ -136,9 +137,23 @@ describe( 'Heading block', () => {
 		).toBeVisible();
 	} );
 
+	it( 'changes heading level', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Heading' );
+
+		// Act
+		fireEvent.press( getBlock( screen, 'Heading' ) );
+		fireEvent.press( screen.getByLabelText( 'Change level' ) );
+		fireEvent.press( screen.getByLabelText( 'Heading 6' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
 	it( 'should merge with an empty Paragraph block and keep being the Heading block', async () => {
 		// Arrange
-		const screen = await initializeEditor();
+		await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
 		// Act

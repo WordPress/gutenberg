@@ -50,13 +50,7 @@ function getTranslation( key ) {
 
 	if ( keyArray?.[ 0 ] === 'blocks' ) {
 		const blockName = getBlockNames()?.[ keyArray[ 1 ] ];
-		return blockName
-			? sprintf(
-					// translators: %s: block name.
-					__( '%s block' ),
-					blockName
-			  )
-			: keyArray[ 1 ];
+		return blockName || keyArray[ 1 ];
 	}
 
 	if ( keyArray?.[ 0 ] === 'elements' ) {
@@ -200,7 +194,7 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 		const deleteCount = changesLength - maxResults;
 		const andMoreText = sprintf(
 			// translators: %d: number of global styles changes that are not displayed in the UI.
-			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
+			_n( '…and %d more change', '…and %d more changes', deleteCount ),
 			deleteCount
 		);
 		changes.splice( maxResults, deleteCount, andMoreText );

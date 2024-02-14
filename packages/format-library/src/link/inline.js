@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -21,9 +21,8 @@ import {
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
-	useCachedTruthy,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -42,9 +41,9 @@ const LINK_SETTINGS = [
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
-	addingLink,
 	value,
 	onChange,
+	onFocusOutside,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -53,15 +52,22 @@ function InlineLinkUI( {
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
 
-	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const _settings = getSettings();
+	const { selectionChange } = useDispatch( blockEditorStore );
 
-		return {
-			createPageEntity: _settings.__experimentalCreatePageEntity,
-			userCanCreatePages: _settings.__experimentalUserCanCreatePages,
-		};
-	}, [] );
+	const { createPageEntity, userCanCreatePages, selectionStart } = useSelect(
+		( select ) => {
+			const { getSettings, getSelectionStart } =
+				select( blockEditorStore );
+			const _settings = getSettings();
+
+			return {
+				createPageEntity: _settings.__experimentalCreatePageEntity,
+				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
+				selectionStart: getSelectionStart(),
+			};
+		},
+		[]
+	);
 
 	const linkValue = useMemo(
 		() => ( {
@@ -113,78 +119,85 @@ function InlineLinkUI( {
 
 		const newText = nextValue.title || newUrl;
 
+		// Scenario: we have any active text selection or an active format.
+		let newValue;
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
-			const toInsert = applyFormat(
-				create( { text: newText } ),
+			const inserted = insert( value, newText );
+
+			newValue = applyFormat(
+				inserted,
 				linkFormat,
-				0,
-				newText.length
+				value.start,
+				value.start + newText.length
 			);
-			onChange( insert( value, toInsert ) );
-		} else {
-			// Scenario: we have any active text selection or an active format.
-			let newValue;
-
-			if ( newText === richTextText ) {
-				// If we're not updating the text then ignore.
-				newValue = applyFormat( value, linkFormat );
-			} else {
-				// Create new RichText value for the new text in order that we
-				// can apply formats to it.
-				newValue = create( { text: newText } );
-
-				// Apply the new Link format to this new text value.
-				newValue = applyFormat(
-					newValue,
-					linkFormat,
-					0,
-					newText.length
-				);
-
-				// Get the boundaries of the active link format.
-				const boundary = getFormatBoundary( value, {
-					type: 'core/link',
-				} );
-
-				// Split the value at the start of the active link format.
-				// Passing "start" as the 3rd parameter is required to ensure
-				// the second half of the split value is split at the format's
-				// start boundary and avoids relying on the value's "end" property
-				// which may not correspond correctly.
-				const [ valBefore, valAfter ] = split(
-					value,
-					boundary.start,
-					boundary.start
-				);
-
-				// Update the original (full) RichTextValue replacing the
-				// target text with the *new* RichTextValue containing:
-				// 1. The new text content.
-				// 2. The new link format.
-				// As "replace" will operate on the first match only, it is
-				// run only against the second half of the value which was
-				// split at the active format's boundary. This avoids a bug
-				// with incorrectly targetted replacements.
-				// See: https://github.com/WordPress/gutenberg/issues/41771.
-				// Note original formats will be lost when applying this change.
-				// That is expected behaviour.
-				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
-				const newValAfter = replace( valAfter, richTextText, newValue );
-
-				newValue = concat( valBefore, newValAfter );
-			}
 
 			onChange( newValue );
+
+			// Close the Link UI.
+			stopAddingLink();
+
+			// Move the selection to the end of the inserted link outside of the format boundary
+			// so the user can continue typing after the link.
+			selectionChange( {
+				clientId: selectionStart.clientId,
+				identifier: selectionStart.attributeKey,
+				start: value.start + newText.length + 1,
+			} );
+
+			return;
+		} else if ( newText === richTextText ) {
+			newValue = applyFormat( value, linkFormat );
+		} else {
+			// Scenario: Editing an existing link.
+
+			// Create new RichText value for the new text in order that we
+			// can apply formats to it.
+			newValue = create( { text: newText } );
+			// Apply the new Link format to this new text value.
+			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
+
+			// Get the boundaries of the active link format.
+			const boundary = getFormatBoundary( value, {
+				type: 'core/link',
+			} );
+
+			// Split the value at the start of the active link format.
+			// Passing "start" as the 3rd parameter is required to ensure
+			// the second half of the split value is split at the format's
+			// start boundary and avoids relying on the value's "end" property
+			// which may not correspond correctly.
+			const [ valBefore, valAfter ] = split(
+				value,
+				boundary.start,
+				boundary.start
+			);
+
+			// Update the original (full) RichTextValue replacing the
+			// target text with the *new* RichTextValue containing:
+			// 1. The new text content.
+			// 2. The new link format.
+			// As "replace" will operate on the first match only, it is
+			// run only against the second half of the value which was
+			// split at the active format's boundary. This avoids a bug
+			// with incorrectly targetted replacements.
+			// See: https://github.com/WordPress/gutenberg/issues/41771.
+			// Note original formats will be lost when applying this change.
+			// That is expected behaviour.
+			// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
+			const newValAfter = replace( valAfter, richTextText, newValue );
+
+			newValue = concat( valBefore, newValAfter );
 		}
+
+		onChange( newValue );
 
 		// Focus should only be returned to the rich text on submit if this link is not
 		// being created for the first time. If it is then focus should remain within the
 		// Link UI because it should remain open for the user to modify the link they have
 		// just created.
 		if ( ! isNewLink ) {
-			const returnFocusToRichText = true;
-			stopAddingLink( returnFocusToRichText );
+			stopAddingLink();
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -203,25 +216,8 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		settings,
+		settings: { ...settings, isActive },
 	} );
-
-	//  As you change the link by interacting with the Link UI
-	//  the return value of document.getSelection jumps to the field you're editing,
-	//  not the highlighted text. Given that useAnchor uses document.getSelection,
-	//  it will return null, since it can't find the <mark> element within the Link UI.
-	//  This caches the last truthy value of the selection anchor reference.
-	// This ensures the Popover is positioned correctly on initial submission of the link.
-	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
-	popoverAnchor.getBoundingClientRect = () => cachedRect;
-
-	// Focus should only be moved into the Popover when the Link is being created or edited.
-	// When the Link is in "preview" mode focus should remain on the rich text because at
-	// this point the Link dialog is informational only and thus the user should be able to
-	// continue editing the rich text.
-	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
@@ -252,9 +248,8 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
-			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			onFocusOutside={ () => stopAddingLink( false ) }
+			onFocusOutside={ onFocusOutside }
 			placement="bottom"
 			offset={ 10 }
 			shift
@@ -263,7 +258,6 @@ function InlineLinkUI( {
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
-				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }

@@ -5,6 +5,8 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
+	__experimentalInputControl as InputControl,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -38,7 +40,18 @@ export default function ChildLayoutControl( {
 	onChange,
 	parentLayout,
 } ) {
-	const { selfStretch, flexSize } = childLayout;
+	const { selfStretch, flexSize, columnSpan, rowSpan } = childLayout;
+	const {
+		type: parentLayoutType,
+		minimumColumnWidth = '12rem',
+		columnCount,
+	} = parentLayout;
+
+	/**
+	 * If columnCount is set, the parentColumnwidth isn't needed because
+	 * the grid has a fixed number of columns with responsive widths.
+	 */
+	const parentColumnWidth = columnCount ? null : minimumColumnWidth;
 
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
@@ -51,49 +64,85 @@ export default function ChildLayoutControl( {
 
 	return (
 		<>
-			<ToggleGroupControl
-				__nextHasNoMarginBottom
-				size={ '__unstable-large' }
-				label={ childLayoutOrientation( parentLayout ) }
-				value={ selfStretch || 'fit' }
-				help={ helpText( selfStretch, parentLayout ) }
-				onChange={ ( value ) => {
-					const newFlexSize = value !== 'fixed' ? null : flexSize;
-					onChange( {
-						...childLayout,
-						selfStretch: value,
-						flexSize: newFlexSize,
-					} );
-				} }
-				isBlock={ true }
-			>
-				<ToggleGroupControlOption
-					key={ 'fit' }
-					value={ 'fit' }
-					label={ __( 'Fit' ) }
-				/>
-				<ToggleGroupControlOption
-					key={ 'fill' }
-					value={ 'fill' }
-					label={ __( 'Fill' ) }
-				/>
-				<ToggleGroupControlOption
-					key={ 'fixed' }
-					value={ 'fixed' }
-					label={ __( 'Fixed' ) }
-				/>
-			</ToggleGroupControl>
-			{ selfStretch === 'fixed' && (
-				<UnitControl
-					size={ '__unstable-large' }
-					onChange={ ( value ) => {
-						onChange( {
-							...childLayout,
-							flexSize: value,
-						} );
-					} }
-					value={ flexSize }
-				/>
+			{ parentLayoutType === 'flex' && (
+				<>
+					<ToggleGroupControl
+						__nextHasNoMarginBottom
+						size={ '__unstable-large' }
+						label={ childLayoutOrientation( parentLayout ) }
+						value={ selfStretch || 'fit' }
+						help={ helpText( selfStretch, parentLayout ) }
+						onChange={ ( value ) => {
+							const newFlexSize =
+								value !== 'fixed' ? null : flexSize;
+							onChange( {
+								selfStretch: value,
+								flexSize: newFlexSize,
+							} );
+						} }
+						isBlock={ true }
+					>
+						<ToggleGroupControlOption
+							key={ 'fit' }
+							value={ 'fit' }
+							label={ __( 'Fit' ) }
+						/>
+						<ToggleGroupControlOption
+							key={ 'fill' }
+							value={ 'fill' }
+							label={ __( 'Fill' ) }
+						/>
+						<ToggleGroupControlOption
+							key={ 'fixed' }
+							value={ 'fixed' }
+							label={ __( 'Fixed' ) }
+						/>
+					</ToggleGroupControl>
+					{ selfStretch === 'fixed' && (
+						<UnitControl
+							size={ '__unstable-large' }
+							onChange={ ( value ) => {
+								onChange( {
+									selfStretch,
+									flexSize: value,
+								} );
+							} }
+							value={ flexSize }
+						/>
+					) }
+				</>
+			) }
+			{ parentLayoutType === 'grid' && (
+				<HStack>
+					<InputControl
+						size={ '__unstable-large' }
+						label={ __( 'Column Span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							onChange( {
+								rowSpan,
+								columnSpan: value,
+								parentColumnWidth,
+							} );
+						} }
+						value={ columnSpan }
+						min={ 1 }
+					/>
+					<InputControl
+						size={ '__unstable-large' }
+						label={ __( 'Row Span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							onChange( {
+								columnSpan,
+								parentColumnWidth,
+								rowSpan: value,
+							} );
+						} }
+						value={ rowSpan }
+						min={ 1 }
+					/>
+				</HStack>
 			) }
 		</>
 	);

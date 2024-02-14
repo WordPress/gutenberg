@@ -212,11 +212,38 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		 * Prints the import map using a script tag with a type="importmap" attribute.
 		 *
 		 * @since 6.5.0
+		 *
+		 * @global WP_Scripts $wp_scripts The WP_Scripts object for printing the polyfill.
 		 */
 		public function print_import_map() {
 			$import_map = $this->get_import_map();
 			if ( ! empty( $import_map['imports'] ) ) {
-				wp_print_inline_script_tag(
+				global $wp_scripts;
+				if ( isset( $wp_scripts ) ) {
+					/*
+					 * In Core, the polyfill is registered with a different approach.
+					 * See: https://github.com/WordPress/wordpress-develop/blob/4b23ba81ddb067110e41d05550de7f2a4f09dad3/src/wp-includes/script-loader.php#L99
+					 */
+					wp_register_script(
+						'wp-polyfill-importmap',
+						gutenberg_url( '/build/modules/importmap-polyfill.min.js' ),
+						array(),
+						'1.8.2',
+						true
+					);
+					gutenberg_print_inline_script_tag(
+						wp_get_script_polyfill(
+							$wp_scripts,
+							array(
+								'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")' => 'wp-polyfill-importmap',
+							)
+						),
+						array(
+							'id' => 'wp-load-polyfill-importmap',
+						)
+					);
+				}
+				gutenberg_print_inline_script_tag(
 					wp_json_encode( $import_map, JSON_HEX_TAG | JSON_HEX_AMP ),
 					array(
 						'type' => 'importmap',

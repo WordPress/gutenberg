@@ -295,7 +295,7 @@ describe( 'PaletteEdit', () => {
 				name: 'Show details',
 			} )
 		);
-		await click( screen.getByText( 'Primary' ) );
+		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
 		await click(
 			screen.getByRole( 'button', {
 				name: 'Remove color',
@@ -328,7 +328,7 @@ describe( 'PaletteEdit', () => {
 				name: 'Show details',
 			} )
 		);
-		await click( screen.getByText( 'Primary' ) );
+		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
 		const nameInput = screen.getByRole( 'textbox', {
 			name: 'Color name',
 		} );

@@ -200,58 +200,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'updatePreferredStyleVariations', () => {
-		it( 'sets a preferred style variation for a block when a style name is passed', () => {
-			registry
-				.dispatch( 'core/edit-post' )
-				.updatePreferredStyleVariations( 'core/paragraph', 'fancy' );
-			registry
-				.dispatch( 'core/edit-post' )
-				.updatePreferredStyleVariations( 'core/quote', 'posh' );
-
-			expect(
-				registry
-					.select( editPostStore )
-					.getPreference( 'preferredStyleVariations' )
-			).toEqual( {
-				'core/paragraph': 'fancy',
-				'core/quote': 'posh',
-			} );
-
-			// Expect a deprecation message for `getPreference`.
-			expect( console ).toHaveWarned();
-		} );
-
-		it( 'removes a preferred style variation for a block when a style name is omitted', () => {
-			registry
-				.dispatch( 'core/edit-post' )
-				.updatePreferredStyleVariations( 'core/paragraph', 'fancy' );
-			registry
-				.dispatch( 'core/edit-post' )
-				.updatePreferredStyleVariations( 'core/quote', 'posh' );
-			expect(
-				registry
-					.select( editPostStore )
-					.getPreference( 'preferredStyleVariations' )
-			).toEqual( {
-				'core/paragraph': 'fancy',
-				'core/quote': 'posh',
-			} );
-
-			registry
-				.dispatch( 'core/edit-post' )
-				.updatePreferredStyleVariations( 'core/paragraph' );
-
-			expect(
-				registry
-					.select( editPostStore )
-					.getPreference( 'preferredStyleVariations' )
-			).toEqual( {
-				'core/quote': 'posh',
-			} );
-		} );
-	} );
-
 	describe( 'toggleDistractionFree', () => {
 		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
 			// Enable everything that shouldn't be enabled in distraction free mode.
