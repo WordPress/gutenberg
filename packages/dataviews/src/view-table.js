@@ -33,6 +33,7 @@ import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
 import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
+import { useHasAPossibleBulkAction } from './bulk-actions';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -219,10 +220,10 @@ function ViewTable( {
 	onSelectionChange,
 	setOpenedFilter,
 } ) {
-	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
+	const hasBulkActions = useHasAPossibleBulkAction( actions, data );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {

@@ -21,6 +21,14 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
+export function useHasAPossibleBulkAction( actions, item ) {
+	return useMemo( () => {
+		return actions.some( ( action ) => {
+			return action.supportsBulk && action.isEligible( item );
+		} );
+	}, [ actions, item ] );
+}
+
 function ActionWithModal( {
 	action,
 	selectedItems,

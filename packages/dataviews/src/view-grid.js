@@ -14,7 +14,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,13 +22,7 @@ import { useState, useMemo } from '@wordpress/element';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 
-function useHasAPossibleBulkAction( actions, item ) {
-	return useMemo( () => {
-		return actions.some( ( action ) => {
-			return action.supportsBulk && action.isEligible( item );
-		} );
-	}, [ actions, item ] );
-}
+import { useHasAPossibleBulkAction } from './bulk-actions';
 
 function GridItem( {
 	selection,
@@ -50,7 +44,7 @@ function GridItem( {
 			spacing={ 0 }
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
-				'is-selected': isSelected,
+				'is-selected': hasBulkAction && isSelected,
 				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
 			onMouseDown={ ( event ) => {
