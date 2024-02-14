@@ -559,6 +559,11 @@ export const toggleDistractionFree =
 		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', false );
+		}
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
@@ -582,6 +587,28 @@ export const toggleDistractionFree =
 					{
 						id: 'core/edit-site/distraction-free-mode/notice',
 						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry.batch( () => {
+										registry
+											.dispatch( preferencesStore )
+											.set(
+												'core',
+												'fixedToolbar',
+												isDistractionFree ? true : false
+											);
+										registry
+											.dispatch( preferencesStore )
+											.toggle(
+												'core',
+												'distractionFree'
+											);
+									} );
+								},
+							},
+						],
 					}
 				);
 		} );

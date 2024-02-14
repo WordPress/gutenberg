@@ -14,25 +14,15 @@
 	height: $header-height;
 	z-index: z-index(".edit-site-layout__hub");
 
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		width: $header-height;
-		padding-right: 0;
-	}
-
 	@include break-medium {
 		width: calc(#{$nav-sidebar-width} - #{$grid-unit-30});
 	}
 
 	.edit-site-layout.is-full-canvas & {
-		padding-right: $grid-unit-20;
+		padding-right: 0;
 		border-radius: 0;
-		width: 100vw;
+		width: $header-height;
 		box-shadow: none;
-
-		@include break-medium {
-			width: auto;
-			padding-right: 0;
-		}
 	}
 }
 
@@ -156,20 +146,13 @@
 	}
 }
 
-.edit-site-template-pages-list-view,
-.edit-site-page-pages-list-view {
-	max-width: $nav-sidebar-width;
-}
-
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
 .edit-site-layout__canvas .interface-interface-skeleton,
-.edit-site-page-pages-preview .interface-interface-skeleton,
 .edit-site-template-pages-preview .interface-interface-skeleton {
 	position: relative !important;
 	min-height: 100% !important;
 }
 
-.edit-site-page-pages-preview,
 .edit-site-template-pages-preview {
 	height: 100%;
 }
@@ -187,7 +170,7 @@
 	justify-content: center;
 	border-bottom: 1px solid transparent;
 
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
+	.edit-site-layout.is-full-canvas & {
 		border-bottom-color: $gray-200;
 		transition: border-bottom-color 0.15s 0.4s ease-out;
 	}
@@ -261,8 +244,7 @@
 	}
 }
 
-.is-edit-mode.is-distraction-free {
-
+.edit-site-layout.is-distraction-free {
 	.edit-site-layout__header-container {
 		height: $header-height;
 		position: absolute;
@@ -299,4 +281,14 @@
 		width: 100%;
 	}
 
+}
+
+.edit-site-layout__area {
+	flex-grow: 1;
+	margin: 0;
+	overflow: hidden;
+	@include break-medium() {
+		border-radius: 8px;
+		margin: $canvas-padding $canvas-padding $canvas-padding 0;
+	}
 }

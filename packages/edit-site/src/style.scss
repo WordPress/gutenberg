@@ -12,7 +12,7 @@
 @import "./components/page/style.scss";
 @import "./components/page-pages/style.scss";
 @import "./components/page-patterns/style.scss";
-@import "./components/page-templates/style.scss";
+@import "./components/page-templates-template-parts/style.scss";
 @import "./components/table/style.scss";
 @import "./components/sidebar-edit-mode/style.scss";
 @import "./components/sidebar-edit-mode/page-panels/style.scss";
@@ -67,13 +67,8 @@ body.js.site-editor-php {
 	background: $gray-900;
 }
 
-.edit-site,
-// The modals are shown outside the .edit-site wrapper, they need these styles.
-.components-modal__frame {
-	@include reset;
-}
-
 .edit-site {
+	@include reset;
 	height: 100vh;
 
 	// On mobile the main content area has to scroll, otherwise you can invoke

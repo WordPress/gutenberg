@@ -3,6 +3,10 @@
  */
 const { join } = require( 'path' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+/**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 /**
  * Internal dependencies
@@ -13,7 +17,8 @@ module.exports = {
 	...baseConfig,
 	name: 'interactivity',
 	entry: {
-		index: `./packages/interactivity/src/index.js`,
+		index: './packages/interactivity',
+		router: './packages/interactivity-router',
 		navigation: './packages/block-library/src/navigation/view.js',
 		query: './packages/block-library/src/query/view.js',
 		image: './packages/block-library/src/image/view.js',
@@ -31,10 +36,8 @@ module.exports = {
 		},
 		path: join( __dirname, '..', '..' ),
 		environment: { module: true },
-	},
-	externalsType: 'module',
-	externals: {
-		'@wordpress/interactivity': '@wordpress/interactivity',
+		module: true,
+		chunkFormat: 'module',
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
@@ -54,13 +57,7 @@ module.exports = {
 							configFile: false,
 							presets: [
 								'@babel/preset-typescript',
-								[
-									'@babel/preset-react',
-									{
-										runtime: 'automatic',
-										importSource: 'preact',
-									},
-								],
+								'@babel/preset-react',
 							],
 						},
 					},
@@ -79,6 +76,7 @@ module.exports = {
 				},
 			],
 		} ),
+		new DependencyExtractionWebpackPlugin(),
 	],
 	watchOptions: {
 		ignored: [ '**/node_modules' ],

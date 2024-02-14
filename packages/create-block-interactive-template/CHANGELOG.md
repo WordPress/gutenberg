@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.14.0 (2024-02-09)
+
+## 1.13.0 (2024-01-24)
+
+## 1.12.0 (2024-01-10)
+
 ### Enhancement
 
 -   Update the template to use `viewModule` in block.json ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).

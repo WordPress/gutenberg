@@ -18,6 +18,7 @@ import {
 	__experimentalVStack as VStack,
 	DropZone,
 	FlexItem,
+	FocalPointPicker,
 	MenuItem,
 	VisuallyHidden,
 	__experimentalItemGroup as ItemGroup,
@@ -59,13 +60,17 @@ export function hasBackgroundImageValue( style ) {
 
 /**
  * Checks if there is a current value in the background size block support
- * attributes.
+ * attributes. Background size values include background size as well
+ * as background position.
  *
  * @param {Object} style Style attribute.
  * @return {boolean}     Whether or not the block has a background size value set.
  */
 export function hasBackgroundSizeValue( style ) {
-	return style?.background?.backgroundSize !== undefined;
+	return (
+		style?.background?.backgroundPosition !== undefined ||
+		style?.background?.backgroundSize !== undefined
+	);
 }
 
 /**
@@ -130,6 +135,7 @@ function resetBackgroundSize( style = {}, setAttributes ) {
 			...style,
 			background: {
 				...style?.background,
+				backgroundPosition: undefined,
 				backgroundRepeat: undefined,
 				backgroundSize: undefined,
 			},
@@ -359,13 +365,33 @@ function BackgroundImagePanelItem( {
 
 function backgroundSizeHelpText( value ) {
 	if ( value === 'cover' || value === undefined ) {
-		return __( 'Stretch image to cover the block.' );
+		return __( 'Image covers the space evenly.' );
 	}
 	if ( value === 'contain' ) {
-		return __( 'Resize image to fit without cropping.' );
+		return __( 'Image is contained without distortion.' );
 	}
-	return __( 'Set a fixed width.' );
+	return __( 'Specify a fixed width.' );
 }
+
+export const coordsToBackgroundPosition = ( value ) => {
+	if ( ! value || isNaN( value.x ) || isNaN( value.y ) ) {
+		return undefined;
+	}
+
+	return `${ value.x * 100 }% ${ value.y * 100 }%`;
+};
+
+export const backgroundPositionToCoords = ( value ) => {
+	if ( ! value ) {
+		return { x: undefined, y: undefined };
+	}
+
+	let [ x, y ] = value.split( ' ' ).map( ( v ) => parseFloat( v ) / 100 );
+	x = isNaN( x ) ? undefined : x;
+	y = isNaN( y ) ? x : y;
+
+	return { x, y };
+};
 
 function BackgroundSizePanelItem( {
 	clientId,
@@ -446,6 +472,18 @@ function BackgroundSizePanelItem( {
 		} );
 	};
 
+	const updateBackgroundPosition = ( next ) => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundPosition: coordsToBackgroundPosition( next ),
+				},
+			} ),
+		} );
+	};
+
 	const toggleIsRepeated = () => {
 		setAttributes( {
 			style: cleanEmptyObject( {
@@ -471,8 +509,16 @@ function BackgroundSizePanelItem( {
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
+			<FocalPointPicker
+				__next40pxDefaultSize
+				label={ __( 'Position' ) }
+				url={ style?.background?.backgroundImage?.url }
+				value={ backgroundPositionToCoords(
+					style?.background?.backgroundPosition
+				) }
+				onChange={ updateBackgroundPosition }
+			/>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				size={ '__unstable-large' }
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
@@ -507,8 +553,7 @@ function BackgroundSizePanelItem( {
 			) : null }
 			{ currentValueForToggle !== 'cover' && (
 				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Repeat image' ) }
+					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }
 				/>

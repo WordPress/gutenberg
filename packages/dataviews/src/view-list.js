@@ -85,14 +85,20 @@ export default function ViewList( {
 								className="dataviews-view-list__item"
 								onClick={ () => onSelectionChange( [ item ] ) }
 							>
-								<HStack spacing={ 3 } justify="start">
+								<HStack
+									spacing={ 3 }
+									justify="start"
+									alignment="flex-start"
+								>
 									<div className="dataviews-view-list__media-wrapper">
 										{ mediaField?.render( { item } ) || (
 											<div className="dataviews-view-list__media-placeholder"></div>
 										) }
 									</div>
 									<VStack spacing={ 1 }>
-										{ primaryField?.render( { item } ) }
+										<span className="dataviews-view-list__primary-field">
+											{ primaryField?.render( { item } ) }
+										</span>
 										<div className="dataviews-view-list__fields">
 											{ visibleFields.map( ( field ) => {
 												return (

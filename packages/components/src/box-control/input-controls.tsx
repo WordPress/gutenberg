@@ -19,6 +19,7 @@ import type { BoxControlInputControlProps, BoxControlValue } from './types';
 const noop = () => {};
 
 export default function BoxInputControls( {
+	__next40pxDefaultSize,
 	onChange = noop,
 	onFocus = noop,
 	values,
@@ -107,6 +108,7 @@ export default function BoxInputControls( {
 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
 							<StyledUnitControl
 								{ ...props }
+								__next40pxDefaultSize={ __next40pxDefaultSize }
 								className="component-box-control__unit-control"
 								id={ inputId }
 								isPressEnterToChange
@@ -131,6 +133,7 @@ export default function BoxInputControls( {
 
 						<FlexedRangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							aria-controls={ inputId }
 							label={ LABELS[ side ] }
 							hideLabelFromVision

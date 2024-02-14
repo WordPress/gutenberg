@@ -14,7 +14,7 @@ test.use( {
 	},
 } );
 
-test.describe( 'Global styles revisions', () => {
+test.describe( 'Style Revisions', () => {
 	let stylesPostId;
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
@@ -57,7 +57,7 @@ test.describe( 'Global styles revisions', () => {
 		// Shows changes made in the revision.
 		await expect(
 			page.getByTestId( 'global-styles-revision-changes' )
-		).toHaveText( 'Colors' );
+		).toHaveText( 'Colors.' );
 
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(

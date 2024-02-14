@@ -1,74 +1,3 @@
-.edit-site-patterns {
-	border-left: 1px solid $gray-800;
-	background: none;
-	margin: $header-height 0 0;
-	border-radius: 0;
-	padding: 0;
-	overflow-x: auto;
-
-	.components-base-control {
-		width: 100%;
-		@include break-medium {
-			width: auto;
-		}
-	}
-
-	.components-text {
-		color: $gray-600;
-	}
-
-	.components-heading {
-		color: $gray-200;
-	}
-
-	@include break-medium {
-		margin: 0;
-	}
-
-	.edit-site-patterns__search-block {
-		min-width: fit-content;
-		flex-grow: 1;
-	}
-
-	// The increased specificity here is to overcome component styles
-	// without relying on internal component class names.
-	.edit-site-patterns__search {
-		input[type="search"] {
-			height: $button-size-next-default-40px;
-			background: $gray-800;
-			color: $gray-200;
-
-			&:focus {
-				background: $gray-800;
-			}
-		}
-
-		svg {
-			fill: $gray-600;
-		}
-	}
-
-	.edit-site-patterns__sync-status-filter {
-		background: $gray-800;
-		border: none;
-		height: $button-size-next-default-40px;
-		min-width: max-content;
-		width: 100%;
-		max-width: 100%;
-
-		@include break-medium {
-			width: 300px;
-		}
-	}
-	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
-		color: $gray-600;
-	}
-	.edit-site-patterns__sync-status-filter-option:active {
-		background: $gray-700;
-		color: $gray-100;
-	}
-}
-
 .edit-site-patterns__header {
 	position: sticky;
 	top: 0;
@@ -81,97 +10,13 @@
 	}
 }
 
-.edit-site-patterns__section {
-	padding: $grid-unit-30 $grid-unit-40;
-	flex: 1;
-}
-
 .edit-site-patterns__section-header {
 	.screen-reader-shortcut:focus {
 		top: 0;
 	}
 }
 
-.edit-site-patterns__grid {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: $grid-unit-40;
-	margin-top: 0;
-	margin-bottom: 0;
-	@include break-large {
-		grid-template-columns: 1fr 1fr;
-	}
-	@include break-huge {
-		grid-template-columns: 1fr 1fr 1fr;
-	}
-	@include break-xhuge {
-		grid-template-columns: 1fr 1fr 1fr 1fr;
-	}
-	.edit-site-patterns__pattern {
-		break-inside: avoid-column;
-		display: flex;
-		flex-direction: column;
-		.edit-site-patterns__preview {
-			box-shadow: none;
-			border: none;
-			padding: 0;
-			background-color: unset;
-			box-sizing: border-box;
-			border-radius: 4px;
-			cursor: pointer;
-			overflow: hidden;
-
-			&:focus {
-				box-shadow: inset 0 0 0 0 $white, 0 0 0 2px var(--wp-admin-theme-color);
-				// Windows High Contrast mode will show this outline, but not the box-shadow.
-				outline: 2px solid transparent;
-			}
-
-			&.is-inactive {
-				cursor: default;
-			}
-			&.is-inactive:focus {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $gray-800;
-				opacity: 0.8;
-			}
-		}
-
-		.edit-site-patterns__footer,
-		.edit-site-patterns__button {
-			color: $gray-600;
-		}
-
-		.edit-site-patterns__dropdown {
-			flex-shrink: 0;
-		}
-
-		&.is-placeholder .edit-site-patterns__preview {
-			min-height: $grid-unit-80;
-			color: $gray-600;
-			border: 1px dashed $gray-800;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			&:focus {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			}
-		}
-	}
-
-	.edit-site-patterns__preview {
-		flex: 0 1 auto;
-		margin-bottom: $grid-unit-15;
-	}
-}
-
-.edit-site-patterns__load-more {
-	align-self: center;
-}
-
 .edit-site-patterns__pattern-title {
-	color: $gray-200;
-
 	.is-link {
 		text-decoration: none;
 		color: $gray-200;
@@ -193,46 +38,39 @@
 	}
 }
 
-.edit-site-patterns__no-results {
-	color: $gray-600;
-}
-
 .edit-site-patterns__delete-modal {
 	width: $modal-width-small;
 }
 
-.edit-site-patterns__pagination {
-	padding: $grid-unit-30 $grid-unit-40;
-	border-top: 1px solid $gray-800;
-	background: $gray-900;
-	position: sticky;
-	bottom: 0;
-	color: $gray-100;
-	z-index: z-index(".edit-site-patterns__grid-pagination");
-	.components-button.is-tertiary {
-		background-color: $gray-800;
-		color: $gray-100;
-
-		&:disabled {
-			color: $gray-600;
-			background: none;
-		}
-
-		&:hover:not(:disabled) {
-			background-color: $gray-700;
-		}
-	}
-}
-
-/**
- * DataViews patterns styles.
- * TODO: when this becomes stable, consolidate styles with the above.
- */
 .edit-site-page-patterns-dataviews {
 	.page-patterns-preview-field {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		border-radius: 3px 3px 0 0;
+
 		&.is-viewtype-grid {
 			.block-editor-block-preview__container {
-				height: auto;
+				height: 100%;
+				border-radius: 3px 3px 0 0;
+			}
+		}
+
+		.page-patterns-preview-field__button {
+			box-shadow: none;
+			border: none;
+			padding: 0;
+			background-color: unset;
+			box-sizing: border-box;
+			cursor: pointer;
+			overflow: hidden;
+			height: 100%;
+			border-radius: 3px 3px 0 0;
+
+			&:focus-visible {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
 			}
 		}
 	}
@@ -253,6 +91,19 @@
 		position: sticky;
 		top: 0;
 		z-index: 2;
+	}
+
+	.edit-site-patterns__pattern-title {
+		display: block;
+		width: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: inherit;
+	}
+
+	.dataviews-pagination {
+		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
 	}
 }
 

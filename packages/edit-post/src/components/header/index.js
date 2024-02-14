@@ -55,7 +55,7 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( { setEntitiesSavedStatesCallback } ) {
+function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
@@ -64,7 +64,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
-		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
@@ -77,9 +76,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
-			isEditingTemplate:
-				select( editorStore ).getRenderingMode() === 'template-only',
+			hasHistory:
+				!! select( editorStore ).getEditorSettings()
+					.onNavigateToPreviousEntityRecord,
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
@@ -104,7 +103,10 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					variants={ slideX }
 					transition={ { type: 'tween', delay: 0.8 } }
 				>
-					<FullscreenModeClose showTooltip />
+					<FullscreenModeClose
+						showTooltip
+						initialPost={ initialPost }
+					/>
 				</motion.div>
 			</MainDashboardButton.Slot>
 			<motion.div
@@ -119,9 +121,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							className={ classnames(
 								'selected-block-tools-wrapper',
 								{
-									'is-collapsed':
-										isEditingTemplate &&
-										isBlockToolsCollapsed,
+									'is-collapsed': isBlockToolsCollapsed,
 								}
 							) }
 						>
@@ -131,7 +131,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ isEditingTemplate && hasBlockSelection && (
+						{ hasBlockSelection && (
 							<Button
 								className="edit-post-header__block-tools-toggle"
 								icon={ isBlockToolsCollapsed ? next : previous }
@@ -152,14 +152,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
-							isEditingTemplate &&
+							hasHistory &&
 							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&
 							isLargeViewport,
 					} ) }
 				>
-					{ ( isEditingTemplate || hasHistory ) && <DocumentBar /> }
+					{ hasHistory && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div

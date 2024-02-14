@@ -27,6 +27,7 @@ import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
+import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 
@@ -39,6 +40,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
 	return (
@@ -49,6 +51,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasMargin ||
 			hasGap ||
 			hasMinHeight ||
+			hasAspectRatio ||
 			hasChildLayout )
 	);
 }
@@ -77,6 +80,10 @@ function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
 }
 
+function useHasAspectRatio( settings ) {
+	return settings?.dimensions?.aspectRatio;
+}
+
 function useHasChildLayout( settings ) {
 	const {
 		type: parentLayoutType = 'default',
@@ -85,7 +92,10 @@ function useHasChildLayout( settings ) {
 	} = settings?.parentLayout ?? {};
 
 	const support =
-		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+		( defaultParentLayoutType === 'flex' ||
+			parentLayoutType === 'flex' ||
+			defaultParentLayoutType === 'grid' ||
+			parentLayoutType === 'grid' ) &&
 		allowSizingOnChildren;
 
 	return !! settings?.layout && support;
@@ -192,6 +202,7 @@ const DEFAULT_CONTROLS = {
 	margin: true,
 	blockGap: true,
 	minHeight: true,
+	aspectRatio: true,
 	childLayout: true,
 };
 
@@ -346,8 +357,18 @@ export default function DimensionsPanel( {
 	const showMinHeightControl = useHasMinHeight( settings );
 	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
 	const setMinHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'minHeight' ],
+			newValue
+		);
+		// Apply min-height, while removing any applied aspect ratio.
 		onChange(
-			setImmutably( value, [ 'dimensions', 'minHeight' ], newValue )
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
 		);
 	};
 	const resetMinHeightValue = () => {
@@ -355,17 +376,38 @@ export default function DimensionsPanel( {
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
+	// Aspect Ratio
+	const showAspectRatioControl = useHasAspectRatio( settings );
+	const aspectRatioValue = decodeValue(
+		inheritedValue?.dimensions?.aspectRatio
+	);
+	const setAspectRatioValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'aspectRatio' ],
+			newValue
+		);
+		// Apply aspect-ratio, while removing any applied min-height.
+		onChange(
+			setImmutably( tempValue, [ 'dimensions', 'minHeight' ], undefined )
+		);
+	};
+	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
+
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
+	const { selfStretch } = childLayout ?? {};
 	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
-	const childLayoutOrientationLabel =
+	const flexResetLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
+	const childLayoutResetLabel = selfStretch
+		? flexResetLabel
+		: __( 'Grid spans' );
 	const setChildLayout = ( newChildLayout ) => {
 		onChange( {
 			...value,
 			layout: {
-				...value?.layout,
 				...newChildLayout,
 			},
 		} );
@@ -374,6 +416,9 @@ export default function DimensionsPanel( {
 		setChildLayout( {
 			selfStretch: undefined,
 			flexSize: undefined,
+			columnSpan: undefined,
+			rowSpan: undefined,
+			parentColumnWidth: undefined,
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
@@ -387,6 +432,9 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				columnSpan: undefined,
+				rowSpan: undefined,
+				parentColumnWidth: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
@@ -397,6 +445,7 @@ export default function DimensionsPanel( {
 			dimensions: {
 				...previousValue?.dimensions,
 				minHeight: undefined,
+				aspectRatio: undefined,
 			},
 		};
 	}, [] );
@@ -600,6 +649,26 @@ export default function DimensionsPanel( {
 					) }
 				</ToolsPanelItem>
 			) }
+			{ showChildLayoutControl && (
+				<VStack
+					as={ ToolsPanelItem }
+					spacing={ 2 }
+					hasValue={ hasChildLayoutValue }
+					label={ childLayoutResetLabel }
+					onDeselect={ resetChildLayoutValue }
+					isShownByDefault={
+						defaultControls.childLayout ??
+						DEFAULT_CONTROLS.childLayout
+					}
+					panelId={ panelId }
+				>
+					<ChildLayoutControl
+						value={ childLayout }
+						onChange={ setChildLayout }
+						parentLayout={ settings?.parentLayout }
+					/>
+				</VStack>
+			) }
 			{ showMinHeightControl && (
 				<ToolsPanelItem
 					hasValue={ hasMinHeightValue }
@@ -617,25 +686,17 @@ export default function DimensionsPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ showChildLayoutControl && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasChildLayoutValue }
-					label={ childLayoutOrientationLabel }
-					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={
-						defaultControls.childLayout ??
-						DEFAULT_CONTROLS.childLayout
-					}
+			{ showAspectRatioControl && (
+				<AspectRatioTool
+					hasValue={ hasAspectRatioValue }
+					value={ aspectRatioValue }
+					onChange={ setAspectRatioValue }
 					panelId={ panelId }
-				>
-					<ChildLayoutControl
-						value={ childLayout }
-						onChange={ setChildLayout }
-						parentLayout={ settings?.parentLayout }
-					/>
-				</VStack>
+					isShownByDefault={
+						defaultControls.aspectRatio ??
+						DEFAULT_CONTROLS.aspectRatio
+					}
+				/>
 			) }
 		</Wrapper>
 	);

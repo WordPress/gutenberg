@@ -414,20 +414,6 @@ supports: {
 }
 ```
 
-## defaultStylePicker
-
--   Type: `boolean`
--   Default value: `true`
-
-When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
-
-```js
-supports: {
-	// Remove the Default Style picker.
-	defaultStylePicker: false
-}
-```
-
 ## dimensions
 
 _**Note:** Since WordPress 6.2._
@@ -442,6 +428,7 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
     dimensions: {
+        aspectRatio: true // Enable aspect ratio control.
         minHeight: true // Enable min height control.
     }
 }
@@ -449,12 +436,13 @@ supports: {
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+- `style`: attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
     style: {
         dimensions: {
+            aspectRatio: "16/9",
             minHeight: "50vh"
         }
     }

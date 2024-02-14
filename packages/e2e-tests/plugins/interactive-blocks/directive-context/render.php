@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-gutenberg_enqueue_module( 'directive-context-view' );
+wp_enqueue_script_module( 'directive-context-view' );
 ?>
 
 <div data-wp-interactive='{"namespace": "directive-context"}'>
@@ -124,7 +124,7 @@ gutenberg_enqueue_module( 'directive-context-view' );
 
 <div
 	data-wp-interactive='{"namespace": "directive-context-navigate"}'
-	data-wp-navigation-id="navigation"
+	data-wp-router-region="navigation"
 	data-wp-context='{ "text": "first page" }'
 >
 	<div data-testid="navigation text" data-wp-text="context.text"></div>
@@ -133,4 +133,13 @@ gutenberg_enqueue_module( 'directive-context-view' );
 	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
 	<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
+</div>
+
+<div
+	data-wp-interactive='{"namespace": "directive-context-non-default"}'
+	data-wp-context--non-default='{ "text": "non default" }'
+	data-wp-context='{ "defaultText": "default" }'
+>
+	<span data-testid="non-default suffix context" data-wp-text="context.text"></span>
+	<span data-testid="default suffix context" data-wp-text="context.defaultText"></span>
 </div>
