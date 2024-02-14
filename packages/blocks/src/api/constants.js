@@ -271,6 +271,9 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	cite: 'cite',
 };
 
+// These paths may have three origins, custom, theme, and default,
+// and are expected to override other origins with custom, theme,
+// and default priority.
 export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
 	'color.duotone': true,
 	'color.gradients': true,

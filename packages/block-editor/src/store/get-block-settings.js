@@ -115,8 +115,8 @@ const mergeCache = new WeakMap();
  * For settings like `color.palette`, which have a value that is an object
  * with `default`, `theme`, `custom`, with field values that are arrays of
  * items, returns the one with the highest priority among these three arrays.
- * @param {Object} value Object to merge
- * @return {Array} Array of merged items
+ * @param {Object} value Object to extract from
+ * @return {Array} Array of items extracted from the three origins
  */
 export function overrideOrigins( value ) {
 	return value.custom ?? value.theme ?? value.default;
