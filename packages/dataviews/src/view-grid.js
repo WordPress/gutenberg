@@ -12,6 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	Tooltip,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 
@@ -128,6 +129,7 @@ export default function ViewGrid( {
 	fields,
 	view,
 	actions,
+	isLoading,
 	getItemId,
 	deferredRendering,
 	selection,
@@ -148,29 +150,45 @@ export default function ViewGrid( {
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
 	const usedData = deferredRendering ? shownData : data;
+	const hasData = !! usedData?.length;
 	return (
-		<Grid
-			gap={ 6 }
-			columns={ 2 }
-			alignment="top"
-			className="dataviews-view-grid"
-		>
-			{ usedData.map( ( item ) => {
-				return (
-					<GridItem
-						key={ getItemId( item ) }
-						selection={ selection }
-						data={ data }
-						onSelectionChange={ onSelectionChange }
-						getItemId={ getItemId }
-						item={ item }
-						actions={ actions }
-						mediaField={ mediaField }
-						primaryField={ primaryField }
-						visibleFields={ visibleFields }
-					/>
-				);
-			} ) }
-		</Grid>
+		<>
+			{ hasData && (
+				<Grid
+					gap={ 6 }
+					columns={ 2 }
+					alignment="top"
+					className="dataviews-view-grid"
+					aria-busy={ isLoading }
+				>
+					{ usedData.map( ( item ) => {
+						return (
+							<GridItem
+								key={ getItemId( item ) }
+								selection={ selection }
+								data={ data }
+								onSelectionChange={ onSelectionChange }
+								getItemId={ getItemId }
+								item={ item }
+								actions={ actions }
+								mediaField={ mediaField }
+								primaryField={ primaryField }
+								visibleFields={ visibleFields }
+							/>
+						);
+					} ) }
+				</Grid>
+			) }
+			{ ! hasData && (
+				<div
+					className={ classnames( {
+						'dataviews-loading': isLoading,
+						'dataviews-no-results': ! isLoading,
+					} ) }
+				>
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				</div>
+			) }
+		</>
 	);
 }

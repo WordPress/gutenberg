@@ -101,6 +101,10 @@
 		text-overflow: ellipsis;
 		color: inherit;
 	}
+
+	.dataviews-pagination {
+		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
+	}
 }
 
 .dataviews-action-modal__duplicate-pattern {

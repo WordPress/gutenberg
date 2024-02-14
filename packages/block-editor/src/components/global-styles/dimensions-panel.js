@@ -92,7 +92,10 @@ function useHasChildLayout( settings ) {
 	} = settings?.parentLayout ?? {};
 
 	const support =
-		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+		( defaultParentLayoutType === 'flex' ||
+			parentLayoutType === 'flex' ||
+			defaultParentLayoutType === 'grid' ||
+			parentLayoutType === 'grid' ) &&
 		allowSizingOnChildren;
 
 	return !! settings?.layout && support;
@@ -394,14 +397,17 @@ export default function DimensionsPanel( {
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
+	const { selfStretch } = childLayout ?? {};
 	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
-	const childLayoutOrientationLabel =
+	const flexResetLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
+	const childLayoutResetLabel = selfStretch
+		? flexResetLabel
+		: __( 'Grid spans' );
 	const setChildLayout = ( newChildLayout ) => {
 		onChange( {
 			...value,
 			layout: {
-				...value?.layout,
 				...newChildLayout,
 			},
 		} );
@@ -410,6 +416,9 @@ export default function DimensionsPanel( {
 		setChildLayout( {
 			selfStretch: undefined,
 			flexSize: undefined,
+			columnSpan: undefined,
+			rowSpan: undefined,
+			parentColumnWidth: undefined,
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
@@ -423,6 +432,9 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				columnSpan: undefined,
+				rowSpan: undefined,
+				parentColumnWidth: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
@@ -637,6 +649,26 @@ export default function DimensionsPanel( {
 					) }
 				</ToolsPanelItem>
 			) }
+			{ showChildLayoutControl && (
+				<VStack
+					as={ ToolsPanelItem }
+					spacing={ 2 }
+					hasValue={ hasChildLayoutValue }
+					label={ childLayoutResetLabel }
+					onDeselect={ resetChildLayoutValue }
+					isShownByDefault={
+						defaultControls.childLayout ??
+						DEFAULT_CONTROLS.childLayout
+					}
+					panelId={ panelId }
+				>
+					<ChildLayoutControl
+						value={ childLayout }
+						onChange={ setChildLayout }
+						parentLayout={ settings?.parentLayout }
+					/>
+				</VStack>
+			) }
 			{ showMinHeightControl && (
 				<ToolsPanelItem
 					hasValue={ hasMinHeightValue }
@@ -665,26 +697,6 @@ export default function DimensionsPanel( {
 						DEFAULT_CONTROLS.aspectRatio
 					}
 				/>
-			) }
-			{ showChildLayoutControl && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasChildLayoutValue }
-					label={ childLayoutOrientationLabel }
-					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={
-						defaultControls.childLayout ??
-						DEFAULT_CONTROLS.childLayout
-					}
-					panelId={ panelId }
-				>
-					<ChildLayoutControl
-						value={ childLayout }
-						onChange={ setChildLayout }
-						parentLayout={ settings?.parentLayout }
-					/>
-				</VStack>
 			) }
 		</Wrapper>
 	);
