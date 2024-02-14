@@ -21,7 +21,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
-import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import Subtitle from './subtitle';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
@@ -166,12 +166,14 @@ function TypographyVariation( { variation } ) {
 }
 
 export default function TypographyVariations() {
-	const typographyVariations = useThemeStyleVariationsByProperty( {
-		styleProperty: 'typography',
-		filter: ( variation ) =>
-			variation?.settings?.typography?.fontFamilies &&
-			Object.keys( variation?.settings?.typography?.fontFamilies ).length,
-	} );
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( {
+			property: 'typography',
+			filter: ( variation ) =>
+				variation?.settings?.typography?.fontFamilies &&
+				Object.keys( variation?.settings?.typography?.fontFamilies )
+					.length,
+		} );
 
 	const { base } = useContext( GlobalStylesContext );
 	const uniqueTypographyVariations = [];

@@ -20,7 +20,7 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -28,12 +28,14 @@ function ScreenTypography() {
 			select( editorStore ).getEditorSettings().fontLibraryEnabled,
 		[]
 	);
-	const typographyVariations = useThemeStyleVariationsByProperty( {
-		styleProperty: 'typography',
-		filter: ( variation ) =>
-			variation?.settings?.typography?.fontFamilies &&
-			Object.keys( variation?.settings?.typography?.fontFamilies ).length,
-	} );
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( {
+			property: 'typography',
+			filter: ( variation ) =>
+				variation?.settings?.typography?.fontFamilies &&
+				Object.keys( variation?.settings?.typography?.fontFamilies )
+					.length,
+		} );
 
 	return (
 		<>

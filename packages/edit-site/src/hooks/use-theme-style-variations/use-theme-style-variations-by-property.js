@@ -1,13 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useContext, useMemo } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { mergeBaseAndUserConfigs } from '../../components/global-styles/global-styles-provider';
 import cloneDeep from '../../utils/clone-deep';
+import { unlock } from '../../lock-unlock';
+
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+
+/**
+ * Fetches the current theme style variations, filters them by the provided property,
+ * and merges with current user-defined global style/settings object.
+ *
+ * @param {Object}   props          Object of hook args.
+ * @param {string}   props.property The property to filter by.
+ * @param {Function} props.filter   Optional. The filter function to apply to the variations.
+ * @return {Object[]|*} The merged object.
+ */
+export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
+	property,
+	filter,
+} ) {
+	const variations = useSelect( ( select ) => {
+		return select(
+			coreStore
+		).__experimentalGetCurrentThemeGlobalStylesVariations();
+	}, [] );
+	const { user: baseVariation } = useContext( GlobalStylesContext );
+
+	return useThemeStyleVariationsByProperty( {
+		variations,
+		property,
+		filter,
+		baseVariation,
+	} );
+}
 
 /**
  * Returns a new object, with properties specified in `property`,

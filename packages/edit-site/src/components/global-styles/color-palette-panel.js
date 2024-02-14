@@ -14,7 +14,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 import ColorVariations from './variations-color';
-import useThemeStyleVariationsByProperty from './use-theme-style-variations-by-property';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
@@ -47,8 +47,8 @@ export default function ColorPalettePanel( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-	const colorVariations = useThemeStyleVariationsByProperty( {
-		styleProperty: 'color',
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
 		filter: ( variation ) =>
 			variation?.settings?.color &&
 			Object.keys( variation?.settings?.color ).length,
