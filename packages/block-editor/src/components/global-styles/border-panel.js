@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { mergeOrigins } from '../../store/get-block-settings';
+import { overrideOrigins } from '../../store/get-block-settings';
 import { setImmutably } from '../../utils/object';
 import { getBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover } from './shadow-panel-components';
@@ -154,12 +154,12 @@ export default function BorderPanel( {
 
 	// Shadow
 	const shadow = decodeValue( inheritedValue?.shadow );
-	const shadowPresets = settings?.shadow?.presets;
-	const mergedShadowPresets = shadowPresets
-		? mergeOrigins( shadowPresets )
+	const shadowPresets = settings?.shadow?.presets ?? {};
+	const overriddenShadowPresets = shadowPresets
+		? overrideOrigins( shadowPresets )
 		: [];
 	const setShadow = ( newValue ) => {
-		const slug = mergedShadowPresets?.find(
+		const slug = overriddenShadowPresets?.find(
 			( { shadow: shadowName } ) => shadowName === newValue
 		)?.slug;
 

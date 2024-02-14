@@ -320,6 +320,7 @@
 		"test:e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e  --runInBand --no-cache --verbose --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test:e2e:playwright": "wp-scripts test-playwright --config test/e2e/playwright.config.ts",
+		"test:e2e:playwright:debug": "wp-scripts test-playwright --config test/e2e/playwright.config.ts --ui",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
@@ -378,18 +379,5 @@
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
-	},
-	"wp-env": {
-		"plugin-dir": "gutenberg",
-		"plugin-name": "Gutenberg",
-		"docker-template": "./bin/docker-compose.override.yml.template",
-		"welcome-logo": [
-			",⁻⁻⁻·       .                 |",
-			"|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.",
-			"|   | |   | |     |---' |   | |   | |---' |     |   |",
-			"`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|",
-			"                                                `---'"
-		],
-		"welcome-build-command": "npm run dev"
 	}
 }

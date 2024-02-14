@@ -1,5 +1,20 @@
 == Changelog ==
 
+= 17.6.6 =
+
+## Changelog
+
+### Bug Fixes
+
+- Script loader 6.4 compat: check for init hook completion ([58406](https://github.com/WordPress/gutenberg/pull/58406))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ramonjd 
+
+
 = 17.7.0-rc.1 =
 
 

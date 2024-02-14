@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import { press, click } from '@ariakit/test';
+import { press, click, sleep } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -1185,10 +1185,18 @@ describe( 'Tabs', () => {
 							/>
 						);
 
+						// Due to the timing of the component re-rendering, we
+						// need to force a delay to ensure the test doesn't run
+						// the upcoming assertions too early.
+						// see https://github.com/WordPress/gutenberg/pull/58629#issuecomment-1924875249
+						await sleep();
+
 						// Tab key should focus the currently selected tab, which is Beta.
 						await press.Tab();
-						expect( await getSelectedTab() ).toHaveTextContent(
-							'Beta'
+						await waitFor( async () =>
+							expect( await getSelectedTab() ).toHaveTextContent(
+								'Beta'
+							)
 						);
 						expect( await getSelectedTab() ).toHaveFocus();
 
@@ -1201,9 +1209,11 @@ describe( 'Tabs', () => {
 						);
 
 						// When the selected tab is changed, it should not automatically receive focus.
+
 						expect( await getSelectedTab() ).toHaveTextContent(
 							'Gamma'
 						);
+
 						expect(
 							screen.getByRole( 'tab', { name: 'Beta' } )
 						).toHaveFocus();
@@ -1247,9 +1257,11 @@ describe( 'Tabs', () => {
 						);
 
 						// When the selected tab is changed, it should not automatically receive focus.
+
 						expect( await getSelectedTab() ).toHaveTextContent(
 							'Gamma'
 						);
+
 						expect(
 							screen.getByRole( 'tab', { name: 'Beta' } )
 						).toHaveFocus();
@@ -1307,10 +1319,13 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
+				await sleep();
 				await press.Tab();
-				expect(
-					await screen.findByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
+				await waitFor( async () =>
+					expect(
+						await screen.findByRole( 'tab', { name: 'Beta' } )
+					).toHaveFocus()
+				);
 
 				// Arrow key should move focus but not automatically change the selected tab.
 				await press.ArrowRight();

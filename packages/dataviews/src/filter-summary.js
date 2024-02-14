@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import {
 	Dropdown,
-	Button,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	FlexItem,
@@ -133,40 +132,6 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 	);
 }
 
-function ResetFilter( { filter, view, onChangeView, addFilterRef } ) {
-	const isDisabled =
-		filter.isPrimary &&
-		view.filters.find( ( _filter ) => _filter.field === filter.field )
-			?.value === undefined;
-	return (
-		<div className="dataviews-filter-summary__reset">
-			<Button
-				disabled={ isDisabled }
-				__experimentalIsFocusable
-				size="compact"
-				variant="tertiary"
-				style={ { justifyContent: 'center', width: '100%' } }
-				onClick={ () => {
-					onChangeView( {
-						...view,
-						page: 1,
-						filters: view.filters.filter(
-							( _filter ) => _filter.field !== filter.field
-						),
-					} );
-					// If the filter is not primary and can be removed, it will be added
-					// back to the available filters from `Add filter` component.
-					if ( ! filter.isPrimary ) {
-						addFilterRef.current?.focus();
-					}
-				} }
-			>
-				{ filter.isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
-			</Button>
-		</div>
-	);
-}
-
 export default function FilterSummary( {
 	addFilterRef,
 	openedFilter,
@@ -269,10 +234,6 @@ export default function FilterSummary( {
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
 						<SearchWidget { ...commonProps } />
-						<ResetFilter
-							{ ...commonProps }
-							addFilterRef={ addFilterRef }
-						/>
 					</VStack>
 				);
 			} }

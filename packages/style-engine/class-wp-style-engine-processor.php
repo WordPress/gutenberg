@@ -65,20 +65,20 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 			}
 
 			foreach ( $css_rules as $rule ) {
-				$selector = $rule->get_selector();
-				$at_rule  = $rule->get_at_rule();
+				$selector    = $rule->get_selector();
+				$rules_group = $rule->get_rules_group();
 
 				/**
 				 * If there is an at_rule and it already exists in the css_rules array,
 				 * add the rule to it.
 				 * Otherwise, create a new entry for the at_rule
 				 */
-				if ( ! empty( $at_rule ) ) {
-					if ( isset( $this->css_rules[ "$at_rule $selector" ] ) ) {
-						$this->css_rules[ "$at_rule $selector" ]->add_declarations( $rule->get_declarations() );
+				if ( ! empty( $rules_group ) ) {
+					if ( isset( $this->css_rules[ "$rules_group $selector" ] ) ) {
+						$this->css_rules[ "$rules_group $selector" ]->add_declarations( $rule->get_declarations() );
 						continue;
 					}
-					$this->css_rules[ "$at_rule $selector" ] = $rule;
+					$this->css_rules[ "$rules_group $selector" ] = $rule;
 					continue;
 				}
 
