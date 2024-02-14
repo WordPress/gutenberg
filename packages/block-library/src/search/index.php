@@ -47,7 +47,7 @@ function render_block_core_search( $attributes ) {
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
 	// This variable is a constant and its value is always false at this moment.
 	// It is defined this way because some values depend on it, in case it changes in the future.
-	$open_by_default = 'false';
+	$open_by_default = false;
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
 	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
@@ -80,6 +80,17 @@ function render_block_core_search( $attributes ) {
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
 		if ( $is_expandable_searchfield ) {
+			$suffix = wp_scripts_get_suffix();
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/search',
+				isset( $module_url ) ? $module_url : includes_url( "blocks/search/view{$suffix}.js" ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
 			wp_enqueue_script_module( '@wordpress/block-library/search' );
 
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
@@ -168,12 +179,20 @@ function render_block_core_search( $attributes ) {
 	if ( $is_expandable_searchfield ) {
 		$aria_label_expanded  = __( 'Submit Search' );
 		$aria_label_collapsed = __( 'Expand search field' );
+		$form_context         = data_wp_context(
+			array(
+				'isSearchInputVisible' => $open_by_default,
+				'inputId'              => $input_id,
+				'ariaLabelExpanded'    => $aria_label_expanded,
+				'ariaLabelCollapsed'   => $aria_label_collapsed,
+			)
+		);
 		$form_directives      = '
-			data-wp-interactive=\'{ "namespace": "core/search" }\'
-			data-wp-context=\'{ "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '", "ariaLabelExpanded": "' . $aria_label_expanded . '", "ariaLabelCollapsed": "' . $aria_label_collapsed . '" }\'
-			data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
-			data-wp-on--keydown="actions.handleSearchKeydown"
-			data-wp-on--focusout="actions.handleSearchFocusout"
+		 data-wp-interactive=\'"core/search"\''
+		. $form_context .
+		'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
+		 data-wp-on--keydown="actions.handleSearchKeydown"
+		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
 	}
 
@@ -195,17 +214,6 @@ function register_block_core_search() {
 		array(
 			'render_callback' => 'render_block_core_search',
 		)
-	);
-
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
-	}
-
-	wp_register_script_module(
-		'@wordpress/block-library/search',
-		isset( $module_url ) ? $module_url : includes_url( 'blocks/search/view.min.js' ),
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }
 add_action( 'init', 'register_block_core_search' );

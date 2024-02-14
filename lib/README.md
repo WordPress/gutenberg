@@ -60,6 +60,8 @@ function wp_get_something_useful() {
 
 Plugin code that is stable and expected to be merged "as-is" into Core in the near future can use the `wp_` prefix for functions or a `WP_` prefix for classes.
 
+#### Avoiding duplicate declarations
+
 When doing so, care must be taken to ensure that no duplicate declarations to create functions or classes exist between Gutenberg and WordPress core code. A quick codebase search will also help you know if your new names are unique.
 
 Wrapping such code in `class_exists()` and `function_exists()` checks should be used to ensure it executes in the plugin up until it is merged to Core, or when running the plugin on older versions of WordPress.
@@ -87,17 +89,25 @@ Or for classes:
  * @since 6.3.0
  */
 if ( ! class_exists( 'WP_A_Stable_Class' ) ) {
-	/**
-	 * A very stable class that does something.
-	 *
-	 * @since 6.3.0
-	 */
+	// Do not invert this pattern with an early `return`.
+	// See below for details...
 	class WP_A_Stable_Class { ... }
 }
-
 ```
 
 Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
+
+The `return` operator is considered an anti-pattern in the context provided below because it [does not halt](https://www.php.net/manual/en/function.return.php#112515) the parsing of the PHP script and can cause [unexpected side effects](https://github.com/WordPress/gutenberg/pull/58429#issuecomment-1916670097):
+```php
+/**
+ * ANTI-PATTERN
+ * DO NOT COPY!
+ *
+ */
+if ( class_exists( 'WP_A_Stable_Class' ) ) {
+	return; // do not do this.
+}
+```
 
 When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely give rise to naming conflicts.
 
@@ -175,6 +185,7 @@ add_action( 'init', 'wp_register_navigation_cpt' );
 ```
 
 ### Requiring files in lib/load.php
+
 Should the load order allow it, try to group imports according to WordPress release, then feature. It'll help everyone to quickly recognise the files that belong to specific WordPress releases.
 
 Existing comments in `lib/load.php` should act as a guide.

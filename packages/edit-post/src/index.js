@@ -55,7 +55,6 @@ export function initializeEditor(
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
 		isPublishSidebarEnabled: true,
-		preferredStyleVariations: {},
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
@@ -103,10 +102,7 @@ export function initializeEditor(
 		'blockEditor.__unstableCanInsertBlockType',
 		'removeTemplatePartsFromInserter',
 		( canInsert, blockType ) => {
-			if (
-				select( editorStore ).getRenderingMode() === 'post-only' &&
-				blockType.name === 'core/template-part'
-			) {
+			if ( blockType.name === 'core/template-part' ) {
 				return false;
 			}
 			return canInsert;
@@ -128,10 +124,7 @@ export function initializeEditor(
 			rootClientId,
 			{ getBlockParentsByBlockName }
 		) => {
-			if (
-				select( editorStore ).getRenderingMode() === 'post-only' &&
-				blockType.name === 'core/post-content'
-			) {
+			if ( blockType.name === 'core/post-content' ) {
 				return (
 					getBlockParentsByBlockName( rootClientId, 'core/query' )
 						.length > 0

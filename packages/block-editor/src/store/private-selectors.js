@@ -71,6 +71,25 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
 	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 };
 
+function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
+	const blockOrder = getBlockOrder( state, rootClientId );
+	const result = [];
+
+	for ( const clientId of blockOrder ) {
+		const innerBlocks = getEnabledClientIdsTreeUnmemoized(
+			state,
+			clientId
+		);
+		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+			result.push( { clientId, innerBlocks } );
+		} else {
+			result.push( ...innerBlocks );
+		}
+	}
+
+	return result;
+}
+
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.
  * Blocks with a 'disabled' editing mode are not included.
@@ -81,19 +100,7 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
 export const getEnabledClientIdsTree = createSelector(
-	( state, rootClientId = '' ) => {
-		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
-			if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
-				return [
-					{
-						clientId,
-						innerBlocks: getEnabledClientIdsTree( state, clientId ),
-					},
-				];
-			}
-			return getEnabledClientIdsTree( state, clientId );
-		} );
-	},
+	getEnabledClientIdsTreeUnmemoized,
 	( state ) => [
 		state.blocks.order,
 		state.blockEditingModes,
@@ -343,4 +350,17 @@ export function getAllBlockBindingsSources( state ) {
 
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
+}
+
+/**
+ * Returns true if the user is dragging anything, or false otherwise. It is possible for a
+ * user to be dragging data from outside of the editor, so this selector is separate from
+ * the `isDraggingBlocks` selector which only returns true if the user is dragging blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging.
+ */
+export function isDragging( state ) {
+	return state.isDragging;
 }

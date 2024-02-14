@@ -1,8 +1,8 @@
 <?php
 /**
- * WP_Theme_JSON_Resolver class
+ * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package gutenberg
+ * @package Gutenberg
  * @since 5.8.0
  */
 
@@ -14,6 +14,7 @@
  * This is a low-level API that may need to do breaking changes. Please,
  * use gutenberg_get_global_settings, gutenberg_get_global_styles, and gutenberg_get_global_stylesheet instead.
  *
+ * @since 5.8.0
  * @access private
  */
 #[AllowDynamicProperties]
@@ -36,7 +37,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from core.
 	 *
 	 * @since 5.8.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $core = null;
 
@@ -44,7 +45,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from the blocks.
 	 *
 	 * @since 6.1.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $blocks = null;
 
@@ -52,7 +53,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from the theme.
 	 *
 	 * @since 5.8.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $theme = null;
 
@@ -60,7 +61,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from the user.
 	 *
 	 * @since 5.9.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $user = null;
 
@@ -154,7 +155,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 *
-	 * @return WP_Theme_JSON Entity that holds core data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
 	 */
 	public static function get_core_data() {
 		if ( null !== static::$core && static::has_same_registered_blocks( 'core' ) ) {
@@ -169,7 +170,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
 		$config       = $theme_json->get_data();
@@ -227,7 +228,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
 	 * }
-	 * @return WP_Theme_JSON Entity that holds theme data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
 	public static function get_theme_data( $deprecated = array(), $options = array() ) {
 		if ( ! empty( $deprecated ) ) {
@@ -251,7 +252,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @since 6.1.0
 			 *
-			 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
 			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
 			$theme_json_data = $theme_json->get_data();
@@ -358,7 +359,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @return WP_Theme_JSON
+	 * @return WP_Theme_JSON_Gutenberg
 	 */
 	public static function get_block_data() {
 		$registry = WP_Block_Type_Registry::get_instance();
@@ -389,7 +390,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
 		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
 		$config     = $theme_json->get_data();
@@ -502,7 +503,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @return WP_Theme_JSON Entity that holds styles for user data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
 	 */
 	public static function get_user_data() {
 		if ( null !== static::$user && static::has_same_registered_blocks( 'user' ) ) {
@@ -523,7 +524,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 *
 				 * @since 6.1.0
 				 *
-				 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
 				$config     = $theme_json->get_data();
@@ -583,7 +584,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
 	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
 	 *
-	 * @return WP_Theme_JSON
+	 * @return WP_Theme_JSON_Gutenberg
 	 */
 	public static function get_merged_data( $origin = 'custom' ) {
 		if ( is_array( $origin ) ) {

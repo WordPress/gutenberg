@@ -2,27 +2,25 @@
 /**
  * Block Bindings API: WP_Block_Bindings_Registry class.
  *
- * Support for overriding content in blocks by connecting them to different sources.
+ * Supports overriding content in blocks by connecting them to different sources.
  *
  * @package WordPress
  * @subpackage Block Bindings
  * @since 6.5.0
  */
 
+/**
+ * Class used for interacting with block bindings sources.
+ *
+ *  @since 6.5.0
+ */
 if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
-
-	/**
-	 * Class used for interacting with block bindings sources.
-	 *
-	 *  @since 6.5.0
-	 */
 	final class WP_Block_Bindings_Registry {
 		/**
 		 * Holds the registered block bindings sources, keyed by source identifier.
 		 *
 		 * @since 6.5.0
-		 *
-		 * @var array
+		 * @var WP_Block_Bindings_Source[]
 		 */
 		private $sources = array();
 
@@ -44,7 +42,9 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string   $source_name       The name of the source.
+		 * @param string   $source_name       The name of the source. It must be a string containing a namespace prefix, i.e.
+		 *                                    `my-plugin/my-custom-source`. It must only contain lowercase alphanumeric
+		 *                                    characters, the forward slash `/` and dashes.
 		 * @param array    $source_properties {
 		 *     The array of arguments that are used to register a source.
 		 *
@@ -57,13 +57,13 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 *                                                                              used to look up the override value,
 		 *                                                                              i.e. {"key": "foo"}.
 		 *                                            - @param WP_Block $block_instance The block instance.
-		 *                                            - @param string   $attribute_name The name of an attribute .
+		 *                                            - @param string   $attribute_name The name of the target attribute.
 		 *                                        The callback has a mixed return type; it may return a string to override
 		 *                                        the block's original value, null, false to remove an attribute, etc.
 		 * }
-		 * @return array|false Source when the registration was successful, or `false` on failure.
+		 * @return WP_Block_Bindings_Source|false Source when the registration was successful, or `false` on failure.
 		 */
-		public function register( $source_name, array $source_properties ) {
+		public function register( string $source_name, array $source_properties ) {
 			if ( ! is_string( $source_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -96,14 +96,44 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Block bindings source name. */
-					sprintf( __( 'Block bindings sources "%s" already registered.' ), $source_name ),
+					sprintf( __( 'Block bindings source "%s" already registered.' ), $source_name ),
 					'6.5.0'
 				);
 				return false;
 			}
 
-			$source = array_merge(
-				array( 'name' => $source_name ),
+			/* Validate that the source properties contain the label */
+			if ( ! isset( $source_properties['label'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The $source_properties must contain a "label".' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
+			/* Validate that the source properties contain the get_value_callback */
+			if ( ! isset( $source_properties['get_value_callback'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The $source_properties must contain a "get_value_callback".' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
+			/* Validate that the get_value_callback is a valid callback */
+			if ( ! is_callable( $source_properties['get_value_callback'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The "get_value_callback" parameter must be a valid callback.' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
+			$source = new WP_Block_Bindings_Source(
+				$source_name,
 				$source_properties
 			);
 
@@ -118,14 +148,14 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $source_name Block bindings source name including namespace.
-		 * @return array|false The unregistred block bindings source on success and `false` otherwise.
+		 * @return WP_Block_Bindings_Source|false The unregistered block bindings source on success and `false` otherwise.
 		 */
-		public function unregister( $source_name ) {
+		public function unregister( string $source_name ) {
 			if ( ! $this->is_registered( $source_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Block bindings source name. */
-					sprintf( __( 'Block bindings "%s" not found.' ), $source_name ),
+					sprintf( __( 'Block binding "%s" not found.' ), $source_name ),
 					'6.5.0'
 				);
 				return false;
@@ -142,7 +172,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @return array The array of registered sources.
+		 * @return WP_Block_Bindings_Source[] The array of registered sources.
 		 */
 		public function get_all_registered() {
 			return $this->sources;
@@ -154,9 +184,9 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param string $source_name The name of the source.
-		 * @return array|null The registered block bindings source, or `null` if it is not registered.
+		 * @return WP_Block_Bindings_Source|null The registered block bindings source, or `null` if it is not registered.
 		 */
-		public function get_registered( $source_name ) {
+		public function get_registered( string $source_name ) {
 			if ( ! $this->is_registered( $source_name ) ) {
 				return null;
 			}
