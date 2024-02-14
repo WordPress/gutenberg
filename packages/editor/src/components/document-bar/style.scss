@@ -46,7 +46,7 @@
 	align-items: center;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	@include break-small() {
+	@include break-medium() {
 		padding-left: $grid-unit-40;
 	}
 
