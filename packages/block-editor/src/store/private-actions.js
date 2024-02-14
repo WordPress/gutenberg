@@ -140,6 +140,15 @@ export const privateRemoveBlocks =
 				}
 
 				if ( rules[ 'bindings/core/pattern-overrides' ] ) {
+					const parentPatternBlocks =
+						select.getBlockParentsByBlockName(
+							clientId,
+							'core/block'
+						);
+					// If the overriden block is a child of a core/block, skip it.
+					if ( parentPatternBlocks?.length > 0 ) {
+						continue;
+					}
 					const blockAttributes =
 						select.getBlockAttributes( clientId );
 					if (
