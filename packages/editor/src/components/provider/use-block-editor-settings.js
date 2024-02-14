@@ -7,12 +7,12 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
-	fetchBlockPatterns,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -20,6 +20,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -247,17 +248,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			__experimentalFetchBlockPatterns: async () => {
-				return ( await fetchBlockPatterns() ).filter(
-					( { postTypes } ) => {
-						return (
-							! postTypes ||
-							( Array.isArray( postTypes ) &&
-								postTypes.includes( postType ) )
-						);
-					}
-				);
-			},
+			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
+				unlock( select( coreStore ) ).getBlockPatternsForPostType(
+					postType
+				),
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
