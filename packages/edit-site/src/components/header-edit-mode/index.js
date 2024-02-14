@@ -206,7 +206,7 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<PostViewLink />
-					<SaveButton />
+					<SaveButton size="compact" />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }

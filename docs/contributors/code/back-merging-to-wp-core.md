@@ -2,14 +2,16 @@
 
 For major releases of the WordPress software, Gutenberg features need to be merged into WordPress Core. Typically this involves taking changes made in `.php` files within the Gutenberg repository and making the equivalent updates in the WP Core codebase.
 
-## Files/Directories
+## Criteria
+
+### Files/Directories
 
 Changes to files within the following files/directories will typically require back-merging to WP Core:
 
 -   `lib/`
 -   `phpunit/`
 
-## Ignored directories/files
+### Ignored directories/files
 
 The following directories/files do _not_ require back-merging to WP Core:
 
@@ -21,11 +23,16 @@ The following directories/files do _not_ require back-merging to WP Core:
 
 Please note this list is not exhaustive.
 
-## Pull Request Criteria
+### Pull Request Criteria
 
 In general, all PHP code committed to the Gutenberg repository since the date of the final Gutenberg release that was included in [the _last_ stable WP Core release](https://developer.wordpress.org/block-editor/contributors/versions-in-wordpress/) should be considered for back merging to WP Core.
 
 There are however certain exceptions to that rule. PRs with the following criteria do _not_ require back-merging to WP Core:
 
 -   Does not contain changes to PHP code.
--   Has label `Backport from WordPress Core` - this code is already in WP Core.
+-   Has label `Backport from WordPress Core` - this code is already in WP Core and is being synchronized back to Gutenberg.
+-   Has label `Backport to WordPress Core` - this code has already been syncrhonized to WP Core.
+
+## Further Reading
+
+Please see also additional documentation regarding [Gutenberg PHP code](/lib/README.md).

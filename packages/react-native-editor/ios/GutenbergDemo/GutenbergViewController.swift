@@ -419,7 +419,6 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
-            .mediaFilesCollectionBlock: true,
             .tiledGalleryBlock: true,
             .videoPressBlock: true,
             .isAudioBlockMediaUploadEnabled: true,

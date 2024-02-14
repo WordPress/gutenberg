@@ -34,7 +34,7 @@ const tabsFromCollections = ( collections ) =>
 	collections.map( ( { slug, name } ) => ( {
 		id: slug,
 		title:
-			collections.length === 1 && slug === 'default-font-collection'
+			collections.length === 1 && slug === 'google-fonts'
 				? __( 'Install Fonts' )
 				: name,
 	} ) );
@@ -43,12 +43,17 @@ function FontLibraryModal( {
 	onRequestClose,
 	initialTabId = 'installed-fonts',
 } ) {
-	const { collections } = useContext( FontLibraryContext );
+	const { collections, setNotice } = useContext( FontLibraryContext );
 
 	const tabs = [
 		...DEFAULT_TABS,
 		...tabsFromCollections( collections || [] ),
 	];
+
+	// Reset notice when new tab is selected.
+	const onSelect = () => {
+		setNotice( null );
+	};
 
 	return (
 		<Modal
@@ -58,7 +63,7 @@ function FontLibraryModal( {
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs initialTabId={ initialTabId }>
+				<Tabs initialTabId={ initialTabId } onSelect={ onSelect }>
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>

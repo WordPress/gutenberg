@@ -44,28 +44,10 @@ test.describe( 'Search', () => {
 		} );
 		await navBlockInserter.click();
 
-		// Expect to see the block inserter.
-		await expect(
-			page.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
-			} )
-		).toBeFocused();
+		await page.getByRole( 'button', { name: 'Add block' } ).click();
 
-		// Search for the Search block.
-		await page.keyboard.type( 'Search' );
-
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const searchBlockResult = blockResults.getByRole( 'option', {
-			name: 'Search',
-		} );
-
-		// Select the Search block.
-		await searchBlockResult.click();
+		// Click on the Search block option.
+		await page.getByRole( 'option', { name: 'Search' } ).click();
 
 		// Expect to see the Search block.
 		const searchBlock = editor.canvas.getByRole( 'document', {

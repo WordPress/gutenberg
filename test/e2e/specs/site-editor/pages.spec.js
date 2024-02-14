@@ -143,6 +143,9 @@ test.describe( 'Pages', () => {
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Site title text' } )
+			.click( { force: true } );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Site title text' } )
 			.fill( 'New Site Title' );
 
 		// Go back to page editing focus.
