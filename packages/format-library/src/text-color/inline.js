@@ -15,7 +15,6 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
-	useCachedTruthy,
 } from '@wordpress/block-editor';
 import {
 	Popover,
@@ -147,21 +146,12 @@ export default function InlineColorUI( {
 	onChange,
 	onClose,
 	contentRef,
+	isActive,
 } ) {
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		settings,
+		settings: { ...settings, isActive },
 	} );
-
-	/*
-	 As you change the text color by typing a HEX value into a field,
-	 the return value of document.getSelection jumps to the field you're editing,
-	 not the highlighted text. Given that useAnchor uses document.getSelection,
-	 it will return null, since it can't find the <mark> element within the HEX input.
-	 This caches the last truthy value of the selection anchor reference.
-	 */
-	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
-	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
 	return (
 		<Popover

@@ -1409,7 +1409,7 @@ Returns an action used to set the rendering mode of the post editor. We support 
 
 _Parameters_
 
--   _mode_ `string`: Mode (one of 'post-only', 'template-locked' or 'all').
+-   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
 
 ### setTemplateValidity
 

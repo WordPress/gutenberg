@@ -82,7 +82,8 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"shadow": true
 	},
 	"editorStyle": "wp-block-columns-editor",
 	"style": "wp-block-columns"

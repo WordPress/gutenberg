@@ -63,6 +63,12 @@ function UploadFonts() {
 		} );
 		if ( allowedFiles.length > 0 ) {
 			loadFiles( allowedFiles );
+		} else {
+			setNotice( {
+				type: 'error',
+				message: __( 'No fonts found to install.' ),
+			} );
+			setIsUploading( false );
 		}
 	};
 

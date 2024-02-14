@@ -373,7 +373,6 @@ export default function TypographyPanel( {
 						withReset={ false }
 						withSlider
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

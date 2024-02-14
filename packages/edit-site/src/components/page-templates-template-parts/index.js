@@ -325,7 +325,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			render: ( { item } ) => {
 				return <AuthorField viewType={ view.type } item={ item } />;
 			},
-			enableHiding: false,
 			type: ENUMERATION_TYPE,
 			elements: authors,
 			width: '1%',
@@ -430,6 +429,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 
 	return (
 		<Page
+			className="edit-site-page-template-template-parts-dataviews"
 			title={
 				postType === TEMPLATE_POST_TYPE
 					? __( 'Templates' )

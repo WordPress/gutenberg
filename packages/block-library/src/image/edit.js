@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -316,6 +317,7 @@ export function ImageEdit( {
 	);
 
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
@@ -339,15 +341,15 @@ export function ImageEdit( {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
+			const blockBindingsSource = unlock(
 				select( blockEditorStore )
-			);
+			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource( metadata?.bindings?.url?.source )
-						?.lockAttributesEditing === true,
+					( ! blockBindingsSource ||
+						blockBindingsSource?.lockAttributesEditing ),
 			};
 		},
 		[ isSingleSelected ]
@@ -377,6 +379,7 @@ export function ImageEdit( {
 					height: width && aspectRatio ? '100%' : height,
 					objectFit: scale,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ lockUrlControls ? (

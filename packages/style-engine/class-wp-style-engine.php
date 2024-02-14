@@ -355,14 +355,15 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string   $store_name       A valid store key.
 		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @param string $rules_group        Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return void.
 		 */
-		public static function store_css_rule( $store_name, $css_selector, $css_declarations ) {
+		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $rules_group = '' ) {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
 				return;
 			}
-			static::get_store( $store_name )->add_rule( $css_selector )->add_declarations( $css_declarations );
+			static::get_store( $store_name )->add_rule( $css_selector, $rules_group )->add_declarations( $css_declarations );
 		}
 
 		/**

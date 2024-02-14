@@ -74,7 +74,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
 		public function get_items( $request ) {
-			$collections_all = WP_Font_Library::get_font_collections();
+			$collections_all = WP_Font_Library::get_instance()->get_font_collections();
 
 			$page        = $request['page'];
 			$per_page    = $request['per_page'];
@@ -142,12 +142,11 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		 */
 		public function get_item( $request ) {
 			$slug       = $request->get_param( 'slug' );
-			$collection = WP_Font_Library::get_font_collection( $slug );
+			$collection = WP_Font_Library::get_instance()->get_font_collection( $slug );
 
-			// If the collection doesn't exist returns a 404.
-			if ( is_wp_error( $collection ) ) {
-				$collection->add_data( array( 'status' => 404 ) );
-				return $collection;
+			// @TODO: remove `is_wp_error` check once WP trunk is updated to return null when a collection is not found.
+			if ( ! $collection || is_wp_error( $collection ) ) {
+				return new WP_Error( 'rest_font_collection_not_found', __( 'Font collection not found.' ), array( 'status' => 404 ) );
 			}
 
 			return $this->prepare_item_for_response( $collection, $request );
@@ -158,22 +157,22 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 		*
 		* @since 6.5.0
 		*
-		* @param WP_Font_Collection $collection Collection object.
-		* @param WP_REST_Request    $request    Request object.
-		* @return WP_REST_Response Response object.
+		* @param WP_Font_Collection $item    Font collection object.
+		* @param WP_REST_Request    $request Request object.
+		* @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		*/
-		public function prepare_item_for_response( $collection, $request ) {
+		public function prepare_item_for_response( $item, $request ) {
 			$fields = $this->get_fields_for_response( $request );
-			$item   = array();
+			$data   = array();
 
 			if ( rest_is_field_included( 'slug', $fields ) ) {
-				$item['slug'] = $collection->slug;
+				$data['slug'] = $item->slug;
 			}
 
 			// If any data fields are requested, get the collection data.
 			$data_fields = array( 'name', 'description', 'font_families', 'categories' );
 			if ( ! empty( array_intersect( $fields, $data_fields ) ) ) {
-				$collection_data = $collection->get_data();
+				$collection_data = $item->get_data();
 				if ( is_wp_error( $collection_data ) ) {
 					$collection_data->add_data( array( 'status' => 500 ) );
 					return $collection_data;
@@ -181,15 +180,15 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 
 				foreach ( $data_fields as $field ) {
 					if ( rest_is_field_included( $field, $fields ) ) {
-						$item[ $field ] = $collection_data[ $field ];
+						$data[ $field ] = $collection_data[ $field ];
 					}
 				}
 			}
 
-			$response = rest_ensure_response( $item );
+			$response = rest_ensure_response( $data );
 
 			if ( rest_is_field_included( '_links', $fields ) ) {
-				$links = $this->prepare_links( $collection );
+				$links = $this->prepare_links( $item );
 				$response->add_links( $links );
 			}
 
@@ -198,17 +197,15 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$response->data = $this->filter_response_by_context( $response->data, $context );
 
 			/**
-			 * Filters a font collection returned from the REST API.
-			 *
-			 * Allows modification of the font collection right before it is returned.
+			 * Filters the font collection data for a REST API response.
 			 *
 			 * @since 6.5.0
 			 *
-			 * @param WP_REST_Response   $response    The response object.
-			 * @param WP_Font_Collection $collection  The Font Collection object.
-			 * @param WP_REST_Request    $request     Request used to generate the response.
+			 * @param WP_REST_Response   $response The response object.
+			 * @param WP_Font_Collection $item     The font collection object.
+			 * @param WP_REST_Request    $request  Request used to generate the response.
 			 */
-			return apply_filters( 'rest_prepare_font_collection', $response, $collection, $request );
+			return apply_filters( 'rest_prepare_font_collection', $response, $item, $request );
 		}
 
 		/**
@@ -319,7 +316,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 
 			return new WP_Error(
 				'rest_cannot_read',
-				__( 'Sorry, you are not allowed to use the Font Library on this site.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to access font collections.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
