@@ -388,7 +388,12 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 	// Default editor colors/gradients if it's not a block-based theme.
 	const defaultPaletteSetting =
 		type === 'colors' ? 'color.palette' : 'color.gradients';
-	const [ defaultPaletteValue ] = useSettings( defaultPaletteSetting );
+	const defaultPaletteValue = useSettings(
+		`${ defaultPaletteSetting }.custom`,
+		`${ defaultPaletteSetting }.theme`,
+		`${ defaultPaletteSetting }.default`
+	).find( ( origin ) => origin !== undefined );
+
 	// In edge cases, the default palette might be undefined. To avoid
 	// exceptions across the editor in that case, we explicitly return
 	// the default editor colors.

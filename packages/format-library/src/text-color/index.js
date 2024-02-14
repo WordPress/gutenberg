@@ -61,10 +61,15 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 } ) {
-	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
+	const [ allowCustomControl, ...colorsByOrigin ] = useSettings(
 		'color.custom',
-		'color.palette'
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default'
 	);
+	const colors =
+		colorsByOrigin.find( ( origin ) => origin !== undefined ) ??
+		EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback(
 		() => setIsAddingColor( true ),

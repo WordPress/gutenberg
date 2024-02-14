@@ -178,19 +178,32 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const [ colors, gradients, customColors, customGradients ] = useSettings(
-		'color.palette',
-		'color.gradients',
+	const [
+		enableCustomColors,
+		userColors,
+		themeColors,
+		defaultColors,
+		enableCustomGradients,
+		userGradients,
+		themeGradients,
+		defaultGradients,
+	] = useSettings(
 		'color.custom',
-		'color.customGradient'
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.customGradient',
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default'
 	);
 
 	return (
 		<ColorGradientControlInner
-			colors={ colors }
-			gradients={ gradients }
-			disableCustomColors={ ! customColors }
-			disableCustomGradients={ ! customGradients }
+			colors={ userColors ?? themeColors ?? defaultColors }
+			gradients={ userGradients ?? themeGradients ?? defaultGradients }
+			disableCustomColors={ ! enableCustomColors }
+			disableCustomGradients={ ! enableCustomGradients }
 			{ ...props }
 		/>
 	);
