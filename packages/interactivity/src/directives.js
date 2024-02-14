@@ -29,9 +29,10 @@ const contextProxy = ( context, stack = {} ) =>
 			}
 			return stack[ k ];
 		},
-		set: ( target, k, value ) =>
-			( ( k in target || ! ( k in stack ) ? target : stack )[ k ] =
-				value ),
+		set: ( target, k, value ) => {
+			( k in target || ! ( k in stack ) ? target : stack )[ k ] = value;
+			return true;
+		},
 		ownKeys: ( target ) => [
 			...new Set( [ ...Object.keys( stack ), ...Object.keys( target ) ] ),
 		],
