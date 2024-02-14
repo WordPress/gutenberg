@@ -85,7 +85,11 @@ export function toVdom( root ) {
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
-						namespaces.push( value?.namespace ?? null );
+						namespaces.push(
+							typeof value === 'string'
+								? value
+								: value?.namespace ?? null
+						);
 					} else {
 						directives.push( [ n, ns, value ] );
 					}

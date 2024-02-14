@@ -6,13 +6,14 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { usePostLinkProps } from './use-post-link-props';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
@@ -90,20 +91,31 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-function useGoBack() {
+function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
+	const previousLocation = usePrevious( location );
 	const history = useHistory();
 	const goBack = useMemo( () => {
 		const isFocusMode =
 			location.params.focusMode ||
-			FOCUSABLE_ENTITIES.includes( location.params.postType );
-		return isFocusMode ? () => history.back() : undefined;
-	}, [ location.params.focusMode, location.params.postType, history ] );
+			( location.params.postId &&
+				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
+		const didComeFromEditorCanvas =
+			previousLocation?.params.postId &&
+			previousLocation?.params.postType &&
+			previousLocation?.params.canvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+		// Disable reason: previousLocation changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ location, history ] );
 	return goBack;
 }
 
 export function useSpecificEditorSettings() {
-	const getPostLinkProps = usePostLinkProps();
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
@@ -132,8 +144,11 @@ export function useSpecificEditorSettings() {
 		[]
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
-	const goBack = useGoBack();
+	const defaultRenderingMode = postWithTemplate
+		? 'template-locked'
+		: 'post-only';
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
@@ -142,8 +157,8 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			getPostLinkProps,
-			goBack,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -152,8 +167,8 @@ export function useSpecificEditorSettings() {
 		settings,
 		canvasMode,
 		defaultRenderingMode,
-		getPostLinkProps,
-		goBack,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );

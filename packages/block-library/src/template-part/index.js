@@ -32,8 +32,9 @@ export const settings = {
 			return;
 		}
 
-		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
-		const entity = getEntityRecord(
+		const { getCurrentTheme, getEditedEntityRecord } =
+			select( coreDataStore );
+		const entity = getEditedEntityRecord(
 			'postType',
 			'wp_template_part',
 			( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
@@ -43,8 +44,7 @@ export const settings = {
 		}
 
 		return (
-			decodeEntities( entity.title?.rendered ) ||
-			capitalCase( entity.slug )
+			decodeEntities( entity.title ) || capitalCase( entity.slug || '' )
 		);
 	},
 	edit,

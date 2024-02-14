@@ -314,11 +314,6 @@
 					"description": "This property adds a field to define a custom className for the block’s wrapper.",
 					"default": true
 				},
-				"defaultStylePicker": {
-					"type": "boolean",
-					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
-					"default": true
-				},
 				"dimensions": {
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
@@ -556,10 +551,12 @@
 					}
 				},
 				"shadow": {
+					"default": false,
 					"description": "Allow blocks to define a box shadow.",
 					"oneOf": [
 						{
-							"type": "boolean"
+							"type": "boolean",
+							"description": "Defines whether a box shadow is enabled or not."
 						},
 						{
 							"type": "object"
@@ -745,7 +742,7 @@
 				},
 				"innerBlocks": {
 					"type": "array",
-					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this: \n\n [ [ 'core/heading', { content: 'This is an Example' }, [] ] ]\n\n Where each block itself is an array that contains the block name, the block attributes, and the blocks inner blocks."
+					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this:\n\n[ { \"name\": \"core/heading\", \"attributes\": { \"content\": \"This is an Example\" } } ]\n\nWhere each block itself is an object that contains the block name, the block attributes, and the blocks inner blocks."
 				}
 			}
 		},

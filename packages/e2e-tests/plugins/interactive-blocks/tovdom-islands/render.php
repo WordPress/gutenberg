@@ -17,7 +17,15 @@ wp_enqueue_script_module( 'tovdom-islands-view' );
 
 	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
 		<div data-wp-show-mock="state.falseValue">
-			<span data-testid="inside an island">
+			<span data-testid="inside an island with json object">
+				This should not be shown because it is inside an island.
+			</span>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="inside an island with string">
 				This should not be shown because it is inside an island.
 			</span>
 		</div>
@@ -68,8 +76,6 @@ wp_enqueue_script_module( 'tovdom-islands-view' );
 			</div>
 		</div>
 	</div>
-
-
 
 	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
 		<div data-wp-interactive='{ "namespace": "something-new" }'></div>
