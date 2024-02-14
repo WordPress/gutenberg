@@ -190,4 +190,17 @@ describe( 'formatFontFaceName', () => {
 			'Font+Name 24'
 		);
 	} );
+
+	it( 'should ouput the font face name with quotes on Firefox', () => {
+		const mockUserAgent =
+			'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0';
+
+		// Mock the userAgent for this test
+		Object.defineProperty( window.navigator, 'userAgent', {
+			value: mockUserAgent,
+			configurable: true,
+		} );
+
+		expect( formatFontFaceName( 'Open Sans' ) ).toBe( '"Open Sans"' );
+	} );
 } );

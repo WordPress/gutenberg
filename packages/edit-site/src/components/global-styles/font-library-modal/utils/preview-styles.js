@@ -84,22 +84,27 @@ export function formatFontFamily( input ) {
  * Example:
  * formatFontFaceName("Open Sans") => "Open Sans"
  * formatFontFaceName("'Open Sans', sans-serif") => "Open Sans"
- * formatFontFaceName("'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
+ * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
  */
 export function formatFontFaceName( input ) {
-	const output = input.trim();
+	let output = input.trim();
 	if ( output.includes( ',' ) ) {
-		return (
-			output
-				.split( ',' )
-				.find( ( item ) => item.trim() !== '' )
-				.trim()
-				// removes leading and trailing quotes.
-				.replace( /^["']|["']$/g, '' )
-		);
+		output = output
+			.split( ',' )
+			// finds the first item that is not an empty string.
+			.find( ( item ) => item.trim() !== '' )
+			.trim()
+			// removes leading and trailing quotes.
+			.replace( /^["']|["']$/g, '' );
 	}
 	// removes leading and trailing quotes.
-	return output.replace( /^["']|["']$/g, '' );
+	output = output.replace( /^["']|["']$/g, '' );
+
+	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
+	if ( window.navigator.userAgent.toLowerCase().includes( 'firefox' ) ) {
+		output = `"${ output }"`;
+	}
+	return output;
 }
 
 export function getFamilyPreviewStyle( family ) {
