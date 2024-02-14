@@ -6,7 +6,8 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useResourcePermissions } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -48,12 +49,16 @@ function FontLibraryModal( {
 	initialTabId = 'installed-fonts',
 } ) {
 	const { collections, setNotice } = useContext( FontLibraryContext );
-	const { canCreate } = useResourcePermissions( 'font-families' );
+
+	const canUserCreate = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
+		return canUser( 'create', 'font-families' );
+	} );
 
 	const tabs = [
 		...DEFAULT_TABS,
-		...( canCreate ? UPLOAD_TABS : [] ),
-		...( canCreate ? tabsFromCollections( collections || [] ) : [] ),
+		...( canUserCreate ? UPLOAD_TABS : [] ),
+		...( canUserCreate ? tabsFromCollections( collections || [] ) : [] ),
 	];
 
 	// Reset notice when new tab is selected.

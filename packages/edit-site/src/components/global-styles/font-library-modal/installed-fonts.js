@@ -12,6 +12,8 @@ import {
 	Spinner,
 	FlexItem,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -173,11 +175,17 @@ function InstalledFonts() {
 function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
 		useContext( FontLibraryContext );
+
+	const canUserDelete = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
+		return canUser( 'delete', 'font-families' );
+	} );
+
 	return (
 		<HStack justify="flex-end">
 			{ isInstalling && <ProgressBar /> }
 			<div>
-				{ shouldDisplayDeleteButton && (
+				{ canUserDelete && shouldDisplayDeleteButton && (
 					<Button
 						isDestructive
 						variant="tertiary"
