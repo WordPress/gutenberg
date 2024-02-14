@@ -3,10 +3,11 @@
 	align-items: center;
 
 	// Hide all action buttons except the inserter on mobile.
-	.editor-document-tools__left > .components-button {
+	.editor-document-tools__left > .editor-history__redo,
+	.editor-document-tools__left > .editor-history__undo {
 		display: none;
 
-		@include break-small() {
+		@include break-medium() {
 			display: inline-flex;
 		}
 	}
@@ -70,14 +71,6 @@
 	// Some plugins add buttons here despite best practices.
 	// Push them a bit rightwards to fit the top toolbar.
 	margin-right: $grid-unit-10;
-
-	@include break-medium() {
-		padding-left: $grid-unit-50 * 0.5;
-	}
-
-	@include break-wide() {
-		padding-right: $grid-unit-10;
-	}
 }
 
 .editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
