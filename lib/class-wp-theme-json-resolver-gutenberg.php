@@ -714,7 +714,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
-	 * @since 6.5.0 Added configurable directory to allow block style variations
+	 * @since 6.6.0 Added configurable directory to allow block style variations
 	 *              to reside in a different directory to theme style variations.
 	 *
 	 * @param string $dir Directory to search for variation partials.
