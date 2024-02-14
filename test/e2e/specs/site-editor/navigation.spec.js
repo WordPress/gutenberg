@@ -47,10 +47,8 @@ test.describe( 'Site editor navigation', () => {
 
 		// Test: Can navigate into the iframe using the keyboard
 		await editorNavigationUtils.tabToNode( 'IFRAME', { times: 10 } );
-		// Getting the actual iframe as a cleaner locator was suprisingly tricky,
-		// so we're using a css selector with .is-focused which should be present when the iframe has focus.
 		await expect(
-			page.locator( 'iframe[name="editor-canvas"].is-focused' )
+			page.getByRole( 'button', { name: 'Editor Canvas' } )
 		).toBeFocused();
 		// Enter into the site editor frame
 		await pageUtils.pressKeys( 'Enter' );
