@@ -16,8 +16,11 @@ import {
 	resetNamespace,
 } from './hooks';
 
-const isObject = ( item: unknown ): boolean =>
-	!! item && typeof item === 'object' && ! Array.isArray( item );
+const isObject = ( item: unknown ): item is Record< string, unknown > => {
+	if ( typeof item !== 'object' || item === null ) return false;
+	const proto = Object.getPrototypeOf( item );
+	return proto === Object.prototype || proto === null;
+};
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
