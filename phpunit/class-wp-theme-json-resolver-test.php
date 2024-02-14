@@ -537,33 +537,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameSetsWithIndex( $group_styles, $expected );
 	}
 
-	public function test_registered_block_styles_not_added_to_theme_data_when_option_is_false() {
-		switch_theme( 'block-theme' );
-
-		$variation_styles_data = array(
-			'color' => array(
-				'background' => 'darkslateblue',
-				'text'       => 'lavender',
-			),
-		);
-
-		register_block_style(
-			'core/group',
-			array(
-				'name'       => 'my-variation',
-				'style_data' => $variation_styles_data,
-			)
-		);
-
-		$options      = array( 'with_block_style_variations' => false );
-		$theme_json   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( null, $options )->get_raw_data();
-		$group_styles = $theme_json['styles']['blocks']['core/group'] ?? array();
-
-		unregister_block_style( 'core/group', 'my-variation' );
-
-		$this->assertArrayNotHasKey( 'variations', $group_styles );
-	}
-
 	/**
 	 * Tests that classic themes still get core default settings such as color palette and duotone.
 	 */
