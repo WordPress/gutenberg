@@ -9,8 +9,8 @@ import {
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
-	ToolbarDropdownMenu,
 	ToolbarGroup,
+	Dropdown,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -31,6 +31,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
 import { switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
@@ -521,13 +522,27 @@ export default function Image( {
 				// With content only mode active, the inspector is hidden, so users need another way
 				// to edit these attributes.
 				<BlockControls group="other">
-					<ToolbarDropdownMenu
-						label={ __( 'Alt' ) }
-						text={ __( 'Alt' ) }
-						icon={ null }
+					<Dropdown
 						popoverProps={ { position: 'bottom right' } }
-					>
-						{ () => (
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								} }
+							>
+								{ _x(
+									'Alt text',
+									'Alternative text for an image'
+								) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
 							<TextareaControl
 								className="wp-block-image__toolbar_content_textarea"
 								label={ __( 'Alternative text' ) }
@@ -558,14 +573,25 @@ export default function Image( {
 								__nextHasNoMarginBottom
 							/>
 						) }
-					</ToolbarDropdownMenu>
-					<ToolbarDropdownMenu
-						label={ __( 'Title' ) }
-						text={ __( 'Title' ) }
-						icon={ null }
+					/>
+					<Dropdown
 						popoverProps={ { position: 'bottom right' } }
-					>
-						{ () => (
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								} }
+							>
+								{ __( 'Title' ) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
 							<TextControl
 								className="wp-block-image__toolbar_content_textarea"
 								__nextHasNoMarginBottom
@@ -595,7 +621,7 @@ export default function Image( {
 								}
 							/>
 						) }
-					</ToolbarDropdownMenu>
+					/>
 				</BlockControls>
 			) }
 			<InspectorControls>
