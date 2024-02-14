@@ -8,10 +8,14 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	Button,
 	Spinner,
 	FlexItem,
 } from '@wordpress/components';
+import { chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,14 +42,6 @@ function InstalledFonts() {
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
-	const handleUnselectFont = () => {
-		handleSetLibraryFontSelected( null );
-	};
-
-	const handleSelectFont = ( font ) => {
-		handleSetLibraryFontSelected( font );
-	};
-
 	const handleConfirmUninstall = async () => {
 		setNotice( null );
 
@@ -57,7 +53,7 @@ function InstalledFonts() {
 			} );
 
 			// If the font was succesfully uninstalled it is unselected.
-			handleUnselectFont();
+			handleSetLibraryFontSelected( null );
 			setIsConfirmDeleteOpen( false );
 		} catch ( error ) {
 			setNotice( {
@@ -77,27 +73,17 @@ function InstalledFonts() {
 		setIsConfirmDeleteOpen( false );
 	};
 
-	const tabDescription = !! libraryFontSelected
-		? __(
-				'Choose font variants. Keep in mind that too many variants could make your site slower.'
-		  )
-		: null;
-
 	const shouldDisplayDeleteButton =
 		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
 
 	useEffect( () => {
-		handleSelectFont( libraryFontSelected );
+		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	return (
 		<TabPanelLayout
-			title={ libraryFontSelected?.name || '' }
-			description={ tabDescription }
 			notice={ notice }
-			handleBack={ !! libraryFontSelected && handleUnselectFont }
 			footer={
 				<Footer
 					shouldDisplayDeleteButton={ shouldDisplayDeleteButton }
@@ -112,23 +98,30 @@ function InstalledFonts() {
 				handleCancelUninstall={ handleCancelUninstall }
 			/>
 
-			{ ! libraryFontSelected && (
-				<>
-					{ isResolvingLibrary && (
-						<FlexItem>
-							<Spacer margin={ 2 } />
-							<Spinner />
-							<Spacer margin={ 2 } />
-						</FlexItem>
-					) }
+			{ isResolvingLibrary && (
+				<FlexItem>
+					<Spacer margin={ 2 } />
+					<Spinner />
+					<Spacer margin={ 2 } />
+				</FlexItem>
+			) }
+
+			<NavigatorProvider initialPath="/">
+				<NavigatorScreen path="/">
 					{ baseCustomFonts.length > 0 && (
 						<>
+							<Text className="font-library-modal__subtitle">
+								{ __( 'Installed Fonts' ) }
+							</Text>
+
+							<Spacer margin={ 2 } />
+
 							{ baseCustomFonts.map( ( font ) => (
 								<LibraryFontCard
 									font={ font }
 									key={ font.slug }
 									onClick={ () => {
-										handleSelectFont( font );
+										handleSetLibraryFontSelected( font );
 									} }
 								/>
 							) ) }
@@ -143,29 +136,45 @@ function InstalledFonts() {
 							</Text>
 
 							<Spacer margin={ 2 } />
+
 							{ baseThemeFonts.map( ( font ) => (
 								<LibraryFontCard
 									font={ font }
 									key={ font.slug }
 									onClick={ () => {
-										handleSelectFont( font );
+										handleSetLibraryFontSelected( font );
 									} }
 								/>
 							) ) }
 						</>
 					) }
 					<Spacer margin={ 16 } />
-				</>
-			) }
+				</NavigatorScreen>
 
-			{ libraryFontSelected && (
-				<LibraryFontDetails
-					font={ libraryFontSelected }
-					isConfirmDeleteOpen={ isConfirmDeleteOpen }
-					handleConfirmUninstall={ handleConfirmUninstall }
-					handleCancelUninstall={ handleCancelUninstall }
-				/>
-			) }
+				<NavigatorScreen path="/fontFamily">
+					<HStack align="center">
+						<NavigatorToParentButton icon={ chevronLeft }>
+							{ __( 'Return to Library' ) }
+						</NavigatorToParentButton>
+
+						<Text className="font-library-modal__subtitle">
+							{ libraryFontSelected?.name }
+						</Text>
+					</HStack>
+					<Text>
+						{ __(
+							'Choose font variants. Keep in mind that too many variants could make your site slower.'
+						) }
+					</Text>
+
+					<LibraryFontDetails
+						font={ libraryFontSelected }
+						isConfirmDeleteOpen={ isConfirmDeleteOpen }
+						handleConfirmUninstall={ handleConfirmUninstall }
+						handleCancelUninstall={ handleCancelUninstall }
+					/>
+				</NavigatorScreen>
+			</NavigatorProvider>
 		</TabPanelLayout>
 	);
 }

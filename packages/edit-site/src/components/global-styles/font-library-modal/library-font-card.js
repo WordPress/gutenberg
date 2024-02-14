@@ -3,6 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
+import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,8 +27,18 @@ function LibraryFontCard( { font, ...props } ) {
 		variantsInstalled
 	);
 
+	const navi = useNavigator();
+
 	return (
-		<FontCard font={ font } variantsText={ variantsText } { ...props } />
+		<FontCard
+			font={ font }
+			variantsText={ variantsText }
+			{ ...props }
+			onClick={ () => {
+				props.onClick();
+				navi.goTo( '/fontFamily' );
+			} }
+		/>
 	);
 }
 
