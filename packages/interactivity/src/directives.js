@@ -1,15 +1,18 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
+import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
  * Internal dependencies
  */
-import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
+import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -98,29 +101,29 @@ export default () => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
-			const passedValues = context.map( ( { value } ) => value );
+			const defaultEntry = context.find(
+				( { suffix } ) => suffix === 'default'
+			);
 
 			currentValue.current = useMemo( () => {
-				const newValue = context
-					.map( ( c ) => deepSignal( { [ c.namespace ]: c.value } ) )
-					.reduceRight( mergeDeepSignals );
-
+				if ( ! defaultEntry ) return null;
+				const { namespace, value } = defaultEntry;
+				const newValue = deepSignal( { [ namespace ]: value } );
 				mergeDeepSignals( newValue, inheritedValue );
 				mergeDeepSignals( currentValue.current, newValue, true );
 				return currentValue.current;
-			}, [ inheritedValue, ...passedValues ] );
+			}, [ inheritedValue, defaultEntry ] );
 
-			return (
-				<Provider value={ currentValue.current }>{ children }</Provider>
-			);
+			if ( currentValue.current ) {
+				return (
+					<Provider value={ currentValue.current }>
+						{ children }
+					</Provider>
+				);
+			}
 		},
 		{ priority: 5 }
 	);
-
-	// data-wp-body
-	directive( 'body', ( { props: { children } } ) => {
-		return createPortal( children, document.body );
-	} );
 
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
@@ -156,15 +159,15 @@ export default () => {
 	// data-wp-class--[classname]
 	directive(
 		'class',
-		( { directives: { class: className }, element, evaluate } ) => {
-			className
+		( { directives: { class: classNames }, element, evaluate } ) => {
+			classNames
 				.filter( ( { suffix } ) => suffix !== 'default' )
 				.forEach( ( entry ) => {
-					const name = entry.suffix;
-					const result = evaluate( entry, { className: name } );
+					const className = entry.suffix;
+					const result = evaluate( entry );
 					const currentClass = element.props.class || '';
 					const classFinder = new RegExp(
-						`(^|\\s)${ name }(\\s|$)`,
+						`(^|\\s)${ className }(\\s|$)`,
 						'g'
 					);
 					if ( ! result )
@@ -173,8 +176,8 @@ export default () => {
 							.trim();
 					else if ( ! classFinder.test( currentClass ) )
 						element.props.class = currentClass
-							? `${ currentClass } ${ name }`
-							: name;
+							? `${ currentClass } ${ className }`
+							: className;
 
 					useInit( () => {
 						/*
@@ -183,29 +186,29 @@ export default () => {
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							element.ref.current.classList.remove( name );
+							element.ref.current.classList.remove( className );
 						} else {
-							element.ref.current.classList.add( name );
+							element.ref.current.classList.add( className );
 						}
 					} );
 				} );
 		}
 	);
 
-	// data-wp-style--[style-key]
+	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
-				const key = entry.suffix;
-				const result = evaluate( entry, { key } );
+				const styleProp = entry.suffix;
+				const result = evaluate( entry );
 				element.props.style = element.props.style || {};
 				if ( typeof element.props.style === 'string' )
 					element.props.style = cssStringToObject(
 						element.props.style
 					);
-				if ( ! result ) delete element.props.style[ key ];
-				else element.props.style[ key ] = result;
+				if ( ! result ) delete element.props.style[ styleProp ];
+				else element.props.style[ styleProp ] = result;
 
 				useInit( () => {
 					/*
@@ -214,9 +217,9 @@ export default () => {
 					 * because it only needs to do it the first time.
 					 */
 					if ( ! result ) {
-						element.ref.current.style.removeProperty( key );
+						element.ref.current.style.removeProperty( styleProp );
 					} else {
-						element.ref.current.style[ key ] = result;
+						element.ref.current.style[ styleProp ] = result;
 					}
 				} );
 			} );
@@ -243,7 +246,11 @@ export default () => {
 					 * property excluding the following special cases. We follow Preact's
 					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					 */
-					if (
+					if ( attribute === 'style' ) {
+						if ( typeof result === 'string' )
+							el.style.cssText = result;
+						return;
+					} else if (
 						attribute !== 'width' &&
 						attribute !== 'height' &&
 						attribute !== 'href' &&
@@ -353,7 +360,8 @@ export default () => {
 			return list.map( ( item ) => {
 				const mergedContext = deepSignal( {} );
 
-				const itemProp = suffix === 'default' ? 'item' : suffix;
+				const itemProp =
+					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const newValue = deepSignal( {
 					[ namespace ]: { [ itemProp ]: item },
 				} );

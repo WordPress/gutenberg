@@ -28,9 +28,7 @@ function hasOnlyToolbarItem( elements ) {
 
 function getAllFocusableToolbarItemsIn( container ) {
 	return Array.from(
-		container.querySelectorAll(
-			'[data-toolbar-item]:not([disabled]):not([aria-disabled="true"])'
-		)
+		container.querySelectorAll( '[data-toolbar-item]:not([disabled])' )
 	);
 }
 
@@ -144,7 +142,13 @@ function useToolbarFocus( {
 		// We have to wait for the next browser paint because block controls aren't
 		// rendered right away when the toolbar gets mounted.
 		let raf = 0;
-		if ( ! initialFocusOnMount ) {
+
+		// If the toolbar already had focus before the render, we don't want to move it.
+		// https://github.com/WordPress/gutenberg/issues/58511
+		if (
+			! initialFocusOnMount &&
+			! hasFocusWithin( navigableToolbarRef )
+		) {
 			raf = window.requestAnimationFrame( () => {
 				const items =
 					getAllFocusableToolbarItemsIn( navigableToolbarRef );

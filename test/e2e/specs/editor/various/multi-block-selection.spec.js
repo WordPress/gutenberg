@@ -221,7 +221,7 @@ test.describe( 'Multi-block selection', () => {
 		pageUtils,
 		multiBlockSelectionUtils,
 	} ) => {
-		for ( let i = 1; i <= 2; i += 1 ) {
+		for ( let i = 1; i <= 3; i += 1 ) {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: `${ i }` },
@@ -232,14 +232,13 @@ test.describe( 'Multi-block selection', () => {
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-			.toEqual( [ 1, 2 ] );
+			.toEqual( [ 1, 2, 3 ] );
 
 		await page.keyboard.press( 'Escape' );
 
-		// FIXME: This doesn't seem to work anymore.
-		// await expect
-		// 	.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-		// 	.toEqual( [] );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1 ] );
 	} );
 
 	test( 'should select with shift + click', async ( {
@@ -615,6 +614,74 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
+	test( 'should keep correct selection when dragging outside block', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '123' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		const coord2 = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const selection = window.getSelection();
+			const range = selection.getRangeAt( 0 );
+			const rect1 = range.getClientRects()[ 0 ];
+			const iframeOffset = window.frameElement.getBoundingClientRect();
+			return {
+				x: iframeOffset.x + rect1.x,
+				y: iframeOffset.y + rect1.y + rect1.height / 2,
+			};
+		} );
+
+		await page.keyboard.press( 'ArrowLeft' );
+
+		const coord1 = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const selection = window.getSelection();
+			const range = selection.getRangeAt( 0 );
+			const rect1 = range.getClientRects()[ 0 ];
+			const iframeOffset = window.frameElement.getBoundingClientRect();
+
+			return {
+				x: iframeOffset.x + rect1.x,
+				y: iframeOffset.y + rect1.y + rect1.height / 2,
+			};
+		} );
+
+		const coord3Y = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const element = document.querySelector(
+				'[data-type="core/paragraph"]'
+			);
+			const rect2 = element.getBoundingClientRect();
+			const iframeOffset = window.frameElement.getBoundingClientRect();
+			// Move a bit outside the paragraph, downwards.
+			return iframeOffset.y + rect2.y + rect2.height + 5;
+		} );
+
+		await page.mouse.click( coord1.x, coord1.y );
+		await page.mouse.down();
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		await page.mouse.move( coord2.x, coord3Y, { steps: 10 } );
+		await page.mouse.up();
+
+		// Wait for:
+		// https://github.com/WordPress/gutenberg/blob/eb2bb1d3456ea98db74b4518e3394ed6aed9e79f/packages/block-editor/src/components/writing-flow/use-drag-selection.js#L47
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
+
+		// "23" should be deleted.
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+		] );
+	} );
+
 	test( 'should preserve dragged selection on move', async ( {
 		page,
 		editor,
@@ -875,35 +942,6 @@ test.describe( 'Multi-block selection', () => {
 				{ name: 'core/paragraph' },
 				{ name: 'core/list' },
 			] );
-	} );
-
-	test( 'should select all from empty selection', async ( {
-		page,
-		editor,
-		pageUtils,
-		multiBlockSelectionUtils,
-	} ) => {
-		for ( let i = 1; i <= 2; i += 1 ) {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: `${ i }` },
-			} );
-		}
-
-		// Clear the selected block.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Escape' );
-
-		await expect
-			.poll( multiBlockSelectionUtils.getSelectedBlocks )
-			.toEqual( [] );
-
-		await pageUtils.pressKeys( 'primary+a' );
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect both paragraphs to be deleted.
-		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should select title if the cursor is on title', async ( {

@@ -55,6 +55,7 @@ function FontLibraryProvider( { children } ) {
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
+	const [ notice, setNotice ] = useState( null );
 
 	const refreshLibrary = () => {
 		setRefreshKey( Date.now() );
@@ -134,6 +135,8 @@ function FontLibraryProvider( { children } ) {
 	}, [ modalTabOpen ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
+		setNotice( null );
+
 		// If font is null, reset the selected font
 		if ( ! font ) {
 			setLibraryFontSelected( null );
@@ -471,6 +474,8 @@ function FontLibraryProvider( { children } ) {
 				modalTabOpen,
 				toggleModal,
 				refreshLibrary,
+				notice,
+				setNotice,
 				saveFontFamilies,
 				fontFamiliesHasChanges,
 				isResolvingLibrary,

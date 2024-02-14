@@ -48,51 +48,37 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const {
-		isEditingTemplate,
-		templateId,
-		postType,
-		postId,
-		goBack,
-		getEditorSettings,
-	} = useSelect( ( select ) => {
-		const {
-			getRenderingMode,
-			getCurrentTemplateId,
-			getCurrentPostId,
-			getCurrentPostType,
-			getEditorSettings: getSettings,
-		} = select( editorStore );
-		const _templateId = getCurrentTemplateId();
-		const back = getSettings().goBack;
-		return {
-			isEditingTemplate:
-				!! _templateId && getRenderingMode() === 'template-only',
-			templateId: _templateId,
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-			goBack: typeof back === 'function' ? back : undefined,
-			getEditorSettings: getSettings,
-		};
-	}, [] );
-
-	const { setRenderingMode } = useDispatch( editorStore );
+	const { postType, postId, onNavigateToPreviousEntityRecord } = useSelect(
+		( select ) => {
+			const {
+				getCurrentPostId,
+				getCurrentPostType,
+				getEditorSettings: getSettings,
+			} = select( editorStore );
+			return {
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+				onNavigateToPreviousEntityRecord:
+					getSettings().onNavigateToPreviousEntityRecord,
+				getEditorSettings: getSettings,
+			};
+		},
+		[]
+	);
 
 	const handleOnBack = () => {
-		if ( isEditingTemplate ) {
-			setRenderingMode( getEditorSettings().defaultRenderingMode );
-			return;
-		}
-		if ( goBack ) {
-			goBack();
+		if ( onNavigateToPreviousEntityRecord ) {
+			onNavigateToPreviousEntityRecord();
 		}
 	};
 
 	return (
 		<BaseDocumentActions
-			postType={ isEditingTemplate ? 'wp_template' : postType }
-			postId={ isEditingTemplate ? templateId : postId }
-			onBack={ isEditingTemplate || goBack ? handleOnBack : undefined }
+			postType={ postType }
+			postId={ postId }
+			onBack={
+				onNavigateToPreviousEntityRecord ? handleOnBack : undefined
+			}
 		/>
 	);
 }

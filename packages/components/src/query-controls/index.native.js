@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useCallback, memo } from '@wordpress/element';
 
 /**
@@ -23,12 +23,12 @@ const options = [
 		value: 'date/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in ascending order */
+		/* translators: Label for ordering posts by title in ascending order. */
 		label: __( 'A → Z' ),
 		value: 'title/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in descending order */
+		/* translators: Label for ordering posts by title in descending order. */
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},
@@ -76,7 +76,7 @@ const QueryControls = memo(
 					<CategorySelect
 						categoriesList={ categoriesList }
 						label={ __( 'Category' ) }
-						noOptionLabel={ __( 'All' ) }
+						noOptionLabel={ _x( 'All', 'categories' ) }
 						selectedCategoryId={ selectedCategoryId }
 						onChange={ onCategoryChange }
 						hideCancelButton={ true }
