@@ -32,6 +32,8 @@ import { Icon, search as inputIcon } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 
+const inputLabel = __( 'Search for commands' );
+
 function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
@@ -44,34 +46,29 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 
 	return (
 		<>
-			<Command.List>
-				{ commands.map( ( command ) => (
-					<Command.Item
-						key={ command.name }
-						value={ command.searchLabel ?? command.label }
-						onSelect={ () => command.callback( { close } ) }
-						id={ command.name }
+			{ commands.map( ( command ) => (
+				<Command.Item
+					key={ command.name }
+					value={ command.searchLabel ?? command.label }
+					onSelect={ () => command.callback( { close } ) }
+					id={ command.name }
+				>
+					<HStack
+						alignment="left"
+						className={ classnames( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<HStack
-							alignment="left"
-							className={ classnames(
-								'commands-command-menu__item',
-								{
-									'has-icon': command.icon,
-								}
-							) }
-						>
-							{ command.icon && <Icon icon={ command.icon } /> }
-							<span>
-								<TextHighlight
-									text={ command.label }
-									highlight={ search }
-								/>
-							</span>
-						</HStack>
-					</Command.Item>
-				) ) }
-			</Command.List>
+						{ command.icon && <Icon icon={ command.icon } /> }
+						<span>
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
+					</HStack>
+				</Command.Item>
+			) ) }
 		</>
 	);
 }
@@ -176,7 +173,7 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			ref={ commandMenuInput }
 			value={ search }
 			onValueChange={ setSearch }
-			placeholder={ __( 'Search for commands' ) }
+			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
 			icon={ search }
 		/>
@@ -195,6 +192,7 @@ export function CommandMenu() {
 	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
+	const commandListRef = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -207,6 +205,16 @@ export function CommandMenu() {
 			},
 		} );
 	}, [ registerShortcut ] );
+
+	// Temporary fix for the suggestions Listbox labeling.
+	// See https://github.com/pacocoursey/cmdk/issues/196
+	useEffect( () => {
+		commandListRef.current?.removeAttribute( 'aria-labelledby' );
+		commandListRef.current?.setAttribute(
+			'aria-label',
+			__( 'Command suggestions' )
+		);
+	}, [ commandListRef.current ] );
 
 	useShortcut(
 		'core/commands',
@@ -265,12 +273,10 @@ export function CommandMenu() {
 			overlayClassName="commands-command-menu__overlay"
 			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
+			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command
-					label={ __( 'Command palette' ) }
-					onKeyDown={ onKeyDown }
-				>
+				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
 						<Icon icon={ inputIcon } />
 						<CommandInput
@@ -279,7 +285,7 @@ export function CommandMenu() {
 							isOpen={ isOpen }
 						/>
 					</div>
-					<Command.List>
+					<Command.List ref={ commandListRef }>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }

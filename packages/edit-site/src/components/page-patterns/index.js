@@ -324,6 +324,7 @@ export default function DataviewsPatterns() {
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
+					isPrimary: true,
 				},
 				enableSorting: false,
 			} );
@@ -390,7 +391,6 @@ export default function DataviewsPatterns() {
 	// Wrap everything in a block editor provider.
 	// This ensures 'styles' that are needed for the previews are synced
 	// from the site editor store to the block editor store.
-	// TODO: check if I add the provider in every preview like in templates...
 	return (
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<Page

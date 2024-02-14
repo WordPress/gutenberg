@@ -36,7 +36,7 @@ function ChangesSummary( { revision, previousRevision } ) {
 			data-testid="global-styles-revision-changes"
 			className="edit-site-global-styles-screen-revisions__changes"
 		>
-			{ changes.join( ', ' ) }
+			{ changes.join( ', ' ) }.
 		</span>
 	);
 }

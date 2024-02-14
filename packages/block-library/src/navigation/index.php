@@ -9,18 +9,11 @@
  * Helper functions used to render the navigation block.
  */
 class WP_Navigation_Block_Renderer {
+
 	/**
-	 * Used to determine which blocks are wrapped in an <li>.
-	 *
-	 * @var array
+	 * Used to determine whether or not a navigation has submenus.
 	 */
-	private static $nav_blocks_wrapped_in_list_item = array(
-		'core/navigation-link',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
+	private static $has_submenus = false;
 
 	/**
 	 * Used to determine which blocks need an <li> wrapper.
@@ -58,22 +51,37 @@ class WP_Navigation_Block_Renderer {
 	 * Returns whether or not a navigation has a submenu.
 	 *
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
-	 * @return bool Returns whether or not a navigation has a submenu.
+	 * @return bool Returns whether or not a navigation has a submenu and also sets the member variable.
 	 */
 	private static function has_submenus( $inner_blocks ) {
+		if ( true === static::$has_submenus ) {
+			return static::$has_submenus;
+		}
+
 		foreach ( $inner_blocks as $inner_block ) {
-			$inner_block_content = $inner_block->render();
-			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
-			if ( $p->next_tag(
-				array(
-					'name'       => 'LI',
-					'class_name' => 'has-child',
-				)
-			) ) {
-				return true;
+			// If this is a page list then work out if any of the pages have children.
+			if ( 'core/page-list' === $inner_block->name ) {
+				$all_pages = get_pages(
+					array(
+						'sort_column' => 'menu_order,post_title',
+						'order'       => 'asc',
+					)
+				);
+				foreach ( (array) $all_pages as $page ) {
+					if ( $page->post_parent ) {
+						static::$has_submenus = true;
+						break;
+					}
+				}
+			}
+			// If this is a navigation submenu then we know we have submenus.
+			if ( 'core/navigation-submenu' === $inner_block->name ) {
+				static::$has_submenus = true;
+				break;
 			}
 		}
-		return false;
+
+		return static::$has_submenus;
 	}
 
 	/**
@@ -96,7 +104,23 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not a block needs a list item wrapper.
 	 */
 	private static function does_block_need_a_list_item_wrapper( $block ) {
-		return in_array( $block->name, static::$needs_list_item_wrapper, true );
+
+		/**
+		 * Filter the list of blocks that need a list item wrapper.
+		 *
+		 * Affords the ability to customize which blocks need a list item wrapper when rendered
+		 * within a core/navigation block.
+		 * This is useful for blocks that are not list items but should be wrapped in a list
+		 * item when used as a child of a navigation block.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $needs_list_item_wrapper The list of blocks that need a list item wrapper.
+		 * @return array The list of blocks that need a list item wrapper.
+		 */
+		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_listable_blocks', static::$needs_list_item_wrapper );
+
+		return in_array( $block->name, $needs_list_item_wrapper, true );
 	}
 
 	/**
@@ -140,7 +164,9 @@ class WP_Navigation_Block_Renderer {
 		$is_list_open      = false;
 
 		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, static::$nav_blocks_wrapped_in_list_item, true );
+			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
+			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item       = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -155,7 +181,7 @@ class WP_Navigation_Block_Renderer {
 				$inner_blocks_html .= '</ul>';
 			}
 
-			$inner_blocks_html .= static::get_markup_for_inner_block( $inner_block );
+			$inner_blocks_html .= $inner_block_markup;
 		}
 
 		if ( $is_list_open ) {
@@ -192,7 +218,7 @@ class WP_Navigation_Block_Renderer {
 			// it encounters whitespace. This code strips it.
 			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
-			if ( function_exists( 'get_hooked_blocks' ) ) {
+			if ( function_exists( 'get_hooked_block_markup' ) ) {
 				// Run Block Hooks algorithm to inject hooked blocks.
 				$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
 				$root_nav_block = parse_blocks( $markup )[0];
@@ -531,19 +557,17 @@ class WP_Navigation_Block_Renderer {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
-		$nav_element_context    = wp_json_encode(
+		$nav_element_context    = data_wp_context(
 			array(
 				'overlayOpenedBy' => array(),
 				'type'            => 'overlay',
 				'roleAttribute'   => '',
 				'ariaLabel'       => __( 'Menu' ),
-			),
-			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
+			)
 		);
 		$nav_element_directives = '
-			data-wp-interactive=\'{"namespace":"core/navigation"}\'
-			data-wp-context=\'' . $nav_element_context . '\'
-		';
+		 data-wp-interactive="core/navigation"'
+		. $nav_element_context;
 
 		/*
 		* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
@@ -567,7 +591,18 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
-			wp_enqueue_script_module( '@wordpress/block-library/navigation-block' );
+			$suffix = wp_scripts_get_suffix();
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/navigation',
+				isset( $module_url ) ? $module_url : includes_url( "blocks/navigation/view{$suffix}.js" ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
+			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
 		}
 	}
 
@@ -743,7 +778,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		)
 	) ) {
 		// Add directives to the parent `<li>`.
-		$tags->set_attribute( 'data-wp-interactive', '{ "namespace": "core/navigation" }' );
+		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
 		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": {}, "type": "submenu" }' );
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
 		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
@@ -968,7 +1003,9 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 function block_core_navigation_get_fallback_blocks() {
 	$page_list_fallback = array(
 		array(
-			'blockName' => 'core/page-list',
+			'blockName'    => 'core/page-list',
+			'innerContent' => array(),
+			'attrs'        => array(),
 		),
 	);
 
@@ -976,12 +1013,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
-
-	if ( class_exists( 'WP_Navigation_Fallback' ) ) {
-		$navigation_post = WP_Navigation_Fallback::get_fallback();
-	} else {
-		$navigation_post = Gutenberg_Navigation_Fallback::get_fallback();
-	}
+	$navigation_post = WP_Navigation_Fallback::get_fallback();
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
@@ -992,7 +1024,7 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 
-		if ( function_exists( 'get_hooked_blocks' ) ) {
+		if ( function_exists( 'get_hooked_block_markup' ) ) {
 			// Run Block Hooks algorithm to inject hooked blocks.
 			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
 			$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
@@ -1078,13 +1110,6 @@ function register_block_core_navigation() {
 		array(
 			'render_callback' => 'render_block_core_navigation',
 		)
-	);
-
-	wp_register_script_module(
-		'@wordpress/block-library/navigation-block',
-		gutenberg_url( '/build/interactivity/navigation.min.js' ),
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }
 
@@ -1358,7 +1383,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
  * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
  */
-function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null ) {
+function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 	$before_block_visitor = null;
 	$after_block_visitor  = null;
 	$hooked_blocks        = get_hooked_blocks();
@@ -1397,10 +1422,6 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post = null
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	if ( ! isset( $post->ID ) ) {
-		return;
-	}
-
 	// We run the Block Hooks mechanism so it will return the list of ignored hooked blocks
 	// in the mock root Navigation block's metadata attribute.
 	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
@@ -1422,9 +1443,14 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	}
 }
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
-// that are not present in Gutenberg's WP 6.4 compatibility layer.
-if ( function_exists( 'get_hooked_blocks' ) ) {
+// Before adding our filter, we verify if it's already added in Core.
+// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+$rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ignore_hooked_blocks_meta';
+
+// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+// that are not present in Gutenberg's WP 6.5 compatibility layer.
+if ( function_exists( 'get_hooked_block_markup' ) && ! has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
@@ -1454,8 +1480,13 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	return $response;
 }
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.4
-// that are not present in Gutenberg's WP 6.4 compatibility layer.
-if ( function_exists( 'get_hooked_blocks' ) ) {
+// Before adding our filter, we verify if it's already added in Core.
+// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+$rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_hooked_blocks_into_rest_response';
+
+// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+// that are not present in Gutenberg's WP 6.5 compatibility layer.
+if ( function_exists( 'get_hooked_block_markup' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }

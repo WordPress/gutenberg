@@ -816,7 +816,7 @@ describe( 'global styles renderer', () => {
 						filter: { duotone: 'img' },
 					},
 					styleVariationSelectors: {
-						foo: '.is-style-foo.my-image',
+						foo: '.my-image.is-style-foo',
 					},
 					hasLayoutSupport: false,
 				},

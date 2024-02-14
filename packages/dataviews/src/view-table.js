@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
@@ -16,75 +16,66 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import {
-	Children,
-	Fragment,
 	forwardRef,
 	useEffect,
 	useId,
 	useRef,
 	useState,
+	Children,
+	Fragment,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
+import { sanitizeOperators } from './utils';
+import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
+
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
 
 const sortArrows = { asc: '↑', desc: '↓' };
 
-const sanitizeOperators = ( field ) => {
-	let operators = field.filterBy?.operators;
-	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = Object.keys( OPERATORS );
-	}
-	return operators.filter( ( operator ) =>
-		Object.keys( OPERATORS ).includes( operator )
-	);
-};
-
 const HeaderMenu = forwardRef( function HeaderMenu(
-	{ field, view, onChangeView, onHide },
+	{ field, view, onChangeView, onHide, setOpenedFilter },
 	ref
 ) {
 	const isHidable = field.enableHiding !== false;
-
 	const isSortable = field.enableSorting !== false;
 	const isSorted = view.sort?.field === field.id;
-
-	let filter, filterInView, activeElement, activeOperator, otherFilters;
 	const operators = sanitizeOperators( field );
-	if ( field.type === ENUMERATION_TYPE && operators.length > 0 ) {
-		filter = {
-			field: field.id,
-			operators,
-			elements: field.elements || [],
-		};
-		filterInView = view.filters.find( ( f ) => f.field === filter.field );
-		otherFilters = view.filters.filter( ( f ) => f.field !== filter.field );
-		activeElement = filter.elements.find(
-			( element ) => element.value === filterInView?.value
-		);
-		activeOperator = filterInView?.operator || filter.operators[ 0 ];
-	}
-	const isFilterable = !! filter;
-
-	if ( ! isSortable && ! isHidable && ! isFilterable ) {
+	// Filter can be added:
+	// 1. If the field is not already part of a view's filters.
+	// 2. If the field meets the type and operator requirements.
+	// 3. If it's not primary. If it is, it should be already visible.
+	const canAddFilter =
+		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
+		field.type === ENUMERATION_TYPE &&
+		!! operators.length &&
+		! field.filterBy?.isPrimary;
+	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
 		return field.header;
 	}
-
 	return (
 		<DropdownMenu
 			align="start"
@@ -146,6 +137,32 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						) }
 					</DropdownMenuGroup>
 				) }
+				{ canAddFilter && (
+					<DropdownMenuGroup>
+						<DropdownMenuItem
+							prefix={ <Icon icon={ funnel } /> }
+							onClick={ () => {
+								setOpenedFilter( field.id );
+								onChangeView( {
+									...view,
+									page: 1,
+									filters: [
+										...( view.filters || [] ),
+										{
+											field: field.id,
+											value: undefined,
+											operator: operators[ 0 ],
+										},
+									],
+								} );
+							} }
+						>
+							<DropdownMenuItemLabel>
+								{ __( 'Add filter' ) }
+							</DropdownMenuItemLabel>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				) }
 				{ isHidable && (
 					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
@@ -164,148 +181,10 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
-				{ isFilterable && (
-					<DropdownMenuGroup>
-						<DropdownMenu
-							key={ filter.field }
-							trigger={
-								<DropdownMenuItem
-									prefix={ <Icon icon={ funnel } /> }
-									suffix={
-										activeElement && (
-											<span aria-hidden="true">
-												{ activeOperator in OPERATORS &&
-													`${ OPERATORS[ activeOperator ].label } ` }
-												{ activeElement?.label }
-											</span>
-										)
-									}
-								>
-									<DropdownMenuItemLabel>
-										{ __( 'Filter by' ) }
-									</DropdownMenuItemLabel>
-								</DropdownMenuItem>
-							}
-						>
-							<WithSeparators>
-								<DropdownMenuGroup>
-									{ filter.elements.map( ( element ) => {
-										const isActive =
-											activeElement?.value ===
-											element.value;
-										return (
-											<DropdownMenuRadioItemCustom
-												key={ element.value }
-												name={ `view-table-${ filter.field }` }
-												value={ element.value }
-												checked={ isActive }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														page: 1,
-														filters: [
-															...otherFilters,
-															{
-																field: filter.field,
-																operator:
-																	activeOperator,
-																value: isActive
-																	? undefined
-																	: element.value,
-															},
-														],
-													} );
-												} }
-											>
-												<DropdownMenuItemLabel>
-													{ element.label }
-												</DropdownMenuItemLabel>
-												{ !! element.description && (
-													<DropdownMenuItemHelpText>
-														{ element.description }
-													</DropdownMenuItemHelpText>
-												) }
-											</DropdownMenuRadioItemCustom>
-										);
-									} ) }
-								</DropdownMenuGroup>
-								{ filter.operators.length > 1 && (
-									<DropdownMenu
-										trigger={
-											<DropdownMenuItem
-												suffix={
-													<span aria-hidden="true">
-														{
-															OPERATORS[
-																activeOperator
-															]?.label
-														}
-													</span>
-												}
-											>
-												<DropdownMenuItemLabel>
-													{ __( 'Conditions' ) }
-												</DropdownMenuItemLabel>
-											</DropdownMenuItem>
-										}
-									>
-										{ Object.entries( OPERATORS ).map(
-											( [
-												operator,
-												{ label, key },
-											] ) => (
-												<DropdownMenuRadioItem
-													key={ key }
-													name={ `view-table-${ filter.field }-conditions` }
-													value={ operator }
-													checked={
-														activeOperator ===
-														operator
-													}
-													onChange={ ( e ) =>
-														onChangeView( {
-															...view,
-															page: 1,
-															filters: [
-																...otherFilters,
-																{
-																	field: filter.field,
-																	operator:
-																		e.target
-																			.value,
-																	value: filterInView?.value,
-																},
-															],
-														} )
-													}
-												>
-													<DropdownMenuItemLabel>
-														{ label }
-													</DropdownMenuItemLabel>
-												</DropdownMenuRadioItem>
-											)
-										) }
-									</DropdownMenu>
-								) }
-							</WithSeparators>
-						</DropdownMenu>
-					</DropdownMenuGroup>
-				) }
 			</WithSeparators>
 		</DropdownMenu>
 	);
 } );
-
-function WithSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
 
 function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
 	const areAllSelected = selection.length === data.length;
@@ -327,60 +206,6 @@ function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
 	);
 }
 
-function SingleSelectionCheckbox( {
-	selection,
-	onSelectionChange,
-	item,
-	data,
-	getItemId,
-	primaryField,
-} ) {
-	const id = getItemId( item );
-	const isSelected = selection.includes( id );
-	let selectionLabel;
-	if ( primaryField?.getValue && item ) {
-		// eslint-disable-next-line @wordpress/valid-sprintf
-		selectionLabel = sprintf(
-			/* translators: %s: item title. */
-			isSelected ? __( 'Deselect item: %s' ) : __( 'Select item: %s' ),
-			primaryField.getValue( { item } )
-		);
-	} else {
-		selectionLabel = isSelected
-			? __( 'Select a new item' )
-			: __( 'Deselect item' );
-	}
-	return (
-		<CheckboxControl
-			className="dataviews-view-table-selection-checkbox"
-			__nextHasNoMarginBottom
-			checked={ isSelected }
-			label={ selectionLabel }
-			onChange={ () => {
-				if ( ! isSelected ) {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId === id || selection.includes( itemId )
-							);
-						} )
-					);
-				} else {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId !== id && selection.includes( itemId )
-							);
-						} )
-					);
-				}
-			} }
-		/>
-	);
-}
-
 function ViewTable( {
 	view,
 	onChangeView,
@@ -392,6 +217,7 @@ function ViewTable( {
 	deferredRendering,
 	selection,
 	onSelectionChange,
+	setOpenedFilter,
 } ) {
 	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
@@ -502,6 +328,7 @@ function ViewTable( {
 									view={ view }
 									onChangeView={ onChangeView }
 									onHide={ onHide }
+									setOpenedFilter={ setOpenedFilter }
 								/>
 							</th>
 						) ) }
@@ -539,7 +366,7 @@ function ViewTable( {
 											minWidth: 20,
 										} }
 									>
-										<span className="dataviews-view-table__cell-content-wrapper">
+										<div className="dataviews-view-table__cell-content-wrapper">
 											<SingleSelectionCheckbox
 												id={
 													getItemId( item ) || index
@@ -553,7 +380,7 @@ function ViewTable( {
 												data={ data }
 												primaryField={ primaryField }
 											/>
-										</span>
+										</div>
 									</td>
 								) }
 								{ visibleFields.map( ( field ) => (
@@ -567,7 +394,7 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										<span
+										<div
 											className={ classnames(
 												'dataviews-view-table__cell-content-wrapper',
 												{
@@ -580,7 +407,7 @@ function ViewTable( {
 											{ field.render( {
 												item,
 											} ) }
-										</span>
+										</div>
 									</td>
 								) ) }
 								{ !! actions?.length && (
