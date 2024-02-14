@@ -11,9 +11,9 @@ import { store as blockEditorStore } from '../../store';
 import { useHasBlockToolbar } from '../block-toolbar/use-has-block-toolbar';
 
 /**
- * Returns true if the block toolbar should be able to receive focus.
+ * Source of truth for which block tools are showing in the block editor.
  *
- * @return {boolean} Whether the block toolbar should be able to receive focus
+ * @return {Object} Object of which block tools will be shown.
  */
 export function useShowBlockTools() {
 	const hasBlockToolbar = useHasBlockToolbar();
