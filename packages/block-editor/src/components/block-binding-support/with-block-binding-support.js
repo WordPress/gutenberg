@@ -64,7 +64,7 @@ const BlockBindingConnector = ( {
 	 */
 	useEffect( () => {
 		updateBoundAttibute( propValue );
-	}, [ propValue, updateBoundAttibute ] ); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [ propValue, updateBoundAttibute ] );
 
 	/*
 	 * Sync data.
