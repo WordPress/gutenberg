@@ -15,7 +15,7 @@ export async function withFakeTimers( fn ) {
 	const cancelAnimationFrameCopy = global.cancelAnimationFrame;
 
 	if ( ! usingFakeTimers ) {
-		jest.useFakeTimers( { legacyFakeTimers: true } );
+		jest.useFakeTimers();
 	}
 
 	// `Date.now` returns the real-time even when using fake timers.
