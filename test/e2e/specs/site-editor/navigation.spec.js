@@ -61,7 +61,7 @@ test.describe( 'Site editor navigation', () => {
 		// But did it do anything?
 		// Test to make sure a Tab keypress works as expected.
 		// As of this writing, we are in select mode and a tab
-		/// keypress will reveal the header template select mode
+		// keypress will reveal the header template select mode
 		// button. This test is not documenting that we _want_
 		// that action, but checking that we are within the site
 		// editor and keypresses work as intened.
