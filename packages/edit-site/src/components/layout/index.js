@@ -248,7 +248,12 @@ export default function Layout() {
 						initial={ canvasMode }
 						whileHover="hover"
 					>
-						<Button { ...siteIconButtonProps } as={ motion.button }>
+						<Button
+							{ ...siteIconButtonProps }
+							as={ motion.button }
+							showTooltip
+							tooltipPosition={ 'middle right' }
+						>
 							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>
 						{ canvasMode === 'edit' && (
