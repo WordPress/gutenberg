@@ -171,7 +171,7 @@ function gutenberg_get_global_styles_custom_css() {
 /**
  * Gets the global styles base custom CSS from theme.json.
  *
- * @since 6.5.0
+ * @since 6.6.0
  *
  * @return string The global base custom CSS.
  */
@@ -205,7 +205,7 @@ function gutenberg_get_global_styles_base_custom_css() {
  * Adds the global styles per-block custom CSS from theme.json
  * to the inline style for each block.
  *
- * @since 6.5.0
+ * @since 6.6.0
  *
  *  @global WP_Styles $wp_styles
  */
@@ -213,7 +213,7 @@ function gutenberg_add_global_styles_block_custom_css() {
 	global $wp_styles;
 
 	if ( ! wp_theme_has_theme_json() || ! wp_should_load_separate_core_block_assets() ) {
-		return '';
+		return;
 	}
 
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
