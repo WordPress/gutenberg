@@ -128,38 +128,11 @@ function gutenberg_render_variation_support_styles( $pre_render, $block ) {
  * @return WP_Theme_JSON_Data_Gutenberg
  */
 function gutenberg_resolve_block_style_variations_from_theme_style_variation( $theme_json ) {
-	// Return early if no shared block style variations.
-	// TODO: Should the theme with the theme style variation still have to register these block style variations so that they show for selection by the user?
 	$theme_json_data   = $theme_json->get_data();
 	$shared_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
+	$variations_data   = gutenberg_resolve_and_register_block_style_variations( $shared_variations );
 
-	if ( empty( $shared_variations ) ) {
-		return $theme_json;
-	}
-
-	$variations_data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
-
-	foreach ( $shared_variations as $variation_name => $variation ) {
-		$supported_blocks = $variation['supportedBlockTypes'] ?? null;
-
-		if ( ! $supported_blocks ) {
-			continue;
-		}
-
-		// TODO: Can we support deregistering block style variations for a
-		// theme style variation by setting it false/empty or something?
-
-		foreach ( $supported_blocks as $block_name ) {
-			$path = array( 'styles', 'blocks', $block_name, 'variations', $variation_name );
-			_wp_array_set( $variations_data, $path, $variation );
-		}
-	}
-
-	// Merge the current theme.json data over shared variation data so that
-	// any previous user selections in global styles are maintained.
-	$variations_theme_json = new WP_Theme_JSON_Data_Gutenberg( $variations_data, 'user' );
-
-	return $variations_theme_json->update_with( $theme_json_data );
+	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json, 'user' );
 }
 
 /**
@@ -174,15 +147,16 @@ function gutenberg_resolve_block_style_variations_from_theme_style_variation( $t
  */
 function gutenberg_resolve_and_register_block_style_variations( $variations ) {
 	$variations_data = array();
-	$registry        = WP_Block_Styles_Registry::get_instance();
 
 	if ( empty( $variations ) ) {
 		return $variations_data;
 	}
 
+	$registry              = WP_Block_Styles_Registry::get_instance();
 	$have_named_variations = array_keys( $variations ) !== range( 0, count( $variations ) - 1 );
 
 	foreach ( $variations as $key => $variation ) {
+		$supported_blocks = $variation['supportedBlockTypes'] ?? array();
 		// Standalone theme.json partial files for block style variations
 		// will have their styles under a top-level property by the same name.
 		// Variations defined within an existing theme.json or theme style
@@ -196,7 +170,7 @@ function gutenberg_resolve_and_register_block_style_variations( $variations ) {
 			continue;
 		}
 
-		foreach ( $variation['supportedBlockTypes'] as $block_type ) {
+		foreach ( $supported_blocks as $block_type ) {
 			$registered_styles = $registry->get_registered_styles_for_block( $block_type );
 
 			if ( ! array_key_exists( $variation_name, $registered_styles ) ) {
@@ -222,11 +196,12 @@ function gutenberg_resolve_and_register_block_style_variations( $variations ) {
  * current theme.json data values take precedence.
  *
  * @param array                        $variations_data Block style variations data keyed by block type.
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
+ * @param WP_Theme_JSON_Data_Gutenberg $theme_json      Current theme.json data.
+ * @param string                       $origin          Origin for the theme.json data.
  *
  * @return WP_Theme_JSON_Gutenberg The merged theme.json data.
  */
-function gutenberg_merge_block_style_variations_data( $variations_data, $theme_json ) {
+function gutenberg_merge_block_style_variations_data( $variations_data, $theme_json, $origin = 'theme' ) {
 	if ( empty( $variations_data ) ) {
 		return $theme_json;
 	}
@@ -236,7 +211,7 @@ function gutenberg_merge_block_style_variations_data( $variations_data, $theme_j
 		'styles'  => array( 'blocks' => $variations_data ),
 	);
 
-	$variations_theme_json = new WP_Theme_JSON_Data_Gutenberg( $variations_theme_json_data, 'theme' );
+	$variations_theme_json = new WP_Theme_JSON_Data_Gutenberg( $variations_theme_json_data, $origin );
 
 	// Merge the current theme.json data over shared variation data so that
 	// any explicit per block variation values take precedence.
