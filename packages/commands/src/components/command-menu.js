@@ -31,6 +31,7 @@ import { Icon, search as inputIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import ErrorBoundary from './error-boundary';
 
 const inputLabel = __( 'Search for commands' );
 
@@ -45,7 +46,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	}
 
 	return (
-		<>
+		<ErrorBoundary>
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
@@ -69,7 +70,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 					</HStack>
 				</Command.Item>
 			) ) }
-		</>
+		</ErrorBoundary>
 	);
 }
 
@@ -214,7 +215,7 @@ export function CommandMenu() {
 			'aria-label',
 			__( 'Command suggestions' )
 		);
-	}, [ commandListRef.current ] );
+	}, [] );
 
 	useShortcut(
 		'core/commands',
