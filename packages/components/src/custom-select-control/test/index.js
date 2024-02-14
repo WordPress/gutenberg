@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '..';
+import UncontrolledCustomSelectControl from '..';
 
 const customClass = 'amber-skies';
 
@@ -51,7 +51,7 @@ const props = {
 const ControlledCustomSelectControl = ( { options } ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
-		<CustomSelectControl
+		<UncontrolledCustomSelectControl
 			{ ...props }
 			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
 			value={ options.find( ( option ) => option.key === value.key ) }
@@ -60,7 +60,7 @@ const ControlledCustomSelectControl = ( { options } ) => {
 };
 
 describe.each( [
-	[ 'uncontrolled', CustomSelectControl ],
+	[ 'uncontrolled', UncontrolledCustomSelectControl ],
 	[ 'controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
