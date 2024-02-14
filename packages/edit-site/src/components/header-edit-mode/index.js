@@ -76,7 +76,7 @@ export default function HeaderEditMode() {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { showFixedToolbar } = useShowBlockTools();
-	const hasTopToolbar = isLargeViewport && showFixedToolbar;
+	const showTopToolbar = isLargeViewport && showFixedToolbar;
 	const blockToolbarRef = useRef();
 	const disableMotion = useReducedMotion();
 
@@ -125,7 +125,7 @@ export default function HeaderEditMode() {
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
 					/>
-					{ hasTopToolbar && (
+					{ showTopToolbar && (
 						<>
 							<div
 								className={ classnames(
@@ -168,7 +168,7 @@ export default function HeaderEditMode() {
 						'edit-site-header-edit-mode__center',
 						{
 							'is-collapsed':
-								! isBlockToolsCollapsed && hasTopToolbar,
+								! isBlockToolsCollapsed && showTopToolbar,
 						}
 					) }
 				>

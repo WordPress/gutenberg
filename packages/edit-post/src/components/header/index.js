@@ -87,7 +87,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	}, [] );
 
 	const { showFixedToolbar } = useShowBlockTools();
-	const hasTopToolbar = isLargeViewport && showFixedToolbar;
+	const showTopToolbar = isLargeViewport && showFixedToolbar;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -119,7 +119,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				className="edit-post-header__toolbar"
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
-				{ hasTopToolbar && (
+				{ showTopToolbar && (
 					<>
 						<div
 							className={ classnames(
@@ -158,7 +158,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 						'is-collapsed':
 							hasHistory &&
 							! isBlockToolsCollapsed &&
-							hasTopToolbar,
+							showTopToolbar,
 					} ) }
 				>
 					{ hasHistory && <DocumentBar /> }
