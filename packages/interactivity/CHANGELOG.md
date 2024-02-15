@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.0.0 (2024-02-09)
+
 ### New Features
 
 -   Export `getConfig()` to retrieve the server-defined configuration for the passed namespace. ([58749](https://github.com/WordPress/gutenberg/pull/58749))

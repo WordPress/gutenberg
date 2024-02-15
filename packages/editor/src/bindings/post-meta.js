@@ -3,7 +3,7 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -11,7 +11,7 @@ import { store as editorStore } from '../store';
 
 export default {
 	name: 'core/post-meta',
-	label: __( 'Post Meta' ),
+	label: _x( 'Post Meta', 'block bindings source' ),
 	useSource( props, sourceAttributes ) {
 		const { getCurrentPostType } = useSelect( editorStore );
 		const { context } = props;
@@ -38,5 +38,4 @@ export default {
 			useValue: [ metaValue, updateMetaValue ],
 		};
 	},
-	lockAttributesEditing: true,
 };

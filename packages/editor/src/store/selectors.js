@@ -1313,6 +1313,18 @@ export function isInserterOpened( state ) {
 	return !! state.blockInserterPanel;
 }
 
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+);
+
 /*
  * Backward compatibility
  */

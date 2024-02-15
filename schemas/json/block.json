@@ -314,11 +314,6 @@
 					"description": "This property adds a field to define a custom className for the block’s wrapper.",
 					"default": true
 				},
-				"defaultStylePicker": {
-					"type": "boolean",
-					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
-					"default": true
-				},
 				"dimensions": {
 					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
@@ -556,10 +551,12 @@
 					}
 				},
 				"shadow": {
+					"default": false,
 					"description": "Allow blocks to define a box shadow.",
 					"oneOf": [
 						{
-							"type": "boolean"
+							"type": "boolean",
+							"description": "Defines whether a box shadow is enabled or not."
 						},
 						{
 							"type": "object"
@@ -789,6 +786,20 @@
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"viewScriptModule": {
+			"description": "Block type frontend script module definition. It will be enqueued only when viewing the content on the front of the site.",
 			"oneOf": [
 				{
 					"type": "string"

@@ -144,7 +144,9 @@ export function useSpecificEditorSettings() {
 		[]
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
+	const defaultRenderingMode = postWithTemplate
+		? 'template-locked'
+		: 'post-only';
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {
@@ -160,6 +162,7 @@ export function useSpecificEditorSettings() {
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			__unstableIsPreviewMode: canvasMode === 'view',
 		};
 	}, [
 		settings,
