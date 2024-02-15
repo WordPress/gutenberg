@@ -14,7 +14,7 @@ import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
-const isObject = ( item ) =>
+const isPlainObject = ( item ) =>
 	item && typeof item === 'object' && item.constructor === Object;
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
@@ -26,7 +26,7 @@ const proxifyContext = ( context, stack = {}, { ignore } = {} ) =>
 				return target[ k ];
 			}
 			if ( k in target || ! ( k in stack ) ) {
-				return isObject( peek( target, k ) )
+				return isPlainObject( peek( target, k ) )
 					? proxifyContext( target[ k ], stack[ k ], { ignore } )
 					: target[ k ];
 			}
@@ -45,7 +45,10 @@ const proxifyContext = ( context, stack = {}, { ignore } = {} ) =>
 
 const updateSignals = ( target, source ) => {
 	for ( const k in source ) {
-		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
+		if (
+			isPlainObject( peek( target, k ) ) &&
+			isPlainObject( peek( source, k ) )
+		) {
 			updateSignals( target[ `$${ k }` ].peek(), source[ k ] );
 		} else {
 			target[ k ] = source[ k ];
