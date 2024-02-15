@@ -1905,13 +1905,10 @@ export function lastBlockInserted( state = {}, action ) {
 				return state;
 			}
 
-			const clientIds = action.blocks.map( ( block ) => {
-				return block.clientId;
-			} );
-
-			const source = action.meta?.source;
-
-			return { clientIds, source };
+			return {
+				clientIds: action.blocks.map( ( block ) => block.clientId ),
+				source: action.meta?.source,
+			};
 		case 'RESET_BLOCKS':
 			return {};
 	}
