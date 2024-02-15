@@ -218,7 +218,7 @@ class WP_Navigation_Block_Renderer {
 			// it encounters whitespace. This code strips it.
 			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
-			if ( function_exists( 'get_hooked_block_markup' ) ) {
+			if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
 				// Run Block Hooks algorithm to inject hooked blocks.
 				$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
 				$root_nav_block = parse_blocks( $markup )[0];
@@ -1024,7 +1024,7 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 
-		if ( function_exists( 'get_hooked_block_markup' ) ) {
+		if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
 			// Run Block Hooks algorithm to inject hooked blocks.
 			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
 			$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
@@ -1425,7 +1425,7 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	// We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
 	// all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
 	$blocks = parse_blocks( $post->post_content );
-	$markup = block_core_navigation_insert_hooked_blocks( $blocks, $post, 'set_ignored_hooked_blocks_metadata' );)
+	$markup = block_core_navigation_insert_hooked_blocks( $blocks, $post, 'set_ignored_hooked_blocks_metadata' );
 
 	$root_nav_block        = parse_blocks( $markup )[0];
 	$ignored_hooked_blocks = isset( $root_nav_block['attrs']['metadata']['ignoredHookedBlocks'] )
@@ -1441,6 +1441,15 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 		update_post_meta( $post->ID, '_wp_ignored_hooked_blocks', json_encode( $ignored_hooked_blocks ) );
 	}
 
+	$serialized_inner_blocks = block_core_navigation_remove_serialized_parent_block( $markup );
+
+	wp_update_post(
+		array(
+			'ID'           => $post->ID,
+			'post_content' => $serialized_inner_blocks,
+		)
+	);
+
 	// TODO: wp_update_post() to set the post_content to the updated markup (to include the ignoredHookedBlocks metadata).
 	// We need to remove the markup for the root Nav block wrapper like we do in block_core_navigation_insert_hooked_blocks_into_rest_response,
 	// or alternatively via serialize_blocks( $root_nav_block['innerBlocks'] ), but that's probably more expensive.
@@ -1453,7 +1462,7 @@ $rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ig
 
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
-if ( function_exists( 'get_hooked_block_markup' ) && ! has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
+if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
@@ -1473,9 +1482,7 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	$content       = block_core_navigation_insert_hooked_blocks( $parsed_blocks, $post );
 
 	// Remove mock Navigation block wrapper.
-	$start   = strpos( $content, '-->' ) + strlen( '-->' );
-	$end     = strrpos( $content, '<!--' );
-	$content = substr( $content, $start, $end - $start );
+	$content = block_core_navigation_remove_serialized_parent_block( $content );
 
 	$response->data['content']['raw']      = $content;
 	$response->data['content']['rendered'] = apply_filters( 'the_content', $content );
@@ -1490,6 +1497,18 @@ $rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_h
 
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
-if ( function_exists( 'get_hooked_block_markup' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
+if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
+}
+
+/**
+ * Accepts the serialized markup of a block and its inner blocks, and returns serialized markup of the inner blocks.
+ *
+ * @param string $serialized_block The serialized markup of a block and its inner blocks.
+ * @return string
+ */
+function block_core_navigation_remove_serialized_parent_block( $serialized_block ) {
+	$start = strpos( $serialized_block, '-->' ) + strlen( '-->' );
+	$end   = strrpos( $serialized_block, '<!--' );
+	return substr( $serialized_block, $start, $end - $start );
 }
