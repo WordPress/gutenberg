@@ -155,9 +155,7 @@ export default function BorderPanel( {
 	// Shadow
 	const shadow = decodeValue( inheritedValue?.shadow );
 	const shadowPresets = settings?.shadow?.presets ?? {};
-	const overriddenShadowPresets = shadowPresets
-		? overrideOrigins( shadowPresets )
-		: [];
+	const overriddenShadowPresets = overrideOrigins( shadowPresets ) ?? [];
 	const setShadow = ( newValue ) => {
 		const slug = overriddenShadowPresets?.find(
 			( { shadow: shadowName } ) => shadowName === newValue
