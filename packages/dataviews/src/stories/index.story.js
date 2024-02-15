@@ -6,9 +6,9 @@ import { useState, useMemo, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DataViews, LAYOUT_GRID, LAYOUT_TABLE } from '../index';
-
+import { DataViews } from '../index';
 import { DEFAULT_VIEW, actions, data } from './fixtures';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 
 const meta = {
 	title: 'DataViews (Experimental)/DataViews',
@@ -17,7 +17,9 @@ const meta = {
 export default meta;
 
 const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'image',
 		primaryField: 'title',
@@ -100,23 +102,19 @@ export const Default = ( props ) => {
 		};
 	}, [ view ] );
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
 	return (
 		<DataViews
@@ -131,7 +129,5 @@ export const Default = ( props ) => {
 };
 Default.args = {
 	actions,
-	getItemId: ( item ) => item.id,
-	isLoading: false,
 	supportedLayouts: [ LAYOUT_TABLE, LAYOUT_GRID ],
 };

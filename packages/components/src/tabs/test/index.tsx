@@ -194,12 +194,14 @@ describe( 'Tabs', () => {
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 
 			// By default the tabpanel should receive focus
+			await sleep();
 			await press.Tab();
 			expect( selectedTabPanel ).toHaveFocus();
 		} );
@@ -229,12 +231,14 @@ describe( 'Tabs', () => {
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 			// Because the alpha tabpanel is set to `focusable: false`, pressing
 			// the Tab key should focus the button, not the tabpanel
+			await sleep();
 			await press.Tab();
 			expect( alphaButton ).toHaveFocus();
 		} );
@@ -305,6 +309,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -338,6 +343,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -373,6 +379,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -472,6 +479,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 			// Confirm onSelect has not been re-called
@@ -514,6 +522,7 @@ describe( 'Tabs', () => {
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
@@ -522,6 +531,7 @@ describe( 'Tabs', () => {
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
 			// Instead, focus should go to the currently selected tabpanel (alpha).
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tabpanel', {
@@ -832,6 +842,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 				// Move focus to the tablist, make sure alpha is focused.
+				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'tab', { name: 'Alpha' } )
@@ -1238,7 +1249,9 @@ describe( 'Tabs', () => {
 						);
 
 						// Tab key should focus the currently selected tab, which is Beta.
+						await sleep();
 						await press.Tab();
+						await sleep();
 						await press.Tab();
 						expect( await getSelectedTab() ).toHaveTextContent(
 							'Beta'
@@ -1273,6 +1286,7 @@ describe( 'Tabs', () => {
 						).toHaveFocus();
 
 						// Press tab, move focus back to the tablist
+						await sleep();
 						await press.Tab();
 
 						const betaTab = screen.getByRole( 'tab', {
@@ -1294,6 +1308,7 @@ describe( 'Tabs', () => {
 			it( 'should automatically select a newly focused tab', async () => {
 				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
 
+				await sleep();
 				await press.Tab();
 
 				// Tab key should focus the currently selected tab, which is Beta.
@@ -1319,10 +1334,13 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
+				await sleep();
 				await press.Tab();
-				expect(
-					await screen.findByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
+				await waitFor( async () =>
+					expect(
+						await screen.findByRole( 'tab', { name: 'Beta' } )
+					).toHaveFocus()
+				);
 
 				// Arrow key should move focus but not automatically change the selected tab.
 				await press.ArrowRight();

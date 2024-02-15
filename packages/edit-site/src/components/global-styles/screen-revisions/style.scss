@@ -49,7 +49,7 @@
 		outline: 3px solid transparent;
 		outline-offset: -2px;
 
-		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		color: var(--wp-admin-theme-color);
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
 		.edit-site-global-styles-screen-revisions__revision-button {
@@ -61,7 +61,7 @@
 		}
 
 		&::before {
-			background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+			background: var(--wp-admin-theme-color);
 		}
 
 		.edit-site-global-styles-screen-revisions__changes,

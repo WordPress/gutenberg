@@ -798,6 +798,20 @@
 				}
 			]
 		},
+		"viewScriptModule": {
+			"description": "Block type frontend script module definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
 		"editorStyle": {
 			"description": "Block type editor style definition. It will only be enqueued in the context of the editor.",
 			"oneOf": [

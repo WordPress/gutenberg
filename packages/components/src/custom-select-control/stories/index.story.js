@@ -20,7 +20,6 @@ export default {
 
 export const Default = CustomSelectControl.bind( {} );
 Default.args = {
-	__nextUnconstrainedWidth: true,
 	label: 'Label',
 	options: [
 		{
