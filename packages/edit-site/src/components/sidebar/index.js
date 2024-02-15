@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -52,6 +53,7 @@ function SidebarScreenWrapper( { className, ...props } ) {
 
 function SidebarScreens() {
 	useSyncPathWithURL();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
 		<>
@@ -82,9 +84,11 @@ function SidebarScreens() {
 			<SidebarScreenWrapper path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</SidebarScreenWrapper>
+			{ ! isMobileViewport && (
+				<SidebarScreenWrapper path="/patterns">
+					<SidebarNavigationScreenPatterns />
+				</SidebarScreenWrapper>
+			) }
 			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
