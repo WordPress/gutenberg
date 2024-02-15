@@ -27,6 +27,7 @@ import {
 	setUIValuesNeeded,
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
+	unloadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
 	makeFontFacesFormData,
 	makeFontFamilyFormData,
@@ -407,6 +408,23 @@ function FontLibraryProvider( { children } ) {
 			...fontFamilies,
 			[ font.source ]: newFonts,
 		} );
+
+		const activatedFont = newFonts.find( ( f ) => f.slug === font.slug );
+		const isFaceActivated = activatedFont?.fontFace?.find(
+			( f ) =>
+				f.fontWeight === face.fontWeight &&
+				f.fontStyle === face.fontStyle
+		);
+		if ( isFaceActivated ) {
+			// Load font faces just in the iframe because they already are in the document.
+			loadFontFaceInBrowser(
+				face,
+				getDisplaySrcFromFontFace( face.src ),
+				'all'
+			);
+		} else {
+			unloadFontFaceInBrowser( face, 'all' );
+		}
 	};
 
 	const loadFontFaceAsset = async ( fontFace ) => {
