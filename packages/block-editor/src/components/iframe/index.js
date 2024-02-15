@@ -273,13 +273,16 @@ function Iframe( {
 				src={ src }
 				title={ __( 'Editor canvas' ) }
 				onKeyDown={ ( event ) => {
+					if ( props.onKeyDown ) {
+						props.onKeyDown( event );
+					}
 					// If the event originates from inside the iframe, it means
 					// it bubbled through the portal, but only with React
 					// events. We need to to bubble native events as well,
 					// though by doing so we also trigger another React event,
 					// so we need to stop the propagation of this event to avoid
 					// duplication.
-					if (
+					else if (
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {
