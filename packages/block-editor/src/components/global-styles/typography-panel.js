@@ -106,7 +106,7 @@ function useHasTextColumnsControl( settings ) {
 
 function getUniqueFontSizesBySlug( settings ) {
 	const fontSizes = settings?.typography?.fontSizes ?? {};
-	const overriddenFontSizes = fontSizes ? overrideOrigins( fontSizes ) : [];
+	const overriddenFontSizes = overrideOrigins( fontSizes ) ?? [];
 	const uniqueSizes = [];
 	for ( const currentSize of overriddenFontSizes ) {
 		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
