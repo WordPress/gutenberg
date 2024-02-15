@@ -14,13 +14,10 @@ import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
-import { Container as InputControlContainer } from '../input-control/styles/input-control-styles';
 import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
-	${ InputControlContainer } {
-		width: ${ space( 24 ) };
-	}
+	width: ${ space( 24 ) };
 `;
 
 export const SelectControl = styled( InnerSelectControl )`
