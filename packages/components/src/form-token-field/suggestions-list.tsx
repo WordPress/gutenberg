@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 import type { MouseEventHandler, ReactNode } from 'react';
 
@@ -45,13 +44,11 @@ export function SuggestionsList< T extends string | { value: string } >( {
 				listNode.children[ selectedIndex ]
 			) {
 				setScrollingIntoView( true );
-				scrollView(
-					listNode.children[ selectedIndex ] as HTMLLIElement,
-					listNode,
-					{
-						onlyScrollIfNeeded: true,
-					}
-				);
+				listNode.children[ selectedIndex ].scrollIntoView( {
+					behavior: 'instant',
+					block: 'nearest',
+					inline: 'nearest',
+				} );
 				rafId = requestAnimationFrame( () => {
 					setScrollingIntoView( false );
 				} );
