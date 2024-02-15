@@ -139,6 +139,12 @@ export default function useLayoutAreas() {
 
 	// Fallback shows the home page preview
 	return {
-		areas: { preview: <Editor isLoading={ isSiteEditorLoading } /> },
+		areas: {
+			preview: <Editor isLoading={ isSiteEditorLoading } />,
+			mobile:
+				canvas === 'edit' ? (
+					<Editor isLoading={ isSiteEditorLoading } />
+				) : undefined,
+		},
 	};
 }
