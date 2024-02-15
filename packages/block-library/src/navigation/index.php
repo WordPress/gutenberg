@@ -1369,25 +1369,28 @@ function block_core_navigation_get_most_recently_published_navigation() {
 }
 
 /**
- * Insert hooked blocks into a Navigation block.
+ * Accepts the serialized markup of a block and its inner blocks, and returns serialized markup of the inner blocks.
  *
- * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
- * this function inserts hooked blocks into it, and returns the serialized inner blocks in a
- * mock Navigation block wrapper.
- *
- * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
- * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
- * of those hooked blocks should be exempted from insertion.
+ * @param string $serialized_block The serialized markup of a block and its inner blocks.
+ * @return string
+ */
+function block_core_navigation_remove_serialized_parent_block( $serialized_block ) {
+	$start = strpos( $serialized_block, '-->' ) + strlen( '-->' );
+	$end   = strrpos( $serialized_block, '<!--' );
+	return substr( $serialized_block, $start, $end - $start );
+}
+
+/**
+ * Mock a parsed block for the Navigation block given its inner blocks and the `wp_navigation` post object.
+ * The `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is queried to add the `metadata.ignoredHookedBlocks` attribute.
  *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
- * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ *
+ * @return array the normalized parsed blocks.
  */
-function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post, $callback = 'insert_hooked_blocks' ) {
-	$before_block_visitor = null;
-	$after_block_visitor  = null;
-	$hooked_blocks        = get_hooked_blocks();
-	$attributes           = array();
+function block_core_navigation_mock_parsed_block( $inner_blocks, $post ) {
+	$attributes = array();
 
 	if ( isset( $post->ID ) ) {
 		$ignored_hooked_blocks = get_post_meta( $post->ID, '_wp_ignored_hooked_blocks', true );
@@ -1405,15 +1408,62 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post, $call
 		'innerBlocks'  => $inner_blocks,
 		'innerContent' => array_fill( 0, count( $inner_blocks ), null ),
 	);
-	$before_block_visitor     = null;
-	$after_block_visitor      = null;
+
+	return $mock_anchor_parent_block;
+}
+
+/**
+ * Insert hooked blocks into a Navigation block.
+ *
+ * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
+ * this function inserts hooked blocks into it, and returns the serialized inner blocks in a
+ * mock Navigation block wrapper.
+ *
+ * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
+ * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
+ * of those hooked blocks should be exempted from insertion.
+ *
+ * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
+ * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
+ * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ */
+function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
+	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
+	$hooked_blocks         = get_hooked_blocks();
+	$before_block_visitor  = null;
+	$after_block_visitor   = null;
 
 	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
-		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, $callback );
-		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, $callback );
+		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
+		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
 	}
 
-	return traverse_and_serialize_block( $mock_anchor_parent_block, $before_block_visitor, $after_block_visitor );
+	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
+}
+
+/**
+ * Insert ignoredHookedBlocks meta into the Navigation block and its inner blocks.
+ *
+ * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
+ * this function inserts ignoredHookedBlocks meta into it, and returns the serialized inner blocks in a
+ * mock Navigation block wrapper.
+ *
+ * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
+ * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
+ * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ */
+function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks, $post ) {
+	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
+	$hooked_blocks         = get_hooked_blocks();
+	$before_block_visitor  = null;
+	$after_block_visitor   = null;
+
+	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
+		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+	}
+
+	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
 }
 
 /**
@@ -1425,7 +1475,7 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	// We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
 	// all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
 	$blocks = parse_blocks( $post->post_content );
-	$markup = block_core_navigation_insert_hooked_blocks( $blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+	$markup = block_core_navigation_set_ignored_hooked_blocks_metadata( $blocks, $post );
 
 	$root_nav_block        = parse_blocks( $markup )[0];
 	$ignored_hooked_blocks = isset( $root_nav_block['attrs']['metadata']['ignoredHookedBlocks'] )
@@ -1495,16 +1545,4 @@ $rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_h
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
 if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
-}
-
-/**
- * Accepts the serialized markup of a block and its inner blocks, and returns serialized markup of the inner blocks.
- *
- * @param string $serialized_block The serialized markup of a block and its inner blocks.
- * @return string
- */
-function block_core_navigation_remove_serialized_parent_block( $serialized_block ) {
-	$start = strpos( $serialized_block, '-->' ) + strlen( '-->' );
-	$end   = strrpos( $serialized_block, '<!--' );
-	return substr( $serialized_block, $start, $end - $start );
 }
