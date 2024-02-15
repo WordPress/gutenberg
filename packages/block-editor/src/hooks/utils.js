@@ -453,6 +453,26 @@ export function createBlockEditFilter( features ) {
 						}
 					}
 
+					/*
+					 * "metadata" attribute is a special case.
+					 */
+					if ( props.attributes.metadata ) {
+						const bindings = {
+							...props.attributes.metadata.bindings,
+						};
+
+						Object.entries( bindings ).forEach(
+							( [ attrName ] ) => {
+								bindings[ attrName ].value =
+									props.attributes[ attrName ];
+							}
+						);
+
+						neededProps.metadata = { bindings };
+						// @todo: grab it from the React context.
+						neededProps.context = props.context;
+					}
+
 					return (
 						<Edit
 							// We can use the index because the array length

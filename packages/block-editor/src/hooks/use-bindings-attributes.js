@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { useEffect, useCallback, useRef } from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
 
 /**
@@ -146,12 +144,13 @@ const BlockBindingConnector = ( {
 	return null;
 };
 
-function BlockBindingBridge( { bindings, props } ) {
+function BlockBindingBridge( props ) {
+	const bindings = props?.metadata?.bindings;
 	if ( ! bindings || Object.keys( bindings ).length === 0 ) {
 		return null;
 	}
 
-	const { attributes, name } = props;
+	const { name } = props;
 	const BindingConnectorInstances = [];
 
 	Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
@@ -162,14 +161,13 @@ function BlockBindingBridge( { bindings, props } ) {
 
 		const { getBlockBindingsSource } = unlock( select( blockEditorStore ) );
 		const source = getBlockBindingsSource( settings.source );
-
 		if ( ! source ) {
 			return;
 		}
 
 		if ( source ) {
 			const { useSource } = source;
-			const attrValue = attributes[ attrName ];
+			const attrValue = settings.source;
 
 			// Create a unique key for the connector instance
 			const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
@@ -190,39 +188,8 @@ function BlockBindingBridge( { bindings, props } ) {
 	return BindingConnectorInstances;
 }
 
-const withBlockBindingSupport = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { attributes } = props;
-
-		// Bail early if the block doesn't have bindings.
-		const bindings = attributes?.metadata?.bindings;
-		if ( ! bindings || Object.keys( bindings ).length === 0 ) {
-			return null;
-		}
-
-		return (
-			<>
-				<BlockBindingBridge bindings={ bindings } props={ props } />
-				<BlockEdit { ...props } />
-			</>
-		);
-	},
-	'withBlockBindingSupport'
-);
-
-function extendBlockWithBoundAttributes( settings, name ) {
-	if ( ! isItPossibleToBindBlock( name ) ) {
-		return settings;
-	}
-
-	return {
-		...settings,
-		edit: withBlockBindingSupport( settings.edit ),
-	};
-}
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/editor/block-edit-with-binding-attributes',
-	extendBlockWithBoundAttributes
-);
+export default {
+	edit: BlockBindingBridge,
+	attributeKeys: [ 'metadata' ],
+	hasSupport: isItPossibleToBindBlock,
+};
