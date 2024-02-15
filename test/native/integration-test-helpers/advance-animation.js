@@ -13,8 +13,6 @@ import { FRAME_TIME } from './constants';
  * @param {number} count Number of frames to advance timers.
  */
 export const advanceAnimationByFrames = ( count ) => {
-	for ( let i = 0; i <= count; i++ ) {
-		jest.advanceTimersByTime( FRAME_TIME );
-	}
-	jest.advanceTimersByTime( FRAME_TIME );
+	jest.advanceTimersByTime( count * FRAME_TIME );
+	jest.runOnlyPendingTimers();
 };
