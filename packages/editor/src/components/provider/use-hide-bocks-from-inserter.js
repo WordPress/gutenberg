@@ -22,7 +22,7 @@ const POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART = [
 export function useHideBlocksFromInserter( postType ) {
 	useEffect( () => {
 		/*
-		 * Prevent adding template part in the post editor.
+		 * Prevent adding template part in the editor.
 		 */
 		addFilter(
 			'blockEditor.__unstableCanInsertBlockType',
@@ -41,7 +41,7 @@ export function useHideBlocksFromInserter( postType ) {
 		);
 
 		/*
-		 * Prevent adding post content block (except in query block) in the post editor.
+		 * Prevent adding post content block (except in query block) in the editor.
 		 */
 		addFilter(
 			'blockEditor.__unstableCanInsertBlockType',
