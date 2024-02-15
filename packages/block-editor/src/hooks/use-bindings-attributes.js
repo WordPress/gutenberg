@@ -168,7 +168,7 @@ function BlockBindingBridge( props ) {
 
 		if ( source ) {
 			const { useSource } = source;
-			const attrValue = settings.source;
+			const attrValue = settings.value;
 
 			// Create a unique key for the connector instance
 			const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
