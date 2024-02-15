@@ -29,7 +29,7 @@ test.describe( 'Site editor navigation', () => {
 		// Test: Can navigate to a sidebar item and into its subnavigation frame without losing focus
 		// Go to the Pages button
 
-		await editorNavigationUtils.tabToLabel( 'Pages', { times: 10 } );
+		await editorNavigationUtils.tabToLabel( 'Pages' );
 
 		await expect(
 			page.getByRole( 'button', { name: 'Pages' } )
