@@ -261,6 +261,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
 					<RichText
+						identifier="fileName"
 						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
@@ -280,6 +281,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						>
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
+								identifier="downloadButtonText"
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
 								className={ classnames(
