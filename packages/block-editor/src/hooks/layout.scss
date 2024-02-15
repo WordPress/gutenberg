@@ -39,16 +39,3 @@
 .block-editor-hooks__toggle-control.block-editor-hooks__toggle-control {
 	margin-bottom: $grid-unit-20;
 }
-
-.block-editor-grid-visualizer .components-popover__content * {
-	pointer-events: none !important;
-}
-
-.block-editor-grid-visualizer__grid {
-	display: grid;
-}
-
-.block-editor-grid-visualizer__item {
-	border: 1px dashed $gray-300;
-	border-radius: 2px;
-}

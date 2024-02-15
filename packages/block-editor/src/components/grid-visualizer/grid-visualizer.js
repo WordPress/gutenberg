@@ -31,7 +31,6 @@ export function GridVisualizer( { clientId } ) {
 			<div
 				className="block-editor-grid-visualizer__grid"
 				style={ {
-					display: 'grid',
 					gridTemplateColumns,
 					gridTemplateRows,
 					gap: getComputedCSS( blockElement, 'gap' ),

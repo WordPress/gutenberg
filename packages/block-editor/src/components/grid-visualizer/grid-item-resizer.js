@@ -19,12 +19,14 @@ export function GridItemResizer( { clientId, onChange } ) {
 	}
 	return (
 		<BlockPopover
+			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
 		>
 			<ResizableBox
 				ref={ resizableRef }
+				className="block-editor-grid-item-resizer__box"
 				defaultSize={ {
 					width: '100%',
 					height: '100%',
@@ -63,15 +65,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 						height: newBoxHeight,
 					} );
 				} }
-			>
-				<div
-					style={ {
-						width: '100%',
-						height: '100%',
-						border: '1px solid blue',
-					} }
-				/>
-			</ResizableBox>
+			/>
 		</BlockPopover>
 	);
 }
