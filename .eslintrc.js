@@ -362,25 +362,15 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					{
-						selector: 'Literal[value=/--wp-admin-theme-/]',
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 						message:
 							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
 					{
 						selector:
-							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
-						message:
-							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
-					},
-					{
-						selector:
-							'Literal[value=/var.+--wp-components-color-/]', // allow overriding definitions, but not access with var()
-						message:
-							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
-					},
-					{
-						selector:
-							'TemplateElement[value.cooked=/var.+--wp-components-color-/]', // allow overriding definitions, but not access with var()
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var.+--wp-components-color-/],TemplateElement[value.cooked=/var.+--wp-components-color-/])',
 						message:
 							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
