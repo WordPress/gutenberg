@@ -53,18 +53,6 @@ describe( 'actions', () => {
 		).toBeNull();
 	} );
 
-	it( 'openGeneralSidebar - should turn off distraction free mode when opening a general sidebar', () => {
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core', 'distractionFree', true );
-		registry
-			.dispatch( editPostStore )
-			.openGeneralSidebar( 'edit-post/block' );
-		expect(
-			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
-		).toBe( false );
-	} );
-
 	it( 'toggleFeature', () => {
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(

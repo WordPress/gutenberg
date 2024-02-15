@@ -75,21 +75,4 @@ describe( 'actions', () => {
 			expect( select.getEditedPostType() ).toBe( 'wp_template_part' );
 		} );
 	} );
-
-	describe( 'openGeneralSidebar', () => {
-		it( 'should turn off distraction free mode when opening a general sidebar', () => {
-			const registry = createRegistryWithStores();
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', true );
-			registry
-				.dispatch( editSiteStore )
-				.openGeneralSidebar( 'edit-site/global-styles' );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( false );
-		} );
-	} );
 } );
