@@ -7,7 +7,6 @@ import type { MouseEventHandler, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -31,8 +30,6 @@ export function SuggestionsList< T extends string | { value: string } >( {
 	instanceId,
 	__experimentalRenderItem,
 }: SuggestionsListProps< T > ) {
-	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
-
 	const listRef = useRefEffect< HTMLUListElement >(
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
@@ -43,14 +40,10 @@ export function SuggestionsList< T extends string | { value: string } >( {
 				scrollIntoView &&
 				listNode.children[ selectedIndex ]
 			) {
-				setScrollingIntoView( true );
 				listNode.children[ selectedIndex ].scrollIntoView( {
 					behavior: 'instant',
 					block: 'nearest',
 					inline: 'nearest',
-				} );
-				rafId = requestAnimationFrame( () => {
-					setScrollingIntoView( false );
 				} );
 			}
 
@@ -65,9 +58,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 
 	const handleHover = ( suggestion: T ) => {
 		return () => {
-			if ( ! scrollingIntoView ) {
-				onHover?.( suggestion );
-			}
+			onHover?.( suggestion );
 		};
 	};
 

@@ -82,19 +82,13 @@ class URLInput extends Component {
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
-			this.suggestionNodes[ selectedSuggestion ] &&
-			! this.scrollingIntoView
+			this.suggestionNodes[ selectedSuggestion ]
 		) {
-			this.scrollingIntoView = true;
 			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
 				behavior: 'instant',
 				block: 'nearest',
 				inline: 'nearest',
 			} );
-
-			this.props.setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
 		}
 
 		// Update suggestions when the value changes.
