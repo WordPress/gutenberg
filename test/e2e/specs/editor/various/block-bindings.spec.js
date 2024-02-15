@@ -565,7 +565,7 @@ test.describe( 'Block bindings', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
@@ -644,7 +644,7 @@ test.describe( 'Block bindings', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const titleValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
@@ -700,7 +700,7 @@ test.describe( 'Block bindings', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
@@ -1108,7 +1108,7 @@ test.describe( 'Block bindings', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
@@ -1184,7 +1184,7 @@ test.describe( 'Block bindings', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const titleValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
@@ -1254,7 +1254,7 @@ test.describe( 'Block bindings', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
