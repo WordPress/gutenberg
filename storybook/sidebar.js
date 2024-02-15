@@ -1,4 +1,9 @@
 /**
+ * Provides sidebar configuration options.
+ * See https://storybook.js.org/docs/configure/features-and-behavior
+ */
+
+/**
  * External dependencies
  */
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
@@ -25,6 +30,10 @@ const Icons = styled.span( {} );
 
 const Icon = styled.span( {} );
 
+/**
+ * Fetches tags from the Storybook API, and returns Icon
+ * elements for any that have matching badge data
+ */
 function useIcons( item ) {
 	const api = useStorybookApi();
 	const prefix = 'status-';
@@ -53,6 +62,9 @@ function useIcons( item ) {
 	}, [ api, item.children, item.isComponent ] );
 }
 
+/**
+ * Renders the item name and any associated badge icons.
+ */
 function Label( { item } ) {
 	const iconSet = useIcons( item );
 	const title = createElement( Title, {}, item.name );
@@ -62,5 +74,6 @@ function Label( { item } ) {
 }
 
 export default {
+	// Renders status icons for items tagged with `status-*`
 	renderLabel: ( item ) => createElement( Label, { item } ),
 };

@@ -1,3 +1,8 @@
+/**
+ * Provides badge configuration options.
+ * See https://github.com/geometricpanda/storybook-addon-badges
+ */
+
 export default {
 	private: {
 		icon: '🔒',
