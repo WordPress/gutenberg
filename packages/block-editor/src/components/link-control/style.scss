@@ -36,10 +36,11 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 
 		.block-editor-link-control__search-item-top {
+			gap: 8px;
+
 			.components-button.has-icon {
-				min-width: 50px;
-				width: 50px;
-				padding: 0 5px;
+				min-width: inherit;
+				width: min-content;
 			}
 		}
 	}
