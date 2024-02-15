@@ -26,7 +26,7 @@ import { unlock } from '../lock-unlock';
 const { PrivateRichText: RichText } = unlock( blockEditorPrivateApis );
 
 export function Caption( {
-	key = 'caption',
+	attributeKey = 'caption',
 	attributes,
 	setAttributes,
 	isSelected,
@@ -36,8 +36,12 @@ export function Caption( {
 	showToolbarButton = true,
 	className,
 	disableEditing,
+	tagName = 'figcaption',
+	addLabel,
+	removeLabel,
+	...props
 } ) {
-	const caption = attributes[ key ];
+	const caption = attributes[ attributeKey ];
 	const prevCaption = usePrevious( caption );
 	const isCaptionEmpty = RichText.isEmpty( caption );
 	const isPrevCaptionEmpty = RichText.isEmpty( prevCaption );
@@ -79,19 +83,15 @@ export function Caption( {
 						} }
 						icon={ captionIcon }
 						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
-						}
+						label={ showCaption ? removeLabel : addLabel }
 					/>
 				</BlockControls>
 			) }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
-						identifier={ key }
-						tagName="figcaption"
+						identifier={ attributeKey }
+						tagName={ tagName }
 						className={ classnames(
 							className,
 							__experimentalGetElementClassName( 'caption' )
@@ -101,7 +101,7 @@ export function Caption( {
 						placeholder={ placeholder }
 						value={ caption }
 						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
+							setAttributes( { [ attributeKey ]: value } )
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
@@ -110,6 +110,7 @@ export function Caption( {
 							)
 						}
 						disableEditing={ disableEditing }
+						{ ...props }
 					/>
 				) }
 		</>
