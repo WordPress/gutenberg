@@ -60,16 +60,16 @@ export function usePasteHandler( props ) {
 
 			function pasteInline( content ) {
 				const transformed = formatTypes.reduce(
-					( accumlator, { __unstablePasteRule } ) => {
+					( accumulator, { __unstablePasteRule } ) => {
 						// Only allow one transform.
-						if ( __unstablePasteRule && accumlator === value ) {
-							accumlator = __unstablePasteRule( value, {
+						if ( __unstablePasteRule && accumulator === value ) {
+							accumulator = __unstablePasteRule( value, {
 								html,
 								plainText,
 							} );
 						}
 
-						return accumlator;
+						return accumulator;
 					},
 					value
 				);
