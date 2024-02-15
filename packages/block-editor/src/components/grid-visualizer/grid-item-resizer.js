@@ -33,9 +33,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 					bottom: true,
 					bottomLeft: false,
 					bottomRight: false,
-					left: true,
+					left: false,
 					right: true,
-					top: true,
+					top: false,
 					topLeft: false,
 					topRight: false,
 				} }
