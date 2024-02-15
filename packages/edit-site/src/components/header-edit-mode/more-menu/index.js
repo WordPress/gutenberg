@@ -16,7 +16,10 @@ import {
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,7 +36,9 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
-import ModeSwitcher from '../mode-switcher';
+import { unlock } from '../../../lock-unlock';
+
+const { ModeSwitcher } = unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );
