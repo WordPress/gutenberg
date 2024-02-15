@@ -49,6 +49,7 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
@@ -77,7 +78,9 @@ export function initializeEditor(
 
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
+	// This behavior is disabled for small viewports.
 	if (
+		isMediumOrBigger &&
 		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
 		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
