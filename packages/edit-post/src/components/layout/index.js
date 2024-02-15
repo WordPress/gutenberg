@@ -310,7 +310,8 @@ function Layout( { initialPost } ) {
 				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
-					( ! isMobileViewport || sidebarIsOpened ) && (
+					( ( isMobileViewport && sidebarIsOpened ) ||
+						( ! isMobileViewport && ! isDistractionFree ) ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toggle-sidebar-panel">

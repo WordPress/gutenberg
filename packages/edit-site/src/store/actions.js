@@ -477,12 +477,6 @@ export const revertTemplate =
 export const openGeneralSidebar =
 	( name ) =>
 	( { registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			registry.dispatch( editorStore ).toggleDistractionFree();
-		}
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editSiteStoreName, name );

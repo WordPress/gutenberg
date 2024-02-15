@@ -268,10 +268,9 @@ export default function Editor( { isLoading } ) {
 						}
 						sidebar={
 							isEditMode &&
-							isRightSidebarOpen && (
-								<>
-									<ComplementaryArea.Slot scope="core/edit-site" />
-								</>
+							isRightSidebarOpen &&
+							! isDistractionFree && (
+								<ComplementaryArea.Slot scope="core/edit-site" />
 							)
 						}
 						footer={

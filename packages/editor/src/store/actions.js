@@ -750,8 +750,6 @@ export const toggleDistractionFree =
 					.set( 'core', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
-				// TODO
-				// dispatch.closeGeneralSidebar();
 			} );
 		}
 		registry.batch( () => {
