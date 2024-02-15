@@ -145,7 +145,7 @@ export const privateRemoveBlocks =
 							clientId,
 							'core/block'
 						);
-					// If the overriden block is a child of a core/block, skip it.
+					// We only need to run this check when editing the original pattern, not pattern instances.
 					if ( parentPatternBlocks?.length > 0 ) {
 						continue;
 					}
