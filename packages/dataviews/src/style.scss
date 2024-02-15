@@ -216,6 +216,10 @@
 	display: block;
 	width: 100%;
 
+	&:has(a) {
+		padding: 0 2px; // space for focus outline to appear.
+	}
+
 	a {
 		text-decoration: none;
 		color: inherit;
