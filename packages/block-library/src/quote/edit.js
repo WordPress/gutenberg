@@ -105,7 +105,7 @@ export default function QuoteEdit( {
 				<Caption
 					attributeKey="citation"
 					tagName={ isWebPlatform ? 'cite' : undefined }
-					style={ { display: 'block' } }
+					style={ isWebPlatform && { display: 'block' } }
 					isSelected={ isSelected }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
