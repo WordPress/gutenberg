@@ -24,6 +24,13 @@ export function isItPossibleToBindBlock( blockName ) {
 	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
 }
 
+function hasPossibleBlockBinding( blockName, attribute ) {
+	return (
+		isItPossibleToBindBlock( blockName ) &&
+		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attribute )
+	);
+}
+
 /**
  * This component is responsible detecting and
  * propagating data changes between block attribute and
@@ -148,6 +155,11 @@ function BlockBindingBridge( { bindings, props } ) {
 	const BindingConnectorInstances = [];
 
 	Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
+		// Check if the block attribute can be bound.
+		if ( ! hasPossibleBlockBinding( name, attrName ) ) {
+			return;
+		}
+
 		const { getBlockBindingsSource } = unlock( select( blockEditorStore ) );
 		const source = getBlockBindingsSource( settings.source );
 
