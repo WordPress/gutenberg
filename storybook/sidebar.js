@@ -11,8 +11,6 @@ import { styled } from '@storybook/theming';
  */
 import badges from './badges';
 
-const STEM = 'sb-';
-
 const Wrapper = styled.span( {
 	flexGrow: 1,
 	display: 'flex',
@@ -29,6 +27,7 @@ const Icon = styled.span( {} );
 
 function useIcons( item ) {
 	const api = useStorybookApi();
+	const prefix = 'status-';
 
 	return useMemo( () => {
 		let data = {};
@@ -40,8 +39,8 @@ function useIcons( item ) {
 		const { tags = [] } = data;
 
 		return tags
-			.filter( ( tag ) => tag.startsWith( STEM ) )
-			.map( ( tag ) => badges[ tag.substring( STEM.length ) ] )
+			.filter( ( tag ) => tag.startsWith( prefix ) )
+			.map( ( tag ) => badges[ tag.substring( prefix.length ) ] )
 			.map( ( { icon, title, tooltip } ) =>
 				icon
 					? createElement(
