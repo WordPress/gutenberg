@@ -1,114 +1,206 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
+import { unlock } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { useBlockEditContext } from '../components/block-edit/context';
-import { unlock } from '../lock-unlock';
 
-/** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
-/** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
-
-/**
- * Given a binding of block attributes, returns a higher order component that
- * overrides its `attributes` and `setAttributes` props to sync any changes needed.
- *
- * @return {WPHigherOrderComponent} Higher-order component.
- */
-
-export const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title', 'alt' ],
 	'core/button': [ 'url', 'text', 'linkTarget' ],
 };
 
-const createEditFunctionWithBindingsAttribute = () =>
-	createHigherOrderComponent(
-		( BlockEdit ) => ( props ) => {
-			const { clientId, name: blockName } = useBlockEditContext();
-			const { getBlockBindingsSource } = unlock(
-				useSelect( blockEditorStore )
-			);
-			const { getBlockAttributes } = useSelect( blockEditorStore );
-
-			const updatedAttributes = getBlockAttributes( clientId );
-			if ( updatedAttributes?.metadata?.bindings ) {
-				Object.entries( updatedAttributes.metadata.bindings ).forEach(
-					( [ attributeName, settings ] ) => {
-						const source = getBlockBindingsSource(
-							settings.source
-						);
-
-						if ( source && source.useSource ) {
-							// Second argument (`updateMetaValue`) will be used to update the value in the future.
-							const {
-								placeholder,
-								useValue: [ metaValue = null ] = [],
-							} = source.useSource( props, settings.args );
-
-							if ( placeholder && ! metaValue ) {
-								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
-								// Adding this workaround until attributes and metadata fields types are improved and include `url`.
-								const htmlAttribute =
-									getBlockType( blockName ).attributes[
-										attributeName
-									].attribute;
-								if (
-									htmlAttribute === 'src' ||
-									htmlAttribute === 'href'
-								) {
-									updatedAttributes[ attributeName ] = null;
-								} else {
-									updatedAttributes[ attributeName ] =
-										placeholder;
-								}
-							}
-
-							if ( metaValue ) {
-								updatedAttributes[ attributeName ] = metaValue;
-							}
-						}
-					}
-				);
-			}
-
-			return (
-				<BlockEdit
-					key="edit"
-					{ ...props }
-					attributes={ updatedAttributes }
-				/>
-			);
-		},
-		'useBoundAttributes'
-	);
+export function isItPossibleToBindBlock( blockName ) {
+	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+}
 
 /**
- * Filters a registered block's settings to enhance a block's `edit` component
- * to upgrade bound attributes.
+ * This component is responsible detecting and
+ * propagating data changes between block attribute and
+ * the block-binding source property.
  *
- * @param {WPBlockSettings} settings Registered block settings.
+ * The app creates an instance of this component for each
+ * pair of block-attribute/source-property.
  *
- * @return {WPBlockSettings} Filtered block settings.
+ * @param {Object}   props            - The component props.
+ * @param {string}   props.attrName   - The attribute name.
+ * @param {any}      props.attrValue  - The attribute value.
+ * @param {Function} props.useSource  - The custom hook to use the source.
+ * @param {Object}   props.blockProps - The block props with bound attribute.
+ * @param {Object}   props.args       - The arguments to pass to the source.
+ * @return {null}                       This is a data-handling component. Render nothing.
  */
-function shimAttributeSource( settings ) {
-	if ( ! ( settings.name in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
+const BlockBindingConnector = ( {
+	args,
+	attrName,
+	attrValue,
+	blockProps,
+	useSource,
+} ) => {
+	const {
+		placeholder,
+		value: propValue,
+		updateValue: updatePropValue,
+	} = useSource( blockProps, args );
+
+	const blockName = blockProps.name;
+
+	const setAttributes = blockProps.setAttributes;
+
+	const updateBoundAttibute = useCallback(
+		( newAttrValue ) => {
+			setAttributes( {
+				[ attrName ]: newAttrValue,
+			} );
+		},
+		[ attrName, setAttributes ]
+	);
+
+	// Store a reference to the last value and attribute value.
+	const lastPropValue = useRef( propValue );
+	const lastAttrValue = useRef( attrValue );
+
+	/*
+	 * Initially sync (first render / onMount ) attribute
+	 * value with the source prop value.
+	 */
+	useEffect( () => {
+		updateBoundAttibute( propValue );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ updateBoundAttibute ] );
+
+	/*
+	 * Sync data.
+	 * This effect will run every time
+	 * the attribute value or the prop value changes.
+	 * It will sync them in both directions.
+	 */
+	useEffect( () => {
+		/*
+		 * Source Prop => Block Attribute
+		 *
+		 * Detect changes in source prop value,
+		 * and update the attribute value accordingly.
+		 */
+		if ( typeof propValue !== 'undefined' ) {
+			if ( propValue !== lastPropValue.current ) {
+				lastPropValue.current = propValue;
+				updateBoundAttibute( propValue );
+				return;
+			}
+		} else if ( placeholder ) {
+			/*
+			 * If the attribute is `src` or `href`,
+			 * a placeholder can't be used because it is not a valid url.
+			 * Adding this workaround until
+			 * attributes and metadata fields types are improved and include `url`.
+			 */
+			const htmlAttribute =
+				getBlockType( blockName ).attributes[ attrName ].attribute;
+
+			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
+				updateBoundAttibute( null );
+				return;
+			}
+
+			updateBoundAttibute( placeholder );
+		}
+
+		/*
+		 * Block Attribute => Source Prop
+		 *
+		 * Detect changes in block attribute value,
+		 * and update the source prop value accordingly.
+		 */
+		if ( attrValue !== lastAttrValue.current && updatePropValue ) {
+			lastAttrValue.current = attrValue;
+			updatePropValue( attrValue );
+		}
+	}, [
+		updateBoundAttibute,
+		propValue,
+		attrValue,
+		updatePropValue,
+		placeholder,
+		blockName,
+		attrName,
+	] );
+
+	return null;
+};
+
+const withBlockBindingSupport = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const { attributes, name } = props;
+
+		const { getBlockBindingsSource } = unlock(
+			useSelect( blockEditorStore )
+		);
+
+		// Bail early if there are no bindings.
+		const bindings = attributes?.metadata?.bindings;
+		if ( ! bindings ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		const BindingConnectorInstances = [];
+
+		Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
+			const source = getBlockBindingsSource( settings.source );
+
+			if ( source ) {
+				const { useSource } = source;
+				const attrValue = attributes[ attrName ];
+
+				// Create a unique key for the connector instance
+				const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
+
+				BindingConnectorInstances.push(
+					<BlockBindingConnector
+						key={ key }
+						attrName={ attrName }
+						attrValue={ attrValue }
+						useSource={ useSource }
+						blockProps={ props }
+						args={ settings.args }
+					/>
+				);
+			}
+		} );
+
+		return (
+			<>
+				{ BindingConnectorInstances }
+				<BlockEdit { ...props } />
+			</>
+		);
+	},
+	'withBlockBindingSupport'
+);
+
+function extendBlockWithBoundAttributes( settings, name ) {
+	if ( ! isItPossibleToBindBlock( name ) ) {
 		return settings;
 	}
-	settings.edit = createEditFunctionWithBindingsAttribute()( settings.edit );
 
-	return settings;
+	return {
+		...settings,
+		edit: withBlockBindingSupport( settings.edit ),
+	};
 }
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
-	shimAttributeSource
+	'core/editor/block-edit-with-binding-attributes',
+	extendBlockWithBoundAttributes
 );
