@@ -4,13 +4,14 @@
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { external } from '@wordpress/icons';
-import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import { external, moreVertical } from '@wordpress/icons';
 import {
-	ActionItem,
-	MoreMenuDropdown,
-	store as interfaceStore,
-} from '@wordpress/interface';
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+	DropdownMenu,
+} from '@wordpress/components';
+import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
@@ -55,10 +56,17 @@ export default function MoreMenu( { showIconLabels } ) {
 
 	return (
 		<>
-			<MoreMenuDropdown
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				popoverProps={ {
+					placement: 'bottom-end',
+				} }
 				toggleProps={ {
 					showTooltip: ! showIconLabels,
 					...( showIconLabels && { variant: 'tertiary' } ),
+					tooltipPosition: 'bottom',
+					size: 'compact',
 				} }
 			>
 				{ ( { onClose } ) => (
@@ -162,7 +170,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 					</>
 				) }
-			</MoreMenuDropdown>
+			</DropdownMenu>
 			<KeyboardShortcutHelpModal />
 			<EditSitePreferencesModal />
 		</>

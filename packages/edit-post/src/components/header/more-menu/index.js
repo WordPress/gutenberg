@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuGroup } from '@wordpress/components';
-import {
-	ActionItem,
-	MoreMenuDropdown,
-	PinnedItems,
-} from '@wordpress/interface';
+import { MenuGroup, DropdownMenu } from '@wordpress/components';
+import { ActionItem, PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,10 +22,16 @@ const MoreMenu = ( { showIconLabels } ) => {
 	const isLargeViewport = useViewportMatch( 'large' );
 
 	return (
-		<MoreMenuDropdown
+		<DropdownMenu
+			icon={ moreVertical }
+			label={ __( 'Options' ) }
+			popoverProps={ {
+				placement: 'bottom-end',
+			} }
 			toggleProps={ {
-				showTooltip: ! showIconLabels,
 				...( showIconLabels && { variant: 'tertiary' } ),
+				tooltipPosition: 'bottom',
+				showTooltip: ! showIconLabels,
 				size: 'compact',
 			} }
 		>
@@ -54,7 +57,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 					</MenuGroup>
 				</>
 			) }
-		</MoreMenuDropdown>
+		</DropdownMenu>
 	);
 };
 
