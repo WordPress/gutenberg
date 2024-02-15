@@ -46,9 +46,7 @@ test.describe( 'Site editor navigation', () => {
 		).toBeFocused();
 
 		// Test: Can navigate into the iframe using the keyboard
-		await editorNavigationUtils.tabToLabel( 'Editor Canvas', {
-			times: 10,
-		} );
+		await editorNavigationUtils.tabToLabel( 'Editor Canvas' );
 		const editorCanvasButton = page.getByRole( 'button', {
 			name: 'Editor Canvas',
 		} );
