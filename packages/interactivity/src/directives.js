@@ -19,28 +19,59 @@ const isPlainObject = ( item ) =>
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
-const proxifyContext = ( context, stack = {}, { ignore } = {} ) =>
-	new Proxy( context, {
+/**
+ * Wrap a context object with a proxy to reproduce the context stack. The proxy
+ * uses the passed `inherited` context as a fallback to look up for properties
+ * that don't exist in the given context. Also, updated properties are modified
+ * where they are defined, or added to the main context when they don't exist.
+ *
+ * By default, all plain objects inside the context are wrapped, unless it is
+ * listed in the `ignore` option.
+ *
+ * @param {Object}   current        Current context.
+ * @param {Object}   inherited      Inherited context, used as fallback.
+ * @param {Object}   options        Options.
+ * @param {Object[]} options.ignore List of object references that should not be
+ *                                  wrapped.
+ *
+ * @return {Object} The wrapped context object.
+ */
+const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
+	new Proxy( current, {
 		get: ( target, k ) => {
-			if ( k in target && ignore?.includes( target[ k ] ) ) {
-				return target[ k ];
+			// Return the prop from inherited when missing in target.
+			if ( ! ( k in target ) && k in inherited ) {
+				return inherited[ k ];
 			}
-			if ( k in target || ! ( k in stack ) ) {
-				return isPlainObject( peek( target, k ) )
-					? proxifyContext( target[ k ], stack[ k ], { ignore } )
-					: target[ k ];
+
+			// Proxify plain objects that are not listed in `ignore`.
+			if (
+				k in target &&
+				! ignore?.includes( target[ k ] ) &&
+				isPlainObject( peek( target, k ) )
+			) {
+				return proxifyContext( target[ k ], inherited[ k ], {
+					ignore,
+				} );
 			}
-			return stack[ k ];
+
+			// For other cases, return the value from target even when it
+			// doesn't exist.
+			return target[ k ];
 		},
 		set: ( target, k, value ) => {
-			( k in target || ! ( k in stack ) ? target : stack )[ k ] = value;
+			( k in target || ! ( k in inherited ) ? target : inherited )[ k ] =
+				value;
 			return true;
 		},
 		ownKeys: ( target ) => [
-			...new Set( [ ...Object.keys( stack ), ...Object.keys( target ) ] ),
+			...new Set( [
+				...Object.keys( inherited ),
+				...Object.keys( target ),
+			] ),
 		],
 		getOwnPropertyDescriptor: ( target, k ) =>
-			descriptor( target, k ) || descriptor( stack, k ),
+			descriptor( target, k ) || descriptor( inherited, k ),
 	} );
 
 const updateSignals = ( target, source ) => {
