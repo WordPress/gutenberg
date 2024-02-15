@@ -13,10 +13,7 @@ const test = base.extend( {
 	},
 } );
 
-// Skip these tests for now as we plan to adapt them to
-// the new patterns UI.
 test.describe( 'Patterns', () => {
-	const noResultsMsg = 'No results';
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllBlocks();
@@ -43,7 +40,7 @@ test.describe( 'Patterns', () => {
 				level: 1,
 			} )
 		).toBeVisible();
-		await expect( patterns.content ).toContainText( noResultsMsg );
+		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.navigation
 			.getByRole( 'button', { name: 'Create pattern' } )
@@ -172,7 +169,7 @@ test.describe( 'Patterns', () => {
 		);
 
 		await searchBox.fill( 'no match' );
-		await expect( patterns.content ).toContainText( noResultsMsg );
+		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
 			.getByRole( 'button', { name: 'Reset filters' } )
