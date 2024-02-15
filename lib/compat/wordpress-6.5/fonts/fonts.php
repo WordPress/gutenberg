@@ -216,6 +216,15 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	}
 }
 
+function gutenberg_font_upload_settings( $settings ) {
+	$fonts_dir = wp_get_font_dir()['path'];
+
+	$settings['fontUploadEnabled'] = wp_is_file_mod_allowed( 'can_upload_fonts' ) && wp_is_writable( $fonts_dir );
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_font_upload_settings' );
+
 // @core-merge: Filters should go in `src/wp-includes/default-filters.php`,
 // functions in a general file for font library.
 if ( ! function_exists( '_wp_after_delete_font_family' ) ) {

@@ -7,6 +7,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -24,11 +26,12 @@ const DEFAULT_TABS = [
 		id: 'installed-fonts',
 		title: __( 'Library' ),
 	},
-	{
-		id: 'upload-fonts',
-		title: __( 'Upload' ),
-	},
 ];
+
+const UPLOAD_TAB = {
+	id: 'upload-fonts',
+	title: __( 'Upload' ),
+};
 
 const tabsFromCollections = ( collections ) =>
 	collections.map( ( { slug, name } ) => ( {
@@ -44,9 +47,15 @@ function FontLibraryModal( {
 	defaultTabId = 'installed-fonts',
 } ) {
 	const { collections, setNotice } = useContext( FontLibraryContext );
+	const fontUploadEnabled = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontUploadEnabled,
+		[]
+	);
 
 	const tabs = [
 		...DEFAULT_TABS,
+		...( fontUploadEnabled ? [ UPLOAD_TAB ] : [] ),
 		...tabsFromCollections( collections || [] ),
 	];
 
