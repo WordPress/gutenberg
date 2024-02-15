@@ -10,14 +10,12 @@ import { __ } from '@wordpress/i18n';
 import {
 	AlignmentControl,
 	BlockControls,
-	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -25,6 +23,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { migrateToQuoteV2 } from './deprecated';
+import { Caption } from '../utils/caption';
 
 const isWebPlatform = Platform.OS === 'web';
 
@@ -74,15 +73,20 @@ export default function QuoteEdit( {
 	className,
 	style,
 } ) {
-	const { align, citation } = attributes;
+	const { align } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
 
-	const hasSelection = useSelect( ( select ) => {
-		const { isBlockSelected, hasSelectedInnerBlock } =
-			select( blockEditorStore );
-		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
-	}, [] );
+	const hasSelection = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return (
+				hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: classNames( className, {
@@ -108,33 +112,26 @@ export default function QuoteEdit( {
 			</BlockControls>
 			<BlockQuotation { ...innerBlocksProps }>
 				{ innerBlocksProps.children }
-				{ ( ! RichText.isEmpty( citation ) || hasSelection ) && (
-					<RichText
-						identifier="citation"
-						tagName={ isWebPlatform ? 'cite' : undefined }
-						style={ { display: 'block' } }
-						value={ citation }
-						onChange={ ( nextCitation ) => {
-							setAttributes( {
-								citation: nextCitation,
-							} );
-						} }
-						__unstableMobileNoFocusOnMount
-						aria-label={ __( 'Quote citation' ) }
-						placeholder={
-							// translators: placeholder text used for the
-							// citation
-							__( 'Add citation' )
-						}
-						className="wp-block-quote__citation"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
-					/>
-				) }
+				<Caption
+					attributeKey="citation"
+					tagName={ isWebPlatform ? 'cite' : undefined }
+					style={ { display: 'block' } }
+					isSelected={ hasSelection }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					__unstableMobileNoFocusOnMount
+					label={ __( 'Quote citation' ) }
+					placeholder={
+						// translators: placeholder text used for the
+						// citation
+						__( 'Add citation' )
+					}
+					addLabel={ __( 'Add citation' ) }
+					removeLabel={ __( 'Remove citation' ) }
+					className="wp-block-quote__citation"
+					insertBlocksAfter={ insertBlocksAfter }
+					{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
+				/>
 			</BlockQuotation>
 		</>
 	);
