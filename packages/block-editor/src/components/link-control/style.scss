@@ -34,6 +34,14 @@ $block-editor-link-control-number-of-actions: 1;
 				content: attr(aria-label);
 			}
 		}
+
+		.block-editor-link-control__search-item-top {
+			.components-button.has-icon {
+				min-width: 50px;
+				width: 50px;
+				padding: 0 5px;
+			}
+		}
 	}
 }
 
