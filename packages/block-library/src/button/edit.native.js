@@ -494,7 +494,7 @@ function ButtonEdit( props ) {
 					<View pointerEvents="none" style={ outLineStyles } />
 				) }
 				<RichText
-					setRef={ onSetRef }
+					ref={ onSetRef }
 					placeholder={ placeholderText }
 					value={ text }
 					onChange={ onChangeText }
