@@ -50,8 +50,7 @@ function useIcons( item ) {
 					  )
 					: null
 			);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ item.id ] );
+	}, [ api, item.children, item.isComponent ] );
 }
 
 function Label( { item } ) {
