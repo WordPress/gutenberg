@@ -257,8 +257,10 @@ function shimAttributeSource( settings, name ) {
 	};
 }
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
-	shimAttributeSource
-);
+export default function init() {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
+		shimAttributeSource
+	);
+}
