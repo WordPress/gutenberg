@@ -28,6 +28,13 @@
 	@include break-large() {
 		width: min(100%, 450px);
 	}
+
+	@include break-xlarge() {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
 }
 
 .editor-document-bar__command {
