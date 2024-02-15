@@ -27,6 +27,11 @@ jobs:
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
+            - uses: ruby/setup-ruby@v1
+              with:
+                  # `.ruby-version` file location
+                  working-directory: packages/react-native-editor/ios
+
             - name: Switch Xcode version to ${{ matrix.xcode }}
               run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
 
