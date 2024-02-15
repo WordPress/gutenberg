@@ -533,7 +533,7 @@ export default function Image( {
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
-								disabled={ lockAltControls }
+								readOnly={ lockAltControls }
 								help={
 									lockAltControls ? (
 										<>
@@ -575,7 +575,7 @@ export default function Image( {
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
-					disabled={ lockTitleControls }
+					readOnly={ lockTitleControls }
 					help={
 						lockTitleControls ? (
 							<>{ __( 'Connected to a custom field' ) }</>

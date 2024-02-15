@@ -69,7 +69,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		hasHistory,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
-		const { getEditorMode } = select( editPostStore );
+		const { getEditorMode } = select( editorStore );
 
 		return {
 			isTextEditor: getEditorMode() === 'text',

@@ -180,7 +180,7 @@ function Layout( { initialPost } ) {
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
-			mode: select( editPostStore ).getEditorMode(),
+			mode: select( editorStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
@@ -310,7 +310,8 @@ function Layout( { initialPost } ) {
 				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
-					( ! isMobileViewport || sidebarIsOpened ) && (
+					( ( isMobileViewport && sidebarIsOpened ) ||
+						( ! isMobileViewport && ! isDistractionFree ) ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toggle-sidebar-panel">
@@ -385,7 +386,7 @@ function Layout( { initialPost } ) {
 			<PostSyncStatusModal />
 			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
-			<SettingsSidebar />
+			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>
 	);
 }

@@ -5,11 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Set of available mode options.
@@ -33,11 +29,11 @@ function ModeSwitcher() {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
-			mode: select( editSiteStore ).getEditorMode(),
+			mode: select( editorStore ).getEditorMode(),
 		} ),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( editSiteStore );
+	const { switchEditorMode } = useDispatch( editorStore );
 
 	const choices = MODES.map( ( choice ) => {
 		if ( choice.value !== mode ) {
