@@ -59,8 +59,6 @@ const postTypeEntities = [
 import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line no-restricted-imports
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -392,8 +390,8 @@ const ComposedNativeProvider = compose( [
 			getEditedPostAttribute,
 			getEditedPostContent,
 			getEditorSettings,
+			getEditorMode,
 		} = select( editorStore );
-		const { getEditorMode } = select( editPostStore );
 
 		const { getBlockIndex, getSelectedBlockClientId, getGlobalBlockCount } =
 			select( blockEditorStore );
@@ -417,15 +415,18 @@ const ComposedNativeProvider = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks, updateEditorSettings } =
-			dispatch( editorStore );
+		const {
+			editPost,
+			resetEditorBlocks,
+			updateEditorSettings,
+			switchEditorMode,
+		} = dispatch( editorStore );
 		const {
 			clearSelectedBlock,
 			updateSettings,
 			insertBlock,
 			replaceBlock,
 		} = dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			dispatch( noticesStore );

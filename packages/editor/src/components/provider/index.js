@@ -24,6 +24,7 @@ import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-bocks-from-inserter';
+import useCommands from '../commands';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -231,6 +232,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
 
 		useHideBlocksFromInserter( post.type );
+
+		// Register the editor commands.
+		useCommands();
 
 		if ( ! isReady ) {
 			return null;
