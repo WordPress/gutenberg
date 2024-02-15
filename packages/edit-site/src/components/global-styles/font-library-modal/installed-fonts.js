@@ -11,6 +11,7 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalHeading as Heading,
 	Button,
 	Spinner,
 	FlexItem,
@@ -152,15 +153,18 @@ function InstalledFonts() {
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/fontFamily">
-					<HStack align="center">
-						<NavigatorToParentButton icon={ chevronLeft }>
-							{ __( 'Return to Library' ) }
-						</NavigatorToParentButton>
+					<HStack spacing={ 2 } aligh="left">
+						<NavigatorToParentButton
+							icon={ chevronLeft }
+							isSmall
+							aria-label={ __( 'Navigate to the previous view' ) }
+						/>
 
-						<Text className="font-library-modal__subtitle">
+						<Heading level={ 2 } size={ 13 }>
 							{ libraryFontSelected?.name }
-						</Text>
+						</Heading>
 					</HStack>
+					<Spacer margin={ 4 } />
 					<Text>
 						{ __(
 							'Choose font variants. Keep in mind that too many variants could make your site slower.'
