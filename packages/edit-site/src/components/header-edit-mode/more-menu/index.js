@@ -16,6 +16,7 @@ import {
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,7 +34,6 @@ import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
-import { store as editSiteStore } from '../../../store';
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -42,7 +42,7 @@ export default function MoreMenu( { showIconLabels } ) {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
 
-	const { toggleDistractionFree } = useDispatch( editSiteStore );
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );

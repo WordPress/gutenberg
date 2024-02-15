@@ -1,15 +1,17 @@
 /**
- * WordPress dependencies
- */
-import * as wpHooks from '@wordpress/hooks';
-/**
- * Internal dependencies
- */
-import ErrorBoundary from '../error-boundary';
-/**
  * External dependencies
  */
 import { render } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import * as wpHooks from '@wordpress/hooks';
+
+/**
+ * Internal dependencies
+ */
+import ErrorBoundary from '../index';
 
 const theError = new Error( 'Kaboom' );
 

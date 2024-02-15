@@ -235,7 +235,7 @@ const universalUnlock =
  * the store by using directives in the HTML, e.g.:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "counter" }'>
+ * <div data-wp-interactive="counter">
  *   <button
  *     data-wp-text="state.double"
  *     data-wp-on--click="actions.increment"

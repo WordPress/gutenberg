@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { click, press, type } from '@ariakit/test';
+import { click, press, sleep, type } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -106,6 +106,7 @@ describe( 'With Legacy Props', () => {
 				expanded: false,
 			} );
 
+			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -315,6 +316,7 @@ describe( 'With Legacy Props', () => {
 				<CustomSelect { ...legacyProps } onChange={ mockOnChange } />
 			);
 
+			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'combobox', {
@@ -336,6 +338,7 @@ describe( 'With Legacy Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 
@@ -361,6 +364,7 @@ describe( 'With Legacy Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				await press.Enter();
 				expect(
@@ -381,6 +385,7 @@ describe( 'With Legacy Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 
@@ -544,6 +549,7 @@ describe( 'With Default Props', () => {
 				expanded: false,
 			} );
 
+			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -572,6 +578,7 @@ describe( 'With Default Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 
@@ -597,6 +604,7 @@ describe( 'With Default Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				await press.Enter();
 				expect(
@@ -617,6 +625,7 @@ describe( 'With Default Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 

@@ -374,11 +374,14 @@ function backgroundSizeHelpText( value ) {
 }
 
 export const coordsToBackgroundPosition = ( value ) => {
-	if ( ! value || isNaN( value.x ) || isNaN( value.y ) ) {
+	if ( ! value || ( isNaN( value.x ) && isNaN( value.y ) ) ) {
 		return undefined;
 	}
 
-	return `${ value.x * 100 }% ${ value.y * 100 }%`;
+	const x = isNaN( value.x ) ? 0.5 : value.x;
+	const y = isNaN( value.y ) ? 0.5 : value.y;
+
+	return `${ x * 100 }% ${ y * 100 }%`;
 };
 
 export const backgroundPositionToCoords = ( value ) => {

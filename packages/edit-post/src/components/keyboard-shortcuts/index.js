@@ -29,7 +29,6 @@ function KeyboardShortcuts() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -39,6 +38,7 @@ function KeyboardShortcuts() {
 		getBlockAttributes,
 		getBlockSelectionStart,
 	} = useSelect( blockEditorStore );
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
 	const handleTextLevelShortcut = ( event, level ) => {
 		event.preventDefault();

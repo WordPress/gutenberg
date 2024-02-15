@@ -8,7 +8,7 @@
 wp_enqueue_script_module( 'directive-watch-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-watch" }'>
+<div data-wp-interactive="directive-watch">
 	<div data-wp-show-mock="state.isOpen">
 		<input
 			data-testid="input"

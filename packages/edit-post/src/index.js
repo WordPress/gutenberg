@@ -9,7 +9,6 @@ import {
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -49,6 +48,7 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
@@ -76,7 +76,9 @@ export function initializeEditor(
 
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
+	// This behavior is disabled for small viewports.
 	if (
+		isMediumOrBigger &&
 		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
 		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
@@ -91,48 +93,6 @@ export function initializeEditor(
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
-
-	/*
-	 * Prevent adding template part in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
-	 * Also only add the filter(s) after registerCoreBlocks()
-	 * so that common filters in the block library are not overwritten.
-	 */
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromInserter',
-		( canInsert, blockType ) => {
-			if ( blockType.name === 'core/template-part' ) {
-				return false;
-			}
-			return canInsert;
-		}
-	);
-
-	/*
-	 * Prevent adding post content block (except in query block) in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
-	 * Also only add the filter(s) after registerCoreBlocks()
-	 * so that common filters in the block library are not overwritten.
-	 */
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removePostContentFromInserter',
-		(
-			canInsert,
-			blockType,
-			rootClientId,
-			{ getBlockParentsByBlockName }
-		) => {
-			if ( blockType.name === 'core/post-content' ) {
-				return (
-					getBlockParentsByBlockName( rootClientId, 'core/query' )
-						.length > 0
-				);
-			}
-			return canInsert;
-		}
-	);
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =
