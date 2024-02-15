@@ -46,7 +46,7 @@ import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
-import { isItPossibleToBindBlock } from '../../hooks/block-binding-support';
+import { isItPossibleToBindBlock } from '../../hooks/use-bindings-attributes';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
