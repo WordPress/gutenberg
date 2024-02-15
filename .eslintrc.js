@@ -370,7 +370,7 @@ module.exports = {
 					{
 						selector:
 							// Allow overriding definitions, but not access with var()
-							':matches(Literal[value=/var.+--wp-components-color-/],TemplateElement[value.cooked=/var.+--wp-components-color-/])',
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 						message:
 							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
