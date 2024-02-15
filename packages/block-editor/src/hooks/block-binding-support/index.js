@@ -44,6 +44,6 @@ export default function extendBlockWithBoundAttributes( settings, name ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'block-edit-with-binding-attributes',
+	'core/editor/block-edit-with-binding-attributes',
 	extendBlockWithBoundAttributes
 );
