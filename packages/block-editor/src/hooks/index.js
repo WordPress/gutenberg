@@ -28,7 +28,7 @@ import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
-import './use-bindings-attributes';
+import blockBinding from './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
@@ -42,7 +42,11 @@ createBlockEditFilter(
 		contentLockUI,
 		blockHooks,
 		blockRenaming,
+<<<<<<< HEAD
 		childLayout,
+=======
+		blockBinding,
+>>>>>>> 730c3930af (use hooks API to extened blocks with bound attts)
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
