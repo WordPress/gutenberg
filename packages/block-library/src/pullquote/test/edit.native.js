@@ -10,7 +10,6 @@ import {
 	getEditorHtml,
 	fireEvent,
 	within,
-	waitFor,
 	typeInRichText,
 } from 'test/helpers';
 
@@ -26,10 +25,6 @@ describe( 'Pullquote', () => {
 		// Arrange
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Pullquote' );
-		// Await inner blocks to be rendered
-		const citationBlock = await waitFor( () =>
-			screen.getByPlaceholderText( 'Add citation' )
-		);
 
 		// Act
 		const pullquoteBlock = getBlock( screen, 'Pullquote' );
@@ -43,7 +38,9 @@ describe( 'Pullquote', () => {
 			keyCode: ENTER,
 		} );
 		typeInRichText( pullquoteTextInput, 'Again' );
-
+		fireEvent.press( screen.getByLabelText( 'Add citation' ) );
+		const citationBlock =
+			await screen.findByPlaceholderText( 'Add citation' );
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
 		typeInRichText( citationTextInput, 'A person' );

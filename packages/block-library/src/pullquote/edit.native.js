@@ -11,12 +11,16 @@ import {
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
+import { Caption } from '../utils/caption';
+
+const isWebPlatform = Platform.OS === 'web';
 
 const getBackgroundColor = ( { attributes, colors, style } ) => {
 	const { backgroundColor } = attributes;
@@ -60,14 +64,12 @@ const getBorderColor = ( props ) => {
 
 function PullQuoteEdit( props ) {
 	const { attributes, setAttributes, isSelected, insertBlocksAfter } = props;
-	const { textAlign, citation, value } = attributes;
+	const { textAlign, value } = attributes;
 
 	const blockProps = useBlockProps( {
 		backgroundColor: getBackgroundColor( props ),
 		borderColor: getBorderColor( props ),
 	} );
-
-	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
 	return (
 		<>
@@ -96,29 +98,30 @@ function PullQuoteEdit( props ) {
 						}
 						textAlign={ textAlign ?? 'center' }
 					/>
-					{ shouldShowCitation && (
-						<RichText
-							identifier="citation"
-							value={ citation }
-							aria-label={ __( 'Pullquote citation text' ) }
-							placeholder={
-								// translators: placeholder text used for the citation
-								__( 'Add citation' )
-							}
-							onChange={ ( nextCitation ) =>
-								setAttributes( {
-									citation: nextCitation,
-								} )
-							}
-							__unstableMobileNoFocusOnMount
-							textAlign={ textAlign ?? 'center' }
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
-								)
-							}
-						/>
-					) }
+					<Caption
+						attributeKey="citation"
+						tagName={ isWebPlatform ? 'cite' : undefined }
+						style={ isWebPlatform && { display: 'block' } }
+						isSelected={ isSelected }
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						label={ __( 'Pullquote citation text' ) }
+						placeholder={
+							// translators: placeholder text used for the citation
+							__( 'Add citation' )
+						}
+						addLabel={ __( 'Add citation' ) }
+						removeLabel={ __( 'Remove citation' ) }
+						className="wp-block-pullquote__citation"
+						__unstableMobileNoFocusOnMount
+						textAlign={ textAlign ?? 'center' }
+						insertBlocksAfter={ insertBlocksAfter }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
 				</BlockQuote>
 			</Figure>
 		</>
