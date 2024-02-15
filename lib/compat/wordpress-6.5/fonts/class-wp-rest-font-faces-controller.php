@@ -326,6 +326,14 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$settings    = $request->get_param( 'font_face_settings' );
 			$file_params = $request->get_file_params();
 
+			if ( ! empty( $file_params ) && ! $this->can_upload_fonts() ) {
+				return new WP_Error(
+					'rest_cannot_upload_fonts',
+					__( 'You are not allowed to upload font files.', 'gutenberg' ),
+					array( 'status' => 403 )
+				);
+			}
+
 			// Check that the necessary font face properties are unique.
 			$query = new WP_Query(
 				array(
@@ -901,6 +909,18 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			}
 
 			return new WP_Error( $code, $message, array( 'status' => $status ) );
+		}
+
+		/**
+		 * Checks if fonts can be uploaded to the site.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return bool Whether font assets can be upload.
+		 */
+		protected function can_upload_fonts() {
+			$fonts_dir = wp_get_font_dir()['path'];
+			return wp_is_file_mod_allowed( 'can_upload_fonts' ) && wp_is_writable( $fonts_dir );
 		}
 
 		/**

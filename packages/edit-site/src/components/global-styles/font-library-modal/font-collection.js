@@ -23,6 +23,8 @@ import {
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -161,13 +163,13 @@ function FontCollection( { slug } ) {
 		setFontsToInstall( [] );
 	};
 
-	const handleInstall = async () => {
+	const handleInstall = async ( shouldUpload = true ) => {
 		setNotice( null );
 
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
-			if ( fontFamily?.fontFace ) {
+			if ( fontFamily?.fontFace && shouldUpload ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
 						if ( fontFace.src ) {
@@ -398,12 +400,17 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 
 function InstallFooter( { handleInstall, isDisabled } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
+	const fontUploadEnabled = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontUploadEnabled,
+		[]
+	);
 
 	return (
 		<Flex justify="flex-end">
 			<Button
 				variant="primary"
-				onClick={ handleInstall }
+				onClick={ () => handleInstall( fontUploadEnabled ) }
 				isBusy={ isInstalling }
 				disabled={ isDisabled || isInstalling }
 				__experimentalIsFocusable
