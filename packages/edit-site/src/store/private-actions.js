@@ -31,6 +31,7 @@ export const setCanvasMode =
 		} );
 		// Check if the block list view should be open by default.
 		// If `distractionFree` mode is enabled, the block list view should not be open.
+		// This behavior is disabled for small viewports.
 		if (
 			isMediumOrBigger &&
 			mode === 'edit' &&
