@@ -37,8 +37,8 @@ export function Caption( {
 	className,
 	disableEditing,
 	tagName = 'figcaption',
-	addLabel,
-	removeLabel,
+	addLabel = __( 'Add caption' ),
+	removeLabel = __( 'Remove caption' ),
 	...props
 } ) {
 	const caption = attributes[ attributeKey ];
