@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
@@ -87,13 +86,11 @@ class URLInput extends Component {
 			! this.scrollingIntoView
 		) {
 			this.scrollingIntoView = true;
-			scrollIntoView(
-				this.suggestionNodes[ selectedSuggestion ],
-				this.autocompleteRef.current,
-				{
-					onlyScrollIfNeeded: true,
-				}
-			);
+			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
+				behavior: 'instant',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
 
 			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
