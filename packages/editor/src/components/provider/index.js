@@ -23,11 +23,8 @@ import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
-<<<<<<< HEAD
 import { useHideBlocksFromInserter } from './use-hide-bocks-from-inserter';
-=======
 import useCommands from '../commands';
->>>>>>> c390fb54b12 (Editor: Unify the editor commands between post and site editors)
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
