@@ -19,12 +19,15 @@ const isObject = ( item ) =>
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
-const contextProxy = ( context, stack = {} ) =>
+const proxifyContext = ( context, stack = {}, { ignore } = {} ) =>
 	new Proxy( context, {
 		get: ( target, k ) => {
+			if ( k in target && ignore?.includes( target[ k ] ) ) {
+				return target[ k ];
+			}
 			if ( k in target || ! ( k in stack ) ) {
 				return isObject( peek( target, k ) )
-					? contextProxy( target[ k ], stack[ k ] )
+					? proxifyContext( target[ k ], stack[ k ], { ignore } )
 					: target[ k ];
 			}
 			return stack[ k ];
@@ -40,16 +43,12 @@ const contextProxy = ( context, stack = {} ) =>
 			descriptor( target, k ) || descriptor( stack, k ),
 	} );
 
-const mergeDeepSignals = ( target, source, overwrite ) => {
+const updateSignals = ( target, source ) => {
 	for ( const k in source ) {
 		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
-			mergeDeepSignals(
-				target[ `$${ k }` ].peek(),
-				source[ `$${ k }` ].peek(),
-				overwrite
-			);
-		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
-			target[ `$${ k }` ] = source[ `$${ k }` ];
+			updateSignals( target[ `$${ k }` ].peek(), source[ k ] );
+		} else {
+			target[ k ] = source[ k ];
 		}
 	}
 };
@@ -132,10 +131,11 @@ export default () => {
 			const contextStack = useMemo( () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
-					const newValue = deepSignal( { [ namespace ]: value } );
-					mergeDeepSignals( currentValue.current, newValue, true );
+					updateSignals( currentValue.current, {
+						[ namespace ]: value,
+					} );
 				}
-				return contextProxy( currentValue.current, inheritedValue );
+				return proxifyContext( currentValue.current, inheritedValue );
 			}, [ defaultEntry, inheritedValue ] );
 
 			return <Provider value={ contextStack }>{ children }</Provider>;
@@ -376,15 +376,16 @@ export default () => {
 
 			const list = evaluate( entry );
 			return list.map( ( item ) => {
-				const mergedContext = deepSignal( {} );
-
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
-				const newValue = deepSignal( {
+				const itemContext = deepSignal( {
 					[ namespace ]: { [ itemProp ]: item },
 				} );
-				mergeDeepSignals( newValue, inheritedValue );
-				mergeDeepSignals( mergedContext, newValue, true );
+				const mergedContext = proxifyContext(
+					itemContext,
+					inheritedValue,
+					{ ignore: [ item ] }
+				);
 
 				const scope = { ...getScope(), context: mergedContext };
 				const key = eachKey
