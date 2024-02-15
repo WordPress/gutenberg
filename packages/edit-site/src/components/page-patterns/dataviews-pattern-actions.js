@@ -68,9 +68,15 @@ export const exportJSONaction = {
 				'application/json'
 			);
 		}
+		const nameCount = {};
 		const filesToZip = items.map( ( item ) => {
+			const name = kebabCase( item.title || item.name );
+			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
 			return {
-				name: `${ kebabCase( item.title || item.name ) }.json`,
+				name: `${
+					name +
+					( nameCount[ name ] > 1 ? '-' + nameCount[ name ] : '' )
+				}.json`,
 				lastModified: new Date(),
 				input: getJsonFromItem( item ),
 			};
