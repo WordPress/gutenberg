@@ -189,20 +189,20 @@ export class MediaUploadProgress extends Component {
 				testID="progress-container"
 			>
 				{ isUploadPaused && (
-					<View style={ styles.iconContainer }>
+					<View style={ styles.indicatorContainer }>
 						<Icon
 							fill="#111"
 							size="20"
 							icon={ offlineIcon }
-							style={ styles.activityIndicator }
+							style={ styles.indicator }
 						/>
 					</View>
 				) }
 				{ showSpinner && (
-					<View style={ styles.iconContainer }>
+					<View style={ styles.indicatorContainer }>
 						<ActivityIndicator
-							style={ styles.activityIndicator }
-							size="small"
+							style={ styles.indicator }
+							size={ 20 }
 							color="#111"
 						/>
 					</View>
