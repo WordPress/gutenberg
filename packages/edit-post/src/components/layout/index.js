@@ -385,7 +385,7 @@ function Layout( { initialPost } ) {
 			<PostSyncStatusModal />
 			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
-			<SettingsSidebar />
+			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>
 	);
 }
