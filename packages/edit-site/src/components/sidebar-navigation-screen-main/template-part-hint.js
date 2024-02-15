@@ -6,6 +6,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 
+/**
+ * Internal dependencies
+ */
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
+
 const PREFERENCE_NAME = 'isTemplatePartMoveHintVisible';
 
 export default function TemplatePartHint() {
@@ -16,7 +21,7 @@ export default function TemplatePartHint() {
 	);
 
 	const { set: setPreference } = useDispatch( preferencesStore );
-	if ( ! showTemplatePartHint ) {
+	if ( ! showTemplatePartHint || isPreviewingTheme() ) {
 		return null;
 	}
 
