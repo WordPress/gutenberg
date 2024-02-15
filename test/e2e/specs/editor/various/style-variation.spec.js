@@ -27,7 +27,7 @@ test.describe( 'adding blocks', () => {
 		// Check the content
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
-			`<!-- wp:quote {"className":"is-style-plain"} -->
+			`<!-- wp:quote {"style":{"variation":"plain"},"className":"is-style-plain"} -->
 <blockquote class="wp-block-quote is-style-plain"><!-- wp:paragraph -->
 <p>Quote content</p>
 <!-- /wp:paragraph --></blockquote>
