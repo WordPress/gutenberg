@@ -8,6 +8,7 @@ import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,10 +24,12 @@ function useEditorCommandLoader() {
 		isTopToolbar,
 		isFocusMode,
 		isPreviewMode,
+		isViewable,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { isListViewOpened } = select( editorStore );
+		const { isListViewOpened, getCurrentPostType } = select( editorStore );
 		const { getSettings } = select( blockEditorStore );
+		const { getPostType } = select( coreStore );
 
 		return {
 			editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -36,6 +39,7 @@ function useEditorCommandLoader() {
 			isFocusMode: get( 'core', 'focusMode' ),
 			isTopToolbar: get( 'core', 'fixedToolbar' ),
 			isPreviewMode: getSettings().__unstableIsPreviewMode,
+			isViewable: getPostType( getCurrentPostType() )?.viewable ?? false,
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
@@ -170,18 +174,19 @@ function useEditorCommandLoader() {
 		},
 	} );
 
-	// Todo: check
-	commands.push( {
-		name: 'core/preview-link',
-		label: __( 'Preview in a new tab' ),
-		icon: external,
-		callback: async ( { close } ) => {
-			close();
-			const postId = getCurrentPostId();
-			const link = await __unstableSaveForPreview();
-			window.open( link, `wp-preview-${ postId }` );
-		},
-	} );
+	if ( isViewable ) {
+		commands.push( {
+			name: 'core/preview-link',
+			label: __( 'Preview in a new tab' ),
+			icon: external,
+			callback: async ( { close } ) => {
+				close();
+				const postId = getCurrentPostId();
+				const link = await __unstableSaveForPreview();
+				window.open( link, `wp-preview-${ postId }` );
+			},
+		} );
+	}
 
 	return {
 		commands,
