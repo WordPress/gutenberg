@@ -29,8 +29,8 @@ export function Caption( {
 	showToolbarButton = true,
 	className,
 	tagName = 'figcaption',
-	addLabel,
-	removeLabel,
+	addLabel = __( 'Add caption' ),
+	removeLabel = __( 'Remove caption' ),
 	...props
 } ) {
 	const caption = attributes[ attributeKey ];
