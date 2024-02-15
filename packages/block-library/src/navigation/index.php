@@ -1449,10 +1449,6 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 			'post_content' => $serialized_inner_blocks,
 		)
 	);
-
-	// TODO: wp_update_post() to set the post_content to the updated markup (to include the ignoredHookedBlocks metadata).
-	// We need to remove the markup for the root Nav block wrapper like we do in block_core_navigation_insert_hooked_blocks_into_rest_response,
-	// or alternatively via serialize_blocks( $root_nav_block['innerBlocks'] ), but that's probably more expensive.
 }
 
 // Before adding our filter, we verify if it's already added in Core.
