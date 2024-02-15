@@ -27,7 +27,7 @@ const config = {
 		),
 	},
 	[ TEMPLATE_PART_POST_TYPE ]: {
-		title: __( 'All template parts' ),
+		title: __( 'Manage template parts' ),
 		description: __(
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
