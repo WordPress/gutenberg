@@ -19,15 +19,10 @@
 	}
 
 	.edit-site-layout.is-full-canvas & {
-		padding-right: $grid-unit-20;
+		padding-right: 0;
 		border-radius: 0;
-		width: 100vw;
+		width: $header-height;
 		box-shadow: none;
-
-		@include break-medium {
-			width: $header-height;
-			padding-right: 0;
-		}
 	}
 }
 
@@ -86,6 +81,12 @@
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
+}
+
+.edit-site-layout__mobile {
+	position: relative;
+	width: 100%;
+	z-index: z-index(".edit-site-layout__canvas-container");
 }
 
 .edit-site-layout__canvas-container {
@@ -152,6 +153,7 @@
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
+.edit-site-layout__mobile .interface-interface-skeleton,
 .edit-site-layout__canvas .interface-interface-skeleton,
 .edit-site-template-pages-preview .interface-interface-skeleton {
 	position: relative !important;

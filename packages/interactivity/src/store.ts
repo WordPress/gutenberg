@@ -11,6 +11,7 @@ import {
 	getScope,
 	setScope,
 	resetScope,
+	getNamespace,
 	setNamespace,
 	resetNamespace,
 } from './hooks';
@@ -34,18 +35,16 @@ const deepMerge = ( target: any, source: any ) => {
 	}
 };
 
-const parseInitialState = () => {
+const parseInitialData = () => {
 	const storeTag = document.querySelector(
 		`script[type="application/json"]#wp-interactivity-data`
 	);
-	if ( ! storeTag?.textContent ) return {};
-	try {
-		const { state } = JSON.parse( storeTag.textContent );
-		if ( isObject( state ) ) return state;
-		throw Error( 'Parsed state is not an object' );
-	} catch ( e ) {
-		// eslint-disable-next-line no-console
-		console.log( e );
+	if ( storeTag?.textContent ) {
+		try {
+			return JSON.parse( storeTag.textContent );
+		} catch ( e ) {
+			// Do nothing.
+		}
 	}
 	return {};
 };
@@ -53,6 +52,7 @@ const parseInitialState = () => {
 export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
+const storeConfigs = new Map();
 
 const objToProxy = new WeakMap();
 const proxyToNs = new WeakMap();
@@ -164,6 +164,16 @@ const handlers = {
 		return result;
 	},
 };
+
+/**
+ * Get the defined config for the store with the passed namespace.
+ *
+ * @param namespace Store's namespace from which to retrieve the config.
+ * @return Defined config for the given namespace.
+ */
+export const getConfig = ( namespace: string ) =>
+	storeConfigs.get( namespace || getNamespace() ) || {};
+
 interface StoreOptions {
 	/**
 	 * Property to block/unblock private store namespaces.
@@ -225,7 +235,7 @@ const universalUnlock =
  * the store by using directives in the HTML, e.g.:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "counter" }'>
+ * <div data-wp-interactive="counter">
  *   <button
  *     data-wp-text="state.double"
  *     data-wp-on--click="actions.increment"
@@ -300,7 +310,15 @@ export function store(
 	return stores.get( namespace );
 }
 
-// Parse and populate the initial state.
-Object.entries( parseInitialState() ).forEach( ( [ namespace, state ] ) => {
-	store( namespace, { state } );
-} );
+// Parse and populate the initial state and config.
+const data = parseInitialData();
+if ( isObject( data?.state ) ) {
+	Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+		store( namespace, { state }, { lock: universalUnlock } );
+	} );
+}
+if ( isObject( data?.config ) ) {
+	Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+		storeConfigs.set( namespace, config );
+	} );
+}

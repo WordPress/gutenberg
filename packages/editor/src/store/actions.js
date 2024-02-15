@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -13,6 +14,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { applyFilters } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -585,7 +587,7 @@ export function updateEditorSettings( settings ) {
  * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
  * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
  *
- * @param {string} mode Mode (one of 'post-only', 'template-locked' or 'all').
+ * @param {string} mode Mode (one of 'post-only' or 'template-locked').
  */
 export const setRenderingMode =
 	( mode ) =>
@@ -724,6 +726,99 @@ export function setIsListViewOpened( isOpen ) {
 		isOpen,
 	};
 }
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', false );
+		}
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core', 'fixedToolbar', true );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', ! isDistractionFree );
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/editor/distraction-free-mode/notice',
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry.batch( () => {
+										registry
+											.dispatch( preferencesStore )
+											.set(
+												'core',
+												'fixedToolbar',
+												isDistractionFree ? true : false
+											);
+										registry
+											.dispatch( preferencesStore )
+											.toggle(
+												'core',
+												'distractionFree'
+											);
+									} );
+								},
+							},
+						],
+					}
+				);
+		} );
+	};
+
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
+export const switchEditorMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
+
+		// Unselect blocks when we switch to a non visual mode.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if ( mode === 'visual' ) {
+			speak( __( 'Visual editor selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
+			speak( __( 'Code editor selected' ), 'assertive' );
+		}
+	};
 
 /**
  * Backward compatibility

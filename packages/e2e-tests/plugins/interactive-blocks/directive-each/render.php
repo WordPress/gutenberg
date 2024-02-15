@@ -8,10 +8,22 @@
 wp_enqueue_script_module( 'directive-each-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-each" }'>
+<div data-wp-interactive="directive-each">
 	<div data-testid="letters">
 		<template data-wp-each="state.letters">
 			<p data-wp-text="context.item" data-testid="item"></p>
+		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>A</p>
+		<p data-testid="item" data-wp-each-child>B</p>
+		<p data-testid="item" data-wp-each-child>C</p>
+	</div>
+
+	<hr>
+
+	<div data-testid="letters-kebab-case">
+		<template data-wp-each--my-item="state.letters">
+			<p data-wp-text="context.myItem" data-testid="item"></p>
 		</template>
 		<!-- SSRed elements; they should be removed on hydration -->
 		<p data-testid="item" data-wp-each-child>A</p>
@@ -208,7 +220,7 @@ wp_enqueue_script_module( 'directive-each-view' );
 <hr>
 
 <div
-	data-wp-interactive='{ "namespace": "directive-each" }'
+	data-wp-interactive="directive-each"
 	data-wp-router-region="navigation-updated list"
 	data-wp-context='{ "list": [ "beta", "gamma", "delta" ] }'
 	data-testid="navigation-updated list"

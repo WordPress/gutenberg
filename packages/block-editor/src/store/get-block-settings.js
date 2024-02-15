@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
+	__EXPERIMENTAL_PATHS_WITH_OVERRIDE as PATHS_WITH_OVERRIDE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
@@ -11,12 +11,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getValueFromObjectPath } from '../utils/object';
-import {
-	getBlockParents,
-	getBlockName,
-	getSettings,
-	getBlockAttributes,
-} from './selectors';
+import { getBlockName, getSettings, getBlockAttributes } from './selectors';
 
 const blockedPaths = [
 	'color',
@@ -119,12 +114,23 @@ const mergeCache = new WeakMap();
 /**
  * For settings like `color.palette`, which have a value that is an object
  * with `default`, `theme`, `custom`, with field values that are arrays of
+ * items, returns the one with the highest priority among these three arrays.
+ * @param {Object} value Object to extract from
+ * @return {Array} Array of items extracted from the three origins
+ */
+export function overrideOrigins( value ) {
+	return value.custom ?? value.theme ?? value.default;
+}
+
+/**
+ * For settings like `color.palette`, which have a value that is an object
+ * with `default`, `theme`, `custom`, with field values that are arrays of
  * items, see if any of the three origins have values.
  *
  * @param {Object} value Object to check
  * @return {boolean} Whether the object has values in any of the three origins
  */
-export function hasMergedOrigins( value ) {
+export function hasOriginValue( value ) {
 	return [ 'default', 'theme', 'custom' ].some(
 		( key ) => value?.[ key ]?.length
 	);
@@ -132,22 +138,17 @@ export function hasMergedOrigins( value ) {
 
 export function getBlockSettings( state, clientId, ...paths ) {
 	const blockName = getBlockName( state, clientId );
-	const candidates = clientId
-		? [
-				clientId,
-				...getBlockParents( state, clientId, /* ascending */ true ),
-		  ].filter( ( candidateClientId ) => {
-				const candidateBlockName = getBlockName(
-					state,
-					candidateClientId
-				);
-				return hasBlockSupport(
-					candidateBlockName,
-					'__experimentalSettings',
-					false
-				);
-		  } )
-		: [];
+	const candidates = [];
+
+	if ( clientId ) {
+		let id = clientId;
+		do {
+			const name = getBlockName( state, id );
+			if ( hasBlockSupport( name, '__experimentalSettings', false ) ) {
+				candidates.push( id );
+			}
+		} while ( ( id = state.blocks.parents.get( id ) ) );
+	}
 
 	return paths.map( ( path ) => {
 		if ( blockedPaths.includes( path ) ) {
@@ -213,8 +214,8 @@ export function getBlockSettings( state, clientId, ...paths ) {
 
 		// Return if the setting was found in either the block instance or the store.
 		if ( result !== undefined ) {
-			if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
-				return mergeOrigins( result );
+			if ( PATHS_WITH_OVERRIDE[ normalizedPath ] ) {
+				return overrideOrigins( result );
 			}
 			return result;
 		}

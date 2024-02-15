@@ -172,8 +172,11 @@ function gutenberg_get_global_styles_custom_css() {
  * Adds global style rules to the inline style for each block.
  *
  * @return void
+ *
+ * @global WP_Styles $wp_styles
  */
 function gutenberg_add_global_styles_for_blocks() {
+	global $wp_styles;
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
@@ -185,38 +188,40 @@ function gutenberg_add_global_styles_for_blocks() {
 		}
 
 		$stylesheet_handle = 'global-styles';
+		/*
+		 * When `wp_should_load_separate_core_block_assets()` is true, block styles are
+		 * enqueued for each block on the page in class WP_Block's render function.
+		 * This means there will be a handle in the styles queue for each of those blocks.
+		 * Block-specific global styles should be attached to the global-styles handle, but
+		 * only for blocks on the page, thus we check if the block's handle is in the queue
+		 * before adding the inline style.
+		 * This conditional loading only applies to core blocks.
+		 */
 		if ( isset( $metadata['name'] ) ) {
-			/*
-			 * These block styles are added on block_render.
-			 * This hooks inline CSS to them so that they are loaded conditionally
-			 * based on whether or not the block is used on the page.
-			 */
 			if ( str_starts_with( $metadata['name'], 'core/' ) ) {
-				$block_name        = str_replace( 'core/', '', $metadata['name'] );
-				$stylesheet_handle = 'wp-block-' . $block_name;
+				$block_name   = str_replace( 'core/', '', $metadata['name'] );
+				$block_handle = 'wp-block-' . $block_name;
+				if ( in_array( $block_handle, $wp_styles->queue, true ) ) {
+					wp_add_inline_style( $stylesheet_handle, $block_css );
+				}
+			} else {
+				wp_add_inline_style( $stylesheet_handle, $block_css );
 			}
-			wp_add_inline_style( $stylesheet_handle, $block_css );
 		}
 
 		// The likes of block element styles from theme.json do not have  $metadata['name'] set.
 		if ( ! isset( $metadata['name'] ) && ! empty( $metadata['path'] ) ) {
-			$result = array_values(
-				array_filter(
-					$metadata['path'],
-					static function ( $item ) {
-						if ( strpos( $item, 'core/' ) !== false ) {
-							return true;
-						}
-						return false;
+			$block_name = wp_get_block_name_from_theme_json_path( $metadata['path'] );
+			if ( $block_name ) {
+				if ( str_starts_with( $block_name, 'core/' ) ) {
+					$block_name   = str_replace( 'core/', '', $block_name );
+					$block_handle = 'wp-block-' . $block_name;
+					if ( in_array( $block_handle, $wp_styles->queue, true ) ) {
+						wp_add_inline_style( $stylesheet_handle, $block_css );
 					}
-				)
-			);
-			if ( isset( $result[0] ) ) {
-				if ( str_starts_with( $result[0], 'core/' ) ) {
-					$block_name        = str_replace( 'core/', '', $result[0] );
-					$stylesheet_handle = 'wp-block-' . $block_name;
+				} else {
+					wp_add_inline_style( $stylesheet_handle, $block_css );
 				}
-				wp_add_inline_style( $stylesheet_handle, $block_css );
 			}
 		}
 	}

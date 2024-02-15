@@ -6,6 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcutsEditMode() {
-	const { getEditorMode } = useSelect( editSiteStore );
+	const { getEditorMode } = useSelect( editorStore );
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea(
@@ -24,7 +25,7 @@ function KeyboardShortcutsEditMode() {
 		[]
 	);
 	const { switchEditorMode, toggleDistractionFree } =
-		useDispatch( editSiteStore );
+		useDispatch( editorStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );

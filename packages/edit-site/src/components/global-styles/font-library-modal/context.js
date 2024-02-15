@@ -61,15 +61,6 @@ function FontLibraryProvider( { children } ) {
 		setRefreshKey( Date.now() );
 	};
 
-	// Reset notice on dismiss.
-	useEffect( () => {
-		if ( notice ) {
-			notice.onRemove = () => {
-				setNotice( null );
-			};
-		}
-	}, [ notice, setNotice ] );
-
 	const {
 		records: libraryPosts = [],
 		isResolving: isResolvingLibrary,
@@ -401,7 +392,7 @@ function FontLibraryProvider( { children } ) {
 					loadFontFaceInBrowser(
 						face,
 						getDisplaySrcFromFontFace( face.src ),
-						'iframe'
+						'all'
 					);
 				} );
 			}

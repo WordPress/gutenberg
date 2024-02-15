@@ -24,7 +24,7 @@ function GoogleFontsConfirmDialog() {
 		<div className="font-library__google-fonts-confirm">
 			<Card>
 				<CardBody>
-					<Text as="h3">Connect to Google Fonts</Text>
+					<Text as="h3">{ __( 'Connect to Google Fonts' ) }</Text>
 					<Spacer margin={ 6 } />
 					<Text as="p">
 						{ __(
@@ -34,7 +34,7 @@ function GoogleFontsConfirmDialog() {
 					<Spacer margin={ 3 } />
 					<Text as="p">
 						{ __(
-							'You can alternatively upload files directly on the Library tab.'
+							'You can alternatively upload files directly on the Upload tab.'
 						) }
 					</Text>
 					<Spacer margin={ 6 } />

@@ -87,7 +87,7 @@ final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Prepares the environment before executing tests. Specifically, sets prefixes for the
-	 * ValidBlockLibraryFunctionName sniff.This is needed since AbstractSniffUnitTest class
+	 * ForbiddenFunctionsAndClassesSniff sniff.This is needed since AbstractSniffUnitTest class
 	 * doesn't apply sniff properties from the Gutenberg/ruleset.xml file.
 	 *
 	 * @param string $filename The name of the file being tested.
