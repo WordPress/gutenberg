@@ -5,13 +5,13 @@ import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useEffect, useCallback, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { useSelect } from '@wordpress/data';
-import { unlock } from '@wordpress/icons';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../../../editor/src/lock-unlock';
 
 const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
@@ -139,48 +139,58 @@ const BlockBindingConnector = ( {
 	return null;
 };
 
-const withBlockBindingSupport = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { attributes, name } = props;
+function BlockBindingBridge( { bindings, props } ) {
+	if ( ! bindings || Object.keys( bindings ).length === 0 ) {
+		return null;
+	}
 
-		const { getBlockBindingsSource } = unlock(
-			useSelect( blockEditorStore )
-		);
+	const { attributes, name } = props;
+	const BindingConnectorInstances = [];
 
-		// Bail early if there are no bindings.
-		const bindings = attributes?.metadata?.bindings;
-		if ( ! bindings ) {
-			return <BlockEdit { ...props } />;
+	Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
+		const { getBlockBindingsSource } = unlock( select( blockEditorStore ) );
+		const source = getBlockBindingsSource( settings.source );
+
+		if ( ! source ) {
+			return;
 		}
 
-		const BindingConnectorInstances = [];
+		if ( source ) {
+			const { useSource } = source;
+			const attrValue = attributes[ attrName ];
 
-		Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
-			const source = getBlockBindingsSource( settings.source );
+			// Create a unique key for the connector instance
+			const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
 
-			if ( source ) {
-				const { useSource } = source;
-				const attrValue = attributes[ attrName ];
+			BindingConnectorInstances.push(
+				<BlockBindingConnector
+					key={ key }
+					attrName={ attrName }
+					attrValue={ attrValue }
+					useSource={ useSource }
+					blockProps={ props }
+					args={ settings.args }
+				/>
+			);
+		}
+	} );
 
-				// Create a unique key for the connector instance
-				const key = `${ settings.source }-${ name }-${ attrName }-${ i }`;
+	return BindingConnectorInstances;
+}
 
-				BindingConnectorInstances.push(
-					<BlockBindingConnector
-						key={ key }
-						attrName={ attrName }
-						attrValue={ attrValue }
-						useSource={ useSource }
-						blockProps={ props }
-						args={ settings.args }
-					/>
-				);
-			}
-		} );
+const withBlockBindingSupport = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const { attributes } = props;
+
+		// Bail early if the block doesn't have bindings.
+		const bindings = attributes?.metadata?.bindings;
+		if ( ! bindings || Object.keys( bindings ).length === 0 ) {
+			return null;
+		}
 
 		return (
 			<>
-				{ BindingConnectorInstances }
+				<BlockBindingBridge bindings={ bindings } props={ props } />
 				<BlockEdit { ...props } />
 			</>
 		);
