@@ -23,4 +23,9 @@
 .entities-saved-states__change-summary {
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	margin-left: $grid-unit-20;
+	li {
+		list-style: disc;
+		margin-bottom: $grid-unit-05;
+	}
 }

@@ -56,7 +56,11 @@ function GlobalStylesDescription( { record } ) {
 	);
 	return globalStylesChanges.length ? (
 		<PanelRow className="entities-saved-states__change-summary">
-			{ globalStylesChanges.join( ', ' ) }.
+			<ul className="entities-saved-states__changes">
+				{ globalStylesChanges.map( ( change ) => (
+					<li key={ change }>{ change }</li>
+				) ) }
+			</ul>
 		</PanelRow>
 	) : null;
 }
