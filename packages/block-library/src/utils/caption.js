@@ -70,7 +70,9 @@ export function Caption( {
 						onClick={ () => {
 							setShowCaption( ! showCaption );
 							if ( showCaption && caption ) {
-								setAttributes( { caption: undefined } );
+								setAttributes( {
+									[ attributeKey ]: undefined,
+								} );
 							}
 						} }
 						icon={ captionIcon }

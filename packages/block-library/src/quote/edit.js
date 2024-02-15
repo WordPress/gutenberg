@@ -15,7 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -72,21 +72,11 @@ export default function QuoteEdit( {
 	clientId,
 	className,
 	style,
+	isSelected,
 } ) {
 	const { align } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
-
-	const hasSelection = useSelect(
-		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
-			return (
-				hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId )
-			);
-		},
-		[ clientId ]
-	);
 
 	const blockProps = useBlockProps( {
 		className: classNames( className, {
@@ -116,7 +106,7 @@ export default function QuoteEdit( {
 					attributeKey="citation"
 					tagName={ isWebPlatform ? 'cite' : undefined }
 					style={ { display: 'block' } }
-					isSelected={ hasSelection }
+					isSelected={ isSelected }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					__unstableMobileNoFocusOnMount
