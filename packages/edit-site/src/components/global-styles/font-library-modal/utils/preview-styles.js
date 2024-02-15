@@ -99,7 +99,7 @@ export function formatFontFaceName( input ) {
 	output = output.replace( /^["']|["']$/g, '' );
 
 	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
-	if ( window.navigator.userAgent.toLowerCase().match( /firefox|fxios/i ) ) {
+	if ( window.navigator.userAgent.toLowerCase().includes( 'firefox' ) ) {
 		output = `"${ output }"`;
 	}
 	return output;
