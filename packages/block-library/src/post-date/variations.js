@@ -10,7 +10,7 @@ const variations = [
 		title: __( 'Modified Date' ),
 		description: __( "Display a post's last updated date." ),
 		attributes: { displayType: 'modified' },
-		scope: [ 'block', 'inserter' ],
+		scope: [ 'block', 'inserter', 'transform', 'hidden' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.displayType === 'modified',
 		icon: postDate,

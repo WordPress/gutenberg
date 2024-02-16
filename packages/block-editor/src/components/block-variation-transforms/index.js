@@ -28,12 +28,17 @@ function VariationsButtons( {
 	selectedValue,
 	variations,
 } ) {
+	// Filters out the hidden scope transforms, which do not render in the block card.
+	const filteredVariations = variations.filter(
+		( variation ) => ! variation.scope.includes( 'hidden' )
+	);
+
 	return (
 		<fieldset className={ className }>
 			<VisuallyHidden as="legend">
 				{ __( 'Transform to variation' ) }
 			</VisuallyHidden>
-			{ variations.map( ( variation ) => (
+			{ filteredVariations.map( ( variation ) => (
 				<Button
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
@@ -62,7 +67,12 @@ function VariationsDropdown( {
 	selectedValue,
 	variations,
 } ) {
-	const selectOptions = variations.map(
+	// Filters out the hidden scope transforms, which do not render in the block card.
+	const filteredVariations = variations.filter(
+		( variation ) => ! variation.scope.includes( 'hidden' )
+	);
+
+	const selectOptions = filteredVariations.map(
 		( { name, title, description } ) => ( {
 			value: name,
 			label: title,
