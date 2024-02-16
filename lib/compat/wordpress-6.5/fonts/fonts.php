@@ -85,29 +85,30 @@ function gutenberg_create_initial_post_types() {
 }
 
 /**
- * Maps the meta capabilities for modifying font face files.
+ * Filters the user capabilities to grant the font family capabilities as necessary.
  *
- * @param array  $caps The primitive capabilities for the given capability.
- * @param string $cap  The capability being checked.
- * @return array The modified primitive capabilities for the given capability.
+ * Files must be modifiable to grant these capabilities and the user must als
+ * have the `edit_theme_options` capability.
+ *
+ * These are created as faux primitive capabilities to allow for the use
+ * if the delete_post meta capability.
+ *
+ * @param bool[] $allcaps An array of all the user's capabilities.
+ * @return bool[] Filtered array of the user's capabilities.
  */
-function gutenberg_map_meta_caps_font_faces( $caps, $cap ) {
-	if ( ! in_array( $cap, array( 'install_font_faces', 'delete_font_faces' ), true ) ) {
-		return $caps;
-	}
-
-	// Remove the font capability as it's not a primitive.
-	$caps   = array_diff( $caps, array( 'install_font_faces', 'delete_font_faces' ) );
-	$caps[] = 'edit_theme_options';
-
-	// Only allow font uploads on systems with file mods enabled.
+function gutenberg_maybe_grant_font_family_caps( $allcaps ) {
 	if ( ! wp_is_file_mod_allowed( 'can_modify_font_faces' ) ) {
-		$caps[] = 'do_not_allow';
+		return $allcaps;
 	}
 
-	return $caps;
+	if ( ! empty( $allcaps['edit_theme_options'] ) ) {
+		$allcaps['install_font_faces'] = true;
+		$allcaps['delete_font_faces']  = true;
+	}
+
+	return $allcaps;
 }
-add_filter( 'map_meta_cap', 'gutenberg_map_meta_caps_font_faces', 10, 2 );
+add_filter( 'user_has_cap', 'gutenberg_maybe_grant_font_family_caps' );
 
 /**
  * Initializes REST routes.
