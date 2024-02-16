@@ -44,7 +44,7 @@ jobs:
               uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts-puppeteer
                   path: artifacts
                   if-no-files-found: ignore
 
@@ -52,7 +52,7 @@ jobs:
               uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
-                  name: flaky-tests-report
+                  name: flaky-tests-report-puppeteer
                   path: flaky-tests
                   if-no-files-found: ignore
 
@@ -95,7 +95,7 @@ jobs:
               uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts-${{ matrix.part }}
                   path: artifacts/test-results
                   if-no-files-found: ignore
 
@@ -103,7 +103,7 @@ jobs:
               uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
-                  name: flaky-tests-report
+                  name: flaky-tests-report-${{ matrix.part }}
                   path: flaky-tests
                   if-no-files-found: ignore
 
@@ -112,6 +112,7 @@ jobs:
         needs: [e2e-puppeteer, e2e-playwright]
         if: ${{ always() }}
         runs-on: ubuntu-latest
+
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
@@ -125,8 +126,9 @@ jobs:
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:
-                  name: flaky-tests-report
+                  pattern: flaky-tests-report-*
                   path: flaky-tests
+                  merge-multiple: true
 
             - name: Setup Node.js and install dependencies
               if: ${{ steps.download_artifact.outcome == 'success' }}
