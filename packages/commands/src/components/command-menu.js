@@ -201,8 +201,9 @@ export function CommandMenu() {
 			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
-				character: 'k',
+				character: '/',
 			},
+			aliases: [ { character: 'F1' } ],
 		} );
 	}, [ registerShortcut ] );
 
@@ -229,9 +230,6 @@ export function CommandMenu() {
 			} else {
 				open();
 			}
-		},
-		{
-			bindGlobal: true,
 		}
 	);
 

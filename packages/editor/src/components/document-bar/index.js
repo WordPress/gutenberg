@@ -170,7 +170,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 						</Text>
 					</HStack>
 					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
+						{ displayShortcut.primary( '/' ) }
 					</span>
 				</Button>
 			) }
