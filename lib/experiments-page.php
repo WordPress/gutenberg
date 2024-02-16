@@ -57,12 +57,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-zoomed-out-view',
-		__( 'Zoomed out view ', 'gutenberg' ),
+		__( 'Zoomed out view', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed).', 'gutenberg' ),
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
@@ -81,7 +81,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-color-randomizer',
-		__( 'Color randomizer ', 'gutenberg' ),
+		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
