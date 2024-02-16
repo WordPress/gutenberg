@@ -33,6 +33,18 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		private static $instance = null;
 
 		/**
+		 * Supported source properties that can be passed to the registered source.
+		 *
+		 * @since 6.5.0
+		 * @var array
+		 */
+		private $allowed_source_properties = array(
+			'label',
+			'get_value_callback',
+			'uses_context',
+		);
+
+		/**
 		 * Supported blocks that can use the block bindings API.
 		 *
 		 * @since 6.5.0
@@ -109,7 +121,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			if ( $this->is_registered( $source_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					// translators: %s: Block bindings source name.
+					/* translators: %s: Block bindings source name. */
 					sprintf( __( 'Block bindings source "%s" already registered.' ), $source_name ),
 					'6.5.0'
 				);
@@ -156,6 +168,16 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
+			// Validate that the source properties contain only allowed properties.
+			if ( ! empty( array_diff( array_keys( $source_properties ), $this->allowed_source_properties ) ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The $source_properties array contains invalid properties.' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
 			$source = new WP_Block_Bindings_Source(
 				$source_name,
 				$source_properties
@@ -173,9 +195,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 							return $uses_context;
 						}
 						// Use array_values to reset the array keys.
-						$merged_uses_context = array_values( array_unique( array_merge( $uses_context, $source->uses_context ) ) );
-
-						return $merged_uses_context;
+						return array_values( array_unique( array_merge( $uses_context, $source->uses_context ) ) );
 					},
 					10,
 					2
@@ -212,7 +232,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			if ( ! $this->is_registered( $source_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					// translators: %s: Block bindings source name.
+					/* translators: %s: Block bindings source name. */
 					sprintf( __( 'Block binding "%s" not found.' ), $source_name ),
 					'6.5.0'
 				);

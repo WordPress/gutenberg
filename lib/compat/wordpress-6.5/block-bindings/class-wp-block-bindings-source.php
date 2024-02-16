@@ -66,11 +66,9 @@ if ( ! class_exists( 'WP_Block_Bindings_Source' ) ) {
 		 * @param array  $source_properties  The properties of the source.
 		 */
 		public function __construct( string $name, array $source_properties ) {
-			$this->name               = $name;
-			$this->label              = $source_properties['label'];
-			$this->get_value_callback = $source_properties['get_value_callback'];
-			if ( isset( $source_properties['uses_context'] ) ) {
-				$this->uses_context = $source_properties['uses_context'];
+			$this->name = $name;
+			foreach ( $source_properties as $property_name => $property_value ) {
+				$this->$property_name = $property_value;
 			}
 		}
 
