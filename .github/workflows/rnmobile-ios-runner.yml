@@ -27,7 +27,7 @@ jobs:
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: ruby/setup-ruby@v1
+            - uses: ruby/setup-ruby@22fdc77bf4148f810455b226c90fb81b5cbc00a7
               with:
                   # `.ruby-version` file location
                   working-directory: packages/react-native-editor/ios
