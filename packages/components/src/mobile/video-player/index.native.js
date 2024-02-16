@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,6 +15,7 @@ import { default as VideoPlayer } from 'react-native-video';
  */
 import styles from './styles.scss';
 import PlayIcon from './gridicon-play';
+import Icon from '../../icon';
 
 // Default Video ratio 16:9
 export const VIDEO_ASPECT_RATIO = 16 / 9;

@@ -111,6 +111,10 @@ export { default as Image } from './mobile/image';
 export { IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image/constants';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
+export {
+	default as VideoPlayer,
+	VIDEO_ASPECT_RATIO,
+} from './mobile/video-player';
 export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
