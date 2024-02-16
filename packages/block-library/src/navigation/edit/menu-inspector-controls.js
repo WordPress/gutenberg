@@ -9,7 +9,6 @@ import {
 import {
 	PanelBody,
 	__experimentalHStack as HStack,
-	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -19,6 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
+import NavigationTools from './navigation-tools';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
@@ -144,29 +144,36 @@ const MenuInspectorControls = ( props ) => {
 		<InspectorControls group="list">
 			<PanelBody title={ null }>
 				<HStack className="wp-block-navigation-off-canvas-editor__header">
-					<Heading
-						className="wp-block-navigation-off-canvas-editor__title"
-						level={ 2 }
-					>
-						{ __( 'Menu' ) }
-					</Heading>
 					{ blockEditingMode === 'default' && (
-						<NavigationMenuSelector
-							currentMenuId={ currentMenuId }
-							onSelectClassicMenu={ onSelectClassicMenu }
-							onSelectNavigationMenu={ onSelectNavigationMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-							actionLabel={ actionLabel }
-							isManageMenusButtonDisabled={
-								isManageMenusButtonDisabled
-							}
-						/>
+						<>
+							<NavigationMenuSelector
+								currentMenuId={ currentMenuId }
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
+								onCreateNew={ onCreateNew }
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								createNavigationMenuIsError={
+									createNavigationMenuIsError
+								}
+								actionLabel={ actionLabel }
+								isManageMenusButtonDisabled={
+									isManageMenusButtonDisabled
+								}
+							/>
+							<NavigationTools
+								onCreateNew={ onCreateNew }
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								createNavigationMenuIsError={
+									createNavigationMenuIsError
+								}
+							/>
+						</>
 					) }
 				</HStack>
 				<MainContent { ...props } />
