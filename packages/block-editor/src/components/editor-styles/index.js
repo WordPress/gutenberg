@@ -16,8 +16,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import transformStyles from '../../utils/transform-styles';
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { store as stylesStore } from '../../store/styles';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -69,7 +68,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 
 export default function EditorStyles( { styles, scope } ) {
 	const overrides = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		( select ) => select( stylesStore ).getStyleOverrides(),
 		[]
 	);
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
