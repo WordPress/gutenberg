@@ -453,10 +453,13 @@ Converts an HTML string to known blocks. Strips everything else.
 _Parameters_
 
 -   _options_ `Object`:
--   _options.HTML_ `[string]`: The HTML to convert.
--   _options.plainText_ `[string]`: Plain text version.
--   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
--   _options.tagName_ `[Array]`: The tag into which content will be inserted.
+-   _options.HTML_ `string`: The HTML to convert.
+-   _options.plainText_ `string`: Plain text version.
+-   _options.mode_ `string`: Handle content as blocks or inline content.
+	-   _'AUTO'_: Decide based on the content passed.
+	-   _'INLINE'_: Always handle as inline content, and return string.
+ 	-   _'BLOCKS'_: Always handle as blocks, and return array of blocks.
+-   _options.tagName_ `Array`: The tag into which content will be inserted.
 
 _Returns_
 
@@ -468,8 +471,8 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
--   _$1_ `Object`:
--   _$1.HTML_ `string`: The HTML to convert.
+-   _options_ `Object`:
+-   _options.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
