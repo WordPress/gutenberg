@@ -42,13 +42,13 @@ function extractFontWeights( fontFaces ) {
  *
  * Example:
  * formatFontFamily( "Open Sans, Font+Name, sans-serif" ) => '"Open Sans", "Font+Name", sans-serif'
- * formatFontFamily( "'Open Sans', sans-serif" ) => '"Open Sans", sans-serif'
+ * formatFontFamily( "'Open Sans', generic(kai), sans-serif" ) => '"Open Sans", sans-serif'
  * formatFontFamily( "DotGothic16, Slabo 27px, serif" ) => '"DotGothic16","Slabo 27px",serif'
  * formatFontFamily( "Mine's, Moe's Typography" ) => `"mine's","Moe's Typography"`
  */
 export function formatFontFamily( input ) {
-	// Matchs any non alphabetic characters (a-zA-Z), dashes - , or parenthesis ()
-	const regex = /[^a-zA-Z\-()]+/;
+	// Matches strings that are not exclusively alphabetic characters or hyphens, and do not exactly follow the pattern generic(alphabetic characters or hyphens).
+	const regex = /^(?!generic\([ a-zA-Z\-]+\)$)(?!^[a-zA-Z\-]+$).+/;
 	const output = input.trim();
 
 	const formatItem = ( item ) => {
@@ -99,7 +99,7 @@ export function formatFontFaceName( input ) {
 	output = output.replace( /^["']|["']$/g, '' );
 
 	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
-	if ( window.navigator.userAgent.toLowerCase().match( /firefox|fxios/i ) ) {
+	if ( window.navigator.userAgent.toLowerCase().includes( 'firefox' ) ) {
 		output = `"${ output }"`;
 	}
 	return output;

@@ -28,6 +28,7 @@ const meta: Meta< typeof Tabs > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabPanel': Tabs.TabPanel,
 	},
+	tags: [ 'status-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		badges: [ 'private' ],

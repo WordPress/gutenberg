@@ -67,7 +67,7 @@
 	}
 	th {
 		text-align: left;
-		color: var(--wp-components-color-foreground, $gray-900);
+		color: $gray-900;
 		font-weight: normal;
 		font-size: $default-font-size;
 	}
@@ -527,7 +527,7 @@
 		&:hover,
 		&[data-active-item],
 		&:focus {
-			background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+			background-color: var(--wp-admin-theme-color);
 			color: $white;
 
 			.dataviews-search-widget-filter-combobox-item-check {
@@ -587,7 +587,7 @@
 
 		&:focus {
 			background: $white;
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&::placeholder {
