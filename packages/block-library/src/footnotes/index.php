@@ -105,7 +105,8 @@ function register_block_core_footnotes_post_meta() {
 		}
 	}
 }
-// Use a priority of 20 to be higher than the default of 10 the priority with which most post types are registered.
+// Most post types are registered at priority 10, so use priority 20 here in
+// order to catch them.
 add_action( 'init', 'register_block_core_footnotes_post_meta', 20 );
 
 /**
