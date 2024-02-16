@@ -120,6 +120,9 @@ function ColorVariation( { variation } ) {
 export default function ColorVariations( { variations } ) {
 	return (
 		<VStack spacing={ 3 }>
+			{ /*
+			@TODO is there an alternative to this heading?
+*/ }
 			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
 				columns={ 2 }

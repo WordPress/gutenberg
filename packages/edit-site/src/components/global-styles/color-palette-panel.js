@@ -96,7 +96,6 @@ export default function ColorPalettePanel( { name } ) {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			{ /* @TODO: pass down variations to component? */ }
 			{ !! colorVariations.length && (
 				<ColorVariations variations={ colorVariations } />
 			) }
