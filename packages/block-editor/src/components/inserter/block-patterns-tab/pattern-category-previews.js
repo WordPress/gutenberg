@@ -161,7 +161,7 @@ export function PatternCategoryPreviews( {
 			{ currentCategoryPatterns.length > 0 && (
 				<BlockPatternsList
 					ref={ scrollContainerRef }
-					shownPatterns={ pagingProps.categoryPatternsAsyncList }
+					asyncListStep={ 5 }
 					blockPatterns={ pagingProps.categoryPatterns }
 					onClickPattern={ onClickPattern }
 					onHover={ onHover }

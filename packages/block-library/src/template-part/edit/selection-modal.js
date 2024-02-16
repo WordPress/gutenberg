@@ -6,7 +6,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
-import { useAsyncList } from '@wordpress/compose';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import {
 	SearchControl,
@@ -48,12 +47,10 @@ export default function TemplatePartSelectionModal( {
 
 		return searchPatterns( partsAsPatterns, searchValue );
 	}, [ templateParts, searchValue ] );
-	const shownTemplateParts = useAsyncList( filteredTemplateParts );
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const filteredBlockPatterns = useMemo( () => {
 		return searchPatterns( blockPatterns, searchValue );
 	}, [ blockPatterns, searchValue ] );
-	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -100,7 +97,6 @@ export default function TemplatePartSelectionModal( {
 					<h2>{ __( 'Existing template parts' ) }</h2>
 					<BlockPatternsList
 						blockPatterns={ filteredTemplateParts }
-						shownPatterns={ shownTemplateParts }
 						onClickPattern={ ( pattern ) => {
 							onTemplatePartSelect( pattern.templatePart );
 						} }
@@ -113,7 +109,6 @@ export default function TemplatePartSelectionModal( {
 					<h2>{ __( 'Patterns' ) }</h2>
 					<BlockPatternsList
 						blockPatterns={ filteredBlockPatterns }
-						shownPatterns={ shownBlockPatterns }
 						onClickPattern={ ( pattern, blocks ) => {
 							createFromBlocks( blocks, pattern.title );
 							onClose();

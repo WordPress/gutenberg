@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useAsyncList } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';
 
@@ -155,6 +155,44 @@ function BlockPattern( {
 	);
 }
 
+function BlockPatternsListAsync( {
+	isDraggable,
+	blockPatterns,
+	asyncListStep,
+	onHover,
+	onClickPattern,
+	showTitlesAsTooltip,
+	setActiveId,
+} ) {
+	const shownPatterns = useAsyncList( blockPatterns, {
+		step: asyncListStep,
+	} );
+
+	useEffect( () => {
+		// We reset the active composite item whenever the
+		// available patterns change, to make sure that
+		// focus is put back to the start.
+		setActiveId( undefined );
+	}, [ setActiveId, shownPatterns, blockPatterns ] );
+
+	return blockPatterns.map( ( pattern ) => {
+		const isShown = shownPatterns.includes( pattern );
+		return isShown ? (
+			<BlockPattern
+				key={ pattern.name }
+				id={ pattern.name }
+				pattern={ pattern }
+				onClick={ onClickPattern }
+				onHover={ onHover }
+				isDraggable={ isDraggable }
+				showTooltip={ showTitlesAsTooltip }
+			/>
+		) : (
+			<BlockPatternPlaceholder key={ pattern.name } />
+		);
+	} );
+}
+
 function BlockPatternPlaceholder() {
 	return (
 		<div className="block-editor-block-patterns-list__item is-placeholder" />
@@ -165,7 +203,7 @@ function BlockPatternsList(
 	{
 		isDraggable,
 		blockPatterns,
-		shownPatterns,
+		asyncListStep,
 		onHover,
 		onClickPattern,
 		orientation,
@@ -177,14 +215,6 @@ function BlockPatternsList(
 ) {
 	const compositeStore = useCompositeStore( { orientation } );
 	const { setActiveId } = compositeStore;
-
-	useEffect( () => {
-		// We reset the active composite item whenever the
-		// available patterns change, to make sure that
-		// focus is put back to the start.
-		setActiveId( undefined );
-	}, [ setActiveId, shownPatterns, blockPatterns ] );
-
 	return (
 		<Composite
 			store={ compositeStore }
@@ -193,22 +223,15 @@ function BlockPatternsList(
 			aria-label={ label }
 			ref={ ref }
 		>
-			{ blockPatterns.map( ( pattern ) => {
-				const isShown = shownPatterns.includes( pattern );
-				return isShown ? (
-					<BlockPattern
-						key={ pattern.name }
-						id={ pattern.name }
-						pattern={ pattern }
-						onClick={ onClickPattern }
-						onHover={ onHover }
-						isDraggable={ isDraggable }
-						showTooltip={ showTitlesAsTooltip }
-					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
-				);
-			} ) }
+			<BlockPatternsListAsync
+				isDraggable={ isDraggable }
+				blockPatterns={ blockPatterns }
+				asyncListStep={ asyncListStep }
+				onHover={ onHover }
+				onClickPattern={ onClickPattern }
+				showTitlesAsTooltip={ showTitlesAsTooltip }
+				setActiveId={ setActiveId }
+			/>
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
