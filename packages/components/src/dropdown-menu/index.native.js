@@ -6,9 +6,10 @@ import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, PanelBody } from '@wordpress/components';
+import { BottomSheet, BottomSheetV2, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * Internal dependencies
@@ -51,6 +52,8 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 } ) {
+	const { bottom: bottomInset } = useSafeAreaInsets();
+
 	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
@@ -107,15 +110,15 @@ function DropdownMenu( {
 			} }
 			renderContent={ ( { isOpen, onClose, ...props } ) => {
 				return (
-					<BottomSheet
-						hideHeader={ true }
-						isVisible={ isOpen }
+					<BottomSheetV2
+						index={ isOpen ? 0 : -1 }
 						onClose={ onClose }
+						snapPoints={ [ BottomSheetV2.CONTENT_HEIGHT ] }
 					>
 						{ isFunction( children ) ? children( props ) : null }
 						<PanelBody
 							title={ label }
-							style={ { paddingLeft: 0, paddingRight: 0 } }
+							style={ { marginBottom: bottomInset + 20 } }
 						>
 							{ controlSets?.flatMap(
 								( controlSet, indexOfSet ) =>
@@ -147,7 +150,7 @@ function DropdownMenu( {
 									)
 							) }
 						</PanelBody>
-					</BottomSheet>
+					</BottomSheetV2>
 				);
 			} }
 		/>
