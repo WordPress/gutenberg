@@ -87,3 +87,9 @@
 		padding-top: 200%; // 2 / 1 * 100
 	}
 }
+
+// Add Align Center Support to Embeds
+.wp-block-embed.aligncenter .wp-block-embed__wrapper {
+	display: flex;
+	justify-content: center;
+}
