@@ -75,7 +75,9 @@ export const exportJSONaction = {
 			return {
 				name: `${
 					name +
-					( nameCount[ name ] > 1 ? '-' + nameCount[ name ] - 1 : '' )
+					( nameCount[ name ] > 1
+						? '-' + ( nameCount[ name ] - 1 )
+						: '' )
 				}.json`,
 				lastModified: new Date(),
 				input: getJsonFromItem( item ),
