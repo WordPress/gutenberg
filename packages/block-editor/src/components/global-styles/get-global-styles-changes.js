@@ -171,8 +171,8 @@ export function getGlobalStylesChangelist( next, previous ) {
 }
 
 /**
- * From a getGlobalStylesChangelist() result, returns a truncated array of translated changes.
- * Appends a translated string indicating the number of changes that were truncated.
+ * From a getGlobalStylesChangelist() result, returns an array of translated global styles changes, grouped by type.
+ * The types are 'blocks', 'elements', 'settings', and 'styles'.
  *
  * @param {Object}              next     The changed object to compare.
  * @param {Object}              previous The original object to compare against.
@@ -235,7 +235,7 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 					);
 				}
 				default: {
-					return changeValues.join( ', ' );
+					return `${ changeValues.join( ', ' ) }.`;
 				}
 			}
 		} );

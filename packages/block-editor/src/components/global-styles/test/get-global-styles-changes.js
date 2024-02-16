@@ -170,6 +170,9 @@ describe( 'getGlobalStylesChanges and utils', () => {
 					},
 				],
 			},
+			typography: {
+				fluid: true,
+			},
 		},
 	};
 
@@ -195,7 +198,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				'Colors, Typography styles.',
 				'Test pumpkin flowers block.',
 				'H3, Caption, H6, Link elements.',
-				'Color settings.',
+				'Color, Typography settings.',
 			] );
 		} );
 
@@ -259,6 +262,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				[ 'elements', 'H6' ],
 				[ 'elements', 'Link' ],
 				[ 'settings', 'Color' ],
+				[ 'settings', 'Typography' ],
 			] );
 
 			const resultB = getGlobalStylesChangelist( next, previous );
