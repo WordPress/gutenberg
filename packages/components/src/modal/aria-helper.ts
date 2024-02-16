@@ -28,7 +28,7 @@ export function modalize( modalElement?: HTMLDivElement ) {
 		if ( element === modalElement ) continue;
 
 		if ( elementShouldBeHidden( element ) ) {
-			element.setAttribute( 'aria-hidden', 'true' );
+			element.setAttribute( 'inert', '' );
 			hiddenElements.push( element );
 		}
 	}
@@ -45,7 +45,7 @@ export function elementShouldBeHidden( element: Element ) {
 	const role = element.getAttribute( 'role' );
 	return ! (
 		element.tagName === 'SCRIPT' ||
-		element.hasAttribute( 'aria-hidden' ) ||
+		element.hasAttribute( 'inert' ) ||
 		element.hasAttribute( 'aria-live' ) ||
 		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
 	);
@@ -58,6 +58,15 @@ export function unmodalize() {
 	const hiddenElements = hiddenElementsByDepth.pop();
 	if ( ! hiddenElements ) return;
 
-	for ( const element of hiddenElements )
-		element.removeAttribute( 'aria-hidden' );
+	for ( const element of hiddenElements ) element.removeAttribute( 'inert' );
+
+	// Hacks around a Chromium bug where it fails to restore a region to the
+	// accessibility tree after an ancestor had the `inert` attribute removed.
+	// The bug seems like a variation of this: https://crbug.com/1354313
+	// This workaround doesn't have to be a custom property. It also seems to
+	// not have to be done each time `showApp` is invoked but it's inexpensive
+	// and ensures some other code didn't remove it.
+	document
+		.querySelectorAll< HTMLElement >( '[role=region]' )
+		.forEach( ( region ) => region.style.setProperty( '--∞', '8' ) );
 }
