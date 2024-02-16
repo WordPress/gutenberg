@@ -17,6 +17,7 @@ describe( 'insert', () => {
 	it( 'should delete and insert', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
@@ -24,6 +25,7 @@ describe( 'insert', () => {
 		};
 		const expected = {
 			formats: [ , , , [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 3, 4 ] ] ] ),
 			replacements: [ , , obj, , , , , , , , ],
 			text: `on${ OBJECT_REPLACEMENT_CHARACTER }o three`,
 			start: 3,

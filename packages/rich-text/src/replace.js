@@ -2,9 +2,22 @@
  * Internal dependencies
  */
 
-import { normaliseFormats } from './normalise-formats';
+import { insert } from './insert';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
+
+function getFormatsAtIndex( value, index ) {
+	const { _formats } = value;
+	const formatsAtIndex = new Set();
+
+	for ( const [ format, [ start, end ] ] of _formats ) {
+		if ( start <= index && end > index ) {
+			formatsAtIndex.add( format );
+		}
+	}
+
+	return formatsAtIndex;
+}
 
 /**
  * Search a Rich Text value and replace the match(es) with `replacement`. This
@@ -22,50 +35,36 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {RichTextValue} A new value with replacements applied.
  */
-export function replace(
-	{ formats, replacements, text, start, end },
-	pattern,
-	replacement
-) {
-	text = text.replace( pattern, ( match, ...rest ) => {
+export function replace( value, pattern, replacement ) {
+	let newValue = value;
+	value.text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
-		let newText = replacement;
-		let newFormats;
-		let newReplacements;
+		let valueToInsert = replacement;
 
-		if ( typeof newText === 'function' ) {
-			newText = replacement( match, ...rest );
+		if ( typeof replacement === 'function' ) {
+			valueToInsert = replacement( match, ...rest );
+		} else if ( typeof replacement === 'string' ) {
+			valueToInsert = {
+				text: replacement,
+				formats: Array( replacement.length ).fill(
+					value.formats[ offset ]
+				),
+				_formats: new Map(
+					Array.from( getFormatsAtIndex( value, offset ) ).map(
+						( format ) => [ format, [ 0, replacement.length ] ]
+					)
+				),
+				replacements: Array( replacement.length ),
+			};
 		}
 
-		if ( typeof newText === 'object' ) {
-			newFormats = newText.formats;
-			newReplacements = newText.replacements;
-			newText = newText.text;
-		} else {
-			newFormats = Array( newText.length );
-			newReplacements = Array( newText.length );
-
-			if ( formats[ offset ] ) {
-				newFormats = newFormats.fill( formats[ offset ] );
-			}
-		}
-
-		formats = formats
-			.slice( 0, offset )
-			.concat( newFormats, formats.slice( offset + match.length ) );
-		replacements = replacements
-			.slice( 0, offset )
-			.concat(
-				newReplacements,
-				replacements.slice( offset + match.length )
-			);
-
-		if ( start ) {
-			start = end = offset + newText.length;
-		}
-
-		return newText;
+		newValue = insert(
+			newValue,
+			valueToInsert,
+			offset,
+			offset + match.length
+		);
 	} );
 
-	return normaliseFormats( { formats, replacements, text, start, end } );
+	return newValue;
 }

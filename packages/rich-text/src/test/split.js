@@ -18,12 +18,14 @@ describe( 'split', () => {
 			start: 5,
 			end: 10,
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = [
 			{
 				formats: [ , , , , [ em ], [ em ] ],
+				_formats: new Map( [ [ em, [ 4, 6 ] ] ] ),
 				replacements: [ , , , , , , ],
 				text: 'one tw',
 			},
@@ -31,6 +33,7 @@ describe( 'split', () => {
 				start: 0,
 				end: 0,
 				formats: [ [ em ], , , , , , , ],
+				_formats: new Map( [ [ em, [ 0, 1 ] ] ] ),
 				replacements: [ , , , , , , , ],
 				text: 'o three',
 			},
@@ -49,6 +52,7 @@ describe( 'split', () => {
 	it( 'should split with selection', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
@@ -57,11 +61,13 @@ describe( 'split', () => {
 		const expected = [
 			{
 				formats: [ , , , , [ em ], [ em ] ],
+				_formats: new Map( [ [ em, [ 4, 6 ] ] ] ),
 				replacements: [ , , , , , , ],
 				text: 'one tw',
 			},
 			{
 				formats: [ [ em ], , , , , , , ],
+				_formats: new Map( [ [ em, [ 0, 1 ] ] ] ),
 				replacements: [ , , , , , , , ],
 				text: 'o three',
 				start: 0,
@@ -82,6 +88,7 @@ describe( 'split', () => {
 	it( 'should split empty', () => {
 		const record = {
 			formats: [],
+			_formats: new Map(),
 			replacements: [],
 			text: '',
 			start: 0,
@@ -90,11 +97,13 @@ describe( 'split', () => {
 		const expected = [
 			{
 				formats: [],
+				_formats: new Map(),
 				replacements: [],
 				text: '',
 			},
 			{
 				formats: [],
+				_formats: new Map(),
 				replacements: [],
 				text: '',
 				start: 0,
@@ -141,12 +150,14 @@ describe( 'split', () => {
 				,
 				,
 			],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , , , , , , , , , , , ],
 			text: 'one two three four five',
 		};
 		const expected = [
 			{
 				formats: [ , , , ],
+				_formats: new Map(),
 				replacements: [ , , , ],
 				text: 'one',
 			},
@@ -154,6 +165,7 @@ describe( 'split', () => {
 				start: 2,
 				end: 3,
 				formats: [ [ em ], [ em ], [ em ] ],
+				_formats: new Map( [ [ em, [ 0, 3 ] ] ] ),
 				replacements: [ , , , ],
 				text: 'two',
 			},
@@ -161,6 +173,7 @@ describe( 'split', () => {
 				start: 0,
 				end: 5,
 				formats: [ , , , , , ],
+				_formats: new Map(),
 				replacements: [ , , , , , ],
 				text: 'three',
 			},
@@ -168,11 +181,13 @@ describe( 'split', () => {
 				start: 0,
 				end: 2,
 				formats: [ , , , , ],
+				_formats: new Map(),
 				replacements: [ , , , , ],
 				text: 'four',
 			},
 			{
 				formats: [ , , , , ],
+				_formats: new Map(),
 				replacements: [ , , , , ],
 				text: 'five',
 			},
@@ -193,12 +208,14 @@ describe( 'split', () => {
 			start: 5,
 			end: 6,
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = [
 			{
 				formats: [ , , , ],
+				_formats: new Map(),
 				replacements: [ , , , ],
 				text: 'one',
 			},
@@ -206,11 +223,13 @@ describe( 'split', () => {
 				start: 1,
 				end: 2,
 				formats: [ [ em ], [ em ], [ em ] ],
+				_formats: new Map( [ [ em, [ 0, 3 ] ] ] ),
 				replacements: [ , , , ],
 				text: 'two',
 			},
 			{
 				formats: [ , , , , , ],
+				_formats: new Map(),
 				replacements: [ , , , , , ],
 				text: 'three',
 			},
@@ -229,6 +248,7 @@ describe( 'split', () => {
 	it( 'should not split without selection', () => {
 		const record = {
 			formats: [],
+			_formats: new Map(),
 			replacements: [],
 			text: '',
 		};

@@ -16,11 +16,13 @@ describe( 'slice', () => {
 	it( 'should slice', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = {
 			formats: [ , [ em ], [ em ] ],
+			_formats: new Map( [ [ em, [ 1, 3 ] ] ] ),
 			replacements: [ , , , ],
 			text: ' tw',
 		};
@@ -34,6 +36,7 @@ describe( 'slice', () => {
 	it( 'should slice record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 3,
@@ -41,6 +44,7 @@ describe( 'slice', () => {
 		};
 		const expected = {
 			formats: [ , [ em ], [ em ] ],
+			_formats: new Map( [ [ em, [ 1, 3 ] ] ] ),
 			replacements: [ , , , ],
 			text: ' tw',
 		};

@@ -18,6 +18,13 @@ import { create } from './create';
  */
 export function mergePair( a, b ) {
 	a.formats = a.formats.concat( b.formats );
+	a._formats = new Map( [
+		...a._formats,
+		...Array.from( b._formats ).map( ( [ format, selection ] ) => [
+			format,
+			selection.map( ( index ) => index + a.text.length ),
+		] ),
+	] );
 	a.replacements = a.replacements.concat( b.replacements );
 	a.text += b.text;
 

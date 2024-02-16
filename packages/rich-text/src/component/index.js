@@ -80,10 +80,12 @@ export function useRichText( {
 		record.current = {
 			text: record.current.text,
 			formats: record.current.formats,
+			_formats: record.current._formats,
 			replacements: record.current.replacements,
 		};
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
+			record.current._formats = new Map();
 			record.current.replacements = Array( value.length );
 		}
 		if ( __unstableAfterParse ) {

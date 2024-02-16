@@ -12,6 +12,9 @@ describe( 'recordToDom', () => {
 	} );
 
 	spec.forEach( ( { description, record, startPath, endPath } ) => {
+		if ( ! record._formats ) {
+			record._formats = new Map();
+		}
 		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const { body, selection } = toDom( {

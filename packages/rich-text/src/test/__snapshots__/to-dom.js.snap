@@ -7,7 +7,6 @@ exports[`recordToDom should create a value with formatting 1`] = `
   >
     test
   </em>
-  
 </body>
 `;
 
@@ -16,9 +15,11 @@ exports[`recordToDom should create a value with formatting for split tags 1`] = 
   <em
     data-rich-text-format-boundary="true"
   >
-    test
+    te
   </em>
-  
+  <em>
+    st
+  </em>
 </body>
 `;
 
@@ -30,7 +31,6 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
   >
     test
   </a>
-  
 </body>
 `;
 
@@ -55,7 +55,6 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
     />
     
   </em>
-  
 </body>
 `;
 
@@ -82,7 +81,6 @@ exports[`recordToDom should create a value with image object and text before 1`]
     />
     
   </em>
-  
 </body>
 `;
 
@@ -95,7 +93,6 @@ exports[`recordToDom should create a value with nested formatting 1`] = `
       test
     </strong>
   </em>
-  
 </body>
 `;
 
@@ -107,14 +104,12 @@ exports[`recordToDom should create a value without formatting 1`] = `
 
 exports[`recordToDom should create an empty value 1`] = `
 <body>
-  
   ﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
-  
   ﻿
 </body>
 `;
@@ -146,7 +141,6 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
   >
     test
   </strong>
-  
 </body>
 `;
 
@@ -171,9 +165,8 @@ exports[`recordToDom should handle br with formatting 1`] = `
       data-rich-text-line-break="true"
     />
     
+    ﻿
   </em>
-  
-  ﻿
 </body>
 `;
 
@@ -228,7 +221,6 @@ exports[`recordToDom should ignore manually added object replacement character w
   >
     hi
   </em>
-  
 </body>
 `;
 
@@ -246,7 +238,6 @@ exports[`recordToDom should not error with overlapping formats (1) 1`] = `
       2
     </strong>
   </a>
-  
 </body>
 `;
 
@@ -254,7 +245,6 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
 <body>
   <em>
     <a
-      data-rich-text-format-boundary="true"
       href="#"
     >
       1
@@ -268,7 +258,6 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
       2
     </a>
   </strong>
-  
 </body>
 `;
 
@@ -285,7 +274,6 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
   >
     🍒
   </em>
-  
 </body>
 `;
 
@@ -297,7 +285,6 @@ exports[`recordToDom should preserve non breaking space 1`] = `
 
 exports[`recordToDom should remove padding 1`] = `
 <body>
-  
   ﻿
 </body>
 `;

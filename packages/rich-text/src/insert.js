@@ -3,7 +3,8 @@
  */
 
 import { create } from './create';
-import { normaliseFormats } from './normalise-formats';
+import { slice } from './slice';
+import { concat } from './concat';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -26,29 +27,19 @@ export function insert(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const { formats, replacements, text } = value;
-
 	if ( typeof valueToInsert === 'string' ) {
 		valueToInsert = create( { text: valueToInsert } );
 	}
 
 	const index = startIndex + valueToInsert.text.length;
+	const newValue = concat(
+		slice( value, 0, startIndex ),
+		valueToInsert,
+		slice( value, endIndex, value.text.length )
+	);
 
-	return normaliseFormats( {
-		formats: formats
-			.slice( 0, startIndex )
-			.concat( valueToInsert.formats, formats.slice( endIndex ) ),
-		replacements: replacements
-			.slice( 0, startIndex )
-			.concat(
-				valueToInsert.replacements,
-				replacements.slice( endIndex )
-			),
-		text:
-			text.slice( 0, startIndex ) +
-			valueToInsert.text +
-			text.slice( endIndex ),
-		start: index,
-		end: index,
-	} );
+	newValue.start = index;
+	newValue.end = index;
+
+	return newValue;
 }
