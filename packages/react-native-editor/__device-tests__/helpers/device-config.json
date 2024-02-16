@@ -5,10 +5,6 @@
 			"deviceTabletName": "iPad (10th generation)",
 			"platformVersion": "16.2"
 		},
-		"saucelabs": {
-			"deviceName": "iPhone 14 Simulator",
-			"deviceTabletName": "iPad (10th generation) Simulator"
-		},
 		"buildkite": {
 			"platformVersion": "16.4"
 		},
@@ -21,9 +17,6 @@
 		"local": {
 			"deviceName": "Pixel_3_XL_API_30",
 			"platformVersion": "11.0"
-		},
-		"saucelabs": {
-			"deviceName": "Google Pixel 3 XL GoogleAPI Emulator"
 		}
 	}
 }

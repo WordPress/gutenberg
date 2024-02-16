@@ -5,7 +5,6 @@ const childProcess = require( 'child_process' );
 // eslint-disable-next-line import/no-extraneous-dependencies, import/named
 import { remote, Key } from 'webdriverio';
 
-const crypto = require( 'crypto' );
 const path = require( 'path' );
 /**
  * Internal dependencies
@@ -15,7 +14,6 @@ const {
 	iosServer,
 	iosLocal,
 	android,
-	sauceOptions,
 	prefixKeysWithAppium,
 } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
@@ -26,7 +24,7 @@ const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 const iPadDevice = process.env.IPAD;
 
-// Environment setup, local environment or Sauce Labs.
+// Environment setup, local environment or server.
 const defaultEnvironment = 'local';
 const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 
@@ -48,7 +46,6 @@ const backspace = '\u0008';
 
 const IOS_BUNDLE_ID = 'org.wordpress.gutenberg.development';
 const ANDROID_COMPONENT_NAME = 'com.gutenberg/.MainActivity';
-const SAUCE_LABS_TIMEOUT = 240;
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
@@ -80,29 +77,22 @@ const PLATFORM_NAME = isAndroid() ? 'Android' : 'iOS';
 
 // Initialises the driver and desired capabilities for appium.
 const setupDriver = async () => {
-	const branch = process.env.CIRCLE_BRANCH || '';
-	const safeBranchName = branch.replace( /\//g, '-' );
-	if ( isLocalEnvironment() ) {
-		try {
-			appiumProcess = await AppiumLocal.start( {
-				port: localAppiumPort,
-			} );
-		} catch ( err ) {
-			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
-			// eslint-disable-next-line no-console
-			await console.log(
-				'Could not start Appium server',
-				err.toString()
-			);
-		}
+	try {
+		appiumProcess = await AppiumLocal.start( {
+			port: localAppiumPort,
+		} );
+	} catch ( err ) {
+		// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
+		// eslint-disable-next-line no-console
+		await console.log( 'Could not start Appium server', err.toString() );
 	}
 
 	let desiredCaps;
 	if ( isAndroid() ) {
 		desiredCaps = { ...android };
+		desiredCaps.app = path.resolve( localAndroidAppPath );
 		if ( isLocalEnvironment() ) {
 			const androidDeviceID = getAndroidEmulatorID();
-			desiredCaps.app = path.resolve( localAndroidAppPath );
 			desiredCaps.udid = androidDeviceID;
 			try {
 				const androidVersion = childProcess
@@ -121,14 +111,9 @@ const setupDriver = async () => {
 			} catch ( error ) {
 				// Ignore error.
 			}
-		} else {
-			desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
-			desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		}
 	} else {
 		desiredCaps = iosServer( { iPadDevice } );
-		desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
-		desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
 			desiredCaps = iosLocal( { iPadDevice } );
 
@@ -154,32 +139,17 @@ const setupDriver = async () => {
 					`Using iOS ${ desiredCaps.platformVersion } platform version`
 				);
 			}
-
-			desiredCaps.app = path.resolve( localIOSAppPath );
-			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
+		desiredCaps.app = path.resolve( localIOSAppPath );
+		desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 	}
 
-	const sauceOptionsConfig = ! isLocalEnvironment()
-		? {
-				'sauce:options': {
-					...sauceOptions,
-					name: `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`,
-					tags: [ 'Gutenberg', branch ],
-				},
-		  }
-		: {};
-	const serverConfig = isLocalEnvironment()
-		? serverConfigs.local
-		: serverConfigs.sauce;
-
 	const driver = await remote( {
-		...serverConfig,
+		...serverConfigs.local,
 		logLevel: 'error',
 		capabilities: {
 			platformName: PLATFORM_NAME,
 			...prefixKeysWithAppium( desiredCaps ),
-			...sauceOptionsConfig,
 		},
 	} );
 
@@ -189,16 +159,10 @@ const setupDriver = async () => {
 
 const stopDriver = async ( driver ) => {
 	if ( ! isLocalEnvironment() ) {
-		const sessionId = driver.sessionId;
-
-		const secret = `${ serverConfigs.sauce.user }:${ serverConfigs.sauce.key }`;
-		const token = crypto
-			.createHmac( 'md5', secret )
-			.update( sessionId )
-			.digest( 'hex' );
-		const jobURL = `https://app.saucelabs.com/tests/${ sessionId }?auth=${ token }`;
 		// eslint-disable-next-line no-console
-		console.log( `You can view the video of this test run at ${ jobURL }` );
+		console.log(
+			`You can view the video of this test run in the artifacts tab`
+		);
 	}
 	if ( driver === undefined ) {
 		return;
@@ -413,7 +377,7 @@ const selectTextFromElement = async ( driver, element ) => {
 		const selectAllElement = await driver.$(
 			'//XCUIElementTypeMenuItem[@name="Select All"]'
 		);
-		await selectAllElement.waitForDisplayed( { timeout } );
+		await selectAllElement.waitForDisplayed( { timeout: 3000 } );
 		await selectAllElement.click();
 	}
 };
