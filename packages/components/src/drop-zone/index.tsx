@@ -81,6 +81,14 @@ export function DropZoneComponent( {
 			}
 		},
 		onDragStart( event ) {
+			const { accept } = restProps;
+
+			// accept is a string passed to `FormFileUpload` that tells the browser which
+			// file types can be upload to the upload window the browser use e.g: `image/*,video/*`.
+			// Check if the dragged item is a file and if it is of the correct type.
+
+
+
 			setIsDraggingOverDocument( true );
 
 			let _type: DropType = 'default';
