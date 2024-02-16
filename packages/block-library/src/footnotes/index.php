@@ -105,8 +105,10 @@ function register_block_core_footnotes_post_meta() {
 		}
 	}
 }
-// Most post types are registered at priority 10, so use priority 20 here in
-// order to catch them.
+/**
+ * Most post types are registered at priority 10, so use priority 20 here in
+ * order to catch them.
+*/
 add_action( 'init', 'register_block_core_footnotes_post_meta', 20 );
 
 /**
