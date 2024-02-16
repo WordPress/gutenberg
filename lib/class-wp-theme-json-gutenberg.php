@@ -1672,6 +1672,9 @@ class WP_Theme_JSON_Gutenberg {
 		$declaration_block = array_reduce(
 			$declarations,
 			static function ( $carry, $element ) {
+				if ( 'unset' === $element['value'] ) {
+					return $carry;
+				}
 				return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
 			''
 		);
