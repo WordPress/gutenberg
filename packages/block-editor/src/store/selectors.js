@@ -2282,6 +2282,38 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 	]
 );
 
+function parseBlocks( blocks, patterns ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		const block = blocks[ i ];
+
+		// Check and parse innerBlocks if present
+		if ( block.innerBlocks && block.innerBlocks.length > 0 ) {
+			parseBlocks( block.innerBlocks, patterns ); // Recursively parse inner blocks
+		}
+
+		if ( block.name === 'core/pattern' ) {
+			const _pattern = patterns.find(
+				( { name } ) => name === block.attributes.slug
+			);
+			if ( _pattern ) {
+				const toInsert = deepParsePattern( _pattern, patterns );
+				blocks.splice( i, 1, ...toInsert );
+				i += toInsert.length - 1; // Adjust loop counter for the new blocks
+			}
+		}
+	}
+}
+
+function deepParsePattern( pattern, patterns ) {
+	const blocks = parse( pattern.content, {
+		__unstableSkipMigrationLogs: true,
+	} );
+
+	parseBlocks( blocks, patterns ); // Start parsing with the top-level blocks
+
+	return blocks;
+}
+
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
 		createSelector( ( state, patternName ) => {
@@ -2295,9 +2327,7 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 			}
 			return {
 				...pattern,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
+				blocks: deepParsePattern( pattern, patterns ),
 			};
 		}, getAllPatternsDependants( select ) )
 );
