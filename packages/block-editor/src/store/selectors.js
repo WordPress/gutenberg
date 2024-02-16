@@ -2972,3 +2972,7 @@ export const isGroupable = createRegistrySelector(
 			);
 		}
 );
+
+export function getBlockBindingsSource( state, sourceName ) {
+	return state.blockBindingsSources[ sourceName ];
+}
