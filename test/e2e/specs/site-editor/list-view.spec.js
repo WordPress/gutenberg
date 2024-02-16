@@ -18,21 +18,20 @@ test.describe( 'Site Editor List View', () => {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should open by default when preference is enabled', async ( {
 		page,
+		editor,
 	} ) => {
 		await expect(
 			page.locator( 'role=region[name="List View"i]' )
 		).toBeHidden();
 
 		// Turn on block list view by default.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', true );
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: true,
 		} );
 
 		await page.reload();
@@ -42,10 +41,8 @@ test.describe( 'Site Editor List View', () => {
 		).toBeVisible();
 
 		// The preferences cleanup.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', false );
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: false,
 		} );
 	} );
 
@@ -105,7 +102,7 @@ test.describe( 'Site Editor List View', () => {
 		// Since focus is now inside the list view, the shortcut should close
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Focus should now be on the list view toggle button.
 		await expect(
@@ -121,6 +118,7 @@ test.describe( 'Site Editor List View', () => {
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page
 				.getByRole( 'region', { name: 'List View' } )
@@ -129,7 +127,7 @@ test.describe( 'Site Editor List View', () => {
 				} )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 		await expect(
 			page.getByRole( 'button', { name: 'List View' } )
 		).toBeFocused();

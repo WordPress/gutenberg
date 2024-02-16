@@ -4,14 +4,11 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	code,
 	drawerLeft,
 	drawerRight,
 	blockDefault,
 	keyboard,
-	desktop,
-	listView,
-	external,
+	fullscreen,
 	formatListBullets,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
@@ -28,43 +25,26 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { store as editPostStore } from '../../store';
 
 export default function useCommonCommands() {
-	const {
-		openGeneralSidebar,
-		closeGeneralSidebar,
-		switchEditorMode,
-		setIsListViewOpened,
-		toggleDistractionFree,
-	} = useDispatch( editPostStore );
+	const { openGeneralSidebar, closeGeneralSidebar } =
+		useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
-	const {
-		editorMode,
-		activeSidebar,
-		isListViewOpen,
-		isPublishSidebarEnabled,
-		showBlockBreadcrumbs,
-		isDistractionFree,
-	} = useSelect( ( select ) => {
-		const { getEditorMode, isListViewOpened, isFeatureActive } =
-			select( editPostStore );
-		return {
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editPostStore.name
-			),
-			editorMode: getEditorMode(),
-			isListViewOpen: isListViewOpened(),
-			isPublishSidebarEnabled:
-				select( editorStore ).isPublishSidebarEnabled(),
-			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
-			isDistractionFree: select( preferencesStore ).get(
-				editPostStore.name,
-				'distractionFree'
-			),
-		};
-	}, [] );
+	const { activeSidebar, isFullscreen, isPublishSidebarEnabled } = useSelect(
+		( select ) => {
+			const { get } = select( preferencesStore );
+
+			return {
+				activeSidebar: select(
+					interfaceStore
+				).getActiveComplementaryArea( editPostStore.name ),
+				isPublishSidebarEnabled:
+					select( editorStore ).isPublishSidebarEnabled(),
+				isFullscreen: get( 'core/edit-post', 'fullscreenMode' ),
+			};
+		},
+		[]
+	);
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { __unstableSaveForPreview } = useDispatch( editorStore );
-	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -95,62 +75,29 @@ export default function useCommonCommands() {
 	} );
 
 	useCommand( {
-		name: 'core/toggle-distraction-free',
-		label: __( 'Toggle distraction free' ),
-		callback: ( { close } ) => {
-			toggleDistractionFree();
-			close();
-		},
-	} );
-
-	useCommand( {
-		name: 'core/toggle-spotlight-mode',
-		label: __( 'Toggle spotlight mode' ),
-		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'focusMode' );
-			close();
-		},
-	} );
-
-	useCommand( {
 		name: 'core/toggle-fullscreen-mode',
-		label: __( 'Toggle fullscreen mode' ),
-		icon: desktop,
+		label: isFullscreen
+			? __( 'Exit fullscreen' )
+			: __( 'Enter fullscreen' ),
+		icon: fullscreen,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fullscreenMode' );
 			close();
-		},
-	} );
-
-	useCommand( {
-		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
-		icon: listView,
-		callback: ( { close } ) => {
-			setIsListViewOpened( ! isListViewOpen );
-			close();
-		},
-	} );
-
-	useCommand( {
-		name: 'core/toggle-top-toolbar',
-		label: __( 'Toggle top toolbar' ),
-		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'fixedToolbar' );
-			if ( isDistractionFree ) {
-				toggleDistractionFree();
-			}
-			close();
-		},
-	} );
-
-	useCommand( {
-		name: 'core/toggle-code-editor',
-		label: __( 'Toggle code editor' ),
-		icon: code,
-		callback: ( { close } ) => {
-			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
-			close();
+			createInfoNotice(
+				isFullscreen ? __( 'Fullscreen off.' ) : __( 'Fullscreen on.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core/edit-post', 'fullscreenMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
@@ -172,55 +119,23 @@ export default function useCommonCommands() {
 	} );
 
 	useCommand( {
-		name: 'core/toggle-breadcrumbs',
-		label: showBlockBreadcrumbs
-			? __( 'Hide block breadcrumbs' )
-			: __( 'Show block breadcrumbs' ),
-		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
-			close();
-			createInfoNotice(
-				showBlockBreadcrumbs
-					? __( 'Breadcrumbs hidden.' )
-					: __( 'Breadcrumbs visible.' ),
-				{
-					id: 'core/edit-post/toggle-breadcrumbs/notice',
-					type: 'snackbar',
-				}
-			);
-		},
-	} );
-
-	useCommand( {
 		name: 'core/toggle-publish-sidebar',
 		label: isPublishSidebarEnabled
-			? __( 'Disable pre-publish checklist' )
-			: __( 'Enable pre-publish checklist' ),
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
 			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
-					? __( 'Pre-publish checklist off.' )
-					: __( 'Pre-publish checklist on.' ),
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
 				{
 					id: 'core/edit-post/publish-sidebar/notice',
 					type: 'snackbar',
 				}
 			);
-		},
-	} );
-
-	useCommand( {
-		name: 'core/preview-link',
-		label: __( 'Preview in a new tab' ),
-		icon: external,
-		callback: async ( { close } ) => {
-			close();
-			const postId = getCurrentPostId();
-			const link = await __unstableSaveForPreview();
-			window.open( link, `wp-preview-${ postId }` );
 		},
 	} );
 }

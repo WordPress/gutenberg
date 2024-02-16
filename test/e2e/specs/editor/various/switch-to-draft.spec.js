@@ -139,20 +139,7 @@ class SwitchToDraftUtils {
 			id = page.id;
 		}
 
-		await this.#admin.visitAdminPage(
-			'post.php',
-			`post=${ id }&action=edit`
-		);
-
-		// Disable welcome guide and full screen mode.
-		await this.#page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuide', false );
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'fullscreenMode', false );
-		} );
+		await this.#admin.editPost( id );
 	};
 
 	getPostStatus = async () => {

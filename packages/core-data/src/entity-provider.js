@@ -132,6 +132,8 @@ export function useEntityProp( kind, name, prop, _id ) {
 	return [ value, setValue, fullValue ];
 }
 
+const parsedBlocksCache = new WeakMap();
+
 /**
  * Hook that returns block content getters and setters for
  * the nearest provided entity of the specified type.
@@ -153,8 +155,12 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
+	const { getEntityRecord, getEntityRecordEdits } = useSelect( STORE_NAME );
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
+			if ( ! id ) {
+				return {};
+			}
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
@@ -169,14 +175,40 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		useDispatch( STORE_NAME );
 
 	const blocks = useMemo( () => {
+		if ( ! id ) {
+			return undefined;
+		}
+
 		if ( editedBlocks ) {
 			return editedBlocks;
 		}
 
-		return content && typeof content !== 'function'
-			? parse( content )
-			: EMPTY_ARRAY;
-	}, [ editedBlocks, content ] );
+		if ( ! content || typeof content !== 'string' ) {
+			return EMPTY_ARRAY;
+		}
+
+		// If there's an edit, cache the parsed blocks by the edit.
+		// If not, cache by the original enity record.
+		const edits = getEntityRecordEdits( kind, name, id );
+		const isUnedited = ! edits || ! Object.keys( edits ).length;
+		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
+		let _blocks = parsedBlocksCache.get( cackeKey );
+
+		if ( ! _blocks ) {
+			_blocks = parse( content );
+			parsedBlocksCache.set( cackeKey, _blocks );
+		}
+
+		return _blocks;
+	}, [
+		kind,
+		name,
+		id,
+		editedBlocks,
+		content,
+		getEntityRecord,
+		getEntityRecordEdits,
+	] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
@@ -189,7 +221,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
-			const { selection } = options;
+			const { selection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
@@ -201,7 +233,10 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				...updateFootnotes( newBlocks ),
 			};
 
-			editEntityRecord( kind, name, id, edits, { isCached: false } );
+			editEntityRecord( kind, name, id, edits, {
+				isCached: false,
+				...rest,
+			} );
 		},
 		[
 			kind,
@@ -216,11 +251,14 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
-			const { selection } = options;
+			const { selection, ...rest } = options;
 			const footnotesChanges = updateFootnotes( newBlocks );
 			const edits = { selection, ...footnotesChanges };
 
-			editEntityRecord( kind, name, id, edits, { isCached: true } );
+			editEntityRecord( kind, name, id, edits, {
+				isCached: true,
+				...rest,
+			} );
 		},
 		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);

@@ -1,23 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import useNavigationMenuTitle from './use-navigation-menu-title';
 import { useLink } from '../routes/link';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 export default function TemplatePartNavigationMenuListItem( { id } ) {
-	const [ title ] = useEntityProp(
-		'postType',
-		NAVIGATION_POST_TYPE,
-		'title',
-		id
-	);
+	const title = useNavigationMenuTitle( id );
 
 	const linkInfo = useLink( {
 		postId: id,

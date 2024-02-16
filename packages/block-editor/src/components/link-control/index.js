@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	Notice,
+	TextControl,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -421,25 +427,6 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
-					additionalControls={ () => {
-						// Expose the "Opens in new tab" settings in the preview
-						// as it is the most common setting to change.
-						if (
-							settings?.find(
-								( setting ) => setting.id === 'opensInNewTab'
-							)
-						) {
-							return (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings?.filter(
-										( { id } ) => id === 'opensInNewTab'
-									) }
-									onChange={ onChange }
-								/>
-							);
-						}
-					} }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
@@ -467,7 +454,13 @@ function LinkControl( {
 			) }
 
 			{ showActions && (
-				<div className="block-editor-link-control__search-actions">
+				<HStack
+					justify="right"
+					className="block-editor-link-control__search-actions"
+				>
+					<Button variant="tertiary" onClick={ handleCancel }>
+						{ __( 'Cancel' ) }
+					</Button>
 					<Button
 						variant="primary"
 						onClick={ isDisabled ? noop : handleSubmit }
@@ -476,13 +469,10 @@ function LinkControl( {
 					>
 						{ __( 'Save' ) }
 					</Button>
-					<Button variant="tertiary" onClick={ handleCancel }>
-						{ __( 'Cancel' ) }
-					</Button>
-				</div>
+				</HStack>
 			) }
 
-			{ renderControlBottom && renderControlBottom() }
+			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }

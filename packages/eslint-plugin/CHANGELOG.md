@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 17.8.0 (2024-02-09)
+
+## 17.7.0 (2024-01-24)
+
+## 17.6.0 (2024-01-10)
+
+## 17.5.0 (2023-12-13)
+
+## 17.4.0 (2023-11-29)
+
+## 17.3.0 (2023-11-16)
+
+## 17.2.0 (2023-11-02)
+
+## 17.1.0 (2023-10-18)
+
+## 17.0.0 (2023-10-05)
+
 ### Breaking Changes
 
 -   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).

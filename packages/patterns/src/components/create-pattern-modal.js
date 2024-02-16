@@ -9,38 +9,55 @@ import {
 	__experimentalVStack as VStack,
 	ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
-
-/**
- * Internal dependencies
- */
 import { store as patternsStore } from '../store';
-import CategorySelector, { CATEGORY_SLUG } from './category-selector';
+import CategorySelector from './category-selector';
+import { useAddPatternCategory } from '../private-hooks';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
-	onSuccess,
-	onError,
+	className = 'patterns-menu-items__convert-modal',
+	modalTitle = __( 'Create pattern' ),
+	...restProps
+} ) {
+	return (
+		<Modal
+			title={ modalTitle }
+			onRequestClose={ restProps.onClose }
+			overlayClassName={ className }
+		>
+			<CreatePatternModalContents { ...restProps } />
+		</Modal>
+	);
+}
+
+export function CreatePatternModalContents( {
+	confirmLabel = __( 'Create' ),
+	defaultCategories = [],
 	content,
 	onClose,
-	className = 'patterns-menu-items__convert-modal',
+	onError,
+	onSuccess,
+	defaultSyncType = PATTERN_SYNC_TYPES.full,
+	defaultTitle = '',
 } ) {
-	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
-	const [ categoryTerms, setCategoryTerms ] = useState( [] );
-	const [ title, setTitle ] = useState( '' );
+	const [ syncType, setSyncType ] = useState( defaultSyncType );
+	const [ categoryTerms, setCategoryTerms ] = useState( defaultCategories );
+	const [ title, setTitle ] = useState( defaultTitle );
+
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 
 	async function onCreate( patternTitle, sync ) {
 		if ( ! title || isSaving ) {
@@ -68,9 +85,9 @@ export default function CreatePatternModal( {
 		} catch ( error ) {
 			createErrorNotice( error.message, {
 				type: 'snackbar',
-				id: 'convert-to-pattern-error',
+				id: 'pattern-create',
 			} );
-			onError();
+			onError?.();
 		} finally {
 			setIsSaving( false );
 			setCategoryTerms( [] );
@@ -78,93 +95,68 @@ export default function CreatePatternModal( {
 		}
 	}
 
-	/**
-	 * @param {string} term
-	 * @return {Promise<number>} The pattern category id.
-	 */
-	async function findOrCreateTerm( term ) {
-		try {
-			const newTerm = await saveEntityRecord(
-				'taxonomy',
-				CATEGORY_SLUG,
-				{ name: term },
-				{ throwOnError: true }
-			);
-			invalidateResolution( 'getUserPatternCategories' );
-			return newTerm.id;
-		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
-				throw error;
-			}
-
-			return error.data.term_id;
-		}
-	}
-
 	return (
-		<Modal
-			title={ __( 'Create pattern' ) }
-			onRequestClose={ () => {
-				onClose();
-				setTitle( '' );
+		<form
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onCreate( title, syncType );
 			} }
-			overlayClassName={ className }
 		>
-			<form
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					onCreate( title, syncType );
-				} }
-			>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						placeholder={ __( 'My pattern' ) }
-						className="patterns-create-modal__name-input"
-					/>
-					<CategorySelector
-						values={ categoryTerms }
-						onChange={ setCategoryTerms }
-					/>
-					<ToggleControl
-						label={ __( 'Synced' ) }
-						help={ __(
-							'Editing the pattern will update it anywhere it is used.'
-						) }
-						checked={ syncType === PATTERN_SYNC_TYPES.full }
-						onChange={ () => {
-							setSyncType(
-								syncType === PATTERN_SYNC_TYPES.full
-									? PATTERN_SYNC_TYPES.unsynced
-									: PATTERN_SYNC_TYPES.full
-							);
+			<VStack spacing="5">
+				<TextControl
+					label={ __( 'Name' ) }
+					value={ title }
+					onChange={ setTitle }
+					placeholder={ __( 'My pattern' ) }
+					className="patterns-create-modal__name-input"
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+				<CategorySelector
+					categoryTerms={ categoryTerms }
+					onChange={ setCategoryTerms }
+					categoryMap={ categoryMap }
+				/>
+				<ToggleControl
+					label={ _x(
+						'Synced',
+						'Option that makes an individual pattern synchronized'
+					) }
+					help={ __(
+						'Sync this pattern across multiple locations.'
+					) }
+					checked={ syncType === PATTERN_SYNC_TYPES.full }
+					onChange={ () => {
+						setSyncType(
+							syncType === PATTERN_SYNC_TYPES.full
+								? PATTERN_SYNC_TYPES.unsynced
+								: PATTERN_SYNC_TYPES.full
+						);
+					} }
+				/>
+				<HStack justify="right">
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ () => {
+							onClose();
+							setTitle( '' );
 						} }
-					/>
-					<HStack justify="right">
-						<Button
-							variant="tertiary"
-							onClick={ () => {
-								onClose();
-								setTitle( '' );
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
+					>
+						{ __( 'Cancel' ) }
+					</Button>
 
-						<Button
-							variant="primary"
-							type="submit"
-							aria-disabled={ ! title || isSaving }
-							isBusy={ isSaving }
-						>
-							{ __( 'Create' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		</Modal>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						aria-disabled={ ! title || isSaving }
+						isBusy={ isSaving }
+					>
+						{ confirmLabel }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
 	);
 }

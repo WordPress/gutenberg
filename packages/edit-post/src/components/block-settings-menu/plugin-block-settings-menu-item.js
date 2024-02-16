@@ -45,7 +45,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * }
  *
  * function MyPluginBlockSettingsMenuItem() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginBlockSettingsMenuItem,
  * 		{
  * 			allowedBlocks: [ 'core/paragraph' ],
@@ -76,7 +76,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const PluginBlockSettingsMenuItem = ( {
 	allowedBlocks,

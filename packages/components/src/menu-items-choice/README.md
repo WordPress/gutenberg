@@ -4,13 +4,6 @@
 
 ![MenuItemsChoice Example](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice.png)
 
-1. MenuItemsChoice
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-
 ## Design guidelines
 
 A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so that the set of options are distinct from nearby `MenuItems`.
@@ -54,8 +47,8 @@ Designs with a `MenuItemsChoice` option selected by default make a strong sugges
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyMenuItemsChoice = () => {
 	const [ mode, setMode ] = useState( 'visual' );

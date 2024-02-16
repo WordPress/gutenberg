@@ -96,7 +96,6 @@ export default function PostTemplateEdit( {
 			// REST API or be handled by custom REST filters like `rest_{$this->post_type}_query`.
 			...restQueryArgs
 		} = {},
-		queryContext = [ { page: 1 } ],
 		templateSlug,
 		previewPostType,
 	},
@@ -104,18 +103,11 @@ export default function PostTemplateEdit( {
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
-
-	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-			const taxonomies = getTaxonomies( {
-				type: postType,
-				per_page: -1,
-				context: 'view',
-			} );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -126,12 +118,17 @@ export default function PostTemplateEdit( {
 					slug: templateSlug.replace( 'category-', '' ),
 				} );
 			const query = {
-				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
+				offset: offset || 0,
 				order,
 				orderby: orderBy,
 			};
 			// There is no need to build the taxQuery if we inherit.
 			if ( taxQuery && ! inherit ) {
+				const taxonomies = getTaxonomies( {
+					type: postType,
+					per_page: -1,
+					context: 'view',
+				} );
 				// We have to build the tax query for the REST API and use as
 				// keys the taxonomies `rest_base` with the `term ids` as values.
 				const builtTaxQuery = Object.entries( taxQuery ).reduce(
@@ -194,7 +191,6 @@ export default function PostTemplateEdit( {
 		},
 		[
 			perPage,
-			page,
 			offset,
 			order,
 			orderBy,

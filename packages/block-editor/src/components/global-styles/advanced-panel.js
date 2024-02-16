@@ -3,12 +3,11 @@
  */
 import {
 	TextareaControl,
-	Tooltip,
+	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,7 +29,7 @@ export default function AdvancedPanel( {
 		} );
 		if ( cssError ) {
 			const [ transformed ] = transformStyles(
-				[ { css: value } ],
+				[ { css: newValue } ],
 				'.editor-styles-wrapper'
 			);
 			if ( transformed ) {
@@ -58,6 +57,11 @@ export default function AdvancedPanel( {
 
 	return (
 		<VStack spacing={ 3 }>
+			{ cssError && (
+				<Notice status="error" onRemove={ () => setCSSError( null ) }>
+					{ cssError }
+				</Notice>
+			) }
 			<TextareaControl
 				label={ __( 'Additional CSS' ) }
 				__nextHasNoMarginBottom
@@ -67,16 +71,6 @@ export default function AdvancedPanel( {
 				className="block-editor-global-styles-advanced-panel__custom-css-input"
 				spellCheck={ false }
 			/>
-			{ cssError && (
-				<Tooltip text={ cssError }>
-					<div className="block-editor-global-styles-advanced-panel__custom-css-validation-wrapper">
-						<Icon
-							icon={ info }
-							className="block-editor-global-styles-advanced-panel__custom-css-validation-icon"
-						/>
-					</div>
-				</Tooltip>
-			) }
 		</VStack>
 	);
 }

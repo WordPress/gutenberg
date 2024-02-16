@@ -2,7 +2,6 @@
  * External dependencies
  */
 const path = require( 'path' );
-const { fileURLToPath } = require( 'url' );
 const { defineConfig, devices } = require( '@playwright/test' );
 
 process.env.WP_ARTIFACTS_PATH ??= path.join( process.cwd(), 'artifacts' );
@@ -24,9 +23,7 @@ const config = defineConfig( {
 	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
 	snapshotPathTemplate:
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
-	globalSetup: fileURLToPath(
-		new URL( './playwright/global-setup.js', 'file:' + __filename ).href
-	),
+	globalSetup: require.resolve( './playwright/global-setup.js' ),
 	use: {
 		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
 		headless: true,

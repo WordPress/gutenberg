@@ -29,7 +29,7 @@ export function mediaPosition( { x, y } = DEFAULT_FOCAL_POINT ) {
 }
 
 export function dimRatioToClass( ratio ) {
-	return ratio === 50 || ! ratio === undefined
+	return ratio === 50 || ratio === undefined
 		? null
 		: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
 }

@@ -33,6 +33,7 @@ const stories = [
 	'../packages/components/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {
@@ -51,6 +52,7 @@ module.exports = {
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
 		'storybook-source-link',
+		'@geometricpanda/storybook-addon-badges',
 	],
 	framework: {
 		name: '@storybook/react-webpack5',

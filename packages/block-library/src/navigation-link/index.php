@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/navigation-link` block.
+ * Server-side registering and rendering of the `core/navigation-link` block.
  *
  * @package WordPress
  */
@@ -132,6 +132,10 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 	$query_params   = wp_parse_args( $query );
 
 	foreach ( $query_params as $query_param ) {
+		$can_query_param_be_encoded = is_string( $query_param ) && ! empty( $query_param );
+		if ( ! $can_query_param_be_encoded ) {
+			continue;
+		}
 		if ( rawurldecode( $query_param ) !== $query_param ) {
 			$is_url_encoded = true;
 			break;
@@ -323,19 +327,40 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 }
 
 /**
- * Register the navigation link block.
+ * Filters the registered variations for a block type.
+ * Returns the dynamically built variations for all post-types and taxonomies.
  *
- * @uses render_block_core_navigation()
- * @throws WP_Error An WP_Error exception parsing the block definition.
+ * @since 6.5.0
+ *
+ * @param array         $variations Array of registered variations for a block type.
+ * @param WP_Block_Type $block_type The full block type object.
  */
-function register_block_core_navigation_link() {
+function block_core_navigation_link_filter_variations( $variations, $block_type ) {
+	if ( 'core/navigation-link' !== $block_type->name ) {
+		return $variations;
+	}
+
+	$generated_variations = block_core_navigation_link_build_variations();
+	return array_merge( $variations, $generated_variations );
+}
+
+/**
+ * Returns an array of variations for the navigation link block.
+ *
+ * @since 6.5.0
+ *
+ * @return array
+ */
+function block_core_navigation_link_build_variations() {
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
 
-	// Use two separate arrays as a way to order the variations in the UI.
-	// Known variations (like Post Link and Page Link) are added to the
-	// `built_ins` array. Variations for custom post types and taxonomies are
-	// added to the `variations` array and will always appear after `built-ins.
+	/*
+	 * Use two separate arrays as a way to order the variations in the UI.
+	 * Known variations (like Post Link and Page Link) are added to the
+	 * `built_ins` array. Variations for custom post types and taxonomies are
+	 * added to the `variations` array and will always appear after `built-ins.
+	 */
 	$built_ins  = array();
 	$variations = array();
 
@@ -360,12 +385,27 @@ function register_block_core_navigation_link() {
 		}
 	}
 
+	return array_merge( $built_ins, $variations );
+}
+
+/**
+ * Registers the navigation link block.
+ *
+ * @uses render_block_core_navigation_link()
+ * @uses build_navigation_link_block_variations()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
+ */
+function register_block_core_navigation_link() {
 	register_block_type_from_metadata(
 		__DIR__ . '/navigation-link',
 		array(
 			'render_callback' => 'render_block_core_navigation_link',
-			'variations'      => array_merge( $built_ins, $variations ),
 		)
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
+/**
+ * Creates all variations for post types / taxonomies dynamically (= each time when variations are requested).
+ * Do not use variation_callback, to also account for unregistering post types/taxonomies later on.
+ */
+add_action( 'get_block_type_variations', 'block_core_navigation_link_filter_variations', 10, 2 );

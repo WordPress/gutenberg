@@ -108,21 +108,24 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Patterns': 'Patterns',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
+	'[Feature] Interactivity API': 'Interactivity API',
 	'[Feature] Drag and Drop': 'Block Editor',
 	'[Feature] Block Multi Selection': 'Block Editor',
 	'[Feature] Link Editing': 'Block Editor',
 	'[Feature] Raw Handling': 'Block Editor',
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
-	'[Package] Block Editor': 'Block Editor',
+	'[Package] Block editor': 'Block Editor',
 	'[Package] Block library': 'Block Library',
 	'[Package] Editor': 'Post Editor',
+	'[Package] Edit Site': 'Site Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
 	'[Package] Components': 'Components',
 	'[Package] Block Library': 'Block Library',
 	'[Package] Rich text': 'Block Editor',
 	'[Package] Data': 'Data Layer',
+	'[Package] Commands': 'Commands',
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
@@ -220,9 +223,18 @@ function getTypesByLabels( labels ) {
 		...new Set(
 			labels
 				.filter( ( label ) =>
-					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+					Object.keys( LABEL_TYPE_MAPPING )
+						.map( ( currentLabel ) => currentLabel.toLowerCase() )
+						.includes( label.toLowerCase() )
 				)
-				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+				.map( ( label ) => {
+					const lowerCaseLabel =
+						Object.keys( LABEL_TYPE_MAPPING ).find(
+							( key ) => key.toLowerCase() === label.toLowerCase()
+						) || label;
+
+					return LABEL_TYPE_MAPPING[ lowerCaseLabel ];
+				} )
 		),
 	];
 }
@@ -236,11 +248,24 @@ function getTypesByLabels( labels ) {
  * @return {string[]} Feature candidates.
  */
 function mapLabelsToFeatures( labels ) {
-	return labels
-		.filter( ( label ) =>
-			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
-		)
-		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_FEATURE_MAPPING )
+						.map( ( currentLabel ) => currentLabel.toLowerCase() )
+						.includes( label.toLowerCase() )
+				)
+				.map( ( label ) => {
+					const lowerCaseLabel =
+						Object.keys( LABEL_FEATURE_MAPPING ).find(
+							( key ) => key.toLowerCase() === label.toLowerCase()
+						) || label;
+
+					return LABEL_FEATURE_MAPPING[ lowerCaseLabel ];
+				} )
+		),
+	];
 }
 
 /**
@@ -1070,4 +1095,5 @@ async function getReleaseChangelog( options ) {
 	getChangelog,
 	getUniqueByUsername,
 	skipCreatedByBots,
+	mapLabelsToFeatures,
 };

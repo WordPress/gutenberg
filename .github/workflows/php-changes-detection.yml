@@ -10,14 +10,14 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         steps:
             - name: Check out code
-              uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   fetch-depth: 0
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Get changed PHP files
               id: changed-files-php
-              uses: tj-actions/changed-files@8238a4103220c636f2dad328ead8a7c8dbe316a3 # v39.2.0
+              uses: tj-actions/changed-files@90a06d6ba9543371ab4df8eeca0be07ca6054959 # v42.0.2
               with:
                   files: |
                       *.{php}
@@ -38,7 +38,7 @@ jobs:
                   echo "formatted_change_list=$formatted_change_list" >> $GITHUB_OUTPUT
 
             - name: Find Comment
-              uses: peter-evans/find-comment@v2
+              uses: peter-evans/find-comment@v3
               id: find-comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
@@ -47,7 +47,7 @@ jobs:
 
             - name: Create comment
               if: steps.find-comment.outputs.comment-id == '' && steps.changed-files-php.outputs.any_changed == 'true'
-              uses: peter-evans/create-or-update-comment@v3
+              uses: peter-evans/create-or-update-comment@v4
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
@@ -67,7 +67,7 @@ jobs:
 
             - name: Update comment
               if: steps.find-comment.outputs.comment-id != '' && steps.changed-files-php.outputs.any_changed == 'true'
-              uses: peter-evans/create-or-update-comment@v3
+              uses: peter-evans/create-or-update-comment@v4
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
@@ -89,7 +89,7 @@ jobs:
 
             - name: Update comment
               if: steps.find-comment.outputs.comment-id != '' && steps.changed-files-php.outputs.any_changed != 'true'
-              uses: peter-evans/create-or-update-comment@v3
+              uses: peter-evans/create-or-update-comment@v4
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}

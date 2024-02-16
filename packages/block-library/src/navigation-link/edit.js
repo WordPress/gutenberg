@@ -27,7 +27,7 @@ import {
 	getColorClassName,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
@@ -44,6 +44,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
+
+const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -355,22 +357,12 @@ export default function NavigationLinkEdit( {
 		onKeyDown,
 	} );
 
-	const ALLOWED_BLOCKS = [
-		'core/navigation-link',
-		'core/navigation-submenu',
-		'core/page-list',
-	];
-	const DEFAULT_BLOCK = {
-		name: 'core/navigation-link',
-	};
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 			renderAppender: false,
@@ -432,7 +424,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
-						value={ url || '' }
+						value={ url ? safeDecodeURI( url ) : '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
 								{ url: urlValue },
@@ -571,7 +563,14 @@ export default function NavigationLinkEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								// If there is no link then remove the auto-inserted block.
+								// This avoids empty blocks which can provided a poor UX.
+								if ( ! url ) {
+									// Need to handle refocusing the Nav block or the inserter?
+									onReplace( [] );
+								}
+							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {

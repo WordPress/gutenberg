@@ -12,11 +12,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContainsThirdPartyBlocks } from '../utils';
-
-const disableEnhancedPaginationDescription = __(
-	'Plugin blocks are not supported yet. For the enhanced pagination to work, remove the plugin block, then re-enable "Enhanced pagination" in the Query Block settings.'
-);
+import { useUnsupportedBlocks } from '../utils';
 
 const modalDescriptionId =
 	'wp-block-query-enhanced-pagination-modal__description';
@@ -27,35 +23,55 @@ export default function EnhancedPaginationModal( {
 	setAttributes,
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
-
-	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
+	const { hasBlocksFromPlugins, hasPostContentBlock, hasUnsupportedBlocks } =
+		useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
-		setOpen( containsThirdPartyBlocks && enhancedPagination );
-	}, [ containsThirdPartyBlocks, enhancedPagination, setOpen ] );
+		if ( enhancedPagination && hasUnsupportedBlocks ) {
+			setAttributes( { enhancedPagination: false } );
+			setOpen( true );
+		}
+	}, [ enhancedPagination, hasUnsupportedBlocks, setAttributes ] );
+
+	const closeModal = () => {
+		setOpen( false );
+	};
+
+	let notice = __(
+		'If you still want to prevent full page reloads, remove that block, then disable "Force page reload" again in the Query Block settings.'
+	);
+	if ( hasBlocksFromPlugins ) {
+		notice =
+			__(
+				'Currently, avoiding full page reloads is not possible when blocks from plugins are present inside the Query block.'
+			) +
+			' ' +
+			notice;
+	} else if ( hasPostContentBlock ) {
+		notice =
+			__(
+				'Currently, avoiding full page reloads is not possible when a Content block is present inside the Query block.'
+			) +
+			' ' +
+			notice;
+	}
 
 	return (
 		isOpen && (
 			<Modal
-				title={ __( 'Enhanced pagination will be disabled' ) }
+				title={ __( 'Query block: Force page reload enabled' ) }
 				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
 				} }
+				role="alertdialog"
+				focusOnMount="firstElement"
 				isDismissible={ false }
-				shouldCloseOnEsc={ false }
-				shouldCloseOnClickOutside={ false }
+				onRequestClose={ closeModal }
 			>
 				<VStack alignment="right" spacing={ 5 }>
-					<span id={ modalDescriptionId }>
-						{ disableEnhancedPaginationDescription }
-					</span>
-					<Button
-						variant="primary"
-						onClick={ () => {
-							setAttributes( { enhancedPagination: false } );
-						} }
-					>
+					<span id={ modalDescriptionId }>{ notice }</span>
+					<Button variant="primary" onClick={ closeModal }>
 						{ __( 'OK' ) }
 					</Button>
 				</VStack>

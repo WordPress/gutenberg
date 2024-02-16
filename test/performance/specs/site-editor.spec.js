@@ -27,6 +27,8 @@ const results = {
 	inserterHover: [],
 	inserterSearch: [],
 	listViewOpen: [],
+	navigate: [],
+	loadPatterns: [],
 };
 
 test.describe( 'Site Editor Performance', () => {
@@ -57,19 +59,13 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 
 	test.describe( 'Loading', () => {
-		let draftURL = null;
+		let draftId = null;
 
-		test( 'Setup the test page', async ( { page, admin, perfUtils } ) => {
+		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost( { postType: 'page' } );
 			await perfUtils.loadBlocksForLargePost();
-			await perfUtils.saveDraft();
 
-			await admin.visitSiteEditor( {
-				postId: new URL( page.url() ).searchParams.get( 'post' ),
-				postType: 'page',
-			} );
-
-			draftURL = page.url();
+			draftId = await perfUtils.saveDraft();
 		} );
 
 		const samples = 10;
@@ -77,18 +73,19 @@ test.describe( 'Site Editor Performance', () => {
 		const iterations = samples + throwaway;
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
-				page,
+				admin,
 				perfUtils,
 				metrics,
 			} ) => {
 				// Go to the test draft.
-				await page.goto( draftURL );
-				const canvas = await perfUtils.getCanvas();
+				await admin.visitSiteEditor( {
+					postId: draftId,
+					postType: 'page',
+				} );
 
 				// Wait for the first block.
-				await canvas.locator( '.wp-block' ).first().waitFor( {
-					timeout: 120_000,
-				} );
+				const canvas = await perfUtils.getCanvas();
+				await canvas.locator( '.wp-block' ).first().waitFor();
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
@@ -108,45 +105,27 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 		}
 	} );
-	test.describe( 'Typing', () => {
-		let draftURL = null;
 
-		test( 'Setup the test post', async ( {
-			page,
-			admin,
-			editor,
-			perfUtils,
-		} ) => {
+	test.describe( 'Typing', () => {
+		let draftId = null;
+
+		test( 'Setup the test post', async ( { admin, editor, perfUtils } ) => {
 			await admin.createNewPost( { postType: 'page' } );
 			await perfUtils.loadBlocksForLargePost();
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await perfUtils.saveDraft();
 
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			// Go to the test draft.
 			await admin.visitSiteEditor( {
-				postId: new URL( page.url() ).searchParams.get( 'post' ),
+				postId: draftId,
 				postType: 'page',
 			} );
 
-			draftURL = page.url();
-		} );
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
-			await page.goto( draftURL );
-			await perfUtils.disableAutosave();
-
-			// Wait for the loader overlay to disappear. This is necessary
-			// because the overlay is still visible for a while after the editor
-			// canvas is ready, and we don't want it to affect the typing
-			// timings.
-			await page
-				.locator(
-					// Spinner was used instead of the progress bar in an earlier version of the site editor.
-					'.edit-site-canvas-loader, .edit-site-canvas-spinner'
-				)
-				.waitFor( { state: 'hidden', timeout: 120_000 } );
-
-			const canvas = await perfUtils.getCanvas();
-
 			// Enter edit mode (second click is needed for the legacy edit mode).
+			const canvas = await perfUtils.getCanvas();
 			await canvas.locator( 'body' ).click();
 			await canvas
 				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
@@ -186,6 +165,122 @@ test.describe( 'Site Editor Performance', () => {
 				results.type.push(
 					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 				);
+			}
+		} );
+	} );
+
+	test.describe( 'Navigating', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentythree' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		const iterations = 5;
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
+				admin,
+				page,
+				metrics,
+			} ) => {
+				await admin.visitSiteEditor( {
+					path: '/wp_template',
+				} );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				await page
+					.getByRole( 'button', { name: 'Single Posts' } )
+					.click();
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
+
+				// Save the results.
+				results.navigate.push( mouseClickEvents[ 0 ] );
+			} );
+		}
+	} );
+
+	test.describe( 'Loading Patterns', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test( 'Run the test', async ( { page, admin, perfUtils, editor } ) => {
+			const samples = 10;
+			for ( let i = 1; i <= samples; i++ ) {
+				// We want to start from a fresh state each time, without
+				// queries or patterns already cached.
+				await admin.visitSiteEditor( {
+					postId: 'twentytwentyfour//home',
+					postType: 'wp_template',
+					canvas: 'edit',
+				} );
+				await editor.openDocumentSettingsSidebar();
+				await page
+					.getByRole( 'button', {
+						name: 'Actions',
+					} )
+					.click();
+
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				const startTime = performance.now();
+
+				await page
+					.getByRole( 'menuitem', { name: 'Replace template' } )
+					.click();
+
+				const patterns = [
+					'Blogging home template',
+					'Business home template',
+					'Portfolio home template with post featured images',
+					'Blogging index template',
+				];
+
+				await Promise.all(
+					patterns.map( async ( pattern ) => {
+						const canvas = await perfUtils.getCanvas(
+							page
+								.getByRole( 'option', {
+									name: pattern,
+									exact: true,
+								} )
+								.getByTitle( 'Editor canvas' )
+						);
+
+						// Wait until the first block is rendered AND all
+						// patterns are replaced.
+						await Promise.all( [
+							canvas.locator( '.wp-block' ).first().waitFor(),
+							page.waitForFunction(
+								() =>
+									document.querySelectorAll(
+										'[data-type="core/pattern"]'
+									).length === 0
+							),
+						] );
+					} )
+				);
+
+				const endTime = performance.now();
+
+				results.loadPatterns.push( endTime - startTime );
+
+				await page.keyboard.press( 'Escape' );
 			}
 		} );
 	} );

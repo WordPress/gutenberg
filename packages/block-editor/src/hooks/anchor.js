@@ -5,7 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -52,87 +51,82 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning the anchor ID, if block supports anchor.
- *
- * @param {WPComponent} BlockEdit Original component.
- *
- * @return {WPComponent} Wrapped component.
- */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
-			const blockEditingMode = useBlockEditingMode();
+function BlockEditAnchorControlPure( {
+	name: blockName,
+	anchor,
+	setAttributes,
+} ) {
+	const blockEditingMode = useBlockEditingMode();
 
-			if ( hasAnchor && props.isSelected ) {
-				const isWeb = Platform.OS === 'web';
-				const textControl = (
-					<TextControl
-						__nextHasNoMarginBottom
-						className="html-anchor-control"
-						label={ __( 'HTML anchor' ) }
-						help={
-							<>
-								{ __(
-									'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
-								) }
+	const isWeb = Platform.OS === 'web';
+	const textControl = (
+		<TextControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			className="html-anchor-control"
+			label={ __( 'HTML anchor' ) }
+			help={
+				<>
+					{ __(
+						'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+					) }
 
-								{ isWeb && (
-									<ExternalLink
-										href={ __(
-											'https://wordpress.org/documentation/article/page-jumps/'
-										) }
-									>
-										{ __( 'Learn more about anchors' ) }
-									</ExternalLink>
-								) }
-							</>
-						}
-						value={ props.attributes.anchor || '' }
-						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
-						onChange={ ( nextValue ) => {
-							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-							props.setAttributes( {
-								anchor: nextValue,
-							} );
-						} }
-						autoCapitalize="none"
-						autoComplete="off"
-					/>
-				);
-
-				return (
-					<>
-						<BlockEdit { ...props } />
-						{ isWeb && blockEditingMode === 'default' && (
-							<InspectorControls group="advanced">
-								{ textControl }
-							</InspectorControls>
-						) }
-						{ /*
-						 * We plan to remove scoping anchors to 'core/heading' to support
-						 * anchors for all eligble blocks. Additionally we plan to explore
-						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
-						 */ }
-						{ ! isWeb && props.name === 'core/heading' && (
-							<InspectorControls>
-								<PanelBody title={ __( 'Heading settings' ) }>
-									{ textControl }
-								</PanelBody>
-							</InspectorControls>
-						) }
-					</>
-				);
+					{ isWeb && (
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/documentation/article/page-jumps/'
+							) }
+						>
+							{ __( 'Learn more about anchors' ) }
+						</ExternalLink>
+					) }
+				</>
 			}
+			value={ anchor || '' }
+			placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
+			onChange={ ( nextValue ) => {
+				nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+				setAttributes( {
+					anchor: nextValue,
+				} );
+			} }
+			autoCapitalize="none"
+			autoComplete="off"
+		/>
+	);
 
-			return <BlockEdit { ...props } />;
-		};
+	return (
+		<>
+			{ isWeb && blockEditingMode === 'default' && (
+				<InspectorControls group="advanced">
+					{ textControl }
+				</InspectorControls>
+			) }
+			{ /*
+			 * We plan to remove scoping anchors to 'core/heading' to support
+			 * anchors for all eligble blocks. Additionally we plan to explore
+			 * leveraging InspectorAdvancedControls instead of a custom
+			 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
+			 */ }
+			{ ! isWeb && blockName === 'core/heading' && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Heading settings' ) }>
+						{ textControl }
+					</PanelBody>
+				</InspectorControls>
+			) }
+		</>
+	);
+}
+
+export default {
+	addSaveProps,
+	edit: BlockEditAnchorControlPure,
+	attributeKeys: [ 'anchor' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'anchor' );
 	},
-	'withInspectorControl'
-);
+};
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -154,13 +148,3 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/anchor/with-inspector-control',
-	withInspectorControl
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/anchor/save-props',
-	addSaveProps
-);

@@ -80,7 +80,7 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
  *
  * @param {Object} props Component props.
  *
- * @return {WPElement} Font appearance control.
+ * @return {Element} Font appearance control.
  */
 export default function FontAppearanceControl( props ) {
 	const {
@@ -215,7 +215,6 @@ export default function FontAppearanceControl( props ) {
 				onChange={ ( { selectedItem } ) =>
 					onChange( selectedItem.style )
 				}
-				__nextUnconstrainedWidth
 			/>
 		)
 	);

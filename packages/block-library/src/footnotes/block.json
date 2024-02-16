@@ -33,6 +33,7 @@
 		"html": false,
 		"multiple": false,
 		"reusable": false,
+		"inserter": false,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -54,6 +55,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-footnotes"

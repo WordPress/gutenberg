@@ -9,6 +9,7 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { undoIgnoreBlocks } from '../../store/undo-ignore';
 
 const noop = () => {};
 
@@ -76,18 +77,11 @@ export default function useBlockSync( {
 		resetBlocks,
 		resetSelection,
 		replaceInnerBlocks,
-		selectBlock,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const {
-		hasSelectedBlock,
-		getBlockName,
-		getBlocks,
-		getSelectionStart,
-		getSelectionEnd,
-		getBlock,
-	} = registry.select( blockEditorStore );
+	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
+		registry.select( blockEditorStore );
 	const isControlled = useSelect(
 		( select ) => {
 			return (
@@ -180,9 +174,6 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
-			const hadSelecton = hasSelectedBlock();
-			const selectionAnchor = getSelectionStart();
-			const selectionFocus = getSelectionEnd();
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
@@ -191,15 +182,6 @@ export default function useBlockSync( {
 					controlledSelection.selectionEnd,
 					controlledSelection.initialPosition
 				);
-			} else {
-				const selectionStillExists = getBlock(
-					selectionAnchor.clientId
-				);
-				if ( hadSelecton && ! selectionStillExists ) {
-					selectBlock( clientId );
-				} else {
-					resetSelection( selectionAnchor, selectionFocus );
-				}
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
@@ -283,6 +265,10 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
+				const undoIgnore = undoIgnoreBlocks.has( blocks );
+				if ( undoIgnore ) {
+					undoIgnoreBlocks.delete( blocks );
+				}
 				updateParent( blocks, {
 					selection: {
 						selectionStart: getSelectionStart(),
@@ -290,6 +276,7 @@ export default function useBlockSync( {
 						initialPosition:
 							getSelectedBlocksInitialCaretPosition(),
 					},
+					undoIgnore,
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;

@@ -80,7 +80,13 @@ const MEDIA_OPTIONS = [
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
-		<BlockEdit isSelected name={ cover.name } clientId={ 0 } { ...props } />
+		<BlockEdit
+			isSelected
+			mayDisplayControls
+			name={ cover.name }
+			clientId={ 0 }
+			{ ...props }
+		/>
 		<BottomSheetSettings isVisible />
 	</SlotFillProvider>
 );

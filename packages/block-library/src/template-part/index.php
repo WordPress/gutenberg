@@ -18,13 +18,10 @@ function render_block_core_template_part( $attributes ) {
 	$template_part_id = null;
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+	$theme            = isset( $attributes['theme'] ) ? $attributes['theme'] : get_stylesheet();
 
-	if (
-		isset( $attributes['slug'] ) &&
-		isset( $attributes['theme'] ) &&
-		get_stylesheet() === $attributes['theme']
-	) {
-		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
+	if ( isset( $attributes['slug'] ) && get_stylesheet() === $theme ) {
+		$template_part_id    = $theme . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'           => 'wp_template_part',
@@ -34,7 +31,7 @@ function render_block_core_template_part( $attributes ) {
 					array(
 						'taxonomy' => 'wp_theme',
 						'field'    => 'name',
-						'terms'    => $attributes['theme'],
+						'terms'    => $theme,
 					),
 				),
 				'posts_per_page'      => 1,
@@ -46,10 +43,10 @@ function render_block_core_template_part( $attributes ) {
 		if ( $template_part_post ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
-			$content    = $template_part_post->post_content;
-			$area_terms = get_the_terms( $template_part_post, 'wp_template_part_area' );
-			if ( ! is_wp_error( $area_terms ) && false !== $area_terms ) {
-				$area = $area_terms[0]->name;
+			$block_template = _build_block_template_result_from_post( $template_part_post );
+			$content        = $block_template->content;
+			if ( isset( $block_template->area ) ) {
+				$area = $block_template->area;
 			}
 			/**
 			 * Fires when a block template part is loaded from a template post stored in the database.
@@ -72,6 +69,12 @@ function render_block_core_template_part( $attributes ) {
 				$content = $block_template->content;
 				if ( isset( $block_template->area ) ) {
 					$area = $block_template->area;
+				}
+
+				// Needed for the `render_block_core_template_part_file` and `render_block_core_template_part_none` actions below.
+				$block_template_file = _get_block_template_file( 'wp_template_part', $attributes['slug'] );
+				if ( $block_template_file ) {
+					$template_part_file_path = $block_template_file['path'];
 				}
 			}
 
@@ -106,16 +109,16 @@ function render_block_core_template_part( $attributes ) {
 	// is set in `wp_debug_mode()`.
 	$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
 
-	if ( is_null( $content ) && $is_debug ) {
-		if ( ! isset( $attributes['slug'] ) ) {
-			// If there is no slug this is a placeholder and we dont want to return any message.
-			return;
+	if ( is_null( $content ) ) {
+		if ( $is_debug && isset( $attributes['slug'] ) ) {
+			return sprintf(
+				/* translators: %s: Template part slug. */
+				__( 'Template part has been deleted or is unavailable: %s' ),
+				$attributes['slug']
+			);
 		}
-		return sprintf(
-			/* translators: %s: Template part slug. */
-			__( 'Template part has been deleted or is unavailable: %s' ),
-			$attributes['slug']
-		);
+
+		return '';
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
@@ -278,8 +281,8 @@ function register_block_core_template_part() {
 	register_block_type_from_metadata(
 		__DIR__ . '/template-part',
 		array(
-			'render_callback' => 'render_block_core_template_part',
-			'variations'      => build_template_part_block_variations(),
+			'render_callback'    => 'render_block_core_template_part',
+			'variation_callback' => 'build_template_part_block_variations',
 		)
 	);
 }

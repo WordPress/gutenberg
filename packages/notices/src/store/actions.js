@@ -81,7 +81,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text
-	// strings. To avoid setting expectation that e.g. a WPElement could be
+	// strings. To avoid setting expectation that e.g. a React Element could be
 	// supported, cast to a string.
 	content = String( content );
 
@@ -330,7 +330,7 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
  * 	const notices = useSelect( ( select ) =>
  * 		select( noticesStore ).getNotices()
  * 	);
- * 	const { removeNotices } = useDispatch( noticesStore );
+ * 	const { removeAllNotices } = useDispatch( noticesStore );
  * 	return (
  * 		<>
  * 			<ul>

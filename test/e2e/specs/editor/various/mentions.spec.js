@@ -23,7 +23,9 @@ test.describe( 'autocomplete mentions', () => {
 	} );
 
 	test( 'should insert mention', async ( { page, editor } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'I am @ad' );
 		await expect(
 			page.locator( 'role=listbox >> role=option[name=/admin/i]' )
@@ -42,7 +44,9 @@ test.describe( 'autocomplete mentions', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Stuck in the middle with you' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 'you'.length } );
 		await page.keyboard.type( '@j' );
@@ -62,7 +66,9 @@ test.describe( 'autocomplete mentions', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'I am @j' );
 		await expect(
 			page.locator( 'role=listbox >> role=option[name=/testuser/i]' )

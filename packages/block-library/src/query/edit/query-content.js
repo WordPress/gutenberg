@@ -112,13 +112,15 @@ export default function QueryContent( {
 				setAttributes={ setAttributes }
 				clientId={ clientId }
 			/>
-			<QueryInspectorControls
-				attributes={ attributes }
-				setQuery={ updateQuery }
-				setDisplayLayout={ updateDisplayLayout }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
+			<InspectorControls>
+				<QueryInspectorControls
+					attributes={ attributes }
+					setQuery={ updateQuery }
+					setDisplayLayout={ updateDisplayLayout }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</InspectorControls>
 			<BlockControls>
 				<QueryToolbar
 					name={ name }
@@ -131,6 +133,7 @@ export default function QueryContent( {
 			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },

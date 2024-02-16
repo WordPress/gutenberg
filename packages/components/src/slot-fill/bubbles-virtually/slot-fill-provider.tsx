@@ -66,7 +66,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		const slotFills = fills.get( name );
 		if ( slotFills ) {
 			// Force update fills.
-			slotFills.map( ( fill ) => fill.current.rerender() );
+			slotFills.forEach( ( fill ) => fill.current.rerender() );
 		}
 	};
 

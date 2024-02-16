@@ -17,7 +17,7 @@ const { Provider } = context;
  *
  * @param {Object} props Props to pass to `div`.
  *
- * @return {import('@wordpress/element').WPElement} Component.
+ * @return {Element} Component.
  */
 export function ShortcutProvider( props ) {
 	const [ keyboardShortcuts ] = useState( () => new Set() );

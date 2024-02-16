@@ -12,7 +12,7 @@ Examples of **incorrect** code for this rule:
 
 ```js
 import { camelCase } from 'change-case';
-import { Component } from '@wordpress/element';
+import { Component } from 'react';
 import edit from './edit';
 ```
 
@@ -27,7 +27,7 @@ import { camelCase } from 'change-case';
 /*
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component } from 'react';
 
 /*
  * Internal dependencies

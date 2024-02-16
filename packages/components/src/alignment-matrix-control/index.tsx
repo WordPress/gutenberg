@@ -8,32 +8,17 @@ import classnames from 'classnames';
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Cell from './cell';
-import { Composite, CompositeGroup, useCompositeState } from '../composite';
+import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
-import { GRID, getItemId } from './utils';
+import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
-import type {
-	AlignmentMatrixControlProps,
-	AlignmentMatrixControlValue,
-} from './types';
-
-const noop = () => {};
-
-function useBaseId( id?: string ) {
-	const instanceId = useInstanceId(
-		AlignmentMatrixControl,
-		'alignment-matrix-control'
-	);
-
-	return id || instanceId;
-}
+import type { AlignmentMatrixControlProps } from './types';
 
 /**
  *
@@ -61,31 +46,27 @@ export function AlignmentMatrixControl( {
 	label = __( 'Alignment Matrix Control' ),
 	defaultValue = 'center center',
 	value,
-	onChange = noop,
+	onChange,
 	width = 92,
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
-	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
-	const baseId = useBaseId( id );
-	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
+	const baseId = useInstanceId(
+		AlignmentMatrixControl,
+		'alignment-matrix-control',
+		id
+	);
 
-	const composite = useCompositeState( {
-		baseId,
-		currentId: initialCurrentId,
+	const compositeStore = useCompositeStore( {
+		defaultActiveId: getItemId( baseId, defaultValue ),
+		activeId: getItemId( baseId, value ),
+		setActiveId: ( nextActiveId ) => {
+			const nextValue = getItemValue( baseId, nextActiveId );
+			if ( nextValue ) onChange?.( nextValue );
+		},
 		rtl: isRTL(),
 	} );
 
-	const handleOnChange = ( nextValue: AlignmentMatrixControlValue ) => {
-		onChange( nextValue );
-	};
-
-	const { setCurrentId } = composite;
-
-	useEffect( () => {
-		if ( typeof value !== 'undefined' ) {
-			setCurrentId( getItemId( baseId, value ) );
-		}
-	}, [ value, setCurrentId, baseId ] );
+	const activeId = compositeStore.useState( 'activeId' );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',
@@ -94,38 +75,34 @@ export function AlignmentMatrixControl( {
 
 	return (
 		<Composite
-			{ ...props }
-			{ ...composite }
-			aria-label={ label }
-			as={ Root }
-			className={ classes }
-			role="grid"
-			size={ width }
+			store={ compositeStore }
+			render={
+				<Root
+					{ ...props }
+					aria-label={ label }
+					className={ classes }
+					id={ baseId }
+					role="grid"
+					size={ width }
+				/>
+			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<CompositeGroup
-					{ ...composite }
-					as={ Row }
-					role="row"
-					key={ index }
-				>
+				<CompositeRow render={ <Row role="row" /> } key={ index }>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
-						const isActive = composite.currentId === cellId;
+						const isActive = cellId === activeId;
 
 						return (
 							<Cell
-								{ ...composite }
 								id={ cellId }
 								isActive={ isActive }
 								key={ cell }
 								value={ cell }
-								onFocus={ () => handleOnChange( cell ) }
-								tabIndex={ isActive ? 0 : -1 }
 							/>
 						);
 					} ) }
-				</CompositeGroup>
+				</CompositeRow>
 			) ) }
 		</Composite>
 	);

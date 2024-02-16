@@ -1,189 +1,436 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import {
-	VisuallyHidden,
-	__experimentalHeading as Heading,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
-import PageActions from '../page-actions';
-import { DataViews, PAGE_SIZE_VALUES } from '../dataviews';
+import { default as Link, useLink } from '../routes/link';
+import {
+	DEFAULT_VIEWS,
+	DEFAULT_CONFIG_PER_VIEW_TYPE,
+} from '../sidebar-dataviews/default-views';
+import {
+	ENUMERATION_TYPE,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	LAYOUT_LIST,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+} from '../../utils/constants';
+
+import {
+	trashPostAction,
+	usePermanentlyDeletePostAction,
+	useRestorePostAction,
+	postRevisionsAction,
+	viewPostAction,
+	useEditPostAction,
+} from '../actions';
+import AddNewPageModal from '../add-new-page';
+import Media from '../media';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
+const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
+	? [ LAYOUT_GRID, LAYOUT_TABLE, LAYOUT_LIST ]
+	: [ LAYOUT_GRID, LAYOUT_TABLE ];
+
+function useView( postType ) {
+	const { params } = useLocation();
+	const { activeView = 'all', isCustom = 'false', layout } = params;
+	const history = useHistory();
+	const selectedDefaultView = useMemo( () => {
+		const defaultView =
+			isCustom === 'false' &&
+			DEFAULT_VIEWS[ postType ].find(
+				( { slug } ) => slug === activeView
+			)?.view;
+		if ( isCustom === 'false' && layout ) {
+			return {
+				...defaultView,
+				type: layout,
+				layout: {
+					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
+				},
+			};
+		}
+		return defaultView;
+	}, [ isCustom, activeView, layout, postType ] );
+	const [ view, setView ] = useState( selectedDefaultView );
+
+	useEffect( () => {
+		if ( selectedDefaultView ) {
+			setView( selectedDefaultView );
+		}
+	}, [ selectedDefaultView ] );
+	const editedViewRecord = useSelect(
+		( select ) => {
+			if ( isCustom !== 'true' ) {
+				return;
+			}
+			const { getEditedEntityRecord } = select( coreStore );
+			const dataviewRecord = getEditedEntityRecord(
+				'postType',
+				'wp_dataviews',
+				Number( activeView )
+			);
+			return dataviewRecord;
+		},
+		[ activeView, isCustom ]
+	);
+	const { editEntityRecord } = useDispatch( coreStore );
+
+	const customView = useMemo( () => {
+		const storedView =
+			editedViewRecord?.content &&
+			JSON.parse( editedViewRecord?.content );
+		if ( ! storedView ) {
+			return storedView;
+		}
+
+		return {
+			...storedView,
+			layout: {
+				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
+			},
+		};
+	}, [ editedViewRecord?.content ] );
+
+	const setCustomView = useCallback(
+		( viewToSet ) => {
+			editEntityRecord(
+				'postType',
+				'wp_dataviews',
+				editedViewRecord?.id,
+				{
+					content: JSON.stringify( viewToSet ),
+				}
+			);
+		},
+		[ editEntityRecord, editedViewRecord?.id ]
+	);
+
+	const setDefaultViewAndUpdateUrl = useCallback(
+		( viewToSet ) => {
+			if ( viewToSet.type !== view?.type ) {
+				history.push( {
+					...params,
+					layout: viewToSet.type,
+				} );
+			}
+			setView( viewToSet );
+		},
+		[ params, view?.type, history ]
+	);
+
+	if ( isCustom === 'false' ) {
+		return [ view, setDefaultViewAndUpdateUrl ];
+	} else if ( isCustom === 'true' && customView ) {
+		return [ customView, setCustomView ];
+	}
+	// Loading state where no the view was not found on custom views or default views.
+	return [ DEFAULT_VIEWS[ postType ][ 0 ].view, setDefaultViewAndUpdateUrl ];
+}
+
+// See https://github.com/WordPress/gutenberg/issues/55886
+// We do not support custom statutes at the moment.
+const STATUSES = [
+	{ value: 'draft', label: __( 'Draft' ) },
+	{ value: 'future', label: __( 'Scheduled' ) },
+	{ value: 'pending', label: __( 'Pending Review' ) },
+	{ value: 'private', label: __( 'Private' ) },
+	{ value: 'publish', label: __( 'Published' ) },
+	{ value: 'trash', label: __( 'Trash' ) },
+];
+const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
+
+function FeaturedImage( { item, viewType } ) {
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+	const hasMedia = !! item.featured_media;
+	const size =
+		viewType === LAYOUT_GRID
+			? [ 'large', 'full', 'medium', 'thumbnail' ]
+			: [ 'thumbnail', 'medium', 'large', 'full' ];
+	const media = hasMedia ? (
+		<Media
+			className="edit-site-page-pages__featured-image"
+			id={ item.featured_media }
+			size={ size }
+		/>
+	) : null;
+	if ( viewType === LAYOUT_LIST ) {
+		return media;
+	}
+	return (
+		<button
+			className={ classNames( 'page-pages-preview-field__button', {
+				'edit-site-page-pages__media-wrapper':
+					viewType === LAYOUT_TABLE,
+			} ) }
+			type="button"
+			onClick={ onClick }
+			aria-label={ item.title?.rendered || __( '(no title)' ) }
+		>
+			{ media }
+		</button>
+	);
+}
 
 export default function PagePages() {
-	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
-	const [ globalFilter, setGlobalFilter ] = useState( '' );
-	const [ paginationInfo, setPaginationInfo ] = useState();
-	const [ { pageIndex, pageSize }, setPagination ] = useState( {
-		pageIndex: 0,
-		pageSize: PAGE_SIZE_VALUES[ 0 ],
-	} );
-	// Request post statuses to get the proper labels.
-	const [ postStatuses, setPostStatuses ] = useState( EMPTY_ARRAY );
-	useEffect( () => {
-		apiFetch( {
-			path: '/wp/v2/statuses',
-		} ).then( setPostStatuses );
-	}, [] );
+	const postType = 'page';
+	const [ view, setView ] = useView( postType );
+	const history = useHistory();
+	const { params } = useLocation();
+	const { isCustom = 'false' } = params;
 
-	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
-	const pagination = useMemo(
-		() => ( { pageIndex, pageSize } ),
-		[ pageIndex, pageSize ]
+	const onSelectionChange = useCallback(
+		( items ) => {
+			if ( isCustom === 'false' && view?.type === LAYOUT_LIST ) {
+				history.push( {
+					...params,
+					postId: items.length === 1 ? items[ 0 ].id : undefined,
+				} );
+			}
+		},
+		[ history, params, view?.type, isCustom ]
 	);
-	const [ sorting, setSorting ] = useState( [
-		{ order: 'desc', orderby: 'date' },
-	] );
-	const queryArgs = useMemo(
-		() => ( {
-			per_page: pageSize,
-			page: pageIndex + 1, // tanstack starts from zero.
-			_embed: 'author',
-			order: sorting[ 0 ]?.desc ? 'desc' : 'asc',
-			orderby: sorting[ 0 ]?.id,
-			search: globalFilter,
-			status: [ 'publish', 'draft' ],
-		} ),
-		[
-			globalFilter,
-			sorting[ 0 ]?.id,
-			sorting[ 0 ]?.desc,
-			pageSize,
-			pageIndex,
-			reset,
-		]
-	);
-	const { records, isResolving: isLoading } = useEntityRecords(
-		'postType',
-		'page',
-		queryArgs
-	);
-	useEffect( () => {
-		// Make extra request to handle controlled pagination.
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/pages', {
-				...queryArgs,
-				_fields: 'id',
-			} ),
-			method: 'HEAD',
-			parse: false,
-		} ).then( ( res ) => {
-			const totalPages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
-			const totalItems = parseInt( res.headers.get( 'X-WP-Total' ) );
-			setPaginationInfo( {
-				totalPages,
-				totalItems,
-			} );
+
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters.forEach( ( filter ) => {
+			if (
+				filter.field === 'status' &&
+				filter.operator === OPERATOR_IN
+			) {
+				filters.status = filter.value;
+			}
+			if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_IN
+			) {
+				filters.author = filter.value;
+			} else if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_NOT_IN
+			) {
+				filters.author_exclude = filter.value;
+			}
 		} );
-		// Status should not make extra request if already did..
-	}, [ globalFilter, pageSize, reset ] );
+		// We want to provide a different default item for the status filter
+		// than the REST API provides.
+		if ( ! filters.status || filters.status === '' ) {
+			filters.status = DEFAULT_STATUSES;
+		}
+
+		return {
+			per_page: view.perPage,
+			page: view.page,
+			_embed: 'author',
+			order: view.sort?.direction,
+			orderby: view.sort?.field,
+			search: view.search,
+			...filters,
+		};
+	}, [ view ] );
+	const {
+		records: pages,
+		isResolving: isLoadingPages,
+		totalItems,
+		totalPages,
+	} = useEntityRecords( 'postType', postType, queryArgs );
+
+	const { records: authors, isResolving: isLoadingAuthors } =
+		useEntityRecords( 'root', 'user' );
+
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems,
+			totalPages,
+		} ),
+		[ totalItems, totalPages ]
+	);
 
 	const fields = useMemo(
 		() => [
 			{
+				id: 'featured-image',
+				header: __( 'Featured Image' ),
+				getValue: ( { item } ) => item.featured_media,
+				render: ( { item } ) => (
+					<FeaturedImage item={ item } viewType={ view.type } />
+				),
+				enableSorting: false,
+				width: '1%',
+			},
+			{
 				header: __( 'Title' ),
 				id: 'title',
-				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				cell: ( props ) => {
-					const page = props.row.original;
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: page.id,
-										postType: page.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities( props.getValue() ) }
-								</Link>
-							</Heading>
-						</VStack>
+				getValue: ( { item } ) => item.title?.rendered,
+				render: ( { item } ) => {
+					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
+						view.type
+					) ? (
+						<Link
+							params={ {
+								postId: item.id,
+								postType: item.type,
+								canvas: 'edit',
+							} }
+						>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+						</Link>
+					) : (
+						decodeEntities( item.title?.rendered ) ||
+							__( '(no title)' )
 					);
 				},
-				maxWidth: 400,
-				sortingFn: 'alphanumeric',
+				maxWidth: 300,
 				enableHiding: false,
 			},
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
-				cell: ( props ) => {
-					const author = props.row.original._embedded?.author[ 0 ];
-					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ author.name }
-						</a>
-					);
-				},
+				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				type: ENUMERATION_TYPE,
+				elements:
+					authors?.map( ( { id, name } ) => ( {
+						value: id,
+						label: name,
+					} ) ) || [],
 			},
 			{
-				header: 'Status',
+				header: __( 'Status' ),
 				id: 'status',
-				cell: ( props ) =>
-					postStatuses[ props.row.original.status ]?.name,
+				getValue: ( { item } ) =>
+					STATUSES.find( ( { value } ) => value === item.status )
+						?.label ?? item.status,
+				type: ENUMERATION_TYPE,
+				elements: STATUSES,
+				enableSorting: false,
+				filterBy: {
+					operators: [ OPERATOR_IN ],
+				},
 			},
 			{
-				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-				id: 'actions',
-				cell: ( props ) => {
-					const page = props.row.original;
-					return (
-						<PageActions
-							postId={ page.id }
-							onRemove={ () => setResetQuery() }
-						/>
+				header: __( 'Date' ),
+				id: 'date',
+				getValue: ( { item } ) => item.date,
+				render: ( { item } ) => {
+					const formattedDate = dateI18n(
+						getSettings().formats.datetimeAbbreviated,
+						getDate( item.date )
 					);
+					return <time>{ formattedDate }</time>;
 				},
-				enableHiding: false,
 			},
 		],
-		[ postStatuses ]
+		[ authors, view.type ]
+	);
+
+	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
+	const restorePostAction = useRestorePostAction();
+	const editPostAction = useEditPostAction();
+	const actions = useMemo(
+		() => [
+			viewPostAction,
+			trashPostAction,
+			restorePostAction,
+			permanentlyDeletePostAction,
+			editPostAction,
+			postRevisionsAction,
+		],
+		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
+	);
+	const onChangeView = useCallback(
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
+					layout: {
+						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
+					},
+				};
+			}
+
+			setView( newView );
+		},
+		[ view.type, setView ]
+	);
+
+	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
+	const openModal = useCallback( () => {
+		if ( ! showAddPageModal ) {
+			setShowAddPageModal( true );
+		}
+	}, [ showAddPageModal ] );
+	const closeModal = useCallback( () => {
+		if ( showAddPageModal ) {
+			setShowAddPageModal( false );
+		}
+	}, [ showAddPageModal ] );
+	const handleNewPage = useCallback(
+		( { type, id } ) => {
+			history.push( {
+				postId: id,
+				postType: type,
+				canvas: 'edit',
+			} );
+			closeModal();
+		},
+		[ history ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
-		<Page title={ __( 'Pages' ) }>
+		<Page
+			title={ __( 'Pages' ) }
+			actions={
+				<>
+					<Button variant="primary" onClick={ openModal }>
+						{ __( 'Add new page' ) }
+					</Button>
+					{ showAddPageModal && (
+						<AddNewPageModal
+							onSave={ handleNewPage }
+							onClose={ closeModal }
+						/>
+					) }
+				</>
+			}
+		>
 			<DataViews
 				paginationInfo={ paginationInfo }
-				data={ records || EMPTY_ARRAY }
-				isLoading={ isLoading }
 				fields={ fields }
-				options={ {
-					manualSorting: true,
-					manualFiltering: true,
-					manualPagination: true,
-					enableRowSelection: true,
-					state: {
-						sorting,
-						globalFilter,
-						pagination,
-					},
-					pageCount: paginationInfo?.totalPages,
-					onSortingChange: setSorting,
-					onGlobalFilterChange: ( value ) => {
-						setGlobalFilter( value );
-						setPagination( { pageIndex: 0, pageSize } );
-					},
-					// TODO: check these callbacks and maybe reset the query when needed...
-					onPaginationChange: setPagination,
-					meta: { resetQuery: setResetQuery },
-				} }
+				actions={ actions }
+				data={ pages || EMPTY_ARRAY }
+				isLoading={ isLoadingPages || isLoadingAuthors }
+				view={ view }
+				onChangeView={ onChangeView }
+				onSelectionChange={ onSelectionChange }
+				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);

@@ -64,7 +64,6 @@ const {
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
-	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useGlobalStyle,
@@ -72,7 +71,6 @@ const {
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
-	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
@@ -109,12 +107,21 @@ function ScreenBlock( { name, variation } ) {
 		settings.spacing.blockGap = false;
 	}
 
+	// Only allow `aspectRatio` support if the block is not the grouping block.
+	// The grouping block allows the user to use Group, Row and Stack variations,
+	// and it is highly likely that the user will not want to set an aspect ratio
+	// for all three at once. Until there is the ability to set a different aspect
+	// ratio for each variation, we disable the aspect ratio controls for the
+	// grouping block in global styles.
+	if ( settings?.dimensions?.aspectRatio && name === 'core/group' ) {
+		settings.dimensions.aspectRatio = false;
+	}
+
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
@@ -132,8 +139,7 @@ function ScreenBlock( { name, variation } ) {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const currentBlockStyle = variation
@@ -270,27 +276,12 @@ function ScreenBlock( { name, variation } ) {
 					settings={ settings }
 				/>
 			) }
-			{ hasEffectsPanel && (
-				<StylesEffectsPanel
-					inheritedValue={ inheritedStyleWithLayout }
-					value={ styleWithLayout }
-					onChange={ setStyle }
-					settings={ settings }
-					includeLayoutControls
-				/>
-			) }
 			{ hasFiltersPanel && (
 				<StylesFiltersPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
 					onChange={ setStyle }
-					settings={ {
-						...settings,
-						color: {
-							...settings.color,
-							customDuotone: false, //TO FIX: Custom duotone only works on the block level right now
-						},
-					} }
+					settings={ settings }
 					includeLayoutControls
 				/>
 			) }

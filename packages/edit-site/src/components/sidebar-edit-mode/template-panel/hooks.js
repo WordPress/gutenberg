@@ -10,7 +10,10 @@ import { parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import { PATTERN_CORE_SOURCES, PATTERN_TYPES } from '../../../utils/constants';
+import {
+	EXCLUDED_PATTERN_SOURCES,
+	PATTERN_TYPES,
+} from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 function injectThemeAttributeInBlockTemplateContent(
@@ -38,9 +41,9 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
-	// Filter out core patterns.
-	const filterOutCorePatterns = ( pattern ) =>
-		! PATTERN_CORE_SOURCES.includes( pattern.source );
+	// Filter out core/directory patterns not included in theme.json.
+	const filterOutExcludedPatternSources = ( pattern ) =>
+		! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
 
 	// Filter only the patterns that are compatible with the current template.
 	const filterCompatiblePatterns = ( pattern ) =>
@@ -48,9 +51,10 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 
 	return patterns
 		.filter(
-			filterOutCorePatterns &&
-				filterOutDuplicatesByName &&
-				filterCompatiblePatterns
+			( pattern, index, items ) =>
+				filterOutExcludedPatternSources( pattern ) &&
+				filterOutDuplicatesByName( pattern, index, items ) &&
+				filterCompatiblePatterns( pattern )
 		)
 		.map( ( pattern ) => ( {
 			...pattern,

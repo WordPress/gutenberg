@@ -147,6 +147,10 @@ export function CustomColorPickerDropdown( {
 	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
+			// Disabling resize as it would otherwise cause the popover to show
+			// scrollbars while dragging the color picker's handle close to the
+			// popover edge.
+			resize: false,
 			...( isRenderedInSidebar
 				? {
 						// When in the sidebar: open to the left (stacking),
@@ -299,6 +303,7 @@ function UnforwardedColorPalette(
 								style={ {
 									background: value,
 								} }
+								type="button"
 							/>
 							<VStack
 								className="components-color-palette__custom-color-text-wrapper"
@@ -307,7 +312,7 @@ function UnforwardedColorPalette(
 								<Truncate className="components-color-palette__custom-color-name">
 									{ value
 										? buttonLabelName
-										: 'No color selected' }
+										: __( 'No color selected' ) }
 								</Truncate>
 								{ /*
 								This `Truncate` is always rendered, even if

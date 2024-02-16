@@ -22,6 +22,8 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
+	overflow-y: hidden;
+
 	&.show-as-tabs {
 		gap: 0;
 	}
@@ -61,7 +63,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs .components-tab-panel__tabs {
+	.block-editor-inserter__tabs div[role="tablist"] {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -106,10 +108,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-
-	.components-search-control__icon {
-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
-	}
 }
 
 .block-editor-inserter__tabs {
@@ -118,10 +116,10 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
-	.components-tab-panel__tabs {
+	div[role="tablist"] {
 		border-bottom: $border-width solid $gray-300;
 
-		.components-tab-panel__tabs-item {
+		button[role="tab"] {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
 			&[id$="reusable"] {
@@ -133,7 +131,7 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	.components-tab-panel__tab-content {
+	div[role="tabpanel"] {
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -214,15 +212,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__preview-container__popover {
+	top: $grid-unit-20 !important;
+}
+
 .block-editor-inserter__preview-container {
 	display: none;
-	width: 300px;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-300;
-	position: absolute;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
+	width: $sidebar-width;
+	padding: $grid-unit-20;
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
@@ -230,12 +227,14 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
-	.block-editor-block-card {
-		padding: $grid-unit-20;
+	.block-editor-block-preview__container {
+		height: 100%;
 	}
 
-	.block-editor-block-card__title {
-		font-size: $default-font-size;
+	.block-editor-block-card {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
 	}
 }
 
@@ -271,14 +270,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__block-patterns-tabs-container,
-.block-editor-block-patterns-explorer__sidebar {
+.block-editor-inserter__block-patterns-tabs-container {
 	height: 100%;
 	nav {
 		height: 100%;
-	}
-	.block-editor-block-patterns__source-filter select.components-select-control__input {
-		height: 40px;
 	}
 }
 
@@ -291,6 +286,11 @@ $block-inserter-tabs-height: 44px;
 	// Push the listitem wrapping the "explore" button to the bottom of the panel.
 	div[role="listitem"]:last-child {
 		margin-top: auto;
+	}
+
+	.block-editor-inserter__patterns-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
 	}
 }
 
@@ -361,6 +361,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
+	border-radius: $radius-block-ui;
 }
 
 .block-editor-inserter__tips {
@@ -442,7 +443,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-20;
+		top: $header-height + $grid-unit-15;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
@@ -533,7 +534,10 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	&__media-category {
+	.block-editor-inserter__media-tabs__media-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+
 		&.is-selected {
 			color: var(--wp-admin-theme-color);
 			position: relative;
@@ -607,15 +611,9 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		&.components-search-control {
-			input[type="search"].components-search-control__input {
-				background: $white;
-			}
-			button.components-button {
-				min-width: auto;
-				padding-left: $grid-unit-05 * 0.5;
-				padding-right: $grid-unit-05 * 0.5;
-			}
+		// TODO: Consider using the Theme component to automatically adapt to a gray background.
+		&:not(:focus-within) {
+			--wp-components-color-background: #{$white};
 		}
 	}
 }

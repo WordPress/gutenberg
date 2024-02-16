@@ -27,8 +27,9 @@ import RootMenu from './root-menu';
 import StylesPreview from './preview';
 import { unlock } from '../../lock-unlock';
 
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+
 function ScreenRoot() {
-	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
 
 	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
@@ -47,8 +48,7 @@ function ScreenRoot() {
 			hasVariations:
 				!! __experimentalGetCurrentThemeGlobalStylesVariations()
 					?.length,
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 

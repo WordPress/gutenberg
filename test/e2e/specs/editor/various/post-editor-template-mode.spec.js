@@ -57,6 +57,7 @@ test.describe( 'Post Editor Template mode', () => {
 		);
 
 		// Save changes.
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Publish"i]' );
 		await page.click( 'role=button[name="Save"i]' );
 
@@ -68,6 +69,42 @@ test.describe( 'Post Editor Template mode', () => {
 				'text="Just a random paragraph added to the template"'
 			)
 		).toBeVisible();
+	} );
+
+	test( 'Swap templates and proper template resolution when switching to default template', async ( {
+		editor,
+		page,
+		requestUtils,
+		postEditorTemplateMode,
+	} ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await postEditorTemplateMode.createPostAndSaveDraft();
+		await page.reload();
+		await postEditorTemplateMode.disableTemplateWelcomeGuide();
+		await postEditorTemplateMode.openTemplatePopover();
+		// Swap to a custom template, save and reload.
+		await page
+			.getByRole( 'menuitem', {
+				name: 'Swap template',
+			} )
+			.click();
+		await page
+			.getByRole( 'option', {
+				name: 'Custom',
+			} )
+			.click();
+		await editor.saveDraft();
+		await page.reload();
+		// Swap to the default template.
+		await postEditorTemplateMode.openTemplatePopover();
+		await page
+			.getByRole( 'menuitem', {
+				name: 'Use default template',
+			} )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Single Entries' );
 	} );
 
 	test( 'Allow creating custom block templates in classic themes', async ( {
@@ -121,10 +158,8 @@ class PostEditorTemplateMode {
 
 	async disableTemplateWelcomeGuide() {
 		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuideTemplate', false );
+		await this.editor.setPreferences( 'core/edit-post', {
+			welcomeGuideTemplate: false,
 		} );
 	}
 
@@ -133,7 +168,9 @@ class PostEditorTemplateMode {
 
 		// Only match the beginning of Select template: because it contains the template name or slug afterwards.
 		await this.editorSettingsSidebar
-			.locator( 'role=button[name^="Select template"i]' )
+			.getByRole( 'button', {
+				name: 'Template options',
+			} )
 			.click();
 	}
 
@@ -141,22 +178,26 @@ class PostEditorTemplateMode {
 		await this.disableTemplateWelcomeGuide();
 
 		await this.openTemplatePopover();
-
-		await this.page.locator( 'role=button[name="Edit template"i]' ).click();
+		await this.page
+			.getByRole( 'menuitem', {
+				name: 'Edit template',
+			} )
+			.click();
 
 		// Check that we switched properly to edit mode.
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Editing template. Changes made here affect all posts and pages that use the template.'
 		);
 
-		await expect(
-			this.editorTopBar.getByRole( 'heading[level=1]' )
-		).toHaveText( 'Editing template: Single Entries' );
+		const title = this.editorTopBar.getByRole( 'heading', {
+			name: 'Editing template: Single Entries',
+		} );
+
+		await expect( title ).toBeVisible();
 	}
 
 	async createPostAndSaveDraft() {
 		await this.admin.createNewPost();
-		await this.editor.canvas.waitForLoadState();
 		// Create a random post.
 		await this.page.keyboard.type( 'Just an FSE Post' );
 		await this.page.keyboard.press( 'Enter' );
@@ -170,10 +211,7 @@ class PostEditorTemplateMode {
 		// Save the post
 		// Saving shouldn't be necessary but unfortunately,
 		// there's a template resolution bug forcing us to do so.
-		await this.page.click( 'role=button[name="Save draft"i]' );
-		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await this.editor.saveDraft();
 	}
 
 	async createNewTemplate( templateName ) {
@@ -212,6 +250,7 @@ class PostEditorTemplateMode {
 	}
 
 	async saveTemplateWithoutPublishing() {
+		await this.page.click( 'role=button[name="Back"i]' );
 		await this.page.click( 'role=button[name="Publish"i]' );
 		const editorPublishRegion = this.page.locator(
 			'role=region[name="Editor publish"i]'

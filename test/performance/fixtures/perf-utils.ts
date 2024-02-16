@@ -30,29 +30,23 @@ export class PerfUtils {
 	 * Returns the locator for the editor canvas element. This supports both the
 	 * legacy and the iframed canvas.
 	 *
+	 * @param canvasLocator
 	 * @return Locator for the editor canvas element.
 	 */
-	async getCanvas() {
-		return await Promise.any( [
-			( async () => {
-				const legacyCanvasLocator = this.page.locator(
-					'.wp-block-post-content'
-				);
-				await legacyCanvasLocator.waitFor( {
-					timeout: 120_000,
-				} );
-				return legacyCanvasLocator;
-			} )(),
-			( async () => {
-				const iframedCanvasLocator = this.page.frameLocator(
-					'[name=editor-canvas]'
-				);
-				await iframedCanvasLocator
-					.locator( 'body' )
-					.waitFor( { timeout: 120_000 } );
-				return iframedCanvasLocator;
-			} )(),
-		] );
+	async getCanvas(
+		canvasLocator = this.page.locator(
+			'.wp-block-post-content, iframe[name=editor-canvas]'
+		)
+	) {
+		const isFramed = await canvasLocator.evaluate(
+			( node ) => node.tagName === 'IFRAME'
+		);
+
+		if ( isFramed ) {
+			return canvasLocator.frameLocator( ':scope' );
+		}
+
+		return canvasLocator;
 	}
 
 	/**
@@ -61,20 +55,22 @@ export class PerfUtils {
 	 * @return URL of the saved draft.
 	 */
 	async saveDraft() {
-		await this.page
-			.getByRole( 'button', { name: 'Save draft' } )
-			.click( { timeout: 60_000 } );
+		await this.page.getByRole( 'button', { name: 'Save draft' } ).click();
 		await expect(
 			this.page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
-		return this.page.url();
+		const postId = new URL( this.page.url() ).searchParams.get( 'post' );
+
+		return postId;
 	}
 
 	/**
 	 * Disables the editor autosave function.
 	 */
 	async disableAutosave() {
+		await this.page.waitForFunction( () => window?.wp?.data );
+
 		await this.page.evaluate( () => {
 			return window.wp.data
 				.dispatch( 'core/editor' )
@@ -83,12 +79,6 @@ export class PerfUtils {
 					localAutosaveInterval: 100000000000,
 				} );
 		} );
-
-		const { autosaveInterval } = await this.page.evaluate( () => {
-			return window.wp.data.select( 'core/editor' ).getEditorSettings();
-		} );
-
-		expect( autosaveInterval ).toBe( 100000000000 );
 	}
 
 	/**
@@ -139,6 +129,10 @@ export class PerfUtils {
 			throw new Error( `File not found: ${ filepath }` );
 		}
 
+		await this.page.waitForFunction(
+			() => window?.wp?.blocks && window?.wp?.data
+		);
+
 		return await this.page.evaluate( ( html: string ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
@@ -159,6 +153,10 @@ export class PerfUtils {
 	 * Generates and loads a 1000 empty paragraphs into the editor canvas.
 	 */
 	async load1000Paragraphs() {
+		await this.page.waitForFunction(
+			() => window?.wp?.blocks && window?.wp?.data
+		);
+
 		await this.page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
+import { isValidElementType } from 'react-is';
 
 /**
  * WordPress dependencies
@@ -17,7 +18,8 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 
-const { error, warn } = window.console;
+const error = ( ...args ) => window?.console?.error?.( ...args );
+const warn = ( ...args ) => window?.console?.warn?.( ...args );
 
 /**
  * Mapping of legacy category slugs to their latest normal values, used to
@@ -112,8 +114,8 @@ export const processBlockType =
 			error( 'The "save" property must be a valid function.' );
 			return;
 		}
-		if ( 'edit' in settings && typeof settings.edit !== 'function' ) {
-			error( 'The "edit" property must be a valid function.' );
+		if ( 'edit' in settings && ! isValidElementType( settings.edit ) ) {
+			error( 'The "edit" property must be a valid component.' );
 			return;
 		}
 

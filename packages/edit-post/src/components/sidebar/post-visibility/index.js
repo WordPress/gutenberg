@@ -2,14 +2,22 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import {
 	PostVisibility as PostVisibilityForm,
 	PostVisibilityLabel,
 	PostVisibilityCheck,
 	usePostVisibilityLabel,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useMemo, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { PostPanelRow } = unlock( editorPrivateApis );
 
 export function PostVisibility() {
 	// Use internal state instead of a ref to make sure that the component
@@ -29,11 +37,10 @@ export function PostVisibility() {
 	return (
 		<PostVisibilityCheck
 			render={ ( { canEdit } ) => (
-				<PanelRow
+				<PostPanelRow
+					label={ __( 'Visibility' ) }
 					ref={ setPopoverAnchor }
-					className="edit-post-post-visibility"
 				>
-					<span>{ __( 'Visibility' ) }</span>
 					{ ! canEdit && (
 						<span>
 							<PostVisibilityLabel />
@@ -55,7 +62,7 @@ export function PostVisibility() {
 							) }
 						/>
 					) }
-				</PanelRow>
+				</PostPanelRow>
 			) }
 		/>
 	);
@@ -65,6 +72,7 @@ function PostVisibilityToggle( { isOpen, onClick } ) {
 	const label = usePostVisibilityLabel();
 	return (
 		<Button
+			__next40pxDefaultSize
 			className="edit-post-post-visibility__toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }

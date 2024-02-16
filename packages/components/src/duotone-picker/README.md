@@ -3,8 +3,8 @@
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const DUOTONE_PALETTE = [
 	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },

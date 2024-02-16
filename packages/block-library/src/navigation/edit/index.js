@@ -16,15 +16,14 @@ import {
 import {
 	InspectorControls,
 	useBlockProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	ContrastChecker,
 	getColorClassName,
 	Warning,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
@@ -43,7 +42,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useMediaQuery } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -72,6 +71,7 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
+import { NAVIGATION_MOBILE_COLLAPSE } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 function Navigation( {
@@ -290,8 +290,22 @@ function Navigation( {
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const hasBlockOverlay = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableHasActiveBlockOverlayActive(
+				clientId
+			),
+		[ clientId ]
+	);
 	const isResponsive = 'never' !== overlayMenu;
+	const isMobileBreakPoint = useMediaQuery(
+		`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
+	);
+
+	const isCollapsed =
+		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
+		'always' === overlayMenu;
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames(
@@ -305,6 +319,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
+				'is-collapsed': isCollapsed,
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
@@ -884,7 +899,6 @@ function Navigation( {
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
-							label={ __( 'Menu' ) }
 							hasIcon={ hasIcon }
 							icon={ icon }
 							isOpen={ isResponsiveMenuOpen }

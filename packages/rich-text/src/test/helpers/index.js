@@ -73,25 +73,6 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should replace characters to format HTML with space',
-		html: '\n\n\r\n\t',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0 ],
-		endPath: [ 0, 1 ],
-		record: {
-			start: 0,
-			end: 1,
-			formats: [ , ],
-			replacements: [ , ],
-			text: ' ',
-		},
-	},
-	{
 		description: 'should preserve non breaking space',
 		html: 'test\u00a0 test',
 		createRange: ( element ) => ( {

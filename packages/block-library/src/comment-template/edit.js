@@ -105,7 +105,7 @@ const getCommentsPlaceholder = ( {
  * @param {Array}  [props.firstCommentId]     - ID of the first comment in the array.
  * @param {Array}  [props.blocks]             - Array of blocks returned from
  *                                            getBlocks() in parent .
- * @return {WPElement}                 		Inner blocks of the Comment Template
+ * @return {Element}                 		Inner blocks of the Comment Template
  */
 function CommentTemplateInnerBlocks( {
 	comment,
@@ -202,7 +202,7 @@ const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
  * @param {Array}  [props.blocks]             - Array of blocks returned from getBlocks() in parent.
  * @param {Object} [props.firstCommentId]     - The ID of the first comment in the array of
  *                                            comment objects.
- * @return {WPElement}                 		List of comments.
+ * @return {Element}                 		List of comments.
  */
 const CommentsList = ( {
 	comments,

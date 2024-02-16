@@ -16,7 +16,6 @@ import {
 	ToolbarButton,
 	Dropdown,
 	withFilters,
-	Tooltip,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -220,19 +219,15 @@ const MediaReplaceFlow = ( {
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURL }>
-								<div>
-									<LinkControl
-										value={ { url: mediaURL } }
-										settings={ [] }
-										showSuggestions={ false }
-										onChange={ ( { url } ) => {
-											onSelectURL( url );
-											editMediaButtonRef.current.focus();
-										} }
-									/>
-								</div>
-							</Tooltip>
+							<LinkControl
+								value={ { url: mediaURL } }
+								settings={ [] }
+								showSuggestions={ false }
+								onChange={ ( { url } ) => {
+									onSelectURL( url );
+									editMediaButtonRef.current.focus();
+								} }
+							/>
 						</form>
 					) }
 				</>

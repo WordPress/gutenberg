@@ -25,6 +25,7 @@ const UnconnectedToolsPanel = (
 		resetAllItems,
 		toggleItem,
 		headingLevel,
+		dropdownMenuProps,
 		...toolsPanelProps
 	} = useToolsPanel( props );
 
@@ -36,6 +37,7 @@ const UnconnectedToolsPanel = (
 					resetAll={ resetAllItems }
 					toggleItem={ toggleItem }
 					headingLevel={ headingLevel }
+					dropdownMenuProps={ dropdownMenuProps }
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>

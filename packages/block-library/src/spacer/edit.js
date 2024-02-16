@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	useBlockProps,
-	useSetting,
+	useSettings,
 	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
@@ -93,9 +93,14 @@ const SpacerEdit = ( {
 		return editorSettings?.disableCustomSpacingSizes;
 	} );
 	const { orientation } = context;
-	const { orientation: parentOrientation, type } = parentLayout || {};
+	const {
+		orientation: parentOrientation,
+		type,
+		default: { type: defaultType } = {},
+	} = parentLayout || {};
 	// Check if the spacer is inside a flex container.
-	const isFlexLayout = type === 'flex';
+	const isFlexLayout =
+		type === 'flex' || ( ! type && defaultType === 'flex' );
 	// If the spacer is inside a flex container, it should either inherit the orientation
 	// of the parent or use the flex default orientation.
 	const inheritedOrientation =
@@ -107,7 +112,7 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const [ spacingSizes ] = useSettings( 'spacing.spacingSizes' );
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );

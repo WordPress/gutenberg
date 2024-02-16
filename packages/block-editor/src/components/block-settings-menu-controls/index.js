@@ -22,6 +22,8 @@ import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 
+import { BlockRenameControl, useBlockRename } from '../block-rename';
+
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( {
@@ -44,7 +46,9 @@ const BlockSettingsMenuControlsSlot = ( {
 	);
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
+	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
 	const showLockButton = selectedClientIds.length === 1 && canLock;
+	const showRenameButton = selectedClientIds.length === 1 && canRename;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -84,6 +88,11 @@ const BlockSettingsMenuControlsSlot = ( {
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
+						{ showRenameButton && (
+							<BlockRenameControl
+								clientId={ selectedClientIds[ 0 ] }
+							/>
+						) }
 						{ fills }
 						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
 							<MenuItem
@@ -112,7 +121,7 @@ const BlockSettingsMenuControlsSlot = ( {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
  * @param {Object} props Fill props.
- * @return {WPElement} Element.
+ * @return {Element} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {
 	return (

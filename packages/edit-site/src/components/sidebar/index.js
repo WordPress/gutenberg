@@ -1,13 +1,18 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -27,58 +32,67 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+function SidebarScreenWrapper( { className, ...props } ) {
+	return (
+		<NavigatorScreen
+			className={ classNames(
+				'edit-site-sidebar__screen-wrapper',
+				className
+			) }
+			{ ...props }
+		/>
+	);
+}
+
 function SidebarScreens() {
 	useSyncPathWithURL();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
 		<>
-			<NavigatorScreen path="/">
+			<SidebarScreenWrapper path="/">
 				<SidebarNavigationScreenMain />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation">
 				<SidebarNavigationScreenNavigationMenus />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation/:postType/:postId">
 				<SidebarNavigationScreenNavigationMenu />
-			</NavigatorScreen>
-			<NavigatorScreen path="/wp_global_styles">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/wp_global_styles">
 				<SidebarNavigationScreenGlobalStyles />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page">
 				<SidebarNavigationScreenPages />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/pages">
+				<SidebarNavigationScreenPagesDataViews />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
-			</NavigatorScreen>
-			{ window?.__experimentalAdminViews && (
-				<NavigatorScreen path="/pages">
-					<SidebarNavigationScreen
-						title={ __( 'All Pages' ) }
-						description={ __( 'Manage your pages.' ) }
-						backPath="/page"
-					/>
-				</NavigatorScreen>
-			) }
-			<NavigatorScreen path="/:postType(wp_template)">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
-			</NavigatorScreen>
-			<NavigatorScreen path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			</SidebarScreenWrapper>
+			{ ! isMobileViewport && (
+				<SidebarScreenWrapper path="/patterns">
+					<SidebarNavigationScreenPatterns />
+				</SidebarScreenWrapper>
+			) }
+			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
 				<SidebarNavigationScreenPattern />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template)/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
-			</NavigatorScreen>
+			</SidebarScreenWrapper>
 		</>
 	);
 }

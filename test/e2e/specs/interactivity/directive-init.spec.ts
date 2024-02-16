@@ -53,7 +53,7 @@ test.describe( 'data-wp-init', () => {
 
 		await toggle.click();
 
-		await expect( show ).not.toBeVisible();
+		await expect( show ).toBeHidden();
 		await expect( isMounted ).toHaveText( 'false' );
 	} );
 
@@ -65,7 +65,7 @@ test.describe( 'data-wp-init', () => {
 
 		await toggle.click();
 
-		await expect( show ).not.toBeVisible();
+		await expect( show ).toBeHidden();
 		await expect( isMounted ).toHaveText( 'false' );
 
 		await toggle.click();

@@ -8,22 +8,41 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Children } from '@wordpress/element';
+import {
+	Children,
+	useContext,
+	createContext,
+	forwardRef,
+} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import type { TooltipProps } from './types';
+import type {
+	TooltipProps,
+	TooltipInternalContext as TooltipInternalContextType,
+} from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
+
+const TooltipInternalContext = createContext< TooltipInternalContextType >( {
+	isNestedInTooltip: false,
+} );
 
 /**
  * Time over anchor to wait before showing tooltip
  */
 export const TOOLTIP_DELAY = 700;
 
-function Tooltip( props: TooltipProps ) {
+const CONTEXT_VALUE = {
+	isNestedInTooltip: true,
+};
+
+function UnforwardedTooltip(
+	props: TooltipProps,
+	ref: React.ForwardedRef< any >
+) {
 	const {
 		children,
 		delay = TOOLTIP_DELAY,
@@ -32,7 +51,11 @@ function Tooltip( props: TooltipProps ) {
 		position,
 		shortcut,
 		text,
+
+		...restProps
 	} = props;
+
+	const { isNestedInTooltip } = useContext( TooltipInternalContext );
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -43,7 +66,7 @@ function Tooltip( props: TooltipProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				'Tooltip should be called with only a single child element.'
+				'wp-components.Tooltip should be called with only a single child element.'
 			);
 		}
 	}
@@ -64,25 +87,37 @@ function Tooltip( props: TooltipProps ) {
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
-	const tooltipStore = Ariakit.useTooltipStore( {
+	// Removing the `Ariakit` namespace from the hook name allows ESLint to
+	// properly identify the hook, and apply the correct linting rules.
+	const useAriakitTooltipStore = Ariakit.useTooltipStore;
+	const tooltipStore = useAriakitTooltipStore( {
 		placement: computedPlacement,
-		timeout: delay,
+		showTimeout: delay,
 	} );
 
-	const isTooltipOpen = tooltipStore.useState( 'open' );
+	if ( isNestedInTooltip ) {
+		return isOnlyChild ? (
+			<Ariakit.Role { ...restProps } render={ children } />
+		) : (
+			children
+		);
+	}
 
 	return (
-		<>
+		<TooltipInternalContext.Provider value={ CONTEXT_VALUE }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
+				ref={ ref }
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
-			{ isOnlyChild && ( text || shortcut ) && isTooltipOpen && (
+			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
+					{ ...restProps }
 					className="components-tooltip"
+					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }
 					overflowPadding={ 0.5 }
@@ -99,8 +134,10 @@ function Tooltip( props: TooltipProps ) {
 					) }
 				</Ariakit.Tooltip>
 			) }
-		</>
+		</TooltipInternalContext.Provider>
 	);
 }
+
+export const Tooltip = forwardRef( UnforwardedTooltip );
 
 export default Tooltip;

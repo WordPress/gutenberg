@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { SeparatorProps } from 'reakit';
+import type { SeparatorProps } from '@ariakit/react';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import type { SpaceInput } from '../utils/space';
 
 export type DividerProps = Omit<
 	SeparatorProps,
-	'children' | 'unstable_system' | 'orientation'
+	'children' | 'unstable_system' | 'orientation' | 'as' | 'render'
 > & {
 	/**
 	 * Adjusts all margins on the inline dimension.

@@ -16,14 +16,8 @@ body.js.widgets-php {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 
-.blocks-widgets-container,
-// The modals are shown outside the .blocks-widgets-container wrapper, they need these styles
-.components-modal__frame {
-	@include reset;
-
-}
-
 .blocks-widgets-container {
+	@include reset;
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the overscroll bounce on the non-scrolling container, for a bad experience.
 	@include break-small {
@@ -56,7 +50,7 @@ body.js.widgets-php {
 
 // Don't display admin notices on the Widgets screen.
 // Needs !important because plugins may add inline styles to notices.
-.widgets-php .notice {
+.js .widgets-php .notice {
 	display: none !important;
 }
 

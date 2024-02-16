@@ -8,9 +8,12 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,7 +30,35 @@ const RANGE_CONTROL_MAX_VALUES = {
 	vh: 100,
 	em: 38,
 	rem: 38,
+	svw: 100,
+	lvw: 100,
+	dvw: 100,
+	svh: 100,
+	lvh: 100,
+	dvh: 100,
+	vi: 100,
+	svi: 100,
+	lvi: 100,
+	dvi: 100,
+	vb: 100,
+	svb: 100,
+	lvb: 100,
+	dvb: 100,
+	vmin: 100,
+	svmin: 100,
+	lvmin: 100,
+	dvmin: 100,
+	vmax: 100,
+	svmax: 100,
+	lvmax: 100,
+	dvmax: 100,
 };
+
+const units = [
+	{ value: 'px', label: 'px', default: 0 },
+	{ value: 'rem', label: 'rem', default: 0 },
+	{ value: 'em', label: 'em', default: 0 },
+];
 
 export default {
 	name: 'grid',
@@ -36,13 +67,24 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
-		return layout?.columnCount ? (
-			<GridLayoutColumnsControl layout={ layout } onChange={ onChange } />
-		) : (
-			<GridLayoutMinimumWidthControl
-				layout={ layout }
-				onChange={ onChange }
-			/>
+		return (
+			<>
+				<GridLayoutTypeControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+				{ layout?.columnCount ? (
+					<GridLayoutColumnsControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) : (
+					<GridLayoutMinimumWidthControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) }
+			</>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls() {
@@ -75,7 +117,8 @@ export default {
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`
+				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
+				`container-type: inline-size`
 			);
 		}
 
@@ -130,12 +173,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 		} else if ( [ 'em', 'rem' ].includes( unit ) && newUnit === 'px' ) {
 			// Convert to pixel value assuming a root size of 16px.
 			newValue = Math.round( quantity * 16 ) + newUnit;
-		} else if (
-			[ 'vh', 'vw', '%' ].includes( newUnit ) &&
-			quantity > 100
-		) {
-			// When converting to `vh`, `vw`, or `%` units, cap the new value at 100.
-			newValue = 100 + newUnit;
 		}
 
 		onChange( {
@@ -161,6 +198,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						} }
 						onUnitChange={ handleUnitChange }
 						value={ value }
+						units={ units }
 						min={ 0 }
 					/>
 				</FlexItem>
@@ -195,5 +233,58 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 			min={ 1 }
 			max={ 6 }
 		/>
+	);
+}
+
+// Enables switching between grid types
+function GridLayoutTypeControl( { layout, onChange } ) {
+	const { columnCount, minimumColumnWidth } = layout;
+
+	/**
+	 * When switching, temporarily save any custom values set on the
+	 * previous type so we can switch back without loss.
+	 */
+	const [ tempColumnCount, setTempColumnCount ] = useState(
+		columnCount || 3
+	);
+	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
+		minimumColumnWidth || '12rem'
+	);
+
+	const isManual = !! columnCount ? 'manual' : 'auto';
+
+	const onChangeType = ( value ) => {
+		if ( value === 'manual' ) {
+			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
+		} else {
+			setTempColumnCount( columnCount || 3 );
+		}
+		onChange( {
+			...layout,
+			columnCount: value === 'manual' ? tempColumnCount : null,
+			minimumColumnWidth:
+				value === 'auto' ? tempMinimumColumnWidth : null,
+		} );
+	};
+
+	return (
+		<ToggleGroupControl
+			__nextHasNoMarginBottom={ true }
+			label={ __( 'Type' ) }
+			value={ isManual }
+			onChange={ onChangeType }
+			isBlock={ true }
+		>
+			<ToggleGroupControlOption
+				key={ 'manual' }
+				value="manual"
+				label={ __( 'Manual' ) }
+			/>
+			<ToggleGroupControlOption
+				key={ 'auto' }
+				value="auto"
+				label={ __( 'Auto' ) }
+			/>
+		</ToggleGroupControl>
 	);
 }

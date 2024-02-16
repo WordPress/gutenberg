@@ -4,13 +4,27 @@
 import createSelector from 'rememo';
 
 /**
+ * WordPress dependencies
+ */
+import { createRegistrySelector } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getSettings,
+	canInsertBlockType,
 } from './selectors';
+import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
+import { selectBlockPatternsKey } from './private-keys';
+
+export { getBlockSettings } from './get-block-settings';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -33,37 +47,49 @@ export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
 
+export function getBlockWithoutAttributes( state, clientId ) {
+	return state.blocks.byClientId.get( clientId );
+}
+
 /**
- * Returns true if the block with the given client ID and all of its descendants
+ * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID.
  *
- * @return {boolean} Whether the block and its descendants are disabled.
+ * @return {boolean} Whether the block descendants are disabled.
  */
-export const isBlockSubtreeDisabled = createSelector(
-	( state, clientId ) => {
-		const isChildSubtreeDisabled = ( childClientId ) => {
-			return (
-				getBlockEditingMode( state, childClientId ) === 'disabled' &&
-				getBlockOrder( state, childClientId ).every(
-					isChildSubtreeDisabled
-				)
-			);
-		};
+export const isBlockSubtreeDisabled = ( state, clientId ) => {
+	const isChildSubtreeDisabled = ( childClientId ) => {
 		return (
-			getBlockEditingMode( state, clientId ) === 'disabled' &&
-			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
+			getBlockEditingMode( state, childClientId ) === 'disabled' &&
+			getBlockOrder( state, childClientId ).every(
+				isChildSubtreeDisabled
+			)
 		);
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockEditingModes,
-		state.blockListSettings,
-	]
-);
+	};
+	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
+};
+
+function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
+	const blockOrder = getBlockOrder( state, rootClientId );
+	const result = [];
+
+	for ( const clientId of blockOrder ) {
+		const innerBlocks = getEnabledClientIdsTreeUnmemoized(
+			state,
+			clientId
+		);
+		if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
+			result.push( { clientId, innerBlocks } );
+		} else {
+			result.push( ...innerBlocks );
+		}
+	}
+
+	return result;
+}
 
 /**
  * Returns a tree of block objects with only clientID and innerBlocks set.
@@ -75,19 +101,7 @@ export const isBlockSubtreeDisabled = createSelector(
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
 export const getEnabledClientIdsTree = createSelector(
-	( state, rootClientId = '' ) => {
-		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
-			if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
-				return [
-					{
-						clientId,
-						innerBlocks: getEnabledClientIdsTree( state, clientId ),
-					},
-				];
-			}
-			return getEnabledClientIdsTree( state, clientId );
-		} );
-	},
+	getEnabledClientIdsTreeUnmemoized,
 	( state ) => [
 		state.blocks.order,
 		state.blockEditingModes,
@@ -236,3 +250,114 @@ export const getInserterMediaCategories = createSelector(
 		state.registeredInserterMediaCategories,
 	]
 );
+
+/**
+ * Returns whether there is at least one allowed pattern for inner blocks children.
+ * This is useful for deferring the parsing of all patterns until needed.
+ *
+ * @param {Object} state               Editor state.
+ * @param {string} [rootClientId=null] Target root client ID.
+ *
+ * @return {boolean} If there is at least one allowed pattern.
+ */
+export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, rootClientId = null ) => {
+			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
+				select( STORE_NAME )
+			);
+			const patterns = getAllPatterns();
+			const { allowedBlockTypes } = getSettings( state );
+			return patterns.some( ( { name, inserter = true } ) => {
+				if ( ! inserter ) {
+					return false;
+				}
+				const { blocks } = __experimentalGetParsedPattern( name );
+				return (
+					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
+					blocks.every( ( { name: blockName } ) =>
+						canInsertBlockType( state, blockName, rootClientId )
+					)
+				);
+			} );
+		},
+		( state, rootClientId ) => [
+			getAllPatternsDependants( select )( state ),
+			state.settings.allowedBlockTypes,
+			state.settings.templateLock,
+			state.blockListSettings[ rootClientId ],
+			state.blocks.byClientId.get( rootClientId ),
+		]
+	)
+);
+
+export const getAllPatterns = createRegistrySelector( ( select ) =>
+	createSelector( ( state ) => {
+		// This setting is left for back compat.
+		const {
+			__experimentalBlockPatterns = [],
+			__experimentalUserPatternCategories = [],
+			__experimentalReusableBlocks = [],
+		} = state.settings;
+		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
+			( userPattern ) => {
+				return {
+					name: `core/block/${ userPattern.id }`,
+					id: userPattern.id,
+					type: INSERTER_PATTERN_TYPES.user,
+					title: userPattern.title.raw,
+					categories: userPattern.wp_pattern_category.map(
+						( catId ) => {
+							const category = (
+								__experimentalUserPatternCategories ?? []
+							).find( ( { id } ) => id === catId );
+							return category ? category.slug : catId;
+						}
+					),
+					content: userPattern.content.raw,
+					syncStatus: userPattern.wp_pattern_sync_status,
+				};
+			}
+		);
+		return [
+			...userPatterns,
+			...__experimentalBlockPatterns,
+			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
+		].filter(
+			( x, index, arr ) =>
+				index === arr.findIndex( ( y ) => x.name === y.name )
+		);
+	}, getAllPatternsDependants( select ) )
+);
+
+/**
+ * Returns the element of the last element that had focus when focus left the editor canvas.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} Element.
+ */
+export function getLastFocus( state ) {
+	return state.lastFocus;
+}
+
+export function getAllBlockBindingsSources( state ) {
+	return state.blockBindingsSources;
+}
+
+export function getBlockBindingsSource( state, sourceName ) {
+	return state.blockBindingsSources[ sourceName ];
+}
+
+/**
+ * Returns true if the user is dragging anything, or false otherwise. It is possible for a
+ * user to be dragging data from outside of the editor, so this selector is separate from
+ * the `isDraggingBlocks` selector which only returns true if the user is dragging blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is dragging.
+ */
+export function isDragging( state ) {
+	return state.isDragging;
+}

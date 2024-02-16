@@ -143,6 +143,7 @@ function ToggleGroupControlOptionBase(
 					<Ariakit.Radio
 						render={
 							<button
+								type="button"
 								{ ...commonProps }
 								onFocus={ ( event ) => {
 									onFocusProp?.( event );

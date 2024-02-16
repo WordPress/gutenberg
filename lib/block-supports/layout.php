@@ -476,7 +476,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
 			);
 		}
 
@@ -528,6 +531,26 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
+ * Generates an incremental ID that is independent per each different prefix.
+ *
+ * It is similar to `wp_unique_id`, but each prefix has it's own internal ID
+ * counter to make each prefix independent from each other. The ID starts at 1
+ * and increments on each call. The returned value is not universally unique,
+ * but it is unique across the life of the PHP process and it's stable per
+ * prefix.
+ *
+ * @param  string $prefix Prefix for the returned ID.
+ * @return string         Incremental ID per prefix.
+ */
+function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
+	static $id_counters = array();
+	if ( ! array_key_exists( $prefix, $id_counters ) ) {
+			$id_counters[ $prefix ] = 0;
+	}
+	return $prefix . (string) ++$id_counters[ $prefix ];
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -537,44 +560,98 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	// If there is any value in style -> layout, the block has a child layout.
+	$child_layout = $block['attrs']['style']['layout'] ?? null;
 
-	if ( ! $block_supports_layout && ! $layout_from_parent ) {
+	if ( ! $block_supports_layout && ! $child_layout ) {
 		return $block_content;
 	}
 
-	$outer_class_names = array();
+	$outer_class_names         = array();
+	$container_content_class   = wp_unique_id( 'wp-container-content-' );
+	$child_layout_declarations = array();
+	$child_layout_styles       = array();
 
-	if ( 'fixed' === $layout_from_parent || 'fill' === $layout_from_parent ) {
-		$container_content_class = wp_unique_id( 'wp-container-content-' );
+	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
 
-		$child_layout_styles = array();
+	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
+		$child_layout_declarations['box-sizing'] = 'border-box';
+	} elseif ( 'fill' === $self_stretch ) {
+		$child_layout_declarations['flex-grow'] = '1';
+	}
 
-		if ( 'fixed' === $layout_from_parent && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-			$child_layout_styles[] = array(
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'flex-basis' => $block['attrs']['style']['layout']['flexSize'],
-					'box-sizing' => 'border-box',
-				),
-			);
-		} elseif ( 'fill' === $layout_from_parent ) {
-			$child_layout_styles[] = array(
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'flex-grow' => '1',
-				),
-			);
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
+		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
+		$child_layout_declarations['grid-column'] = "span $column_span";
+	}
+	if ( isset( $block['attrs']['style']['layout']['rowSpan'] ) ) {
+		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
+		$child_layout_declarations['grid-row'] = "span $row_span";
+	}
+	$child_layout_styles[] = array(
+		'selector'     => ".$container_content_class",
+		'declarations' => $child_layout_declarations,
+	);
+
+	/**
+	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+	 * the columnSpan should be removed on small grids. If there's a minimumColumnWidth, the grid is responsive.
+	 * But if the minimumColumnWidth value wasn't changed, it won't be set. In that case, if columnCount doesn't
+	 * exist, we can assume that the grid is responsive.
+	 */
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && ( isset( $block['parentLayout']['minimumColumnWidth'] ) || ! isset( $block['parentLayout']['columnCount'] ) ) ) {
+		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
+		$parent_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : '12rem';
+		$parent_column_value = floatval( $parent_column_width );
+		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
+		/**
+		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
+		 * to defaults.
+		 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
+		 */
+		if ( count( $parent_column_unit ) <= 1 ) {
+			$parent_column_unit  = 'rem';
+			$parent_column_value = 12;
+		} else {
+			$parent_column_unit = $parent_column_unit[1];
+
+			if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
+				$parent_column_unit = 'rem';
+			}
 		}
 
-		gutenberg_style_engine_get_stylesheet_from_css_rules(
-			$child_layout_styles,
-			array(
-				'context'  => 'block-supports',
-				'prettify' => false,
-			)
-		);
+		/**
+		 * A default gap value is used for this computation because custom gap values may not be
+		 * viable to use in the computation of the container query value.
+		 */
+		$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
+		$container_query_value = $column_span_number * $parent_column_value + ( $column_span_number - 1 ) * $default_gap_value;
+		$container_query_value = $container_query_value . $parent_column_unit;
 
+		$child_layout_styles[] = array(
+			'rules_group'  => "@container (max-width: $container_query_value )",
+			'selector'     => ".$container_content_class",
+			'declarations' => array(
+				'grid-column' => '1/-1',
+			),
+		);
+	}
+
+	/**
+	 * Add to the style engine store to enqueue and render layout styles.
+	 * Return styles here just to check if any exist.
+	 */
+	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
+		$child_layout_styles,
+		array(
+			'context'  => 'block-supports',
+			'prettify' => false,
+		)
+	);
+
+	if ( $child_css ) {
 		$outer_class_names[] = $container_content_class;
 	}
 
@@ -597,6 +674,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$processor->add_class( $class_name );
 		}
 		return $processor->get_updated_html();
+	} elseif ( ! $block_supports_layout ) {
+		// Ensure layout classnames are not injected if there is no layout support.
+		return $block_content;
 	}
 
 	$global_settings = gutenberg_get_global_settings();
@@ -608,7 +688,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
-	$container_class    = wp_unique_id( 'wp-container-' );
+
+	/*
+	* We use an incremental ID that is independent per prefix to make sure that
+	* rendering different numbers of blocks doesn't affect the IDs of other
+	* blocks. We need this to make the CSS class names stable across paginations
+	* for features like the enhanced pagination of the Query block.
+	*/
+	$container_class = gutenberg_incremental_id_per_prefix(
+		'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
+	);
 
 	// Set the correct layout type for blocks using legacy content width.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
@@ -787,7 +876,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			break;
 		}
 
-		if ( false !== strpos( $processor->get_attribute( 'class' ), $inner_block_wrapper_classes ) ) {
+		$class_attribute = $processor->get_attribute( 'class' );
+		if ( is_string( $class_attribute ) && str_contains( $class_attribute, $inner_block_wrapper_classes ) ) {
 			break;
 		}
 	} while ( $processor->next_tag() );
@@ -799,6 +889,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	return $processor->get_updated_html();
 }
+
+/**
+ * Add a `render_block_data` filter to fetch the parent block layout data.
+ */
+add_filter(
+	'render_block_data',
+	function ( $parsed_block, $source_block, $parent_block ) {
+		/**
+		 * Check if the parent block exists and if it has a layout attribute.
+		 * If it does, add the parent layout to the parsed block.
+		 */
+		if ( $parent_block && isset( $parent_block->parsed_block['attrs']['layout'] ) ) {
+			$parsed_block['parentLayout'] = $parent_block->parsed_block['attrs']['layout'];
+		}
+		return $parsed_block;
+	},
+	10,
+	3
+);
 
 // Register the block support. (overrides core one).
 WP_Block_Supports::get_instance()->register(
@@ -836,17 +945,63 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$replace_regex   = sprintf(
+	/**
+	 * This filter runs after the layout classnames have been added to the block, so they
+	 * have to be removed from the outer wrapper and then added to the inner.
+	*/
+	$layout_classes = array();
+	$processor      = new WP_HTML_Tag_Processor( $block_content );
+
+	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
+		if ( method_exists( $processor, 'class_list' ) ) {
+			foreach ( $processor->class_list() as $class_name ) {
+				if ( str_contains( $class_name, 'layout' ) ) {
+					array_push( $layout_classes, $class_name );
+					$processor->remove_class( $class_name );
+				}
+			}
+		} else {
+			/**
+			* The class_list method was only added in 6.4 so this needs a temporary fallback.
+			* This fallback should be removed when the minimum supported version is 6.4.
+			*/
+			$classes = $processor->get_attribute( 'class' );
+			if ( $classes ) {
+				$classes = explode( ' ', $classes );
+				foreach ( $classes as $class_name ) {
+					if ( str_contains( $class_name, 'is-layout-' ) ) {
+						array_push( $layout_classes, $class_name );
+						$processor->remove_class( $class_name );
+					}
+				}
+			}
+		}
+	}
+
+	$content_without_layout_classes = $processor->get_updated_html();
+	$replace_regex                  = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
 		preg_quote( $tag_name, '/' )
 	);
-	$updated_content = preg_replace_callback(
+	$updated_content                = preg_replace_callback(
 		$replace_regex,
 		static function ( $matches ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
 		},
-		$block_content
+		$content_without_layout_classes
 	);
+
+	// Add layout classes to inner wrapper.
+	if ( ! empty( $layout_classes ) ) {
+		$processor = new WP_HTML_Tag_Processor( $updated_content );
+		if ( $processor->next_tag( array( 'class_name' => 'wp-block-group__inner-container' ) ) ) {
+			foreach ( $layout_classes as $class_name ) {
+				$processor->add_class( $class_name );
+			}
+		}
+		$updated_content = $processor->get_updated_html();
+	}
+
 	return $updated_content;
 }
 

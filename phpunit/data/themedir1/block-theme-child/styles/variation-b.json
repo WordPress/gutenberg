@@ -1,0 +1,18 @@
+{
+	"version": 2,
+	"settings": {
+		"blocks": {
+			"core/post-title": {
+				"color": {
+					"palette": [
+						{
+							"slug": "dark",
+							"name": "Dark",
+							"color": "#010101"
+						}
+					]
+				}
+			}
+		}
+	}
+}

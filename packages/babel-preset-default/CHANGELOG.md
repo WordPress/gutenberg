@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 7.35.0 (2024-02-09)
+
+## 7.34.0 (2024-01-24)
+
+## 7.33.0 (2024-01-10)
+
+## 7.32.0 (2023-12-13)
+
+## 7.31.0 (2023-11-29)
+
+## 7.30.0 (2023-11-16)
+
+## 7.29.0 (2023-11-02)
+
+## 7.28.0 (2023-10-18)
+
+## 7.27.0 (2023-10-05)
+
 ### Internal
 
 -   The bundled `browserslist` dependency has been updated from requiring `^4.21.9` to requiring `^4.21.10` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).

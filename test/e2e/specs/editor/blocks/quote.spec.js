@@ -33,7 +33,9 @@ test.describe( 'Quote', () => {
 		page,
 	} ) => {
 		// Create a block with some text that will trigger a paragraph creation.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '> A quote' );
 		// Create a second paragraph.
 		await page.keyboard.press( 'Enter' );
@@ -56,7 +58,9 @@ test.describe( 'Quote', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 'test'.length } );
 		await page.keyboard.type( '> ' );
@@ -71,7 +75,9 @@ test.describe( 'Quote', () => {
 
 	test( 'can be created by typing "/quote"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/quote' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
@@ -88,7 +94,9 @@ test.describe( 'Quote', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -104,14 +112,16 @@ test.describe( 'Quote', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await editor.canvas.click(
-			'role=document[name="Block: Paragraph"i] >> text=one'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=one' )
+			.click();
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'core/quote' );
 		expect( await editor.getEditedPostContent() ).toBe(

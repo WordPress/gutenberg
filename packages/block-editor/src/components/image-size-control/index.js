@@ -8,7 +8,6 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,11 +30,6 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
-	deprecated( 'wp.blockEditor.__experimentalImageSizeControl', {
-		since: '6.3',
-		alternative:
-			'wp.blockEditor.privateApis.DimensionsTool and wp.blockEditor.privateApis.ResolutionTool',
-	} );
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
@@ -93,7 +87,7 @@ export default function ImageSizeControl( {
 								return (
 									<Button
 										key={ scale }
-										isSmall
+										size="small"
 										variant={
 											isCurrent ? 'primary' : undefined
 										}
@@ -110,7 +104,10 @@ export default function ImageSizeControl( {
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ () => updateDimensions() }>
+						<Button
+							size="small"
+							onClick={ () => updateDimensions() }
+						>
 							{ __( 'Reset' ) }
 						</Button>
 					</HStack>

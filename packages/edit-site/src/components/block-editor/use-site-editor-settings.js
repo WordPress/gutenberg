@@ -1,15 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import inserterMediaCategories from './inserter-media-categories';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
+
+const { useBlockEditorSettings } = unlock( editorPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -83,111 +91,104 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-export default function useSiteEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType } = useSelect(
+function useNavigateToPreviousEntityRecord() {
+	const location = useLocation();
+	const previousLocation = usePrevious( location );
+	const history = useHistory();
+	const goBack = useMemo( () => {
+		const isFocusMode =
+			location.params.focusMode ||
+			( location.params.postId &&
+				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
+		const didComeFromEditorCanvas =
+			previousLocation?.params.postId &&
+			previousLocation?.params.postType &&
+			previousLocation?.params.canvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+		// Disable reason: previousLocation changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ location, history ] );
+	return goBack;
+}
+
+export function useSpecificEditorSettings() {
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
-			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
-				select( editSiteStore )
+			const {
+				getEditedPostType,
+				getEditedPostId,
+				getEditedPostContext,
+				getCanvasMode,
+				getSettings,
+			} = unlock( select( editSiteStore ) );
+			const { getEditedEntityRecord } = select( coreStore );
+			const usedPostType = getEditedPostType();
+			const usedPostId = getEditedPostId();
+			const _record = getEditedEntityRecord(
+				'postType',
+				usedPostType,
+				usedPostId
 			);
+			const _context = getEditedPostContext();
 			return {
-				storedSettings: getSettings( setIsInserterOpened ),
+				templateSlug: _record.slug,
 				canvasMode: getCanvasMode(),
-				templateType: getEditedPostType(),
+				settings: getSettings(),
+				postWithTemplate: _context?.postId,
 			};
 		},
-		[ setIsInserterOpened ]
+		[]
 	);
-
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const {
-		restBlockPatterns,
-		restBlockPatternCategories,
-		templateSlug,
-		userPatternCategories,
-	} = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord, getUserPatternCategories } =
-			select( coreStore );
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		const _record = getEditedEntityRecord(
-			'postType',
-			usedPostType,
-			usedPostId
-		);
-		return {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-			templateSlug: _record.slug,
-			userPatternCategories: getUserPatternCategories(),
-		};
-	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
-
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
-
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-	return useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			focusMode,
-			...restStoredSettings
-		} = storedSettings;
-
+	const defaultRenderingMode = postWithTemplate
+		? 'template-locked'
+		: 'post-only';
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
+	const defaultEditorSettings = useMemo( () => {
 		return {
-			...restStoredSettings,
-			inserterMediaCategories,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			...settings,
+
+			richEditingEnabled: true,
+			supportsTemplateMode: true,
+			focusMode: canvasMode !== 'view',
+			defaultRenderingMode,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			__unstableIsPreviewMode: canvasMode === 'view',
 		};
 	}, [
-		storedSettings,
-		blockPatterns,
-		blockPatternCategories,
-		userPatternCategories,
+		settings,
 		canvasMode,
+		defaultRenderingMode,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );
+
+	return defaultEditorSettings;
+}
+
+export default function useSiteEditorSettings() {
+	const defaultEditorSettings = useSpecificEditorSettings();
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = unlock(
+			select( editSiteStore )
+		);
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		return {
+			postType: usedPostType,
+			postId: usedPostId,
+		};
+	}, [] );
+	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

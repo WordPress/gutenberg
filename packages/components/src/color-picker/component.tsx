@@ -10,13 +10,17 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useCallback, useState, useMemo } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnect } from '../context';
+import {
+	useContextSystem,
+	contextConnect,
+	ContextSystemProvider,
+} from '../context';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -39,6 +43,9 @@ const options = [
 	{ label: 'Hex', value: 'hex' as const },
 ];
 
+// `isBorderless` is still experimental and not a public prop for InputControl yet.
+const BORDERLESS_SELECT_CONTROL_CONTEXT = { InputBase: { isBorderless: true } };
+
 const UnconnectedColorPicker = (
 	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
@@ -49,8 +56,24 @@ const UnconnectedColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+
+		// Context
+		onPickerDragStart,
+		onPickerDragEnd,
 		...divProps
-	} = useContextSystem( props, 'ColorPicker' );
+	} = useContextSystem<
+		ColorPickerProps & {
+			onPickerDragStart?: ( event: MouseEvent ) => void;
+			onPickerDragEnd?: ( event: MouseEvent ) => void;
+		}
+	>( props, 'ColorPicker' );
+
+	const [ containerEl, setContainerEl ] = useState< HTMLElement | null >(
+		null
+	);
+	const containerRef = ( node: HTMLElement | null ) => {
+		setContainerEl( node );
+	};
 
 	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const [ color, setColor ] = useControlledValue( {
@@ -77,24 +100,34 @@ const UnconnectedColorPicker = (
 	);
 
 	return (
-		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+		<ColorfulWrapper
+			ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+			{ ...divProps }
+		>
 			<Picker
+				containerEl={ containerEl }
 				onChange={ handleChange }
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
+				onDragStart={ onPickerDragStart }
+				onDragEnd={ onPickerDragEnd }
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
-					<SelectControl
-						__nextHasNoMarginBottom
-						options={ options }
-						value={ colorType }
-						onChange={ ( nextColorType ) =>
-							setColorType( nextColorType as ColorType )
-						}
-						label={ __( 'Color format' ) }
-						hideLabelFromVision
-					/>
+					<ContextSystemProvider
+						value={ BORDERLESS_SELECT_CONTROL_CONTEXT }
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							options={ options }
+							value={ colorType }
+							onChange={ ( nextColorType ) =>
+								setColorType( nextColorType as ColorType )
+							}
+							label={ __( 'Color format' ) }
+							hideLabelFromVision
+						/>
+					</ContextSystemProvider>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }

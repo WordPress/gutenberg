@@ -9,15 +9,14 @@ GradientPicker is a React component that renders a color gradient picker to defi
 Render a GradientPicker.
 
 ```jsx
+import { useState } from 'react';
 import { GradientPicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const myGradientPicker = () => {
 	const [ gradient, setGradient ] = useState( null );
 
 	return (
 		<GradientPicker
-			__nextHasNoMargin
 			value={ gradient }
 			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
 			gradients={ [
@@ -88,13 +87,6 @@ If true, the gradient picker will not be displayed and only defined gradients fr
 
 -   Required: No
 -   Default: false
-
-### `__nextHasNoMargin`: `boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
-
--   Required: No
--   Default: `false`
 
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 

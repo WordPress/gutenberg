@@ -63,11 +63,6 @@ export function convertLegacyData( data ) {
 	data = moveIndividualPreference(
 		data,
 		{ from: 'core/edit-post', to: 'core/edit-post' },
-		'preferredStyleVariations'
-	);
-	data = moveIndividualPreference(
-		data,
-		{ from: 'core/edit-post', to: 'core/edit-post' },
 		'panels',
 		convertEditPostPanels
 	);

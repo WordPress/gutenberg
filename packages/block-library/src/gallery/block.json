@@ -4,6 +4,7 @@
 	"name": "core/gallery",
 	"title": "Gallery",
 	"category": "media",
+	"allowedBlocks": [ "core/image" ],
 	"description": "Display multiple images in a rich gallery.",
 	"keywords": [ "images", "photos" ],
 	"textdomain": "default",
@@ -46,8 +47,8 @@
 					"attribute": "data-id"
 				},
 				"caption": {
-					"type": "string",
-					"source": "html",
+					"type": "rich-text",
+					"source": "rich-text",
 					"selector": ".blocks-gallery-item__caption"
 				}
 			}
@@ -72,13 +73,17 @@
 			"maximum": 8
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": ".blocks-gallery-caption"
 		},
 		"imageCrop": {
 			"type": "boolean",
 			"default": true
+		},
+		"randomOrder": {
+			"type": "boolean",
+			"default": false
 		},
 		"fixedHeight": {
 			"type": "boolean",
@@ -132,6 +137,9 @@
 			"default": {
 				"type": "flex"
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-gallery-editor",

@@ -232,7 +232,7 @@ When the block declares support for `color.background`, the attributes definitio
 
 _**Note:** Deprecated since WordPress 6.3._
 
-This property has been replaced by [`filter.duotone`](#filter-duotone).
+This property has been replaced by [`filter.duotone`](#filterduotone).
 
 ### color.gradients
 
@@ -414,20 +414,6 @@ supports: {
 }
 ```
 
-## defaultStylePicker
-
--   Type: `boolean`
--   Default value: `true`
-
-When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
-
-```js
-supports: {
-	// Remove the Default Style picker.
-	defaultStylePicker: false
-}
-```
-
 ## dimensions
 
 _**Note:** Since WordPress 6.2._
@@ -437,11 +423,12 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `minHeight`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 ```js
 supports: {
     dimensions: {
+        aspectRatio: true // Enable aspect ratio control.
         minHeight: true // Enable min height control.
     }
 }
@@ -449,12 +436,13 @@ supports: {
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+- `style`: attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
     style: {
         dimensions: {
+            aspectRatio: "16/9",
             minHeight: "50vh"
         }
     }
@@ -491,7 +479,7 @@ selectors: {
 
 The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
 
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md).
 
 When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
 
@@ -556,6 +544,7 @@ supports: {
     -   `allowVerticalAlignment`: type `boolean`, default value `true`
     -   `allowJustification`: type `boolean`, default value `true`
     -   `allowOrientation`: type `boolean`, default value `true`
+    -   `allowCustomContentAndWideSize`: type `boolean`, default value `true`
 
 This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
 
@@ -615,6 +604,13 @@ For the `flex` layout type, determines display of the justification control in t
 
 For the `flex` layout type only, determines display of the orientation control in the block toolbar.
 
+### layout.allowCustomContentAndWideSize
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
+
 
 ## multiple
 
@@ -667,7 +663,7 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `sticky`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
 

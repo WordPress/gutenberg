@@ -8,6 +8,11 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+
 export function useHasImageSettingsPanel( name, value, inheritedValue ) {
 	// Note: If lightbox `value` exists, that means it was
 	// defined via the the Global Styles UI and will NOT
@@ -47,6 +52,7 @@ export default function ImageSettingsPanel( {
 				label={ _x( 'Settings', 'Image settings' ) }
 				resetAll={ resetLightbox }
 				panelId={ panelId }
+				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 			>
 				<ToolsPanelItem
 					// We use the `userSettings` prop instead of `settings`, because `settings`
@@ -54,13 +60,13 @@ export default function ImageSettingsPanel( {
 					// "RESET" button ONLY when the user has explicitly set a value in the
 					// Global Styles.
 					hasValue={ () => !! value?.lightbox }
-					label={ __( 'Expand on Click' ) }
+					label={ __( 'Expand on click' ) }
 					onDeselect={ resetLightbox }
 					isShownByDefault={ true }
 					panelId={ panelId }
 				>
 					<ToggleControl
-						label={ __( 'Expand on Click' ) }
+						label={ __( 'Expand on click' ) }
 						checked={ lightboxChecked }
 						onChange={ onChangeLightbox }
 					/>

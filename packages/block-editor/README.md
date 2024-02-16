@@ -15,13 +15,12 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ## Usage
 
 ```js
+import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
-	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -32,9 +31,7 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<BlockTools>
-				<BlockCanvas height="400px" />
-			</BlockTools>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	);
 }
@@ -114,7 +111,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Block Breadcrumb.
+-   `Element`: Block Breadcrumb.
 
 ### BlockCanvas
 
@@ -142,11 +139,11 @@ _Parameters_
 -   _props_ `Object`: Component props.
 -   _props.height_ `string`: Canvas height, defaults to 300px.
 -   _props.styles_ `Array`: Content styles to inject into the iframe.
--   _props.children_ `WPElement`: Content of the canvas, defaults to the BlockList component.
+-   _props.children_ `Element`: Content of the canvas, defaults to the BlockList component.
 
 _Returns_
 
--   `WPElement`: Block Breadcrumb.
+-   `Element`: Block Breadcrumb.
 
 ### BlockColorsStyleSelector
 
@@ -226,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### BlockSelectionClearer
 
@@ -248,7 +245,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Element.
+-   `Element`: Element.
 
 ### BlockStyles
 
@@ -280,9 +277,17 @@ _Returns_
 
 ### BlockToolbar
 
+Renders the block toolbar.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Components props.
+-   _props.hideDragHandle_ `boolean`: Show or hide the Drag Handle for drag and drop functionality.
+-   _props.variant_ `string`: Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
 
 ### BlockTools
 
@@ -334,9 +339,11 @@ _Related_
 
 ### CopyHandler
 
-_Related_
+> **Deprecated**
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
+_Parameters_
+
+-   _props_ `Object`:
 
 ### createCustomColorsHOC
 
@@ -532,16 +539,13 @@ _Returns_
 
 ### getPxFromCssUnit
 
-Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+> **Deprecated**
 
-_Parameters_
-
--   _cssUnit_ `string`:
--   _options_ `Object`:
+This function was accidentially exposed for mobile/native usage.
 
 _Returns_
 
--   `string`: returns the cssUnit value in a simple px format.
+-   `string`: Empty string.
 
 ### getSpacingPresetCssVar
 
@@ -578,7 +582,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The toolbar.
+-   `ComponentType`: The toolbar.
 
 ### HeightControl
 
@@ -597,7 +601,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### InnerBlocks
 
@@ -703,6 +707,23 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### RecursionProvider
+
+A React context provider for use with the `useHasRecursion` hook to prevent recursive renders.
+
+Wrap block content with this provider and provide the same `uniqueId` prop as used with `useHasRecursion`.
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+-   _props.blockName_ `string`: Optional block name.
+-   _props.children_ `JSX.Element`: React children.
+
+_Returns_
+
+-   `JSX.Element`: A React element.
+
 ### ReusableBlocksRenameHint
 
 Undocumented declaration.
@@ -787,12 +808,22 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Object|Array`: CSS rules.
--   _wrapperClassName_ `string`: Wrapper Class Name.
+-   _styles_ `EditorStyle[]`: CSS rules.
+-   _wrapperSelector_ `string`: Wrapper selector.
 
 _Returns_
 
 -   `Array`: converted rules.
+
+_Type Definition_
+
+-   _EditorStyle_ `Object`
+
+_Properties_
+
+-   _css_ `string`: the CSS block(s), as a single string.
+-   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
+-   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 
@@ -927,6 +958,21 @@ _Returns_
 
 -   `any`: value
 
+### useHasRecursion
+
+A React hook for keeping track of blocks previously rendered up in the block tree. Blocks susceptible to recursion can use this hook in their `Edit` function to prevent said recursion.
+
+Use this with the `RecursionProvider` component, using the same `uniqueId` value for both the hook and the provider.
+
+_Parameters_
+
+-   _uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+-   _blockName_ `string`: Optional block name.
+
+_Returns_
+
+-   `boolean`: A boolean describing whether the provided id has already been rendered.
+
 ### useInnerBlocksProps
 
 This hook is used to lightly mark an element as an inner blocks wrapper element. Call this hook and pass the returned props to the element to mark as an inner blocks wrapper, automatically rendering inner blocks as children. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
@@ -942,9 +988,11 @@ _Parameters_
 
 ### useSetting
 
+> **Deprecated** 6.5.0 Use useSettings instead.
+
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.
 
 _Usage_
 
@@ -959,6 +1007,26 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
+
+### useSettings
+
+Hook that retrieves the given settings for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
+
+_Usage_
+
+```js
+const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+```
+
+_Parameters_
+
+-   _paths_ `string[]`: The paths to the settings.
+
+_Returns_
+
+-   `any[]`: Returns the values defined for the settings.
 
 ### Warning
 
@@ -1012,7 +1080,7 @@ Handles selection and navigation across blocks. This component should be wrapped
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.children_ `WPElement`: Children to be rendered.
+-   _props.children_ `Element`: Children to be rendered.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

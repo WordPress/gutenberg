@@ -3,21 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalHeading as Heading } from '@wordpress/components';
-import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import NavigationMenuEditor from '../sidebar-navigation-screen-navigation-menu/navigation-menu-editor';
-import { NAVIGATION_POST_TYPE } from '../../utils/constants';
+import useNavigationMenuTitle from './use-navigation-menu-title';
 
 export default function TemplatePartNavigationMenu( { id } ) {
-	const [ title ] = useEntityProp(
-		'postType',
-		NAVIGATION_POST_TYPE,
-		'title',
-		id
-	);
+	const title = useNavigationMenuTitle( id );
 
 	if ( ! id || title === undefined ) {
 		return null;

@@ -13,5 +13,10 @@
 .components-text-control__input[type="month"],
 .components-text-control__input[type="number"] {
 	width: 100%;
+	height: $grid-unit-40;
 	@include input-control;
+
+	&.is-next-40px-default-size {
+		height: $grid-unit-50;
+	}
 }

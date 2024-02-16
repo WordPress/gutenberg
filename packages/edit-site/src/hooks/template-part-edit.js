@@ -24,11 +24,13 @@ function EditTemplatePartMenuItem( { attributes } ) {
 	const { params } = useLocation();
 	const templatePart = useSelect(
 		( select ) => {
-			return select( coreStore ).getEntityRecord(
+			const { getCurrentTheme, getEntityRecord } = select( coreStore );
+
+			return getEntityRecord(
 				'postType',
 				TEMPLATE_PART_POST_TYPE,
 				// Ideally this should be an official public API.
-				`${ theme }//${ slug }`
+				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
 			);
 		},
 		[ theme, slug ]
@@ -41,7 +43,7 @@ function EditTemplatePartMenuItem( { attributes } ) {
 			canvas: 'edit',
 		},
 		{
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || templatePart?.id,
 		}
 	);
 
@@ -50,16 +52,14 @@ function EditTemplatePartMenuItem( { attributes } ) {
 	}
 
 	return (
-		<BlockControls group="other">
-			<ToolbarButton
-				{ ...linkProps }
-				onClick={ ( event ) => {
-					linkProps.onClick( event );
-				} }
-			>
-				{ __( 'Edit' ) }
-			</ToolbarButton>
-		</BlockControls>
+		<ToolbarButton
+			{ ...linkProps }
+			onClick={ ( event ) => {
+				linkProps.onClick( event );
+			} }
+		>
+			{ __( 'Edit' ) }
+		</ToolbarButton>
 	);
 }
 
@@ -70,9 +70,11 @@ export const withEditBlockControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				{ isDisplayed && (
-					<EditTemplatePartMenuItem attributes={ attributes } />
+					<BlockControls group="other">
+						<EditTemplatePartMenuItem attributes={ attributes } />
+					</BlockControls>
 				) }
 			</>
 		);

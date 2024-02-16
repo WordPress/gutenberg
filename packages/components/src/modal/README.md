@@ -4,12 +4,6 @@ Modals give users information and choices related to a task they’re trying to 
 
 ![An alert modal for trashing a post](https://wordpress.org/gutenberg/files/2019/04/Modal.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -120,8 +114,8 @@ The modal is used to create an accessible modal over an application.
 The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Modal } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyModal = () => {
 	const [ isOpen, setOpen ] = useState( false );

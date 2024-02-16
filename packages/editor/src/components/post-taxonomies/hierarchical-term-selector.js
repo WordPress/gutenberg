@@ -149,7 +149,7 @@ export function getFilterMatcher( filterValue ) {
  *
  * @param {Object} props      Component props.
  * @param {string} props.slug Taxonomy slug.
- * @return {WPElement}        Hierarchical term selector component.
+ * @return {Element}        Hierarchical term selector component.
  */
 export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );

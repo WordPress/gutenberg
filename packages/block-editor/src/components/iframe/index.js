@@ -28,7 +28,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
-import { useCompatibilityStyles } from './use-compatibility-styles';
+import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 
 function bubbleEvent( event, Constructor, frame ) {
@@ -38,7 +38,14 @@ function bubbleEvent( event, Constructor, frame ) {
 		init[ key ] = event[ key ];
 	}
 
-	if ( event instanceof frame.ownerDocument.defaultView.MouseEvent ) {
+	// Check if the event is a MouseEvent generated within the iframe.
+	// If so, adjust the coordinates to be relative to the position of
+	// the iframe. This ensures that components such as Draggable
+	// receive coordinates relative to the window, instead of relative
+	// to the iframe. Without this, the Draggable event handler would
+	// result in components "jumping" position as soon as the user
+	// drags over the iframe.
+	if ( event instanceof frame.contentDocument.defaultView.MouseEvent ) {
 		const rect = frame.getBoundingClientRect();
 		init.clientX += rect.left;
 		init.clientY += rect.top;
@@ -66,12 +73,13 @@ function bubbleEvent( event, Constructor, frame ) {
  * @param {Document} iframeDocument Document to attach listeners to.
  */
 function useBubbleEvents( iframeDocument ) {
-	return useRefEffect( ( body ) => {
+	return useRefEffect( () => {
 		const { defaultView } = iframeDocument;
 		if ( ! defaultView ) {
 			return;
 		}
 		const { frameElement } = defaultView;
+		const html = iframeDocument.documentElement;
 		const eventTypes = [ 'dragover', 'mousemove' ];
 		const handlers = {};
 		for ( const name of eventTypes ) {
@@ -81,12 +89,12 @@ function useBubbleEvents( iframeDocument ) {
 				const Constructor = window[ constructorName ];
 				bubbleEvent( event, Constructor, frameElement );
 			};
-			body.addEventListener( name, handlers[ name ] );
+			html.addEventListener( name, handlers[ name ] );
 		}
 
 		return () => {
 			for ( const name of eventTypes ) {
-				body.removeEventListener( name, handlers[ name ] );
+				html.removeEventListener( name, handlers[ name ] );
 			}
 		};
 	} );
@@ -113,7 +121,6 @@ function Iframe( {
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const compatStyles = useCompatibilityStyles();
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
@@ -148,7 +155,7 @@ function Iframe( {
 
 			contentDocument.dir = ownerDocument.dir;
 
-			for ( const compatStyle of compatStyles ) {
+			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
 					continue;
 				}
@@ -266,13 +273,16 @@ function Iframe( {
 				src={ src }
 				title={ __( 'Editor canvas' ) }
 				onKeyDown={ ( event ) => {
+					if ( props.onKeyDown ) {
+						props.onKeyDown( event );
+					}
 					// If the event originates from inside the iframe, it means
 					// it bubbled through the portal, but only with React
 					// events. We need to to bubble native events as well,
 					// though by doing so we also trigger another React event,
 					// so we need to stop the propagation of this event to avoid
 					// duplication.
-					if (
+					else if (
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {

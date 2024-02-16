@@ -24,6 +24,8 @@ export const InsertionPointOpenRef = createContext();
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
+	operation = 'insert',
+	nearestSide = 'right',
 } ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
@@ -79,11 +81,16 @@ function InbetweenInsertionPointPopover( {
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
+	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	const disableMotion = useReducedMotion();
 
 	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
+		if (
+			event.target === ref.current &&
+			nextClientId &&
+			getBlockEditingMode( nextClientId ) !== 'disabled'
+		) {
 			selectBlock( nextClientId, -1 );
 		}
 	}
@@ -138,9 +145,14 @@ function InbetweenInsertionPointPopover( {
 		return null;
 	}
 
+	const orientationClassname =
+		orientation === 'horizontal' || operation === 'group'
+			? 'is-horizontal'
+			: 'is-vertical';
+
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
-		'is-' + orientation
+		orientationClassname
 	);
 
 	return (
@@ -149,6 +161,8 @@ function InbetweenInsertionPointPopover( {
 			nextClientId={ nextClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			operation={ operation }
+			nearestSide={ nearestSide }
 		>
 			<motion.div
 				layout={ ! disableMotion }
@@ -236,6 +250,10 @@ export default function InsertionPoint( props ) {
 			{ ...props }
 		/>
 	) : (
-		<InbetweenInsertionPointPopover { ...props } />
+		<InbetweenInsertionPointPopover
+			operation={ insertionPoint.operation }
+			nearestSide={ insertionPoint.nearestSide }
+			{ ...props }
+		/>
 	);
 }

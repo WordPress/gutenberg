@@ -21,7 +21,7 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
@@ -36,7 +36,10 @@ export default {
 		layoutBlockSupport = {},
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
-		const { allowJustification = true } = layoutBlockSupport;
+		const {
+			allowJustification = true,
+			allowCustomContentAndWideSize = true,
+		} = layoutBlockSupport;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -60,66 +63,65 @@ export default {
 				label: __( 'Justify items right' ),
 			},
 		];
+		const [ availableUnits ] = useSettings( 'spacing.units' );
 		const units = useCustomUnits( {
-			availableUnits: useSetting( 'spacing.units' ) || [
-				'%',
-				'px',
-				'em',
-				'rem',
-				'vw',
-			],
+			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
 		return (
 			<>
-				<div className="block-editor-hooks__layout-controls">
-					<div className="block-editor-hooks__layout-controls-unit">
-						<UnitControl
-							className="block-editor-hooks__layout-controls-unit-input"
-							label={ __( 'Content' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ contentSize || wideSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									contentSize: nextWidth,
-								} );
-							} }
-							units={ units }
-						/>
-						<Icon icon={ positionCenter } />
-					</div>
-					<div className="block-editor-hooks__layout-controls-unit">
-						<UnitControl
-							className="block-editor-hooks__layout-controls-unit-input"
-							label={ __( 'Wide' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ wideSize || contentSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									wideSize: nextWidth,
-								} );
-							} }
-							units={ units }
-						/>
-						<Icon icon={ stretchWide } />
-					</div>
-				</div>
-				<p className="block-editor-hooks__layout-controls-helptext">
-					{ __(
-						'Customize the width for all elements that are assigned to the center or wide columns.'
-					) }
-				</p>
+				{ allowCustomContentAndWideSize && (
+					<>
+						<div className="block-editor-hooks__layout-controls">
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									className="block-editor-hooks__layout-controls-unit-input"
+									label={ __( 'Content' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ contentSize || wideSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										onChange( {
+											...layout,
+											contentSize: nextWidth,
+										} );
+									} }
+									units={ units }
+								/>
+								<Icon icon={ positionCenter } />
+							</div>
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									className="block-editor-hooks__layout-controls-unit-input"
+									label={ __( 'Wide' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ wideSize || contentSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										onChange( {
+											...layout,
+											wideSize: nextWidth,
+										} );
+									} }
+									units={ units }
+								/>
+								<Icon icon={ stretchWide } />
+							</div>
+						</div>
+						<p className="block-editor-hooks__layout-controls-helptext">
+							{ __(
+								'Customize the width for all elements that are assigned to the center or wide columns.'
+							) }
+						</p>
+					</>
+				) }
 				{ allowJustification && (
 					<ToggleGroupControl
 						__nextHasNoMarginBottom

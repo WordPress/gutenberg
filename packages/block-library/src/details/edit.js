@@ -72,7 +72,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
 						}
-						multiline={ false }
 					/>
 				</summary>
 				{ innerBlocksProps.children }

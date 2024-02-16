@@ -27,6 +27,12 @@
 			opacity: 0;
 		}
 	}
+	.block-bindings-media-placeholder-message {
+		opacity: 0;
+	}
+	&.is-selected .block-bindings-media-placeholder-message {
+		opacity: 1;
+	}
 
 	// Remove the transition while we still have a legacy placeholder style.
 	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
@@ -37,7 +43,6 @@
 		transition: none;
 	}
 }
-
 
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
@@ -175,4 +180,9 @@ figure.wp-block-image:not(.wp-block) {
 		padding-left: 0;
 		padding-right: 0;
 	}
+}
+
+.wp-block-image__toolbar_content_textarea {
+	// Corresponds to the size of the textarea in the block inspector.
+	width: 250px;
 }

@@ -224,45 +224,13 @@ const getAttachmentsCollection = ( ids ) => {
 };
 
 class MediaUpload extends Component {
-	constructor( {
-		allowedTypes,
-		gallery = false,
-		unstableFeaturedImageFlow = false,
-		modalClass,
-		multiple = false,
-		title = __( 'Select or Upload Media' ),
-	} ) {
+	constructor() {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onOpen = this.onOpen.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
-
-		const { wp } = window;
-
-		if ( gallery ) {
-			this.buildAndSetGalleryFrame();
-		} else {
-			const frameConfig = {
-				title,
-				multiple,
-			};
-			if ( !! allowedTypes ) {
-				frameConfig.library = { type: allowedTypes };
-			}
-
-			this.frame = wp.media( frameConfig );
-		}
-
-		if ( modalClass ) {
-			this.frame.$el.addClass( modalClass );
-		}
-
-		if ( unstableFeaturedImageFlow ) {
-			this.buildAndSetFeatureImageFrame();
-		}
-		this.initializeListeners();
 	}
 
 	initializeListeners() {
@@ -348,7 +316,7 @@ class MediaUpload extends Component {
 	}
 
 	componentWillUnmount() {
-		this.frame.remove();
+		this.frame?.remove();
 	}
 
 	onUpdate( selections ) {
@@ -444,9 +412,38 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
-		if ( this.props.gallery ) {
+		const {
+			allowedTypes,
+			gallery = false,
+			unstableFeaturedImageFlow = false,
+			modalClass,
+			multiple = false,
+			title = __( 'Select or Upload Media' ),
+		} = this.props;
+		const { wp } = window;
+
+		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
+		} else {
+			const frameConfig = {
+				title,
+				multiple,
+			};
+			if ( !! allowedTypes ) {
+				frameConfig.library = { type: allowedTypes };
+			}
+
+			this.frame = wp.media( frameConfig );
 		}
+
+		if ( modalClass ) {
+			this.frame.$el.addClass( modalClass );
+		}
+
+		if ( unstableFeaturedImageFlow ) {
+			this.buildAndSetFeatureImageFrame();
+		}
+		this.initializeListeners();
 		this.frame.open();
 	}
 

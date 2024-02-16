@@ -17,7 +17,7 @@ test.describe( 'Push to Global Styles button', () => {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should apply Heading block styles to all Heading blocks', async ( {
@@ -52,6 +52,16 @@ test.describe( 'Push to Global Styles button', () => {
 				name: 'Apply globally',
 			} )
 		).toBeDisabled();
+
+		// Enable letter case.
+		const typographyOptions = page.getByRole( 'button', {
+			name: 'Typography options',
+		} );
+		await typographyOptions.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Letter case' } )
+			.click();
+		await typographyOptions.click();
 
 		// Make the Heading block uppercase
 		await page.getByRole( 'button', { name: 'Uppercase' } ).click();

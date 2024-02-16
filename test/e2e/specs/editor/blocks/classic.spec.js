@@ -18,15 +18,10 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -124,22 +119,12 @@ test.describe( 'Classic', () => {
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
 
-		await page.click( 'role=button[name="Save draft"i]' );
-
-		await expect(
-			page.locator( 'role=button[name="Saved"i]' )
-		).toBeDisabled();
-
+		await editor.saveDraft();
 		await page.reload();
 		await page.unroute( '**' );
 
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
 
 		const errors = [];
 		page.on( 'pageerror', ( exception ) => {
