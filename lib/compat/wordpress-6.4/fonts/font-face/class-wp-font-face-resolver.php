@@ -76,7 +76,15 @@ if ( ! class_exists( 'WP_Font_Face_Resolver' ) ) {
 						$fonts[ $font_family_name ] = array();
 					}
 
-					$fonts[ $font_family_name ] = static::convert_font_face_properties( $definition['fontFace'], $font_family_name );
+					$font_faces_to_add = static::convert_font_face_properties( $definition['fontFace'], $font_family_name );
+					foreach ( $font_faces_to_add as $font_face_to_add ) {
+						$offset = static::search_font_face( $font_face_to_add, $fonts[ $font_family_name ] );
+						if ( false !== $offset ) {
+							$fonts[ $font_family_name ][ $offset ] = array_merge( $fonts[ $font_family_name ][ $offset ], $font_face_to_add );
+						} else {
+							$fonts[ $font_family_name ][] = $font_face_to_add;
+						}
+					}
 				}
 			}
 
@@ -130,6 +138,29 @@ if ( ! class_exists( 'WP_Font_Face_Resolver' ) ) {
 			}
 
 			return $converted_font_faces;
+		}
+
+		/**
+		 * Search the specified font-face from the font-face array.
+		 *
+		 * @since 6.4.0
+		 *
+		 * @param array $font_face The searched font-face.
+		 * @param array $font_faces The font-face array.
+		 * @return integer|boolean Returns the key for the searched font-face if it's found in the array, false otherwise.
+		 */
+		private static function search_font_face( array $font_face, array $font_faces ) {
+			foreach ( $font_faces as $key => $value ) {
+				if (
+					$font_face['font-family'] === $value['font-family'] &&
+					$font_face['font-style'] === $value['font-style'] &&
+					$font_face['font-weight'] === $value['font-weight']
+				) {
+					return $key;
+				}
+			}
+
+			return false;
 		}
 
 		/**
