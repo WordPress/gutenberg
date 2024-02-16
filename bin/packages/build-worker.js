@@ -174,12 +174,22 @@ async function buildJS( file ) {
 	}
 }
 
+async function copyJSON( file ) {
+	const content = await readFile( file, 'utf8' );
+	for ( const buildDir of Object.values( JS_ENVIRONMENTS ) ) {
+		const destPath = getBuildPath( file, buildDir );
+		await makeDir( path.dirname( destPath ) );
+		await writeFile( destPath, content );
+	}
+}
+
 /**
  * Object of build tasks per file extension.
  *
  * @type {Object<string,Function>}
  */
 const BUILD_TASK_BY_EXTENSION = {
+	'.json': copyJSON,
 	'.scss': buildCSS,
 	'.js': buildJS,
 	'.ts': buildJS,

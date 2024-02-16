@@ -3,11 +3,6 @@
  */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name } from './block.json';
-
 const transforms = {
 	from: [
 		{
@@ -22,7 +17,10 @@ const transforms = {
 				},
 			} ),
 			transform( node ) {
-				const attributes = getBlockAttributes( name, node.outerHTML );
+				const attributes = getBlockAttributes(
+					'core/paragraph',
+					node.outerHTML
+				);
 				const { textAlign } = node.style || {};
 
 				if (
@@ -33,7 +31,7 @@ const transforms = {
 					attributes.align = textAlign;
 				}
 
-				return createBlock( name, attributes );
+				return createBlock( 'core/paragraph', attributes );
 			},
 		},
 	],
