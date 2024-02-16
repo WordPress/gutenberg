@@ -12,6 +12,7 @@ import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
 import { getTextContent } from './get-text-content';
+import { toggleFormat } from './toggle-format';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -155,6 +156,11 @@ export class RichTextData {
 	}
 	toJSON() {
 		return this.toHTMLString();
+	}
+	toggleFormat( format, startIndex, endIndex ) {
+		return new RichTextData(
+			toggleFormat( this.#value, format, startIndex, endIndex )
+		);
 	}
 	get length() {
 		return this.text.length;
