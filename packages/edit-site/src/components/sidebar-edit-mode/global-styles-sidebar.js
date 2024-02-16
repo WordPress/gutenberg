@@ -41,7 +41,7 @@ export default function GlobalStylesSidebar() {
 		);
 		const canvasContainerView = getEditorCanvasContainerView();
 		const _isVisualEditorMode =
-			'visual' === select( editSiteStore ).getEditorMode();
+			'visual' === select( editorStore ).getEditorMode();
 		const _isEditCanvasMode = 'edit' === getCanvasMode();
 		const _showListViewByDefault = select( preferencesStore ).get(
 			'core',

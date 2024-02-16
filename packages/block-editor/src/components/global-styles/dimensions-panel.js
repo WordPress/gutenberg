@@ -97,7 +97,6 @@ function useHasChildLayout( settings ) {
 			defaultParentLayoutType === 'grid' ||
 			parentLayoutType === 'grid' ) &&
 		allowSizingOnChildren;
-
 	return !! settings?.layout && support;
 }
 
@@ -397,13 +396,16 @@ export default function DimensionsPanel( {
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
-	const { selfStretch } = childLayout ?? {};
 	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
+	const {
+		type: parentType,
+		default: { type: defaultParentType = 'default' } = {},
+	} = settings?.parentLayout ?? {};
+	const parentLayoutType = parentType || defaultParentType;
 	const flexResetLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
-	const childLayoutResetLabel = selfStretch
-		? flexResetLabel
-		: __( 'Grid spans' );
+	const childLayoutResetLabel =
+		parentLayoutType === 'flex' ? flexResetLabel : __( 'Grid spans' );
 	const setChildLayout = ( newChildLayout ) => {
 		onChange( {
 			...value,
@@ -418,7 +420,6 @@ export default function DimensionsPanel( {
 			flexSize: undefined,
 			columnSpan: undefined,
 			rowSpan: undefined,
-			parentColumnWidth: undefined,
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
@@ -434,7 +435,6 @@ export default function DimensionsPanel( {
 				flexSize: undefined,
 				columnSpan: undefined,
 				rowSpan: undefined,
-				parentColumnWidth: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
