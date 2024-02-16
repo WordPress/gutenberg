@@ -28,6 +28,7 @@ import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
 import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
+import { insertBlockAndWaitForSelector } from './insert-block-and-wait-for-selector';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -61,6 +62,9 @@ export class Editor {
 		getEditedPostContent.bind( this );
 	/** @borrows insertBlock as this.insertBlock */
 	insertBlock: typeof insertBlock = insertBlock.bind( this );
+	/** @borrows insertBlockAndWaitForSelector as this.insertBlockAndWaitForSelector */
+	insertBlockAndWaitForSelector: typeof insertBlockAndWaitForSelector =
+		insertBlockAndWaitForSelector.bind( this );
 	/** @borrows openDocumentSettingsSidebar as this.openDocumentSettingsSidebar */
 	openDocumentSettingsSidebar: typeof openDocumentSettingsSidebar =
 		openDocumentSettingsSidebar.bind( this );
