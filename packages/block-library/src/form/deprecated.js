@@ -5,37 +5,18 @@ import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 const deprecated = [
 	{
-		supports: {
-			anchor: true,
-			className: false,
-			color: {
-				gradients: true,
-				link: true,
-				__experimentalDefaultControls: {
-					background: true,
-					text: true,
-					link: true,
-				},
-			},
-			spacing: {
-				margin: true,
-				padding: true,
-			},
-			typography: {
-				fontSize: true,
-				lineHeight: true,
-				__experimentalFontFamily: true,
-				__experimentalTextDecoration: true,
-				__experimentalFontStyle: true,
-				__experimentalFontWeight: true,
-				__experimentalLetterSpacing: true,
-				__experimentalTextTransform: true,
-				__experimentalDefaultControls: {
-					fontSize: true,
-				},
-			},
-			__experimentalSelector: 'form',
-		},
+		// The block supports here are deliberately empty despite this
+		// deprecated version of the block having adopted block supports.
+		// The attributes added by these supports have been manually
+		// added to this deprecated version's attributes definition so
+		// that the data isn't lost on migration. All this is so that the
+		// automatic application of block support classes doesn't occur
+		// as this version of the block had a bug that overrode those
+		// classes. If those block support classes are applied during the
+		// deprecation process, this deprecation doesn't match and won't
+		// run.
+		// @see https://github.com/WordPress/gutenberg/pull/55755
+		supports: {},
 		attributes: {
 			submissionMethod: {
 				type: 'string',
@@ -49,6 +30,26 @@ const deprecated = [
 				type: 'string',
 			},
 			email: {
+				type: 'string',
+			},
+			// The following attributes have been added to match the block
+			// supports at the time of the deprecation. See above for details.
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+			style: {
+				type: 'object',
+			},
+			fontFamily: {
+				type: 'string',
+			},
+			fontSize: {
 				type: 'string',
 			},
 		},
