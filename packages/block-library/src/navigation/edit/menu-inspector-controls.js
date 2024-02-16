@@ -34,13 +34,17 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 ];
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
+function AdditionalBlockContent( {
+	clientId,
+	insertedBlock,
+	setInsertedBlock,
+} ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
 		insertedBlock?.name
 	);
-	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+	const blockWasJustInserted = insertedBlock?.clientId === clientId;
 	const showLinkControls = supportsLinkControls && blockWasJustInserted;
 
 	if ( ! showLinkControls ) {

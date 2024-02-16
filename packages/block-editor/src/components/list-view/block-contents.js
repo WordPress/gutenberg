@@ -22,7 +22,7 @@ const ListViewBlockContents = forwardRef(
 		{
 			onClick,
 			onToggleExpanded,
-			block,
+			clientId,
 			isSelected,
 			position,
 			siblingBlockCount,
@@ -33,8 +33,6 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const { clientId } = block;
-
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
 				const { hasBlockMovingClientId, getSelectedBlockClientId } =
@@ -69,7 +67,7 @@ const ListViewBlockContents = forwardRef(
 			<>
 				{ AdditionalBlockContent && (
 					<AdditionalBlockContent
-						block={ block }
+						clientId={ clientId }
 						insertedBlock={ insertedBlock }
 						setInsertedBlock={ setInsertedBlock }
 					/>
@@ -83,7 +81,7 @@ const ListViewBlockContents = forwardRef(
 						<ListViewBlockSelectButton
 							ref={ ref }
 							className={ className }
-							block={ block }
+							clientId={ clientId }
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
