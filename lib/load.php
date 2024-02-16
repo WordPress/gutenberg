@@ -192,6 +192,7 @@ require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/tokens.php';
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
