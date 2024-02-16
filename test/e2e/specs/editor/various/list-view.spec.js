@@ -378,6 +378,7 @@ test.describe( 'List View', () => {
 		// Focus the outline tab and select it. This test ensures the outline
 		// tab receives similar focus events based on the shortcut.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await page.keyboard.press( 'ArrowRight' );
 		const outlineButton = page.getByRole( 'tab', {
 			name: 'Outline',
@@ -387,7 +388,7 @@ test.describe( 'List View', () => {
 
 		// From here, tab in to the editor so focus can be checked on return to
 		// the outline tab in the sidebar.
-		await pageUtils.pressKeys( 'Tab', { times: 2 } );
+		await pageUtils.pressKeys( 'Tab', { times: 3 } );
 		// Focus should be placed on the outline tab button since there is
 		// nothing to focus inside the tab itself.
 		await pageUtils.pressKeys( 'access+o' );
