@@ -11,7 +11,7 @@ import type { Editor } from './index';
  * @return Promise resolving with post content markup.
  */
 export async function getEditedPostContent( this: Editor ) {
-	await this.page.waitForFunction( () => window?.wp?.data );
+	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
 
 	return await this.page.evaluate( () =>
 		window.wp.data.select( 'core/editor' ).getEditedPostContent()
