@@ -186,37 +186,21 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			$this->sources[ $source_name ] = $source;
 
 			// Add `uses_context` defined by block bindings sources.
-			// If `get_uses_context` exists (from WP 6.5), use its filter because it is more reliable.
-			if ( method_exists( 'WP_Block_Type', 'get_uses_context' ) ) {
-				add_filter(
-					'get_block_type_uses_context',
-					function ( $uses_context, $block_type ) use ( $source ) {
-						if ( ! in_array( $block_type->name, $this->supported_blocks, true ) || empty( $source->uses_context ) ) {
-							return $uses_context;
-						}
-						// Use array_values to reset the array keys.
-						return array_values( array_unique( array_merge( $uses_context, $source->uses_context ) ) );
-					},
-					10,
-					2
-				);
-			} else {
-				add_filter(
-					'register_block_type_args',
-					function ( $args, $block_name ) use ( $source ) {
-						if ( ! in_array( $block_name, $this->supported_blocks, true ) || empty( $source->uses_context ) ) {
-							return $args;
-						}
-						$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
-						// Use array_values to reset the array keys.
-						$args['uses_context'] = array_values( array_unique( array_merge( $original_use_context, $source->uses_context ) ) );
-
+			add_filter(
+				'register_block_type_args',
+				function ( $args, $block_name ) use ( $source ) {
+					if ( ! in_array( $block_name, $this->supported_blocks, true ) || empty( $source->uses_context ) ) {
 						return $args;
-					},
-					10,
-					2
-				);
-			}
+					}
+					$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
+					// Use array_values to reset the array keys.
+					$args['uses_context'] = array_values( array_unique( array_merge( $original_use_context, $source->uses_context ) ) );
+
+					return $args;
+				},
+				10,
+				2
+			);
 			return $source;
 		}
 
