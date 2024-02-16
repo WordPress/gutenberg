@@ -1,4 +1,5 @@
 import Foundation
+import React
 
 class CustomImageLoader: NSObject, RCTImageURLLoader {
 
