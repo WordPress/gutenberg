@@ -68,26 +68,46 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
  * @since 6.3.0
  */
 function register_block_core_footnotes() {
-	$post_types = get_post_types(
-		array(
-			'show_in_rest' => true,
-			'public'       => true,
-		)
-	);
+	// Replace this to run at `init,100` to ensure that the post types are registered.
+	if ( doing_action( 'init' ) ) {
+		if ( 10 === has_action( 'init', 'register_block_core_footnotes' ) ) {
+			/*
+			 * Remove the action from the default priority to run at init, 100.
+			 *
+			 * To ensure the post types are registered before footnotes, this needs
+			 * to run at a later priority than the default. For backwards compatibility
+			 * with plugins that have deregistered the block, it is moved during the init
+			 * hook.
+			 */
+			remove_action( 'init', 'register_block_core_footnotes' );
+			add_action( 'init', 'register_block_core_footnotes', 100 );
+			return;
+		}
+	}
+
+	// Only register publicly_queryable post types available in the REST API.
+	$post_types = get_post_types( array( 'show_in_rest' => true ) );
+	$post_types = array_filter( $post_types, 'is_post_type_viewable' );
+
+	// @todo Check for footnotes block support for each post type.
+
 	foreach ( $post_types as $post_type ) {
 		// Only register the meta field if the post type supports the editor, custom fields, and revisions.
-		if ( post_type_supports( $post_type, 'editor' ) && post_type_supports( $post_type, 'custom-fields' ) && post_type_supports( $post_type, 'revisions' ) ) {
-			register_post_meta(
-				$post_type,
-				'footnotes',
-				array(
-					'show_in_rest'      => true,
-					'single'            => true,
-					'type'              => 'string',
-					'revisions_enabled' => true,
-				)
-			);
+		$supports = get_all_post_type_supports( $post_type );
+		if ( ! isset( $supports['editor'], $supports['custom-fields'], $supports['revisions'] ) ) {
+			continue;
 		}
+
+		register_post_meta(
+			$post_type,
+			'footnotes',
+			array(
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'revisions_enabled' => true,
+			)
+		);
 	}
 	register_block_type_from_metadata(
 		__DIR__ . '/footnotes',
@@ -102,15 +122,27 @@ add_action( 'init', 'register_block_core_footnotes' );
  * Adds the footnotes field to the revisions display.
  *
  * @since 6.3.0
+ * @since 6.5.0 The `$post` parameter was added.
  *
  * @param array $fields The revision fields.
+ * @param array $post   The post formatted as an array. Note: this is the post the revision is
+ *                      for, not the revision itself.
  * @return array The revision fields.
  */
-function wp_add_footnotes_to_revision( $fields ) {
+function wp_add_footnotes_to_revision( $fields, $post ) {
+	$post_type = $post['post_type'];
+	$supports  = get_all_post_type_supports( $post_type );
+
+	if ( ! isset( $supports['editor'], $supports['custom-fields'], $supports['revisions'] ) ) {
+		return $fields;
+	}
+
+	// @todo Check for footnotes block support.
+
 	$fields['footnotes'] = __( 'Footnotes' );
 	return $fields;
 }
-add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
+add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision', 10, 2 );
 
 /**
  * Gets the footnotes field from the revision for the revisions screen.
