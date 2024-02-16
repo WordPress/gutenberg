@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        gradlePluginVersion = '8.1.1'
+        gradlePluginVersion = '8.1.0'
         kotlinVersion = '1.8.0'
         buildToolsVersion = "34.0.0"
         minSdkVersion = 24
@@ -18,6 +18,14 @@ buildscript {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+    // Fix AGP version to 8.1.0 until the main Android app upgrades to 8.1.1
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'com.android.tools.build' && details.requested.name == 'gradle') {
+                details.useVersion gradlePluginVersion
+            }
+        }
     }
 }
 
