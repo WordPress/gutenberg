@@ -6,9 +6,9 @@ import { View, Platform, Pressable } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useCallback } from '@wordpress/element';
+import { useRef, useState, useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
 	WIDE_ALIGNMENTS,
@@ -69,7 +69,9 @@ export default function BlockList( {
 	withFooter = true,
 } ) {
 	const {
-		blockClientIds,
+		rootBlock,
+		blockOrder,
+		blocks,
 		blockCount,
 		blockInsertionPointIsVisible,
 		isReadOnly,
@@ -78,9 +80,13 @@ export default function BlockList( {
 		isStackedHorizontally,
 		maxWidth,
 		isRTL,
+		hasNestedInnerBlocks,
+		selectedBlockId,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlock,
+				getBlocks,
 				getBlockCount,
 				getBlockHierarchyRootClientId,
 				getBlockOrder,
@@ -94,12 +100,6 @@ export default function BlockList( {
 				selectedBlockClientId
 			);
 
-			let blockOrder = getBlockOrder( rootClientId );
-			// Display only block which fulfill the condition in passed `filterInnerBlocks` function.
-			if ( filterInnerBlocks ) {
-				blockOrder = filterInnerBlocks( blockOrder );
-			}
-
 			const {
 				isRTL: isRTLSetting,
 				maxWidth: maxWidthSetting,
@@ -107,7 +107,9 @@ export default function BlockList( {
 			} = getSettings();
 
 			return {
-				blockClientIds: blockOrder,
+				rootBlock: getBlock( rootClientId ),
+				blockOrder: getBlockOrder( rootClientId ),
+				blocks: getBlocks( rootClientId ),
 				blockCount: getBlockCount(),
 				blockInsertionPointIsVisible:
 					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
@@ -118,10 +120,65 @@ export default function BlockList( {
 				isStackedHorizontally: orientation === 'horizontal',
 				maxWidth: maxWidthSetting,
 				isRTL: isRTLSetting,
+				hasNestedInnerBlocks: getBlocks( rootClientId ).some(
+					( item ) => item.innerBlocks?.length > 0
+				),
+				selectedBlockId: selectedBlockClientId,
 			};
 		},
-		[ filterInnerBlocks, orientation, rootClientId ]
+		[ orientation, rootClientId ]
 	);
+
+	// Calculate ids of blocks to render in the block list.
+	const blockClientIds = useMemo( () => {
+		const blockOrderFiltered = filterInnerBlocks
+			? // Display only blocks that fulfill the condition passed in `filterInnerBlocks` function.
+			  filterInnerBlocks( blockOrder )
+			: blockOrder;
+		const blocksFiltered = blocks.filter( ( item ) =>
+			blockOrderFiltered.includes( item.clientId )
+		);
+
+		// In order to avoid deeply nested structures, try to flatten nested inner blocks.
+		const blocksFlattened = [];
+		const canFlattenInnerBlocks = ( block ) => {
+			const blockType = getBlockType( block.name );
+			return (
+				block.innerBlocks.length > 0 &&
+				// If the block is selected, we render the block as usual.
+				// Otherwise, the group blocks won't be editable.
+				selectedBlockId !== block.clientId &&
+				// `canFlattenInnerBlocks` is a helper that edit component of a blocks can define.
+				// By default, we assume that inner blocks can't be flattened.
+				blockType?.edit?.canFlattenInnerBlocks?.()
+			);
+		};
+		if (
+			hasNestedInnerBlocks &&
+			rootClientId !== undefined &&
+			canFlattenInnerBlocks( rootBlock )
+		) {
+			const flattenInnerBlocks = ( items ) => {
+				return items.forEach( ( item ) =>
+					canFlattenInnerBlocks( item )
+						? flattenInnerBlocks( item.innerBlocks )
+						: blocksFlattened.push( item.clientId )
+				);
+			};
+			flattenInnerBlocks( blocksFiltered );
+			return blocksFlattened;
+		}
+
+		return blockOrderFiltered;
+	}, [
+		filterInnerBlocks,
+		blockOrder,
+		blocks,
+		rootClientId,
+		hasNestedInnerBlocks,
+		selectedBlockId,
+		rootBlock,
+	] );
 
 	const { insertBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 
