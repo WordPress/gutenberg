@@ -231,7 +231,7 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 				} )
 			}
 			min={ 1 }
-			max={ 6 }
+			max={ 16 }
 		/>
 	);
 }
@@ -276,14 +276,14 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			isBlock={ true }
 		>
 			<ToggleGroupControlOption
-				key={ 'manual' }
-				value="manual"
-				label={ __( 'Manual' ) }
-			/>
-			<ToggleGroupControlOption
 				key={ 'auto' }
 				value="auto"
 				label={ __( 'Auto' ) }
+			/>
+			<ToggleGroupControlOption
+				key={ 'manual' }
+				value="manual"
+				label={ __( 'Manual' ) }
 			/>
 		</ToggleGroupControl>
 	);
