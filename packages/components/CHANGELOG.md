@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Modal`: Update the Modal Heading and Label text color value so that it matches with the text color used for other areas of the editor. ([#50448](https://github.com/WordPress/gutenberg/pull/50916)).
+
 ### Breaking Changes
 
 -   `CustomSelectControl`: Remove deprecated `__nextUnconstrainedWidth` prop and promote to default behavior ([#58974](https://github.com/WordPress/gutenberg/pull/58974)).
