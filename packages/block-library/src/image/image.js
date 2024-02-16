@@ -744,10 +744,6 @@ export default function Image( {
 				ref={ imageRef }
 				className={ borderProps.className }
 				style={ {
-					width:
-						( width && height ) || aspectRatio ? '100%' : undefined,
-					height:
-						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
 					...shadowProps.style,
@@ -850,12 +846,7 @@ export default function Image( {
 		img = (
 			<ResizableBox
 				style={ {
-					display: 'block',
-					objectFit: scale,
-					aspectRatio:
-						! width && ! height && aspectRatio
-							? aspectRatio
-							: undefined,
+					aspectRatio: ! width && ! height && aspectRatio,
 				} }
 				size={ {
 					width: currentWidth ?? 'auto',
