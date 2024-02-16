@@ -29,6 +29,12 @@ export default function separatorSave( { attributes } ) {
 			[ colorClass ]: colorClass,
 			'has-css-opacity': opacity === 'css',
 			'has-alpha-channel-opacity': opacity === 'alpha-channel',
+			'is-style-default':
+				( ! attributes.hasOwnProperty( 'className' ) ||
+					attributes.className === 'is-style-default' ) &&
+				'is-style-default',
+			'is-style-wide': attributes.className === 'is-style-wide',
+			'is-style-dots': attributes.className === 'is-style-dots',
 		},
 		colorProps.className
 	);
