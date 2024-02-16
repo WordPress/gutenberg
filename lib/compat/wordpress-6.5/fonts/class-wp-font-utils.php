@@ -47,7 +47,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * Sanitizes and formats font family names.
 		 *
 		 * - Applies `sanitize_text_field`.
-		 * - Adds surrounding quotes to names that contain spaces or special characters.
+		 * - Adds surrounding quotes to names containing any characters that are not alphabetic or dashes.
 		 *
 		 * It follows the recommendations from the CSS Fonts Module Level 4.
 		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
