@@ -76,6 +76,12 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
+	// If default unit isn't available, convert default value to first available unit.
+	const [ smallestFontSizeValue, smallestFontSizeUnit ] =
+		parseQuantityAndUnitFromRawValue( smallestFontSize, availableUnits );
+	const [ largestFontSizeValue, largestFontSizeUnit ] =
+		parseQuantityAndUnitFromRawValue( smallestFontSize, availableUnits );
+
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 		const [ quantity, newUnit ] =
@@ -136,7 +142,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<FlexItem isBlock>
 						<UnitControl
 							label={ __( 'Smallest size' ) }
-							value={ smallestFontSize }
+							value={ `${ smallestFontSizeValue }${ smallestFontSizeUnit }` }
 							onChange={ ( value ) => {
 								onFontSizeChange( 'smallestFontSize', value );
 							} }
@@ -148,7 +154,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<FlexItem isBlock>
 						<UnitControl
 							label={ __( 'Largest size' ) }
-							value={ largestFontSize }
+							value={ `${ largestFontSizeValue }${ largestFontSizeUnit }` }
 							onChange={ ( value ) => {
 								onFontSizeChange( 'largestFontSize', value );
 							} }
