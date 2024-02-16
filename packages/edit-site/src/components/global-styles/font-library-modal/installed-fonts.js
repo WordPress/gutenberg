@@ -102,6 +102,7 @@ function InstalledFonts() {
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
 			footer={
 				<Footer
+					libraryFontSelected={ libraryFontSelected }
 					shouldDisplayDeleteButton={ shouldDisplayDeleteButton }
 					handleUninstallClick={ handleUninstallClick }
 				/>
@@ -172,13 +173,23 @@ function InstalledFonts() {
 	);
 }
 
-function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
+function Footer( {
+	shouldDisplayDeleteButton,
+	handleUninstallClick,
+	libraryFontSelected,
+} ) {
 	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
 		useContext( FontLibraryContext );
 
+	const customFontFamilyId =
+		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
+
 	const canUserDelete = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
-		return canUser( 'delete', 'font-families' );
+		return (
+			customFontFamilyId &&
+			canUser( 'delete', 'font-families', customFontFamilyId )
+		);
 	} );
 
 	return (
