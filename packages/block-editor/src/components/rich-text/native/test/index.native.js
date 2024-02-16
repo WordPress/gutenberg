@@ -96,6 +96,7 @@ describe( '<RichText/>', () => {
 				<RichText
 					onChange={ handleChange }
 					value={ defaultEmptyValue }
+					__unstableInputRule={ () => null }
 				/>
 			);
 

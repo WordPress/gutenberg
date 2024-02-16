@@ -6,6 +6,7 @@ import {
 	backspace,
 	clickBeginningOfElement,
 	waitForMediaLibrary,
+	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -329,5 +330,89 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 
 		// Assert that even though there are 3 blocks, there should only be 2 paragraph blocks
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
+	} );
+
+	it( 'should be able to use a prefix to create a Heading block', async () => {
+		await editorPage.initializeEditor();
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph
+		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '#' );
+		await editorPage.typeKeyString( ' ' );
+
+		const headingBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.heading
+		);
+
+		await editorPage.typeTextToTextBlock(
+			headingBlockElement,
+			testData.heading
+		);
+		expect( headingBlockElement ).toBeTruthy();
+	} );
+
+	it( 'should be able to use a prefix to create a Quote block', async () => {
+		await editorPage.initializeEditor();
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph
+		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '>' );
+		await editorPage.typeKeyString( ' ' );
+
+		const quoteBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.quote
+		);
+		expect( quoteBlockElement ).toBeTruthy();
+	} );
+
+	it( 'should be able to use a prefix to create a numbered List block', async () => {
+		await editorPage.initializeEditor();
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph
+		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '1.' );
+		await editorPage.typeKeyString( ' ' );
+
+		const listBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.list
+		);
+		expect( listBlockElement ).toBeTruthy();
+
+		const firstListItemElement = isAndroid()
+			? `//android.widget.Button[@content-desc="List item Block. Row 1"]//android.widget.TextView[@text='1.']`
+			: `//XCUIElementTypeStaticText[@name="1."]`;
+		const firstListItem = await editorPage.driver.$( firstListItemElement );
+
+		expect( await firstListItem.isDisplayed() ).toBe( true );
+	} );
+
+	it( 'should be able to use a prefix to create a List block', async () => {
+		await editorPage.initializeEditor();
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph
+		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '-' );
+		await editorPage.typeKeyString( ' ' );
+
+		const listBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.list
+		);
+		expect( listBlockElement ).toBeTruthy();
 	} );
 } );
