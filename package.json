@@ -306,7 +306,7 @@
 		"other:check-local-changes": "node ./bin/check-local-changes.js",
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package && node ./patches/patch-xcode.js",
+		"postinstall": "patch-package",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"start": "npm run dev",

@@ -12,7 +12,6 @@ const path = require( 'path' );
  */
 const serverConfigs = require( './serverConfigs' );
 const {
-	iosServer,
 	iosLocal,
 	android,
 	sauceOptions,
@@ -126,38 +125,38 @@ const setupDriver = async () => {
 			desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		}
 	} else {
-		desiredCaps = iosServer( { iPadDevice } );
+		desiredCaps = desiredCaps = iosLocal( {
+			iPadDevice,
+			environment: testEnvironment,
+		} );
 		desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
-		if ( isLocalEnvironment() ) {
-			desiredCaps = iosLocal( { iPadDevice } );
 
-			const iosPlatformVersions = getIOSPlatformVersions( {
-				requiredVersion: desiredCaps.platformVersion,
-			} );
-			if ( iosPlatformVersions.length === 0 ) {
-				throw new Error(
-					`No compatible iOS simulators available! Please verify that you have iOS ${ desiredCaps.platformVersion } simulators installed.`
-				);
-			}
+		const iosPlatformVersions = getIOSPlatformVersions( {
+			requiredVersion: desiredCaps.platformVersion,
+		} );
+		if ( iosPlatformVersions.length === 0 ) {
+			throw new Error(
+				`No compatible iOS simulators available! Please verify that you have iOS ${ desiredCaps.platformVersion } simulators installed.`
+			);
+		}
+		// eslint-disable-next-line no-console
+		console.log(
+			'Available iOS platform versions:',
+			iosPlatformVersions.map( ( { name } ) => name )
+		);
+
+		if ( ! desiredCaps.platformVersion ) {
+			desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
+
 			// eslint-disable-next-line no-console
 			console.log(
-				'Available iOS platform versions:',
-				iosPlatformVersions.map( ( { name } ) => name )
+				`Using iOS ${ desiredCaps.platformVersion } platform version`
 			);
-
-			if ( ! desiredCaps.platformVersion ) {
-				desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
-
-				// eslint-disable-next-line no-console
-				console.log(
-					`Using iOS ${ desiredCaps.platformVersion } platform version`
-				);
-			}
-
-			desiredCaps.app = path.resolve( localIOSAppPath );
-			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
+
+		desiredCaps.app = path.resolve( localIOSAppPath );
+		desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 	}
 
 	const sauceOptionsConfig = ! isLocalEnvironment()
@@ -224,11 +223,6 @@ const typeString = async ( driver, element, str, clear ) => {
 	}
 
 	await element.addValue( str );
-
-	if ( ! isAndroid() ) {
-		// Await the completion of the scroll-to-text-input animation
-		await driver.pause( 3000 );
-	}
 };
 
 /**
@@ -296,11 +290,15 @@ const clickMiddleOfElement = async ( driver, element ) => {
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
+	const borderPadding = 8;
 	await driver
 		.action( 'pointer', {
 			parameters: { pointerType: 'touch' },
 		} )
-		.move( { x: location.x, y: location.y } )
+		.move( {
+			x: location.x + borderPadding,
+			y: location.y + borderPadding,
+		} )
 		.down()
 		.up()
 		.perform();
@@ -408,13 +406,28 @@ const selectTextFromElement = async ( driver, element ) => {
 			.perform();
 	} else {
 		// On iOS we can use the context menu to "Select all" text.
-		await longPressMiddleOfElement( driver, element );
+		await clickBeginningOfElement( driver, element );
 
-		const selectAllElement = await driver.$(
-			'//XCUIElementTypeMenuItem[@name="Select All"]'
+		const selectAllSelector =
+			'//XCUIElementTypeMenuItem[@name="Select All"]';
+		const selectCopySelector = '//XCUIElementTypeMenuItem[@name="Copy"]';
+
+		// Wait for the context menu to be opened, there are cases where it selects the
+		// text automatticaly so the context option will be different.
+		await driver.waitUntil(
+			async function () {
+				return (
+					( await driver.$( selectAllSelector ).isDisplayed() ) ||
+					( await driver.$( selectCopySelector ).isDisplayed() )
+				);
+			},
+			{ timeout: 8000 }
 		);
-		await selectAllElement.waitForDisplayed( { timeout } );
-		await selectAllElement.click();
+
+		const selectAllElement = await driver.$$( selectAllSelector );
+		if ( selectAllElement.length > 0 ) {
+			await selectAllElement[ 0 ].click();
+		}
 	}
 };
 
@@ -536,23 +549,16 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
-	} else if ( toggleOn ) {
+	} else {
+		const action = toggleOn ? 'Switch to HTML' : 'Switch To Visual';
+		await driver.waitUntil( driver.$( '~editor-menu-button' ).isDisplayed );
 		const moreOptionsButton = await driver.$( '~editor-menu-button' );
 		await moreOptionsButton.click();
 
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="Switch to HTML"]'
-		);
-	} else {
-		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
-		await driver.pause( 3000 );
-		const moreOptionsButton = await driver.$( '~editor-menu-button' );
-		await moreOptionsButton.click();
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="Switch To Visual"]'
-		);
+		await driver.waitUntil( driver.$( `~${ action }` ).isDisplayed );
+
+		const actionButton = await driver.$( `~${ action }` );
+		await actionButton.click();
 	}
 };
 
