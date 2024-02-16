@@ -43,7 +43,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
-import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 
@@ -104,7 +103,6 @@ export default function Image( {
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
-	containerRef,
 	context,
 	clientId,
 	blockEditingMode,
@@ -177,7 +175,6 @@ export default function Image( {
 	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
@@ -760,7 +757,7 @@ export default function Image( {
 
 	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
 	// So we try using the imageRef width first and fallback to clientWidth.
-	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+	const fallbackClientWidth = imageRef.current?.width;
 
 	if ( canEditImage && isEditingImage ) {
 		img = (
