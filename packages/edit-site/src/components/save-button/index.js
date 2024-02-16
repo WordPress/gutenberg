@@ -88,8 +88,6 @@ export default function SaveButton( {
 
 		if ( isSaving ) {
 			return __( 'Saving' );
-		} else if ( disabled ) {
-			return __( 'Saved' );
 		} else if ( defaultLabel ) {
 			return defaultLabel;
 		}
