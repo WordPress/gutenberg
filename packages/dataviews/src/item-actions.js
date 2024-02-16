@@ -136,6 +136,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 		<HStack
 			spacing={ 1 }
 			justify="flex-end"
+			className="dataviews-view-table__actions"
 			style={ {
 				flexShrink: '0',
 				width: 'auto',

@@ -128,9 +128,14 @@
 			}
 		}
 
+		.dataviews-view-table__actions {
+			opacity: 0;
+		}
+
 		&:focus-within,
 		&:hover {
-			.components-checkbox-control__input {
+			.components-checkbox-control__input,
+			.dataviews-view-table__actions {
 				opacity: 1;
 			}
 		}
