@@ -64,6 +64,8 @@ if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
 	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
+require_once __DIR__ . '/experimental/general-template.php';
+
 require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
