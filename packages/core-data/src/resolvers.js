@@ -661,42 +661,12 @@ export const getUserPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select } ) => {
+	async ( { dispatch } ) => {
 		const fallback = await apiFetch( {
-			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
-				_embed: true,
-			} ),
+			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback' ),
 		} );
 
-		const record = fallback?._embedded?.self;
-
 		dispatch.receiveNavigationFallbackId( fallback?.id );
-
-		if ( record ) {
-			// If the fallback is already in the store, don't invalidate navigation queries.
-			// Otherwise, invalidate the cache for the scenario where there were no Navigation
-			// posts in the state and the fallback created one.
-			const existingFallbackEntityRecord = select.getEntityRecord(
-				'postType',
-				'wp_navigation',
-				fallback?.id
-			);
-			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
-			dispatch.receiveEntityRecords(
-				'postType',
-				'wp_navigation',
-				record,
-				undefined,
-				invalidateNavigationQueries
-			);
-
-			// Resolve to avoid further network requests.
-			dispatch.finishResolution( 'getEntityRecord', [
-				'postType',
-				'wp_navigation',
-				fallback?.id,
-			] );
-		}
 	};
 
 export const getDefaultTemplateId =
