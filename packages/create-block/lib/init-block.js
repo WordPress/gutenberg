@@ -32,6 +32,7 @@ async function initBlockJSON( {
 	viewStyle,
 	render,
 	viewModule,
+	viewScriptModule,
 	viewScript,
 	customBlockJSON,
 	example,
@@ -66,6 +67,7 @@ async function initBlockJSON( {
 					viewStyle,
 					render,
 					viewModule,
+					viewScriptModule,
 					viewScript,
 					...customBlockJSON,
 				} ).filter( ( [ , value ] ) => !! value )
