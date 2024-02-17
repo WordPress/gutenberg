@@ -74,7 +74,7 @@ function usePageContentFocusCommands() {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
 			label: sprintf(
-				/* translators: %1$s: template title */
+				/* translators: %s: template title */
 				__( 'Edit template: %s' ),
 				decodeEntities( template.title )
 			),
