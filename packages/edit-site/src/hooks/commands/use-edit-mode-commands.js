@@ -119,14 +119,12 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRevertable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
-				?
-				  sprintf(
+				? sprintf(
 						/* translators: %s: template title */
 						__( 'Reset template: %s' ),
 						decodeEntities( template.title )
 				  )
-				:
-				  sprintf(
+				: sprintf(
 						/* translators: %s: template part title */
 						__( 'Reset template part: %s' ),
 						decodeEntities( template.title )
@@ -145,14 +143,12 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRemovable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
-				?
-				  sprintf(
+				? sprintf(
 						/* translators: %s: template title */
 						__( 'Delete template: %s' ),
 						decodeEntities( template.title )
 				  )
-				:
-				  sprintf(
+				: sprintf(
 						/* translators: %s: template part title */
 						__( 'Delete template part: %s' ),
 						decodeEntities( template.title )
