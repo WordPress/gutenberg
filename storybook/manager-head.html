@@ -1,0 +1,35 @@
+<script>
+	( function redirectIfStoryMoved() {
+		const REDIRECTS = [
+			{
+				from: /\/components-deprecated-/,
+				to: '/components-',
+			},
+		];
+
+		const params = new URLSearchParams( window.location.search );
+
+		const matchedRedirect = REDIRECTS.find( ( { from } ) =>
+			from.test( params.get( 'path' ) )
+		);
+
+		if ( ! matchedRedirect ) {
+			return;
+		}
+
+		params.set(
+			'path',
+			params
+				.get( 'path' )
+				.replace( matchedRedirect.from, matchedRedirect.to )
+		);
+
+		const newUrl =
+			window.location.origin +
+			window.location.pathname +
+			'?' +
+			decodeURIComponent( params.toString() );
+
+		window.location.replace( newUrl );
+	} )();
+</script>
