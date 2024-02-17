@@ -121,13 +121,13 @@ function useManipulateDocumentCommands() {
 			template.type === TEMPLATE_POST_TYPE
 				?
 				  sprintf(
-					        /* translators: %1$s: template title */
+						/* translators: %s: template title */
 						__( 'Reset template: %s' ),
 						decodeEntities( template.title )
 				  )
 				:
 				  sprintf(
-					  	/* translators: %1$s: template part title */
+						/* translators: %s: template part title */
 						__( 'Reset template part: %s' ),
 						decodeEntities( template.title )
 				  );
@@ -147,13 +147,13 @@ function useManipulateDocumentCommands() {
 			template.type === TEMPLATE_POST_TYPE
 				?
 				  sprintf(
-					  	/* translators: %1$s: template title */
+						/* translators: %s: template title */
 						__( 'Delete template: %s' ),
 						decodeEntities( template.title )
 				  )
 				:
 				  sprintf(
-					  	/* translators: %1$s: template part title */
+						/* translators: %s: template part title */
 						__( 'Delete template part: %s' ),
 						decodeEntities( template.title )
 				  );
