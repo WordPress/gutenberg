@@ -73,9 +73,9 @@ function usePageContentFocusCommands() {
 	if ( currentPostType !== 'wp_template' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
-			/* translators: %1$s: template title */
 			label: sprintf(
-				'Edit template: %s',
+				/* translators: %s: template title */
+				__( 'Edit template: %s' ),
 				decodeEntities( template.title )
 			),
 			icon: layout,
@@ -119,14 +119,14 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRevertable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
-				? /* translators: %1$s: template title */
-				  sprintf(
-						'Reset template: %s',
+				? sprintf(
+						/* translators: %s: template title */
+						__( 'Reset template: %s' ),
 						decodeEntities( template.title )
 				  )
-				: /* translators: %1$s: template part title */
-				  sprintf(
-						'Reset template part: %s',
+				: sprintf(
+						/* translators: %s: template part title */
+						__( 'Reset template part: %s' ),
 						decodeEntities( template.title )
 				  );
 		commands.push( {
@@ -143,14 +143,14 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRemovable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
-				? /* translators: %1$s: template title */
-				  sprintf(
-						'Delete template: %s',
+				? sprintf(
+						/* translators: %s: template title */
+						__( 'Delete template: %s' ),
 						decodeEntities( template.title )
 				  )
-				: /* translators: %1$s: template part title */
-				  sprintf(
-						'Delete template part: %s',
+				: sprintf(
+						/* translators: %s: template part title */
+						__( 'Delete template part: %s' ),
 						decodeEntities( template.title )
 				  );
 		const path =
