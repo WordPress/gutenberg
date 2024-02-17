@@ -1,0 +1,31 @@
+{
+	"name": "interactivity-api",
+	"version": "0.1.0",
+	"description": "Example of how to use Interactivity Api",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build --webpack-copy-php",
+		"build:dev": "wp-scripts start --webpack--devtool=inline-source-map --experimental-modules --webpack-copy-php",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start --webpack-copy-php"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "27.2.0"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "^12.19.1",
+		"@wordpress/blocks": "^12.28.1",
+		"@wordpress/components": "^26.0.1",
+		"@wordpress/dom-ready": "^3.51.0",
+		"@wordpress/i18n": "^4.51.0",
+		"@wordpress/icons": "^9.42.0",
+		"@wordpress/interactivity": "^5.0.0",
+		"react": "^18.2.0"
+	}
+}

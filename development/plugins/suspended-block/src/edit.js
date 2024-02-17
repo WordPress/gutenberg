@@ -1,18 +1,27 @@
+/**
+ * External dependencies
+ */
 import React, { Suspense } from 'react';
 
+/**
+ * WordPress dependencies
+ */
 import { useBlockProps } from '@wordpress/block-editor';
 import { useSuspenseSelect, useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import fetch from '@wordpress/api-fetch';
 
+/**
+ * Internal dependencies
+ */
 import './editor.scss';
 
 export default function Edit() {
 	return (
 		<div { ...useBlockProps() }>
 			<Suspense fallback={ <Spinner /> }>
-				<SelectEntities />
+				<SuspenseEntities />
 			</Suspense>
 		</div>
 	);

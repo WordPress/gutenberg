@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "interactivity-api/accordion",
+	"version": "0.1.0",
+	"title": "Interactive Accordion",
+	"category": "design",
+	"icon": "smiley",
+	"description": "Example of how to use Interactivity Api",
+	"example": {},
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": "Accordion Title"
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "interactivity-api",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewModule": "file:./view.js"
+}

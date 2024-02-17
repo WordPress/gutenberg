@@ -1,0 +1,14 @@
+.interactivity-api-accordion {
+	.interactivity-api-accordion-title {
+		&_action {
+			appearance: none;
+			border: none;
+			background: none;
+			font-size: inherit;
+
+			&:hover {
+				cursor: pointer;
+			}
+		}
+	}
+}
