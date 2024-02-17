@@ -271,7 +271,8 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
-				title={ __( 'Editor canvas' ) }
+				title={ __( 'Block canvas' ) }
+				role="application"
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
 						props.onKeyDown( event );
