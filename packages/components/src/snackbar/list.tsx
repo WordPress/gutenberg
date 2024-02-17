@@ -73,7 +73,12 @@ export function SnackbarList( {
 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
 			onRemove?.( notice.id );
 	return (
-		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+		<div
+			className={ className }
+			tabIndex={ -1 }
+			ref={ listRef }
+			data-testid="snackbar-list"
+		>
 			{ children }
 			<AnimatePresence>
 				{ notices.map( ( notice ) => {
