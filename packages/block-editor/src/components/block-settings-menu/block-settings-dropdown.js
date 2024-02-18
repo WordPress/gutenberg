@@ -9,30 +9,24 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import {
-	Children,
-	cloneElement,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard, useViewportMatch } from '@wordpress/compose';
+import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
-import BlockIcon from '../block-icon';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
+import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -43,38 +37,6 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
-}
-
-function ParentSelectorMenuItem( { parentClientId, parentBlockType } ) {
-	const isSmallViewport = useViewportMatch( 'medium', '<' );
-	const { selectBlock } = useDispatch( blockEditorStore );
-
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const menuItemRef = useRef();
-	const gesturesProps = useShowHoveredOrFocusedGestures( {
-		ref: menuItemRef,
-		highlightParent: true,
-	} );
-
-	if ( ! isSmallViewport ) {
-		return null;
-	}
-
-	return (
-		<MenuItem
-			{ ...gesturesProps }
-			ref={ menuItemRef }
-			icon={ <BlockIcon icon={ parentBlockType.icon } /> }
-			onClick={ () => selectBlock( parentClientId ) }
-		>
-			{ sprintf(
-				/* translators: %s: Name of the block's parent. */
-				__( 'Select parent block (%s)' ),
-				parentBlockType.title
-			) }
-		</MenuItem>
-	);
 }
 
 export function BlockSettingsDropdown( {
@@ -314,7 +276,7 @@ export function BlockSettingsDropdown( {
 								/>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
-										<ParentSelectorMenuItem
+										<BlockParentSelectorMenuItem
 											parentClientId={
 												firstParentClientId
 											}
