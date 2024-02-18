@@ -151,3 +151,15 @@ wp_enqueue_script_module( 'directive-context-view' );
 	<span data-testid="non-default suffix context" data-wp-text="context.text"></span>
 	<span data-testid="default suffix context" data-wp-text="context.defaultText"></span>
 </div>
+
+<div
+	data-wp-interactive='directive-context'
+	data-wp-context='{ "list": [
+		{ "id": 1, "text": "Text 1" },
+		{ "id": 2, "text": "Text 2" }
+	] }'
+>
+	<button data-testid="select 1" data-wp-on--click="actions.selectItem" value=1>Select 1</button>
+	<button data-testid="select 2" data-wp-on--click="actions.selectItem" value=2>Select 2</button>
+	<div data-testid="selected" data-wp-text="state.selected"></div>
+</div>

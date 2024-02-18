@@ -220,4 +220,18 @@ test.describe( 'data-wp-context', () => {
 		const element = page.getByTestId( 'non-default suffix context' );
 		await expect( element ).toHaveText( '' );
 	} );
+
+	test( 'references to objects are kept', async ( { page } ) => {
+		const selected = page.getByTestId( 'selected' );
+		const select1 = page.getByTestId( 'select 1' );
+		const select2 = page.getByTestId( 'select 2' );
+
+		await expect( selected ).toBeEmpty();
+
+		await select1.click();
+		await expect( selected ).toHaveText( 'Text 1' );
+
+		await select2.click();
+		await expect( selected ).toHaveText( 'Text 2' );
+	} );
 } );

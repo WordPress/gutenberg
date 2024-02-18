@@ -14,6 +14,9 @@ import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
+// Properties that should be ignore during proxification.
+const contextIgnores = new WeakMap();
+
 const isPlainObject = ( item ) =>
 	item && typeof item === 'object' && item.constructor === Object;
 
@@ -47,7 +50,7 @@ const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
 			// Proxify plain objects that are not listed in `ignore`.
 			if (
 				k in target &&
-				! ignore?.includes( target[ k ] ) &&
+				! contextIgnores.get( target )?.has( k ) &&
 				isPlainObject( peek( target, k ) )
 			) {
 				return proxifyContext( target[ k ], inherited[ k ], {
@@ -60,8 +63,19 @@ const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
 			return target[ k ];
 		},
 		set: ( target, k, value ) => {
-			( k in target || ! ( k in inherited ) ? target : inherited )[ k ] =
-				value;
+			const obj =
+				k in target || ! ( k in inherited ) ? target : inherited;
+
+			// Values that are objects should not be proxified so they point to
+			// the original object and don't inherit unexpected properties.
+			if ( value && typeof value === 'object' ) {
+				if ( ! contextIgnores.has( obj ) ) {
+					contextIgnores.set( obj, new Set() );
+				}
+				contextIgnores.get( obj ).add( k );
+			}
+
+			obj[ k ] = value;
 			return true;
 		},
 		ownKeys: ( target ) => [
@@ -415,10 +429,13 @@ export default () => {
 				const itemContext = deepSignal( {
 					[ namespace ]: { [ itemProp ]: item },
 				} );
+				contextIgnores.set(
+					itemContext[ namespace ],
+					new Set( [ itemProp ] )
+				);
 				const mergedContext = proxifyContext(
 					itemContext,
-					inheritedValue,
-					{ ignore: [ item ] }
+					inheritedValue
 				);
 
 				const scope = { ...getScope(), context: mergedContext };

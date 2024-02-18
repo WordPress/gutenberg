@@ -9,6 +9,10 @@ store( 'directive-context', {
 			const ctx = getContext();
 			return JSON.stringify( ctx, undefined, 2 );
 		},
+		get selected() {
+			const { list, selected } = getContext();
+			return list.find( ( obj ) => obj === selected )?.text;
+		}
 	},
 	actions: {
 		updateContext( event ) {
@@ -22,6 +26,11 @@ store( 'directive-context', {
 			const ctx = getContext();
 			ctx.text = ctx.text === 'Text 1' ? 'Text 2' : 'Text 1';
 		},
+		selectItem( event ) {
+			const ctx = getContext();
+			const value = parseInt( event.target.value );
+			ctx.selected = ctx.list.find( ( { id } ) => id === value );
+		}
 	},
 } );
 
