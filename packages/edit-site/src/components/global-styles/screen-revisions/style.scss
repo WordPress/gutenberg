@@ -148,10 +148,10 @@
 .edit-site-global-styles-screen-revisions__changes {
 	text-align: left;
 	line-height: $default-line-height;
-	margin-left: $grid-unit-10;
+	margin-left: $grid-unit-15;
+	list-style: disc;
 
 	li {
-		list-style: disc;
 		margin-bottom: $grid-unit-05;
 	}
 }

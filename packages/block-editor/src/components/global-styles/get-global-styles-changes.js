@@ -199,13 +199,14 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 			}, {} )
 		).map( ( [ key, changeValues ] ) => {
 			const changeValuesLength = changeValues.length;
+			const joinedChangesValue = changeValues.join( __( ', ' ) );
 			switch ( key ) {
 				case 'blocks': {
 					return sprintf(
 						// translators: %2$s: a list of block names separated by a comma.
 						_n( '%2$s block.', '%2$s blocks.', changeValuesLength ),
 						changeValuesLength,
-						changeValues.join( ', ' )
+						joinedChangesValue
 					);
 				}
 				case 'elements': {
@@ -217,25 +218,29 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 							changeValuesLength
 						),
 						changeValuesLength,
-						changeValues.join( ', ' )
+						joinedChangesValue
 					);
 				}
 				case 'settings': {
 					return sprintf(
 						// translators: %s: a list of theme.json setting labels separated by a comma.
 						__( '%s settings.' ),
-						changeValues.join( ', ' )
+						joinedChangesValue
 					);
 				}
 				case 'styles': {
 					return sprintf(
 						// translators: %s: a list of theme.json top-level styles labels separated by a comma.
 						__( '%s styles.' ),
-						changeValues.join( ', ' )
+						joinedChangesValue
 					);
 				}
 				default: {
-					return `${ changeValues.join( ', ' ) }.`;
+					return sprintf(
+						// translators: %s: a list of global styles changes separated by a comma.
+						__( '%s.' ),
+						joinedChangesValue
+					);
 				}
 			}
 		} );
