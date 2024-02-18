@@ -50,6 +50,14 @@ wp_enqueue_script_module( 'directive-context-view' );
 		>
 			obj.prop5
 		</button>
+		<button
+			data-testid="parent new"
+			name="new"
+			value="modifiedFromParent"
+			data-wp-on--click="actions.updateContext"
+		>
+			new
+		</button>
 		<div
 			data-wp-context='{ "prop2":"child","prop3":"child","obj":{"prop5":"child","prop6":"child"},"array":[4,5,6] }'
 		>

@@ -136,6 +136,27 @@ test.describe( 'data-wp-context', () => {
 		expect( parentContext.obj.prop5 ).toBe( 'modifiedFromParent' );
 	} );
 
+	test( 'new inherited properties update child contexts', async ( {
+		page,
+	} ) => {
+		const childContextBefore = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+		expect( childContextBefore.new ).toBeUndefined();
+
+		await page.getByTestId( 'parent new' ).click();
+
+		const childContextAfter = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+		expect( childContextAfter.new ).toBe( 'modifiedFromParent' );
+
+		const parentContext = await parseContent(
+			page.getByTestId( 'parent context' )
+		);
+		expect( parentContext.new ).toBe( 'modifiedFromParent' );
+	} );
+
 	test( 'Array properties are shadowed', async ( { page } ) => {
 		const parentContext = await parseContent(
 			page.getByTestId( 'parent context' )
