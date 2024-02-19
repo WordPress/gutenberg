@@ -361,7 +361,6 @@ function UnforwardedModal(
  * ```jsx
  * import { Button, Modal } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
-  import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
  *
  * const MyModal = () => {
  *   const [ isOpen, setOpen ] = useState( false );
