@@ -36,8 +36,6 @@ export default function BlockActions( {
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 
 			return {
-				blocks,
-				rootClientId,
 				canMove: canMoveBlocks( clientIds, rootClientId ),
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				canInsertDefaultBlock: canInsertBlockType(
@@ -62,10 +60,9 @@ export default function BlockActions( {
 		},
 		[ clientIds, getDefaultBlockName ]
 	);
+	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
 
 	const {
-		blocks,
-		rootClientId,
 		canMove,
 		canRemove,
 		canInsertDefaultBlock,
@@ -94,8 +91,6 @@ export default function BlockActions( {
 		canInsertDefaultBlock,
 		canMove,
 		canRemove,
-		rootClientId,
-		blocks,
 		onDuplicate() {
 			return duplicateBlocks( clientIds, updateSelection );
 		},
@@ -120,14 +115,17 @@ export default function BlockActions( {
 			setBlockMovingClientId( clientIds[ 0 ] );
 		},
 		onGroup() {
-			if ( ! blocks.length ) {
+			if ( ! clientIds.length ) {
 				return;
 			}
 
 			const groupingBlockName = getGroupingBlockName();
 
 			// Activate the `transform` on `core/group` which does the conversion.
-			const newBlocks = switchToBlockType( blocks, groupingBlockName );
+			const newBlocks = switchToBlockType(
+				getBlocksByClientId( clientIds ),
+				groupingBlockName
+			);
 
 			if ( ! newBlocks ) {
 				return;
@@ -135,12 +133,11 @@ export default function BlockActions( {
 			replaceBlocks( clientIds, newBlocks );
 		},
 		onUngroup() {
-			if ( ! blocks.length ) {
+			if ( ! clientIds.length ) {
 				return;
 			}
 
-			const innerBlocks = blocks[ 0 ].innerBlocks;
-
+			const innerBlocks = getBlocks( clientIds[ 0 ] );
 			if ( ! innerBlocks.length ) {
 				return;
 			}
@@ -148,16 +145,13 @@ export default function BlockActions( {
 			replaceBlocks( clientIds, innerBlocks );
 		},
 		onCopy() {
-			const selectedBlockClientIds = blocks.map(
-				( { clientId } ) => clientId
-			);
-			if ( blocks.length === 1 ) {
-				flashBlock( selectedBlockClientIds[ 0 ] );
+			if ( clientIds.length === 1 ) {
+				flashBlock( clientIds[ 0 ] );
 			}
-			notifyCopy( 'copy', selectedBlockClientIds );
+			notifyCopy( 'copy', clientIds );
 		},
 		async onPasteStyles() {
-			await pasteStyles( blocks );
+			await pasteStyles( getBlocksByClientId( clientIds ) );
 		},
 	} );
 }

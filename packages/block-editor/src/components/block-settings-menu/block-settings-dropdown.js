@@ -33,8 +33,12 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { blocks, onCopy, label } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+function CopyMenuItem( { clientIds, onCopy, label } ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const ref = useCopyToClipboard(
+		() => serialize( getBlocksByClientId( clientIds ) ),
+		onCopy
+	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
@@ -208,7 +212,6 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 				onMoveTo,
-				blocks,
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
@@ -286,7 +289,7 @@ export function BlockSettingsDropdown( {
 									/>
 								) }
 								<CopyMenuItem
-									blocks={ blocks }
+									clientIds={ clientIds }
 									onCopy={ onCopy }
 								/>
 								{ canDuplicate && (
@@ -327,7 +330,7 @@ export function BlockSettingsDropdown( {
 							{ canCopyStyles && (
 								<MenuGroup>
 									<CopyMenuItem
-										blocks={ blocks }
+										clientIds={ clientIds }
 										onCopy={ onCopy }
 										label={ __( 'Copy styles' ) }
 									/>
