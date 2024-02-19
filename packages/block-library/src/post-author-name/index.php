@@ -14,7 +14,7 @@
  * @return string Returns the rendered post author name block.
  */
 function render_block_core_post_author_name( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['postId'] ) ) {
+	if ( isset( $block->context['postId'] ) ) {
 		$author_id = get_post_field( 'post_author', $block->context['postId'] );
 	} else {
 		$author_id = get_query_var( 'author' );
