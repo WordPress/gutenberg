@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useReducer,
 	useLayoutEffect,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -75,6 +76,23 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
+	const [ selectedElementWidth, setSelectedElementWidth ] = useState(
+		selectedElement.offsetWidth
+	);
+	const [ selectedElementHeight, setSelectedElementHeight ] = useState(
+		selectedElement.offsetHeight
+	);
+	useLayoutEffect( () => {
+		if ( ! selectedElement ) {
+			return;
+		}
+		const observer = new window.ResizeObserver( () => {
+			setSelectedElementWidth( selectedElement.offsetWidth );
+			setSelectedElementHeight( selectedElement.offsetHeight );
+		} );
+		observer.observe( selectedElement );
+		return () => observer.disconnect();
+	} );
 	const style = useMemo( () => {
 		if (
 			// popoverDimensionsRecomputeCounter is by definition always equal or greater
@@ -86,17 +104,18 @@ function BlockPopover(
 		) {
 			return {};
 		}
-
 		return {
 			position: 'absolute',
-			width: selectedElement.offsetWidth,
-			height: selectedElement.offsetHeight,
+			width: selectedElementWidth,
+			height: selectedElementHeight,
 		};
 	}, [
 		selectedElement,
 		lastSelectedElement,
 		__unstableRefreshSize,
 		popoverDimensionsRecomputeCounter,
+		selectedElementWidth,
+		selectedElementHeight,
 	] );
 
 	const popoverAnchor = useMemo( () => {

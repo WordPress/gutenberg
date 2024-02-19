@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { ResizableBox } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,7 +11,6 @@ import BlockPopover from '../block-popover';
 import { getComputedCSS } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
-	const resizableRef = useRef();
 	const blockElement = useBlockElement( clientId );
 	if ( ! blockElement ) {
 		return null;
@@ -26,9 +24,8 @@ export function GridItemResizer( { clientId, onChange } ) {
 			shift={ false }
 		>
 			<ResizableBox
-				ref={ resizableRef }
 				className="block-editor-grid-item-resizer__box"
-				defaultSize={ {
+				size={ {
 					width: '100%',
 					height: '100%',
 				} }
@@ -74,28 +71,16 @@ export function GridItemResizer( { clientId, onChange } ) {
 						gridRowLines,
 						blockElement.offsetTop + boxElement.offsetHeight
 					);
-					const columnSpan = Math.max( columnEnd - columnStart, 1 );
-					const rowSpan = Math.max( rowEnd - rowStart, 1 );
-					const width =
-						gridColumnLines[ columnStart + columnSpan ] -
-						gridColumnLines[ columnStart ] -
-						columnGap;
-					const height =
-						gridRowLines[ rowStart + rowSpan ] -
-						gridRowLines[ rowStart ] -
-						rowGap;
-					onChange( { columnSpan, rowSpan } );
-					resizableRef.current.updateSize( { width, height } );
+					onChange( {
+						columnSpan: Math.max( columnEnd - columnStart, 1 ),
+						rowSpan: Math.max( rowEnd - rowStart, 1 ),
+					} );
 				} }
 			/>
 		</BlockPopover>
 	);
 }
 
-/**
- * @param {string} template
- * @param {number} gap
- */
 function getGridLines( template, gap ) {
 	const lines = [ 0 ];
 	for ( const size of template.split( ' ' ) ) {
@@ -105,10 +90,6 @@ function getGridLines( template, gap ) {
 	return lines;
 }
 
-/**
- * @param {number[]} lines
- * @param {number}   position
- */
 function getClosestLine( lines, position ) {
 	return lines.reduce(
 		( closest, line, index ) =>
