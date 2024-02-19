@@ -203,21 +203,15 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 			switch ( key ) {
 				case 'blocks': {
 					return sprintf(
-						// translators: %2$s: a list of block names separated by a comma.
-						_n( '%2$s block.', '%2$s blocks.', changeValuesLength ),
-						changeValuesLength,
+						// translators: %s: a list of block names separated by a comma.
+						_n( '%s block.', '%s blocks.', changeValuesLength ),
 						joinedChangesValue
 					);
 				}
 				case 'elements': {
 					return sprintf(
-						// translators: %2$s: a list of element names separated by a comma.
-						_n(
-							'%2$s element.',
-							'%2$s elements.',
-							changeValuesLength
-						),
-						changeValuesLength,
+						// translators: %s: a list of element names separated by a comma.
+						_n( '%s element.', '%s elements.', changeValuesLength ),
 						joinedChangesValue
 					);
 				}
