@@ -94,18 +94,16 @@ const BlockBindingConnector = ( {
 		[ attrName, setAttributes ]
 	);
 
-	/*
-	 * Initially sync (first render / onMount ) attribute
-	 * value with the source prop value.
-	 */
-	useEffect( () => {
-		updateBoundAttibute( propValue );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ updateBoundAttibute ] );
-
 	useEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			updateBoundAttibute( propValue );
+
+			/*
+			 * If the attribute is `src` or `href`,
+			 * a placeholder can't be used because it is not a valid url.
+			 * Adding this workaround until
+			 * attributes and metadata fields types are improved and include `url`.
+			 */
 		} else if ( placeholder ) {
 			const htmlAttribute =
 				getBlockType( blockName ).attributes[ attrName ].attribute;
