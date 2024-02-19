@@ -34,6 +34,9 @@ const deprecated = [
 			},
 			// The following attributes have been added to match the block
 			// supports at the time of the deprecation. See above for details.
+			anchor: {
+				type: 'string',
+			},
 			backgroundColor: {
 				type: 'string',
 			},
