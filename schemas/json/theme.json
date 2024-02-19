@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
