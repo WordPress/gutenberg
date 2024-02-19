@@ -352,7 +352,7 @@
 						},
 						"backgroundSize": {
 							"type": "boolean",
-							"description": "Allow blocks to define a background position, size, and whether it repeats.",
+							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
 							"default": false
 						}
 					}

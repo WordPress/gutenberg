@@ -260,7 +260,7 @@
 							"default": false
 						},
 						"backgroundSize": {
-							"description": "Allow users to set a background position, size, and whether it repeats.",
+							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
 							"type": "boolean",
 							"default": false
 						}
