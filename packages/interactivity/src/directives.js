@@ -88,6 +88,12 @@ const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
 			descriptor( target, k ) || descriptor( inherited, k ),
 	} );
 
+/**
+ * Recursively update values within a deepSignal object.
+ *
+ * @param {Object} target A deepSignal instance.
+ * @param {Object} source Object with properties to update in `target`
+ */
 const updateSignals = ( target, source ) => {
 	for ( const k in source ) {
 		if (
