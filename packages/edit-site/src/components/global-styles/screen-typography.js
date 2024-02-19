@@ -50,7 +50,6 @@ function ScreenTypography() {
 					{ ! window.__experimentalDisableFontLibrary && (
 						<VStack spacing={ 3 }>
 							{ fontLibraryEnabled && <FontFamilies /> }
-							{ /* @TODO: abstract into component */ }
 							{ !! typographyVariations.length && (
 								<ItemGroup isBordered>
 									<NavigationButtonAsItem
@@ -59,7 +58,6 @@ function ScreenTypography() {
 									>
 										<HStack justify="space-between">
 											<FlexItem>
-												{ /* @TODO: think about this category. Could we stress "variations" typography styles to make descriptions/labelling easier (no font-name farming) */ }
 												{ __( 'Typesets' ) }
 											</FlexItem>
 											<IconWithCurrentColor

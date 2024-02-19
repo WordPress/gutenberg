@@ -120,19 +120,14 @@ function ColorVariation( { variation } ) {
 export default function ColorVariations( { variations } ) {
 	return (
 		<VStack spacing={ 3 }>
-			{ /*
-			@TODO is there an alternative to this heading?
-*/ }
 			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
 				columns={ 2 }
 				className="edit-site-global-styles-color-variations"
 			>
-				{ variations.map( ( variation, index ) => {
-					return (
-						<ColorVariation key={ index } variation={ variation } />
-					);
-				} ) }
+				{ variations.map( ( variation, index ) => (
+					<ColorVariation key={ index } variation={ variation } />
+				) ) }
 			</Grid>
 		</VStack>
 	);

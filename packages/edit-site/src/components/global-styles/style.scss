@@ -207,3 +207,10 @@
 .edit-site-global-styles-screen-typography-typeset__button {
 	border: $gray-200 $border-width solid;
 }
+
+.edit-site-global-styles-sidebar__panel .edit-site-global-styles-style-variations-container .edit-site-global-styles-variations_item-preview {
+	min-height: 70px;
+	line-height: 1.2;
+	text-align: center;
+	padding: $grid-unit-10 $border-width * 2;
+}

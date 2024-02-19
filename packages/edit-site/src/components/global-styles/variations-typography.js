@@ -123,7 +123,7 @@ function TypographyVariation( { variation } ) {
 	const headingPreviewStyle = {
 		...( headingFontFamilies &&
 			getFamilyPreviewStyle( headingFontFamilies ) ),
-		fontSize: '1.2rem',
+		fontSize: '16px',
 	};
 
 	return (
@@ -147,11 +147,6 @@ function TypographyVariation( { variation } ) {
 				<VStack
 					className="edit-site-global-styles-variations_item-preview"
 					isFocused={ isFocused }
-					style={ {
-						height: 70,
-						lineHeight: 1.2,
-						textAlign: 'center',
-					} }
 				>
 					<div style={ headingPreviewStyle }>
 						{ headingFontFamilies?.name || variation?.title }

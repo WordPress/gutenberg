@@ -15,7 +15,7 @@ export default function ScreenTypographyTypesets() {
 			<ScreenHeader
 				title={ __( 'Typeset' ) }
 				description={ __(
-					'Manage typography of different global elements on your site.'
+					"Apply a typography style variation to your site's font styles and settings."
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-typography">

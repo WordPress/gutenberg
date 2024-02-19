@@ -85,6 +85,9 @@ export default function ColorPalettePanel( { name } ) {
 						popoverProps={ popoverProps }
 					/>
 				) }
+			{ !! colorVariations.length && (
+				<ColorVariations variations={ colorVariations } />
+			) }
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
@@ -96,9 +99,6 @@ export default function ColorPalettePanel( { name } ) {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			{ !! colorVariations.length && (
-				<ColorVariations variations={ colorVariations } />
-			) }
 		</VStack>
 	);
 }

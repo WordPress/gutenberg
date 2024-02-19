@@ -16,8 +16,8 @@ import { unlock } from '../../lock-unlock';
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 /**
- * Fetches the current theme style variations, filters them by the provided property,
- * and merges with current user-defined global style/settings object.
+ * A convenience wrapper for `useThemeStyleVariationsByProperty()` that fetches the current theme style variations,
+ * and user-defined global style/settings object.
  *
  * @param {Object}   props          Object of hook args.
  * @param {string}   props.property The property to filter by.
