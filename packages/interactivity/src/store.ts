@@ -19,7 +19,7 @@ import {
 const isObject = ( item: unknown ): item is Record< string, unknown > => {
 	if ( typeof item !== 'object' || item === null ) return false;
 	const proto = Object.getPrototypeOf( item );
-	return proto === Object.prototype || proto === null;
+	return proto === Object.prototype;
 };
 
 const deepMerge = ( target: any, source: any ) => {
