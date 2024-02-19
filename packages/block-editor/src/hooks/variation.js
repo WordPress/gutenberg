@@ -17,7 +17,7 @@ import { useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
 export default {
-	hasSupport: () => true, // TODO: Work out what the eligibility here should be.
+	hasSupport: () => true,
 	attributeKeys: [ 'style' ],
 	passChildren: true,
 	useBlockProps,

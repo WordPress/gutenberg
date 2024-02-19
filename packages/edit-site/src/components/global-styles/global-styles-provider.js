@@ -16,7 +16,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-//TODO: If this these updates actually stick around. Move this to utils.
 import { setNestedValue } from '../../hooks/push-changes-to-global-styles';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
@@ -156,10 +155,6 @@ function useGlobalStylesContext() {
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 
-	// TODO: Where is the right place to resolve shared block style
-	// variations within the site editor when they are in a theme
-	// style variation's data that simply gets applied to the "user"
-	// origin styles?
 	const userConfigWithVariations = useMemo( () => {
 		if ( ! userConfig ) {
 			return userConfig;
