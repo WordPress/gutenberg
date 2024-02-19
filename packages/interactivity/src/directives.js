@@ -14,8 +14,8 @@ import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
-// Properties that should be ignore during proxification.
-const contextIgnores = new WeakMap();
+// Assigned objects should be ignore during proxification.
+const contextAssignedObjects = new WeakMap();
 
 const isPlainObject = ( item ) =>
 	item && typeof item === 'object' && item.constructor === Object;
@@ -50,7 +50,7 @@ const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
 			// Proxify plain objects that are not listed in `ignore`.
 			if (
 				k in target &&
-				! contextIgnores.get( target )?.has( k ) &&
+				! contextAssignedObjects.get( target )?.has( k ) &&
 				isPlainObject( peek( target, k ) )
 			) {
 				return proxifyContext( target[ k ], inherited[ k ], {
@@ -69,10 +69,10 @@ const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
 			// Values that are objects should not be proxified so they point to
 			// the original object and don't inherit unexpected properties.
 			if ( value && typeof value === 'object' ) {
-				if ( ! contextIgnores.has( obj ) ) {
-					contextIgnores.set( obj, new Set() );
+				if ( ! contextAssignedObjects.has( obj ) ) {
+					contextAssignedObjects.set( obj, new Set() );
 				}
-				contextIgnores.get( obj ).add( k );
+				contextAssignedObjects.get( obj ).add( k );
 			}
 
 			obj[ k ] = value;
