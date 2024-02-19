@@ -5,18 +5,15 @@ import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import { ToolbarButton } from '@wordpress/components';
+import { connection } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
 import { BlockControls } from '../components';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
 import { useBlockEditContext } from '../components/block-edit/context';
 import { unlock } from '../lock-unlock';
-import { ToolbarButton } from '@wordpress/components';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -86,7 +83,11 @@ const createEditFunctionWithBindingsAttribute = () =>
 			return (
 				<>
 					<BlockControls group="first">
-						<ToolbarButton icon="admin-plugins" color="purple" />
+						<ToolbarButton
+							icon={ connection }
+							label="Block bindings"
+							iconSize={ 24 }
+						></ToolbarButton>
 					</BlockControls>
 					<BlockEdit
 						key="edit"
