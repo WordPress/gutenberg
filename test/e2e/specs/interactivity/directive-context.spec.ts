@@ -221,6 +221,8 @@ test.describe( 'data-wp-context', () => {
 		await expect( text2 ).toBeEmpty();
 		await page.getByTestId( 'toggle text' ).click();
 		await expect( text ).toHaveText( 'changed dynamically' );
+		await page.getByTestId( 'add text2' ).click();
+		await expect( text2 ).toHaveText( 'some new text' );
 		await page.getByTestId( 'navigate' ).click();
 		await expect( text ).toHaveText( 'second page' );
 		await expect( text2 ).toHaveText( 'second page' );

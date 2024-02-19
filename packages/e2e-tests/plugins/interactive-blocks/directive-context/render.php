@@ -143,6 +143,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 	<div data-testid="navigation new text" data-wp-text="context.newText"></div>
 	<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
+	<button data-testid="add text2" data-wp-on--click="actions.addText2">Add Text 2</button>
 	<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 </div>
