@@ -55,7 +55,7 @@ function LibraryFontVariant( { face, font } ) {
 				/>
 				<label htmlFor={ checkboxId }>
 					<FontFaceDemo
-						fontFace={ face }
+						font={ face }
 						text={ displayName }
 						onClick={ handleToggleActivation }
 					/>

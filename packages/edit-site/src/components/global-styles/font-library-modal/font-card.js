@@ -14,27 +14,9 @@ import {
  * Internal dependencies
  */
 import FontDemo from './font-demo';
-import { getFamilyPreviewStyle } from './utils/preview-styles';
 import { chevronRight } from '@wordpress/icons';
 
 function FontCard( { font, onClick, variantsText } ) {
-	const fakeFontFace = {
-		fontStyle: 'normal',
-		fontWeight: '400',
-		fontFamily: font.fontFamily,
-		fake: true,
-	};
-
-	const displayFontFace =
-		font.fontFace && font.fontFace.length
-			? font?.fontFace?.find(
-					( face ) =>
-						face.fontStyle === 'normal' && face.fontWeight === '400'
-			  ) || font.fontFace[ 0 ]
-			: fakeFontFace;
-
-	const demoStyle = getFamilyPreviewStyle( font );
-
 	const variantsCount = font.fontFace?.length || 1;
 
 	const style = {
@@ -48,12 +30,7 @@ function FontCard( { font, onClick, variantsText } ) {
 			className="font-library-modal__font-card"
 		>
 			<Flex justify="space-between" wrap={ false }>
-				<FontDemo
-					customPreviewUrl={ font.preview }
-					fontFace={ displayFontFace }
-					text={ font.name }
-					style={ demoStyle }
-				/>
+				<FontDemo font={ font } />
 				<Flex justify="flex-end">
 					<FlexItem>
 						<Text className="font-library-modal__font-card__count">
