@@ -20,42 +20,58 @@ export default function BlockActions( {
 	children,
 	__experimentalUpdateSelection: updateSelection,
 } ) {
-	const {
-		canInsertBlockType,
-		getBlockRootClientId,
-		getBlocksByClientId,
-		canMoveBlocks,
-		canRemoveBlocks,
-	} = useSelect( blockEditorStore );
 	const { getDefaultBlockName, getGroupingBlockName } =
 		useSelect( blocksStore );
+	const selected = useSelect(
+		( select ) => {
+			const {
+				canInsertBlockType,
+				getBlockRootClientId,
+				getBlocksByClientId,
+				canMoveBlocks,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
 
-	const blocks = getBlocksByClientId( clientIds );
-	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const blocks = getBlocksByClientId( clientIds );
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 
-	const canCopyStyles = blocks.every( ( block ) => {
-		return (
-			!! block &&
-			( hasBlockSupport( block.name, 'color' ) ||
-				hasBlockSupport( block.name, 'typography' ) )
-		);
-	} );
-
-	const canDuplicate = blocks.every( ( block ) => {
-		return (
-			!! block &&
-			hasBlockSupport( block.name, 'multiple', true ) &&
-			canInsertBlockType( block.name, rootClientId )
-		);
-	} );
-
-	const canInsertDefaultBlock = canInsertBlockType(
-		getDefaultBlockName(),
-		rootClientId
+			return {
+				blocks,
+				rootClientId,
+				canMove: canMoveBlocks( clientIds, rootClientId ),
+				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				canInsertDefaultBlock: canInsertBlockType(
+					getDefaultBlockName(),
+					rootClientId
+				),
+				canCopyStyles: blocks.every( ( block ) => {
+					return (
+						!! block &&
+						( hasBlockSupport( block.name, 'color' ) ||
+							hasBlockSupport( block.name, 'typography' ) )
+					);
+				} ),
+				canDuplicate: blocks.every( ( block ) => {
+					return (
+						!! block &&
+						hasBlockSupport( block.name, 'multiple', true ) &&
+						canInsertBlockType( block.name, rootClientId )
+					);
+				} ),
+			};
+		},
+		[ clientIds, getDefaultBlockName ]
 	);
 
-	const canMove = canMoveBlocks( clientIds, rootClientId );
-	const canRemove = canRemoveBlocks( clientIds, rootClientId );
+	const {
+		blocks,
+		rootClientId,
+		canMove,
+		canRemove,
+		canInsertDefaultBlock,
+		canCopyStyles,
+		canDuplicate,
+	} = selected;
 
 	const {
 		removeBlocks,
