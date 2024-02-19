@@ -98,6 +98,7 @@ export function BlockSettingsDropdown( {
 		parentBlockType,
 		previousBlockClientId,
 		selectedBlockClientIds,
+		openedBlockSettingsMenu,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -107,7 +108,8 @@ export function BlockSettingsDropdown( {
 				getPreviousBlockClientId,
 				getSelectedBlockClientIds,
 				getBlockAttributes,
-			} = select( blockEditorStore );
+				getOpenedBlockSettingsMenu,
+			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
 
@@ -129,18 +131,13 @@ export function BlockSettingsDropdown( {
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
+				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 			};
 		},
 		[ firstBlockClientId ]
 	);
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
-
-	const openedBlockSettingsMenu = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getOpenedBlockSettingsMenu(),
-		[]
-	);
 
 	const { setOpenedBlockSettingsMenu } = unlock(
 		useDispatch( blockEditorStore )
