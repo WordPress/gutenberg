@@ -453,53 +453,6 @@ export function createBlockEditFilter( features ) {
 						}
 					}
 
-					/*
-					 * "metadata" attribute is a special case.
-					 * It has the following structure:
-					 *
-					 * metadata: {
-					 *   bindings: {
-					 *     <attr-name>: {
-					 *       source: <source-handler>,
-					 *       key: <source-prop-key>,
-					 *     }
-					 *   }
-					 * }
-					 *
-					 * When the feature has a "metadata" attribute, we need to
-					 * pass the "metadata" attribute to the Edit component,
-					 * but also the bound attributes (<attr-name>).
-					 * Additionally, we populate the bound attribute object
-					 * with the attribute value. Thus:
-					 *
-					 * metadata: {
-					 *   bindings: {
-					 *     <attr-name>: {
-					 *       source: <source-handler>,
-					 *       key: <source-prop-key>,
-					 *       value: <attr-value>
-					 *     }
-					 *   }
-					 * }
-					 */
-					if ( props.attributes.metadata ) {
-						const bindings = {
-							...props.attributes.metadata.bindings,
-						};
-
-						Object.entries( bindings ).forEach(
-							( [ attrName ] ) => {
-								bindings[ attrName ].value =
-									props.attributes[ attrName ];
-							}
-						);
-
-						neededProps.metadata = { bindings };
-
-						// @todo: grab it from the React context.
-						neededProps.context = props.context;
-					}
-
 					return (
 						<Edit
 							// We can use the index because the array length
