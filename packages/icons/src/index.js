@@ -59,6 +59,7 @@ export { default as commentAuthorName } from './library/comment-author-name';
 export { default as commentContent } from './library/comment-content';
 export { default as commentReplyLink } from './library/comment-reply-link';
 export { default as commentEditLink } from './library/comment-edit-link';
+export { default as connection } from './library/connection';
 export { default as cover } from './library/cover';
 export { default as create } from './library/create';
 export { default as crop } from './library/crop';
