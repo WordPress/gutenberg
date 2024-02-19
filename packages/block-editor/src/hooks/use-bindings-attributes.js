@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useEffect, useCallback, useRef } from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 
@@ -166,21 +165,19 @@ function BlockBindingBridge( props ) {
 			return;
 		}
 
-		if ( source ) {
-			const { useSource } = source;
-			const attrValue = settings.value;
+		const { useSource } = source;
+		const attrValue = settings.value;
 
-			BindingConnectorInstances.push(
-				<BlockBindingConnector
-					key={ `${ settings.source }-${ name }-${ attrName }-${ i }` }
-					attrName={ attrName }
-					attrValue={ attrValue }
-					useSource={ useSource }
-					blockProps={ props }
-					args={ settings.args }
-				/>
-			);
-		}
+		BindingConnectorInstances.push(
+			<BlockBindingConnector
+				key={ `${ settings.source }-${ name }-${ attrName }-${ i }` }
+				attrName={ attrName }
+				attrValue={ attrValue }
+				useSource={ useSource }
+				blockProps={ props }
+				args={ settings.args }
+			/>
+		);
 	} );
 
 	return BindingConnectorInstances;
