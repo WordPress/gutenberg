@@ -107,6 +107,7 @@ Settings related to background.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
