@@ -202,6 +202,18 @@ test.describe( 'data-wp-context', () => {
 		await expect( element ).toHaveText( 'some new text' );
 	} );
 
+	test( 'should update values when navigating back or forward', async ( {
+		page,
+	} ) => {
+		const element = page.getByTestId( 'navigation text' );
+		await page.getByTestId( 'navigate' ).click();
+		await expect( element ).toHaveText( 'second page' );
+		await page.goBack();
+		await expect( element ).toHaveText( 'first page' );
+		await page.goForward();
+		await expect( element ).toHaveText( 'second page' );
+	} );
+
 	test( 'should maintain the same context reference on async actions', async ( {
 		page,
 	} ) => {

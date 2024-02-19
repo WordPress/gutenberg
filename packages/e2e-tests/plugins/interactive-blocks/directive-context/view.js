@@ -60,11 +60,11 @@ const { actions } = store( 'directive-context-navigate', {
 		},
 		navigate() {
 			return import( '@wordpress/interactivity-router' ).then(
-				( { actions: routerActions } ) =>
-					routerActions.navigate(
-						window.location,
-						{ force: true, html },
-					)
+				( { actions: routerActions } ) => {
+					const url = new URL( window.location.href );
+					url.searchParams.set( 'next_page', 'true' );
+					return routerActions.navigate( url, { force: true, html } );
+				}
 			);
 
 		},

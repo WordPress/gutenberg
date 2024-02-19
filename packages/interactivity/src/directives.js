@@ -107,6 +107,27 @@ const updateSignals = ( target, source ) => {
 	}
 };
 
+/**
+ * Recursively clone the passed object.
+ *
+ * @param {Object} source Source object.
+ * @return {Object} Cloned object.
+ */
+const deepClone = ( source ) => {
+	if ( isPlainObject( source ) ) {
+		return Object.fromEntries(
+			Object.entries( source ).map( ( [ key, value ] ) => [
+				key,
+				deepClone( value ),
+			] )
+		);
+	}
+	if ( Array.isArray( source ) ) {
+		return source.map( ( i ) => deepClone( i ) );
+	}
+	return source;
+};
+
 const newRule =
 	/(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
 const ruleClean = /\/\*[^]*?\*\/|  +/g;
@@ -186,7 +207,7 @@ export default () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					updateSignals( currentValue.current, {
-						[ namespace ]: value,
+						[ namespace ]: deepClone( value ),
 					} );
 				}
 				return proxifyContext( currentValue.current, inheritedValue );
