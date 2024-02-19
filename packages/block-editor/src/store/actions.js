@@ -1556,11 +1556,23 @@ export const insertBeforeBlock =
 		}
 
 		const firstSelectedIndex = select.getBlockIndex( clientId );
-		return dispatch.insertDefaultBlock(
-			{},
-			rootClientId,
-			firstSelectedIndex
+		const directInsertBlock = rootClientId
+			? select.getDirectInsertBlock( rootClientId )
+			: null;
+
+		if ( ! directInsertBlock ) {
+			return dispatch.insertDefaultBlock(
+				{},
+				rootClientId,
+				firstSelectedIndex
+			);
+		}
+
+		const block = createBlock(
+			directInsertBlock.name,
+			directInsertBlock.attributes
 		);
+		return dispatch.insertBlock( block, firstSelectedIndex, rootClientId );
 	};
 
 /**
@@ -1581,10 +1593,26 @@ export const insertAfterBlock =
 		}
 
 		const firstSelectedIndex = select.getBlockIndex( clientId );
-		return dispatch.insertDefaultBlock(
-			{},
-			rootClientId,
-			firstSelectedIndex + 1
+		const directInsertBlock = rootClientId
+			? select.getDirectInsertBlock( rootClientId )
+			: null;
+
+		if ( ! directInsertBlock ) {
+			return dispatch.insertDefaultBlock(
+				{},
+				rootClientId,
+				firstSelectedIndex + 1
+			);
+		}
+
+		const block = createBlock(
+			directInsertBlock.name,
+			directInsertBlock.attributes
+		);
+		return dispatch.insertBlock(
+			block,
+			firstSelectedIndex + 1,
+			rootClientId
 		);
 	};
 

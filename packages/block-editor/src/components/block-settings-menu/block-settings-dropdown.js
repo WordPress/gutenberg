@@ -202,7 +202,7 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canCopyStyles,
 				canDuplicate,
-				canInsertDefaultBlock,
+				canInsertBlock,
 				canMove,
 				canRemove,
 				onDuplicate,
@@ -248,7 +248,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-after',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -258,7 +258,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-before',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -304,7 +304,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertDefaultBlock && (
+								{ canInsertBlock && (
 									<>
 										<MenuItem
 											onClick={ pipe(

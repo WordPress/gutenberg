@@ -28,20 +28,25 @@ export default function BlockActions( {
 				canInsertBlockType,
 				getBlockRootClientId,
 				getBlocksByClientId,
+				getDirectInsertBlock,
 				canMoveBlocks,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				rootClientId
+			);
+			const directInsertBlock = rootClientId
+				? getDirectInsertBlock( rootClientId )
+				: null;
 
 			return {
 				canMove: canMoveBlocks( clientIds, rootClientId ),
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
-				canInsertDefaultBlock: canInsertBlockType(
-					getDefaultBlockName(),
-					rootClientId
-				),
+				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
 						!! block &&
@@ -62,13 +67,8 @@ export default function BlockActions( {
 	);
 	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
 
-	const {
-		canMove,
-		canRemove,
-		canInsertDefaultBlock,
-		canCopyStyles,
-		canDuplicate,
-	} = selected;
+	const { canMove, canRemove, canInsertBlock, canCopyStyles, canDuplicate } =
+		selected;
 
 	const {
 		removeBlocks,
@@ -88,7 +88,7 @@ export default function BlockActions( {
 	return children( {
 		canCopyStyles,
 		canDuplicate,
-		canInsertDefaultBlock,
+		canInsertBlock,
 		canMove,
 		canRemove,
 		onDuplicate() {
