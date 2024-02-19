@@ -37,7 +37,7 @@ Get hands on: check out the [block editor live demo](https://wordpress.org/guten
 
 Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-Review the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for the fastest way to get started extending the block editor. See the [Developer Documentation](https://developer.wordpress.org/block-editor/#develop-for-the-block-editor) for extensive tutorials, documentation, and API references.
+Review the [Create a Block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) for the fastest way to get started extending the block editor. See the [Developer Documentation](https://developer.wordpress.org/block-editor/#develop-for-the-block-editor) for extensive tutorials, documentation, and API references.
 
 ### Contribute to Gutenberg
 
@@ -49,7 +49,7 @@ To get up and running quickly with **code contribution** see [Getting Started Wi
 
 In whichever way you wish to contribute please be sure to read the [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) first.
 
-As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://github.com/WordPress/gutenberg/blob/HEAD/CODE_OF_CONDUCT.md).
+As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/).
 
 ## Get Involved
 

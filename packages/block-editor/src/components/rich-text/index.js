@@ -19,6 +19,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -44,6 +45,8 @@ import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
+import { unlock } from '../../lock-unlock';
+import { BLOCK_BINDINGS_ALLOWED_BLOCKS } from '../../hooks/use-bindings-attributes';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -113,7 +116,11 @@ export function RichTextWrapper(
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const { clientId, isSelected: isBlockSelected } = useBlockEditContext();
+	const {
+		clientId,
+		isSelected: isBlockSelected,
+		name: blockName,
+	} = useBlockEditContext();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -121,10 +128,12 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd } =
+		const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
+		const blockBindings =
+			getBlockAttributes( clientId )?.metadata?.bindings;
 
 		let isSelected;
 
@@ -137,18 +146,50 @@ export function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
+		// Disable Rich Text editing if block bindings specify that.
+		let shouldDisableEditing = false;
+		if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
+			const blockTypeAttributes = getBlockType( blockName ).attributes;
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+			for ( const [ attribute, args ] of Object.entries(
+				blockBindings
+			) ) {
+				if (
+					blockTypeAttributes?.[ attribute ]?.source !== 'rich-text'
+				) {
+					break;
+				}
+
+				// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+				const blockBindingsSource = getBlockBindingsSource(
+					args.source
+				);
+				if (
+					! blockBindingsSource ||
+					blockBindingsSource.lockAttributesEditing
+				) {
+					shouldDisableEditing = true;
+					break;
+				}
+			}
+		}
+
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			shouldDisableEditing,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
-		clientId,
-		identifier,
-		originalIsSelected,
-		isBlockSelected,
-	] );
+	const { selectionStart, selectionEnd, isSelected, shouldDisableEditing } =
+		useSelect( selector, [
+			clientId,
+			identifier,
+			originalIsSelected,
+			isBlockSelected,
+		] );
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -314,7 +355,6 @@ export function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					editableContentElement={ anchorRef.current }
-					value={ value }
 				/>
 			) }
 			<TagName
@@ -322,6 +362,7 @@ export function RichTextWrapper(
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
+				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
@@ -376,7 +417,7 @@ export function RichTextWrapper(
 					useFirefoxCompat(),
 					anchorRef,
 				] ) }
-				contentEditable={ true }
+				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
@@ -389,7 +430,11 @@ export function RichTextWrapper(
 				// select blocks when Shift Clicking into an element with
 				// tabIndex because Safari will focus the element. However,
 				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
+				tabIndex={
+					props.tabIndex === 0 && ! shouldDisableEditing
+						? null
+						: props.tabIndex
+				}
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>

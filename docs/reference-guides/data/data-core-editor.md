@@ -353,6 +353,18 @@ _Returns_
 
 -   `Array`: Block list.
 
+### getEditorMode
+
+Returns the current editing mode.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Editing mode.
+
 ### getEditorSelection
 
 Returns the current selection.
@@ -1404,13 +1416,12 @@ _Returns_
 Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
 
 -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
--   `template-only`: This mode renders the editor with only the template blocks visible.
 -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
 -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
 
 _Parameters_
 
--   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+-   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
 
 ### setTemplateValidity
 
@@ -1468,6 +1479,14 @@ _Related_
 
 -   stopTyping in core/block-editor store.
 
+### switchEditorMode
+
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
+
 ### synchronizeTemplate
 
 _Related_
@@ -1479,6 +1498,10 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleEditorPanelEnabled
 

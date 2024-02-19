@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -96,12 +96,12 @@ export function QueryControls( {
 								value: 'date/asc',
 							},
 							{
-								/* translators: label for ordering posts by title in ascending order */
+								/* translators: Label for ordering posts by title in ascending order. */
 								label: __( 'A → Z' ),
 								value: 'title/asc',
 							},
 							{
-								/* translators: label for ordering posts by title in descending order */
+								/* translators: Label for ordering posts by title in descending order. */
 								label: __( 'Z → A' ),
 								value: 'title/desc',
 							},
@@ -137,7 +137,7 @@ export function QueryControls( {
 							key="query-controls-category-select"
 							categoriesList={ props.categoriesList }
 							label={ __( 'Category' ) }
-							noOptionLabel={ __( 'All' ) }
+							noOptionLabel={ _x( 'All', 'categories' ) }
 							selectedCategoryId={ props.selectedCategoryId }
 							onChange={ props.onCategoryChange }
 						/>
@@ -174,7 +174,7 @@ export function QueryControls( {
 						key="query-controls-author-select"
 						authorList={ authorList }
 						label={ __( 'Author' ) }
-						noOptionLabel={ __( 'All' ) }
+						noOptionLabel={ _x( 'All', 'authors' ) }
 						selectedAuthorId={ selectedAuthorId }
 						onChange={ onAuthorChange }
 					/>

@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,9 +14,11 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import BulkActions from './bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
+const defaultOnSelectionChange = () => {};
 
 export default function DataViews( {
 	view,
@@ -30,15 +32,39 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
-	onSelectionChange,
+	onSelectionChange = defaultOnSelectionChange,
+	onDetailsChange = null,
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+	const [ openedFilter, setOpenedFilter ] = useState( null );
 
-	const onSetSelection = ( items ) => {
-		setSelection( items.map( ( item ) => item.id ) );
-		onSelectionChange( items );
-	};
+	useEffect( () => {
+		if (
+			selection.length > 0 &&
+			selection.some(
+				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
+			)
+		) {
+			const newSelection = selection.filter( ( id ) =>
+				data.some( ( item ) => getItemId( item ) === id )
+			);
+			setSelection( newSelection );
+			onSelectionChange(
+				data.filter( ( item ) =>
+					newSelection.includes( getItemId( item ) )
+				)
+			);
+		}
+	}, [ selection, data, getItemId, onSelectionChange ] );
+
+	const onSetSelection = useCallback(
+		( items ) => {
+			setSelection( items.map( ( item ) => getItemId( item ) ) );
+			onSelectionChange( items );
+		},
+		[ setSelection, getItemId, onSelectionChange ]
+	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -51,30 +77,46 @@ export default function DataViews( {
 	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 0 } justify="flex-start">
+			<VStack spacing={ 3 } justify="flex-start">
 				<HStack
 					alignment="flex-start"
-					className="dataviews__filters-view-actions"
+					justify="start"
+					className="dataviews-filters__view-actions"
 				>
-					<HStack justify="start" wrap>
-						{ search && (
-							<Search
-								label={ searchLabel }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
-						) }
-						<Filters
-							fields={ fields }
+					{ search && (
+						<Search
+							label={ searchLabel }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
-					</HStack>
+					) }
+					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
+					/>
+				</HStack>
+				<HStack
+					justify="start"
+					className="dataviews-filters__container"
+					wrap
+				>
+					<Filters
+						fields={ _fields }
+						view={ view }
+						onChangeView={ onChangeView }
+						openedFilter={ openedFilter }
+						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
 				<ViewComponent
@@ -86,8 +128,10 @@ export default function DataViews( {
 					getItemId={ getItemId }
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
+					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
+					setOpenedFilter={ setOpenedFilter }
 				/>
 				<Pagination
 					view={ view }

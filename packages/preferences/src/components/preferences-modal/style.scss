@@ -1,0 +1,21 @@
+.preferences-modal {
+	// To keep modal dimensions consistent as subsections are navigated, width
+	// and height are used instead of max-(width/height).
+	@include break-small() {
+		width: calc(100% - #{ $grid-unit-20 * 2 });
+		height: calc(100% - #{ $header-height * 2 });
+	}
+	@include break-medium() {
+		width: $break-medium - $grid-unit-20 * 2;
+	}
+	@include break-large() {
+		height: 70%;
+	}
+
+	// Clears spacing to flush fit the navigator component to the modal edges.
+	@media (max-width: #{ ($break-medium - 1) }) {
+		.components-modal__content {
+			padding: 0;
+		}
+	}
+}

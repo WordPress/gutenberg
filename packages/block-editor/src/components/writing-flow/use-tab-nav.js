@@ -12,6 +12,7 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 export default function useTabNav() {
 	const container = useRef();
@@ -20,16 +21,15 @@ export default function useTabNav() {
 
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode, setLastFocus } = useDispatch( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
 
-	const lastFocus = useSelect(
-		( select ) => select( blockEditorStore ).getLastFocus(),
-		[]
-	);
+	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 
 	// Don't allow tabbing to this element in Navigation mode.
 	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
@@ -45,7 +45,7 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			lastFocus.current.focus();
+			getLastFocus()?.current.focus();
 		} else {
 			setNavigationMode( true );
 
@@ -163,7 +163,7 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			setLastFocus( { ...lastFocus, current: event.target } );
+			setLastFocus( { ...getLastFocus(), current: event.target } );
 
 			const { ownerDocument } = node;
 

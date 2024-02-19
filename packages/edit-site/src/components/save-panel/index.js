@@ -23,10 +23,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useActivateTheme } from '../../utils/use-activate-theme';
-import {
-	currentlyPreviewingTheme,
-	isPreviewingTheme,
-} from '../../utils/is-previewing-theme';
+import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 
@@ -39,19 +37,22 @@ const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 		activateSaveLabel = __( 'Activate' );
 	}
 
-	const themeName = useSelect( ( select ) => {
-		const theme = select( coreStore ).getTheme(
-			currentlyPreviewingTheme()
-		);
+	const currentTheme = useActualCurrentTheme();
 
-		return theme?.name?.rendered;
-	}, [] );
+	const previewingTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme(),
+		[]
+	);
 
 	const additionalPrompt = (
 		<p>
 			{ sprintf(
-				'Saving your changes will change your active theme to %s.',
-				themeName
+				/* translators: %1$s: The name of active theme, %2$s: The name of theme to be activated. */
+				__(
+					'Saving your changes will change your active theme from %1$s to %2$s.'
+				),
+				currentTheme?.name?.rendered ?? '...',
+				previewingTheme?.name?.rendered ?? '...'
 			) }
 		</p>
 	);

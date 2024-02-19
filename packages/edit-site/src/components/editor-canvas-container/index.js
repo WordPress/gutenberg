@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, useState, useMemo } from '@wordpress/element';
+import { Children, cloneElement, useState } from '@wordpress/element';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
@@ -35,7 +35,7 @@ function getEditorCanvasContainerTitle( view ) {
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
 		case 'global-styles-revisions:style-book':
-			return __( 'Global styles revisions' );
+			return __( 'Style Revisions' );
 		default:
 			return '';
 	}
@@ -63,7 +63,7 @@ function EditorCanvasContainer( {
 			).getEditorCanvasContainerView();
 
 			const _showListViewByDefault = select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'showListViewByDefault'
 			);
 
@@ -82,10 +82,6 @@ function EditorCanvasContainer( {
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
-	const title = useMemo(
-		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
-		[ editorCanvasContainerView ]
-	);
 
 	function onCloseContainer() {
 		setIsListViewOpened( showListViewByDefault );
@@ -119,6 +115,7 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
+	const title = getEditorCanvasContainerTitle( editorCanvasContainerView );
 	const shouldShowCloseButton = onClose || closeButtonLabel;
 
 	return (

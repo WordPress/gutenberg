@@ -414,20 +414,6 @@ supports: {
 }
 ```
 
-## defaultStylePicker
-
--   Type: `boolean`
--   Default value: `true`
-
-When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
-
-```js
-supports: {
-	// Remove the Default Style picker.
-	defaultStylePicker: false
-}
-```
-
 ## dimensions
 
 _**Note:** Since WordPress 6.2._
@@ -437,11 +423,12 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `minHeight`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 ```js
 supports: {
     dimensions: {
+        aspectRatio: true // Enable aspect ratio control.
         minHeight: true // Enable min height control.
     }
 }
@@ -449,12 +436,13 @@ supports: {
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+- `style`: attribute of `object` type with no default assigned. This is added when `aspectRatio` or `minHeight` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
     style: {
         dimensions: {
+            aspectRatio: "16/9",
             minHeight: "50vh"
         }
     }
@@ -491,7 +479,7 @@ selectors: {
 
 The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
 
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md).
 
 When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
 
@@ -542,6 +530,21 @@ supports: {
 	inserter: false
 }
 ```
+
+## interactivity
+
+-   Type: `boolean` or `object`
+-   Default value: `false`
+-   Subproperties:
+    -   `clientNavigation`: type `boolean`, default value `false`
+    -   `interactive`: type `boolean`, default value `false`
+
+Indicates if the block is using Interactivity API features.
+
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
+Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+
+The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
 ## layout
 
@@ -675,7 +678,7 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `sticky`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
 

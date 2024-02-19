@@ -49,6 +49,7 @@ const VALID_SETTINGS = [
 	'color.palette',
 	'color.text',
 	'custom',
+	'dimensions.aspectRatio',
 	'dimensions.minHeight',
 	'layout.contentSize',
 	'layout.definitions',
@@ -342,12 +343,14 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
+		[ 'aspectRatio', 'minHeight' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.dimensions = {
+					...updatedSettings.dimensions,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (

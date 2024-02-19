@@ -23,10 +23,11 @@
 	height: 100%;
 	display: block;
 	overflow: hidden;
-	background-color: $gray-900;
+	background-color: $gray-300;
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
+	// Controls height of editor and editor canvas container (style book, global styles revisions previews etc.)
 	iframe {
 		display: block;
 		width: 100%;
@@ -35,8 +36,6 @@
 	}
 
 	.edit-site-visual-editor__editor-canvas {
-		height: 100%;
-
 		&.is-focused {
 			outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
 			outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
@@ -46,7 +45,7 @@
 
 	&.is-focus-mode {
 		.edit-site-layout.is-full-canvas & {
-			padding: $grid-unit-60;
+			padding: $grid-unit-30;
 		}
 
 		.edit-site-visual-editor__editor-canvas {
@@ -70,24 +69,6 @@
 	&.is-view-mode {
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 	}
-}
-
-.edit-site-visual-editor__back-button {
-	position: absolute;
-	top: $grid-unit-10;
-	left: $grid-unit-10;
-	color: $white;
-
-	&:active:not([aria-disabled="true"]),
-	&:focus:not([aria-disabled="true"]),
-	&:hover {
-		color: $gray-100;
-	}
-}
-
-// The toolbar header in distraction mode sits over the back button, which renders it unreachable.
-.is-distraction-free .edit-site-visual-editor__back-button {
-	display: none;
 }
 
 .resizable-editor__drag-handle {

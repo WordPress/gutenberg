@@ -17,10 +17,10 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
-		( select ) =>
+	const { clientIds, selectPrevious, blockNamesForPrompt, messageType } =
+		useSelect( ( select ) =>
 			unlock( select( blockEditorStore ) ).getRemovalPromptData()
-	);
+		);
 
 	const {
 		clearBlockRemovalPrompt,
@@ -41,6 +41,19 @@ export function BlockRemovalWarningModal( { rules } ) {
 		return;
 	}
 
+	const message =
+		messageType === 'templates'
+			? _n(
+					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
+					'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.',
+					blockNamesForPrompt.length
+			  )
+			: _n(
+					'Deleting this block could break patterns on your site that have content linked to it. Are you sure you want to delete it?',
+					'Deleting these blocks could break patterns on your site that have content linked to them. Are you sure you want to delete them?',
+					blockNamesForPrompt.length
+			  );
+
 	const onConfirmRemoval = () => {
 		privateRemoveBlocks( clientIds, selectPrevious, /* force */ true );
 		clearBlockRemovalPrompt();
@@ -50,14 +63,9 @@ export function BlockRemovalWarningModal( { rules } ) {
 		<Modal
 			title={ __( 'Be careful!' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
+			size="medium"
 		>
-			<p>
-				{ _n(
-					'Post or page content will not be displayed if you delete this block.',
-					'Post or page content will not be displayed if you delete these blocks.',
-					blockNamesForPrompt.length
-				) }
-			</p>
+			<p>{ message }</p>
 			<HStack justify="right">
 				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
 					{ __( 'Cancel' ) }

@@ -24,18 +24,30 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden } = useSelect( ( select ) => {
-		const { getRenderingMode } = unlock( select( editorStore ) );
+	const {
+		isTemplateHidden,
+		onNavigateToEntityRecord,
+		getEditorSettings,
+		hasGoBack,
+	} = useSelect( ( select ) => {
+		const { getRenderingMode, getEditorSettings: _getEditorSettings } =
+			unlock( select( editorStore ) );
+		const editorSettings = _getEditorSettings();
 		return {
 			isTemplateHidden: getRenderingMode() === 'post-only',
+			onNavigateToEntityRecord: editorSettings.onNavigateToEntityRecord,
+			getEditorSettings: _getEditorSettings,
+			hasGoBack: editorSettings.hasOwnProperty(
+				'onNavigateToPreviousEntityRecord'
+			),
 		};
 	}, [] );
+
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
 		id
 	);
-	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 
@@ -43,11 +55,23 @@ export default function BlockThemeControl( { id } ) {
 		return null;
 	}
 
+	// The site editor does not have a `onNavigateToPreviousEntityRecord` setting as it uses its own routing
+	// and assigns its own backlink to focusMode pages.
+	const notificationAction = hasGoBack
+		? [
+				{
+					label: __( 'Go back' ),
+					onClick: () =>
+						getEditorSettings().onNavigateToPreviousEntityRecord(),
+				},
+		  ]
+		: undefined;
 	return (
 		<DropdownMenu
 			popoverProps={ POPOVER_PROPS }
 			focusOnMount
 			toggleProps={ {
+				__next40pxDefaultSize: true,
 				variant: 'tertiary',
 			} }
 			label={ __( 'Template options' ) }
@@ -59,7 +83,10 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							onClick={ () => {
-								setRenderingMode( 'template-only' );
+								onNavigateToEntityRecord( {
+									postId: template.id,
+									postType: 'wp_template',
+								} );
 								onClose();
 								createSuccessNotice(
 									__(
@@ -67,22 +94,14 @@ export default function BlockThemeControl( { id } ) {
 									),
 									{
 										type: 'snackbar',
-										actions: [
-											{
-												label: __( 'Go back' ),
-												onClick: () =>
-													setRenderingMode(
-														getEditorSettings()
-															.defaultRenderingMode
-													),
-											},
-										],
+										actions: notificationAction,
 									}
 								);
 							} }
 						>
 							{ __( 'Edit template' ) }
 						</MenuItem>
+
 						<SwapTemplateButton onClick={ onClose } />
 						<ResetDefaultTemplate onClick={ onClose } />
 						<CreateNewTemplate onClick={ onClose } />
@@ -90,7 +109,8 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							icon={ ! isTemplateHidden ? check : undefined }
-							isPressed={ ! isTemplateHidden }
+							isSelected={ ! isTemplateHidden }
+							role="menuitemcheckbox"
 							onClick={ () => {
 								setRenderingMode(
 									isTemplateHidden

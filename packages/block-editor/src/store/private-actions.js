@@ -131,12 +131,37 @@ export const privateRemoveBlocks =
 			// corresponding to "important" blocks, i.e. blocks that require a
 			// removal prompt.
 			const queue = [ ...clientIds ];
+			let messageType = 'templates';
 			while ( queue.length ) {
 				const clientId = queue.shift();
 				const blockName = select.getBlockName( clientId );
 				if ( rules[ blockName ] ) {
 					blockNamesForPrompt.add( blockName );
 				}
+
+				if ( rules[ 'bindings/core/pattern-overrides' ] ) {
+					const parentPatternBlocks =
+						select.getBlockParentsByBlockName(
+							clientId,
+							'core/block'
+						);
+					// We only need to run this check when editing the original pattern, not pattern instances.
+					if ( parentPatternBlocks?.length > 0 ) {
+						continue;
+					}
+					const blockAttributes =
+						select.getBlockAttributes( clientId );
+					if (
+						blockAttributes?.metadata?.bindings &&
+						JSON.stringify(
+							blockAttributes.metadata.bindings
+						).includes( 'core/pattern-overrides' )
+					) {
+						blockNamesForPrompt.add( blockName );
+						messageType = 'patternOverrides';
+					}
+				}
+
 				const innerBlocks = select.getBlockOrder( clientId );
 				queue.push( ...innerBlocks );
 			}
@@ -148,7 +173,8 @@ export const privateRemoveBlocks =
 					displayBlockRemovalPrompt(
 						clientIds,
 						selectPrevious,
-						Array.from( blockNamesForPrompt )
+						Array.from( blockNamesForPrompt ),
+						messageType
 					)
 				);
 				return;
@@ -211,19 +237,22 @@ export const ensureDefaultBlock =
  * @param {string[]}        blockNamesForPrompt Names of the blocks that
  *                                              triggered the need for
  *                                              confirmation before removal.
+ * @param {string}          messageType         The type of message to display.
  *
  * @return {Object} Action object.
  */
 function displayBlockRemovalPrompt(
 	clientIds,
 	selectPrevious,
-	blockNamesForPrompt
+	blockNamesForPrompt,
+	messageType
 ) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
 		blockNamesForPrompt,
+		messageType,
 	};
 }
 
@@ -321,5 +350,74 @@ export function syncDerivedUpdates( callback ) {
 			const updatedBlocks = select.getBlocks();
 			undoIgnoreBlocks.add( updatedBlocks );
 		} );
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param {Object} lastFocus The last focused element.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setLastFocus( lastFocus = null ) {
+	return {
+		type: 'LAST_FOCUS',
+		lastFocus,
+	};
+}
+
+/**
+ * Action that stops temporarily editing as blocks.
+ *
+ * @param {string} clientId The block's clientId.
+ */
+export function stopEditingAsBlocks( clientId ) {
+	return ( { select, dispatch } ) => {
+		const focusModeToRevert =
+			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateSettings( { focusMode: focusModeToRevert } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks();
+	};
+}
+
+export function registerBlockBindingsSource( source ) {
+	return {
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		useSource: source.useSource,
+		lockAttributesEditing: source.lockAttributesEditing,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has begun to drag.
+ *
+ * @return {Object} Action object.
+ */
+export function startDragging() {
+	return {
+		type: 'START_DRAGGING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped dragging.
+ *
+ * @return {Object} Action object.
+ */
+export function stopDragging() {
+	return {
+		type: 'STOP_DRAGGING',
 	};
 }

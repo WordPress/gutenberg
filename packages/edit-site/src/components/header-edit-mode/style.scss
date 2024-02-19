@@ -86,7 +86,13 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__actions {
 	display: inline-flex;
 	align-items: center;
-	padding-right: $grid-unit-10;
+	flex-wrap: nowrap;
+	padding-right: $grid-unit-05;
+
+	@include break-small () {
+		padding-right: $grid-unit-10;
+	}
+
 	gap: $grid-unit-10;
 }
 
@@ -96,49 +102,6 @@ $header-toolbar-min-width: 335px;
 
 	&.is-zoomed-out {
 		opacity: 0;
-	}
-}
-
-.edit-site-header-edit-mode__document-tools {
-	display: flex;
-	border: none;
-
-	// The Toolbar component adds different styles to buttons, so we reset them
-	// here to the original button styles
-	.edit-site-header-edit-mode__toolbar > .components-button.has-icon,
-	.edit-site-header-edit-mode__toolbar > .components-dropdown > .components-button.has-icon {
-		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
-		// This is best fixed by making the mover control area a proper single toolbar group.
-		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
-		height: $button-size-compact;
-		min-width: $button-size-compact;
-		padding: 4px;
-
-		&.is-pressed {
-			background: $gray-900;
-		}
-
-		&:focus:not(:disabled) {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
-			outline: $border-width solid transparent;
-		}
-
-		&::before {
-			display: none;
-		}
-	}
-
-	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-icon {
-		// Special dimensions for this button.
-		min-width: $button-size-compact;
-		width: $button-size-compact;
-		height: $button-size-compact;
-		padding: 0;
-	}
-
-	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-text.has-icon {
-		width: auto;
-		padding: 0 $grid-unit-10;
 	}
 }
 
@@ -185,33 +148,65 @@ $header-toolbar-min-width: 335px;
 		padding: 0 $grid-unit-10;
 	}
 
-	.edit-site-header-edit-mode__document-tools .edit-site-header-edit-mode__toolbar > * + * {
-		margin-left: $grid-unit-10;
-	}
-
 	.block-editor-block-mover {
+		// Modified group borders.
 		border-left: none;
 
 		&::before {
 			content: "";
 			width: $border-width;
-			margin-top: $grid-unit + $grid-unit-05;
-			margin-bottom: $grid-unit + $grid-unit-05;
+			height: $grid-unit-30;
 			background-color: $gray-300;
+			margin-top: $grid-unit-05;
 			margin-left: $grid-unit;
+		}
+
+		// Modified block movers horizontal separator.
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
 		}
 	}
 }
 
 .has-fixed-toolbar {
 	.selected-block-tools-wrapper {
-		overflow-x: scroll;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		height: $header-height;
 
 		.block-editor-block-contextual-toolbar {
 			border-bottom: 0;
+			height: 100%;
 		}
 
-		// Modified group borders
+		// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
+		.block-editor-block-toolbar {
+			height: 100%;
+			// Push down so that buttons are centered vertically.
+			// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+			// but there is a -1px top-margin down the stack that affects this.
+			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
+
+			// Match the height of other buttons in the header toolbar.
+			.components-button:not(.block-editor-block-mover-button) {
+				height: $button-size-compact;
+			}
+		}
+
+		&::after {
+			content: "";
+			width: $border-width;
+			height: $grid-unit-30;
+			background-color: $gray-300;
+			margin-left: $grid-unit;
+		}
+
+		// Modified group borders.
 		.components-toolbar-group,
 		.components-toolbar {
 			border-right: none;
@@ -219,15 +214,31 @@ $header-toolbar-min-width: 335px;
 			&::after {
 				content: "";
 				width: $border-width;
-				margin-top: $grid-unit + $grid-unit-05;
-				margin-bottom: $grid-unit + $grid-unit-05;
+				height: $grid-unit-30;
 				background-color: $gray-300;
+				margin-top: $grid-unit-05;
 				margin-left: $grid-unit;
 			}
 
 			& .components-toolbar-group.components-toolbar-group {
 				&::after {
 					display: none;
+				}
+			}
+		}
+
+		.block-editor-block-mover {
+			// Match the height of other buttons in the header toolbar.
+			&.is-horizontal .block-editor-block-mover-button {
+				height: $button-size-compact;
+				overflow: visible;
+			}
+
+			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+			@include break-small() {
+				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+					position: relative;
+					top: -10px;
 				}
 			}
 		}

@@ -48,39 +48,36 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { isEditingTemplate, templateId, postType, postId } = useSelect(
+	const { postType, postId, onNavigateToPreviousEntityRecord } = useSelect(
 		( select ) => {
 			const {
-				getRenderingMode,
-				getCurrentTemplateId,
 				getCurrentPostId,
 				getCurrentPostType,
+				getEditorSettings: getSettings,
 			} = select( editorStore );
-			const _templateId = getCurrentTemplateId();
 			return {
-				isEditingTemplate:
-					!! _templateId && getRenderingMode() === 'template-only',
-				templateId: _templateId,
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
+				onNavigateToPreviousEntityRecord:
+					getSettings().onNavigateToPreviousEntityRecord,
+				getEditorSettings: getSettings,
 			};
 		},
 		[]
 	);
-	const { getEditorSettings } = useSelect( editorStore );
-	const { setRenderingMode } = useDispatch( editorStore );
+
+	const handleOnBack = () => {
+		if ( onNavigateToPreviousEntityRecord ) {
+			onNavigateToPreviousEntityRecord();
+		}
+	};
 
 	return (
 		<BaseDocumentActions
-			postType={ isEditingTemplate ? 'wp_template' : postType }
-			postId={ isEditingTemplate ? templateId : postId }
+			postType={ postType }
+			postId={ postId }
 			onBack={
-				isEditingTemplate
-					? () =>
-							setRenderingMode(
-								getEditorSettings().defaultRenderingMode
-							)
-					: undefined
+				onNavigateToPreviousEntityRecord ? handleOnBack : undefined
 			}
 		/>
 	);

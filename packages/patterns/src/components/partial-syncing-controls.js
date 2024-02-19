@@ -19,10 +19,10 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 	const attributeSources = Object.keys( syncedAttributes ).map(
 		( attributeName ) =>
-			attributes.connections?.attributes?.[ attributeName ]?.source
+			attributes.metadata?.bindings?.[ attributeName ]?.source
 	);
 	const isConnectedToOtherSources = attributeSources.every(
-		( source ) => source && source !== 'pattern_attributes'
+		( source ) => source && source !== 'core/pattern-overrides'
 	);
 
 	// Render nothing if all supported attributes are connected to other sources.
@@ -30,52 +30,56 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		return null;
 	}
 
-	function updateConnections( isChecked ) {
-		let updatedConnections = {
-			...attributes.connections,
-			attributes: { ...attributes.connections?.attributes },
+	function updateBindings( isChecked ) {
+		let updatedBindings = {
+			...attributes?.metadata?.bindings,
 		};
 
 		if ( ! isChecked ) {
 			for ( const attributeName of Object.keys( syncedAttributes ) ) {
 				if (
-					updatedConnections.attributes[ attributeName ]?.source ===
-					'pattern_attributes'
+					updatedBindings[ attributeName ]?.source ===
+					'core/pattern-overrides'
 				) {
-					delete updatedConnections.attributes[ attributeName ];
+					delete updatedBindings[ attributeName ];
 				}
 			}
-			if ( ! Object.keys( updatedConnections.attributes ).length ) {
-				delete updatedConnections.attributes;
-			}
-			if ( ! Object.keys( updatedConnections ).length ) {
-				updatedConnections = undefined;
+			if ( ! Object.keys( updatedBindings ).length ) {
+				updatedBindings = undefined;
 			}
 			setAttributes( {
-				connections: updatedConnections,
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
 			} );
 			return;
 		}
 
 		for ( const attributeName of Object.keys( syncedAttributes ) ) {
-			if ( ! updatedConnections.attributes[ attributeName ] ) {
-				updatedConnections.attributes[ attributeName ] = {
-					source: 'pattern_attributes',
+			if ( ! updatedBindings[ attributeName ] ) {
+				updatedBindings[ attributeName ] = {
+					source: 'core/pattern-overrides',
 				};
 			}
 		}
 
 		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( { connections: updatedConnections } );
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
+			} );
 			return;
 		}
 
 		const id = nanoid( 6 );
 		setAttributes( {
-			connections: updatedConnections,
 			metadata: {
 				...attributes.metadata,
 				id,
+				bindings: updatedBindings,
 			},
 		} );
 	}
@@ -90,10 +94,10 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 					__nextHasNoMarginBottom
 					label={ __( 'Allow instance overrides' ) }
 					checked={ attributeSources.some(
-						( source ) => source === 'pattern_attributes'
+						( source ) => source === 'core/pattern-overrides'
 					) }
 					onChange={ ( isChecked ) => {
-						updateConnections( isChecked );
+						updateBindings( isChecked );
 					} }
 				/>
 			</BaseControl>

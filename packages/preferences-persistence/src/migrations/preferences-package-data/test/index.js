@@ -20,9 +20,6 @@ const input = {
 		fullscreenMode: false,
 		hiddenBlockTypes: [ 'core/audio', 'core/cover' ],
 		editorMode: 'visual',
-		preferredStyleVariations: {
-			'core/quote': 'large',
-		},
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 		pinnedItems: {
@@ -42,14 +39,9 @@ describe( 'convertPreferencesPackageData', () => {
 		expect( convertPreferencesPackageData( input ) )
 			.toMatchInlineSnapshot( `
 		{
-		  "core/customize-widgets": {
-		    "fixedToolbar": true,
-		    "welcomeGuide": false,
-		  },
-		  "core/edit-post": {
+		  "core": {
 		    "editorMode": "visual",
 		    "fixedToolbar": true,
-		    "fullscreenMode": false,
 		    "hiddenBlockTypes": [
 		      "core/audio",
 		      "core/cover",
@@ -58,16 +50,19 @@ describe( 'convertPreferencesPackageData', () => {
 		    "openPanels": [
 		      "post-status",
 		    ],
+		  },
+		  "core/customize-widgets": {
+		    "fixedToolbar": true,
+		    "welcomeGuide": false,
+		  },
+		  "core/edit-post": {
+		    "fullscreenMode": false,
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
-		    },
-		    "preferredStyleVariations": {
-		      "core/quote": "large",
 		    },
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-site": {
-		    "fixedToolbar": true,
 		    "isComplementaryAreaVisible": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,

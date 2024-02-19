@@ -23,11 +23,6 @@ const TEMPLATE = [
 	[ 'core/query-pagination-numbers' ],
 	[ 'core/query-pagination-next' ],
 ];
-const ALLOWED_BLOCKS = [
-	'core/query-pagination-previous',
-	'core/query-pagination-numbers',
-	'core/query-pagination-next',
-];
 
 export default function QueryPaginationEdit( {
 	attributes: { paginationArrow, showLabel },
@@ -54,7 +49,6 @@ export default function QueryPaginationEdit( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	// Always show label text if paginationArrow is set to 'none'.
 	useEffect( () => {

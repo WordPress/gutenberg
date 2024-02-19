@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import convertComplementaryAreas from './convert-complementary-areas';
+import convertEditorSettings from './convert-editor-settings';
 
 export default function convertPreferencesPackageData( data ) {
-	return convertComplementaryAreas( data );
+	let newData = convertComplementaryAreas( data );
+	newData = convertEditorSettings( newData );
+	return newData;
 }

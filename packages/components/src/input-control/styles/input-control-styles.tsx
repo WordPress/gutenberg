@@ -97,10 +97,11 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 	} );
 };
 
-const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		compact: '13px',
 		'__unstable-large': '13px',
 	};
 
@@ -138,6 +139,13 @@ export const getSizeConfig = ( {
 			paddingLeft: space( 2 ),
 			paddingRight: space( 2 ),
 		},
+		compact: {
+			height: 32,
+			lineHeight: 1,
+			minHeight: 32,
+			paddingLeft: space( 2 ),
+			paddingRight: space( 2 ),
+		},
 		'__unstable-large': {
 			height: 40,
 			lineHeight: 1,
@@ -148,13 +156,7 @@ export const getSizeConfig = ( {
 	};
 
 	if ( ! __next40pxDefaultSize ) {
-		sizes.default = {
-			height: 32,
-			lineHeight: 1,
-			minHeight: 32,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
-		};
+		sizes.default = sizes.compact;
 	}
 
 	return sizes[ size as Size ] || sizes.default;
@@ -211,7 +213,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -261,20 +263,23 @@ export const LabelWrapper = styled( FlexItem )`
 
 type BackdropProps = {
 	disabled?: boolean;
+	isBorderless?: boolean;
 	isFocused?: boolean;
 };
 
 const backdropFocusedStyles = ( {
 	disabled,
+	isBorderless,
 	isFocused,
 }: BackdropProps ): SerializedStyles => {
-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
 
 	let boxShadow;
 	let outline;
 	let outlineOffset;
 
 	if ( isFocused ) {
+		borderColor = COLORS.ui.borderFocus;
 		boxShadow = CONFIG.controlBoxShadowFocus;
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline = `2px solid transparent`;
@@ -282,7 +287,7 @@ const backdropFocusedStyles = ( {
 	}
 
 	if ( disabled ) {
-		borderColor = COLORS.ui.borderDisabled;
+		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
 	}
 
 	return css( {

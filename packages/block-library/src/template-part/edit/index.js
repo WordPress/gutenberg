@@ -7,8 +7,9 @@ import {
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,6 +30,43 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 
+function ReplaceButton( {
+	isEntityAvailable,
+	area,
+	clientId,
+	templatePartId,
+	isTemplatePartSelectionOpen,
+	setIsTemplatePartSelectionOpen,
+} ) {
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+	const canReplace =
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
+
+	if ( ! canReplace ) {
+		return null;
+	}
+
+	return (
+		<MenuItem
+			onClick={ () => {
+				setIsTemplatePartSelectionOpen( true );
+			} }
+			aria-expanded={ isTemplatePartSelectionOpen }
+			aria-haspopup="dialog"
+		>
+			{ __( 'Replace' ) }
+		</MenuItem>
+	);
+}
+
 export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
@@ -44,14 +82,11 @@ export default function TemplatePartEdit( {
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
 		useState( false );
 
-	// Set the postId block attribute if it did not exist,
-	// but wait until the inner blocks have loaded to allow
-	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const { isResolved, hasInnerBlocks, isMissing, area } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+			const { getBlockCount } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -70,7 +105,7 @@ export default function TemplatePartEdit( {
 				: false;
 
 			return {
-				innerBlocks: getBlocks( clientId ),
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
 				isResolved: hasResolvedEntity,
 				isMissing:
 					hasResolvedEntity &&
@@ -81,27 +116,17 @@ export default function TemplatePartEdit( {
 		},
 		[ templatePartId, attributes.area, clientId ]
 	);
-	const { templateParts } = useAlternativeTemplateParts(
-		area,
-		templatePartId
-	);
-	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
 
-	const canReplace =
-		isEntityAvailable &&
-		hasReplacements &&
-		( area === 'header' || area === 'footer' );
-
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
 	if (
-		innerBlocks.length === 0 &&
+		! hasInnerBlocks &&
 		( ( slug && ! theme ) || ( slug && isMissing ) )
 	) {
 		return (
@@ -132,14 +157,16 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				<TemplatePartAdvancedControls
-					tagName={ tagName }
-					setAttributes={ setAttributes }
-					isEntityAvailable={ isEntityAvailable }
-					templatePartId={ templatePartId }
-					defaultWrapper={ areaObject.tagName }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-				/>
+				<InspectorControls group="advanced">
+					<TemplatePartAdvancedControls
+						tagName={ tagName }
+						setAttributes={ setAttributes }
+						isEntityAvailable={ isEntityAvailable }
+						templatePartId={ templatePartId }
+						defaultWrapper={ areaObject.tagName }
+						hasInnerBlocks={ hasInnerBlocks }
+					/>
+				</InspectorControls>
 				{ isPlaceholder && (
 					<TagName { ...blockProps }>
 						<TemplatePartPlaceholder
@@ -153,42 +180,39 @@ export default function TemplatePartEdit( {
 						/>
 					</TagName>
 				) }
-				{ canReplace && (
-					<BlockSettingsMenuControls>
-						{ ( { selectedClientIds } ) => {
-							// Only enable for single selection that matches the current block.
-							// Ensures menu item doesn't render multiple times.
-							if (
-								! (
-									selectedClientIds.length === 1 &&
-									clientId === selectedClientIds[ 0 ]
-								)
-							) {
-								return null;
-							}
+				<BlockSettingsMenuControls>
+					{ ( { selectedClientIds } ) => {
+						// Only enable for single selection that matches the current block.
+						// Ensures menu item doesn't render multiple times.
+						if (
+							! (
+								selectedClientIds.length === 1 &&
+								clientId === selectedClientIds[ 0 ]
+							)
+						) {
+							return null;
+						}
 
-							return (
-								<MenuItem
-									onClick={ () => {
-										setIsTemplatePartSelectionOpen( true );
-									} }
-									aria-expanded={
-										isTemplatePartSelectionOpen
-									}
-									aria-haspopup="dialog"
-								>
-									{ __( 'Replace' ) }
-								</MenuItem>
-							);
-						} }
-					</BlockSettingsMenuControls>
-				) }
+						return (
+							<ReplaceButton
+								{ ...{
+									isEntityAvailable,
+									area,
+									clientId,
+									templatePartId,
+									isTemplatePartSelectionOpen,
+									setIsTemplatePartSelectionOpen,
+								} }
+							/>
+						);
+					} }
+				</BlockSettingsMenuControls>
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
 						tagName={ TagName }
 						blockProps={ blockProps }
 						postId={ templatePartId }
-						hasInnerBlocks={ innerBlocks.length > 0 }
+						hasInnerBlocks={ hasInnerBlocks }
 						layout={ layout }
 					/>
 				) }

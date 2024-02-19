@@ -37,7 +37,7 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 		const priorityTextTranformsNames = Object.keys(
 			priorityContentTranformationBlocks
 		);
-		return possibleBlockTransformations.reduce(
+		const groupedPossibleTransforms = possibleBlockTransformations.reduce(
 			( accumulator, item ) => {
 				const { name } = item;
 				if ( priorityTextTranformsNames.includes( name ) ) {
@@ -49,6 +49,23 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 			},
 			{ priorityTextTransformations: [], restTransformations: [] }
 		);
+		/**
+		 * If there is only one priority text transformation and it's a Quote,
+		 * is should move to the rest transformations. This is because Quote can
+		 * be a container for any block type, so in multi-block selection it will
+		 * always be suggested, even for non-text blocks.
+		 */
+		if (
+			groupedPossibleTransforms.priorityTextTransformations.length ===
+				1 &&
+			groupedPossibleTransforms.priorityTextTransformations[ 0 ].name ===
+				'core/quote'
+		) {
+			const singleQuote =
+				groupedPossibleTransforms.priorityTextTransformations.pop();
+			groupedPossibleTransforms.restTransformations.push( singleQuote );
+		}
+		return groupedPossibleTransforms;
 	}, [ possibleBlockTransformations ] );
 
 	// Order the priority text transformations.

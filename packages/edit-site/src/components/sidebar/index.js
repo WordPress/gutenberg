@@ -7,12 +7,12 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,9 +32,8 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../sidebar-dataviews';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -52,6 +51,7 @@ function SidebarScreenWrapper( { className, ...props } ) {
 
 function SidebarScreens() {
 	useSyncPathWithURL();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
 		<>
@@ -70,24 +70,20 @@ function SidebarScreens() {
 			<SidebarScreenWrapper path="/page">
 				<SidebarNavigationScreenPages />
 			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/pages">
+				<SidebarNavigationScreenPagesDataViews />
+			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
-			{ window?.__experimentalAdminViews && (
-				<SidebarScreenWrapper path="/pages">
-					<SidebarNavigationScreen
-						title={ __( 'Pages' ) }
-						backPath="/page"
-						content={ <DataViewsSidebarContent /> }
-					/>
-				</SidebarScreenWrapper>
-			) }
 			<SidebarScreenWrapper path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</SidebarScreenWrapper>
+			{ ! isMobileViewport && (
+				<SidebarScreenWrapper path="/patterns">
+					<SidebarNavigationScreenPatterns />
+				</SidebarScreenWrapper>
+			) }
 			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>

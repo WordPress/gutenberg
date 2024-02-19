@@ -1,4 +1,4 @@
-## Disable Editor functionality
+# Disable Editor functionality
 
 This page is dedicated to the many ways you can disable specific functionality in the Post Editor and Site Editor that are not covered in other areas of the curation documentation. 
 

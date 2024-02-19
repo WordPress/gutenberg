@@ -54,7 +54,11 @@ export function BlockPreview( {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const renderedBlocks = useMemo(
@@ -117,6 +121,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		() => ( {
 			...originalSettings,
 			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
+			focusMode: false, // Disable "Spotlight mode".
 			__unstableIsPreviewMode: true,
 		} ),
 		[ originalSettings ]

@@ -9,8 +9,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
+import { EditorProvider, store as editorStore } from '@wordpress/editor';
+import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -24,7 +24,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import Layout from './components/layout';
-import { store as editPostStore } from './store';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -47,39 +46,11 @@ class Editor extends Component {
 		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
-	getEditorSettings(
-		settings,
-		hasFixedToolbar,
-		focusMode,
-		hiddenBlockTypes,
-		blockTypes
-	) {
+	getEditorSettings( settings ) {
 		settings = {
 			...settings,
 			isRTL: I18nManager.isRTL,
-			hasFixedToolbar,
-			focusMode,
 		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( hiddenBlockTypes.length > 0 ) {
-			if ( settings.allowedBlockTypes === undefined ) {
-				// If no specific flags for allowedBlockTypes are set, assume `true`
-				// meaning allow all block types.
-				settings.allowedBlockTypes = true;
-			}
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? blockTypes.map( ( { name } ) => name )
-					: settings.allowedBlockTypes || [];
-
-			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(
-				( type ) => ! hiddenBlockTypes.includes( type )
-			);
-		}
 
 		return settings;
 	}
@@ -134,11 +105,7 @@ class Editor extends Component {
 	render() {
 		const {
 			settings,
-			hasFixedToolbar,
-			focusMode,
 			initialEdits,
-			hiddenBlockTypes,
-			blockTypes,
 			post,
 			postId,
 			postType,
@@ -147,13 +114,7 @@ class Editor extends Component {
 			...props
 		} = this.props;
 
-		const editorSettings = this.getEditorSettings(
-			settings,
-			hasFixedToolbar,
-			focusMode,
-			hiddenBlockTypes,
-			blockTypes
-		);
+		const editorSettings = this.getEditorSettings( settings );
 
 		const normalizedPost = post || {
 			id: postId,
@@ -192,20 +153,14 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isFeatureActive, getEditorMode, getHiddenBlockTypes } =
-			select( editPostStore );
-		const { getBlockTypes } = select( blocksStore );
+		const { getEditorMode } = select( editorStore );
 
 		return {
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
-			hiddenBlockTypes: getHiddenBlockTypes(),
-			blockTypes: getBlockTypes(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( editPostStore );
+		const { switchEditorMode } = dispatch( editorStore );
 		const { editEntityRecord } = dispatch( coreStore );
 		return {
 			switchEditorMode,
