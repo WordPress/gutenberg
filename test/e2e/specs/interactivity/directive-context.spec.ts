@@ -214,6 +214,25 @@ test.describe( 'data-wp-context', () => {
 		await expect( element ).toHaveText( 'second page' );
 	} );
 
+	test( 'should inherit values on navigation', async ( { page } ) => {
+		const text = page.getByTestId( 'navigation inherited text' );
+		const text2 = page.getByTestId( 'navigation inherited text2' );
+		await expect( text ).toHaveText( 'first page' );
+		await expect( text2 ).toBeEmpty();
+		await page.getByTestId( 'toggle text' ).click();
+		await expect( text ).toHaveText( 'changed dynamically' );
+		await page.getByTestId( 'navigate' ).click();
+		await expect( text ).toHaveText( 'second page' );
+		await expect( text2 ).toHaveText( 'second page' );
+		await page.goBack();
+		await expect( text ).toHaveText( 'first page' );
+		// text2 maintains its value as it is not defined in the first page.
+		await expect( text2 ).toHaveText( 'second page' );
+		await page.goForward();
+		await expect( text ).toHaveText( 'second page' );
+		await expect( text2 ).toHaveText( 'second page' );
+	} );
+
 	test( 'should maintain the same context reference on async actions', async ( {
 		page,
 	} ) => {

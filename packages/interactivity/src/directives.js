@@ -31,20 +31,21 @@ const descriptor = Reflect.getOwnPropertyDescriptor;
  * By default, all plain objects inside the context are wrapped, unless it is
  * listed in the `ignore` option.
  *
- * @param {Object}   current        Current context.
- * @param {Object}   inherited      Inherited context, used as fallback.
- * @param {Object}   options        Options.
- * @param {Object[]} options.ignore List of object references that should not be
- *                                  wrapped.
+ * @param {Object} current   Current context.
+ * @param {Object} inherited Inherited context, used as fallback.
  *
  * @return {Object} The wrapped context object.
  */
-const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
+const proxifyContext = ( current, inherited = {} ) =>
 	new Proxy( current, {
 		get: ( target, k ) => {
-			// Return the prop from inherited when missing in target.
+			// Always subscribe to the inherited and current props.
+			const inheritedProp = inherited[ k ];
+			const currentProp = target[ k ];
+
+			// Return the inherited prop when missing in target.
 			if ( ! ( k in target ) && k in inherited ) {
-				return inherited[ k ];
+				return inheritedProp;
 			}
 
 			// Proxify plain objects that are not listed in `ignore`.
@@ -53,14 +54,11 @@ const proxifyContext = ( current, inherited = {}, { ignore } = {} ) =>
 				! contextAssignedObjects.get( target )?.has( k ) &&
 				isPlainObject( peek( target, k ) )
 			) {
-				return proxifyContext( target[ k ], inherited[ k ], {
-					ignore,
-				} );
+				return proxifyContext( currentProp, inheritedProp );
 			}
 
-			// For other cases, return the value from target even when it
-			// doesn't exist.
-			return target[ k ];
+			// For other cases, return the value from target.
+			return currentProp;
 		},
 		set: ( target, k, value ) => {
 			const obj =

@@ -135,6 +135,10 @@ wp_enqueue_script_module( 'directive-context-view' );
 	data-wp-router-region="navigation"
 	data-wp-context='{ "text": "first page" }'
 >
+	<div data-wp-context='{}'>
+		<div data-testid="navigation inherited text" data-wp-text="context.text"></div>
+		<div data-testid="navigation inherited text2" data-wp-text="context.text2"></div>
+	</div>
 	<div data-testid="navigation text" data-wp-text="context.text"></div>
 	<div data-testid="navigation new text" data-wp-text="context.newText"></div>
 	<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>

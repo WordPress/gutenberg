@@ -38,8 +38,12 @@ const html = `
 		<div
 			data-wp-interactive="directive-context-navigate"
 			data-wp-router-region="navigation"
-			data-wp-context='{ "text": "second page" }'
+			data-wp-context='{ "text": "second page", "text2": "second page" }'
 		>
+			<div data-wp-context='{}'>
+				<div data-testid="navigation inherited text" data-wp-text="context.text"></div>
+				<div data-testid="navigation inherited text2" data-wp-text="context.text2"></div>
+			</div>
 			<div data-testid="navigation text" data-wp-text="context.text"></div>
 			<div data-testid="navigation new text" data-wp-text="context.newText"></div>
 			<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
