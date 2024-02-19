@@ -426,17 +426,14 @@ export default () => {
 			return list.map( ( item ) => {
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
-				const itemContext = deepSignal( {
-					[ namespace ]: { [ itemProp ]: item },
-				} );
-				contextIgnores.set(
-					itemContext[ namespace ],
-					new Set( [ itemProp ] )
-				);
+				const itemContext = deepSignal( { [ namespace ]: {} } );
 				const mergedContext = proxifyContext(
 					itemContext,
 					inheritedValue
 				);
+
+				// Set the item after proxifying the context.
+				mergedContext[ namespace ][ itemProp ] = item;
 
 				const scope = { ...getScope(), context: mergedContext };
 				const key = eachKey
