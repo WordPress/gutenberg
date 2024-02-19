@@ -27,6 +27,7 @@ export function GridVisualizer( { clientId } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
 		>
 			<div
 				className="block-editor-grid-visualizer__grid"

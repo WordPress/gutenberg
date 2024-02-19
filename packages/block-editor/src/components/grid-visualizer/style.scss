@@ -16,6 +16,10 @@
 	border: $border-width dashed $gray-300;
 }
 
+.block-editor-grid-item-resizer {
+	z-index: z-index(".block-editor-grid-visualizer") !important;
+}
+
 .block-editor-grid-item-resizer .components-popover__content * {
 	pointer-events: none !important;
 }

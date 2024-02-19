@@ -23,6 +23,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
 		>
 			<ResizableBox
 				ref={ resizableRef }
