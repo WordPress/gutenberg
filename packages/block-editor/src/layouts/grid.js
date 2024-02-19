@@ -8,6 +8,7 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
@@ -221,18 +222,40 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 	const { columnCount = 3 } = layout;
 
 	return (
-		<RangeControl
-			label={ __( 'Columns' ) }
-			value={ columnCount }
-			onChange={ ( value ) =>
-				onChange( {
-					...layout,
-					columnCount: value,
-				} )
-			}
-			min={ 1 }
-			max={ 16 }
-		/>
+		<fieldset>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Columns' ) }
+			</BaseControl.VisualLabel>
+			<Flex gap={ 4 }>
+				<FlexItem isBlock>
+					<NumberControl
+						size={ '__unstable-large' }
+						onChange={ ( value ) =>
+							onChange( {
+								...layout,
+								columnCount: value,
+							} )
+						}
+						value={ columnCount }
+						min={ 1 }
+					/>
+				</FlexItem>
+				<FlexItem isBlock>
+					<RangeControl
+						value={ columnCount }
+						onChange={ ( value ) =>
+							onChange( {
+								...layout,
+								columnCount: value,
+							} )
+						}
+						min={ 1 }
+						max={ 16 }
+						withInputField={ false }
+					/>
+				</FlexItem>
+			</Flex>
+		</fieldset>
 	);
 }
 
