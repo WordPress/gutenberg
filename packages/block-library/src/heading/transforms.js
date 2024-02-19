@@ -15,12 +15,14 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, anchor, align: textAlign } ) =>
-					createBlock( 'core/heading', {
-						content,
-						anchor,
-						textAlign,
-					} )
+				attributes.map(
+					( { content, anchor, align: textAlign, metadata } ) =>
+						createBlock( 'core/heading', {
+							content,
+							anchor,
+							textAlign,
+							metadata,
+						} )
 				),
 		},
 		{
@@ -82,8 +84,12 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align } ) =>
-					createBlock( 'core/paragraph', { content, align } )
+				attributes.map( ( { content, textAlign: align, metadata } ) =>
+					createBlock( 'core/paragraph', {
+						content,
+						align,
+						metadata,
+					} )
 				),
 		},
 	],
