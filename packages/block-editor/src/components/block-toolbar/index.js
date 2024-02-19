@@ -166,6 +166,11 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
+				<BlockControls.Slot
+					// TODO: Rename "first" to something more meaningful.
+					group="first"
+					className="block-editor-block-toolbar__slot"
+				/>
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					isDefaultEditingMode && (
 						<div
