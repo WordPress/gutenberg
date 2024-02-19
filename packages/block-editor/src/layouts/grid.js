@@ -234,12 +234,17 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 				<FlexItem isBlock>
 					<NumberControl
 						size={ '__unstable-large' }
-						onChange={ ( value ) =>
+						onChange={ ( value ) => {
+							/**
+							 * If the input is cleared, avoid switching
+							 * back to "Auto" by setting a value of "1".
+							 */
+							const validValue = value !== '' ? value : '1';
 							onChange( {
 								...layout,
-								columnCount: value,
-							} )
-						}
+								columnCount: validValue,
+							} );
+						} }
 						value={ columnCount }
 						min={ 1 }
 						label={ __( 'Columns' ) }
@@ -248,7 +253,7 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
-						value={ columnCount }
+						value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
 						onChange={ ( value ) =>
 							onChange( {
 								...layout,
