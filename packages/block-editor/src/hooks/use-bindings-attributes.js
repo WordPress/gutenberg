@@ -11,7 +11,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { unlock } from '../../../editor/src/lock-unlock';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -80,7 +80,6 @@ const BlockBindingConnector = ( {
 	const blockName = blockProps.name;
 
 	const setAttributes = blockProps.setAttributes;
-
 	const updateBoundAttibute = useCallback(
 		( newAttrValue ) => {
 			setAttributes( {
