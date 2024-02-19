@@ -2243,18 +2243,12 @@ export const getDirectInsertBlock = createSelector(
 		if ( ! rootClientId ) {
 			return;
 		}
-		const defaultBlock =
-			state.blockListSettings[ rootClientId ]?.defaultBlock;
-		const directInsert =
-			state.blockListSettings[ rootClientId ]?.directInsert;
+		const { defaultBlock, directInsert } =
+			state.blockListSettings[ rootClientId ] ?? {};
 		if ( ! defaultBlock || ! directInsert ) {
 			return;
 		}
-		if ( typeof directInsert === 'function' ) {
-			return directInsert( getBlock( state, rootClientId ) )
-				? defaultBlock
-				: null;
-		}
+
 		return defaultBlock;
 	},
 	( state, rootClientId ) => [
