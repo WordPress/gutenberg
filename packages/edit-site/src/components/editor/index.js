@@ -84,6 +84,9 @@ const blockRemovalRules = {
 	'core/post-template': __(
 		'Post Template displays each post or page in a Query Loop.'
 	),
+	'bindings/core/pattern-overrides': __(
+		'Blocks from synced patterns that can have overriden content.'
+	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -112,14 +115,18 @@ export default function Editor( { isLoading } ) {
 		postTypeLabel,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+		const { getEditedPostContext, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { isInserterOpened, isListViewOpened, getPostTypeLabel } =
-			select( editorStore );
+		const {
+			isInserterOpened,
+			isListViewOpened,
+			getPostTypeLabel,
+			getEditorMode,
+		} = select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -260,11 +267,11 @@ export default function Editor( { isLoading } ) {
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
+							! isDistractionFree &&
 							isEditMode &&
-							isRightSidebarOpen && (
-								<>
-									<ComplementaryArea.Slot scope="core/edit-site" />
-								</>
+							isRightSidebarOpen &&
+							! isDistractionFree && (
+								<ComplementaryArea.Slot scope="core/edit-site" />
 							)
 						}
 						footer={

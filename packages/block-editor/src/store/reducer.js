@@ -1521,11 +1521,17 @@ export function isSelectionEnabled( state = true, action ) {
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
-			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			const {
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
+				messageType,
+			} = action;
 			return {
 				clientIds,
 				selectPrevious,
 				blockNamesForPrompt,
+				messageType,
 			};
 		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
 			return false;
@@ -2051,19 +2057,10 @@ function blockBindingsSources( state = {}, action ) {
 			[ action.sourceName ]: {
 				label: action.sourceLabel,
 				useSource: action.useSource,
-				lockAttributesEditing: action.lockAttributesEditing,
+				lockAttributesEditing: action.lockAttributesEditing ?? true,
 			},
 		};
 	}
-	return state;
-}
-
-function blockPatterns( state = [], action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_BLOCK_PATTERNS':
-			return action.patterns;
-	}
-
 	return state;
 }
 
@@ -2099,7 +2096,6 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	blockBindingsSources,
-	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

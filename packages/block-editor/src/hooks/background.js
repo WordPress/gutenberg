@@ -365,20 +365,23 @@ function BackgroundImagePanelItem( {
 
 function backgroundSizeHelpText( value ) {
 	if ( value === 'cover' || value === undefined ) {
-		return __( 'Stretch image to cover the block.' );
+		return __( 'Image covers the space evenly.' );
 	}
 	if ( value === 'contain' ) {
-		return __( 'Resize image to fit without cropping.' );
+		return __( 'Image is contained without distortion.' );
 	}
-	return __( 'Set a fixed width.' );
+	return __( 'Specify a fixed width.' );
 }
 
 export const coordsToBackgroundPosition = ( value ) => {
-	if ( ! value || isNaN( value.x ) || isNaN( value.y ) ) {
+	if ( ! value || ( isNaN( value.x ) && isNaN( value.y ) ) ) {
 		return undefined;
 	}
 
-	return `${ value.x * 100 }% ${ value.y * 100 }%`;
+	const x = isNaN( value.x ) ? 0.5 : value.x;
+	const y = isNaN( value.y ) ? 0.5 : value.y;
+
+	return `${ x * 100 }% ${ y * 100 }%`;
 };
 
 export const backgroundPositionToCoords = ( value ) => {
@@ -510,7 +513,6 @@ function BackgroundSizePanelItem( {
 			panelId={ clientId }
 		>
 			<FocalPointPicker
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
 				url={ style?.background?.backgroundImage?.url }
@@ -520,7 +522,6 @@ function BackgroundSizePanelItem( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				size={ '__unstable-large' }
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
@@ -555,8 +556,7 @@ function BackgroundSizePanelItem( {
 			) : null }
 			{ currentValueForToggle !== 'cover' && (
 				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Repeat image' ) }
+					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }
 				/>

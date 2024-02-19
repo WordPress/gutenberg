@@ -72,7 +72,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should lock the appropriate controls', async ( {
+			test( 'Should lock the appropriate controls with a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -84,6 +84,52 @@ test.describe( 'Block bindings', () => {
 							bindings: {
 								content: {
 									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await paragraphBlock.click();
+
+				// Alignment controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
+				).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
+				).toBeHidden();
+
+				// Paragraph is not editable.
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+
+			test( 'Should lock the appropriate controls when source is not defined', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'plugin/undefined-source',
 									args: { key: 'text_custom_field' },
 								},
 							},
@@ -143,7 +189,7 @@ test.describe( 'Block bindings', () => {
 				await expect( headingBlock ).toHaveText( 'text_custom_field' );
 			} );
 
-			test( 'Should lock the appropriate controls', async ( {
+			test( 'Should lock the appropriate controls with a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -155,6 +201,52 @@ test.describe( 'Block bindings', () => {
 							bindings: {
 								content: {
 									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const headingBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} );
+				await headingBlock.click();
+
+				// Alignment controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
+				).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
+				).toBeHidden();
+
+				// Heading is not editable.
+				await expect( headingBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+
+			test( 'Should lock the appropriate controls when source is not defined', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'heading default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'plugin/undefined-source',
 									args: { key: 'text_custom_field' },
 								},
 							},
@@ -221,7 +313,7 @@ test.describe( 'Block bindings', () => {
 				await expect( buttonBlock ).toHaveText( 'text_custom_field' );
 			} );
 
-			test( 'Should lock text controls when text is bound', async ( {
+			test( 'Should lock text controls when text is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -250,7 +342,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 
 				// Alignment controls exist.
@@ -283,7 +375,69 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 			} );
 
-			test( 'Should lock url controls when url is bound', async ( {
+			test( 'Should lock text controls when text is bound to an undefined source', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'plugin/undefined-source',
+											args: { key: 'text_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' );
+				await buttonBlock.click();
+
+				// Alignment controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
+				).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
+				).toBeHidden();
+
+				// Button is not editable.
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+
+				// Link controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Unlink' } )
+				).toBeVisible();
+			} );
+
+			test( 'Should lock url controls when url is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -312,7 +466,67 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
+				await buttonBlock.click();
+
+				// Format controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
+				).toBeVisible();
+
+				// Button is editable.
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'true'
+				);
+
+				// Link controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Link' } )
+				).toBeHidden();
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Unlink' } )
+				).toBeHidden();
+			} );
+
+			test( 'Should lock url controls when url is bound to an undefined source', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										url: {
+											source: 'plugin/undefined-source',
+											args: { key: 'url_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 
 				// Format controls exist.
@@ -376,7 +590,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 
 				// Alignment controls are visible.
@@ -429,7 +643,7 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 			} );
 
-			test( 'Should NOT show the upload form when url is bound', async ( {
+			test( 'Should NOT show the upload form when url is bound to a registered source', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -457,7 +671,35 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 			} );
 
-			test( 'Should lock url controls when url is bound', async ( {
+			test( 'Should NOT show the upload form when url is bound to an undefined source', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'plugin/undefined-source',
+									args: { key: 'url_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+				await expect(
+					imageBlock.getByRole( 'button', { name: 'Upload' } )
+				).toBeHidden();
+			} );
+
+			test( 'Should lock url controls when url is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -499,11 +741,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is enabled and with the original value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
@@ -516,17 +758,86 @@ test.describe( 'Block bindings', () => {
 
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'Should disable alt textarea when alt is bound', async ( {
+			test( 'Should lock url controls when url is bound to an undefined source', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'plugin/undefined-source',
+									args: { key: 'url_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Replace controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
+				).toBeHidden();
+
+				// Image placeholder doesn't show the upload button.
+				await expect(
+					imageBlock.getByRole( 'button', { name: 'Upload' } )
+				).toBeHidden();
+
+				// Alt textarea is enabled and with the original value.
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Alternative text' )
+				).toBeEnabled();
+				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Alternative text' )
+					.inputValue();
+				expect( altValue ).toBe( 'default alt value' );
+
+				// Title input is enabled and with the original value.
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
+
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toBeEnabled();
+				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+					.inputValue();
+				expect( titleValue ).toBe( 'default title value' );
+			} );
+
+			test( 'Should disable alt textarea when alt is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -563,11 +874,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'text_custom_field' );
@@ -579,17 +890,80 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'Should disable title input when title is bound', async ( {
+			test( 'Should disable alt textarea when alt is bound to an undefined source', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								alt: {
+									source: 'plguin/undefined-source',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Replace controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
+				).toBeVisible();
+
+				// Alt textarea is disabled and with the custom field value.
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Alternative text' )
+				).toHaveAttribute( 'readonly' );
+				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Alternative text' )
+					.inputValue();
+				expect( altValue ).toBe( 'default alt value' );
+
+				// Title input is enabled and with the original value.
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toBeEnabled();
+				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+					.inputValue();
+				expect( titleValue ).toBe( 'default title value' );
+			} );
+
+			test( 'Should disable title input when title is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -626,11 +1000,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is enabled and with the original value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
 				).toBeEnabled();
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'default alt value' );
@@ -642,14 +1016,77 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'text_custom_field' );
+			} );
+
+			test( 'Should disable title input when title is bound to an undefined source', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								title: {
+									source: 'plugin/undefined-source',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Replace controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
+				).toBeVisible();
+
+				// Alt textarea is enabled and with the original value.
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Alternative text' )
+				).toBeEnabled();
+				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Alternative text' )
+					.inputValue();
+				expect( altValue ).toBe( 'default alt value' );
+
+				// Title input is disabled and with the custom field value.
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toHaveAttribute( 'readonly' );
+				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+					.inputValue();
+				expect( titleValue ).toBe( 'default title value' );
 			} );
 
 			test( 'Multiple bindings should lock the appropriate controls', async ( {
@@ -698,11 +1135,11 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'text_custom_field' );
@@ -714,11 +1151,11 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
@@ -734,11 +1171,11 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the value of the custom field when exists', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
+						anchor: 'paragraph-binding',
 						content: 'paragraph default content',
 						metadata: {
 							bindings: {
@@ -763,7 +1200,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				await BlockBindingsUtils.setId( 'paragraph-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect(
@@ -777,11 +1213,11 @@ test.describe( 'Block bindings', () => {
 			test( "Should show the value of the key when custom field doesn't exists", async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
+						anchor: 'paragraph-binding',
 						content: 'p',
 						metadata: {
 							bindings: {
@@ -806,7 +1242,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend doesn't show the content.
-				await BlockBindingsUtils.setId( 'paragraph-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect(
@@ -818,11 +1253,11 @@ test.describe( 'Block bindings', () => {
 		test( 'Heading - should show the value of the custom field', async ( {
 			editor,
 			page,
-			BlockBindingsUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/heading',
 				attributes: {
+					anchor: 'heading-binding',
 					content: 'heading default content',
 					metadata: {
 						bindings: {
@@ -847,7 +1282,6 @@ test.describe( 'Block bindings', () => {
 			);
 
 			// Check the frontend shows the value of the custom field.
-			await BlockBindingsUtils.setId( 'heading-binding' );
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 			await expect( page.locator( '#heading-binding' ) ).toBeVisible();
@@ -860,7 +1294,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Should show the value of the custom field when text is bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -868,6 +1301,7 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
+								anchor: 'button-text-binding',
 								text: 'button default text',
 								url: '#default-url',
 								metadata: {
@@ -887,7 +1321,7 @@ test.describe( 'Block bindings', () => {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.locator( 'div' );
+					.getByRole( 'textbox' );
 				await buttonBlock.click();
 				await expect( buttonBlock ).toHaveText(
 					'Value of the text_custom_field'
@@ -900,7 +1334,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				await BlockBindingsUtils.setId( 'button-text-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				const buttonDom = page.locator( '#button-text-binding a' );
@@ -917,7 +1350,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Should use the value of the custom field when url is bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -925,6 +1357,7 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
+								anchor: 'button-url-binding',
 								text: 'button default text',
 								url: '#default-url',
 								metadata: {
@@ -941,7 +1374,6 @@ test.describe( 'Block bindings', () => {
 				} );
 
 				// Check the frontend shows the original value of the custom field.
-				await BlockBindingsUtils.setId( 'button-url-binding' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				const buttonDom = page.locator( '#button-url-binding a' );
@@ -956,7 +1388,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Should use the values of the custom fields when text and url are bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -964,6 +1395,7 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
+								anchor: 'button-multiple-bindings',
 								text: 'button default text',
 								url: '#default-url',
 								metadata: {
@@ -984,7 +1416,6 @@ test.describe( 'Block bindings', () => {
 				} );
 
 				// Check the frontend uses the values of the custom fields.
-				await BlockBindingsUtils.setId( 'button-multiple-bindings' );
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				const buttonDom = page.locator( '#button-multiple-bindings a' );
@@ -1031,6 +1462,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-url-binding',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1055,7 +1487,6 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend uses the value of the custom field.
-				await BlockBindingsUtils.setId( 'image-url-binding' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-url-binding img' );
@@ -1082,6 +1513,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-alt-binding',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1111,17 +1543,16 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
-				await BlockBindingsUtils.setId( 'image-alt-binding' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-alt-binding img' );
@@ -1148,6 +1579,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-title-binding',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1176,7 +1608,7 @@ test.describe( 'Block bindings', () => {
 
 				// Title input is disabled and with the custom field value.
 				const advancedButton = page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', {
 						name: 'Advanced',
 					} );
@@ -1187,17 +1619,16 @@ test.describe( 'Block bindings', () => {
 				}
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
-				await BlockBindingsUtils.setId( 'image-title-binding' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-title-binding img' );
@@ -1224,6 +1655,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/image',
 					attributes: {
+						anchor: 'image-multiple-bindings',
 						url: imagePlaceholderSrc,
 						alt: 'default alt value',
 						title: 'default title value',
@@ -1257,18 +1689,18 @@ test.describe( 'Block bindings', () => {
 				// Alt textarea is disabled and with the custom field value.
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Alternative text' )
-				).toBeDisabled();
+				).toHaveAttribute( 'readonly' );
 				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Title input is enabled and with the original value.
 				const advancedButton = page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', {
 						name: 'Advanced',
 					} );
@@ -1279,17 +1711,16 @@ test.describe( 'Block bindings', () => {
 				}
 				await expect(
 					page
-						.getByRole( 'tabpanel', { name: 'Block' } )
+						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toBeEnabled();
 				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Block' } )
+					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'default title value' );
 
 				// Check the frontend uses the values of the custom fields.
-				await BlockBindingsUtils.setId( 'image-multiple-bindings' );
 				const postId = await BlockBindingsUtils.updatePost();
 				await page.goto( `/?p=${ postId }` );
 				const imageDom = page.locator( '#image-multiple-bindings img' );
@@ -1314,24 +1745,6 @@ test.describe( 'Block bindings', () => {
 class BlockBindingsUtils {
 	constructor( { page } ) {
 		this.page = page;
-	}
-
-	// Helper to add an anchor/id to be able to locate the block in the frontend.
-	async setId( testId ) {
-		const isAdvancedPanelOpen = await this.page
-			.getByRole( 'tabpanel', { name: 'Block' } )
-			.getByRole( 'button', { name: 'Advanced' } )
-			.getAttribute( 'aria-expanded' );
-		if ( isAdvancedPanelOpen === 'false' ) {
-			await this.page
-				.getByRole( 'tabpanel', { name: 'Block' } )
-				.getByRole( 'button', { name: 'Advanced' } )
-				.click();
-		}
-		await this.page
-			.getByRole( 'tabpanel', { name: 'Block' } )
-			.getByLabel( 'HTML anchor' )
-			.fill( testId );
 	}
 
 	// Helper to update the post.

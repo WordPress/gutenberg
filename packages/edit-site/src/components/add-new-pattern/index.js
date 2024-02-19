@@ -25,10 +25,11 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
-import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { CreatePatternModal } = unlock( editPatternsPrivateApis );
+const { CreatePatternModal, useAddPatternCategory } = unlock(
+	editPatternsPrivateApis
+);
 
 export default function AddNewPattern() {
 	const history = useHistory();
@@ -43,7 +44,6 @@ export default function AddNewPattern() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const { patternCategories } = usePatternCategories();
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -97,6 +97,7 @@ export default function AddNewPattern() {
 		title: __( 'Import pattern from JSON' ),
 	} );
 
+	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 	return (
 		<>
 			<DropdownMenu
@@ -132,12 +133,23 @@ export default function AddNewPattern() {
 					const file = event.target.files?.[ 0 ];
 					if ( ! file ) return;
 					try {
-						const currentCategoryId =
-							params.categoryType !== TEMPLATE_PART_POST_TYPE &&
-							patternCategories.find(
-								( category ) =>
-									category.name === params.categoryId
-							)?.id;
+						let currentCategoryId;
+						// When we're not handling template parts, we should
+						// add or create the proper pattern category.
+						if ( params.categoryType !== TEMPLATE_PART_POST_TYPE ) {
+							const currentCategory = categoryMap
+								.values()
+								.find(
+									( term ) => term.name === params.categoryId
+								);
+							if ( !! currentCategory ) {
+								currentCategoryId =
+									currentCategory.id ||
+									( await findOrCreateTerm(
+										currentCategory.label
+									) );
+							}
+						}
 						const pattern = await createPatternFromFile(
 							file,
 							currentCategoryId
@@ -146,8 +158,12 @@ export default function AddNewPattern() {
 						);
 
 						// Navigate to the All patterns category for the newly created pattern
-						// if we're not on that page already.
-						if ( ! currentCategoryId ) {
+						// if we're not on that page already and if we're not in the `my-patterns`
+						// category.
+						if (
+							! currentCategoryId &&
+							params.categoryId !== 'my-patterns'
+						) {
 							history.push( {
 								path: `/patterns`,
 								categoryType: PATTERN_TYPES.theme,

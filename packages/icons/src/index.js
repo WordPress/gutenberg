@@ -53,6 +53,7 @@ export { default as color } from './library/color';
 export { default as column } from './library/column';
 export { default as columns } from './library/columns';
 export { default as copy } from './library/copy';
+export { default as copySmall } from './library/copy-small';
 export { default as comment } from './library/comment';
 export { default as commentAuthorAvatar } from './library/comment-author-avatar';
 export { default as commentAuthorName } from './library/comment-author-name';

@@ -2299,12 +2299,12 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 					__unstableSkipMigrationLogs: true,
 				} ),
 			};
-		}, getAllPatternsDependants )
+		}, getAllPatternsDependants( select ) )
 );
 
-const getAllowedPatternsDependants = ( state, rootClientId ) => {
+const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => {
 	return [
-		...getAllPatternsDependants( state ),
+		...getAllPatternsDependants( select )( state ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
@@ -2345,7 +2345,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			);
 
 			return patternsAllowed;
-		}, getAllowedPatternsDependants );
+		}, getAllowedPatternsDependants( select ) );
 	}
 );
 
@@ -2384,7 +2384,7 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 			return filteredPatterns;
 		},
 		( state, blockNames, rootClientId ) =>
-			getAllowedPatternsDependants( state, rootClientId )
+			getAllowedPatternsDependants( select )( state, rootClientId )
 	)
 );
 
@@ -2458,7 +2458,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 				);
 			},
 			( state, blocks, rootClientId ) =>
-				getAllowedPatternsDependants( state, rootClientId )
+				getAllowedPatternsDependants( select )( state, rootClientId )
 		)
 );
 

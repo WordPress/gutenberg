@@ -11,11 +11,18 @@
 }
 
 .dataviews-filters__view-actions {
-	padding: $grid-unit-15 $grid-unit-40;
+	padding: $grid-unit-15 $grid-unit-40 0;
 	.components-search-control {
 		flex-grow: 1;
-		max-width: 240px;
+
+		.components-base-control__field {
+			max-width: 240px;
+		}
 	}
+}
+
+.dataviews-filters__container {
+	padding: 0 $grid-unit-40;
 }
 
 .dataviews-filters__view-actions.components-h-stack {
@@ -24,24 +31,6 @@
 
 .dataviews-filters-button {
 	position: relative;
-}
-
-.dataviews-filters-count {
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: $grid-unit-20;
-	color: var(--wp-components-color-accent-inverted, $white);
-	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-	border-radius: $grid-unit-10;
-	min-width: $grid-unit-20;
-	padding: 0 $grid-unit-05;
-	transform: translateX(40%) translateY(-40%);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 11px;
-	font-weight: 300;
 }
 
 .dataviews-pagination {
@@ -78,7 +67,7 @@
 	}
 	th {
 		text-align: left;
-		color: var(--wp-components-color-foreground, $gray-900);
+		color: $gray-900;
 		font-weight: normal;
 		font-size: $default-font-size;
 	}
@@ -274,7 +263,7 @@
 		justify-content: flex-start;
 
 		.dataviews-view-grid__title-actions {
-			padding: $grid-unit-05 $grid-unit 0 $grid-unit-05;
+			padding: $grid-unit-05 $grid-unit $grid-unit-05 $grid-unit-05;
 		}
 
 		.dataviews-view-grid__primary-field {
@@ -536,4 +525,223 @@
 
 .dataviews-view-grid__card.has-no-pointer-events * {
 	pointer-events: none;
+}
+.dataviews-filter-summary__popover {
+	.components-popover__content {
+		width: 230px;
+		padding: 0;
+		border-radius: $grid-unit-05;
+	}
+}
+
+.dataviews-search-widget-filter-combobox-list {
+	max-height: $grid-unit * 23;
+	padding: $grid-unit-05;
+	overflow: auto;
+	border-top: 1px solid $gray-200;
+
+	.dataviews-search-widget-filter-combobox-item {
+		display: flex;
+		align-items: center;
+		gap: $grid-unit-10;
+		border-radius: $radius-block-ui;
+		box-sizing: border-box;
+		padding: $grid-unit-10 $grid-unit-15;
+		cursor: default;
+		margin-block-end: 2px;
+
+		&:last-child {
+			margin-block-end: 0;
+		}
+
+		&:hover,
+		&[data-active-item],
+		&:focus {
+			background-color: var(--wp-admin-theme-color);
+			color: $white;
+
+			.dataviews-search-widget-filter-combobox-item-check {
+				fill: $white;
+			}
+
+			.dataviews-search-widget-filter-combobox-item-description {
+				color: $white;
+			}
+		}
+
+		.dataviews-search-widget-filter-combobox-item-check {
+			width: 24px;
+			height: 24px;
+			flex-shrink: 0;
+		}
+
+		.dataviews-search-widget-filter-combobox-item-value {
+			[data-user-value] {
+				font-weight: 600;
+			}
+		}
+
+		.dataviews-search-widget-filter-combobox-item-description {
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-size: $helptext-font-size;
+			line-height: 16px;
+			color: $gray-700;
+		}
+	}
+}
+
+.dataviews-search-widget-filter-combobox__wrapper {
+	position: relative;
+	padding: $grid-unit-10;
+
+	.dataviews-search-widget-filter-combobox__input {
+		@include input-control;
+		display: block;
+		padding: 0 $grid-unit-40 0 $grid-unit-10;
+		background: $gray-100;
+		border: none;
+		width: 100%;
+		height: $grid-unit-40;
+
+		// Unset inherited values.
+		margin-left: 0;
+		margin-right: 0;
+
+		/* Fonts smaller than 16px causes mobile safari to zoom. */
+		font-size: $mobile-text-min-font-size;
+		@include break-small {
+			font-size: $default-font-size;
+		}
+
+		&:focus {
+			background: $white;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+
+		&::placeholder {
+			color: $gray-700;
+		}
+
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
+	}
+
+	.dataviews-search-widget-filter-combobox__icon {
+		position: absolute;
+		right: $grid-unit-15;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: $icon-size;
+	}
+}
+
+.dataviews-filter-summary__operators-container {
+	padding: $grid-unit-10 $grid-unit-10 $grid-unit-05;
+	padding-bottom: 0;
+
+	&:empty {
+		display: none;
+	}
+
+	.dataviews-filter-summary__operators-filter-name {
+		color: $gray-700;
+	}
+}
+
+.dataviews-filter-summary__chip-container {
+	position: relative;
+	white-space: pre-wrap;
+
+	.dataviews-filter-summary__chip {
+		border-radius: $grid-unit-20;
+		border: 1px solid transparent;
+		cursor: pointer;
+		padding: 0 $grid-unit-15;
+		height: $grid-unit-40;
+		background: $gray-100;
+		color: $gray-700;
+		position: relative;
+		display: flex;
+		align-items: center;
+
+		&.has-reset {
+			padding-inline-end: $button-size-small + $grid-unit-05;
+		}
+
+		&:hover,
+		&:focus-visible {
+			background: $gray-200;
+			color: $gray-900;
+		}
+
+		&.has-values {
+			color: var(--wp-admin-theme-color);
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+
+			&:hover {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			}
+		}
+
+		&:focus-visible {
+			outline: none;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+
+		.dataviews-filter-summary__filter-text-name {
+			font-weight: 500;
+		}
+	}
+
+	.dataviews-filter-summary__chip-remove {
+		width: $icon-size;
+		height: $icon-size;
+		border-radius: 50%;
+		border: 0;
+		padding: 0;
+		position: absolute;
+		right: $grid-unit-05;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		cursor: pointer;
+
+		svg {
+			fill: $gray-700;
+		}
+
+		&:hover,
+		&:focus {
+			background: $gray-200;
+			svg {
+				fill: $gray-900;
+			}
+		}
+
+		&.has-values {
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+			&:hover {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			}
+		}
+
+		&:focus-visible {
+			outline: none;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
 }

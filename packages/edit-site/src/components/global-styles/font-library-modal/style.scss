@@ -36,11 +36,8 @@
 	}
 }
 
-.font-library-modal__fonts-grid {
-	.font-library-modal__fonts-grid__main {
-		display: flex;
-		flex-direction: column;
-	}
+.font-library-modal__tabpanel-layout .components-base-control__field {
+	margin-bottom: 0;
 }
 
 .font-library-modal__font-card {
@@ -74,7 +71,6 @@
 .font-library-modal__font-variant_demo-text {
 	white-space: nowrap;
 	flex-shrink: 0;
-	font-size: 18px;
 	transition: opacity 0.3s ease-in-out;
 	@include reduce-motion("transition");
 }

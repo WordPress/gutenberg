@@ -40,7 +40,7 @@ function render_block_core_file( $attributes, $content ) {
 	if ( ! empty( $attributes['displayPreview'] ) ) {
 		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-			$module_url = gutenberg_url( "/build/interactivity/file{$suffix}.js" );
+			$module_url = gutenberg_url( '/build/interactivity/file.min.js' );
 		}
 
 		wp_register_script_module(
@@ -53,7 +53,7 @@ function render_block_core_file( $attributes, $content ) {
 
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
-		$processor->set_attribute( 'data-wp-interactive', '{"namespace":"core/file"}' );
+		$processor->set_attribute( 'data-wp-interactive', 'core/file' );
 		$processor->next_tag( 'object' );
 		$processor->set_attribute( 'data-wp-bind--hidden', '!state.hasPdfPreview' );
 		$processor->set_attribute( 'hidden', true );
