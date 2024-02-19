@@ -28,7 +28,7 @@ describe( 'Snackbar', () => {
 	it( 'should render correctly', () => {
 		render( <Snackbar>Message</Snackbar> );
 
-		const snackbar = screen.getByTestId( 'snackbar' );
+		const snackbar = screen.getByTestId( testId );
 
 		expect( snackbar ).toBeVisible();
 		expect( snackbar ).toHaveTextContent( 'Message' );
@@ -37,7 +37,7 @@ describe( 'Snackbar', () => {
 	it( 'should render with an additional className', () => {
 		render( <Snackbar className="gutenberg">Message</Snackbar> );
 
-		expect( screen.getByTestId( 'snackbar' ) ).toHaveClass( 'gutenberg' );
+		expect( screen.getByTestId( testId ) ).toHaveClass( 'gutenberg' );
 	} );
 
 	it( 'should render with an icon', () => {
@@ -49,7 +49,7 @@ describe( 'Snackbar', () => {
 
 		render( <Snackbar icon={ testIcon }>Message</Snackbar> );
 
-		const snackbar = screen.getByTestId( 'snackbar' );
+		const snackbar = screen.getByTestId( testId );
 		const icon = within( snackbar ).getByTestId( 'icon' );
 
 		expect( icon ).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe( 'Snackbar', () => {
 			</Snackbar>
 		);
 
-		const snackbar = screen.getByTestId( 'snackbar' );
+		const snackbar = screen.getByTestId( testId );
 
 		expect( snackbar ).toHaveAttribute( 'role', 'button' );
 		expect( snackbar ).toHaveAttribute(
