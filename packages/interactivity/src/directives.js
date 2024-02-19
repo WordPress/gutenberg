@@ -39,7 +39,7 @@ const descriptor = Reflect.getOwnPropertyDescriptor;
 const proxifyContext = ( current, inherited = {} ) =>
 	new Proxy( current, {
 		get: ( target, k ) => {
-			// Always subscribe to the inherited and current props.
+			// Subscribe to the inherited and current props.
 			const inheritedProp = inherited[ k ];
 			const currentProp = target[ k ];
 
