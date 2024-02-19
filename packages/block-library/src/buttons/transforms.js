@@ -33,19 +33,23 @@ const transforms = {
 					{},
 					// Loop the selected buttons.
 					buttons.map( ( attributes ) => {
-						const element = createElement(
-							document,
-							attributes.content
-						);
+						const { content, metadata } = attributes;
+						const element = createElement( document, content );
 						// Remove any HTML tags.
 						const text = element.innerText || '';
 						// Get first url.
 						const link = element.querySelector( 'a' );
 						const url = link?.getAttribute( 'href' );
+						// Adapt bindings to the button block.
+						if ( metadata?.bindings?.content ) {
+							metadata.bindings.text = metadata.bindings.content;
+							delete metadata.bindings.content;
+						}
 						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
 							text,
 							url,
+							metadata,
 						} );
 					} )
 				),
