@@ -59,7 +59,7 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 
 	spinner.text = 'Removing docker images, volumes, and networks.';
 
-	await dockerCompose.down( {
+	await dockerCompose.downAll( {
 		config: config.dockerComposeConfigPath,
 		commandOptions: [ '--volumes', '--remove-orphans', '--rmi', 'all' ],
 		log: debug,
