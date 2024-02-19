@@ -42,61 +42,80 @@ export function GridItemResizer( { clientId, onChange } ) {
 					topLeft: false,
 					topRight: false,
 				} }
-				onResizeStop={ ( event, direction, element ) => {
-					const boxWidth = element.offsetWidth;
-					const boxHeight = element.offsetHeight;
-					const { columnGap, rowGap, itemWidth, itemHeight } =
-						getGridDimensions( blockElement.parentElement );
-					const columnSpan = Math.round(
-						( columnGap + boxWidth ) / ( columnGap + itemWidth )
+				onResizeStop={ ( event, direction, boxElement ) => {
+					const gridElement = blockElement.parentElement;
+					const columnGap = parseFloat(
+						getComputedCSS( gridElement, 'column-gap' )
 					);
-					const rowSpan = Math.round(
-						( rowGap + boxHeight ) / ( rowGap + itemHeight )
+					const rowGap = parseFloat(
+						getComputedCSS( gridElement, 'row-gap' )
 					);
-					const newBoxWidth =
-						columnSpan * itemWidth + ( columnSpan - 1 ) * columnGap;
-					const newBoxHeight =
-						rowSpan * itemHeight + ( rowSpan - 1 ) * rowGap;
-					onChange( {
-						columnSpan,
-						rowSpan,
-					} );
-					resizableRef.current.updateSize( {
-						width: newBoxWidth,
-						height: newBoxHeight,
-					} );
+					const gridColumnLines = getGridLines(
+						getComputedCSS( gridElement, 'grid-template-columns' ),
+						columnGap
+					);
+					const gridRowLines = getGridLines(
+						getComputedCSS( gridElement, 'grid-template-rows' ),
+						rowGap
+					);
+					const columnStart = getClosestLine(
+						gridColumnLines,
+						blockElement.offsetLeft
+					);
+					const rowStart = getClosestLine(
+						gridRowLines,
+						blockElement.offsetTop
+					);
+					const columnEnd = getClosestLine(
+						gridColumnLines,
+						blockElement.offsetLeft + boxElement.offsetWidth
+					);
+					const rowEnd = getClosestLine(
+						gridRowLines,
+						blockElement.offsetTop + boxElement.offsetHeight
+					);
+					const columnSpan = Math.max( columnEnd - columnStart, 1 );
+					const rowSpan = Math.max( rowEnd - rowStart, 1 );
+					const width =
+						gridColumnLines[ columnStart + columnSpan ] -
+						gridColumnLines[ columnStart ] -
+						columnGap;
+					const height =
+						gridRowLines[ rowStart + rowSpan ] -
+						gridRowLines[ rowStart ] -
+						rowGap;
+					onChange( { columnSpan, rowSpan } );
+					resizableRef.current.updateSize( { width, height } );
 				} }
 			/>
 		</BlockPopover>
 	);
 }
 
-function getGridDimensions( element ) {
-	const width = element.clientWidth;
-	const height = element.clientHeight;
-	const paddingX =
-		parseFloat( getComputedCSS( element, 'padding-left' ) ) +
-		parseFloat( getComputedCSS( element, 'padding-right' ) );
-	const paddingY =
-		parseFloat( getComputedCSS( element, 'padding-top' ) ) +
-		parseFloat( getComputedCSS( element, 'padding-bottom' ) );
-	const gridTemplateColumns = getComputedCSS(
-		element,
-		'grid-template-columns'
+/**
+ * @param {string} template
+ * @param {number} gap
+ */
+function getGridLines( template, gap ) {
+	const lines = [ 0 ];
+	for ( const size of template.split( ' ' ) ) {
+		const line = parseFloat( size );
+		lines.push( lines[ lines.length - 1 ] + line + gap );
+	}
+	return lines;
+}
+
+/**
+ * @param {number[]} lines
+ * @param {number}   position
+ */
+function getClosestLine( lines, position ) {
+	return lines.reduce(
+		( closest, line, index ) =>
+			Math.abs( line - position ) <
+			Math.abs( lines[ closest ] - position )
+				? index
+				: closest,
+		0
 	);
-	const gridTemplateRows = getComputedCSS( element, 'grid-template-rows' );
-	const numColumns = gridTemplateColumns.split( ' ' ).length;
-	const numRows = gridTemplateRows.split( ' ' ).length;
-	const columnGap = parseFloat( getComputedCSS( element, 'column-gap' ) );
-	const rowGap = parseFloat( getComputedCSS( element, 'row-gap' ) );
-	const totalColumnGap = columnGap * ( numColumns - 1 );
-	const totalRowGap = rowGap * ( numRows - 1 );
-	const itemWidth = ( width - paddingX - totalColumnGap ) / numColumns;
-	const itemHeight = ( height - paddingY - totalRowGap ) / numRows;
-	return {
-		columnGap,
-		rowGap,
-		itemWidth,
-		itemHeight,
-	};
 }
