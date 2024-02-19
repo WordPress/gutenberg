@@ -58,11 +58,7 @@ export function hasPossibleBlockBinding( blockName, attributeName ) {
 
 /**
  * This component is responsible detecting and
- * propagating data changes between block attribute and
- * the block-binding source property.
- *
- * The app creates an instance of this component for each
- * pair of block-attribute/source-property.
+ * propagating data changes from the source to the block.
  *
  * @param {Object}   props            - The component props.
  * @param {string}   props.attrName   - The attribute name.
