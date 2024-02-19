@@ -10,6 +10,7 @@ import useBlockEditorSettings from './components/provider/use-block-editor-setti
 import DocumentTools from './components/document-tools';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
+import ModeSwitcher from './components/mode-switcher';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostPanelRow from './components/post-panel-row';
 import PostViewLink from './components/post-view-link';
@@ -25,6 +26,7 @@ lock( privateApis, {
 	EntitiesSavedStatesExtensible,
 	InserterSidebar,
 	ListViewSidebar,
+	ModeSwitcher,
 	PluginPostExcerpt,
 	PostPanelRow,
 	PostViewLink,
