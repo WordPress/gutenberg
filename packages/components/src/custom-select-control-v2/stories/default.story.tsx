@@ -25,6 +25,7 @@ const meta: Meta< typeof CustomSelect > = {
 		children: { control: { type: null } },
 		value: { control: { type: null } },
 	},
+	tags: [ 'status-wip' ],
 	parameters: {
 		badges: [ 'wip' ],
 		actions: { argTypesRegex: '^on.*' },
