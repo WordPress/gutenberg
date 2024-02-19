@@ -6,6 +6,10 @@
 
 -   `CustomSelectControl`: Remove deprecated `__nextUnconstrainedWidth` prop and promote to default behavior ([#58974](https://github.com/WordPress/gutenberg/pull/58974)).
 
+### Bug Fix
+
+-   `ToolbarButton`: Center text for short labels ([#59117](https://github.com/WordPress/gutenberg/pull/59117)).
+
 ### Internal
 
 -   `ColorPicker`: Style without accessing internal `InputControl` classes ([#59069](https://github.com/WordPress/gutenberg/pull/59069)).
