@@ -1425,7 +1425,7 @@ function block_core_navigation_mock_parsed_block( $inner_blocks, $post ) {
  *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
- * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ * @return string Serialized inner blocks with hooked blocks inserted, if any.
  */
 function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
@@ -1438,7 +1438,8 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
 	}
 
-	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
+	$markup = traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
+	return block_core_navigation_remove_serialized_parent_block( $markup );
 }
 
 /**
@@ -1526,9 +1527,6 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	}
 	$parsed_blocks = parse_blocks( $response->data['content']['raw'] );
 	$content       = block_core_navigation_insert_hooked_blocks( $parsed_blocks, $post );
-
-	// Remove mock Navigation block wrapper.
-	$content = block_core_navigation_remove_serialized_parent_block( $content );
 
 	$response->data['content']['raw']      = $content;
 	$response->data['content']['rendered'] = apply_filters( 'the_content', $content );
