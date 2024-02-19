@@ -8,9 +8,15 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import { BlockControls } from '../components';
+
+/**
+ * Internal dependencies
+ */
 import { store as blockEditorStore } from '../store';
 import { useBlockEditContext } from '../components/block-edit/context';
 import { unlock } from '../lock-unlock';
+import { ToolbarButton } from '@wordpress/components';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -80,11 +86,16 @@ const createEditFunctionWithBindingsAttribute = () =>
 			}
 
 			return (
-				<BlockEdit
-					key="edit"
-					{ ...props }
-					attributes={ updatedAttributes }
-				/>
+				<>
+					<BlockControls group="first">
+						<ToolbarButton icon="admin-plugins" color="purple" />
+					</BlockControls>
+					<BlockEdit
+						key="edit"
+						{ ...props }
+						attributes={ updatedAttributes }
+					/>
+				</>
 			);
 		},
 		'useBoundAttributes'
