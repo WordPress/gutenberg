@@ -28,7 +28,7 @@ import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
-import blockBinding from './use-bindings-attributes';
+import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
@@ -42,7 +42,6 @@ createBlockEditFilter(
 		contentLockUI,
 		blockHooks,
 		blockRenaming,
-		blockBinding,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
