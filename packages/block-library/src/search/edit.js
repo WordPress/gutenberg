@@ -17,6 +17,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
+	useFontSizeFromPreset,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -142,6 +143,7 @@ export default function SearchEdit( {
 	const hasOnlyButton = 'button-only' === buttonPosition;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
+	const fontSizeFromPreset = useFontSizeFromPreset( attributes?.fontSize );
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
@@ -326,6 +328,11 @@ export default function SearchEdit( {
 			}
 		};
 
+		const iconDimensions =
+			fontSizeFromPreset?.size ||
+			attributes?.style?.typography?.fontSize ||
+			undefined;
+
 		return (
 			<>
 				{ buttonUseIcon && (
@@ -341,7 +348,7 @@ export default function SearchEdit( {
 						onClick={ handleButtonClick }
 						ref={ buttonRef }
 					>
-						<Icon icon={ search } />
+						<Icon icon={ search } size={ iconDimensions } />
 					</button>
 				) }
 

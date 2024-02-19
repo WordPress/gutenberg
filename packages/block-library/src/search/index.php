@@ -131,9 +131,24 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			$button_classes[]       = 'has-icon';
+			$button_classes[] = 'has-icon';
+			$icon_dimensions  = '24';
+			if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
+				$icon_dimensions = $attributes['style']['typography']['fontSize'];
+			} else if ( ! empty( $attributes['fontSize'] ) ) {
+				$font_size_presets = wp_get_global_settings( array( 'typography', 'fontSizes' ) );
+				if ( isset( $font_size_presets['default'] ) || isset( $font_size_presets['theme'] ) ) {
+					$font_size_presets     = $font_size_presets['theme'] ?? $font_size_presets['default'];
+					$font_size_from_preset = array_filter( $font_size_presets, fn( $font_size ) => $font_size['slug'] === $attributes['fontSize'] );
+					if ( ! empty( $font_size_from_preset ) ) {
+						$font_size_from_preset = array_shift($font_size_from_preset );
+						$font_size_from_preset = $font_size_from_preset['size'] || '24';
+					}
+				}
+			}
+
 			$button_internal_markup =
-				'<svg class="search-icon" viewBox="0 0 24 24" width="24" height="24">
+				'<svg class="search-icon" viewBox="0 0 24 24" width="' . $icon_dimensions . '" height="' . $icon_dimensions . '">
 					<path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path>
 				</svg>';
 		}
