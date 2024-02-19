@@ -201,6 +201,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						value={ value }
 						units={ units }
 						min={ 0 }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -210,6 +212,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						min={ 0 }
 						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
 						withInputField={ false }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 			</Flex>
@@ -238,6 +242,8 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 						}
 						value={ columnCount }
 						min={ 1 }
+						label={ __( 'Columns' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -252,6 +258,8 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 						min={ 1 }
 						max={ 16 }
 						withInputField={ false }
+						label={ __( 'Columns' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 			</Flex>
