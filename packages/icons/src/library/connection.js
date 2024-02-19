@@ -10,8 +10,8 @@ const connection = (
 		viewBox="0 0 24 24"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<Path d="M5 19L8 16L5 19Z" fill="#911BEE" />
-		<Path d="M16 8L19 5L16 8Z" fill="#911BEE" />
+		<Path d="M5 19L8 16L5 19Z" fill="#9747FF" />
+		<Path d="M16 8L19 5L16 8Z" fill="#9747FF" />
 		<G
 			stroke-width="1.5"
 			stroke-linecap="round"

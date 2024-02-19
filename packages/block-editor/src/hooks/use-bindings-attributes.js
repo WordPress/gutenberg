@@ -41,6 +41,8 @@ const createEditFunctionWithBindingsAttribute = () =>
 			);
 			const { getBlockAttributes } = useSelect( blockEditorStore );
 
+			let hasSource = false;
+
 			const updatedAttributes = getBlockAttributes( clientId );
 			if ( updatedAttributes?.metadata?.bindings ) {
 				Object.entries( updatedAttributes.metadata.bindings ).forEach(
@@ -76,6 +78,7 @@ const createEditFunctionWithBindingsAttribute = () =>
 
 							if ( metaValue ) {
 								updatedAttributes[ attributeName ] = metaValue;
+								hasSource = true;
 							}
 						}
 					}
@@ -83,20 +86,29 @@ const createEditFunctionWithBindingsAttribute = () =>
 			}
 
 			return (
-				<>
-					<BlockControls group="first">
-						<ToolbarButton
-							icon={ connection }
-							label="Block bindings"
-							iconSize={ 24 }
-						></ToolbarButton>
-					</BlockControls>
+				// TODO: only set this if the block is connected to a source.
+				// this might not be a good way to do it if a block can have child
+				// blocks that are NOT connected to a source.
+				<div
+					style={
+						hasSource ? { '--wp-admin-theme-color': '#9747FF' } : {}
+					}
+				>
+					{ hasSource ? (
+						<BlockControls group="first">
+							<ToolbarButton
+								icon={ connection }
+								label="Block bindings"
+								iconSize={ 24 }
+							></ToolbarButton>
+						</BlockControls>
+					) : null }
 					<BlockEdit
 						key="edit"
 						{ ...props }
 						attributes={ updatedAttributes }
 					/>
-				</>
+				</div>
 			);
 		},
 		'useBoundAttributes'
