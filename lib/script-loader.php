@@ -53,20 +53,12 @@ function gutenberg_enqueue_global_styles() {
 
 	// Add each block as an inline css.
 	gutenberg_add_global_styles_for_blocks();
-}
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
-add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
 
-/**
- * Enqueues the global styles custom css.
- *
- * @since 6.2.0
- */
-function gutenberg_enqueue_global_styles_custom_css() {
-	if ( ! wp_is_block_theme() ) {
-		return;
-	}
-
+	/**
+	 * Add the custom CSS for the global styles.
+	 * Before that, dequeue the Customizer's custom CSS
+	 * and add it before the global styles custom CSS.
+	 */
 	// Don't enqueue Customizer's custom CSS separately.
 	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
 
@@ -91,8 +83,30 @@ function gutenberg_enqueue_global_styles_custom_css() {
 
 	gutenberg_add_global_styles_block_custom_css();
 }
-remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles_custom_css' );
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_custom_css' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
+add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
+
+/**
+ * Enqueues the global styles custom css.
+ *
+ * @since 6.2.0
+ */
+function gutenberg_enqueue_global_styles_custom_css() {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.8.0', 'gutenberg_enqueue_global_styles' );
+	if ( ! wp_is_block_theme() ) {
+		return;
+	}
+
+	// Don't enqueue Customizer's custom CSS separately.
+	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
+
+	$custom_css  = wp_get_custom_css();
+	$custom_css .= gutenberg_get_global_styles_custom_css();
+
+	if ( ! empty( $custom_css ) ) {
+		wp_add_inline_style( 'global-styles', $custom_css );
+	}
+}
 
 /**
  * Function that enqueues the CSS Custom Properties coming from theme.json.
