@@ -85,22 +85,22 @@ function TypographyElements() {
 				<ElementItem
 					parentMenu={ parentMenu }
 					element="link"
-					label={ __( 'Links' ) }
+					label={ __( 'Link' ) }
 				/>
 				<ElementItem
 					parentMenu={ parentMenu }
 					element="heading"
-					label={ __( 'Headings' ) }
+					label={ __( 'Heading' ) }
 				/>
 				<ElementItem
 					parentMenu={ parentMenu }
 					element="caption"
-					label={ __( 'Captions' ) }
+					label={ __( 'Caption' ) }
 				/>
 				<ElementItem
 					parentMenu={ parentMenu }
 					element="button"
-					label={ __( 'Buttons' ) }
+					label={ __( 'Button' ) }
 				/>
 			</ItemGroup>
 		</VStack>

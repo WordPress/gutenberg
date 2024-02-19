@@ -445,7 +445,7 @@ export default function ColorPanel( {
 	const elements = [
 		{
 			name: 'caption',
-			label: __( 'Captions' ),
+			label: __( 'Caption' ),
 			showPanel: useHasCaptionPanel( settings ),
 		},
 		{
