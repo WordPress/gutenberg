@@ -5,11 +5,10 @@ import {
 	privateApis as componentsPrivateApis,
 	Button,
 	Modal,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { bulkSelect } from '@wordpress/icons';
+import { bulkSelect, cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -123,6 +122,19 @@ export default function BulkActions( {
 	}
 	return (
 		<>
+			{ selection.length > 0 && (
+				<div className="dataviews-bulk-edit-button__selection-count">
+					{ sprintf(
+						/* translators: %d: Number of items. */
+						_n(
+							'%d item selected',
+							'%d items selected',
+							selection.length
+						),
+						selection.length
+					) }
+				</div>
+			) }
 			<DropdownMenu
 				open={ isMenuOpen }
 				onOpenChange={ onMenuOpenChange }
@@ -146,17 +158,8 @@ export default function BulkActions( {
 								  )
 								: __( 'Bulk edit' )
 						}
-						icon={ bulkSelect }
-					>
-						{ selection.length > 0 && (
-							<div className="dataviews-bulk-edit-button__selection-count">
-								<VisuallyHidden>
-									{ __( 'Edit items:' ) }
-								</VisuallyHidden>
-								{ selection.length }
-							</div>
-						) }
-					</Button>
+						icon={ selection.length === 0 ? bulkSelect : cog }
+					/>
 				}
 			>
 				<ActionsMenuGroup
