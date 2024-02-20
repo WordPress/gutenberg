@@ -28,7 +28,6 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
-	useBlockCommands,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
@@ -66,7 +65,6 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
-	useBlockCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
