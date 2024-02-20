@@ -27,6 +27,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -100,6 +101,7 @@ export default function DocumentBar() {
 	}, [] );
 
 	const { open: openCommandCenter } = useDispatch( commandsStore );
+	const isReducedMotion = useReducedMotion();
 
 	const isNotFound = ! document && ! isResolving;
 	const icon = ICONS[ postType ] ?? pageIcon;
@@ -137,6 +139,9 @@ export default function DocumentBar() {
 						}
 						animate={ { opacity: 1, transform: 'translateX(0%)' } }
 						exit={ { opacity: 0, transform: 'translateX(15%)' } }
+						transition={
+							isReducedMotion ? { duration: 0 } : undefined
+						}
 					>
 						{ __( 'Back' ) }
 					</MotionButton>
@@ -171,6 +176,9 @@ export default function DocumentBar() {
 							opacity: 1,
 							transform: 'translateX(0%)',
 						} }
+						transition={
+							isReducedMotion ? { duration: 0 } : undefined
+						}
 					>
 						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
 						<Text
