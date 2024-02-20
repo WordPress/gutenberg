@@ -86,7 +86,9 @@ export default {
 						onChange={ onChange }
 					/>
 				) }
-				<GridVisualizer clientId={ clientId } />
+				{ window.__experimentalEnableGridInteractivity && (
+					<GridVisualizer clientId={ clientId } />
+				) }
 			</>
 		);
 	},

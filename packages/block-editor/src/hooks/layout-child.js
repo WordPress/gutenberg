@@ -108,6 +108,9 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	if ( parentLayout.type !== 'grid' ) {
 		return null;
 	}
+	if ( ! window.__experimentalEnableGridInteractivity ) {
+		return null;
+	}
 	return (
 		<>
 			<GridVisualizer clientId={ rootClientId } />
