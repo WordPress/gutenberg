@@ -414,6 +414,10 @@ export default function DimensionsPanel( {
 			},
 		} );
 	};
+	const setChildLayoutAlign = ( newChildLayoutAlign ) => {
+		onChange( newChildLayoutAlign );
+	};
+
 	const resetChildLayoutValue = () => {
 		setChildLayout( {
 			selfStretch: undefined,
@@ -665,6 +669,7 @@ export default function DimensionsPanel( {
 					<ChildLayoutControl
 						value={ childLayout }
 						onChange={ setChildLayout }
+						onChangeAlign={ setChildLayoutAlign }
 						parentLayout={ settings?.parentLayout }
 					/>
 				</VStack>

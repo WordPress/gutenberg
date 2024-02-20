@@ -17,11 +17,33 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
 	} );
 	const layout = style?.layout ?? {};
-	const { selfStretch, flexSize, columnSpan, rowSpan } = layout;
+	const { selfStretch, flexSize, columnSpan, rowSpan, height, width } =
+		layout;
 	const parentLayout = useLayout() || {};
-	const { columnCount, minimumColumnWidth } = parentLayout;
+	const {
+		columnCount,
+		minimumColumnWidth,
+		orientation,
+		type: parentType,
+		default: { type: defaultParentType = 'default' } = {},
+	} = parentLayout;
+	const parentLayoutType = parentType || defaultParentType;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
+
+	const isFlowOrConstrained =
+		parentLayout.type === 'constrained' ||
+		parentLayout.type === 'default' ||
+		parentLayout.type === undefined;
+
+	const widthProp =
+		isFlowOrConstrained || orientation === 'vertical'
+			? 'selfAlign'
+			: 'selfStretch';
+	const heightProp =
+		isFlowOrConstrained || orientation === 'vertical'
+			? 'selfStretch'
+			: 'selfAlign';
 
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
@@ -38,6 +60,101 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			css = `${ selector } {
 				grid-column: span ${ columnSpan };
 			}`;
+		}
+		if ( isFlowOrConstrained || orientation === 'vertical' ) {
+			// set width
+			if ( layout[ widthProp ] === 'fixed' && width ) {
+				css += `${ selector } {
+					max-width: ${ width };
+				}`;
+			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					width: ${ width };
+				}`;
+			} else if ( layout[ widthProp ] === 'fill' ) {
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( layout[ widthProp ] === 'fit' ) {
+				css += `${ selector } {
+					width: fit-content;
+				}`;
+			}
+
+			// set height
+			if ( layout[ heightProp ] === 'fixed' && height ) {
+				css += `${ selector } {
+					max-height: ${ height };
+					flex-grow: 0;
+					flex-shrink: 1;
+					flex-basis: ${ height };
+				}`;
+			} else if ( layout[ heightProp ] === 'fixedNoShrink' && height ) {
+				css += `${ selector } {
+					height: ${ height };
+					flex-shrink: 0;
+					flex-grow: 0;
+					flex-basis: auto;
+				}`;
+			} else if ( layout[ heightProp ] === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+					flex-shrink: 1;
+				}`;
+			} else if ( layout[ heightProp ] === 'fit' ) {
+				css += `${ selector } {
+					flex-grow: 0;
+					flex-shrink: 0;
+					flex-basis: auto;
+					height: auto;
+				}`;
+			}
+		} else if ( parentLayoutType !== 'grid' ) {
+			// set width
+			if ( layout[ widthProp ] === 'fixed' && width ) {
+				css += `${ selector } {
+					max-width: ${ width };
+					flex-grow: 0;
+					flex-shrink: 1;
+					flex-basis: ${ width };
+					
+				}`;
+			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					width: ${ width };
+					flex-shrink: 0;
+					flex-grow: 0;
+					flex-basis: auto;
+				}`;
+			} else if ( layout[ widthProp ] === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+					flex-shrink: 1;
+					flex-basis: 100%;
+				}`;
+			} else if ( layout[ widthProp ] === 'fit' ) {
+				css += `${ selector } {
+					flex-grow: 0;
+					flex-shrink: 0;
+					flex-basis: auto;
+					width: fit-content;
+				}`;
+			}
+
+			// set height
+			if ( layout[ heightProp ] === 'fill' ) {
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( layout[ heightProp ] === 'fit' ) {
+				css += `${ selector } {
+						height: fit-content;
+					}`;
+			} else if ( layout[ heightProp ] === 'fixedNoShrink' ) {
+				css += `${ selector } {
+						height: ${ height };
+					}`;
+			}
 		}
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no

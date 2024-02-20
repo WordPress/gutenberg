@@ -70,6 +70,7 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
+		align,
 		layout,
 		name,
 		blockType,
@@ -104,19 +105,18 @@ function UncontrolledInnerBlocks( props ) {
 		getBlockSupport( name, '__experimentalLayout' ) ||
 		EMPTY_OBJECT;
 
-	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-	const usedLayout = layout || defaultLayoutBlockSupport;
-
 	const memoedLayout = useMemo(
 		() => ( {
-			// Default layout will know about any content/wide size defined by the theme.
+			// Default layout contains theme.json settings such as content and wide size.
 			...defaultLayout,
-			...usedLayout,
-			...( allowSizingOnChildren && {
-				allowSizingOnChildren: true,
-			} ),
+			// Any layout settings added to the block.
+			...layout,
+			// The layout settings from the block's block.json.
+			...defaultLayoutBlockSupport,
+			// Any alignment set on the block.
+			...( align && { alignWidth: align } ),
 		} ),
-		[ defaultLayout, usedLayout, allowSizingOnChildren ]
+		[ defaultLayout, layout, defaultLayoutBlockSupport, align ]
 	);
 
 	// For controlled inner blocks, we don't want a change in blocks to
@@ -185,6 +185,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	} = options;
 	const {
 		clientId,
+		align = null,
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
@@ -259,6 +260,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
+		align,
 		layout,
 		name,
 		blockType,
