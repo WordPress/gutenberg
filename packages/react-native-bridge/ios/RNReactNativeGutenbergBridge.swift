@@ -426,6 +426,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 	func requestConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
 		callback([self.delegate?.gutenbergDidRequestConnectionStatus() ?? true])
 	}
+
+    @objc
+	func logException(_ exception: [AnyHashable: Any]) {
+        self.delegate?.gutenbergDidRequestLogException(exception)
+	}
 }
 
 // MARK: - RCTBridgeModule delegate

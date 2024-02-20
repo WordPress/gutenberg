@@ -43,5 +43,6 @@ RCT_EXTERN_METHOD(generateHapticFeedback)
 RCT_EXTERN_METHOD(toggleUndoButton:(BOOL)isDisabled)
 RCT_EXTERN_METHOD(toggleRedoButton:(BOOL)isDisabled)
 RCT_EXTERN_METHOD(requestConnectionStatus:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(logException:(NSDictionary *)exception)
 
 @end

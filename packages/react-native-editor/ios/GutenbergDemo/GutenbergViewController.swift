@@ -349,6 +349,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestConnectionStatus() -> Bool {
         return true
     }
+
+    func logException(_ exception: [AnyHashable: Any]) -> Bool {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {

@@ -8,6 +8,11 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
  */
 import RCTAztecView from '@wordpress/react-native-aztec';
 
+/**
+ * Internal dependencies
+ */
+import parseException from './lib/parseException';
+
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
 const isAndroid = Platform.OS === 'android';
@@ -527,6 +532,30 @@ export function toggleUndoButton( isDisabled ) {
 
 export function toggleRedoButton( isDisabled ) {
 	RNReactNativeGutenbergBridge.toggleRedoButton( isDisabled );
+}
+
+/**
+ * Log exception to host app's crash logging service.
+ * @param {Object} exception       Exception object
+ * @param {Object} [extra]         Extra parameters to include in the exception (e.g. the block where the exception occurred)
+ * @param {Object} [extra.context] Context of the exception.
+ * @param {Object} [extra.tags]    Tags to associate with the exception.
+ */
+export function logException(
+	exception,
+	{ context, tags } = { context: {}, tags: {} }
+) {
+	const parsedException = parseException( exception, { context, tags } );
+
+	// Only log exceptions in production.
+	// eslint-disable-next-line no-undef
+	if ( __DEV__ ) {
+		// eslint-disable-next-line no-console
+		console.info( 'Log exception', parsedException );
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.logException( parsedException );
 }
 
 export default RNReactNativeGutenbergBridge;

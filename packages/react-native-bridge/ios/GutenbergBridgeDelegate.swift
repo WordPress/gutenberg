@@ -284,6 +284,8 @@ public protocol GutenbergBridgeDelegate: AnyObject {
     func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
 
     func gutenbergDidRequestConnectionStatus() -> Bool
+    
+    func gutenbergDidRequestLogException(_ exception: [AnyHashable: Any])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
