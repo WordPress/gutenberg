@@ -483,8 +483,8 @@ describe( 'global styles renderer', () => {
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
 				BASE_STYLES +
-					':where(body) {background-color: red;margin: 10px;padding: 10px;}:where(a) {color: blue;}a:hover{color: orange;}a:focus{color: orange;}:where(h1) {font-size: 42px;}:where(.wp-block-group) {margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:where(h1,h2,h3,h4,h5,h6) {color: orange;}:where(h1 a,h2 a,h3 a,h4 a,h5 a,h6 a) {color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
-					':where(.wp-block-image img, .wp-block-image .wp-crop-area) {border-radius: 9999px;}:where(.wp-block-image) {color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
+					':where(body){background-color: red;margin: 10px;padding: 10px;}:where(a){color: blue;}a:hover{color: orange;}a:focus{color: orange;}:where(h1){font-size: 42px;}:where(.wp-block-group){margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:where(h1,h2,h3,h4,h5,h6){color: orange;}:where(h1 a,h2 a,h3 a,h4 a,h5 a,h6 a){color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
+					':where(.wp-block-image img, .wp-block-image .wp-crop-area){border-radius: 9999px;}:where(.wp-block-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
 		} );
@@ -526,7 +526,7 @@ describe( 'global styles renderer', () => {
 
 			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
 				BASE_STYLES +
-					':where(.wp-image-spacing) {padding-top: 1px;}:where(.wp-image-border-color) {border-color: red;}:where(.wp-image-border) {border-radius: 9999px;}:where(.wp-image) {color: red;}' +
+					':where(.wp-image-spacing){padding-top: 1px;}:where(.wp-image-border-color){border-color: red;}:where(.wp-image-border){border-radius: 9999px;}:where(.wp-image){color: red;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
@@ -574,7 +574,7 @@ describe( 'global styles renderer', () => {
 
 			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
 				BASE_STYLES +
-					'.is-style-foo.wp-image.wp-image-spacing{padding-top: 2px;}.is-style-foo.wp-image.wp-image-border-color{border-color: blue;}.is-style-foo.wp-image{color: blue;}' +
+					':where(.is-style-foo.wp-image.wp-image-spacing){padding-top: 2px;}:where(.is-style-foo.wp-image.wp-image-border-color){border-color: blue;}:where(.is-style-foo.wp-image){color: blue;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
