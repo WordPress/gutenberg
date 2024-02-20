@@ -3,6 +3,13 @@
  */
 import { createBlock } from '@wordpress/blocks';
 import { __unstableCreateElement as createElement } from '@wordpress/rich-text';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { getTransformedMetadata } = unlock( blockEditorPrivateApis );
 
 const transforms = {
 	from: [
@@ -40,29 +47,15 @@ const transforms = {
 						// Get first url.
 						const link = element.querySelector( 'a' );
 						const url = link?.getAttribute( 'href' );
-						// Transform metadata object for button block.
-						let buttonMetadata;
-						if ( metadata ) {
-							// Only transform these metadata props.
-							const supportedProps = [ 'id', 'name', 'bindings' ];
-							buttonMetadata = Object.entries( metadata ).reduce(
-								( obj, [ prop, value ] ) => {
-									if ( supportedProps.includes( prop ) ) {
-										obj[ prop ] =
-											prop === 'bindings'
-												? { text: value.content }
-												: value;
-									}
-									return obj;
-								},
-								{}
-							);
-						}
 						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
 							text,
 							url,
-							metadata: buttonMetadata,
+							metadata: getTransformedMetadata(
+								metadata,
+								[ 'id', 'name', 'bindings' ],
+								{ content: 'text' }
+							),
 						} );
 					} )
 				),

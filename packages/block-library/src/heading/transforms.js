@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
+import { unlock } from '../lock-unlock';
+
+const { getTransformedMetadata } = unlock( blockEditorPrivateApis );
 
 const transforms = {
 	from: [
@@ -16,32 +20,17 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map(
-					( { content, anchor, align: textAlign, metadata } ) => {
-						// Transform metadata object.
-						let headingMetadata;
-						if ( metadata ) {
-							// Only transform these metadata props.
-							const supportedProps = [ 'id', 'name', 'bindings' ];
-							headingMetadata = Object.entries( metadata ).reduce(
-								( obj, [ prop, value ] ) => {
-									if ( supportedProps.includes( prop ) ) {
-										obj[ prop ] =
-											prop === 'bindings'
-												? { content: value.content }
-												: value;
-									}
-									return obj;
-								},
-								{}
-							);
-						}
-						return createBlock( 'core/heading', {
+					( { content, anchor, align: textAlign, metadata } ) =>
+						createBlock( 'core/heading', {
 							content,
 							anchor,
 							textAlign,
-							metadata: headingMetadata,
-						} );
-					}
+							metadata: getTransformedMetadata(
+								metadata,
+								[ 'id', 'name', 'bindings' ],
+								{ content: 'content' }
+							),
+						} )
 				),
 		},
 		{
@@ -103,31 +92,17 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align, metadata } ) => {
-					// Transform metadata object.
-					let headingMetadata;
-					if ( metadata ) {
-						// Only transform these metadata props.
-						const supportedProps = [ 'id', 'name', 'bindings' ];
-						headingMetadata = Object.entries( metadata ).reduce(
-							( obj, [ prop, value ] ) => {
-								if ( supportedProps.includes( prop ) ) {
-									obj[ prop ] =
-										prop === 'bindings'
-											? { content: value.content }
-											: value;
-								}
-								return obj;
-							},
-							{}
-						);
-					}
-					return createBlock( 'core/paragraph', {
+				attributes.map( ( { content, textAlign: align, metadata } ) =>
+					createBlock( 'core/paragraph', {
 						content,
 						align,
-						metadata: headingMetadata,
-					} );
-				} ),
+						metadata: getTransformedMetadata(
+							metadata,
+							[ 'id', 'name', 'bindings' ],
+							{ content: 'content' }
+						),
+					} )
+				),
 		},
 	],
 };
