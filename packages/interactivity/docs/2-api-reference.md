@@ -917,9 +917,6 @@ store( "myPlugin", {
 
 #### On the server side
 
-> **Note**
-> The store is called wp_interactivity_state
-
 The state can also be initialized on the server using the `wp_interactivity_state()` function. You would typically do this in the `render.php` file of your block (the `render.php` templates were [introduced](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/) in WordPress 6.1).
 
 The state defined on the server with `wp_interactivity_state()` gets merged with the stores defined in the view.js files.
