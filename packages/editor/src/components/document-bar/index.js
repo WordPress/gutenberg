@@ -11,7 +11,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
@@ -155,11 +154,8 @@ export default function DocumentBar() {
 					onClick={ () => openCommandCenter() }
 					size="compact"
 				>
-					<HStack
-						as={ motion.div }
+					<motion.div
 						className="editor-document-bar__title"
-						spacing={ 1 }
-						justify="center"
 						// Force entry animation when the back button is added or removed.
 						key={ hasBackButton }
 						initial={
@@ -193,7 +189,7 @@ export default function DocumentBar() {
 						>
 							{ title }
 						</Text>
-					</HStack>
+					</motion.div>
 					<span className="editor-document-bar__shortcut">
 						{ displayShortcut.primary( 'k' ) }
 					</span>

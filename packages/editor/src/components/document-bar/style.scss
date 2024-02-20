@@ -40,6 +40,10 @@
 	flex-grow: 1;
 	overflow: hidden;
 	color: $gray-800;
+	gap: $grid-unit-05;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
 	@include break-small() {
