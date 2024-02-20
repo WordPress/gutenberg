@@ -160,7 +160,7 @@ function gutenberg_process_block_bindings( $block_content, $parsed_block, $block
 	$supported_block_attrs = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
