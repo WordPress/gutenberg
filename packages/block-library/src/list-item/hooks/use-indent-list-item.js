@@ -35,12 +35,7 @@ export default function useIndentListItem( clientId ) {
 					getBlockListSettings( rootClientId )
 				);
 			}
-			moveBlocksToPosition(
-				clientIds,
-				rootClientId,
-				nestedListId,
-				getBlockOrder( nestedListId ).length
-			);
+			moveBlocksToPosition( clientIds, rootClientId, nestedListId );
 		} );
 
 		return true;
