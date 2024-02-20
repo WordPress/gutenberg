@@ -77,10 +77,10 @@ function BlockPopover(
 	}, [ selectedElement ] );
 
 	const [ selectedElementWidth, setSelectedElementWidth ] = useState(
-		selectedElement.offsetWidth
+		selectedElement?.offsetWidth
 	);
 	const [ selectedElementHeight, setSelectedElementHeight ] = useState(
-		selectedElement.offsetHeight
+		selectedElement?.offsetHeight
 	);
 	useLayoutEffect( () => {
 		if ( ! selectedElement ) {
