@@ -10,10 +10,6 @@
 	color: inherit;
 	width: 100%;
 
-	&.components-button.components-button {
-		justify-content: center;
-	}
-
 	&[aria-disabled="true"] {
 		opacity: 1;
 	}
