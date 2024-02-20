@@ -312,6 +312,8 @@
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build:packages",
 		"storybook:build": "storybook build -c ./storybook -o ./storybook/build",
+		"prestorybook:validate": "npm run build:packages",
+		"storybook:validate": "storybook dev -c ./storybook --ci --smoke-test",
 		"prestorybook:dev": "npm run build:packages",
 		"storybook:dev": "concurrently \"npm run dev:packages\" \"storybook dev -c ./storybook -p 50240\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev:packages\" \"storybook dev -c test/storybook-playwright/storybook -p 50241\"",
