@@ -46,7 +46,7 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -363,7 +363,7 @@ function FontCollection( { slug } ) {
 							} }
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
-						<FontFaceDemo font={ selectedFont } />
+						<FontDemo font={ selectedFont } />
 					</HStack>
 					<Spacer margin={ 4 } />
 					<Text> { __( 'Select font variants to install.' ) } </Text>

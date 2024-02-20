@@ -25,7 +25,7 @@ import { chevronLeft } from '@wordpress/icons';
  */
 import { unlock } from '../../../lock-unlock';
 import { FontLibraryContext } from './context';
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
@@ -185,7 +185,7 @@ function InstalledFonts() {
 							} }
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
-						<FontFaceDemo font={ libraryFontSelected } />
+						<FontDemo font={ libraryFontSelected } />
 					</HStack>
 					<Spacer margin={ 4 } />
 					<Text>

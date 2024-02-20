@@ -39,7 +39,7 @@ function getDisplayFontFace( font ) {
 	};
 }
 
-function FontFaceDemo( { font, text } ) {
+function FontDemo( { font, text } ) {
 	const ref = useRef( null );
 
 	const fontFace = getDisplayFontFace( font );
@@ -105,4 +105,4 @@ function FontFaceDemo( { font, text } ) {
 	);
 }
 
-export default FontFaceDemo;
+export default FontDemo;

@@ -11,7 +11,7 @@ import {
  * Internal dependencies
  */
 import { getFontFaceVariantName } from './utils';
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
 
 function CollectionFontVariant( {
@@ -44,7 +44,7 @@ function CollectionFontVariant( {
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>
-					<FontFaceDemo
+					<FontDemo
 						font={ face }
 						text={ displayName }
 						onClick={ handleToggleActivation }
