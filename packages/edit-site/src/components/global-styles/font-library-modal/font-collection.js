@@ -355,7 +355,7 @@ function FontCollection( { slug } ) {
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/fontFamily">
-					<HStack spacing={ 2 } aligh="left">
+					<Flex justify="flex-start">
 						<NavigatorToParentButton
 							icon={ chevronLeft }
 							isSmall
@@ -365,7 +365,7 @@ function FontCollection( { slug } ) {
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
 						<FontDemo font={ selectedFont } />
-					</HStack>
+					</Flex>
 					{ notice && (
 						<>
 							<Spacer margin={ 1 } />

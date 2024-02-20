@@ -9,11 +9,12 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalUseNavigator as useNavigator,
-	Notice,
 	__experimentalSpacer as Spacer,
-	Spinner,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Flex,
+	Notice,
+	Spinner,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useContext, useEffect, useState } from '@wordpress/element';
@@ -175,7 +176,7 @@ function InstalledFonts() {
 						}
 					/>
 
-					<HStack spacing={ 2 } aligh="left">
+					<Flex justify="flex-start">
 						<NavigatorToParentButton
 							icon={ chevronLeft }
 							isSmall
@@ -185,7 +186,7 @@ function InstalledFonts() {
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
 						<FontDemo font={ libraryFontSelected } />
-					</HStack>
+					</Flex>
 					{ notice && (
 						<>
 							<Spacer margin={ 1 } />
