@@ -6,6 +6,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { select, useSelect } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -83,12 +84,30 @@ const BlockBindingConnector = ( {
 	const blockName = blockProps.name;
 
 	const setAttributes = blockProps.setAttributes;
+
 	const updateBoundAttibute = useCallback(
-		( newAttrValue ) =>
+		( newAttrValue ) => {
+			/*
+			 * If the attribute is a RichTextData instance,
+			 * (core/paragraph, core/heading, etc.)
+			 * convert it to HTML string and compare with the new value.
+			 * If they are the same, don't update the attribute.
+			 *
+			 * To do: it looks like a workaround.
+			 * Consider improving the attribute and metadata fields types.
+			 */
+			if (
+				attrValue instanceof RichTextData &&
+				attrValue.toHTMLString() === newAttrValue
+			) {
+				return;
+			}
+
 			setAttributes( {
 				[ attrName ]: newAttrValue,
-			} ),
-		[ attrName, setAttributes ]
+			} );
+		},
+		[ attrName, attrValue, setAttributes ]
 	);
 
 	useEffect( () => {
