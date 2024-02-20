@@ -92,6 +92,7 @@ class Layout extends Component {
 
 	renderHTML() {
 		const { globalStyles } = this.props;
+		throw Error( 'Error in editor' );
 		return (
 			<HTMLTextInput
 				parentHeight={ this.state.rootViewHeight }
