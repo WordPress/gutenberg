@@ -15,6 +15,7 @@ export default function useIndentListItem( clientId ) {
 		getBlockRootClientId,
 		getBlockListSettings,
 		getSelectedBlockClientIds,
+		getBlockOrder,
 	} = useSelect( blockEditorStore );
 	return useCallback( () => {
 		const clientIds = getSelectedBlockClientIds();
@@ -22,18 +23,23 @@ export default function useIndentListItem( clientId ) {
 		const rootClientId = getBlockRootClientId( clientId );
 
 		registry.batch( () => {
-			const indentedList = createBlock( 'core/list' );
-			insertBlock( indentedList, 0, previousSiblingId, false );
-			// Immediately update the block list settings, otherwise blocks
-			// can't be moved here due to canInsert checks.
-			updateBlockListSettings(
-				indentedList.clientId,
-				getBlockListSettings( rootClientId )
-			);
+			let nestedListId = getBlockOrder( previousSiblingId )[ 0 ];
+			if ( ! nestedListId ) {
+				const indentedList = createBlock( 'core/list' );
+				nestedListId = indentedList.clientId;
+				insertBlock( indentedList, 0, previousSiblingId, false );
+				// Immediately update the block list settings, otherwise blocks
+				// can't be moved here due to canInsert checks.
+				updateBlockListSettings(
+					nestedListId,
+					getBlockListSettings( rootClientId )
+				);
+			}
 			moveBlocksToPosition(
 				clientIds,
 				rootClientId,
-				indentedList.clientId
+				nestedListId,
+				getBlockOrder( nestedListId ).length
 			);
 		} );
 
