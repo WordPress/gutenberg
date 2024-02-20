@@ -9,6 +9,7 @@
 .edit-site-save-hub__button {
 	color: inherit;
 	width: 100%;
+	justify-content: center;
 
 	&[aria-disabled="true"] {
 		opacity: 1;
