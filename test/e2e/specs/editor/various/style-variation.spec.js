@@ -18,7 +18,7 @@ test.describe( 'adding blocks', () => {
 		} );
 
 		// Select the quote block.
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		await editor.clickBlockToolbarButton( 'Quote' );
 

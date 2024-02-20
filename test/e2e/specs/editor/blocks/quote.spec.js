@@ -147,7 +147,7 @@ test.describe( 'Quote', () => {
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
 			// Navigate to the citation to select the block.
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowUp' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
@@ -168,7 +168,8 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowUp' );
+			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -191,7 +192,8 @@ test.describe( 'Quote', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowUp' );
+			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -211,7 +213,7 @@ test.describe( 'Quote', () => {
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			// Select the quote
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowUp' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe( '' );
 		} );
@@ -238,7 +240,8 @@ test.describe( 'Quote', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowUp' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( 'cite' );
 		await editor.transformBlockTo( 'core/pullquote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -301,7 +304,8 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowUp' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
@@ -331,7 +335,8 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowUp' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'Shift+ArrowUp' );
 		let error;
