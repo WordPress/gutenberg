@@ -134,19 +134,30 @@ function render_block_core_search( $attributes ) {
 			$button_classes[] = 'has-icon';
 			$icon_dimensions  = '24';
 			if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
-				$icon_dimensions = $attributes['style']['typography']['fontSize'];
+				$icon_dimensions = esc_attr( $attributes['style']['typography']['fontSize'] );
 			} elseif ( ! empty( $attributes['fontSize'] ) ) {
 				$font_size_presets = wp_get_global_settings( array( 'typography', 'fontSizes' ) );
-				if ( ! empty( $font_size_presets ) ) {
-					/*
-					 * The prioritization of origins matches the order in which the block editor fetches settings.
-					 * Font sizes are sourced from either 'typography.fontSizes.custom' || 'typography.fontSizes.theme' || 'typography.fontSizes.default'.
-					 * See: `getBlockSettings()` packages/block-editor/src/store/get-block-settings.js
-					 */
-					$font_size_presets     = $font_size_presets['custom'] ?? $font_size_presets['theme'] ?? $font_size_presets['default'];
-					$font_size_from_preset = array_column( $font_size_presets, null, 'slug' )[ $attributes['fontSize'] ] ?? false;
-					if ( isset( $font_size_from_preset['size'] ) ) {
-						$icon_dimensions = $font_size_from_preset['size'];
+				/*
+				 * The prioritization of origins matches the order in which the block editor fetches settings.
+				 * Font sizes are sourced from either 'typography.fontSizes.custom' || 'typography.fontSizes.theme' || 'typography.fontSizes.default'.
+				 * See: `getBlockSettings()` packages/block-editor/src/store/get-block-settings.js
+				 * @TODO Abstract the logic to get presets from origin into a block-supports/typography.php helper function.
+				 * @TODO Maybe update to use null coalescing operator when PHP 7.0 is the minimum version.
+				 */
+				$font_size_presets_from_origin = array();
+
+				if ( ! empty( $font_size_presets['custom'] ) ) {
+					$font_size_presets_from_origin = $font_size_presets['custom'];
+				} elseif ( ! empty( $font_size_presets['theme'] ) ) {
+					$font_size_presets_from_origin = $font_size_presets['theme'];
+				} elseif ( ! empty( $font_size_presets['default'] ) ) {
+					$font_size_presets_from_origin = $font_size_presets['default'];
+				}
+
+				if ( ! empty( $font_size_presets_from_origin ) ) {
+					$font_size_preset_index = array_search( $attributes['fontSize'], array_column( $font_size_presets_from_origin, 'slug' ) );
+					if ( isset( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] ) ) {
+						$icon_dimensions = $font_size_presets_from_origin[ $font_size_preset_index ]['size'];
 					}
 				}
 			}
