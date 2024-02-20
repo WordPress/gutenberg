@@ -16,13 +16,29 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map(
-					( { content, anchor, align: textAlign, metadata } ) =>
-						createBlock( 'core/heading', {
+					( { content, anchor, align: textAlign, metadata } ) => {
+						// Transform metadata object.
+						let headingMetadata;
+						if ( metadata ) {
+							// Only transform these metadata props.
+							const supportedProps = [ 'id', 'name', 'bindings' ];
+							headingMetadata = Object.entries( metadata ).reduce(
+								( obj, [ prop, value ] ) => {
+									if ( supportedProps.includes( prop ) ) {
+										obj[ prop ] = value;
+									}
+									return obj;
+								},
+								{}
+							);
+						}
+						return createBlock( 'core/heading', {
 							content,
 							anchor,
 							textAlign,
-							metadata,
-						} )
+							metadata: headingMetadata,
+						} );
+					}
 				),
 		},
 		{
@@ -84,13 +100,28 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align, metadata } ) =>
-					createBlock( 'core/paragraph', {
+				attributes.map( ( { content, textAlign: align, metadata } ) => {
+					// Transform metadata object.
+					let headingMetadata;
+					if ( metadata ) {
+						// Only transform these metadata props.
+						const supportedProps = [ 'id', 'name', 'bindings' ];
+						headingMetadata = Object.entries( metadata ).reduce(
+							( obj, [ prop, value ] ) => {
+								if ( supportedProps.includes( prop ) ) {
+									obj[ prop ] = value;
+								}
+								return obj;
+							},
+							{}
+						);
+					}
+					return createBlock( 'core/paragraph', {
 						content,
 						align,
-						metadata,
-					} )
-				),
+						metadata: headingMetadata,
+					} );
+				} ),
 		},
 	],
 };
