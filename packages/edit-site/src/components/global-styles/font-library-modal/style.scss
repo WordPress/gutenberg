@@ -22,6 +22,11 @@
 		font-weight: 500;
 		font-size: 11px;
 	}
+
+	// Add padding so the focus state outline (box-shadow) of font list items is visible
+	.components-navigator-screen {
+		padding: 3px;
+	}
 }
 
 .font-library-modal__tabpanel-layout {
