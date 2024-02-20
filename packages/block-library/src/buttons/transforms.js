@@ -40,16 +40,29 @@ const transforms = {
 						// Get first url.
 						const link = element.querySelector( 'a' );
 						const url = link?.getAttribute( 'href' );
-						// Adapt bindings to the button block.
-						if ( metadata?.bindings?.content ) {
-							metadata.bindings.text = metadata.bindings.content;
-							delete metadata.bindings.content;
+						// Transform metadata object for button block.
+						let buttonMetadata;
+						if ( metadata ) {
+							// Only transform these metadata props.
+							const supportedProps = [ 'id', 'name', 'bindings' ];
+							buttonMetadata = Object.entries( metadata ).reduce(
+								( obj, [ prop, value ] ) => {
+									if ( supportedProps.includes( prop ) ) {
+										obj[ prop ] =
+											prop === 'bindings'
+												? { text: value.content }
+												: value;
+									}
+									return obj;
+								},
+								{}
+							);
 						}
 						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
 							text,
 							url,
-							metadata,
+							metadata: buttonMetadata,
 						} );
 					} )
 				),
