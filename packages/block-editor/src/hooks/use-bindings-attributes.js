@@ -144,7 +144,7 @@ function BlockBindingBridge( { bindings, props } ) {
 
 		// Bail early if the block doesn't have a valid source handler.
 		const source = getBlockBindingsSource( boundAttribute.source );
-		if ( ! source ) {
+		if ( ! source?.useSource ) {
 			return;
 		}
 
