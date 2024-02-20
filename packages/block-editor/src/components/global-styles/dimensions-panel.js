@@ -85,18 +85,9 @@ function useHasAspectRatio( settings ) {
 }
 
 function useHasChildLayout( settings ) {
-	const {
-		type: parentLayoutType = 'default',
-		default: { type: defaultParentLayoutType = 'default' } = {},
-		allowSizingOnChildren = false,
-	} = settings?.parentLayout ?? {};
+	const { allowSizingOnChildren = false } = settings?.parentLayout ?? {};
 
-	const support =
-		( defaultParentLayoutType === 'flex' ||
-			parentLayoutType === 'flex' ||
-			defaultParentLayoutType === 'grid' ||
-			parentLayoutType === 'grid' ) &&
-		allowSizingOnChildren;
+	const support = allowSizingOnChildren;
 	return !! settings?.layout && support;
 }
 
