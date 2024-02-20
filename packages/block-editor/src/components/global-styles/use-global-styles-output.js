@@ -575,9 +575,9 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector = `:where(${ selector } .${ className }${
+							const combinedSelector = `${ selector } .${ className }${
 								baseStyle?.selector || ''
-							})`;
+							}`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
 							) }; }`;
