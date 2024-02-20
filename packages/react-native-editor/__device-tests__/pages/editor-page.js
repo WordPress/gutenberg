@@ -205,6 +205,24 @@ class EditorPage {
 		return lastElementFound;
 	}
 
+	/**
+	 * Selects a block by its type.
+	 *
+	 * @param {string} blockType     The type of the block to select.
+	 * @param {Object} options       Additional options.
+	 * @param {number} options.index The index of the block to select (default: 1).
+	 *
+	 * @return {import('webdriverio').ChainablePromiseArray} The selected block element.
+	 */
+	async selectBlockByType( blockType, { index = 1 } = {} ) {
+		const locator = isAndroid()
+			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockType } Block. Row ${ index }")]`
+			: `-ios predicate string:label == '${ blockType } Block. Row ${ index }'`;
+		const block = await this.driver.$$( locator )[ 0 ];
+		await block.click();
+		return block;
+	}
+
 	async getFirstBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 		return await waitForVisible( this.driver, firstBlockLocator );
