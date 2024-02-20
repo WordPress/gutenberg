@@ -3,6 +3,11 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * External dependencies
+ */
+const path = require( 'path' );
+
 test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
@@ -583,5 +588,67 @@ test.describe( 'Pattern Overrides', () => {
 		await editor.selectBlocks( patternBlock );
 		await editor.showBlockToolbar();
 		await expect( resetButton ).toBeDisabled();
+	} );
+
+	// Fix https://github.com/WordPress/gutenberg/issues/58708.
+	test( 'overridden empty images should not have upload button', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const imageId = 'image-id';
+		const TEST_IMAGE_FILE_PATH = path.resolve(
+			__dirname,
+			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:image {"metadata":{"id":"${ imageId }","bindings":{"id":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"title":{"source":"core/pattern-overrides"},"alt":{"source":"core/pattern-overrides"}}}} -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await editor.selectBlocks( imageBlock );
+		await imageBlock
+			.getByTestId( 'form-file-upload-input' )
+			.setInputFiles( TEST_IMAGE_FILE_PATH );
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveCount( 1 );
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			/\/wp-content\/uploads\//
+		);
+
+		await editor.publishPost();
+		await page.reload();
+
+		await editor.selectBlocks( imageBlock );
+		await editor.showBlockToolbar();
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			/\/wp-content\/uploads\//
+		);
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'Replace' } )
+		).toBeEnabled();
+		await expect(
+			blockToolbar.getByRole( 'button', {
+				name: 'Upload to Media Library',
+			} )
+		).toBeHidden();
 	} );
 } );
