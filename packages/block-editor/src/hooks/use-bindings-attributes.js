@@ -60,46 +60,48 @@ export function hasPossibleBlockBinding( blockName, attributeName ) {
  * This component is responsible detecting and
  * propagating data changes from the source to the block.
  *
- * @param {Object}   props            - The component props.
- * @param {string}   props.attrName   - The attribute name.
- * @param {any}      props.attrValue  - The attribute value.
- * @param {Function} props.useSource  - The custom hook to use the source.
- * @param {Object}   props.blockProps - The block props with bound attribute.
- * @param {Object}   props.args       - The arguments to pass to the source.
- * @return {null}                       This is a data-handling component. Render nothing.
+ * @param {Object} props            - The component props.
+ * @param {string} props.attrName   - The attribute name.
+ * @param {any}    props.attrValue  - The attribute value.
+ * @param {Object} props.blockProps - The block props with bound attribute.
+ * @param {Object} props.source     - Source handler.
+ * @param {Object} props.args       - The arguments to pass to the source.
+ * @return {null}                     This is a data-handling component. Render nothing.
  */
 const BlockBindingConnector = ( {
 	args,
 	attrName,
 	attrValue,
 	blockProps,
-	useSource,
+	source,
 } ) => {
-	const { placeholder, value: propValue } = useSource( blockProps, args );
+	const { placeholder, value: propValue } = source.useSource(
+		blockProps,
+		args
+	);
 
 	const blockName = blockProps.name;
 
 	const setAttributes = blockProps.setAttributes;
 	const updateBoundAttibute = useCallback(
-		( newAttrValue ) => {
+		( newAttrValue ) =>
 			setAttributes( {
 				[ attrName ]: newAttrValue,
-			} );
-		},
+			} ),
 		[ attrName, setAttributes ]
 	);
 
 	useEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			updateBoundAttibute( propValue );
-
+		} else if ( placeholder ) {
 			/*
+			 * Placeholder fallback.
 			 * If the attribute is `src` or `href`,
 			 * a placeholder can't be used because it is not a valid url.
 			 * Adding this workaround until
 			 * attributes and metadata fields types are improved and include `url`.
 			 */
-		} else if ( placeholder ) {
 			const htmlAttribute =
 				getBlockType( blockName ).attributes[ attrName ].attribute;
 
@@ -127,36 +129,35 @@ function BlockBindingBridge( { bindings, props } ) {
 		return null;
 	}
 
-	const { name } = props;
+	const { name, attributes } = props;
+
+	// Collect all the binding connectors.
 	const BindingConnectorInstances = [];
 
-	Object.entries( bindings ).forEach( ( [ attrName, settings ], i ) => {
+	Object.entries( bindings ).forEach( ( [ attrName, boundAttribute ], i ) => {
 		// Check if the block attribute can be bound.
 		if ( ! hasPossibleBlockBinding( name, attrName ) ) {
 			return;
 		}
 
 		const { getBlockBindingsSource } = unlock( select( blockEditorStore ) );
-		const source = getBlockBindingsSource( settings.source );
+
+		// Bail early if the block doesn't have a valid source handler.
+		const source = getBlockBindingsSource( boundAttribute.source );
 		if ( ! source ) {
 			return;
 		}
 
-		if ( source ) {
-			const { useSource } = source;
-			const attrValue = settings.value;
-
-			BindingConnectorInstances.push(
-				<BlockBindingConnector
-					key={ `${ settings.source }-${ name }-${ attrName }-${ i }` }
-					attrName={ attrName }
-					attrValue={ attrValue }
-					useSource={ useSource }
-					blockProps={ props }
-					args={ settings.args }
-				/>
-			);
-		}
+		BindingConnectorInstances.push(
+			<BlockBindingConnector
+				key={ `${ boundAttribute.source }-${ name }-${ attrName }-${ i }` }
+				attrName={ attrName }
+				attrValue={ attributes[ attrName ] }
+				source={ source }
+				blockProps={ props }
+				args={ boundAttribute.args }
+			/>
+		);
 	} );
 
 	return BindingConnectorInstances;
