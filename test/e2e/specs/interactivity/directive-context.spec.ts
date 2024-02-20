@@ -170,6 +170,52 @@ test.describe( 'data-wp-context', () => {
 		expect( childContext.array ).toMatchObject( [ 4, 5, 6 ] );
 	} );
 
+	test( 'overwritten objects updates inherited values', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'parent replace' ).click();
+
+		const childContext = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContext.obj.prop4 ).toBeUndefined();
+		expect( childContext.obj.prop5 ).toBe( 'child' );
+		expect( childContext.obj.prop6 ).toBe( 'child' );
+		expect( childContext.obj.overwritten ).toBe( true );
+
+		const parentContext = await parseContent(
+			page.getByTestId( 'parent context' )
+		);
+
+		expect( parentContext.obj.prop4 ).toBeUndefined();
+		expect( parentContext.obj.prop5 ).toBeUndefined();
+		expect( parentContext.obj.prop6 ).toBeUndefined();
+		expect( parentContext.obj.overwritten ).toBe( true );
+	} );
+
+	test( 'overwritten objects do not inherit values', async ( { page } ) => {
+		await page.getByTestId( 'child replace' ).click();
+
+		const childContext = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContext.obj.prop4 ).toBeUndefined();
+		expect( childContext.obj.prop5 ).toBeUndefined();
+		expect( childContext.obj.prop6 ).toBeUndefined();
+		expect( childContext.obj.overwritten ).toBe( true );
+
+		const parentContext = await parseContent(
+			page.getByTestId( 'parent context' )
+		);
+
+		expect( parentContext.obj.prop4 ).toBe( 'parent' );
+		expect( parentContext.obj.prop5 ).toBe( 'parent' );
+		expect( parentContext.obj.prop6 ).toBeUndefined();
+		expect( parentContext.obj.overwritten ).toBeUndefined();
+	} );
+
 	test( 'can be accessed in other directives on the same element', async ( {
 		page,
 	} ) => {

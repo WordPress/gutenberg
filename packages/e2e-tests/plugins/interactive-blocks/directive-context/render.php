@@ -18,6 +18,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 		>
 			<!-- rendered during hydration -->
 		</pre>
+		<button data-testid="parent replace" data-wp-on--click="actions.replaceObj">Replace obj</button>
 		<button
 			data-testid="parent prop1"
 			name="prop1"
@@ -67,6 +68,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 			>
 				<!-- rendered during hydration -->
 			</pre>
+			<button data-testid="child replace" data-wp-on--click="actions.replaceObj">Replace obj</button>
 			<button
 				data-testid="child prop1"
 				name="prop1"

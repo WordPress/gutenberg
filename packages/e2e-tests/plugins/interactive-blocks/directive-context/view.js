@@ -30,6 +30,10 @@ store( 'directive-context', {
 			const ctx = getContext();
 			const value = parseInt( event.target.value );
 			ctx.selected = ctx.list.find( ( { id } ) => id === value );
+		},
+		replaceObj() {
+			const ctx = getContext();
+			ctx.obj = { overwritten: true };
 		}
 	},
 } );
