@@ -3,6 +3,7 @@
  */
 import { _n, sprintf } from '@wordpress/i18n';
 import {
+	__experimentalUseNavigator as useNavigator,
 	__experimentalText as Text,
 	Button,
 	Flex,
@@ -16,16 +17,23 @@ import {
 import FontDemo from './font-demo';
 import { chevronRight } from '@wordpress/icons';
 
-function FontCard( { font, onClick, variantsText } ) {
+function FontCard( { font, onClick, variantsText, navigatorPath } ) {
 	const variantsCount = font.fontFace?.length || 1;
 
 	const style = {
 		cursor: !! onClick ? 'pointer' : 'default',
 	};
 
+	const navigator = useNavigator();
+
 	return (
 		<Button
-			onClick={ onClick }
+			onClick={ () => {
+				onClick();
+				if ( navigatorPath ) {
+					navigator.goTo( navigatorPath );
+				}
+			} }
 			style={ style }
 			className="font-library-modal__font-card"
 		>

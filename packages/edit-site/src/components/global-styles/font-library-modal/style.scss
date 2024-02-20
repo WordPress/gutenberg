@@ -25,6 +25,9 @@
 }
 
 .font-library-modal__tabpanel-layout {
+
+	margin-top: $grid-unit-40;
+
 	.font-library-modal__tabpanel-layout__footer {
 		border-top: 1px solid $gray-300;
 		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};

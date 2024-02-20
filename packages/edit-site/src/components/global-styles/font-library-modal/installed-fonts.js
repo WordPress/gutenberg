@@ -17,7 +17,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
 
 /**
@@ -26,7 +26,7 @@ import { chevronLeft } from '@wordpress/icons';
 import { unlock } from '../../../lock-unlock';
 import { FontLibraryContext } from './context';
 import FontFaceDemo from './font-demo';
-import LibraryFontCard from './library-font-card';
+import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
 const { ProgressBar } = unlock( componentsPrivateApis );
@@ -42,6 +42,7 @@ function InstalledFonts() {
 		isResolvingLibrary,
 		isInstalling,
 		saveFontFamilies,
+		getFontFacesActivated,
 		fontFamiliesHasChanges,
 		notice,
 		setNotice,
@@ -66,11 +67,25 @@ function InstalledFonts() {
 					fontStyle: 'normal',
 					fontWeight: '400',
 				},
-			 ]
+			];
 		}
-		return sortFontFaces ( font.fontFace );
-	}
+		return sortFontFaces( font.fontFace );
+	};
 
+	const getFontCardVariantsText = ( font ) => {
+		const variantsInstalled =
+			font?.fontFace?.length > 0 ? font.fontFace.length : 1;
+		const variantsActive = getFontFacesActivated(
+			font.slug,
+			font.source
+		).length;
+		return sprintf(
+			/* translators: 1: Active font variants, 2: Total font variants. */
+			__( '%1$s/%2$s variants active' ),
+			variantsActive,
+			variantsInstalled
+		);
+	};
 
 	useEffect( () => {
 		handleSetLibraryFontSelected( libraryFontSelected );
@@ -79,12 +94,11 @@ function InstalledFonts() {
 
 	return (
 		<div className="font-library-modal__tabpanel-layout">
-
 			{ isResolvingLibrary && (
 				<HStack align="center">
-					<Spacer/>
+					<Spacer />
 					<Spinner />
-					<Spacer/>
+					<Spacer />
 				</HStack>
 			) }
 
@@ -103,50 +117,63 @@ function InstalledFonts() {
 
 			<NavigatorProvider initialPath="/">
 				<NavigatorScreen path="/">
-					{ baseCustomFonts.length > 0 && ( <>
-						<Text className="font-library-modal__subtitle">
-							{ __( 'Installed Fonts' ) }
-						</Text>
-						<Spacer margin={ 2 } />
-						{ baseCustomFonts.map( ( font ) => (
-							<LibraryFontCard
-								font={ font }
-								key={ font.slug }
-								onClick={ () => {
-									handleSetLibraryFontSelected( font );
-								} }
-							/>
-						) ) }
-						<Spacer margin={ 8 } />
-					</> ) }
+					{ baseCustomFonts.length > 0 && (
+						<>
+							<Text className="font-library-modal__subtitle">
+								{ __( 'Installed Fonts' ) }
+							</Text>
+							<Spacer margin={ 2 } />
+							{ baseCustomFonts.map( ( font ) => (
+								<FontCard
+									font={ font }
+									key={ font.slug }
+									navigatorPath={ '/fontFamily' }
+									variantsText={ getFontCardVariantsText(
+										font
+									) }
+									onClick={ () => {
+										handleSetLibraryFontSelected( font );
+									} }
+								/>
+							) ) }
+							<Spacer margin={ 8 } />
+						</>
+					) }
 
-					{ baseThemeFonts.length > 0 && ( <>
-						<Text className="font-library-modal__subtitle">
-							{ __( 'Theme Fonts' ) }
-						</Text>
-						<Spacer margin={ 2 } />
-						{ baseThemeFonts.map( ( font ) => (
-							<LibraryFontCard
-								font={ font }
-								key={ font.slug }
-								onClick={ () => {
-									handleSetLibraryFontSelected( font );
-								} }
-							/>
-						) ) }
-					</> ) }
+					{ baseThemeFonts.length > 0 && (
+						<>
+							<Text className="font-library-modal__subtitle">
+								{ __( 'Theme Fonts' ) }
+							</Text>
+							<Spacer margin={ 2 } />
+							{ baseThemeFonts.map( ( font ) => (
+								<FontCard
+									font={ font }
+									key={ font.slug }
+									navigatorPath={ '/fontFamily' }
+									variantsText={ getFontCardVariantsText(
+										font
+									) }
+									onClick={ () => {
+										handleSetLibraryFontSelected( font );
+									} }
+								/>
+							) ) }
+						</>
+					) }
 					<Spacer margin={ 16 } />
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/fontFamily">
-
 					<ConfirmDeleteDialog
 						font={ libraryFontSelected }
 						isOpen={ isConfirmDeleteOpen }
 						setIsOpen={ setIsConfirmDeleteOpen }
 						setNotice={ setNotice }
 						uninstallFontFamily={ uninstallFontFamily }
-						handleSetLibraryFontSelected={ handleSetLibraryFontSelected }
+						handleSetLibraryFontSelected={
+							handleSetLibraryFontSelected
+						}
 					/>
 
 					<HStack spacing={ 2 } aligh="left">
@@ -169,28 +196,32 @@ function InstalledFonts() {
 					<Spacer margin={ 4 } />
 					<VStack spacing={ 0 }>
 						<Spacer margin={ 8 } />
-						{ getFontFacesToDisplay( libraryFontSelected ).map( ( face, i ) => (
-						<LibraryFontVariant
-							font={ libraryFontSelected }
-							face={ face }
-							key={ `face${ i }` }
-						/>
-						) ) }
+						{ getFontFacesToDisplay( libraryFontSelected ).map(
+							( face, i ) => (
+								<LibraryFontVariant
+									font={ libraryFontSelected }
+									face={ face }
+									key={ `face${ i }` }
+								/>
+							)
+						) }
 					</VStack>
-
 				</NavigatorScreen>
 			</NavigatorProvider>
 
-			<HStack justify="flex-end" className="font-library-modal__tabpanel-layout__footer">
+			<HStack
+				justify="flex-end"
+				className="font-library-modal__tabpanel-layout__footer"
+			>
 				{ isInstalling && <ProgressBar /> }
 				{ shouldDisplayDeleteButton && (
-				<Button
-					isDestructive
-					variant="tertiary"
-					onClick={ handleUninstallClick }
-				>
-					{ __( 'Delete' ) }
-				</Button>
+					<Button
+						isDestructive
+						variant="tertiary"
+						onClick={ handleUninstallClick }
+					>
+						{ __( 'Delete' ) }
+					</Button>
 				) }
 				<Button
 					variant="primary"
@@ -211,9 +242,8 @@ function ConfirmDeleteDialog( {
 	setIsOpen,
 	setNotice,
 	uninstallFontFamily,
-	handleSetLibraryFontSelected
+	handleSetLibraryFontSelected,
 } ) {
-
 	const navigator = useNavigator();
 
 	const handleConfirmUninstall = async () => {
