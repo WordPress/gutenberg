@@ -260,10 +260,9 @@ function ConfirmDeleteDialog( {
 
 	const handleConfirmUninstall = async () => {
 		setNotice( null );
-
+		setIsOpen( false );
 		try {
 			await uninstallFontFamily( font );
-			setIsOpen( false );
 			navigator.goBack();
 			handleSetLibraryFontSelected( null );
 			setNotice( {
@@ -271,7 +270,6 @@ function ConfirmDeleteDialog( {
 				message: __( 'Font family uninstalled successfully.' ),
 			} );
 		} catch ( error ) {
-			setIsOpen( false );
 			setNotice( {
 				type: 'error',
 				message:
