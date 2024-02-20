@@ -208,20 +208,36 @@ class EditorPage {
 	/**
 	 * Selects a block by its type.
 	 *
-	 * @param {string} blockType     The type of the block to select.
-	 * @param {Object} options       Additional options.
-	 * @param {number} options.index The index of the block to select (default: 1).
-	 * @param {number} options.x     The x-coordinate offset from the center of the element (default: 0).
-	 * @param {number} options.y     The y-coordinate offset from the center of the element (default: 0).
+	 * @param {string} blockType      The type of the block to select.
+	 * @param {Object} options        Additional options.
+	 * @param {number} options.index  The index of the block to select (default: 1).
+	 * @param {Object} options.offset The offset of the block to select (default: { x: 0, y: 0 }).
 	 *
 	 * @return {import('webdriverio').ChainablePromiseArray} The selected block element.
 	 */
-	async selectBlockByType( blockType, { index = 1, x = 0, y = 0 } = {} ) {
+	async selectBlockByType(
+		blockType,
+		{ index = 1, offset = { x: 0, y: 0 } } = {}
+	) {
 		const locator = isAndroid()
 			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockType } Block. Row ${ index }")]`
 			: `-ios predicate string:label == '${ blockType } Block. Row ${ index }'`;
 		const block = await this.driver.$$( locator )[ 0 ];
-		await block.click( { x, y } );
+
+		const size = await block.getSize();
+
+		let offsetX = offset.x;
+		if ( typeof offset.x === 'function' ) {
+			offsetX = offset.x( size.width );
+		}
+
+		let offsetY = offset.y;
+		if ( typeof offset.y === 'function' ) {
+			offsetY = offset.y( size.height );
+		}
+
+		await block.click( { x: offsetX, y: offsetY } );
+
 		return block;
 	}
 
