@@ -7,7 +7,7 @@ import { Button } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { doAction } from '@wordpress/hooks';
+import { logException } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -44,14 +44,13 @@ class ErrorBoundary extends Component {
 		};
 	}
 
-	componentDidCatch( error, info ) {
-		// TODO: Send error to tracking service.
-		// eslint-disable-next-line no-console
-		console.log( { error } );
-		// eslint-disable-next-line no-console
-		console.log( 'Stack trace:', info.componentStack );
-
-		doAction( 'editor.ErrorBoundary.errorLogged', error );
+	componentDidCatch( error ) {
+		logException( error, {
+			context: {
+				component_stack: error.componentStack,
+				error_boundary_level: 'editor',
+			},
+		} );
 	}
 
 	static getDerivedStateFromError( error ) {

@@ -143,7 +143,10 @@ function BlockWrapper( {
 				isSelected={ isSelected }
 				name={ name }
 			/>
-			<BlockCrashBoundary fallback={ <BlockCrashWarning /> }>
+			<BlockCrashBoundary
+				blockName={ name }
+				fallback={ <BlockCrashWarning /> }
+			>
 				<BlockDraggable
 					clientId={ clientId }
 					draggingClientId={ draggingClientId }

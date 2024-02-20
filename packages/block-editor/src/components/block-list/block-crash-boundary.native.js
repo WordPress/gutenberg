@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { logException } from '@wordpress/react-native-bridge';
 
 class BlockCrashBoundary extends Component {
 	constructor() {
@@ -16,12 +17,16 @@ class BlockCrashBoundary extends Component {
 		return { error };
 	}
 
-	componentDidCatch( error, info ) {
-		// TODO: Send error to tracking service.
-		// eslint-disable-next-line no-console
-		console.log( { error } );
-		// eslint-disable-next-line no-console
-		console.log( 'Stack trace:', info.componentStack );
+	componentDidCatch( error ) {
+		const { blockName } = this.props;
+
+		logException( error, {
+			context: {
+				component_stack: error.componentStack,
+				error_boundary_level: 'block',
+				block_name: blockName,
+			},
+		} );
 	}
 
 	render() {
