@@ -1097,6 +1097,7 @@ const blockNames = {
 	preformatted: 'Preformatted',
 	unsupported: 'Unsupported',
 	mediaText: 'Media & Text',
+	quote: 'Quote',
 };
 
 module.exports = { setupEditor, blockNames };
