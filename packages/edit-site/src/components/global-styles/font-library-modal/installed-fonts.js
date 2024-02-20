@@ -102,21 +102,20 @@ function InstalledFonts() {
 				</HStack>
 			) }
 
-			{ notice && (
-				<>
-					<Spacer margin={ 1 } />
-					<Notice
-						status={ notice.type }
-						onRemove={ () => setNotice( null ) }
-					>
-						{ notice.message }
-					</Notice>
-					<Spacer margin={ 1 } />
-				</>
-			) }
-
 			<NavigatorProvider initialPath="/">
 				<NavigatorScreen path="/">
+					{ notice && (
+						<>
+							<Spacer margin={ 1 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ () => setNotice( null ) }
+							>
+								{ notice.message }
+							</Notice>
+							<Spacer margin={ 1 } />
+						</>
+					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
 							<Text className="font-library-modal__subtitle">
@@ -187,6 +186,18 @@ function InstalledFonts() {
 						/>
 						<FontDemo font={ libraryFontSelected } />
 					</HStack>
+					{ notice && (
+						<>
+							<Spacer margin={ 1 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ () => setNotice( null ) }
+							>
+								{ notice.message }
+							</Notice>
+							<Spacer margin={ 1 } />
+						</>
+					) }
 					<Spacer margin={ 4 } />
 					<Text>
 						{ __(
@@ -251,15 +262,15 @@ function ConfirmDeleteDialog( {
 
 		try {
 			await uninstallFontFamily( font );
+			setIsOpen( false );
+			navigator.goBack();
+			handleSetLibraryFontSelected( null );
 			setNotice( {
 				type: 'success',
 				message: __( 'Font family uninstalled successfully.' ),
 			} );
-
-			navigator.goBack();
-			handleSetLibraryFontSelected( null );
-			setIsOpen( false );
 		} catch ( error ) {
+			setIsOpen( false );
 			setNotice( {
 				type: 'error',
 				message:

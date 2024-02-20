@@ -18,6 +18,7 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalHeading as Heading,
+	Notice,
 	SelectControl,
 	Spinner,
 	Icon,
@@ -365,6 +366,18 @@ function FontCollection( { slug } ) {
 						/>
 						<FontDemo font={ selectedFont } />
 					</HStack>
+					{ notice && (
+						<>
+							<Spacer margin={ 1 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ () => setNotice( null ) }
+							>
+								{ notice.message }
+							</Notice>
+							<Spacer margin={ 1 } />
+						</>
+					) }
 					<Spacer margin={ 4 } />
 					<Text> { __( 'Select font variants to install.' ) } </Text>
 					<Spacer margin={ 4 } />
