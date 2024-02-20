@@ -137,8 +137,8 @@ function render_block_core_search( $attributes ) {
 				$icon_dimensions = $attributes['style']['typography']['fontSize'];
 			} elseif ( ! empty( $attributes['fontSize'] ) ) {
 				$font_size_presets = wp_get_global_settings( array( 'typography', 'fontSizes' ) );
-				if ( isset( $font_size_presets['theme'] ) || isset( $font_size_presets['default'] ) ) {
-					$font_size_presets     = $font_size_presets['theme'] ?? $font_size_presets['default'];
+				if ( ! empty( $font_size_presets ) ) {
+					$font_size_presets     = $font_size_presets['custom'] ?? $font_size_presets['theme'] ?? $font_size_presets['default'];
 					$font_size_from_preset = array_column( $font_size_presets, null, 'slug' )[ $attributes['fontSize'] ] ?? false;
 					if ( isset( $font_size_from_preset['size'] ) ) {
 						$icon_dimensions = $font_size_from_preset['size'];

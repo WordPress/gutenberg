@@ -13,7 +13,6 @@ export {
 	getGapCSSValue as __experimentalGetGapCSSValue,
 	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
 	useCachedTruthy,
-	useFontSizeFromPreset,
 } from './hooks';
 export * from './components';
 export * from './elements';

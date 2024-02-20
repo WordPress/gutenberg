@@ -958,18 +958,6 @@ _Returns_
 
 -   `any`: value
 
-### useFontSizeFromPreset
-
-Given a font size slug preset, returns the matching preset.
-
-_Parameters_
-
--   _slug_ `string`: The slug of the font size preset
-
-_Returns_
-
--   `object|undefined`: The font size object, if found.
-
 ### useHasRecursion
 
 A React hook for keeping track of blocks previously rendered up in the block tree. Blocks susceptible to recursion can use this hook in their `Edit` function to prevent said recursion.

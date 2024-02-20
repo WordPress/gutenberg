@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
-	useFontSizeFromPreset,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -55,6 +55,9 @@ import {
 	MIN_WIDTH,
 	isPercentageUnit,
 } from './utils.js';
+import { unlock } from '../lock-unlock';
+
+const { useFontSizeFromPreset } = unlock( blockEditorPrivateApis );
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.

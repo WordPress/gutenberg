@@ -15,7 +15,11 @@ import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
-import { useLayoutClasses, useLayoutStyles } from './hooks';
+import {
+	useLayoutClasses,
+	useLayoutStyles,
+	useFontSizeFromPreset,
+} from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
 import {
@@ -52,6 +56,7 @@ lock( privateApis, {
 	BlockRemovalWarningModal,
 	useLayoutClasses,
 	useLayoutStyles,
+	useFontSizeFromPreset,
 	DimensionsTool,
 	ResolutionTool,
 	ReusableBlocksRenameHint,
