@@ -596,13 +596,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	/**
 	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
-	 * the columnSpan should be removed on small grids.
+	 * the columnSpan should be removed on small grids. If there's a minimumColumnWidth, the grid is responsive.
+	 * But if the minimumColumnWidth value wasn't changed, it won't be set. In that case, if columnCount doesn't
+	 * exist, we can assume that the grid is responsive.
 	 */
-	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && isset( $block['attrs']['style']['layout']['parentColumnWidth'] ) ) {
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && ( isset( $block['parentLayout']['minimumColumnWidth'] ) || ! isset( $block['parentLayout']['columnCount'] ) ) ) {
 		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
-		$parent_column_width = $block['attrs']['style']['layout']['parentColumnWidth'];
+		$parent_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : '12rem';
 		$parent_column_value = floatval( $parent_column_width );
 		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
 		/**
 		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
 		 * to defaults.
@@ -886,6 +889,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	return $processor->get_updated_html();
 }
+
+/**
+ * Add a `render_block_data` filter to fetch the parent block layout data.
+ */
+add_filter(
+	'render_block_data',
+	function ( $parsed_block, $source_block, $parent_block ) {
+		/**
+		 * Check if the parent block exists and if it has a layout attribute.
+		 * If it does, add the parent layout to the parsed block.
+		 */
+		if ( $parent_block && isset( $parent_block->parsed_block['attrs']['layout'] ) ) {
+			$parsed_block['parentLayout'] = $parent_block->parsed_block['attrs']['layout'];
+		}
+		return $parsed_block;
+	},
+	10,
+	3
+);
 
 // Register the block support. (overrides core one).
 WP_Block_Supports::get_instance()->register(

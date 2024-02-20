@@ -20,7 +20,6 @@ import {
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	useBlockCommands,
 	BlockBreadcrumb,
 	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
@@ -134,7 +133,6 @@ function useEditorStyles() {
 function Layout( { initialPost } ) {
 	useCommands();
 	useCommonCommands();
-	useBlockCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );

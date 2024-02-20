@@ -23,7 +23,7 @@ import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
-import { useHideBlocksFromInserter } from './use-hide-bocks-from-inserter';
+import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );

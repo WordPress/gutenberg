@@ -75,15 +75,6 @@ function KeyboardShortcutsRegister() {
 				},
 			],
 		} );
-		registerShortcut( {
-			name: 'core/edit-site/toggle-mode',
-			category: 'global',
-			description: __( 'Switch between visual editor and code editor.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'm',
-			},
-		} );
 
 		registerShortcut( {
 			name: 'core/edit-site/transform-heading-to-paragraph',
@@ -105,16 +96,6 @@ function KeyboardShortcutsRegister() {
 					character: `${ level }`,
 				},
 			} );
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/toggle-distraction-free',
-			category: 'global',
-			description: __( 'Toggle distraction free mode.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: '\\',
-			},
 		} );
 	}, [ registerShortcut ] );
 
