@@ -74,7 +74,7 @@ function SidebarScreens() {
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/pages">
 				<SidebarNavigationScreen
-					title={ __( 'Pages' ) }
+					title={ __( 'Manage Pages' ) }
 					content={ <DataViewsSidebarContent /> }
 				/>
 			</SidebarScreenWrapper>
