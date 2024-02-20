@@ -18,7 +18,7 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 } from '@wordpress/compose';
-import { Icon, home } from '@wordpress/icons';
+import { Icon, chevronLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
@@ -187,24 +187,49 @@ export default function Layout() {
 				stiffness: 400,
 			},
 		},
+	};
+
+	const siteIconVariants = {
+		view: {
+			clipPath: 'inset(0% round 0)',
+		},
+		edit: {
+			clipPath: 'inset(0% round 0)',
+		},
 		hover: {
-			scale: canvasMode === 'edit' ? 0.6 : 1,
-			borderRadius: '4px',
+			clipPath:
+				canvasMode === 'edit'
+					? 'inset( 22% round 2px )'
+					: 'inset(0% round 0)',
+			transition: {
+				duration: 0.2,
+			},
+		},
+		tap: {
+			// scale: canvasMode === 'edit' ? 0.6 : 1,
+			clipPath: 'inset(0% round 0)',
+			transition: {
+				delay: 0.1,
+			},
 		},
 	};
 
 	const toggleHomeIconVariants = {
 		view: {
 			opacity: 0,
-			scale: 0.5,
+			scale: 0.2,
 		},
 		edit: {
 			opacity: 0,
-			scale: 0.5,
+			scale: 0.2,
 		},
 		hover: {
-			opacity: 1,
-			scale: 1.3,
+			opacity: canvasMode === 'edit' ? 1 : 0,
+			scale: 1,
+			clipPath:
+				canvasMode === 'edit'
+					? 'inset( 22% round 2px )'
+					: 'inset(0% round 0)',
 		},
 	};
 
@@ -247,23 +272,23 @@ export default function Layout() {
 						animate={ canvasMode }
 						initial={ canvasMode }
 						whileHover="hover"
+						whileTap="tap"
 					>
 						<Button
 							{ ...siteIconButtonProps }
-							as={ motion.button }
 							showTooltip
 							tooltipPosition={ 'middle right' }
 						>
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-						</Button>
-						{ canvasMode === 'edit' && (
-							<motion.div
-								className="edit-site-layout__home-icon"
-								variants={ toggleHomeIconVariants }
-							>
-								<Icon icon={ home } />
+							<motion.div variants={ siteIconVariants }>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 							</motion.div>
-						) }
+						</Button>
+						<motion.div
+							className="edit-site-layout__home-icon"
+							variants={ toggleHomeIconVariants }
+						>
+							<Icon icon={ chevronLeft } />
+						</motion.div>
 					</motion.div>
 					<NavigableRegion
 						ariaLabel={ __( 'Navigation' ) }
