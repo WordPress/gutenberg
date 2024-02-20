@@ -13,15 +13,14 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
-import { verse } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
-import { Caption } from '../utils/caption';
 
 const isWebPlatform = Platform.OS === 'web';
 
@@ -31,12 +30,13 @@ function PullQuoteEdit( {
 	isSelected,
 	insertBlocksAfter,
 } ) {
-	const { textAlign, value } = attributes;
+	const { textAlign, citation, value } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
 	return (
 		<>
@@ -66,26 +66,32 @@ function PullQuoteEdit( {
 						}
 						textAlign="center"
 					/>
-					<Caption
-						attributeKey="citation"
-						tagName={ isWebPlatform ? 'cite' : undefined }
-						style={ { display: 'block' } }
-						isSelected={ isSelected }
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						icon={ verse }
-						label={ __( 'Pullquote citation text' ) }
-						placeholder={
-							// translators: placeholder text used for the citation
-							__( 'Add citation' )
-						}
-						addLabel={ __( 'Add citation' ) }
-						removeLabel={ __( 'Remove citation' ) }
-						className="wp-block-pullquote__citation"
-						__unstableMobileNoFocusOnMount
-						textAlign="center"
-						insertBlocksAfter={ insertBlocksAfter }
-					/>
+					{ shouldShowCitation && (
+						<RichText
+							identifier="citation"
+							tagName={ isWebPlatform ? 'cite' : undefined }
+							style={ { display: 'block' } }
+							value={ citation }
+							aria-label={ __( 'Pullquote citation text' ) }
+							placeholder={
+								// translators: placeholder text used for the citation
+								__( 'Add citation' )
+							}
+							onChange={ ( nextCitation ) =>
+								setAttributes( {
+									citation: nextCitation,
+								} )
+							}
+							className="wp-block-pullquote__citation"
+							__unstableMobileNoFocusOnMount
+							textAlign="center"
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+							}
+						/>
+					) }
 				</BlockQuote>
 			</Figure>
 		</>
