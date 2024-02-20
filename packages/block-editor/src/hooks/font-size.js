@@ -21,10 +21,7 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import { useSettings } from '../components/use-settings';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -151,8 +148,9 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 }
 
 function useBlockProps( { name, fontSize, style } ) {
-	const [ typography, layout ] = useSettings(
-		'typography',
+	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
+		'typography.fontSizes',
+		'typography.fluid',
 		'layout'
 	);
 
@@ -176,7 +174,12 @@ function useBlockProps( { name, fontSize, style } ) {
 			style: {
 				fontSize: getTypographyFontSizeValue(
 					{ size: style.typography.fontSize },
-					{ typography, layout }
+					{
+						typography: {
+							fluid: fluidTypographySettings,
+						},
+						layout: layoutSettings,
+					}
 				),
 			},
 		};
@@ -186,7 +189,7 @@ function useBlockProps( { name, fontSize, style } ) {
 		props = {
 			style: {
 				fontSize: getFontSize(
-					typography?.fontSizes,
+					fontSizes,
 					fontSize,
 					style?.typography?.fontSize
 				).size,
