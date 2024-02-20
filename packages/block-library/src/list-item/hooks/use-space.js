@@ -40,14 +40,17 @@ export default function useSpace( clientId ) {
 					selectionStart.offset === 0 &&
 					selectionEnd.offset === 0
 				) {
-					event.preventDefault();
 					if ( shiftKey ) {
 						// Note that backspace behaviour in defined in onMerge.
 						if ( keyCode === TAB ) {
-							outdentListItem();
+							if ( outdentListItem() ) {
+								event.preventDefault();
+							}
 						}
 					} else if ( getBlockIndex( clientId ) !== 0 ) {
-						indentListItem();
+						if ( indentListItem() ) {
+							event.preventDefault();
+						}
 					}
 				}
 			}

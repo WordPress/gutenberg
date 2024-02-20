@@ -93,5 +93,7 @@ export default function useOutdentListItem() {
 				removeBlock( parentListId, shouldSelectParent );
 			}
 		} );
+
+		return true;
 	}, [] );
 }
