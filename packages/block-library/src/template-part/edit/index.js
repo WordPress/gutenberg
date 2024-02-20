@@ -32,6 +32,7 @@ import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
+	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 
 function ReplaceButton( {
@@ -155,6 +156,11 @@ export default function TemplatePartEdit( {
 		hasReplacements &&
 		( area === 'header' || area === 'footer' );
 
+	const createFromBlocks = useCreateTemplatePartFromBlocks(
+		area,
+		setAttributes
+	);
+
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
 	if (
@@ -189,13 +195,12 @@ export default function TemplatePartEdit( {
 	const partsAsPatterns = templateParts.map( ( templatePart ) =>
 		mapTemplatePartToBlockPattern( templatePart )
 	);
-	const patternsAndParts = [ ...blockPatterns, ...partsAsPatterns ];
 
-	const onTemplatePartSelect = ( { templatePart } ) => {
+	const onTemplatePartSelect = ( templatePart ) => {
 		setAttributes( {
 			slug: templatePart.slug,
 			theme: templatePart.theme,
-			area: templatePart.area,
+			area: undefined,
 		} );
 		createSuccessNotice(
 			sprintf(
@@ -263,16 +268,31 @@ export default function TemplatePartEdit( {
 					} }
 				</BlockSettingsMenuControls>
 
-				{ canReplace && patternsAndParts.length && (
-					<InspectorControls>
-						<PanelBody title={ __( 'Replace' ) }>
-							<TemplatesList
-								availableTemplates={ patternsAndParts }
-								onSelect={ onTemplatePartSelect }
-							/>
-						</PanelBody>
-					</InspectorControls>
-				) }
+				{ canReplace &&
+					( partsAsPatterns.length > 0 ||
+						blockPatterns.length > 0 ) && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Replace' ) }>
+								<TemplatesList
+									availableTemplates={ partsAsPatterns }
+									onSelect={ ( pattern ) => {
+										onTemplatePartSelect(
+											pattern.templatePart
+										);
+									} }
+								/>
+								<TemplatesList
+									availableTemplates={ blockPatterns }
+									onSelect={ ( pattern, blocks ) => {
+										createFromBlocks(
+											blocks,
+											pattern.title
+										);
+									} }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
 
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
