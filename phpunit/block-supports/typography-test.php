@@ -355,14 +355,14 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output' => null,
 			),
 
-			'returns value when fluid config is empty`'  => array(
+			'returns value when fluid is `false`'  => array(
 				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => false,
 				),
 				'settings'        => array(
 					'typography' => array(
-						'fluid' => true,
+						'fluid' => false,
 					),
 				),
 				'expected_output' => '28px',

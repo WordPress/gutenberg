@@ -478,7 +478,7 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 		$global_settings
 	);
 	$typography_settings         = isset( $settings['typography'] ) ? $settings['typography'] : array();
-	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && ! empty( $typography_settings['fluid'] );
+	$should_use_fluid_typography = ! empty( $typography_settings['fluid'] );
 
 	if ( ! $should_use_fluid_typography ) {
 		return $preset['size'];
