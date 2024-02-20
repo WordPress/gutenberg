@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useState, useEffect } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
@@ -10,6 +15,51 @@ export function GridVisualizer( { clientId } ) {
 	if ( ! blockElement ) {
 		return null;
 	}
+	return (
+		<BlockPopover
+			className="block-editor-grid-visualizer"
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
+		>
+			<GridVisualizerGrid blockElement={ blockElement } />
+		</BlockPopover>
+	);
+}
+
+function GridVisualizerGrid( { blockElement } ) {
+	const [ gridInfo, setGridInfo ] = useState( () =>
+		getGridInfo( blockElement )
+	);
+	useEffect( () => {
+		const observers = [];
+		for ( const element of [ blockElement, ...blockElement.children ] ) {
+			const observer = new window.ResizeObserver( () => {
+				setGridInfo( getGridInfo( blockElement ) );
+			} );
+			observer.observe( element );
+			observers.push( observer );
+		}
+		return () => {
+			for ( const observer of observers ) {
+				observer.disconnect();
+			}
+		};
+	}, [ blockElement ] );
+	return (
+		<div
+			className="block-editor-grid-visualizer__grid"
+			style={ gridInfo.style }
+		>
+			{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
+				<div key={ i } className="block-editor-grid-visualizer__item" />
+			) ) }
+		</div>
+	);
+}
+
+function getGridInfo( blockElement ) {
 	const gridTemplateColumns = getComputedCSS(
 		blockElement,
 		'grid-template-columns'
@@ -21,30 +71,13 @@ export function GridVisualizer( { clientId } ) {
 	const numColumns = gridTemplateColumns.split( ' ' ).length;
 	const numRows = gridTemplateRows.split( ' ' ).length;
 	const numItems = numColumns * numRows;
-	return (
-		<BlockPopover
-			className="block-editor-grid-visualizer"
-			clientId={ clientId }
-			__unstableCoverTarget
-			__unstablePopoverSlot="block-toolbar"
-			shift={ false }
-		>
-			<div
-				className="block-editor-grid-visualizer__grid"
-				style={ {
-					gridTemplateColumns,
-					gridTemplateRows,
-					gap: getComputedCSS( blockElement, 'gap' ),
-					padding: getComputedCSS( blockElement, 'padding' ),
-				} }
-			>
-				{ Array.from( { length: numItems }, ( _, i ) => (
-					<div
-						key={ i }
-						className="block-editor-grid-visualizer__item"
-					/>
-				) ) }
-			</div>
-		</BlockPopover>
-	);
+	return {
+		numItems,
+		style: {
+			gridTemplateColumns,
+			gridTemplateRows,
+			gap: getComputedCSS( blockElement, 'gap' ),
+			padding: getComputedCSS( blockElement, 'padding' ),
+		},
+	};
 }
