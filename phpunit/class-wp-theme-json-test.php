@@ -1395,15 +1395,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_stylesheet_generates_fluid_typography_values() {
-		register_block_type( 'test/clamp-me', array(
-			'api_version' => 3,
-		) );
+		register_block_type(
+			'test/clamp-me',
+			array(
+				'api_version' => 3,
+			)
+		);
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'typography' => array(
-						'fluid' => true,
+						'fluid'     => true,
 						'fontSizes' => array(
 							array(
 								'size' => '16px',
@@ -1422,14 +1425,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'typography' => array(
 						'fontSize' => '1em',
 					),
-					'elements' => array(
+					'elements'   => array(
 						'h1' => array(
 							'typography' => array(
 								'fontSize' => '100px',
 							),
 						),
 					),
-					'blocks' => array(
+					'blocks'     => array(
 						'test/clamp-me' => array(
 							'typography' => array(
 								'fontSize' => '48px',
