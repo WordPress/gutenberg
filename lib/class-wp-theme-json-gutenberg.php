@@ -1857,6 +1857,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * </code>
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Passing $settings to the callbacks defined in static::PRESETS_METADATA.
 	 *
 	 * @param array $settings        Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
@@ -1883,7 +1884,7 @@ class WP_Theme_JSON_Gutenberg {
 					is_callable( $preset_metadata['value_func'] )
 				) {
 					$value_func = $preset_metadata['value_func'];
-					$value      = call_user_func( $value_func, $preset );
+					$value      = call_user_func( $value_func, $preset, $settings );
 				} else {
 					// If we don't have a value, then don't add it to the result.
 					continue;

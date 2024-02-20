@@ -431,7 +431,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.2.0 Added 'settings.typography.fluid.minFontSize' support.
  * @since 6.3.0 Using layout.wideSize as max viewport width, and logarithmic scale factor to calculate minimum font scale.
  * @since 6.4.0 Added configurable min and max viewport width values to the typography.fluid theme.json schema.
- * @since 6.5.0 Deprecated bool argument $should_use_fluid_typography.
+ * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
  *
  * @param array $preset       {
  *     Required. fontSizes preset value as seen in theme.json.
@@ -463,7 +463,7 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	 * As a bool (deprecated since 6.5), $settings acts as an override to switch fluid typography "on" (`true`) or "off" (`false`).
 	 */
 	if ( is_bool( $settings ) ) {
-		_deprecated_argument( __FUNCTION__, '6.5.0', __( '`boolean` type for second argument `$settings` is deprecated. Use `array()` instead.', 'gutenberg' ) );
+		_deprecated_argument( __FUNCTION__, '6.6.0', __( '`boolean` type for second argument `$settings` is deprecated. Use `array()` instead.', 'gutenberg' ) );
 		$settings = array(
 			'typography' => array(
 				'fluid' => $settings,
