@@ -160,7 +160,7 @@ function BlockBindingBridge( { bindings, props } ) {
 		);
 	} );
 
-	return BindingConnectorInstances;
+	return <>{ BindingConnectorInstances }</>;
 }
 
 const withBlockBindingSupport = createHigherOrderComponent(
