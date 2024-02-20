@@ -17,9 +17,8 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, ruleKeysForPrompt } = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getRemovalPromptData()
+	const { clientIds, selectPrevious, messages } = useSelect( ( select ) =>
+		unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
@@ -37,7 +36,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 		};
 	}, [ rules, setBlockRemovalRules ] );
 
-	if ( ! ruleKeysForPrompt ) {
+	if ( ! messages ) {
 		return;
 	}
 
@@ -53,15 +52,8 @@ export function BlockRemovalWarningModal( { rules } ) {
 			size="medium"
 		>
 			<ul>
-				{ ruleKeysForPrompt.map( ( ruleKey ) => {
-					if ( rules[ ruleKey ]?.message ) {
-						return (
-							<li key={ ruleKey }>
-								{ rules[ ruleKey ].message }
-							</li>
-						);
-					}
-					return null;
+				{ messages.map( ( message ) => {
+					return <li key={ message }>{ message }</li>;
 				} ) }
 			</ul>
 			<HStack justify="right">

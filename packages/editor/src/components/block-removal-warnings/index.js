@@ -5,6 +5,7 @@
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,66 +16,80 @@ import { store as editorStore } from '../../store';
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
 // Prevent accidental removal of certain blocks, asking the user for confirmation first.
-const blockRemovalRules = {
-	'core-query': {
-		message: __(
-			'The Query Loop block displays a list of posts or pages, so removing it will prevent that content from displaying.'
-		),
+const blockRemovalRules = [
+	{
+		// Query loop.
 		postTypes: [ 'wp_template' ],
-		callback: ( blockName, ruleKeysForPrompt ) => {
-			if ( blockName === 'core/query' ) {
-				ruleKeysForPrompt.add( 'core-query' );
+		callback( removedBlocks ) {
+			if ( removedBlocks.some( ( { name } ) => name === 'core/query' ) ) {
+				return __(
+					'The Query Loop block displays a list of posts or pages, so removing it will prevent that content from displaying.'
+				);
 			}
 		},
 	},
-	'core-post-content': {
-		message: __(
-			'Removing the Post Content block will stop your post or page content from displaying on this template.'
-		),
+	{
+		// Post content.
 		postTypes: [ 'wp_template' ],
-		callback: ( blockName, ruleKeysForPrompt ) => {
-			if ( blockName === 'core/post-content' ) {
-				ruleKeysForPrompt.add( 'core-post-content' );
-			}
-		},
-	},
-	'core-post-template': {
-		message: __(
-			'The Post Template block displays each post or page in a Query Loop, so removing it will stop post content displaying in your query loop.'
-		),
-		postTypes: [ 'wp_template', 'post', 'page' ],
-		callback: ( blockName, ruleKeysForPrompt ) => {
-			if ( blockName === 'core/post-template' ) {
-				ruleKeysForPrompt.add( 'core-post-template' );
-			}
-		},
-	},
-	'core-pattern-overrides': {
-		message: __(
-			'Deleting a block with pattern instance overrides can break other blocks on your site that have content linked to it.'
-		),
-		postTypes: [ 'wp_block' ],
-		callback: ( blockName, ruleKeysForPrompt, blockAttributes ) => {
+		callback( removedBlocks ) {
 			if (
-				blockAttributes?.metadata?.bindings &&
-				JSON.stringify( blockAttributes.metadata.bindings ).includes(
-					'core/pattern-overrides'
+				removedBlocks.some(
+					( { name } ) => name === 'core/post-content'
 				)
 			) {
-				ruleKeysForPrompt.add( 'core-pattern-overrides' );
+				return __(
+					'Removing the Post Content block will stop your post or page content from displaying on this template.'
+				);
 			}
 		},
 	},
-};
+	{
+		// Post template.
+		postTypes: [ 'wp_template', 'post', 'page' ],
+		callback( removedBlocks ) {
+			if (
+				removedBlocks.some(
+					( { name } ) => name === 'core/post-template'
+				)
+			) {
+				return __(
+					'The Post Template block displays each post or page in a Query Loop, so removing it will stop post content displaying in your query loop.'
+				);
+			}
+		},
+	},
+	{
+		// Pattern overrides.
+		postTypes: [ 'wp_block' ],
+		callback( removedBlocks ) {
+			const hasOverrides = removedBlocks.some(
+				( { attributes } ) =>
+					attributes?.metadata?.bindings &&
+					Object.values( attributes.metadata.bindings ).some(
+						( binding ) =>
+							binding.source === 'core/pattern-overrides'
+					)
+			);
+			if ( hasOverrides ) {
+				return __(
+					'Deleting a block with pattern instance overrides can break other blocks on your site that have content linked to it.'
+				);
+			}
+		},
+	},
+];
 
 export default function BlockRemovalWarnings() {
-	const { currentPostType } = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( editorStore );
+	const { currentPostType } = useSelect(
+		( select ) => select( editorStore ).getCurrentPostType(),
+		[]
+	);
 
-		return {
-			currentPostType: getCurrentPostType(),
-		};
-	}, [] );
-	blockRemovalRules.currentPostType = currentPostType;
-	return <BlockRemovalWarningModal rules={ blockRemovalRules } />;
+	const removalRulesForPostType = useMemo( () => {
+		blockRemovalRules.filter( ( rule ) =>
+			rule.postTypes.some( ( postType ) => postType === currentPostType )
+		);
+	}, [ currentPostType ] );
+
+	return <BlockRemovalWarningModal rules={ removalRulesForPostType } />;
 }

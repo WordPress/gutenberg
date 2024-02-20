@@ -1521,11 +1521,11 @@ export function isSelectionEnabled( state = true, action ) {
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
-			const { clientIds, selectPrevious, ruleKeysForPrompt } = action;
+			const { clientIds, selectPrevious, messages } = action;
 			return {
 				clientIds,
 				selectPrevious,
-				ruleKeysForPrompt,
+				messages,
 			};
 		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
 			return false;

@@ -123,48 +123,32 @@ export const privateRemoveBlocks =
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
 		const rules = ! forceRemove && select.getBlockRemovalRules();
+
 		if ( rules ) {
-			const ruleKeysForPrompt = new Set();
-
-			// Given a list of client IDs of blocks that the user intended to
-			// remove, perform a tree search (BFS) to find all block names
-			// corresponding to "important" blocks, i.e. blocks that require a
-			// removal prompt.
-			const queue = [ ...clientIds ];
-			while ( queue.length ) {
-				const clientId = queue.shift();
-				const blockName = select.getBlockName( clientId );
-
-				Object.values( rules ).forEach( ( rule ) => {
-					if (
-						( rule.postTypes &&
-							! rule.postTypes.includes(
-								rules.currentPostType
-							) ) ||
-						! rule.callback
-					) {
-						return;
-					}
-
-					rule.callback(
-						blockName,
-						ruleKeysForPrompt,
-						select.getBlockAttributes( clientId )
-					);
-				} );
-
-				const innerBlocks = select.getBlockOrder( clientId );
-				queue.push( ...innerBlocks );
+			function flattenBlocks( blocks ) {
+				const result = [];
+				const stack = [ ...blocks ];
+				while ( stack.length ) {
+					const { innerBlocks, ...block } = stack.shift();
+					stack.push( ...innerBlocks );
+					result.push( block );
+				}
+				return result;
 			}
 
-			// If any such blocks were found, trigger the removal prompt and
-			// skip any other steps (thus postponing actual removal).
-			if ( ruleKeysForPrompt.size ) {
+			const blockList = clientIds.map( select.getBlock );
+			const flattenedBlocks = flattenBlocks( blockList );
+
+			const messages = rules
+				.map( ( { callback } ) => callback( flattenedBlocks ) )
+				.filter( ( candidateMessage ) => candidateMessage );
+
+			if ( messages.length ) {
 				dispatch(
 					displayBlockRemovalPrompt(
 						clientIds,
 						selectPrevious,
-						Array.from( ruleKeysForPrompt )
+						messages
 					)
 				);
 				return;
@@ -218,31 +202,21 @@ export const ensureDefaultBlock =
  *
  * Contrast with `setBlockRemovalRules`.
  *
- * @param {string|string[]} clientIds         Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious    True if the previous block
- *                                            or the immediate parent
- *                                            (if no previous block exists)
- *                                            should be selected
- *                                            when a block is removed.
- * @param {string[]}        ruleKeysForPrompt Names of the rules that
- *                                            triggered the need for
- *                                            confirmation before removal.
- * @param {string}          messageType       The type of message to display.
+ * @param {string|string[]} clientIds      Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious True if the previous block or the
+ *                                         immediate parent (if no previous
+ *                                         block exists) should be selected
+ *                                         when a block is removed.
+ * @param {string[]}        messages       Messages to display in the prompt.
  *
  * @return {Object} Action object.
  */
-function displayBlockRemovalPrompt(
-	clientIds,
-	selectPrevious,
-	ruleKeysForPrompt,
-	messageType
-) {
+function displayBlockRemovalPrompt( clientIds, selectPrevious, messages ) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
-		ruleKeysForPrompt,
-		messageType,
+		messages,
 	};
 }
 
