@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	useBlockProps,
@@ -12,12 +12,12 @@ import {
 	InspectorControls,
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
-import { parse } from '@wordpress/blocks';
 import { PanelBody, Spinner, Modal, MenuItem } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -27,6 +27,7 @@ import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
+import { mapTemplatePartToBlockPattern } from './utils/map-template-part-to-block-pattern';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
@@ -91,6 +92,7 @@ export default function TemplatePartEdit( {
 	setAttributes,
 	clientId,
 } ) {
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -184,15 +186,11 @@ export default function TemplatePartEdit( {
 		);
 	}
 
-	const partsAsPatterns = templateParts.map( ( templatePart ) => ( {
-		name: createTemplatePartId( templatePart.theme, templatePart.slug ),
-		title: templatePart.title.rendered,
-		blocks: parse( templatePart.content.raw ),
-		templatePart,
-	} ) );
+	const partsAsPatterns = templateParts.map( ( templatePart ) =>
+		mapTemplatePartToBlockPattern( templatePart )
+	);
 	const patternsAndParts = [ ...blockPatterns, ...partsAsPatterns ];
 
-	// TODO - de dupe
 	const onTemplatePartSelect = ( { templatePart } ) => {
 		setAttributes( {
 			slug: templatePart.slug,
@@ -202,7 +200,7 @@ export default function TemplatePartEdit( {
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
-				__( 'Template Part "%s" inserted.' ),
+				__( 'Template Part "%s" replaceed.' ),
 				templatePart.title?.rendered || templatePart.slug
 			),
 			{
