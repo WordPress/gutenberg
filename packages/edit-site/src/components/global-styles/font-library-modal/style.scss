@@ -55,6 +55,10 @@
 	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
 
+	&:hover {
+		background-color: $gray-100;
+	}
+
 	.font-library-modal__font-card__name {
 		font-weight: bold;
 	}
@@ -62,12 +66,6 @@
 	.font-library-modal__font-card__count {
 		color: $gray-700;
 	}
-}
-
-.font-library-modal__library-font-variant {
-	border: 1px solid $gray-200;
-	padding: $grid-unit-20;
-	margin-top: -1px; /* To collapse the margin with the previous element */
 }
 
 .font-library-modal__font-variant_demo-image {
