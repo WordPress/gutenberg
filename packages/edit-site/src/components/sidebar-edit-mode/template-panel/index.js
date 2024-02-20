@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, PanelRow } from '@wordpress/components';
 import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
@@ -28,6 +28,7 @@ import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
 import SidebarCard from '../sidebar-card';
 import { useAvailablePatterns } from './hooks';
+import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 
 const CARD_ICONS = {
 	wp_block: symbol,
@@ -103,20 +104,22 @@ export default function TemplatePanel() {
 				>
 					<TemplateAreas />
 				</SidebarCard>
-				<SidebarCard
-					className="edit-site-template-card__templates-list"
-					title={ __( 'Transform into:' ) }
-				>
+			</PanelBody>
+			<PanelBody
+				title={ __( 'Transform into:' ) }
+				initialOpen={ postType === TEMPLATE_PART_POST_TYPE }
+			>
+				<PanelRow>
 					<p>
 						{ __(
 							'Choose a predefined pattern to switch up the look of your template.' // TODO - make this dynamic?
 						) }
 					</p>
-					<TemplatesList
-						availableTemplates={ availablePatterns }
-						onSelect={ onTemplateSelect }
-					/>
-				</SidebarCard>
+				</PanelRow>
+				<TemplatesList
+					availableTemplates={ availablePatterns }
+					onSelect={ onTemplateSelect }
+				/>
 			</PanelBody>
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
