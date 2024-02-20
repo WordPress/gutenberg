@@ -37,7 +37,7 @@ const CARD_ICONS = {
 
 function TemplatesList( { availableTemplates, onSelect } ) {
 	const shownTemplates = useAsyncList( availableTemplates );
-	if ( ! availableTemplates || availableTemplates?.length < 2 ) {
+	if ( ! availableTemplates || availableTemplates?.length === 0 ) {
 		return null;
 	}
 
@@ -105,22 +105,25 @@ export default function TemplatePanel() {
 					<TemplateAreas />
 				</SidebarCard>
 			</PanelBody>
-			<PanelBody
-				title={ __( 'Transform into:' ) }
-				initialOpen={ postType === TEMPLATE_PART_POST_TYPE }
-			>
-				<PanelRow>
-					<p>
-						{ __(
-							'Choose a predefined pattern to switch up the look of your template.' // TODO - make this dynamic?
-						) }
-					</p>
-				</PanelRow>
-				<TemplatesList
-					availableTemplates={ availablePatterns }
-					onSelect={ onTemplateSelect }
-				/>
-			</PanelBody>
+			{ availablePatterns?.length > 0 && (
+				<PanelBody
+					title={ __( 'Transform into:' ) }
+					initialOpen={ postType === TEMPLATE_PART_POST_TYPE }
+				>
+					<PanelRow>
+						<p>
+							{ __(
+								'Choose a predefined pattern to switch up the look of your template.' // TODO - make this dynamic?
+							) }
+						</p>
+					</PanelRow>
+
+					<TemplatesList
+						availableTemplates={ availablePatterns }
+						onSelect={ onTemplateSelect }
+					/>
+				</PanelBody>
+			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
 			<PostFeaturedImagePanel />
