@@ -170,7 +170,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		// Bail early if the block doesn't have bindings.
 		const bindings = attributes?.metadata?.bindings;
 		if ( ! bindings ) {
-			return null;
+			return <BlockEdit { ...props } />;
 		}
 
 		return (
