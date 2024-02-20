@@ -27,7 +27,10 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import {
+	privateApis as patternsPrivateApis,
+	store as patternsStore,
+} from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -38,7 +41,11 @@ import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
+const {
+	hasOverridableAttributes,
+	hasOverridableBlocks,
+	getOverridableAttributes,
+} = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -70,33 +77,6 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 		return { alignment, layout };
 	}, [ blocks, parentLayout ] );
 };
-
-function hasOverridableAttributes( block ) {
-	return (
-		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		)
-	);
-}
-
-function hasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( hasOverridableAttributes( block ) ) return true;
-		return hasOverridableBlocks( block.innerBlocks );
-	} );
-}
-
-function getOverridableAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
-}
 
 function applyInitialContentValuesToInnerBlocks(
 	blocks,
@@ -177,22 +157,6 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
-function setBlockEditMode( setEditMode, blocks, mode ) {
-	blocks.forEach( ( block ) => {
-		const editMode =
-			mode ||
-			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
-		setEditMode( block.clientId, editMode );
-
-		setBlockEditMode(
-			setEditMode,
-			block.innerBlocks,
-			// Disable editing for nested patterns.
-			block.name === patternBlockName ? 'disabled' : mode
-		);
-	} );
-}
-
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
@@ -222,6 +186,7 @@ export default function ReusableBlockEdit( {
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
+	const { syncPatternEditingMode } = unlock( useDispatch( patternsStore ) );
 
 	const {
 		innerBlocks,
@@ -253,16 +218,6 @@ export default function ReusableBlockEdit( {
 		[ patternClientId, ref ]
 	);
 
-	// Sync the editing mode of the pattern block with the inner blocks.
-	useEffect( () => {
-		setBlockEditMode(
-			setBlockEditingMode,
-			innerBlocks,
-			// Disable editing if the pattern itself is disabled.
-			editingMode === 'disabled' ? 'disabled' : undefined
-		);
-	}, [ editingMode, innerBlocks, setBlockEditingMode ] );
-
 	const canOverrideBlocks = useMemo(
 		() => hasOverridableBlocks( innerBlocks ),
 		[ innerBlocks ]
@@ -285,16 +240,20 @@ export default function ReusableBlockEdit( {
 		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
-			syncDerivedUpdates( () => {
-				replaceInnerBlocks(
-					patternClientId,
-					applyInitialContentValuesToInnerBlocks(
-						initialBlocks,
-						initialContent.current,
-						defaultContent.current
-					)
+			const blocksWithInitialContent =
+				applyInitialContentValuesToInnerBlocks(
+					initialBlocks,
+					initialContent.current,
+					defaultContent.current
 				);
+			syncDerivedUpdates( () => {
+				replaceInnerBlocks( patternClientId, blocksWithInitialContent );
 			} );
+			syncPatternEditingMode(
+				patternClientId,
+				// Disable editing if the pattern itself is disabled.
+				originalEditingMode === 'disabled' ? 'disabled' : undefined
+			);
 			setBlockEditingMode( patternClientId, originalEditingMode );
 		} );
 	}, [
@@ -306,7 +265,17 @@ export default function ReusableBlockEdit( {
 		getBlockEditingMode,
 		setBlockEditingMode,
 		syncDerivedUpdates,
+		syncPatternEditingMode,
 	] );
+
+	// Sync the editing mode of the pattern block with the inner blocks.
+	useEffect( () => {
+		syncPatternEditingMode(
+			patternClientId,
+			// Disable editing if the pattern itself is disabled.
+			editingMode === 'disabled' ? 'disabled' : undefined
+		);
+	}, [ editingMode, patternClientId, syncPatternEditingMode ] );
 
 	const { alignment, layout } = useInferredLayout(
 		innerBlocks,

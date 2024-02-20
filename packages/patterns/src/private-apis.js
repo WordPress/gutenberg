@@ -24,6 +24,11 @@ import {
 	PATTERN_SYNC_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 } from './constants';
+import {
+	hasOverridableAttributes,
+	hasOverridableBlocks,
+	getOverridableAttributes,
+} from './utils';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -43,4 +48,7 @@ lock( privateApis, {
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_SYNC_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
+	hasOverridableAttributes,
+	hasOverridableBlocks,
+	getOverridableAttributes,
 } );
