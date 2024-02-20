@@ -34,7 +34,6 @@ import { search, closeSmall, moreVertical, chevronLeft } from '@wordpress/icons'
 /**
  * Internal dependencies
  */
-import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
@@ -242,12 +241,7 @@ function FontCollection( { slug } ) {
 	};
 
 	if ( renderConfirmDialog ) {
-		return (
-			<TabPanelLayout notice={ notice }>
-				<Spacer margin={ 8 } />
-				<GoogleFontsConfirmDialog />
-			</TabPanelLayout>
-		);
+		return <GoogleFontsConfirmDialog />;
 	}
 
 	const ActionsComponent = () => {

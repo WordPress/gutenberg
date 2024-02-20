@@ -123,6 +123,7 @@ button.font-library-modal__upload-area {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	margin-top: $grid-unit-80;
 
 	h3 {
 		font-size: 1.4rem;
@@ -130,7 +131,7 @@ button.font-library-modal__upload-area {
 
 	.components-card {
 		width: 50%;
-		min-width: 250px;
-		max-width: 350px;
+		min-width: 350px;
+		max-width: 400px;
 	}
 }
