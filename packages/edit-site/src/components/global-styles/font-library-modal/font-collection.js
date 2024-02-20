@@ -19,10 +19,11 @@ import {
 	FlexItem,
 	Flex,
 	Button,
+	DropdownMenu,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { search, closeSmall } from '@wordpress/icons';
+import { search, closeSmall, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -75,6 +76,14 @@ function FontCollection( { slug } ) {
 		window.addEventListener( 'storage', handleStorage );
 		return () => window.removeEventListener( 'storage', handleStorage );
 	}, [ slug, requiresPermission ] );
+
+	const revokeAccess = () => {
+		window.localStorage.setItem(
+			'wp-font-library-google-fonts-permission',
+			'false'
+		);
+		window.dispatchEvent( new Event( 'storage' ) );
+	};
 
 	useEffect( () => {
 		const fetchFontCollection = async () => {
@@ -223,11 +232,31 @@ function FontCollection( { slug } ) {
 		);
 	}
 
+	let actionsComponent = null;
+	if ( ! renderConfirmDialog && ! selectedFont ) {
+		actionsComponent = (
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Actions' ) }
+				popoverProps={ {
+					position: 'bottom left',
+				} }
+				controls={ [
+					{
+						title: __( 'Revoke access to Google Fonts' ),
+						onClick: revokeAccess,
+					},
+				] }
+			/>
+		);
+	}
+
 	return (
 		<TabPanelLayout
 			title={
 				! selectedFont ? selectedCollection.name : selectedFont.name
 			}
+			actions={ actionsComponent }
 			description={
 				! selectedFont
 					? selectedCollection.description
