@@ -105,7 +105,6 @@ export default function CoverInspectorControls( {
 		minHeightUnit,
 		alt,
 		tagName,
-		style,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -310,7 +309,9 @@ export default function CoverInspectorControls( {
 				>
 					<CoverHeightInput
 						value={
-							style?.dimensions?.aspectRatio ? '' : minHeight
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
 						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
