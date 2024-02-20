@@ -25,7 +25,10 @@ const transforms = {
 							headingMetadata = Object.entries( metadata ).reduce(
 								( obj, [ prop, value ] ) => {
 									if ( supportedProps.includes( prop ) ) {
-										obj[ prop ] = value;
+										obj[ prop ] =
+											prop === 'bindings'
+												? { content: value.content }
+												: value;
 									}
 									return obj;
 								},
@@ -109,7 +112,10 @@ const transforms = {
 						headingMetadata = Object.entries( metadata ).reduce(
 							( obj, [ prop, value ] ) => {
 								if ( supportedProps.includes( prop ) ) {
-									obj[ prop ] = value;
+									obj[ prop ] =
+										prop === 'bindings'
+											? { content: value.content }
+											: value;
 								}
 								return obj;
 							},
