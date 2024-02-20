@@ -8,9 +8,12 @@ import classnames from 'classnames';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useContext, useState } from '@wordpress/element';
+import { useMemo, useContext, useState, useEffect } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
-import { __experimentalGrid as Grid } from '@wordpress/components';
+import {
+	__experimentalGrid as Grid,
+	ToggleControl,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -25,9 +28,9 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-function Variation( { variation } ) {
+function Variation( { variation, setCurrentVariation, variationId } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
+	const { base, user } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
 		return {
 			user: {
@@ -41,12 +44,7 @@ function Variation( { variation } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
-		setUserConfig( () => {
-			return {
-				settings: variation.settings,
-				styles: variation.styles,
-			};
-		} );
+		setCurrentVariation( variationId );
 	};
 
 	const selectOnEnter = ( event ) => {
@@ -101,6 +99,13 @@ function Variation( { variation } ) {
 }
 
 export default function StyleVariationsContainer() {
+	const { user, setUserConfig } = useContext( GlobalStylesContext );
+	const [ currentUserStyles ] = useState( { ...user } );
+	const [ currentVariation, setCurrentVariation ] = useState();
+
+	const [ preserveAdditionalCSS, setPreserveAdditionalCSS ] =
+		useState( true );
+
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -114,22 +119,110 @@ export default function StyleVariationsContainer() {
 				settings: {},
 				styles: {},
 			},
-			...( variations ?? [] ).map( ( variation ) => ( {
-				...variation,
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			} ) ),
+			...( variations ?? [] ).map( ( variation ) => {
+				const blockStyles = { ...variation?.styles?.blocks } || {};
+				if (
+					currentUserStyles?.styles?.blocks &&
+					preserveAdditionalCSS
+				) {
+					Object.keys( currentUserStyles.styles.blocks ).forEach(
+						( blockName ) => {
+							if (
+								currentUserStyles.styles.blocks[ blockName ].css
+							) {
+								blockStyles[ blockName ] = {
+									...( blockStyles[ blockName ]
+										? blockStyles[ blockName ]
+										: {} ),
+									css: `${
+										blockStyles[ blockName ]?.css || ''
+									} ${
+										currentUserStyles.styles.blocks[
+											blockName
+										].css
+									}`,
+								};
+							}
+						}
+					);
+				}
+
+				const styles = preserveAdditionalCSS
+					? {
+							...variation.styles,
+							...( currentUserStyles?.styles?.css ||
+							variation?.styles?.css
+								? {
+										css: `${
+											variation.styles?.css || ''
+										} ${ currentUserStyles.styles.css }`,
+								  }
+								: {} ),
+							blocks: {
+								...blockStyles,
+							},
+					  }
+					: variation.styles;
+
+				return {
+					...variation,
+					settings: variation.settings ?? {},
+					styles: styles ?? {},
+				};
+			} ),
 		];
-	}, [ variations ] );
+	}, [
+		variations,
+		currentUserStyles.styles.blocks,
+		currentUserStyles.styles.css,
+		preserveAdditionalCSS,
+	] );
+
+	useEffect( () => {
+		if ( currentVariation ) {
+			setUserConfig( () => {
+				return {
+					settings: withEmptyVariation[ currentVariation ]?.settings,
+					styles: withEmptyVariation[ currentVariation ]?.styles,
+				};
+			} );
+		}
+	}, [
+		currentVariation,
+		preserveAdditionalCSS,
+		setUserConfig,
+		withEmptyVariation,
+	] );
 
 	return (
-		<Grid
-			columns={ 2 }
-			className="edit-site-global-styles-style-variations-container"
-		>
-			{ withEmptyVariation.map( ( variation, index ) => (
-				<Variation key={ index } variation={ variation } />
-			) ) }
-		</Grid>
+		<>
+			<Grid
+				columns={ 2 }
+				className="edit-site-global-styles-style-variations-container"
+			>
+				{ withEmptyVariation.map( ( variation, index ) => (
+					<Variation
+						key={ index }
+						variation={ variation }
+						variationId={ index }
+						setCurrentVariation={ setCurrentVariation }
+					/>
+				) ) }
+			</Grid>
+
+			<ToggleControl
+				className="edit-site-global-styles-style-variations-preserve-css"
+				label={ __( 'Keep additional CSS' ) }
+				help={ __(
+					'Preserve additional CSS when switching between variations.'
+				) }
+				checked={ preserveAdditionalCSS }
+				onChange={ () => {
+					setPreserveAdditionalCSS(
+						preserveAdditionalCSS ? false : true
+					);
+				} }
+			/>
+		</>
 	);
 }
