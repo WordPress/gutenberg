@@ -58,11 +58,13 @@ function filterPatterns( patterns, template ) {
 		pattern.templateTypes?.includes( template.slug ) ||
 		pattern.blockTypes?.includes( 'core/template-part/' + template.area );
 
-	return patterns.filter(
-		filterOutDuplicatesByName &&
-			filterOutExcludedPatternSources &&
-			filterCompatiblePatterns
-	);
+	return patterns.filter( ( pattern, index, items ) => {
+		return (
+			filterOutDuplicatesByName( pattern, index, items ) &&
+			filterOutExcludedPatternSources( pattern ) &&
+			filterCompatiblePatterns( pattern )
+		);
+	} );
 }
 
 function preparePatterns( patterns, template, currentThemeStylesheet ) {
