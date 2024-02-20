@@ -211,15 +211,17 @@ class EditorPage {
 	 * @param {string} blockType     The type of the block to select.
 	 * @param {Object} options       Additional options.
 	 * @param {number} options.index The index of the block to select (default: 1).
+	 * @param {number} options.x     The x-coordinate offset from the center of the element (default: 0).
+	 * @param {number} options.y     The y-coordinate offset from the center of the element (default: 0).
 	 *
 	 * @return {import('webdriverio').ChainablePromiseArray} The selected block element.
 	 */
-	async selectBlockByType( blockType, { index = 1 } = {} ) {
+	async selectBlockByType( blockType, { index = 1, x = 0, y = 0 } = {} ) {
 		const locator = isAndroid()
 			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockType } Block. Row ${ index }")]`
 			: `-ios predicate string:label == '${ blockType } Block. Row ${ index }'`;
 		const block = await this.driver.$$( locator )[ 0 ];
-		await block.click();
+		await block.click( { x, y } );
 		return block;
 	}
 
