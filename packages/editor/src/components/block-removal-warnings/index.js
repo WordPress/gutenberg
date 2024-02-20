@@ -91,5 +91,9 @@ export default function BlockRemovalWarnings() {
 		);
 	}, [ currentPostType ] );
 
+	if ( ! removalRulesForPostType ) {
+		return null;
+	}
+
 	return <BlockRemovalWarningModal rules={ removalRulesForPostType } />;
 }
