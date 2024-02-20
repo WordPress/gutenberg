@@ -944,8 +944,7 @@ wp_interactivity_state( 'favoriteMovies', array(
         "id" => "123-abc",
         "movieName" => __("someMovieName", "textdomain")
       ),
-	)
-);
+) );
 ```
 
 ### Private stores
