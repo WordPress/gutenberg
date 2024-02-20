@@ -3,7 +3,7 @@
  */
 import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { select } from '@wordpress/data';
+import { select, useSelect } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
@@ -57,7 +57,7 @@ export function hasPossibleBlockBinding( blockName, attributeName ) {
 }
 
 /**
- * This component is responsible detecting and
+ * This component is responsible for detecting and
  * propagating data changes from the source to the block.
  *
  * @param {Object} props            - The component props.
@@ -125,6 +125,13 @@ const BlockBindingConnector = ( {
 };
 
 function BlockBindingBridge( { bindings, props } ) {
+	const { getBlockBindingsSource } = useSelect( () => {
+		return {
+			getBlockBindingsSource: unlock( select( blockEditorStore ) )
+				.getBlockBindingsSource,
+		};
+	}, [] );
+
 	if ( ! bindings ) {
 		return null;
 	}
@@ -139,8 +146,6 @@ function BlockBindingBridge( { bindings, props } ) {
 		if ( ! hasPossibleBlockBinding( name, attrName ) ) {
 			return;
 		}
-
-		const { getBlockBindingsSource } = unlock( select( blockEditorStore ) );
 
 		// Bail early if the block doesn't have a valid source handler.
 		const source = getBlockBindingsSource( boundAttribute.source );
