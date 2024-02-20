@@ -57,7 +57,7 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  */
 function gutenberg_block_bindings_replace_html( $block_content, $block_name, string $attribute_name, $source_value ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-	if ( ! isset( $block_type->attributes[ $attribute_name ] ) ) {
+	if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
 		return $block_content;
 	}
 
