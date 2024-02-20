@@ -81,6 +81,14 @@ import useOverlay from './use-overlay';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+function useInheritedRef() {
+	const {
+		params: { myNavRef },
+	} = useLocation();
+
+	return myNavRef;
+}
+
 function Navigation( {
 	attributes,
 	setAttributes,
@@ -103,10 +111,6 @@ function Navigation( {
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const {
-		params: { myNavRef },
-	} = useLocation();
-
-	const {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
@@ -122,19 +126,17 @@ function Navigation( {
 
 	const [ tempRef, setTempRef ] = useState( null );
 
-	const ref = tempRef || attributes.ref;
+	const ref = attributes.ref || tempRef;
 
-	const isInheritRefMode = attributes.ref === 'inherit';
+	const inheritedRef = useInheritedRef();
+
+	const isInheritRefMode = !! inheritedRef;
 
 	const setRef = useCallback(
 		( postId ) => {
-			if ( isInheritRefMode ) {
-				setTempRef( Number( postId ) );
-			} else {
-				setAttributes( { ref: postId } );
-			}
+			setAttributes( { ref: postId } );
 		},
-		[ setAttributes, isInheritRefMode, setTempRef ]
+		[ setAttributes ]
 	);
 
 	const recursionId = `navigationMenu/${ ref }`;
@@ -264,7 +266,7 @@ function Navigation( {
 	useEffect( () => {
 		// Todo: set the ref based on context.
 		if ( isInheritRefMode ) {
-			setRef( myNavRef );
+			setTempRef( inheritedRef );
 			return;
 		}
 
@@ -295,7 +297,7 @@ function Navigation( {
 		navigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
 		isInheritRefMode,
-		myNavRef,
+		inheritedRef,
 	] );
 
 	const navRef = useRef();
