@@ -39,6 +39,7 @@ export function Caption( {
 	tagName = 'figcaption',
 	addLabel = __( 'Add caption' ),
 	removeLabel = __( 'Remove caption' ),
+	icon = captionIcon,
 	...props
 } ) {
 	const caption = attributes[ attributeKey ];
@@ -83,7 +84,7 @@ export function Caption( {
 								} );
 							}
 						} }
-						icon={ captionIcon }
+						icon={ icon }
 						isPressed={ showCaption }
 						label={ showCaption ? removeLabel : addLabel }
 					/>

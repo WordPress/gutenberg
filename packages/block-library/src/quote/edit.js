@@ -18,6 +18,7 @@ import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
+import { verse } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -110,6 +111,7 @@ export default function QuoteEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					__unstableMobileNoFocusOnMount
+					icon={ verse }
 					label={ __( 'Quote citation' ) }
 					placeholder={
 						// translators: placeholder text used for the

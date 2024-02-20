@@ -14,6 +14,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { Platform } from '@wordpress/element';
+import { verse } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -72,6 +73,7 @@ function PullQuoteEdit( {
 						isSelected={ isSelected }
 						attributes={ attributes }
 						setAttributes={ setAttributes }
+						icon={ verse }
 						label={ __( 'Pullquote citation text' ) }
 						placeholder={
 							// translators: placeholder text used for the citation
