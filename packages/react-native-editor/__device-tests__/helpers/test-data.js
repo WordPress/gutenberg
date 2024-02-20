@@ -203,6 +203,16 @@ exports.galleryBlock = `<!-- wp:gallery {"columns":8,"linkTo":"none","className"
 </figure>
 <!-- /wp:gallery -->`;
 
+exports.galleryBlockTwoImages = `<!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
+<figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
+<!-- /wp:image -->
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
+<!-- /wp:image -->
+</figure>
+<!-- /wp:gallery -->`;
+
 exports.groupNestedStructure = `<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#f9d0d0"}}} -->
 <p class="has-background" style="background-color:#f9d0d0">Level 1</p>
