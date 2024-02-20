@@ -355,7 +355,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output' => null,
 			),
 
-			'returns value when fluid is `false`'  => array(
+			'returns value when fluid is `false`'        => array(
 				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => false,
