@@ -162,28 +162,28 @@ function gutenberg_register_font_collections() {
 	wp_register_font_collection(
 		'google-fonts',
 		array(
-			'name'          => _x( 'Google Fonts', 'font collection name' ),
-			'description'   => __( 'Install from Google Fonts. Fonts are copied to and served from your site.' ),
+			'name'          => _x( 'Google Fonts', 'font collection name', 'gutenberg' ),
+			'description'   => __( 'Install from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 			'font_families' => 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json',
 			'categories'    => array(
 				array(
-					'name' => _x( 'Sans Serif', 'font category' ),
+					'name' => _x( 'Sans Serif', 'font category', 'gutenberg' ),
 					'slug' => 'sans-serif',
 				),
 				array(
-					'name' => _x( 'Display', 'font category' ),
+					'name' => _x( 'Display', 'font category', 'gutenberg' ),
 					'slug' => 'display',
 				),
 				array(
-					'name' => _x( 'Serif', 'font category' ),
+					'name' => _x( 'Serif', 'font category', 'gutenberg' ),
 					'slug' => 'serif',
 				),
 				array(
-					'name' => _x( 'Handwriting', 'font category' ),
+					'name' => _x( 'Handwriting', 'font category', 'gutenberg' ),
 					'slug' => 'handwriting',
 				),
 				array(
-					'name' => _x( 'Monospace', 'font category' ),
+					'name' => _x( 'Monospace', 'font category', 'gutenberg' ),
 					'slug' => 'monospace',
 				),
 			),
