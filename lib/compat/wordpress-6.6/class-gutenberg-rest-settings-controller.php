@@ -36,7 +36,7 @@ class Gutenberg_REST_Settings_Controller extends WP_REST_Settings_Controller {
 
 			$default_schema = array(
 				'type'        => empty( $args['type'] ) ? null : $args['type'],
-				'label'       => empty( $args['label'] ) ? '' : $args['label'], // Note: Only change to the method.
+				'title'       => empty( $args['label'] ) ? '' : $args['label'], // Note: Only change to the method.
 				'description' => empty( $args['description'] ) ? '' : $args['description'],
 				'default'     => isset( $args['default'] ) ? $args['default'] : null,
 			);
