@@ -80,7 +80,7 @@ function InserterMenu(
 	);
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
-	const showMedia = mediaCategories.length > 0;
+	const showMedia = mediaCategories.length > 0 && showBlocks;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
