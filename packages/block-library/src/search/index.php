@@ -133,12 +133,12 @@ function render_block_core_search( $attributes ) {
 		} else {
 			$button_classes[]       = 'has-icon';
 			$icon_dimensions        = '24';
-			$search_block_font_size = gutenberg_get_global_styles( array( 'typography', 'fontSize' ), array( 'block_name' => 'core/search', 'transforms' => array( 'resolve-variables' ) ) );
+			$search_block_font_size = wp_get_global_styles( array( 'typography', 'fontSize' ), array( 'block_name' => 'core/search', 'transforms' => array( 'resolve-variables' ) ) );
 
 			if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
 				$icon_dimensions = esc_attr( $attributes['style']['typography']['fontSize'] );
 			} elseif ( ! empty( $attributes['fontSize'] ) ) {
-				$font_size_presets = gutenberg_get_global_settings( array( 'typography', 'fontSizes' ) );
+				$font_size_presets = wp_get_global_settings( array( 'typography', 'fontSizes' ) );
 				/*
 				 * The prioritization of origins matches the order in which the block editor fetches settings.
 				 * Font sizes are sourced from either 'typography.fontSizes.custom' || 'typography.fontSizes.theme' || 'typography.fontSizes.default'.
