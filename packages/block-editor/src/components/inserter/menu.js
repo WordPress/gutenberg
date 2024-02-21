@@ -66,10 +66,13 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns } = useSelect(
+	const { showBlocks, showPatterns } = useSelect(
 		( select ) => {
-			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
+			const { hasAllowedPatterns, __unstableGetEditorMode } = unlock(
+				select( blockEditorStore )
+			);
 			return {
+				showBlocks: __unstableGetEditorMode() !== 'zoom-out',
 				showPatterns: hasAllowedPatterns( destinationRootClientId ),
 			};
 		},
@@ -248,13 +251,14 @@ function InserterMenu(
 							__experimentalInsertionIndex={
 								__experimentalInsertionIndex
 							}
-							showBlockDirectory
+							showBlockDirectory={ showBlocks }
 							shouldFocusBlock={ shouldFocusBlock }
 						/>
 					</div>
 				) }
 				{ showAsTabs && (
 					<InserterTabs
+						showBlocks={ showBlocks }
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
