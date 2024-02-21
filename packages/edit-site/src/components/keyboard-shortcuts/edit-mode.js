@@ -15,7 +15,6 @@ import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcutsEditMode() {
-	const { getEditorMode } = useSelect( editSiteStore );
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea(
@@ -23,8 +22,6 @@ function KeyboardShortcutsEditMode() {
 			) === SIDEBAR_BLOCK,
 		[]
 	);
-	const { switchEditorMode, toggleDistractionFree } =
-		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -71,10 +68,6 @@ function KeyboardShortcutsEditMode() {
 		}
 	} );
 
-	useShortcut( 'core/edit-site/toggle-mode', () => {
-		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
-	} );
-
 	useShortcut( 'core/edit-site/transform-heading-to-paragraph', ( event ) =>
 		handleTextLevelShortcut( event, 0 )
 	);
@@ -87,10 +80,6 @@ function KeyboardShortcutsEditMode() {
 			`core/edit-site/transform-paragraph-to-heading-${ level }`,
 			( event ) => handleTextLevelShortcut( event, level )
 		);
-	} );
-
-	useShortcut( 'core/edit-site/toggle-distraction-free', () => {
-		toggleDistractionFree();
 	} );
 
 	return null;

@@ -331,36 +331,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
-	const preferredStyleVariations =
-		blockEditorSettings?.__experimentalPreferredStyleVariations?.value ??
-		{};
-	return blocks.map( ( block ) => {
-		const blockName = block.name;
-		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
-			return block;
-		}
-		if ( ! preferredStyleVariations[ blockName ] ) {
-			return block;
-		}
-		const className = block.attributes?.className;
-		if ( className?.includes( 'is-style-' ) ) {
-			return block;
-		}
-		const { attributes = {} } = block;
-		const blockStyle = preferredStyleVariations[ blockName ];
-		return {
-			...block,
-			attributes: {
-				...attributes,
-				className: `${
-					className || ''
-				} is-style-${ blockStyle }`.trim(),
-			},
-		};
-	} );
-}
-
 /* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
@@ -378,10 +348,7 @@ export const replaceBlocks =
 	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
-		blocks = getBlocksWithDefaultStylesApplied(
-			castArray( blocks ),
-			select.getSettings()
-		);
+		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
 		for ( let index = 0; index < blocks.length; index++ ) {
@@ -594,10 +561,7 @@ export const insertBlocks =
 			);
 		}
 
-		blocks = getBlocksWithDefaultStylesApplied(
-			castArray( blocks ),
-			select.getSettings()
-		);
+		blocks = castArray( blocks );
 		const allowedBlocks = [];
 		for ( const block of blocks ) {
 			const isValid = select.canInsertBlockType(

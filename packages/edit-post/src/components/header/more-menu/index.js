@@ -9,14 +9,17 @@ import {
 	PinnedItems,
 } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import ModeSwitcher from '../mode-switcher';
 import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import WritingMenu from '../writing-menu';
+import { unlock } from '../../../lock-unlock';
+
+const { ModeSwitcher } = unlock( editorPrivateApis );
 
 const MoreMenu = ( { showIconLabels } ) => {
 	const isLargeViewport = useViewportMatch( 'large' );

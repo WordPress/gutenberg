@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { cloneBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	Warning,
@@ -18,6 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useParsePatternDependencies } from './recursion-detector';
 
 const PatternEdit = ( { attributes, clientId } ) => {
+	const registry = useRegistry();
 	const selectedPattern = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__experimentalGetParsedPattern(
@@ -97,15 +98,17 @@ const PatternEdit = ( { attributes, clientId } ) => {
 					)
 				);
 				const rootEditingMode = getBlockEditingMode( rootClientId );
-				// Temporarily set the root block to default mode to allow replacing the pattern.
-				// This could happen when the page is disabling edits of non-content blocks.
-				__unstableMarkNextChangeAsNotPersistent();
-				setBlockEditingMode( rootClientId, 'default' );
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlocks( clientId, clonedBlocks );
-				// Restore the root block's original mode.
-				__unstableMarkNextChangeAsNotPersistent();
-				setBlockEditingMode( rootClientId, rootEditingMode );
+				registry.batch( () => {
+					// Temporarily set the root block to default mode to allow replacing the pattern.
+					// This could happen when the page is disabling edits of non-content blocks.
+					__unstableMarkNextChangeAsNotPersistent();
+					setBlockEditingMode( rootClientId, 'default' );
+					__unstableMarkNextChangeAsNotPersistent();
+					replaceBlocks( clientId, clonedBlocks );
+					// Restore the root block's original mode.
+					__unstableMarkNextChangeAsNotPersistent();
+					setBlockEditingMode( rootClientId, rootEditingMode );
+				} );
 			} );
 		}
 	}, [

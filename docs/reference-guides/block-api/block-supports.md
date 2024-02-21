@@ -414,20 +414,6 @@ supports: {
 }
 ```
 
-## defaultStylePicker
-
--   Type: `boolean`
--   Default value: `true`
-
-When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
-
-```js
-supports: {
-	// Remove the Default Style picker.
-	defaultStylePicker: false
-}
-```
-
 ## dimensions
 
 _**Note:** Since WordPress 6.2._
@@ -544,6 +530,21 @@ supports: {
 	inserter: false
 }
 ```
+
+## interactivity
+
+-   Type: `boolean` or `object`
+-   Default value: `false`
+-   Subproperties:
+    -   `clientNavigation`: type `boolean`, default value `false`
+    -   `interactive`: type `boolean`, default value `false`
+
+Indicates if the block is using Interactivity API features.
+
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
+Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+
+The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
 ## layout
 

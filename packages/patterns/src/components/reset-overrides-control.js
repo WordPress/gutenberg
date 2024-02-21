@@ -59,7 +59,19 @@ export default function ResetOverridesControl( props ) {
 		const blocks = editedRecord.blocks ?? parse( editedRecord.content );
 		const block = recursivelyFindBlockWithId( blocks, id );
 
-		props.setAttributes( block.attributes );
+		const newAttributes = Object.assign(
+			// Reset every existing attribute to undefined.
+			Object.fromEntries(
+				Object.keys( props.attributes ).map( ( key ) => [
+					key,
+					undefined,
+				] )
+			),
+			// Then assign the original attributes.
+			block.attributes
+		);
+
+		props.setAttributes( newAttributes );
 	};
 
 	return (

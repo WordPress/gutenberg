@@ -109,25 +109,25 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 		 * Gets a WP_Style_Engine_CSS_Rule object by its selector.
 		 * If the rule does not exist, it will be created.
 		 *
-		 * @param string $selector The CSS selector.
-		 * @param string $at_rule  The CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string $selector    The CSS selector.
+		 * @param string $rules_group A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`..
 		 *
 		 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 		 */
-		public function add_rule( $selector, $at_rule = '' ) {
-			$selector = trim( $selector );
-			$at_rule  = trim( $at_rule );
+		public function add_rule( $selector, $rules_group = '' ) {
+			$selector    = $selector ? trim( $selector ) : '';
+			$rules_group = $rules_group ? trim( $rules_group ) : '';
 
 			// Bail early if there is no selector.
 			if ( empty( $selector ) ) {
 				return;
 			}
 
-			if ( ! empty( $at_rule ) ) {
-				if ( empty( $this->rules[ "$at_rule $selector" ] ) ) {
-					$this->rules[ "$at_rule $selector" ] = new WP_Style_Engine_CSS_Rule( $selector, array(), $at_rule );
+			if ( ! empty( $rules_group ) ) {
+				if ( empty( $this->rules[ "$rules_group $selector" ] ) ) {
+					$this->rules[ "$rules_group $selector" ] = new WP_Style_Engine_CSS_Rule( $selector, array(), $rules_group );
 				}
-				return $this->rules[ "$at_rule $selector" ];
+				return $this->rules[ "$rules_group $selector" ];
 			}
 
 			// Create the rule if it doesn't exist.

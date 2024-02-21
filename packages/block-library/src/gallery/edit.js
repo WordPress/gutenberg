@@ -73,6 +73,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
 function GalleryEdit( props ) {
@@ -102,7 +103,6 @@ function GalleryEdit( props ) {
 	const {
 		getBlock,
 		getSettings,
-		preferredStyle,
 		innerBlockImages,
 		blockWasJustInserted,
 		multiGallerySelection,
@@ -115,15 +115,11 @@ function GalleryEdit( props ) {
 				getBlock: _getBlock,
 				wasBlockJustInserted,
 			} = select( blockEditorStore );
-			const preferredStyleVariations =
-				_getSettings().__experimentalPreferredStyleVariations;
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {
 				getBlock: _getBlock,
 				getSettings: _getSettings,
-				preferredStyle:
-					preferredStyleVariations?.value?.[ 'core/image' ],
 				innerBlockImages:
 					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
 				blockWasJustInserted: wasBlockJustInserted(
@@ -195,10 +191,6 @@ function GalleryEdit( props ) {
 		let newClassName;
 		if ( imageAttributes.className && imageAttributes.className !== '' ) {
 			newClassName = imageAttributes.className;
-		} else {
-			newClassName = preferredStyle
-				? `is-style-${ preferredStyle }`
-				: undefined;
 		}
 
 		let newLinkTarget;
@@ -505,6 +497,8 @@ function GalleryEdit( props ) {
 	};
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		...nativeInnerBlockProps,
