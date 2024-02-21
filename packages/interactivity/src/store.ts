@@ -15,6 +15,7 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
+import type { StoreOptions } from './types';
 
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	item && typeof item === 'object' && item.constructor === Object;
@@ -71,9 +72,11 @@ const handlers = {
 	get: ( target: any, key: string | symbol, receiver: any ) => {
 		const ns = proxyToNs.get( receiver );
 
-		// Check if the property is a getter and we are inside an scope. If that is
-		// the case, we clone the getter to avoid overwriting the scoped
-		// dependencies of the computed each time that getter runs.
+		/*
+		 * Check if the property is a getter and is inside an scope. If that is
+		 * the case, clone the getter to avoid overwriting the scoped
+		 * dependencies of the computed each time that getter runs.
+		 */
 		const getter = Object.getOwnPropertyDescriptor( target, key )?.get;
 		if ( getter ) {
 			const scope = getScope();
@@ -102,17 +105,21 @@ const handlers = {
 
 		const result = Reflect.get( target, key, receiver );
 
-		// Check if the proxy is the store root and no key with that name exist. In
-		// that case, return an empty object for the requested key.
+		/*
+		 * Check if the proxy is the store root and no key with that name exist. In
+		 * that case, return an empty object for the requested key.
+		 */
 		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
 			const obj = {};
 			Reflect.set( target, key, obj, receiver );
 			return proxify( obj, ns );
 		}
 
-		// Check if the property is a generator. If it is, we turn it into an
-		// asynchronous function where we restore the default namespace and scope
-		// each time it awaits/yields.
+		/*
+		 * Check if the property is a generator. If it is, turn it into an
+		 * asynchronous function where the default namespace and scope are restored
+		 * each time it awaits/yields.
+		 */
 		if ( result?.constructor?.name === 'GeneratorFunction' ) {
 			return async ( ...args: unknown[] ) => {
 				const scope = getScope();
@@ -144,9 +151,11 @@ const handlers = {
 			};
 		}
 
-		// Check if the property is a synchronous function. If it is, set the
-		// default namespace. Synchronous functions always run in the proper scope,
-		// which is set by the Directives component.
+		/*
+		 * Check if the property is a synchronous function. If it is, set the
+		 * default namespace. Synchronous functions always run in the proper scope,
+		 * which is set by the Directives component.
+		 */
 		if ( typeof result === 'function' ) {
 			return ( ...args: unknown[] ) => {
 				setNamespace( ns );
@@ -173,34 +182,6 @@ const handlers = {
  */
 export const getConfig = ( namespace: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
-
-interface StoreOptions {
-	/**
-	 * Property to block/unblock private store namespaces.
-	 *
-	 * If the passed value is `true`, it blocks the given namespace, making it
-	 * accessible only trough the returned variables of the `store()` call. In
-	 * the case a lock string is passed, it also blocks the namespace, but can
-	 * be unblocked for other `store()` calls using the same lock string.
-	 *
-	 * @example
-	 * ```
-	 * // The store can only be accessed where the `state` const can.
-	 * const { state } = store( 'myblock/private', { ... }, { lock: true } );
-	 * ```
-	 *
-	 * @example
-	 * ```
-	 * // Other modules knowing `SECRET_LOCK_STRING` can access the namespace.
-	 * const { state } = store(
-	 *   'myblock/private',
-	 *   { ... },
-	 *   { lock: 'SECRET_LOCK_STRING' }
-	 * );
-	 * ```
-	 */
-	lock?: boolean | string;
-}
 
 const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
@@ -268,9 +249,11 @@ export function store(
 	{ lock = false }: StoreOptions = {}
 ) {
 	if ( ! stores.has( namespace ) ) {
-		// Lock the store if the passed lock is different from the universal
-		// unlock. Once the lock is set (either false, true, or a given string),
-		// it cannot change.
+		/*
+		 * Lock the store if the passed lock is different from the universal
+		 * unlock. Once the lock is set (either false, true, or a given string),
+		 * it cannot change.
+		 */
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
@@ -280,9 +263,11 @@ export function store(
 		stores.set( namespace, proxiedStore );
 		proxyToNs.set( proxiedStore, namespace );
 	} else {
-		// Lock the store if it wasn't locked yet and the passed lock is
-		// different from the universal unlock. If no lock is given, the store
-		// will be public and won't accept any lock from now on.
+		/*
+		 * Lock the store if it wasn't locked yet and the passed lock is
+		 * different from the universal unlock. If no lock is given, the store
+		 * will be public and won't accept any lock from now on.
+		 */
 		if ( lock !== universalUnlock && ! storeLocks.has( namespace ) ) {
 			storeLocks.set( namespace, lock );
 		} else {

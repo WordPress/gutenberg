@@ -11,7 +11,7 @@ import { directivePrefix } from './constants';
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
-export const getRegionRootFragment = ( region ) => {
+export const getRegionRootFragment = ( region: Node ): Node => {
 	if ( ! regionRootFragments.has( region ) ) {
 		regionRootFragments.set(
 			region,
@@ -21,7 +21,7 @@ export const getRegionRootFragment = ( region ) => {
 	return regionRootFragments.get( region );
 };
 
-function yieldToMain() {
+function yieldToMain(): Promise< void > {
 	return new Promise( ( resolve ) => {
 		// TODO: Use scheduler.yield() when available.
 		setTimeout( resolve, 0 );
@@ -32,12 +32,12 @@ function yieldToMain() {
 export const initialVdom = new WeakMap();
 
 // Initialize the router with the initial DOM.
-export const init = async () => {
-	const nodes = document.querySelectorAll(
+export const init = async (): Promise< void > => {
+	const nodes: NodeListOf< Element > = document.querySelectorAll(
 		`[data-${ directivePrefix }-interactive]`
 	);
-
-	for ( const node of nodes ) {
+	const nodesArray: Element[] = Array.from( nodes );
+	for ( const node of nodesArray ) {
 		if ( ! hydratedIslands.has( node ) ) {
 			await yieldToMain();
 			const fragment = getRegionRootFragment( node );

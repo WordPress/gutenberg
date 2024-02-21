@@ -33,8 +33,10 @@ test.describe( 'Directives (w/ priority)', () => {
 			'from context'
 		);
 
-		// Check that text value is correctly received from Provider, and text
-		// wrapped with an element with `data-testid=text`.
+		/*
+		 * Check that text value is correctly received from Provider, and text
+		 * wrapped with an element with `data-testid=text`.
+		 */
 		const text = element.getByTestId( 'text' );
 		await expect( text ).toHaveText( 'from context' );
 	} );
@@ -54,10 +56,12 @@ test.describe( 'Directives (w/ priority)', () => {
 			name: 'Update text',
 		} );
 
-		// Modify `attribute` inside context. This triggers a re-render for the
-		// component that wraps the `attribute` directive, evaluating it again.
-		// Nested components are re-rendered as well, so their directives are
-		// also re-evaluated (note how `text` and `children` have run).
+		/*
+		 * Modify `attribute` inside context. This triggers a re-render for the
+		 * component that wraps the `attribute` directive, evaluating it again.
+		 * Nested components are re-rendered as well, so their directives are
+		 * also re-evaluated (note how `text` and `children` have run).
+		 */
 		await updateAttribute.click();
 		await expect( element ).toHaveAttribute( 'data-attribute', 'updated' );
 		await expect( executionOrder ).toHaveText(
@@ -67,9 +71,11 @@ test.describe( 'Directives (w/ priority)', () => {
 			].join( ', ' )
 		);
 
-		// Modify `text` inside context. This triggers a re-render of the
-		// component that wraps the `text` directive. In this case, only
-		// `children` run as well, right after `text`.
+		/*
+		 * Modify `text` inside context. This triggers a re-render of the
+		 * component that wraps the `text` directive. In this case, only
+		 * `children` run as well, right after `text`.
+		 */
 		await updateText.click();
 		await expect( element ).toHaveAttribute( 'data-attribute', 'updated' );
 		await expect( text ).toHaveText( 'updated' );

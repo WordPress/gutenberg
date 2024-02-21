@@ -10,86 +10,19 @@ import {
 	cloneElement,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context, RefObject } from 'preact';
+import type { VNode } from 'preact';
 
 /**
  * Internal dependencies
  */
 import { stores } from './store';
-interface DirectiveEntry {
-	value: string | Object;
-	namespace: string;
-	suffix: string;
-}
-
-type DirectiveEntries = Record< string, DirectiveEntry[] >;
-
-interface DirectiveArgs {
-	/**
-	 * Object map with the defined directives of the element being evaluated.
-	 */
-	directives: DirectiveEntries;
-	/**
-	 * Props present in the current element.
-	 */
-	props: Object;
-	/**
-	 * Virtual node representing the element.
-	 */
-	element: VNode;
-	/**
-	 * The inherited context.
-	 */
-	context: Context< any >;
-	/**
-	 * Function that resolves a given path to a value either in the store or the
-	 * context.
-	 */
-	evaluate: Evaluate;
-}
-
-interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | void;
-}
-
-interface DirectiveOptions {
-	/**
-	 * Value that specifies the priority to evaluate directives of this type.
-	 * Lower numbers correspond with earlier execution.
-	 *
-	 * @default 10
-	 */
-	priority?: number;
-}
-
-interface Scope {
-	evaluate: Evaluate;
-	context: Context< any >;
-	ref: RefObject< HTMLElement >;
-	attributes: createElement.JSX.HTMLAttributes;
-}
-
-interface Evaluate {
-	( entry: DirectiveEntry, ...args: any[] ): any;
-}
-
-interface GetEvaluate {
-	( args: { scope: Scope } ): Evaluate;
-}
-
-type PriorityLevel = string[];
-
-interface GetPriorityLevels {
-	( directives: DirectiveEntries ): PriorityLevel[];
-}
-
-interface DirectivesProps {
-	directives: DirectiveEntries;
-	priorityLevels: PriorityLevel[];
-	element: VNode;
-	originalProps: any;
-	previousScope?: Scope;
-}
+import type {
+	DirectiveCallback,
+	DirectiveOptions,
+	DirectivesProps,
+	GetPriorityLevels,
+	Scope,
+} from './types';
 
 // Main context.
 const context = createContext< any >( {} );
@@ -117,8 +50,10 @@ const deepImmutable = < T extends Object = {} >( target: T ): T => {
 	return immutableMap.get( target );
 };
 
-// Store stacks for the current scope and the default namespaces and export APIs
-// to interact with them.
+/*
+ * Store stacks for the current scope and the default namespaces and export APIs
+ * to interact with them.
+ */
 const scopeStack: Scope[] = [];
 const namespaceStack: string[] = [];
 
@@ -154,21 +89,22 @@ export const getElement = () => {
 	} );
 };
 
-export const getScope = () => scopeStack.slice( -1 )[ 0 ];
+export const getScope = (): Scope | undefined => scopeStack.slice( -1 )[ 0 ];
 
-export const setScope = ( scope: Scope ) => {
+export const setScope = ( scope: Scope ): void => {
 	scopeStack.push( scope );
 };
-export const resetScope = () => {
+export const resetScope = (): void => {
 	scopeStack.pop();
 };
 
-export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
+export const getNamespace = (): string | undefined =>
+	namespaceStack.slice( -1 )[ 0 ];
 
-export const setNamespace = ( namespace: string ) => {
+export const setNamespace = ( namespace: string ): void => {
 	namespaceStack.push( namespace );
 };
-export const resetNamespace = () => {
+export const resetNamespace = (): void => {
 	namespaceStack.pop();
 };
 
@@ -268,7 +204,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-export const getEvaluate: GetEvaluate =
+export const getEvaluate: any =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
@@ -285,8 +221,10 @@ export const getEvaluate: GetEvaluate =
 		return hasNegationOperator ? ! result : result;
 	};
 
-// Separate directives by priority. The resulting array contains objects
-// of directives grouped by same priority, and sorted in ascending order.
+/*
+ * Separate directives by priority. The resulting array contains objects
+ * of directives grouped by same priority, and sorted in ascending order.
+ */
 const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 	const byPriority = Object.keys( directives ).reduce<
 		Record< number, string[] >
@@ -311,9 +249,11 @@ const Directives = ( {
 	originalProps,
 	previousScope,
 }: DirectivesProps ) => {
-	// Initialize the scope of this element. These scopes are different per each
-	// level because each level has a different context, but they share the same
-	// element ref, state and props.
+	/*
+	 * Initialize the scope of this element. These scopes are different per each
+	 * level because each level has a different context, but they share the same
+	 * element ref, state and props.
+	 */
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
 	scope.context = useContext( context );
@@ -321,8 +261,10 @@ const Directives = ( {
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a fresh copy of the vnode element and add the props to the scope,
-	// named as attributes (HTML Attributes).
+	/*
+	 * Create a fresh copy of the vnode element and add the props to the scope,
+	 * named as attributes (HTML Attributes).
+	 */
 	element = cloneElement( element, { ref: scope.ref } );
 	scope.attributes = element.props;
 

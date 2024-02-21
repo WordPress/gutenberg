@@ -5,6 +5,7 @@
  */
 import { h as createElement } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
+import type { DeepSignal } from 'deepsignal';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -13,11 +14,44 @@ import { deepSignal, peek } from 'deepsignal';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
+import type { DirectiveArgs } from './types';
 
-const isObject = ( item ) =>
+/**
+ * Checks if the provided item is an object and not an array.
+ *
+ * @param item The item to check.
+ *
+ * @return Whether the item is an object.
+ *
+ * @example
+ * isObject({}); // returns true
+ * isObject([]); // returns false
+ * isObject('string'); // returns false
+ * isObject(null); // returns false
+ */
+const isObject = ( item: any ): boolean =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
-const mergeDeepSignals = ( target, source, overwrite ) => {
+/**
+ * Recursively merges properties from the source object into the target object.
+ * If `overwrite` is true, existing properties in the target object are overwritten by properties in the source object with the same key.
+ * If `overwrite` is false, existing properties in the target object are preserved.
+ *
+ * @param target    - The target object that properties are merged into.
+ * @param source    - The source object that properties are merged from.
+ * @param overwrite - Whether to overwrite existing properties in the target object.
+ *
+ * @example
+ * const target = { $key1: { peek: () => ({ a: 1 }) }, $key2: { peek: () => ({ b: 2 }) } };
+ * const source = { $key1: { peek: () => ({ a: 3 }) }, $key3: { peek: () => ({ c: 3 }) } };
+ * mergeDeepSignals(target, source, true);
+ * // target is now { $key1: { peek: () => ({ a: 3 }) }, $key2: { peek: () => ({ b: 2 }) }, $key3: { peek: () => ({ c: 3 }) } }
+ */
+const mergeDeepSignals = (
+	target: DeepSignal< any >,
+	source: DeepSignal< any >,
+	overwrite?: boolean
+) => {
 	for ( const k in source ) {
 		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
@@ -43,10 +77,10 @@ const empty = ' ';
  * Made by Cristian Bote (@cristianbote) for Goober.
  * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
  *
- * @param {string} val CSS string.
- * @return {Object} CSS object.
+ * @param val CSS string.
+ * @return CSS object.
  */
-const cssStringToObject = ( val ) => {
+const cssStringToObject = ( val: string ): Object => {
 	const tree = [ {} ];
 	let block, left;
 
@@ -70,22 +104,21 @@ const cssStringToObject = ( val ) => {
  * Creates a directive that adds an event listener to the global window or
  * document object.
  *
- * @param {string} type 'window' or 'document'
- * @return {void}
+ * @param type 'window' or 'document'
  */
 const getGlobalEventDirective =
-	( type ) =>
-	( { directives, evaluate } ) => {
+	( type: 'window' | 'document' ) =>
+	( { directives, evaluate }: DirectiveArgs ): void => {
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
 				useInit( () => {
-					const cb = ( event ) => evaluate( entry, event );
+					const cb = ( event: Event ) => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
 					globalVar.addEventListener( entry.suffix, cb );
 					return () =>
 						globalVar.removeEventListener( entry.suffix, cb );
-				}, [] );
+				} );
 			} );
 	};
 
@@ -121,6 +154,7 @@ export default () => {
 					</Provider>
 				);
 			}
+			return undefined;
 		},
 		{ priority: 5 }
 	);
@@ -195,7 +229,7 @@ export default () => {
 		}
 	);
 
-	// data-wp-style--[style-prop]
+	// data-wp-style--[style-key]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style
 			.filter( ( { suffix } ) => suffix !== 'default' )
