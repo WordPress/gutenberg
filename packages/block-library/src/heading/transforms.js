@@ -24,8 +24,8 @@ const transforms = {
 							textAlign,
 							metadata: getTransformedMetadata(
 								metadata,
-								[ 'id', 'name', 'bindings' ],
-								{ content: 'content' }
+								'core/paragraph',
+								'core/heading'
 							),
 						} )
 				),
@@ -95,8 +95,8 @@ const transforms = {
 						align,
 						metadata: getTransformedMetadata(
 							metadata,
-							[ 'id', 'name', 'bindings' ],
-							{ content: 'content' }
+							'core/heading',
+							'core/paragraph'
 						),
 					} )
 				),

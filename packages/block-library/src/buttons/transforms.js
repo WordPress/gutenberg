@@ -51,8 +51,8 @@ const transforms = {
 							url,
 							metadata: getTransformedMetadata(
 								metadata,
-								[ 'id', 'name', 'bindings' ],
-								{ content: 'text' }
+								'core/paragraph',
+								'core/button'
 							),
 						} );
 					} )
