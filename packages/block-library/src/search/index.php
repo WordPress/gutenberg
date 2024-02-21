@@ -165,11 +165,11 @@ function render_block_core_search( $attributes ) {
 				if ( ! empty( $font_size_presets_from_origin ) ) {
 					$font_size_preset_index = array_search( $attributes['fontSize'], array_column( $font_size_presets_from_origin, 'slug' ) );
 					if ( isset( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] ) ) {
-						$icon_dimensions = $font_size_presets_from_origin[ $font_size_preset_index ]['size'];
+						$icon_dimensions = esc_attr( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] );
 					}
 				}
 			} elseif ( $search_block_font_size ) {
-				$icon_dimensions = $search_block_font_size;
+				$icon_dimensions = esc_attr( $search_block_font_size );
 			}
 
 			$button_internal_markup =
