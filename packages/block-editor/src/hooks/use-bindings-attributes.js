@@ -44,7 +44,7 @@ export function canBindBlock( blockName ) {
 
 /**
  * Based on the given block name and attribute name,
- * check if it is possible to bind the block.
+ * check if it is possible to bind the block attribute.
  *
  * @param {string} blockName     - The block name.
  * @param {string} attributeName - The attribute name.
