@@ -42,15 +42,14 @@ const DEFAULT_CATEGORY = {
 	slug: 'all',
 	name: _x( 'All', 'font categories' ),
 };
+
+const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
+
 function FontCollection( { slug } ) {
 	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
-		return (
-			window.localStorage.getItem(
-				'wp-font-library-google-fonts-permission'
-			) === 'true'
-		);
+		return window.localStorage.getItem( LOCAL_STORAGE_ITEM ) === 'true';
 	};
 
 	const [ selectedFont, setSelectedFont ] = useState( null );
@@ -78,10 +77,7 @@ function FontCollection( { slug } ) {
 	}, [ slug, requiresPermission ] );
 
 	const revokeAccess = () => {
-		window.localStorage.setItem(
-			'wp-font-library-google-fonts-permission',
-			'false'
-		);
+		window.localStorage.setItem( LOCAL_STORAGE_ITEM, 'false' );
 		window.dispatchEvent( new Event( 'storage' ) );
 	};
 
@@ -232,9 +228,11 @@ function FontCollection( { slug } ) {
 		);
 	}
 
-	let actionsComponent = null;
-	if ( ! renderConfirmDialog && ! selectedFont ) {
-		actionsComponent = (
+	const ActionsComponent = () => {
+		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
+			return null;
+		}
+		return (
 			<DropdownMenu
 				icon={ moreVertical }
 				label={ __( 'Actions' ) }
@@ -249,14 +247,14 @@ function FontCollection( { slug } ) {
 				] }
 			/>
 		);
-	}
+	};
 
 	return (
 		<TabPanelLayout
 			title={
 				! selectedFont ? selectedCollection.name : selectedFont.name
 			}
-			actions={ actionsComponent }
+			actions={ <ActionsComponent /> }
 			description={
 				! selectedFont
 					? selectedCollection.description
