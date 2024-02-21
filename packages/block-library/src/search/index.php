@@ -133,7 +133,13 @@ function render_block_core_search( $attributes ) {
 		} else {
 			$button_classes[]       = 'has-icon';
 			$icon_dimensions        = '24';
-			$search_block_font_size = wp_get_global_styles( array( 'typography', 'fontSize' ), array( 'block_name' => 'core/search', 'transforms' => array( 'resolve-variables' ) ) );
+			$search_block_font_size = wp_get_global_styles(
+				array( 'typography', 'fontSize' ),
+				array(
+					'block_name' => 'core/search',
+					'transforms' => array( 'resolve-variables' ),
+				)
+			);
 
 			if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
 				$icon_dimensions = esc_attr( $attributes['style']['typography']['fontSize'] );
