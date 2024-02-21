@@ -3,7 +3,7 @@
  */
 import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { select, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
@@ -144,7 +144,7 @@ const BindingConnector = ( {
 };
 
 function BlockBindingBridge( { bindings, props } ) {
-	const { getBlockBindingsSource } = useSelect( () => {
+	const { getBlockBindingsSource } = useSelect( ( select ) => {
 		return {
 			getBlockBindingsSource: unlock( select( blockEditorStore ) )
 				.getBlockBindingsSource,
