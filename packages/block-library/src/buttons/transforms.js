@@ -51,8 +51,10 @@ const transforms = {
 							url,
 							metadata: getTransformedMetadata(
 								metadata,
-								'core/paragraph',
-								'core/button'
+								'core/button',
+								( { content: contentBinding } ) => ( {
+									text: contentBinding,
+								} )
 							),
 						} );
 					} )

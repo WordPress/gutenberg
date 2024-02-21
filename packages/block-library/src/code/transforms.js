@@ -22,11 +22,7 @@ const transforms = {
 			transform: ( { content, metadata } ) =>
 				createBlock( 'core/code', {
 					content,
-					metadata: getTransformedMetadata(
-						metadata,
-						'core/paragraph',
-						'core/code'
-					),
+					metadata: getTransformedMetadata( metadata, 'core/code' ),
 				} ),
 		},
 		{
@@ -37,11 +33,7 @@ const transforms = {
 					// The HTML is plain text (with plain line breaks), so
 					// convert it to rich text.
 					content: toHTMLString( { value: create( { text } ) } ),
-					metadata: getTransformedMetadata(
-						metadata,
-						'core/html',
-						'core/code'
-					),
+					metadata: getTransformedMetadata( metadata, 'core/code' ),
 				} );
 			},
 		},
@@ -73,7 +65,6 @@ const transforms = {
 					content,
 					metadata: getTransformedMetadata(
 						metadata,
-						'core/code',
 						'core/paragraph'
 					),
 				} ),
