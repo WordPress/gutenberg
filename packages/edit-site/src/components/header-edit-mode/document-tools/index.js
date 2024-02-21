@@ -3,7 +3,10 @@
  */
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
