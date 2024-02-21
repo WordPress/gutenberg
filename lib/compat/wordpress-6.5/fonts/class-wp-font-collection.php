@@ -261,25 +261,25 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 							'preview'    => 'sanitize_url',
 							'fontFace'   => array(
 								array(
-									'fontFamily'            => 'sanitize_text_field',
-									'fontStyle'             => 'sanitize_text_field',
-									'fontWeight'            => 'sanitize_text_field',
-									'src'                   => static function ( $value ) {
+									'fontFamily'          => 'sanitize_text_field',
+									'fontStyle'           => 'sanitize_text_field',
+									'fontWeight'          => 'sanitize_text_field',
+									'src'                 => static function ( $value ) {
 										return is_array( $value )
 											? array_map( 'sanitize_text_field', $value )
 											: sanitize_text_field( $value );
 									},
-									'preview'               => 'sanitize_url',
-									'fontDisplay'           => 'sanitize_text_field',
-									'fontStretch'           => 'sanitize_text_field',
-									'ascentOverride'        => 'sanitize_text_field',
-									'descentOverride'       => 'sanitize_text_field',
-									'fontVariant'           => 'sanitize_text_field',
-									'fontFeatureSettings'   => 'sanitize_text_field',
+									'preview'             => 'sanitize_url',
+									'fontDisplay'         => 'sanitize_text_field',
+									'fontStretch'         => 'sanitize_text_field',
+									'ascentOverride'      => 'sanitize_text_field',
+									'descentOverride'     => 'sanitize_text_field',
+									'fontVariant'         => 'sanitize_text_field',
+									'fontFeatureSettings' => 'sanitize_text_field',
 									'fontVariationSettings' => 'sanitize_text_field',
-									'lineGapOverride'       => 'sanitize_text_field',
-									'sizeAdjust'            => 'sanitize_text_field',
-									'unicodeRange'          => 'sanitize_text_field',
+									'lineGapOverride'     => 'sanitize_text_field',
+									'sizeAdjust'          => 'sanitize_text_field',
+									'unicodeRange'        => 'sanitize_text_field',
 								),
 							),
 						),
