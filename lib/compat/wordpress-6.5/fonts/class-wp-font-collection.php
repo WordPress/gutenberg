@@ -48,28 +48,32 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param string       $slug         Font collection slug.
-		 * @param array|string $data_or_file Font collection data array or a path/URL to a JSON file
-		 *                                   containing the font collection.
-		 *                                   See {@see wp_register_font_collection()} for the supported fields.
+		 * @param string $slug Font collection slug. May only contain alphanumeric characters, dashes,
+		 *                     and underscores. See sanitize_title().
+		 * @param array  $args Font collection data. See wp_register_font_collection() for information on accepted arguments.
 		 */
-		public function __construct( $slug, $data_or_file ) {
+		public function __construct( string $slug, array $args ) {
 			$this->slug = sanitize_title( $slug );
 			if ( $this->slug !== $slug ) {
 				_doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: Font collection slug. */
-					sprintf( __( 'Font collection slug "%s" is not valid. Slugs must use only alphanumeric characters, dashes, and underscores.', 'gutenberg' ), $slug ),
+					sprintf( __( 'Font collection slug "%s" is not valid. Slugs must use only alphanumeric characters, dashes, and underscores.' ), $slug ),
 					'6.5.0'
 				);
 			}
 
-			if ( is_array( $data_or_file ) ) {
-				$this->data = $this->sanitize_and_validate_data( $data_or_file );
-			} else {
+			$required_properties = array( 'name', 'font_families' );
+
+			if ( isset( $args['font_families'] ) && is_string( $args['font_families'] ) ) {
 				// JSON data is lazy loaded by ::get_data().
-				$this->src = $data_or_file;
+				$this->src = $args['font_families'];
+				unset( $args['font_families'] );
+
+				$required_properties = array( 'name' );
 			}
+
+			$this->data = $this->sanitize_and_validate_data( $args, $required_properties );
 		}
 
 		/**
@@ -80,8 +84,12 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 * @return array|WP_Error An array containing the font collection data, or a WP_Error on failure.
 		 */
 		public function get_data() {
+			if ( is_wp_error( $this->data ) ) {
+				return $this->data;
+			}
+
 			// If the collection uses JSON data, load it and cache the data/error.
-			if ( $this->src && empty( $this->data ) ) {
+			if ( isset( $this->src ) ) {
 				$this->data = $this->load_from_json( $this->src );
 			}
 
@@ -113,12 +121,31 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 
 			if ( ! $url && ! $file ) {
 				// translators: %s: File path or URL to font collection JSON file.
-				$message = __( 'Font collection JSON file is invalid or does not exist.', 'gutenberg' );
+				$message = __( 'Font collection JSON file is invalid or does not exist.' );
 				_doing_it_wrong( __METHOD__, $message, '6.5.0' );
 				return new WP_Error( 'font_collection_json_missing', $message );
 			}
 
-			return $url ? $this->load_from_url( $url ) : $this->load_from_file( $file );
+			$data = $url ? $this->load_from_url( $url ) : $this->load_from_file( $file );
+
+			if ( is_wp_error( $data ) ) {
+				return $data;
+			}
+
+			$data = array(
+				'name'          => $this->data['name'],
+				'font_families' => $data['font_families'],
+			);
+
+			if ( isset( $this->data['description'] ) ) {
+				$data['description'] = $this->data['description'];
+			}
+
+			if ( isset( $this->data['categories'] ) ) {
+				$data['categories'] = $this->data['categories'];
+			}
+
+			return $data;
 		}
 
 		/**
@@ -133,10 +160,10 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		private function load_from_file( $file ) {
 			$data = wp_json_file_decode( $file, array( 'associative' => true ) );
 			if ( empty( $data ) ) {
-				return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection JSON file contents.', 'gutenberg' ) );
+				return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection JSON file contents.' ) );
 			}
 
-			return $this->sanitize_and_validate_data( $data );
+			return $this->sanitize_and_validate_data( $data, array( 'font_families' ) );
 		}
 
 		/**
@@ -156,17 +183,23 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 			if ( false === $data ) {
 				$response = wp_safe_remote_get( $url );
 				if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-					// translators: %s: Font collection URL.
-					return new WP_Error( 'font_collection_request_error', sprintf( __( 'Error fetching the font collection data from "%s".', 'gutenberg' ), $url ) );
+					return new WP_Error(
+						'font_collection_request_error',
+						sprintf(
+							// translators: %s: Font collection URL.
+							__( 'Error fetching the font collection data from "%s".' ),
+							$url
+						)
+					);
 				}
 
 				$data = json_decode( wp_remote_retrieve_body( $response ), true );
 				if ( empty( $data ) ) {
-					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the HTTP response JSON.', 'gutenberg' ) );
+					return new WP_Error( 'font_collection_decode_error', __( 'Error decoding the font collection data from the HTTP response JSON.' ) );
 				}
 
 				// Make sure the data is valid before storing it in a transient.
-				$data = $this->sanitize_and_validate_data( $data );
+				$data = $this->sanitize_and_validate_data( $data, array( 'font_families' ) );
 				if ( is_wp_error( $data ) ) {
 					return $data;
 				}
@@ -182,19 +215,19 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $data Font collection data to sanitize and validate.
+		 * @param array $data                Font collection data to sanitize and validate.
+		 * @param array $required_properties Required properties that must exist in the passed data.
 		 * @return array|WP_Error Sanitized data if valid, otherwise a WP_Error instance.
 		 */
-		private function sanitize_and_validate_data( $data ) {
+		private function sanitize_and_validate_data( $data, $required_properties = array() ) {
 			$schema = self::get_sanitization_schema();
 			$data   = WP_Font_Utils::sanitize_from_schema( $data, $schema );
 
-			$required_properties = array( 'name', 'font_families' );
 			foreach ( $required_properties as $property ) {
 				if ( empty( $data[ $property ] ) ) {
 					$message = sprintf(
-					// translators: 1: Font collection slug, 2: Missing property name, e.g. "font_families".
-						__( 'Font collection "%1$s" has missing or empty property: "%2$s".', 'gutenberg' ),
+						// translators: 1: Font collection slug, 2: Missing property name, e.g. "font_families".
+						__( 'Font collection "%1$s" has missing or empty property: "%2$s".' ),
 						$this->slug,
 						$property
 					);
@@ -228,25 +261,25 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 							'preview'    => 'sanitize_url',
 							'fontFace'   => array(
 								array(
-									'fontFamily'          => 'sanitize_text_field',
-									'fontStyle'           => 'sanitize_text_field',
-									'fontWeight'          => 'sanitize_text_field',
-									'src'                 => static function ( $value ) {
+									'fontFamily'            => 'sanitize_text_field',
+									'fontStyle'             => 'sanitize_text_field',
+									'fontWeight'            => 'sanitize_text_field',
+									'src'                   => static function ( $value ) {
 										return is_array( $value )
 											? array_map( 'sanitize_text_field', $value )
 											: sanitize_text_field( $value );
 									},
-									'preview'             => 'sanitize_url',
-									'fontDisplay'         => 'sanitize_text_field',
-									'fontStretch'         => 'sanitize_text_field',
-									'ascentOverride'      => 'sanitize_text_field',
-									'descentOverride'     => 'sanitize_text_field',
-									'fontVariant'         => 'sanitize_text_field',
-									'fontFeatureSettings' => 'sanitize_text_field',
+									'preview'               => 'sanitize_url',
+									'fontDisplay'           => 'sanitize_text_field',
+									'fontStretch'           => 'sanitize_text_field',
+									'ascentOverride'        => 'sanitize_text_field',
+									'descentOverride'       => 'sanitize_text_field',
+									'fontVariant'           => 'sanitize_text_field',
+									'fontFeatureSettings'   => 'sanitize_text_field',
 									'fontVariationSettings' => 'sanitize_text_field',
-									'lineGapOverride'     => 'sanitize_text_field',
-									'sizeAdjust'          => 'sanitize_text_field',
-									'unicodeRange'        => 'sanitize_text_field',
+									'lineGapOverride'       => 'sanitize_text_field',
+									'sizeAdjust'            => 'sanitize_text_field',
+									'unicodeRange'          => 'sanitize_text_field',
 								),
 							),
 						),
