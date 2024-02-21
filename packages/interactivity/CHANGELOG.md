@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
+
 ## 5.0.0 (2024-02-09)
 
 ### New Features

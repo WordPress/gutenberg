@@ -51,15 +51,13 @@ At this point you should be able to insert the "My First Interactive Block" bloc
 
 To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) and some specific code in your block, which should include:
 
-#### A local WordPress installation
+#### A local 6.5 WordPress installation
 
 You can use [the tools to set your local WordPress environment](https://developer.wordpress.org/block-editor/getting-started/devenv/#wordpress-development-site) you feel more comfortable with.
 
 To get quickly started, [`wp-now`](https://www.npmjs.com/package/@wp-now/wp-now) is the easiest way to get a WordPress site up and running locally.
 
-#### Latest vesion of Gutenberg
-
-The Interactivity API is currently only available as an experimental feature from Gutenberg, so you'll need to have Gutenberg 17.5 or higher version installed and activated in your WordPress installation.
+Interactivity API is included in Core in WordPress 6.5, for versions below, you'll need to have Gutenberg 17.5 or higher version installed and activated in your WordPress installation.
 
 #### Node.js
 
