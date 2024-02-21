@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useReducer,
 	useLayoutEffect,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -28,7 +29,6 @@ function BlockPopover(
 		clientId,
 		bottomClientId,
 		children,
-		__unstableRefreshSize,
 		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
@@ -74,30 +74,6 @@ function BlockPopover(
 			observer.disconnect();
 		};
 	}, [ selectedElement ] );
-
-	const style = useMemo( () => {
-		if (
-			// popoverDimensionsRecomputeCounter is by definition always equal or greater
-			// than 0. This check is only there to satisfy the correctness of the
-			// exhaustive-deps rule for the `useMemo` hook.
-			popoverDimensionsRecomputeCounter < 0 ||
-			! selectedElement ||
-			lastSelectedElement !== selectedElement
-		) {
-			return {};
-		}
-
-		return {
-			position: 'absolute',
-			width: selectedElement.offsetWidth,
-			height: selectedElement.offsetHeight,
-		};
-	}, [
-		selectedElement,
-		lastSelectedElement,
-		__unstableRefreshSize,
-		popoverDimensionsRecomputeCounter,
-	] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -155,6 +131,9 @@ function BlockPopover(
 		return null;
 	}
 
+	const shouldCoverTarget =
+		__unstableCoverTarget && lastSelectedElement === selectedElement;
+
 	return (
 		<Popover
 			ref={ mergedRefs }
@@ -176,10 +155,39 @@ function BlockPopover(
 			) }
 			variant="unstyled"
 		>
-			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
-			{ ! __unstableCoverTarget && children }
+			{ shouldCoverTarget ? (
+				<CoverTargetContainer selectedElement={ selectedElement }>
+					{ children }
+				</CoverTargetContainer>
+			) : (
+				children
+			) }
 		</Popover>
 	);
+}
+
+function CoverTargetContainer( { selectedElement, children } ) {
+	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
+	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
+
+	useLayoutEffect( () => {
+		const observer = new window.ResizeObserver( () => {
+			setWidth( selectedElement.offsetWidth );
+			setHeight( selectedElement.offsetHeight );
+		} );
+		observer.observe( selectedElement, { box: 'border-box' } );
+		return () => observer.disconnect();
+	}, [ selectedElement ] );
+
+	const style = useMemo( () => {
+		return {
+			position: 'absolute',
+			width,
+			height,
+		};
+	}, [ width, height ] );
+
+	return <div style={ style }>{ children }</div>;
 }
 
 export default forwardRef( BlockPopover );
