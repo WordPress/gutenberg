@@ -13,7 +13,6 @@ import {
 	useMemo,
 	useReducer,
 	useLayoutEffect,
-	useState,
 } from '@wordpress/element';
 
 /**
@@ -29,7 +28,6 @@ function BlockPopover(
 		clientId,
 		bottomClientId,
 		children,
-		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
 		shift = true,
@@ -131,9 +129,6 @@ function BlockPopover(
 		return null;
 	}
 
-	const shouldCoverTarget =
-		__unstableCoverTarget && lastSelectedElement === selectedElement;
-
 	return (
 		<Popover
 			ref={ mergedRefs }
@@ -155,39 +150,9 @@ function BlockPopover(
 			) }
 			variant="unstyled"
 		>
-			{ shouldCoverTarget ? (
-				<CoverTargetContainer selectedElement={ selectedElement }>
-					{ children }
-				</CoverTargetContainer>
-			) : (
-				children
-			) }
+			{ children }
 		</Popover>
 	);
-}
-
-function CoverTargetContainer( { selectedElement, children } ) {
-	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
-	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
-
-	useLayoutEffect( () => {
-		const observer = new window.ResizeObserver( () => {
-			setWidth( selectedElement.offsetWidth );
-			setHeight( selectedElement.offsetHeight );
-		} );
-		observer.observe( selectedElement, { box: 'border-box' } );
-		return () => observer.disconnect();
-	}, [ selectedElement ] );
-
-	const style = useMemo( () => {
-		return {
-			position: 'absolute',
-			width,
-			height,
-		};
-	}, [ width, height ] );
-
-	return <div style={ style }>{ children }</div>;
 }
 
 export default forwardRef( BlockPopover );
