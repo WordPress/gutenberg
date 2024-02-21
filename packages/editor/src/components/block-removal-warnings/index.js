@@ -41,7 +41,7 @@ const BLOCK_REMOVAL_RULES = [
 	},
 	{
 		// Pattern overrides.
-		// The warning is only shown when the user manipulates
+		// The warning is only shown when the user edits a pattern.
 		postTypes: [ 'wp_block' ],
 		callback( removedBlocks ) {
 			const removedBlocksWithOverrides = removedBlocks.filter(
