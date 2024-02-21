@@ -13,7 +13,6 @@ import {
 	useMemo,
 	useReducer,
 	useLayoutEffect,
-	useState,
 } from '@wordpress/element';
 
 /**
@@ -29,8 +28,6 @@ function BlockPopover(
 		clientId,
 		bottomClientId,
 		children,
-		__unstableRefreshSize,
-		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
 		shift = true,
@@ -75,48 +72,6 @@ function BlockPopover(
 			observer.disconnect();
 		};
 	}, [ selectedElement ] );
-
-	const [ selectedElementWidth, setSelectedElementWidth ] = useState(
-		selectedElement?.offsetWidth
-	);
-	const [ selectedElementHeight, setSelectedElementHeight ] = useState(
-		selectedElement?.offsetHeight
-	);
-	useLayoutEffect( () => {
-		if ( ! selectedElement ) {
-			return;
-		}
-		const observer = new window.ResizeObserver( () => {
-			setSelectedElementWidth( selectedElement.offsetWidth );
-			setSelectedElementHeight( selectedElement.offsetHeight );
-		} );
-		observer.observe( selectedElement );
-		return () => observer.disconnect();
-	} );
-	const style = useMemo( () => {
-		if (
-			// popoverDimensionsRecomputeCounter is by definition always equal or greater
-			// than 0. This check is only there to satisfy the correctness of the
-			// exhaustive-deps rule for the `useMemo` hook.
-			popoverDimensionsRecomputeCounter < 0 ||
-			! selectedElement ||
-			lastSelectedElement !== selectedElement
-		) {
-			return {};
-		}
-		return {
-			position: 'absolute',
-			width: selectedElementWidth,
-			height: selectedElementHeight,
-		};
-	}, [
-		selectedElement,
-		lastSelectedElement,
-		__unstableRefreshSize,
-		popoverDimensionsRecomputeCounter,
-		selectedElementWidth,
-		selectedElementHeight,
-	] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -195,8 +150,7 @@ function BlockPopover(
 			) }
 			variant="unstyled"
 		>
-			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
-			{ ! __unstableCoverTarget && children }
+			{ children }
 		</Popover>
 	);
 }

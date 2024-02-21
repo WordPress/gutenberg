@@ -8,6 +8,7 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
@@ -205,6 +206,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						value={ value }
 						units={ units }
 						min={ 0 }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -214,6 +217,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						min={ 0 }
 						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
 						withInputField={ false }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 			</Flex>
@@ -226,18 +231,49 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 	const { columnCount = 3 } = layout;
 
 	return (
-		<RangeControl
-			label={ __( 'Columns' ) }
-			value={ columnCount }
-			onChange={ ( value ) =>
-				onChange( {
-					...layout,
-					columnCount: value,
-				} )
-			}
-			min={ 1 }
-			max={ 6 }
-		/>
+		<fieldset>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Columns' ) }
+			</BaseControl.VisualLabel>
+			<Flex gap={ 4 }>
+				<FlexItem isBlock>
+					<NumberControl
+						size={ '__unstable-large' }
+						onChange={ ( value ) => {
+							/**
+							 * If the input is cleared, avoid switching
+							 * back to "Auto" by setting a value of "1".
+							 */
+							const validValue = value !== '' ? value : '1';
+							onChange( {
+								...layout,
+								columnCount: validValue,
+							} );
+						} }
+						value={ columnCount }
+						min={ 1 }
+						label={ __( 'Columns' ) }
+						hideLabelFromVision
+					/>
+				</FlexItem>
+				<FlexItem isBlock>
+					<RangeControl
+						value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
+						onChange={ ( value ) =>
+							onChange( {
+								...layout,
+								columnCount: value,
+							} )
+						}
+						min={ 1 }
+						max={ 16 }
+						withInputField={ false }
+						label={ __( 'Columns' ) }
+						hideLabelFromVision
+					/>
+				</FlexItem>
+			</Flex>
+		</fieldset>
 	);
 }
 
@@ -281,14 +317,14 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			isBlock={ true }
 		>
 			<ToggleGroupControlOption
-				key={ 'manual' }
-				value="manual"
-				label={ __( 'Manual' ) }
-			/>
-			<ToggleGroupControlOption
 				key={ 'auto' }
 				value="auto"
 				label={ __( 'Auto' ) }
+			/>
+			<ToggleGroupControlOption
+				key={ 'manual' }
+				value="manual"
+				label={ __( 'Manual' ) }
 			/>
 		</ToggleGroupControl>
 	);

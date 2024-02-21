@@ -69,6 +69,7 @@ export default function PatternsHeader( {
 								__( 'Action menu for %s pattern category' ),
 								title
 							),
+							size: 'compact',
 						} }
 					>
 						{ ( { onClose } ) => (
