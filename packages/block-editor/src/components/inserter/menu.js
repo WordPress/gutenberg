@@ -266,7 +266,7 @@ function InserterMenu(
 						tabsContents={ inserterTabsContents }
 					/>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
+				{ ! delayedFilterValue && ! showAsTabs && ! isZoomOutMode && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>
