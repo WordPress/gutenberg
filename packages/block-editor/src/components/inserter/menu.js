@@ -251,7 +251,8 @@ function InserterMenu(
 							__experimentalInsertionIndex={
 								__experimentalInsertionIndex
 							}
-							showBlockDirectory={ showBlocks }
+							showBlockDirectory
+							showBlocks={ showBlocks }
 							shouldFocusBlock={ shouldFocusBlock }
 						/>
 					</div>
