@@ -36,7 +36,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * check if it is possible to bind the block.
  *
  * @param {string} blockName - The block name.
- * @return {boolean} Whether it is possible to bind the block attribute.
+ * @return {boolean} Whether it is possible to bind the block to sources.
  */
 export function canBindBlock( blockName ) {
 	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
