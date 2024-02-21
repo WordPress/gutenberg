@@ -146,8 +146,9 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			// Navigate to the citation to select the block.
-			await page.keyboard.press( 'ArrowUp' );
+			await editor.clickBlockToolbarButton(
+				'Select parent block: Quote'
+			);
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
@@ -168,7 +169,9 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await page.keyboard.press( 'ArrowUp' );
+			await editor.clickBlockToolbarButton(
+				'Select parent block: Quote'
+			);
 			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
@@ -240,7 +243,7 @@ test.describe( 'Quote', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'ArrowUp' );
+		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( 'cite' );
 		await editor.transformBlockTo( 'core/pullquote' );
