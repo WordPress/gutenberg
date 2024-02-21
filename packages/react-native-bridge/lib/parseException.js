@@ -83,7 +83,6 @@ const parseStacktraceLine = ( line ) => {
 	return {
 		filename,
 		function: func,
-		in_app: true,
 		...( lineno ? { lineno } : null ),
 		...( colno ? { colno } : null ),
 	};
