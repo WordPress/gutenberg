@@ -163,7 +163,7 @@ function render_block_core_search( $attributes ) {
 				}
 
 				if ( ! empty( $font_size_presets_from_origin ) ) {
-					$font_size_preset_index = array_search( $attributes['fontSize'], array_column( $font_size_presets_from_origin, 'slug' ) );
+					$font_size_preset_index = array_search( $attributes['fontSize'], array_column( $font_size_presets_from_origin, 'slug' ), true );
 					if ( isset( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] ) ) {
 						$icon_dimensions = esc_attr( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] );
 					}
