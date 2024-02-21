@@ -15,7 +15,7 @@ import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import editorStyles from '../editor-styles';
+import { editorStyles } from '../editor-styles';
 import './style.css';
 
 export default function EditorWithUndoRedo() {
