@@ -23,6 +23,12 @@ function getPreviewUrl( fontFace ) {
 }
 
 function getDisplayFontFace( font ) {
+	// if this IS a font face return it
+	if ( font.fontStyle || font.fontWeight ) {
+		return font;
+	}
+	// if this is a font family with a collection of font faces
+	// return the first one that is normal and 400 OR just the first one
 	if ( font.fontFace && font.fontFace.length ) {
 		return (
 			font.fontFace.find(
@@ -31,6 +37,8 @@ function getDisplayFontFace( font ) {
 			) || font.fontFace[ 0 ]
 		);
 	}
+	// This must be a font family with no font faces
+	// return a fake font face
 	return {
 		fontStyle: 'normal',
 		fontWeight: '400',
@@ -60,8 +68,8 @@ function FontDemo( { font, text } ) {
 		fontSize: '18px',
 		lineHeight: 1,
 		opacity: isAssetLoaded ? '1' : '0',
-		...faceStyles,
 		...style,
+		...faceStyles,
 	};
 
 	useEffect( () => {
