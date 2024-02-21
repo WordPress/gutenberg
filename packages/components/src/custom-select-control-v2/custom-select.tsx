@@ -96,9 +96,17 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 		children,
 		hideLabelFromVision = false,
 		label,
+		popoverProps,
 		store,
 		...restProps
 	} = props;
+
+	const selectPopoverProps = {
+		gutter: 12,
+		sameWidth: true,
+		...popoverProps,
+		store,
+	};
 
 	return (
 		<>
@@ -110,7 +118,7 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 				</Styled.SelectLabel>
 			) }
 			<CustomSelectButton { ...restProps } store={ store } />
-			<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
+			<Styled.SelectPopover { ...selectPopoverProps }>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
 				</CustomSelectContext.Provider>

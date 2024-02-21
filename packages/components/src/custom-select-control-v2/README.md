@@ -123,6 +123,12 @@ A function that receives the new value of the input.
 
 -   Required: no
 
+##### `popoverProps`: `Object`
+
+Optional props passed to the Ariakit Select Popover.
+
+-   Required: no
+
 ##### `renderSelectedValue`: `( selectValue: string | string[] ) => React.ReactNode`
 
 Can be used to render select UI with custom styled values.

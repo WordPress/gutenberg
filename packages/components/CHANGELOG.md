@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `CustomSelectControlV2`: Support custom popover props.([#57780](https://github.com/WordPress/gutenberg/pull/57780)).
+
 ## 26.0.1 (2024-02-13)
 
 ### Bug Fix
