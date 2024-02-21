@@ -18,14 +18,15 @@ import { useEffect } from '@wordpress/element';
  * @param {Object}   props.value        The child layout value.
  * @param {Function} props.onChange     Function to update the child layout value.
  * @param {Object}   props.parentLayout The parent layout value.
+ * @param {Object}   props.alignments
  *
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
 	value: childLayout = {},
 	onChange,
-	onChangeAlign,
 	parentLayout,
+	alignments,
 } ) {
 	const {
 		selfStretch,
@@ -36,13 +37,20 @@ export default function ChildLayoutControl( {
 		height,
 		width,
 	} = childLayout;
+
+	const {
+		current: currentAlignment,
+		supported: supportedAlignments,
+		onChangeAlignment,
+	} = alignments || {};
+
 	const {
 		orientation = 'horizontal',
 		type: parentType,
 		default: { type: defaultParentType = 'default' } = {},
 		justifyContent = 'left',
 		verticalAlignment = 'center',
-		alignWidth = 'none',
+		alignWidth: parentAlignment = 'none',
 	} = parentLayout ?? {};
 	const parentLayoutType = parentType || defaultParentType;
 
@@ -68,14 +76,20 @@ export default function ChildLayoutControl( {
 			value: 'content',
 			name: __( 'Default' ),
 		} );
-		if ( alignWidth === 'wide' ) {
+		if (
+			supportedAlignments?.includes( 'wide' ) &&
+			( parentAlignment === 'wide' || parentAlignment === 'full' )
+		) {
 			widthOptions.push( {
 				key: 'wide',
 				value: 'wide',
 				name: __( 'Wide' ),
 			} );
 		}
-		if ( alignWidth === 'full' ) {
+		if (
+			supportedAlignments?.includes( 'full' ) &&
+			parentAlignment === 'full'
+		) {
 			widthOptions.push( {
 				key: 'fill',
 				value: 'fill',
@@ -91,7 +105,7 @@ export default function ChildLayoutControl( {
 			{
 				key: 'fixedNoShrink',
 				value: 'fixedNoShrink',
-				name: __( 'Custom' ),
+				name: __( 'Fixed' ),
 			}
 		);
 	} else if (
@@ -178,9 +192,9 @@ export default function ChildLayoutControl( {
 		let selectedValue;
 		if ( isFlowOrConstrained ) {
 			// Replace "full" with "fill" for full width alignments.
-			if ( alignWidth === 'full' ) {
+			if ( currentAlignment === 'full' ) {
 				selectedValue = 'fill';
-			} else if ( alignWidth === 'wide' ) {
+			} else if ( currentAlignment === 'wide' ) {
 				selectedValue = 'wide';
 			} else if ( selfAlign === 'fixedNoShrink' ) {
 				selectedValue = 'fixedNoShrink';
@@ -233,19 +247,19 @@ export default function ChildLayoutControl( {
 		if ( isFlowOrConstrained ) {
 			if ( key === 'fill' ) {
 				onChange( { [ widthProp ]: key } );
-				onChangeAlign( { align: 'full' } );
+				onChangeAlignment( 'full' );
 			} else if ( key === 'wide' ) {
 				onChange( { [ widthProp ]: key } );
-				onChangeAlign( { align: 'wide' } );
+				onChangeAlignment( 'wide' );
 			} else if ( key === 'fixedNoShrink' ) {
 				onChange( {
 					...childLayout,
 					[ widthProp ]: key,
 				} );
-				onChangeAlign( { align: 'none' } );
+				onChangeAlignment( null );
 			} else {
 				onChange( { [ widthProp ]: key } );
-				onChangeAlign( { align: 'none' } );
+				onChangeAlignment( null );
 			}
 		} else if ( parentLayoutType === 'flex' ) {
 			onChange( {

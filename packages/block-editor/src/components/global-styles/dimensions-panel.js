@@ -199,6 +199,7 @@ const DEFAULT_CONTROLS = {
 export default function DimensionsPanel( {
 	as: Wrapper = DimensionsToolsPanel,
 	value,
+	alignments = null,
 	onChange,
 	inheritedValue = value,
 	settings,
@@ -397,16 +398,9 @@ export default function DimensionsPanel( {
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 	const childLayoutResetLabel =
 		parentLayoutType === 'flex' ? flexResetLabel : __( 'Grid spans' );
+
 	const setChildLayout = ( newChildLayout ) => {
-		onChange( {
-			...value,
-			layout: {
-				...newChildLayout,
-			},
-		} );
-	};
-	const setChildLayoutAlign = ( newChildLayoutAlign ) => {
-		onChange( newChildLayoutAlign );
+		onChange( setImmutably( value, [ 'layout' ], newChildLayout ) );
 	};
 
 	const resetChildLayoutValue = () => {
@@ -660,8 +654,8 @@ export default function DimensionsPanel( {
 					<ChildLayoutControl
 						value={ childLayout }
 						onChange={ setChildLayout }
-						onChangeAlign={ setChildLayoutAlign }
 						parentLayout={ settings?.parentLayout }
+						alignments={ alignments }
 					/>
 				</VStack>
 			) }
