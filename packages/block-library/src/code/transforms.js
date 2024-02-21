@@ -3,14 +3,11 @@
  */
 import { createBlock } from '@wordpress/blocks';
 import { create, toHTMLString } from '@wordpress/rich-text';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
-
-const { getTransformedMetadata } = unlock( blockEditorPrivateApis );
+import { getTransformedMetadata } from '../utils/get-transformed-metadata';
 
 const transforms = {
 	from: [
