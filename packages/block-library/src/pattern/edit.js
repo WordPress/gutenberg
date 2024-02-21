@@ -32,14 +32,8 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		[]
 	);
 
-	const {
-		replaceBlocks,
-		setBlockEditingMode,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
-	const { getBlockRootClientId, getBlockEditingMode } =
-		useSelect( blockEditorStore );
-
+	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const [ hasRecursionError, setHasRecursionError ] = useState( false );
 	const parsePatternDependencies = useParsePatternDependencies();
 
@@ -89,7 +83,6 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			// because nested pattern blocks cannot be inserted if the parent block supports
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
-				const rootClientId = getBlockRootClientId( clientId );
 				// Clone blocks from the pattern before insertion to ensure they receive
 				// distinct client ids. See https://github.com/WordPress/gutenberg/issues/50628.
 				const clonedBlocks = selectedPattern.blocks.map( ( block ) =>
@@ -115,29 +108,21 @@ const PatternEdit = ( { attributes, clientId } ) => {
 						},
 					};
 				}
-				const rootEditingMode = getBlockEditingMode( rootClientId );
 				registry.batch( () => {
-					// Temporarily set the root block to default mode to allow replacing the pattern.
-					// This could happen when the page is disabling edits of non-content blocks.
-					__unstableMarkNextChangeAsNotPersistent();
-					setBlockEditingMode( rootClientId, 'default' );
 					__unstableMarkNextChangeAsNotPersistent();
 					replaceBlocks( clientId, clonedBlocks );
-					// Restore the root block's original mode.
-					__unstableMarkNextChangeAsNotPersistent();
-					setBlockEditingMode( rootClientId, rootEditingMode );
 				} );
 			} );
 		}
 	}, [
+		registry,
+		parsePatternDependencies,
 		clientId,
 		hasRecursionError,
 		selectedPattern,
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceBlocks,
-		getBlockEditingMode,
-		setBlockEditingMode,
-		getBlockRootClientId,
+		injectThemeAttributeInBlockTemplateContent,
 	] );
 
 	const props = useBlockProps();
