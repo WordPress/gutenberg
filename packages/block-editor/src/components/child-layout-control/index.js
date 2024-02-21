@@ -200,8 +200,10 @@ export default function ChildLayoutControl( {
 				selectedValue = 'fixedNoShrink';
 			} else if ( selfAlign === 'fit' ) {
 				selectedValue = 'fit';
-			} else {
+			} else if ( parentLayoutType === 'constrained' ) {
 				selectedValue = 'content';
+			} else {
+				selectedValue = 'fill';
 			}
 		} else if (
 			parentLayoutType === 'flex' &&
@@ -256,10 +258,10 @@ export default function ChildLayoutControl( {
 					...childLayout,
 					[ widthProp ]: key,
 				} );
-				onChangeAlignment( null );
+				onChangeAlignment( undefined );
 			} else {
 				onChange( { [ widthProp ]: key } );
-				onChangeAlignment( null );
+				onChangeAlignment( undefined );
 			}
 		} else if ( parentLayoutType === 'flex' ) {
 			onChange( {
