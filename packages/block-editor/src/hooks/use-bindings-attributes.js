@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { ToolbarButton } from '@wordpress/components';
 import { connection } from '@wordpress/icons';
+import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -96,7 +97,11 @@ const createEditFunctionWithBindingsAttribute = () =>
 						<BlockControls group="first">
 							<ToolbarButton
 								icon={ connection }
-								label="Block bindings"
+								label={ _x(
+									// TODO: Let's get this naming right
+									'Connected to a block bindings source',
+									'block toolbar button label'
+								) }
 								iconSize={ 24 }
 							></ToolbarButton>
 						</BlockControls>
