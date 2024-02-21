@@ -150,25 +150,6 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 	);
 }
 
-/**
- * Given a font size slug preset, returns the matching preset.
- * The reference for the fontSizes preset array depends on the origin.
- * Font sizes are sourced from either 'typography.fontSizes.custom' || 'typography.fontSizes.theme' || 'typography.fontSizes.default'.
- * See: `useSettings() -> getBlockSettings() -> overrideOrigins()`.
- *
- * @param {string} slug The slug of the font size preset
- * @return {object|undefined} The font size object, if found.
- */
-export function useFontSizeFromPreset( slug ) {
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-	const hasFontSizes = !! fontSizes?.length;
-	if ( ! slug || ! hasFontSizes ) {
-		return;
-	}
-
-	return fontSizes.find( ( fontSize ) => fontSize.slug === slug );
-}
-
 function useBlockProps( { name, fontSize, style } ) {
 	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
 		'typography.fontSizes',

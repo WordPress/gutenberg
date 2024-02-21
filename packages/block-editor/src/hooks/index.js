@@ -77,4 +77,3 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
-export { useFontSizeFromPreset } from './font-size';

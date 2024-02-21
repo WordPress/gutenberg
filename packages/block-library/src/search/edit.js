@@ -17,7 +17,6 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -55,9 +54,6 @@ import {
 	MIN_WIDTH,
 	isPercentageUnit,
 } from './utils.js';
-import { unlock } from '../lock-unlock';
-
-const { useFontSizeFromPreset } = unlock( blockEditorPrivateApis );
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -146,7 +142,6 @@ export default function SearchEdit( {
 	const hasOnlyButton = 'button-only' === buttonPosition;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
-	const fontSizeFromPreset = useFontSizeFromPreset( attributes?.fontSize );
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
@@ -331,10 +326,11 @@ export default function SearchEdit( {
 			}
 		};
 
-		const iconDimensions =
-			fontSizeFromPreset?.size ||
-			attributes?.style?.typography?.fontSize ||
-			undefined;
+		const iconDimensions = buttonRef?.current
+			? buttonRef.current.ownerDocument.defaultView.getComputedStyle(
+					buttonRef.current
+			  ).fontSize
+			: 24;
 
 		return (
 			<>
