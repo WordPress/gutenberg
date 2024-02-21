@@ -7,7 +7,12 @@ import { nanoid } from 'nanoid';
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, CheckboxControl } from '@wordpress/components';
+import {
+	BaseControl,
+	CheckboxControl,
+	TextControl,
+	PanelBody,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -83,6 +88,9 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 			},
 		} );
 	}
+	const hasOverrides = attributeSources.some(
+		( source ) => source === 'core/pattern-overrides'
+	);
 
 	return (
 		<InspectorControls group="advanced">
@@ -93,13 +101,33 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 				<CheckboxControl
 					__nextHasNoMarginBottom
 					label={ __( 'Allow instance overrides' ) }
-					checked={ attributeSources.some(
-						( source ) => source === 'core/pattern-overrides'
-					) }
+					checked={ hasOverrides }
 					onChange={ ( isChecked ) => {
 						updateBindings( isChecked );
 					} }
 				/>
+				{ hasOverrides && (
+					<PanelBody
+						className="block-editor-block-inspector__advanced"
+						title={ __( 'Override settings' ) }
+						initialOpen={ false }
+					>
+						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Override id' ) }
+							value={ attributes.metadata?.id || '' }
+							onChange={ ( newId ) => {
+								setAttributes( {
+									metadata: {
+										...attributes.metadata,
+										id: newId,
+									},
+								} );
+							} }
+						/>
+					</PanelBody>
+				) }
 			</BaseControl>
 		</InspectorControls>
 	);
