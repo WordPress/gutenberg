@@ -8,6 +8,7 @@ const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
 const dns = require( 'dns' ).promises;
+const semver = require( 'semver' );
 
 /**
  * Promisified dependencies
@@ -51,10 +52,20 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
+	let wpVersion = '';
+	try {
+		wpVersion = readWordPressVersion( config.env[ environment ].coreSource, spinner, config.debug );
+	} catch ( err ) {
+		// Ignore error.
+	}
+
 	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
+
+	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
+	const configAnchor = wpVersion && semver.lt( wpVersion, '5.1' ) ? `"define('WP_DEBUG',"` : `"define( 'WP_DEBUG',"`;
 
 	// Set wp-config.php values.
 	for ( let [ key, value ] of Object.entries(
@@ -68,7 +79,7 @@ async function configureWordPress( environment, config, spinner ) {
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
-			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
+			`wp config set ${ key } ${ value } --anchor=${ configAnchor }${
 				typeof value !== 'string' ? ' --raw' : ''
 			}`
 		);
@@ -98,6 +109,15 @@ async function configureWordPress( environment, config, spinner ) {
 		}
 	);
 
+	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
+	// Additionally, WordPress versions below 5.4 used `dirname( __FILE__ )` instead of `__DIR__`.
+	let abspathDef = `define( 'ABSPATH', __DIR__ . '\\/' );`;
+	if ( wpVersion && semver.lt( wpVersion, '5.1' ) ) {
+		abspathDef = `define('ABSPATH', dirname(__FILE__) . '\\/');`;
+	} else if ( wpVersion && semver.lt( wpVersion, '5.4' ) ) {
+		abspathDef = `define( 'ABSPATH', dirname(__FILE__) . '\\/' );`;
+	}
+
 	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
 	// the directory that the test suite is contained within.
 	// Make sure ABSPATH points to the WordPress install.
@@ -106,7 +126,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[
 			'sh',
 			'-c',
-			`sed -e "/^require.*wp-settings.php/d" -e "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
+			`sed -e "/^require.*wp-settings.php/d" -e "s/${ abspathDef }/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
