@@ -22,8 +22,24 @@ function gutenberg_update_initial_settings( $args, $defaults, $option_group, $op
 		'default_comment_status' => __( 'Allow comments on new posts' ),
 	);
 
-	if ( isset( $settings_label_map[ $option_name ] ) ) {
-		$args['title'] = $settings_label_map[ $option_name ];
+	if ( ! isset( $settings_label_map[ $option_name ] ) ) {
+		return $args;
+	}
+
+	$args['label'] = $settings_label_map[ $option_name ];
+	$schema        = array( 'title' => $args['label'] );
+
+	if ( ! is_array( $args['show_in_rest'] ) ) {
+		$args['show_in_rest'] = array(
+			'schema' => $schema,
+		);
+		return $args;
+	}
+
+	if ( ! empty( $args['show_in_rest']['schema'] ) ) {
+		$args['show_in_rest']['schema'] = array_merge( $args['show_in_rest']['schema'], $schema );
+	} else {
+		$args['show_in_rest']['schema'] = $schema;
 	}
 
 	return $args;
