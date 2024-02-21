@@ -56,6 +56,11 @@ export function getTransformedMetadata( metadata, fromBlockName, toBlockName ) {
 		transformSupportedProps.push( 'name' );
 	}
 
+	// Return early if no supported properties.
+	if ( ! transformSupportedProps.length ) {
+		return;
+	}
+
 	return Object.entries( metadata ).reduce( ( obj, [ prop, value ] ) => {
 		// If prop is not supported, don't add it to the new metadata object.
 		if ( ! transformSupportedProps.includes( prop ) ) {
