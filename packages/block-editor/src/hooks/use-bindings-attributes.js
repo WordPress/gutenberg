@@ -5,13 +5,9 @@ import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { ToolbarButton } from '@wordpress/components';
-import { connection } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { BlockControls } from '../components';
 import { store as blockEditorStore } from '../store';
 import { useBlockEditContext } from '../components/block-edit/context';
 import { unlock } from '../lock-unlock';
@@ -93,19 +89,6 @@ const createEditFunctionWithBindingsAttribute = () =>
 						hasSource ? { '--wp-admin-theme-color': '#9747FF' } : {}
 					}
 				>
-					{ hasSource ? (
-						<BlockControls group="first">
-							<ToolbarButton
-								icon={ connection }
-								label={ _x(
-									// TODO: Let's get this naming right
-									'Connected to a block bindings source',
-									'block toolbar button label'
-								) }
-								iconSize={ 24 }
-							></ToolbarButton>
-						</BlockControls>
-					) : null }
 					<BlockEdit
 						key="edit"
 						{ ...props }

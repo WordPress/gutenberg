@@ -13,9 +13,9 @@ const connection = (
 		<Path d="M5 19L8 16L5 19Z" fill="#9747FF" />
 		<Path d="M16 8L19 5L16 8Z" fill="#9747FF" />
 		<G
-			stroke-width="1.5"
-			stroke-linecap="round"
-			stroke-linejoin="round"
+			strokeWidth="1.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
 			stroke="#9747FF"
 		>
 			<Path d="M5 19L8 16" />
