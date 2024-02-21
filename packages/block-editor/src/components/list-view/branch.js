@@ -96,7 +96,6 @@ function ListViewBranch( props ) {
 		fixedListWindow,
 		isExpanded,
 		parentId,
-		shouldShowInnerBlocks = true,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
 	} = props;
@@ -174,10 +173,9 @@ function ListViewBranch( props ) {
 						: `${ position }`;
 				const hasNestedBlocks = !! innerBlocks?.length;
 
-				const shouldExpand =
-					hasNestedBlocks && shouldShowInnerBlocks
-						? expandedState[ clientId ] ?? isExpanded
-						: undefined;
+				const shouldExpand = hasNestedBlocks
+					? expandedState[ clientId ] ?? isExpanded
+					: undefined;
 
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.

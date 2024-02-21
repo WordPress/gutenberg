@@ -2817,7 +2817,8 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	if (
 		editorMode === 'zoom-out' &&
 		clientId &&
-		! getBlockRootClientId( state, clientId )
+		getBlockRootClientId( state, clientId ) ===
+			getSectionsContainerClientId( state )
 	) {
 		return true;
 	}
@@ -2976,4 +2977,16 @@ export const isGroupable = createRegistrySelector(
 				canRemoveBlocks( state, _clientIds, rootClientId )
 			);
 		}
+);
+
+export const getSectionsContainerClientId = createRegistrySelector(
+	( select ) => ( state ) => {
+		const { getGroupingBlockName } = select( blocksStore );
+		const groupBlocks = getBlocksByName( state, getGroupingBlockName() );
+
+		return groupBlocks.find(
+			( clientId ) =>
+				getBlockAttributes( state, clientId )?.tagName === 'main'
+		);
+	}
 );
