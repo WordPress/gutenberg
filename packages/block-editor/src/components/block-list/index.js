@@ -40,6 +40,7 @@ import {
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
 import { unlock } from '../../lock-unlock';
+import DisableNonMainBlocks from './disable-non-main-blocks';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -119,8 +120,10 @@ function Root( { className, ...settings } ) {
 		},
 		settings
 	);
+
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
+			<DisableNonMainBlocks />
 			<div { ...innerBlocksProps } />
 			{ !! temporarilyEditingAsBlocks && (
 				<StopEditingAsBlocksOnOutsideSelect
