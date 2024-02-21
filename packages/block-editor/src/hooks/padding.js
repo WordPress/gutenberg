@@ -20,47 +20,51 @@ export function PaddingVisualizer( { clientId, value, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
 	const [ style, setStyle ] = useState();
 
+	useEffect( () => {
+		if ( ! blockElement ) {
+			return;
+		}
+		// It's not sufficient to read the computed padding value when value.spacing.padding
+		// changes as useEffect may run before the browser recomputes CSS and paints. Instead,
+		// we use a ResizeObserver with the box option set to 'border-box' to listen out for
+		// changes to the padding.
+		const observer = new window.ResizeObserver( () => {
+			setStyle( {
+				borderTopWidth: getComputedCSS( blockElement, 'padding-top' ),
+				borderRightWidth: getComputedCSS(
+					blockElement,
+					'padding-right'
+				),
+				borderBottomWidth: getComputedCSS(
+					blockElement,
+					'padding-bottom'
+				),
+				borderLeftWidth: getComputedCSS( blockElement, 'padding-left' ),
+			} );
+		} );
+		observer.observe( blockElement, { box: 'border-box' } );
+		return () => observer.disconnect();
+	}, [ blockElement ] );
+
 	const padding = value?.spacing?.padding;
+	const previousPadding = useRef( padding );
+	const [ isActive, setIsActive ] = useState( false );
 
 	useEffect( () => {
-		if (
-			! blockElement ||
-			null === blockElement.ownerDocument.defaultView
-		) {
+		if ( isShallowEqual( padding, previousPadding.current ) || forceShow ) {
 			return;
 		}
 
-		setStyle( {
-			borderTopWidth: getComputedCSS( blockElement, 'padding-top' ),
-			borderRightWidth: getComputedCSS( blockElement, 'padding-right' ),
-			borderBottomWidth: getComputedCSS( blockElement, 'padding-bottom' ),
-			borderLeftWidth: getComputedCSS( blockElement, 'padding-left' ),
-		} );
-	}, [ blockElement, padding ] );
+		setIsActive( true );
+		previousPadding.current = padding;
 
-	const [ isActive, setIsActive ] = useState( false );
-	const valueRef = useRef( padding );
-	const timeoutRef = useRef();
-
-	const clearTimer = () => {
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
-		}
-	};
-
-	useEffect( () => {
-		if ( ! isShallowEqual( padding, valueRef.current ) && ! forceShow ) {
-			setIsActive( true );
-			valueRef.current = padding;
-
-			timeoutRef.current = setTimeout( () => {
-				setIsActive( false );
-			}, 400 );
-		}
+		const timeout = setTimeout( () => {
+			setIsActive( false );
+		}, 400 );
 
 		return () => {
 			setIsActive( false );
-			clearTimer();
+			clearTimeout( timeout );
 		};
 	}, [ padding, forceShow ] );
 

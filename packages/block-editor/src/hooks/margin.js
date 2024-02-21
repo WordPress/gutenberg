@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useLayoutEffect,
+	useEffect,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -16,60 +21,59 @@ function getComputedCSS( element, property ) {
 		.getPropertyValue( property );
 }
 
-export function MarginVisualizer( { clientId, attributes, forceShow } ) {
+export function MarginVisualizer( { clientId, value, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
 	const [ style, setStyle ] = useState();
 
-	const margin = attributes?.style?.spacing?.margin;
+	const margin = value?.spacing?.margin;
+
+	useLayoutEffect( () => {
+		if ( ! blockElement ) {
+			return;
+		}
+		// It's not sufficient to read the computed padding value when value.spacing.padding
+		// changes as useEffect may run before the browser recomputes CSS and paints, and,
+		// unlike padding, there's no way to observe when the margin changes using ResizeObserver.
+		// We therefore combine useLayoutEffect and two rAF calls to ensure that we read the margin
+		// after the current paint but before the next paint.
+		window.requestAnimationFrame( () =>
+			window.requestAnimationFrame( () => {
+				const top = getComputedCSS( blockElement, 'margin-top' );
+				const right = getComputedCSS( blockElement, 'margin-right' );
+				const bottom = getComputedCSS( blockElement, 'margin-bottom' );
+				const left = getComputedCSS( blockElement, 'margin-left' );
+				setStyle( {
+					borderTopWidth: top,
+					borderRightWidth: right,
+					borderBottomWidth: bottom,
+					borderLeftWidth: left,
+					top: top ? `-${ top }` : 0,
+					right: right ? `-${ right }` : 0,
+					bottom: bottom ? `-${ bottom }` : 0,
+					left: left ? `-${ left }` : 0,
+				} );
+			} )
+		);
+	}, [ blockElement, margin ] );
+
+	const previousMargin = useRef( margin );
+	const [ isActive, setIsActive ] = useState( false );
 
 	useEffect( () => {
-		if (
-			! blockElement ||
-			null === blockElement.ownerDocument.defaultView
-		) {
+		if ( isShallowEqual( margin, previousMargin.current ) || forceShow ) {
 			return;
 		}
 
-		const top = getComputedCSS( blockElement, 'margin-top' );
-		const right = getComputedCSS( blockElement, 'margin-right' );
-		const bottom = getComputedCSS( blockElement, 'margin-bottom' );
-		const left = getComputedCSS( blockElement, 'margin-left' );
+		setIsActive( true );
+		previousMargin.current = margin;
 
-		setStyle( {
-			borderTopWidth: top,
-			borderRightWidth: right,
-			borderBottomWidth: bottom,
-			borderLeftWidth: left,
-			top: top ? `-${ top }` : 0,
-			right: right ? `-${ right }` : 0,
-			bottom: bottom ? `-${ bottom }` : 0,
-			left: left ? `-${ left }` : 0,
-		} );
-	}, [ blockElement, margin ] );
-
-	const [ isActive, setIsActive ] = useState( false );
-	const valueRef = useRef( margin );
-	const timeoutRef = useRef();
-
-	const clearTimer = () => {
-		if ( timeoutRef.current ) {
-			window.clearTimeout( timeoutRef.current );
-		}
-	};
-
-	useEffect( () => {
-		if ( ! isShallowEqual( margin, valueRef.current ) && ! forceShow ) {
-			setIsActive( true );
-			valueRef.current = margin;
-
-			timeoutRef.current = setTimeout( () => {
-				setIsActive( false );
-			}, 400 );
-		}
+		const timeout = setTimeout( () => {
+			setIsActive( false );
+		}, 400 );
 
 		return () => {
 			setIsActive( false );
-			clearTimer();
+			clearTimeout( timeout );
 		};
 	}, [ margin, forceShow ] );
 
