@@ -83,6 +83,8 @@ function ListViewBlockSelectButton(
 		  )
 		: '';
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
 	// We need to clear any HTML drag data to prevent `pasteHandler` from firing
@@ -90,6 +92,7 @@ function ListViewBlockSelectButton(
 	const onDragStartHandler = ( event ) => {
 		event.dataTransfer.clearData();
 		onDragStart?.( event );
+		__unstableSetEditorMode( 'zoom-out' );
 	};
 
 	// Determine which blocks to update:
