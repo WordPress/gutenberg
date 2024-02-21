@@ -54,7 +54,10 @@ describe( 'getKindEntities', () => {
 			getEntitiesConfig: jest.fn( () => entities ),
 		};
 		const entities = [ { kind: 'postType' } ];
-		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig(
+			'postType',
+			undefined
+		)( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 
@@ -63,7 +66,10 @@ describe( 'getKindEntities', () => {
 		const select = {
 			getEntitiesConfig: jest.fn( () => [] ),
 		};
-		await getOrLoadEntitiesConfig( 'unknownKind' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig(
+			'unknownKind',
+			undefined
+		)( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 
@@ -85,7 +91,10 @@ describe( 'getKindEntities', () => {
 		};
 		triggerFetch.mockImplementation( () => fetchedEntities );
 
-		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig(
+			'postType',
+			'post'
+		)( { dispatch, select } );
 		expect( dispatch ).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'ADD_ENTITIES' );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].entities.length ).toBe( 1 );
