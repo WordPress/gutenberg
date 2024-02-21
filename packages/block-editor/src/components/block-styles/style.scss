@@ -13,6 +13,10 @@
 	}
 }
 
+.block-editor-block-styles__popover {
+	z-index: z-index(".components-popover");
+}
+
 // To prevent overflow in the preview container,
 // ensure that block contents' margin and padding
 // do not add to the block container's width.
