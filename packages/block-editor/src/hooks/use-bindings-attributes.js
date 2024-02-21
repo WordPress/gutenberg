@@ -69,7 +69,7 @@ export function hasPossibleBlockBinding( blockName, attributeName ) {
  * @param {Object} props.args       - The arguments to pass to the source.
  * @return {null}                     This is a data-handling component. Render nothing.
  */
-const BlockBindingConnector = ( {
+const BindingConnector = ( {
 	args,
 	attrName,
 	attrValue,
@@ -157,34 +157,37 @@ function BlockBindingBridge( { bindings, props } ) {
 
 	const { name, attributes } = props;
 
-	// Collect all the binding connectors.
-	const BindingConnectorInstances = [];
+	return (
+		<>
+			{ Object.entries( bindings ).map(
+				( [ attrName, boundAttribute ], i ) => {
+					// Check if the block attribute can be bound.
+					if ( ! hasPossibleBlockBinding( name, attrName ) ) {
+						return null;
+					}
 
-	Object.entries( bindings ).forEach( ( [ attrName, boundAttribute ], i ) => {
-		// Check if the block attribute can be bound.
-		if ( ! hasPossibleBlockBinding( name, attrName ) ) {
-			return;
-		}
+					// Bail early if the block doesn't have a valid source handler.
+					const source = getBlockBindingsSource(
+						boundAttribute.source
+					);
+					if ( ! source?.useSource ) {
+						return null;
+					}
 
-		// Bail early if the block doesn't have a valid source handler.
-		const source = getBlockBindingsSource( boundAttribute.source );
-		if ( ! source?.useSource ) {
-			return;
-		}
-
-		BindingConnectorInstances.push(
-			<BlockBindingConnector
-				key={ `${ boundAttribute.source }-${ name }-${ attrName }-${ i }` }
-				attrName={ attrName }
-				attrValue={ attributes[ attrName ] }
-				source={ source }
-				blockProps={ props }
-				args={ boundAttribute.args }
-			/>
-		);
-	} );
-
-	return <>{ BindingConnectorInstances }</>;
+					return (
+						<BindingConnector
+							key={ `${ boundAttribute.source }-${ name }-${ attrName }-${ i }` }
+							attrName={ attrName }
+							attrValue={ attributes[ attrName ] }
+							source={ source }
+							blockProps={ props }
+							args={ boundAttribute.args }
+						/>
+					);
+				}
+			) }
+		</>
+	);
 }
 
 const withBlockBindingSupport = createHigherOrderComponent(
