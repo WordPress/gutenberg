@@ -141,8 +141,8 @@ export const privateRemoveBlocks =
 
 			// Find the first message and use it.
 			let message;
-			for ( const rule in rules ) {
-				message = rule( flattenedBlocks );
+			for ( const rule of rules ) {
+				message = rule.callback( flattenedBlocks );
 				if ( message ) {
 					dispatch(
 						displayBlockRemovalPrompt(

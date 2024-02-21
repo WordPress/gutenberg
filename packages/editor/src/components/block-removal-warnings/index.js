@@ -64,16 +64,18 @@ const BLOCK_REMOVAL_RULES = [
 ];
 
 export default function BlockRemovalWarnings() {
-	const { currentPostType } = useSelect(
+	const currentPostType = useSelect(
 		( select ) => select( editorStore ).getCurrentPostType(),
 		[]
 	);
 
-	const removalRulesForPostType = useMemo( () => {
-		BLOCK_REMOVAL_RULES.filter( ( rule ) =>
-			rule.postTypes.some( ( postType ) => postType === currentPostType )
-		);
-	}, [ currentPostType ] );
+	const removalRulesForPostType = useMemo(
+		() =>
+			BLOCK_REMOVAL_RULES.filter( ( rule ) =>
+				rule.postTypes.includes( currentPostType )
+			),
+		[ currentPostType ]
+	);
 
 	if ( ! removalRulesForPostType ) {
 		return null;
