@@ -35,6 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
+import Shuffle from './shuffle';
 
 /**
  * Renders the block toolbar.
@@ -185,6 +186,7 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
+				<Shuffle clientId={ blockClientId } />
 				{ shouldShowVisualToolbar && isMultiToolbar && (
 					<BlockGroupToolbar />
 				) }

@@ -2278,11 +2278,21 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 			if ( ! pattern ) {
 				return null;
 			}
+			const blocks = parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+			} );
+			if ( blocks.length === 1 ) {
+				blocks[ 0 ].attributes = {
+					...blocks[ 0 ].attributes,
+					metadata: {
+						...( blocks[ 0 ].attributes.metadata || {} ),
+						categories: pattern.categories,
+					},
+				};
+			}
 			return {
 				...pattern,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
+				blocks,
 			};
 		}, getAllPatternsDependants( select ) )
 );
