@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- Update `docker-compose` dependency to `0.24.6` and change method calls from `down()` to the new `downAll()`.
+
 ## 9.3.0 (2024-02-09)
 
 ## 9.2.0 (2024-01-24)
