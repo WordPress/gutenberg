@@ -38,7 +38,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * @param {string} blockName - The block name.
  * @return {boolean} Whether it is possible to bind the block attribute.
  */
-export function isItPossibleToBindBlock( blockName ) {
+export function canBindBlock( blockName ) {
 	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
 }
 
@@ -50,9 +50,9 @@ export function isItPossibleToBindBlock( blockName ) {
  * @param {string} attributeName - The attribute name.
  * @return {boolean} Whether it is possible to bind the block attribute.
  */
-export function hasPossibleBlockBinding( blockName, attributeName ) {
+export function canBindAttribute( blockName, attributeName ) {
 	return (
-		isItPossibleToBindBlock( blockName ) &&
+		canBindBlock( blockName ) &&
 		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
 	);
 }
@@ -162,7 +162,7 @@ function BlockBindingBridge( { bindings, props } ) {
 			{ Object.entries( bindings ).map(
 				( [ attrName, boundAttribute ], i ) => {
 					// Check if the block attribute can be bound.
-					if ( ! hasPossibleBlockBinding( name, attrName ) ) {
+					if ( ! canBindAttribute( name, attrName ) ) {
 						return null;
 					}
 
@@ -219,7 +219,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
  * @return {WPBlockSettings} Filtered block settings.
  */
 function shimAttributeSource( settings, name ) {
-	if ( ! isItPossibleToBindBlock( name ) ) {
+	if ( ! canBindBlock( name ) ) {
 		return settings;
 	}
 
