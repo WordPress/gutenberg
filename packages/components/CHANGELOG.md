@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.0.0 (2024-02-21)
+
 ### Breaking Changes
 
 -   `CustomSelectControl`: Remove deprecated `__nextUnconstrainedWidth` prop and promote to default behavior ([#58974](https://github.com/WordPress/gutenberg/pull/58974)).
