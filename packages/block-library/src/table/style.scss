@@ -6,7 +6,8 @@
 
 	overflow-x: auto;
 
-	&[style*="font-size"] {
+	&[style*="font-size"],
+	&[class*="font-size"] {
 		> *,
 		tr,
 		th,
@@ -15,10 +16,9 @@
 		}
 	}
 
-	&.wp-block > table {
+	table {
 		border-collapse: collapse;
 		width: 100%;
-		margin: 0;
 	}
 
 	thead {
@@ -213,21 +213,12 @@
 			}
 		}
 
-		table[style*="color"] {
+		table[style*=" color"] {
 			> *,
 			tr,
 			th,
 			td {
 				color: inherit;
-			}
-		}
-
-		table[style*="background-color"] {
-			> *,
-			tr,
-			th,
-			td {
-				background-color: inherit;
 			}
 		}
 	}
@@ -317,7 +308,8 @@
 		}
 	}
 
-	table[style*="color"] {
+	table[style*=" color"],
+	table[class*="text-color"] {
 		> *,
 		tr,
 		th,
@@ -326,7 +318,8 @@
 		}
 	}
 
-	table[style*="background-color"] {
+	table[style*="background-color"],
+	table[class*="background-color"] {
 		> *,
 		tr,
 		th,
