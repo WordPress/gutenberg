@@ -211,7 +211,7 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-table > table td",
+		"__experimentalSelector": ".wp-block-table > table",
 		"interactivity": {
 			"clientNavigation": true
 		}

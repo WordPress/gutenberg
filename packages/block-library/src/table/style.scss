@@ -87,10 +87,6 @@
 		background-color: transparent;
 		border-bottom: 1px solid $gray-100;
 
-		&.wp-block > table {
-			margin: 0;
-		}
-
 		&[style*="font-size"] {
 			> *,
 			tr,
