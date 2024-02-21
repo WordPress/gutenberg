@@ -113,6 +113,17 @@ function ListViewBranch( props ) {
 		[ parentId ]
 	);
 
+	const { getHasOverlay, isZoomOutMode } = useSelect( ( select ) => {
+		return {
+			getHasOverlay:
+				select( blockEditorStore )
+					.__unstableHasActiveBlockOverlayActive,
+			isZoomOutMode:
+				select( blockEditorStore ).__unstableGetEditorMode() ===
+				'zoom-out',
+		};
+	}, [] );
+
 	const {
 		blockDropPosition,
 		blockDropTargetIndex,
@@ -186,6 +197,9 @@ function ListViewBranch( props ) {
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
 
+				const hideInnerBlocks =
+					isZoomOutMode && getHasOverlay( clientId );
+
 				// To avoid performance issues, we only render blocks that are in view,
 				// or blocks that are selected or dragged. If a block is selected,
 				// it is only counted if it is the first of the block selection.
@@ -218,6 +232,7 @@ function ListViewBranch( props ) {
 								displacement={ displacement }
 								isAfterDraggedBlocks={ isAfterDraggedBlocks }
 								isNesting={ isNesting }
+								hideInnerBlocks={ hideInnerBlocks }
 							/>
 						) }
 						{ ! showBlock && (
@@ -225,22 +240,25 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && shouldExpand && ! isDragged && (
-							<ListViewBranch
-								parentId={ clientId }
-								blocks={ innerBlocks }
-								selectBlock={ selectBlock }
-								showBlockMovers={ showBlockMovers }
-								level={ level + 1 }
-								path={ updatedPath }
-								listPosition={ nextPosition + 1 }
-								fixedListWindow={ fixedListWindow }
-								isBranchSelected={ isSelectedBranch }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								isSyncedBranch={ syncedBranch }
-							/>
-						) }
+						{ hasNestedBlocks &&
+							shouldExpand &&
+							! hideInnerBlocks &&
+							! isDragged && (
+								<ListViewBranch
+									parentId={ clientId }
+									blocks={ innerBlocks }
+									selectBlock={ selectBlock }
+									showBlockMovers={ showBlockMovers }
+									level={ level + 1 }
+									path={ updatedPath }
+									listPosition={ nextPosition + 1 }
+									fixedListWindow={ fixedListWindow }
+									isBranchSelected={ isSelectedBranch }
+									selectedClientIds={ selectedClientIds }
+									isExpanded={ isExpanded }
+									isSyncedBranch={ syncedBranch }
+								/>
+							) }
 					</AsyncModeProvider>
 				);
 			} ) }
