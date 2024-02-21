@@ -63,6 +63,7 @@ function ListViewBlock( {
 	isExpanded,
 	selectedClientIds,
 	isSyncedBranch,
+	hideInnerBlocks,
 } ) {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
@@ -316,7 +317,9 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canEdit ? isExpanded : undefined }
+			data-expanded={
+				canEdit && ! hideInnerBlocks ? isExpanded : undefined
+			}
 			ref={ rowRef }
 		>
 			<TreeGridCell
