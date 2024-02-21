@@ -72,7 +72,6 @@ export function PaddingVisualizer( { clientId, value, forceShow } ) {
 		<BlockPopover
 			clientId={ clientId }
 			__unstableCoverTarget
-			__unstableRefreshSize={ padding }
 			__unstablePopoverSlot="block-toolbar"
 			shift={ false }
 		>

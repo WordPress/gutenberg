@@ -81,7 +81,6 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 		<BlockPopover
 			clientId={ clientId }
 			__unstableCoverTarget
-			__unstableRefreshSize={ margin }
 			__unstablePopoverSlot="block-toolbar"
 			shift={ false }
 		>
