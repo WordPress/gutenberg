@@ -13,49 +13,12 @@
 	}
 }
 
-.block-editor-block-styles__variants {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	gap: $grid-unit-10;
-
-	button.components-button.block-editor-block-styles__item {
-		color: $gray-900;
-		box-shadow: inset 0 0 0 $border-width $gray-300;
-		display: inline-block;
-		width: calc(50% - #{$grid-unit-05});
-
-		&:hover {
-			color: var(--wp-admin-theme-color);
-			box-shadow: inset 0 0 0 $border-width $gray-300;
-		}
-
-		&.is-active,
-		&.is-active:hover {
-			background-color: $gray-900;
-			box-shadow: none;
-		}
-
-		&.is-active .block-editor-block-styles__item-text,
-		&.is-active:hover .block-editor-block-styles__item-text {
-			color: $white;
-		}
-
-		&:focus,
-		&.is-active:focus {
-			@include block-toolbar-button-style__focus();
-		}
-	}
-
-	.block-editor-block-styles__item-text {
-		word-break: break-all;
-		// The Button component is white-space: nowrap, and that won't work with line-clamp.
-		white-space: normal;
-
-		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
-		text-align: start;
-		text-align-last: center;
-	}
+.block-editor-block-styles__dropdown {
+	width: 100%;
+}
+.block-editor-block-styles__dropdown-toggle {
+	box-shadow: inset 0 0 0 $border-width $gray-300;
+	width: 100%;
 }
 
 // To prevent overflow in the preview container,

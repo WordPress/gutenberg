@@ -1,22 +1,14 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { debounce, useViewportMatch } from '@wordpress/compose';
-import {
-	Button,
-	__experimentalTruncate as Truncate,
-	Popover,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import BlockStylesDropdown from './block-styles-dropdown';
 import BlockStylesPreviewPanel from './preview-panel';
 import useStylesForBlocks from './use-styles-for-block';
 
@@ -61,40 +53,12 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 	return (
 		<div className="block-editor-block-styles">
-			<div className="block-editor-block-styles__variants">
-				{ stylesToRender.map( ( style ) => {
-					const buttonText = style.label || style.name;
-
-					return (
-						<Button
-							__next40pxDefaultSize
-							className={ classnames(
-								'block-editor-block-styles__item',
-								{
-									'is-active':
-										activeStyle.name === style.name,
-								}
-							) }
-							key={ style.name }
-							variant="secondary"
-							label={ buttonText }
-							onMouseEnter={ () => styleItemHandler( style ) }
-							onFocus={ () => styleItemHandler( style ) }
-							onMouseLeave={ () => styleItemHandler( null ) }
-							onBlur={ () => styleItemHandler( null ) }
-							onClick={ () => onSelectStylePreview( style ) }
-							aria-current={ activeStyle.name === style.name }
-						>
-							<Truncate
-								numberOfLines={ 1 }
-								className="block-editor-block-styles__item-text"
-							>
-								{ buttonText }
-							</Truncate>
-						</Button>
-					);
-				} ) }
-			</div>
+			<BlockStylesDropdown
+				handlePreview={ styleItemHandler }
+				onSelect={ onSelectStylePreview }
+				styles={ stylesToRender }
+				value={ activeStyle }
+			/>
 			{ hoveredStyle && ! isMobileViewport && (
 				<Popover
 					placement="left-start"
