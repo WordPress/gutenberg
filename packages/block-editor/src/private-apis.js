@@ -11,7 +11,6 @@ import { default as PrivateQuickInserter } from './components/inserter/quick-ins
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useCanBlockToolbarBeFocused } from './utils/use-can-block-toolbar-be-focused';
-import { getTransformedMetadata } from './utils/get-transformed-metadata';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
@@ -45,7 +44,6 @@ lock( privateApis, {
 	ResizableBoxPopover,
 	BlockInfo,
 	useCanBlockToolbarBeFocused,
-	getTransformedMetadata,
 	cleanEmptyObject,
 	useStyleOverride,
 	BlockQuickNavigation,

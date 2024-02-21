@@ -2,15 +2,12 @@
  * WordPress dependencies
  */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
-import { unlock } from '../lock-unlock';
-
-const { getTransformedMetadata } = unlock( blockEditorPrivateApis );
+import { getTransformedMetadata } from '../utils/get-transformed-metadata';
 
 const transforms = {
 	from: [
