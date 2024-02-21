@@ -477,6 +477,10 @@ export const initializeMetaBoxes =
 		} );
 	};
 
+export function toggleMetaBoxes() {
+	return { type: 'TOGGLE_META_BOXES' };
+}
+
 /**
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the

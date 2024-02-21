@@ -168,7 +168,8 @@ function Layout( { initialPost } ) {
 
 		return {
 			showMetaBoxes:
-				select( editorStore ).getRenderingMode() === 'post-only',
+				select( editorStore ).getRenderingMode() === 'post-only' &&
+				select( editPostStore ).showMetaBoxes(),
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name

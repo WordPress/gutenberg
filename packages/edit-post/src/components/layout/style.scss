@@ -1,6 +1,15 @@
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
 	clear: both;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background: $white;
+	z-index: 100;
+	padding: 20px;
+	box-sizing: border-box;
 }
 
 // Adjust the position of the notices

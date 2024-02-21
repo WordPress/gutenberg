@@ -19,9 +19,9 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
+import { next, previous, box } from '@wordpress/icons';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -65,6 +65,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		isTextEditor,
 		blockSelectionStart,
 		hasActiveMetaboxes,
+		showMetaBoxes,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
@@ -77,6 +78,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			blockSelectionStart:
 				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			showMetaBoxes: select( editPostStore ).showMetaBoxes(),
 			hasHistory:
 				!! select( editorStore ).getEditorSettings()
 					.onNavigateToPreviousEntityRecord,
@@ -85,6 +87,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 		};
 	}, [] );
+	const { toggleMetaBoxes } = useDispatch( editPostStore );
 
 	const { showFixedToolbar } = useShowBlockTools();
 	const showTopToolbar = isLargeViewport && showFixedToolbar;
@@ -189,6 +192,16 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 						setEntitiesSavedStatesCallback
 					}
 				/>
+				{ hasActiveMetaboxes && (
+					<Button
+						icon={ box }
+						onClick={ () => {
+							toggleMetaBoxes();
+						} }
+						label={ __( 'Show meta boxes' ) }
+						isPressed={ showMetaBoxes }
+					/>
+				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core/edit-post" />
 				) }
