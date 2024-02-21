@@ -139,19 +139,20 @@ export const privateRemoveBlocks =
 			const blockList = clientIds.map( select.getBlock );
 			const flattenedBlocks = flattenBlocks( blockList );
 
-			const messages = rules
-				.map( ( { callback } ) => callback( flattenedBlocks ) )
-				.filter( ( candidateMessage ) => candidateMessage );
-
-			if ( messages.length ) {
-				dispatch(
-					displayBlockRemovalPrompt(
-						clientIds,
-						selectPrevious,
-						messages
-					)
-				);
-				return;
+			// Find the first message and use it.
+			let message;
+			for ( const rule in rules ) {
+				message = rule( flattenedBlocks );
+				if ( message ) {
+					dispatch(
+						displayBlockRemovalPrompt(
+							clientIds,
+							selectPrevious,
+							message
+						)
+					);
+					return;
+				}
 			}
 		}
 
@@ -207,16 +208,16 @@ export const ensureDefaultBlock =
  *                                         immediate parent (if no previous
  *                                         block exists) should be selected
  *                                         when a block is removed.
- * @param {string[]}        messages       Messages to display in the prompt.
+ * @param {string}          message        Message to display in the prompt.
  *
  * @return {Object} Action object.
  */
-function displayBlockRemovalPrompt( clientIds, selectPrevious, messages ) {
+function displayBlockRemovalPrompt( clientIds, selectPrevious, message ) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
-		messages,
+		message,
 	};
 }
 

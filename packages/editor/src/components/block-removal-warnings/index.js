@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { __ } from '@wordpress/i18n';
+import { _n } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -16,53 +16,35 @@ import { store as editorStore } from '../../store';
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
 // Prevent accidental removal of certain blocks, asking the user for confirmation first.
-const blockRemovalRules = [
+const TEMPLATE_BLOCKS = [
+	'core/post-content',
+	'core/post-template',
+	'core/query',
+];
+const BLOCK_REMOVAL_RULES = [
 	{
-		// Query loop.
-		postTypes: [ 'wp_template' ],
+		// Template blocks.
+		// The warning is only shown when a user manipulates templates or template parts.
+		postTypes: [ 'wp_template', 'wp_template_part' ],
 		callback( removedBlocks ) {
-			if ( removedBlocks.some( ( { name } ) => name === 'core/query' ) ) {
-				return __(
-					'The Query Loop block displays a list of posts or pages, so removing it will prevent that content from displaying.'
-				);
-			}
-		},
-	},
-	{
-		// Post content.
-		postTypes: [ 'wp_template' ],
-		callback( removedBlocks ) {
-			if (
-				removedBlocks.some(
-					( { name } ) => name === 'core/post-content'
-				)
-			) {
-				return __(
-					'Removing the Post Content block will stop your post or page content from displaying on this template.'
-				);
-			}
-		},
-	},
-	{
-		// Post template.
-		postTypes: [ 'wp_template', 'post', 'page' ],
-		callback( removedBlocks ) {
-			if (
-				removedBlocks.some(
-					( { name } ) => name === 'core/post-template'
-				)
-			) {
-				return __(
-					'The Post Template block displays each post or page in a Query Loop, so removing it will stop post content displaying in your query loop.'
+			const removedTemplateBlocks = removedBlocks.filter( ( { name } ) =>
+				TEMPLATE_BLOCKS.includes( name )
+			);
+			if ( removedTemplateBlocks.length ) {
+				return _n(
+					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
+					'Some of the deleted blocks will stop your post or page content from displaying on this template. It is not recommended.',
+					removedBlocks.length
 				);
 			}
 		},
 	},
 	{
 		// Pattern overrides.
+		// The warning is only shown when the user manipulates
 		postTypes: [ 'wp_block' ],
 		callback( removedBlocks ) {
-			const hasOverrides = removedBlocks.some(
+			const removedBlocksWithOverrides = removedBlocks.filter(
 				( { attributes } ) =>
 					attributes?.metadata?.bindings &&
 					Object.values( attributes.metadata.bindings ).some(
@@ -70,9 +52,11 @@ const blockRemovalRules = [
 							binding.source === 'core/pattern-overrides'
 					)
 			);
-			if ( hasOverrides ) {
-				return __(
-					'Deleting a block with pattern instance overrides can break other blocks on your site that have content linked to it.'
+			if ( removedBlocksWithOverrides.length ) {
+				return _n(
+					'The deleted block allows instance overrides. Removing it may result in content not displaying where this pattern is used. Are you sure you want to proceed?',
+					'Some of the deleted blocks allow instance overrides. Removing them may result in content not displaying where this pattern is used. Are you sure you want to proceed?',
+					removedBlocks.length
 				);
 			}
 		},
@@ -86,7 +70,7 @@ export default function BlockRemovalWarnings() {
 	);
 
 	const removalRulesForPostType = useMemo( () => {
-		blockRemovalRules.filter( ( rule ) =>
+		BLOCK_REMOVAL_RULES.filter( ( rule ) =>
 			rule.postTypes.some( ( postType ) => postType === currentPostType )
 		);
 	}, [ currentPostType ] );
