@@ -23,7 +23,7 @@ function gutenberg_update_initial_settings( $args, $defaults, $option_group, $op
 	);
 
 	if ( isset( $settings_label_map[ $option_name ] ) ) {
-		$args['label'] = $settings_label_map[ $option_name ];
+		$args['title'] = $settings_label_map[ $option_name ];
 	}
 
 	return $args;

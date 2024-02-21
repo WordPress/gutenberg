@@ -7,6 +7,36 @@
 
 class Gutenberg_REST_Settings_Controller extends WP_REST_Settings_Controller {
 	/**
+	 * Registers the routes for the site's settings.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @see register_rest_route()
+	 */
+	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'args'                => array(),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			),
+			true // Override.
+		);
+	}
+
+	/**
 	 * Retrieves all of the registered options for the Settings API.
 	 *
 	 * @since 4.7.0
@@ -36,7 +66,7 @@ class Gutenberg_REST_Settings_Controller extends WP_REST_Settings_Controller {
 
 			$default_schema = array(
 				'type'        => empty( $args['type'] ) ? null : $args['type'],
-				'title'       => empty( $args['label'] ) ? '' : $args['label'], // Note: Only change to the method.
+				'title'       => empty( $args['title'] ) ? '' : $args['title'], // Note: Only change to the method.
 				'description' => empty( $args['description'] ) ? '' : $args['description'],
 				'default'     => isset( $args['default'] ) ? $args['default'] : null,
 			);
