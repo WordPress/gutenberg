@@ -192,9 +192,15 @@ export default function ChildLayoutControl( {
 		let selectedValue;
 		if ( isFlowOrConstrained ) {
 			// Replace "full" with "fill" for full width alignments.
-			if ( currentAlignment === 'full' ) {
+			if (
+				currentAlignment === 'full' &&
+				parentLayoutType === 'constrained'
+			) {
 				selectedValue = 'fill';
-			} else if ( currentAlignment === 'wide' ) {
+			} else if (
+				currentAlignment === 'wide' &&
+				parentLayoutType === 'constrained'
+			) {
 				selectedValue = 'wide';
 			} else if ( selfAlign === 'fixedNoShrink' ) {
 				selectedValue = 'fixedNoShrink';
@@ -248,10 +254,17 @@ export default function ChildLayoutControl( {
 		const { key } = selectedItem;
 		if ( isFlowOrConstrained ) {
 			if ( key === 'fill' ) {
-				onChange( { [ widthProp ]: key } );
-				onChangeAlignment( 'full' );
+				onChange( { ...childLayout, [ widthProp ]: key } );
+				/**
+				 * Fill exists for both flow and constrained layouts but
+				 * should only change alignment for constrained layouts.
+				 * "fill" in flow layout is the default state of its children.
+				 */
+				if ( parentLayoutType === 'constrained' ) {
+					onChangeAlignment( 'full' );
+				}
 			} else if ( key === 'wide' ) {
-				onChange( { [ widthProp ]: key } );
+				onChange( { ...childLayout, [ widthProp ]: key } );
 				onChangeAlignment( 'wide' );
 			} else if ( key === 'fixedNoShrink' ) {
 				onChange( {
@@ -260,21 +273,28 @@ export default function ChildLayoutControl( {
 				} );
 				onChangeAlignment( undefined );
 			} else {
-				onChange( { [ widthProp ]: key } );
+				onChange( { ...childLayout, [ widthProp ]: key } );
 				onChangeAlignment( undefined );
 			}
 		} else if ( parentLayoutType === 'flex' ) {
+			// if the layout is horizontal, reset any flexSize when changing width.
+			const resetFlexSize =
+				orientation !== 'vertical' ? undefined : flexSize;
 			onChange( {
 				...childLayout,
 				[ widthProp ]: key,
+				flexSize: resetFlexSize,
 			} );
 		}
 	};
 
 	const onChangeHeight = ( newHeight ) => {
+		// If the layout is vertical, reset any flexSize when changing height.
+		const resetFlexSize = orientation === 'vertical' ? undefined : flexSize;
 		onChange( {
 			...childLayout,
 			[ heightProp ]: newHeight.selectedItem.key,
+			flexSize: resetFlexSize,
 		} );
 	};
 

@@ -47,15 +47,13 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
+		// Flex size should still be output for back compat.
 		if ( selfStretch === 'fixed' && flexSize ) {
 			css = `${ selector } {
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
 			}`;
-		} else if ( selfStretch === 'fill' ) {
-			css = `${ selector } {
-				flex-grow: 1;
-			}`;
+			// Grid type styles.
 		} else if ( columnSpan ) {
 			css = `${ selector } {
 				grid-column: span ${ columnSpan };
@@ -150,9 +148,13 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				css += `${ selector } {
 						height: fit-content;
 					}`;
-			} else if ( layout[ heightProp ] === 'fixedNoShrink' ) {
+			} else if ( layout[ heightProp ] === 'fixedNoShrink' && height ) {
 				css += `${ selector } {
 						height: ${ height };
+					}`;
+			} else if ( layout[ heightProp ] === 'fixed' && height ) {
+				css += `${ selector } {
+						max-height: ${ height };
 					}`;
 			}
 		}
