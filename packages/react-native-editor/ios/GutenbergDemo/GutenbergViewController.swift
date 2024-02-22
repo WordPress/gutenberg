@@ -350,7 +350,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         return true
     }
 
-    func logException(_ exception: [AnyHashable: Any]) -> Bool {
+    func gutenbergDidRequestLogException(_ exception: [AnyHashable : Any]) {
         print(#function)
     }
 }
