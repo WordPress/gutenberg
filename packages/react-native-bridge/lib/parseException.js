@@ -106,9 +106,12 @@ const reverseEntries = ( stack ) => {
 
 // Based on function `createStackParser` of Sentry JavaScript SDK:
 // https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/utils/src/stacktrace.ts#L16-L59
-const parseStacktrace = ( stacktrace ) => {
+// And function `parseStackFrames` of Sentry JavaScript SDK:
+// https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L100-L118
+const parseStacktrace = ( exception ) => {
+	const plainStacktrace = exception.stacktrace || exception.stack || '';
 	const entries = [];
-	const lines = stacktrace.split( '\n' );
+	const lines = plainStacktrace.split( '\n' );
 
 	for ( let i = 0; i < lines.length; i++ ) {
 		const line = lines[ i ];
@@ -135,28 +138,14 @@ const parseStacktrace = ( stacktrace ) => {
 	return reverseEntries( entries );
 };
 
-// Based on function `parseStackFrames` of Sentry JavaScript SDK:
-// https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L100-L118
-const convertStacktraceToArray = ( exception ) => {
-	const stacktrace = exception.stacktrace || exception.stack || '';
-
-	try {
-		return parseStacktrace( stacktrace );
-	} catch ( e ) {
-		// noop
-	}
-
-	return [];
-};
-
 // Based on function `extractMessage` of Sentry JavaScript SDK:
 // https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L142-L151
 const extractMessage = ( exception ) => {
-	const message = exception && exception.message;
+	const message = exception?.message;
 	if ( ! message ) {
 		return 'No error message';
 	}
-	if ( message.error && typeof message.error.message === 'string' ) {
+	if ( typeof message.error?.message === 'string' ) {
 		return message.error.message;
 	}
 	return message;
@@ -165,15 +154,14 @@ const extractMessage = ( exception ) => {
 // Based on function `exceptionFromError` of Sentry JavaScript SDK:
 // https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L31-L49
 const parseException = ( originalException ) => {
-	const stacktraceEntries = convertStacktraceToArray( originalException );
-
 	const exception = {
 		type: originalException?.name,
 		value: extractMessage( originalException ),
 	};
 
-	if ( stacktraceEntries.length ) {
-		exception.stacktrace = stacktraceEntries;
+	const stacktrace = parseStacktrace( originalException );
+	if ( stacktrace.length ) {
+		exception.stacktrace = stacktrace;
 	}
 
 	if ( exception.type === undefined && exception.value === '' ) {
