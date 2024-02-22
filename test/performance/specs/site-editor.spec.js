@@ -241,11 +241,13 @@ test.describe( 'Site Editor Performance', () => {
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
 				// eslint-disable-next-line no-restricted-syntax
-				const actionsButtonElement = await page.$$(
-					".edit-site-template-card__actions button[aria-label='Actions']"
-				);
+				const isActionsButtonVisible = await page
+					.locator(
+						'.edit-site-template-card__actions button[aria-label="Actions"]'
+					)
+					.isVisible();
 
-				if ( actionsButtonElement.length ) {
+				if ( isActionsButtonVisible ) {
 					await page
 						.getByRole( 'button', {
 							name: 'Actions',
@@ -259,7 +261,7 @@ test.describe( 'Site Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				if ( actionsButtonElement.length ) {
+				if ( isActionsButtonVisible ) {
 					await page
 						.getByRole( 'menuitem', { name: 'Replace template' } )
 						.click();
