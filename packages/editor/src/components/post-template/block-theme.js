@@ -119,7 +119,7 @@ export default function BlockThemeControl( { id } ) {
 								);
 							} }
 						>
-							{ __( 'Template preview' ) }
+							{ __( 'Show template' ) }
 						</MenuItem>
 					</MenuGroup>
 				</>
