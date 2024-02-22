@@ -40,7 +40,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 #### 1. Scaffold an interactive block
 
-We can scaffold a WordPress plugin that registers an interactive block (using the Interactivity API) by using a [template](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) with the `@wordpress/create-block` command.
+A WordPress plugin that registers an interactive block (using the Interactivity API) by using a [template](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) can be scaffolded with the `@wordpress/create-block` command.
 
 ```
 npx @wordpress/create-block@latest my-first-interactive-block --template @wordpress/create-block-interactive-template
@@ -48,7 +48,7 @@ npx @wordpress/create-block@latest my-first-interactive-block --template @wordpr
 
 #### 2. Generate the build
 
-When the plugin folder is generated, we should launch the build process to get the final version of the interactive block that can be used from WordPress.
+When the plugin folder is generated, the build process needs to be launched to get the final version of the interactive block that can be used from WordPress.
 
 ```
 cd my-first-interactive-block && npm start
@@ -84,7 +84,7 @@ Block development requires [Node](https://nodejs.org/en), so you'll need to have
 
 ##### Add `interactivity` support to `block.json`
 
-To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
+To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json`
 
 ```
 "supports": {
@@ -94,7 +94,7 @@ To indicate that our block [supports](https://developer.wordpress.org/block-edit
 
 ##### Add `wp-interactive` directive to a DOM element
 
-To "activate" the Interactivity API in a DOM element (and its children) we add the [`wp-interactive` directive](#wp-interactive) to it from our `render.php` or `save.js`
+To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive` directive](#wp-interactive) to it from `render.php` or `save.js`
 
 
 ```html
@@ -174,7 +174,7 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 #### List of Directives
 
-With directives, we can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
+With directives, you can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
 
 ##### `wp-interactive`
 
@@ -764,7 +764,7 @@ It would generate the following output:
 </ul>
 ```
 
-The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, we change the default prop `item` to `greeting`.
+The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, the default prop changes from `item` to `greeting`.
 
 ```html
 <ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
@@ -813,7 +813,7 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 
 The value assigned to a directive is a string pointing to a specific state, action, or side effect.
 
-In the following example, we use a getter to define the `state.isPlaying` derived value.
+In the following example, a getter is used to define the `state.isPlaying` derived value.
 
 ```js
 const { state } = store( "myPlugin", {
@@ -826,7 +826,7 @@ const { state } = store( "myPlugin", {
 } );
 ```
 
-And then, we use the string value `"state.isPlaying"` to assign the result of this selector to `data-bind--hidden`.
+And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-bind--hidden`.
 
 ```html
 <div data-bind--hidden="!state.isPlaying" ... >
@@ -836,9 +836,9 @@ And then, we use the string value `"state.isPlaying"` to assign the result of th
 
 These values assigned to directives are **references** to a particular property in the store. They are wired to the directives automatically so that each directive “knows” what store element refers to, without any additional configuration.
 
-Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property we want to access is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
+Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property accessed is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
 
-In the example below, we get `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
+The example below is getting `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
 
 ```html
 <div data-wp-interactive="myPlugin">
@@ -995,7 +995,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 ##### On the client side
 
-*In the `view.js` file of each block* we can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
+*In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
 The `store` method used to set the store in javascript can be imported from `@wordpress/interactivity`.
 
@@ -1093,9 +1093,9 @@ There's a Tracking Issue opened to ease the coordination of the work related to 
 
 ## Get Involved
 
-As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) we encourage participation in helping shape this API and its Docs. The [discussions](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) and [issues](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API) in GitHub are the best place to engage.
+As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) participation is encouraged in helping shape this API and its Docs. The [discussions](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) and [issues](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API) in GitHub are the best place to engage.
 
-If you are willing to help with the documentation, please add a comment to [#51928](https://github.com/WordPress/gutenberg/discussions/51928), and we'll coordinate everyone's efforts.
+If you are willing to help with the documentation, please add a comment to [#51928](https://github.com/WordPress/gutenberg/discussions/51928) to coordinate everyone's efforts.
 
 
 ## License
