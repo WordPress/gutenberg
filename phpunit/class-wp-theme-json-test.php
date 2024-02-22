@@ -5070,12 +5070,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'core/post-template'       => array(
+						'core/post-template'   => array(
 							'spacing' => array(
 								'blockGap' => null,
 							),
 						),
-						'core/columns'       => array(
+						'core/columns'         => array(
 							'spacing' => array(
 								'margin' => 'var(--wp--preset--spacing--100)',
 							),
