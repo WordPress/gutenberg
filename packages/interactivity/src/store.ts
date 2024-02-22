@@ -149,6 +149,7 @@ const handlers = {
 
 		return result;
 	},
+	// Prevents passing the current proxy as the receiver to the deepSignal.
 	set( target: any, key: string, value: any ) {
 		return Reflect.set( target, key, value );
 	},
