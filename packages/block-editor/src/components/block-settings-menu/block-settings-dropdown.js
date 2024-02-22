@@ -39,8 +39,12 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { blocks, onCopy, label } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+function CopyMenuItem( { clientIds, onCopy, label } ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const ref = useCopyToClipboard(
+		() => serialize( getBlocksByClientId( clientIds ) ),
+		onCopy
+	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
@@ -239,7 +243,7 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canCopyStyles,
 				canDuplicate,
-				canInsertDefaultBlock,
+				canInsertBlock,
 				canMove,
 				canRemove,
 				onDuplicate,
@@ -249,7 +253,6 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 				onMoveTo,
-				blocks,
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
@@ -286,7 +289,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-after',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -296,7 +299,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-before',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -327,7 +330,7 @@ export function BlockSettingsDropdown( {
 									/>
 								) }
 								<CopyMenuItem
-									blocks={ blocks }
+									clientIds={ clientIds }
 									onCopy={ onCopy }
 								/>
 								{ canDuplicate && (
@@ -342,7 +345,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertDefaultBlock && (
+								{ canInsertBlock && (
 									<>
 										<MenuItem
 											onClick={ pipe(
@@ -368,7 +371,7 @@ export function BlockSettingsDropdown( {
 							{ canCopyStyles && (
 								<MenuGroup>
 									<CopyMenuItem
-										blocks={ blocks }
+										clientIds={ clientIds }
 										onCopy={ onCopy }
 										label={ __( 'Copy styles' ) }
 									/>
