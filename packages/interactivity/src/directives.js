@@ -56,9 +56,11 @@ const proxifyContext = ( current, inherited = {} ) =>
 				return proxifyContext( currentProp, inherited[ k ] );
 			}
 
-			// For other cases, return the value from target, but subscribing
-			// also to changes in the parent context when the current prop is
-			// not defined.
+			/* 
+			 * For other cases, return the value from target, also subscribing
+			 * to changes in the parent context when the current prop is
+			 * not defined.
+			 */
 			return k in target ? currentProp : inherited[ k ];
 		},
 		set: ( target, k, value ) => {
