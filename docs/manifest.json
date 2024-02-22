@@ -1680,6 +1680,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "API Reference",
+		"slug": "packages-interactivity-api-reference",
+		"markdown_source": "../packages/interactivity/docs/api-reference.md",
+		"parent": "packages-interactivity"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",

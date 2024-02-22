@@ -14,6 +14,13 @@ These Core blocks are already powered by thi API:
 
 ## Installation
 
+> **Note**
+> This step is only required if you are using this API outside of WordPress.
+>
+> Within WordPress, the package is already bundled in Core, so all you need to do to ensure it is loaded, by adding `wp-interactivity` to the dependency array of the module script.
+>
+>This happens automatically when you use the dependency extraction Webpack plugin that is used in tools like wp-scripts.
+
 Install the module:
 
 ```bash
@@ -48,7 +55,7 @@ npx @wordpress/create-block@latest my-first-interactive-block --template @wordpr
 
 #### 2. Generate the build
 
-When the plugin folder is generated, the build process needs to be launched to get the final version of the interactive block that can be used from WordPress.
+When the plugin folder is generated, the build process needs to be launched to get a working version of the interactive block that can be used in WordPress.
 
 ```
 cd my-first-interactive-block && npm start
