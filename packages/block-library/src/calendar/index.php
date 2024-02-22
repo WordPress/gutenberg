@@ -10,7 +10,7 @@
  *
  * @global int $monthnum.
  * @global int $year
- * 
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the block content.
