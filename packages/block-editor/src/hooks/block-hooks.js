@@ -19,6 +19,10 @@ import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
 
+function isNavigationBlock( block ) {
+	return block.name === 'core/navigation';
+}
+
 function BlockHooksControlPure( { name, clientId } ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
@@ -55,10 +59,9 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 			return {
 				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength:
-					getBlock( clientId )?.innerBlocks?.length > 0
-						? getBlock( clientId )?.innerBlocks?.length
-						: getInnerBlocksByOrderTree( clientId )?.length,
+				innerBlocksLength: isNavigationBlock( getBlock( clientId ) )
+					? getInnerBlocksByOrderTree( clientId )?.length
+					: getBlock( clientId )?.innerBlocks?.length,
 				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
@@ -96,7 +99,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// as a hooked first or last child block, as the block might've been automatically
 							// inserted and then moved around a bit by the user.
 							const currentBlock = getBlock( clientId );
-							if ( currentBlock.innerBlocks.length === 0 ) {
+							if ( isNavigationBlock( currentBlock ) ) {
 								candidates =
 									getInnerBlocksByOrderTree( clientId );
 							} else {
