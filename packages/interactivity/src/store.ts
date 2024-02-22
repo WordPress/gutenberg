@@ -35,20 +35,6 @@ const deepMerge = ( target: any, source: any ) => {
 	}
 };
 
-export const parseInitialData = () => {
-	const storeTag = document.querySelector(
-		`script[type="application/json"]#wp-interactivity-data`
-	);
-	if ( storeTag?.textContent ) {
-		try {
-			return JSON.parse( storeTag.textContent );
-		} catch ( e ) {
-			// Do nothing.
-		}
-	}
-	return {};
-};
-
 export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
@@ -309,6 +295,20 @@ export function store(
 
 	return stores.get( namespace );
 }
+
+export const parseInitialData = ( dom = document ) => {
+	const storeTag = dom.querySelector(
+		`script[type="application/json"]#wp-interactivity-data`
+	);
+	if ( storeTag?.textContent ) {
+		try {
+			return JSON.parse( storeTag.textContent );
+		} catch ( e ) {
+			// Do nothing.
+		}
+	}
+	return {};
+};
 
 export const populateInitialData = ( data?: {
 	state?: Record< string, unknown >;
