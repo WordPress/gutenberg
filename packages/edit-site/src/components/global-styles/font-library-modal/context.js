@@ -392,7 +392,7 @@ function FontLibraryProvider( { children } ) {
 					loadFontFaceInBrowser(
 						face,
 						getDisplaySrcFromFontFace( face.src ),
-						'iframe'
+						'all'
 					);
 				} );
 			}

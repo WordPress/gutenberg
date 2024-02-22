@@ -16,8 +16,8 @@ import {
 	resetNamespace,
 } from './hooks';
 
-const isObject = ( item: unknown ): boolean =>
-	!! item && typeof item === 'object' && ! Array.isArray( item );
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	item && typeof item === 'object' && item.constructor === Object;
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
@@ -235,7 +235,7 @@ const universalUnlock =
  * the store by using directives in the HTML, e.g.:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "counter" }'>
+ * <div data-wp-interactive="counter">
  *   <button
  *     data-wp-text="state.double"
  *     data-wp-on--click="actions.increment"

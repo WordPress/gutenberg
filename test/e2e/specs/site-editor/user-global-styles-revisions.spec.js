@@ -56,8 +56,11 @@ test.describe( 'Style Revisions', () => {
 
 		// Shows changes made in the revision.
 		await expect(
-			page.getByTestId( 'global-styles-revision-changes' )
-		).toHaveText( 'Colors.' );
+			page
+				.getByTestId( 'global-styles-revision-changes' )
+				.getByRole( 'listitem' )
+				.first()
+		).toHaveText( 'Colors styles.' );
 
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
