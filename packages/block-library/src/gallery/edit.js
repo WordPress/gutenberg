@@ -73,6 +73,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
 function GalleryEdit( props ) {
@@ -496,6 +497,8 @@ function GalleryEdit( props ) {
 	};
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		...nativeInnerBlockProps,

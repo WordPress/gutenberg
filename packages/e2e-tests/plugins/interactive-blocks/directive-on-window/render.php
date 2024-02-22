@@ -8,7 +8,7 @@
 wp_enqueue_script_module( 'directive-on-window-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-on-window" }'>
+<div data-wp-interactive="directive-on-window">
 	<button
 		data-wp-on--click="actions.visibilityHandler"
 		data-testid="visibility">

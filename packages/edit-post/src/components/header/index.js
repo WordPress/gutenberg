@@ -61,7 +61,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const blockToolbarRef = useRef();
 	const {
 		isTextEditor,
-		hasBlockSelection,
+		blockSelectionStart,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
 		isPublishSidebarOpened,
@@ -69,12 +69,12 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		hasHistory,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
-		const { getEditorMode } = select( editPostStore );
+		const { getEditorMode } = select( editorStore );
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
+			blockSelectionStart:
+				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory:
 				!! select( editorStore ).getEditorSettings()
@@ -88,13 +88,14 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
+	const hasBlockSelection = !! blockSelectionStart;
 
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
-		if ( hasBlockSelection ) {
+		if ( blockSelectionStart ) {
 			setIsBlockToolsCollapsed( false );
 		}
-	}, [ hasBlockSelection ] );
+	}, [ blockSelectionStart ] );
 
 	return (
 		<div className="edit-post-header">
@@ -121,7 +122,9 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 							className={ classnames(
 								'selected-block-tools-wrapper',
 								{
-									'is-collapsed': isBlockToolsCollapsed,
+									'is-collapsed':
+										isBlockToolsCollapsed ||
+										! hasBlockSelection,
 								}
 							) }
 						>

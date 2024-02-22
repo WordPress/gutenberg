@@ -18,7 +18,7 @@ if ( $attributes['disableNavigation'] ) {
 ?>
 
 <div
-	data-wp-interactive='{ "namespace": "router" }'
+	data-wp-interactive="router"
 	data-wp-router-region="region-1"
 >
 	<h2 data-testid="title"><?php echo $attributes['title']; ?></h2>

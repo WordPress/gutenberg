@@ -9,7 +9,7 @@ wp_enqueue_script_module( 'directive-run-view' );
 ?>
 
 <div
-	data-wp-interactive='{ "namespace": "directive-run" }'
+	data-wp-interactive="directive-run"
 	data-wp-router-region='test-directive-run'
 >
 	<div data-testid="hydrated" data-wp-text="state.isHydrated"></div>
@@ -24,7 +24,7 @@ wp_enqueue_script_module( 'directive-run-view' );
 	></div>
 </div>
 
-<div data-wp-interactive='{ "namespace": "directive-run" }' >
+<div data-wp-interactive="directive-run" >
 	<button data-testid="toggle" data-wp-on--click="actions.toggle">
 		Toggle
 	</button>
