@@ -94,17 +94,17 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 			) }
 			actions={
 				<>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
 					<PageActions
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
 							goTo( '/page' );
 						} }
-					/>
-					<SidebarButton
-						onClick={ () => setCanvasMode( 'edit' ) }
-						label={ __( 'Edit' ) }
-						icon={ pencil }
 					/>
 				</>
 			}

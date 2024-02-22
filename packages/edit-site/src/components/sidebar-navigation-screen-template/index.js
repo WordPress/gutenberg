@@ -109,6 +109,11 @@ export default function SidebarNavigationScreenTemplate() {
 			title={ title }
 			actions={
 				<>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
 					<TemplateActions
 						postType={ postType }
 						postId={ postId }
@@ -116,11 +121,6 @@ export default function SidebarNavigationScreenTemplate() {
 						onRemove={ () => {
 							navigator.goTo( `/${ postType }/all` );
 						} }
-					/>
-					<SidebarButton
-						onClick={ () => setCanvasMode( 'edit' ) }
-						label={ __( 'Edit' ) }
-						icon={ pencil }
 					/>
 				</>
 			}
