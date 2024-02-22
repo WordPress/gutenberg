@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarItem, ToolbarGroup, Icon } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { connection } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
@@ -11,7 +11,7 @@ import { _x } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function BlockBindingsButton( { clientId } ) {
+export default function BlockBindingsIndicator( { clientId } ) {
 	const isConnected = useSelect(
 		( select ) => {
 			const attributes =
@@ -23,10 +23,14 @@ export default function BlockBindingsButton( { clientId } ) {
 	);
 
 	return isConnected ? (
-		<ToolbarButton
-			icon={ connection }
-			label={ _x( 'Connected', 'block toolbar button label' ) }
-			iconSize={ 24 }
-		></ToolbarButton>
+		<ToolbarGroup>
+			<ToolbarItem
+				as={ 'div' }
+				aria-label={ _x( 'Connected', 'block toolbar button label' ) }
+				className="block-editor-block-bindings-indicator"
+			>
+				<Icon icon={ connection } size={ 24 } />
+			</ToolbarItem>
+		</ToolbarGroup>
 	) : null;
 }

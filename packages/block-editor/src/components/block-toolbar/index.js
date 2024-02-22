@@ -36,7 +36,7 @@ import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 import Shuffle from './shuffle';
-import BlockBindingsButton from '../block-bindings-button';
+import BlockBindingsIndicator from '../block-bindings-indicator';
 
 /**
  * Renders the block toolbar.
@@ -167,7 +167,7 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
-				<BlockBindingsButton clientId={ blockClientId } />
+				<BlockBindingsIndicator clientId={ blockClientId } />
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					isDefaultEditingMode && (
 						<div
