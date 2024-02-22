@@ -1,5 +1,8 @@
 # API Reference
 
+> **Note**
+> Interactivity API is only available for WordPress 6.5 and above.
+
 To add interactivity to blocks using the Interactivity API, developers can use:
 
 - **Directives** - added to the markup to add specific behavior to the DOM elements of the block.
@@ -7,7 +10,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 
 DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=T4meh6lltJh6TCX51NTIu,DmIhxYSGFTL_ywZFbsmuSw)).
 
-![State & Directives](./assets/interactivity-state-directives.png)
+![State & Directives](https://make.wordpress.org/core/files/2024/02/interactivity-state-directives.png)
 
 ## Table of Contents
 
