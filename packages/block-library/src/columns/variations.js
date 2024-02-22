@@ -21,12 +21,14 @@ const variations = [
 				width="48"
 				height="48"
 				viewBox="0 0 48 48"
+				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
-					d="m39.0625 14h-30.0625v20.0938h30.0625zm-30.0625-2c-1.10457 0-2 .8954-2 2v20.0938c0 1.1045.89543 2 2 2h30.0625c1.1046 0 2-.8955 2-2v-20.0938c0-1.1046-.8954-2-2-2z"
+					d="M42 10H6C4.89543 10 4 10.8954 4 12V36C4 37.1046 4.89543 38 6 38H42C43.1046 38 44 37.1046 44 36V12C44 10.8954 43.1046 10 42 10ZM6 11.5H42C42.2761 11.5 42.5 11.7239 42.5 12V36C42.5 36.2761 42.2761 36.5 42 36.5H6C5.72386 36.5 5.5 36.2761 5.5 36V12C5.5 11.7239 5.72386 11.5 6 11.5Z"
+					fill="currentColor"
 				/>
 			</SVG>
 		),
@@ -35,19 +37,21 @@ const variations = [
 	},
 	{
 		name: 'two-columns-equal',
-		title: __( '50 / 50' ),
+		title: __( '50/50' ),
 		description: __( 'Two columns; equal split' ),
 		icon: (
 			<SVG
 				width="48"
 				height="48"
 				viewBox="0 0 48 48"
+				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
-					d="M39 12C40.1046 12 41 12.8954 41 14V34C41 35.1046 40.1046 36 39 36H9C7.89543 36 7 35.1046 7 34V14C7 12.8954 7.89543 12 9 12H39ZM39 34V14H25V34H39ZM23 34H9V14H23V34Z"
+					d="M23.5 11.5H6C5.72386 11.5 5.5 11.7239 5.5 12V36C5.5 36.2761 5.72386 36.5 6 36.5H23.5V11.5ZM25 11.5H42C42.2761 11.5 42.5 11.7239 42.5 12V36C42.5 36.2761 42.2761 36.5 42 36.5H25V11.5ZM6 10H42C43.1046 10 44 10.8954 44 12V36C44 37.1046 43.1046 38 42 38H6C4.89543 38 4 37.1046 4 36V12C4 10.8954 4.89543 10 6 10Z"
+					fill="currentColor"
 				/>
 			</SVG>
 		),
@@ -56,20 +60,49 @@ const variations = [
 		scope: [ 'block' ],
 	},
 	{
+		name: 'three-columns-equal',
+		title: __( '33/33/33' ),
+		description: __( 'Three columns; equal split' ),
+		icon: (
+			<SVG
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<Path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M42 10H6C4.89543 10 4 10.8954 4 12V36C4 37.1046 4.89543 38 6 38H42C43.1046 38 44 37.1046 44 36V12C44 10.8954 43.1046 10 42 10ZM6 11.5H16.5V36.5H6C5.72386 36.5 5.5 36.2761 5.5 36V12C5.5 11.7239 5.72386 11.5 6 11.5ZM30 11.5H18V36.5H30V11.5ZM31.5 11.5V36.5H42C42.2761 36.5 42.5 36.2761 42.5 36V12C42.5 11.7239 42.2761 11.5 42 11.5H31.5Z"
+					fill="currentColor"
+				/>
+			</SVG>
+		),
+		innerBlocks: [
+			[ 'core/column' ],
+			[ 'core/column' ],
+			[ 'core/column' ],
+		],
+		scope: [ 'block' ],
+	},
+	{
 		name: 'two-columns-one-third-two-thirds',
-		title: __( '33 / 66' ),
+		title: __( '33/66' ),
 		description: __( 'Two columns; one-third, two-thirds split' ),
 		icon: (
 			<SVG
 				width="48"
 				height="48"
 				viewBox="0 0 48 48"
+				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
-					d="M39 12C40.1046 12 41 12.8954 41 14V34C41 35.1046 40.1046 36 39 36H9C7.89543 36 7 35.1046 7 34V14C7 12.8954 7.89543 12 9 12H39ZM39 34V14H20V34H39ZM18 34H9V14H18V34Z"
+					d="M6 10H42C43.1046 10 44 10.8954 44 12V36C44 37.1046 43.1046 38 42 38H6C4.89543 38 4 37.1046 4 36V12C4 10.8954 4.89543 10 6 10ZM16.5 11.5H6C5.72386 11.5 5.5 11.7239 5.5 12V36C5.5 36.2761 5.72386 36.5 6 36.5H16.5V11.5ZM18 11.5H42C42.2761 11.5 42.5 11.7239 42.5 12V36C42.5 36.2761 42.2761 36.5 42 36.5H18V11.5Z"
+					fill="currentColor"
 				/>
 			</SVG>
 		),
@@ -81,19 +114,21 @@ const variations = [
 	},
 	{
 		name: 'two-columns-two-thirds-one-third',
-		title: __( '66 / 33' ),
+		title: __( '66/33' ),
 		description: __( 'Two columns; two-thirds, one-third split' ),
 		icon: (
 			<SVG
 				width="48"
 				height="48"
 				viewBox="0 0 48 48"
+				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<Path
 					fillRule="evenodd"
 					clipRule="evenodd"
-					d="M39 12C40.1046 12 41 12.8954 41 14V34C41 35.1046 40.1046 36 39 36H9C7.89543 36 7 35.1046 7 34V14C7 12.8954 7.89543 12 9 12H39ZM39 34V14H30V34H39ZM28 34H9V14H28V34Z"
+					d="M6 10H42C43.1046 10 44 10.8954 44 12V36C44 37.1046 43.1046 38 42 38H6C4.89543 38 4 37.1046 4 36V12C4 10.8954 4.89543 10 6 10ZM29.5 11.5H6C5.72386 11.5 5.5 11.7239 5.5 12V36C5.5 36.2761 5.72386 36.5 6 36.5H29.5V11.5ZM31 11.5H42C42.2761 11.5 42.5 11.7239 42.5 12V36C42.5 36.2761 42.2761 36.5 42 36.5H31V11.5Z"
+					fill="currentColor"
 				/>
 			</SVG>
 		),
@@ -104,43 +139,22 @@ const variations = [
 		scope: [ 'block' ],
 	},
 	{
-		name: 'three-columns-equal',
-		title: __( '33 / 33 / 33' ),
-		description: __( 'Three columns; equal split' ),
-		icon: (
-			<SVG
-				width="48"
-				height="48"
-				viewBox="0 0 48 48"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<Path
-					fillRule="evenodd"
-					d="M41 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h30a2 2 0 0 0 2-2V14zM28.5 34h-9V14h9v20zm2 0V14H39v20h-8.5zm-13 0H9V14h8.5v20z"
-				/>
-			</SVG>
-		),
-		innerBlocks: [
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-		],
-		scope: [ 'block' ],
-	},
-	{
 		name: 'three-columns-wider-center',
-		title: __( '25 / 50 / 25' ),
+		title: __( '25/50/25' ),
 		description: __( 'Three columns; wide center column' ),
 		icon: (
 			<SVG
 				width="48"
 				height="48"
 				viewBox="0 0 48 48"
+				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				<Path
 					fillRule="evenodd"
-					d="M41 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h30a2 2 0 0 0 2-2V14zM31 34H17V14h14v20zm2 0V14h6v20h-6zm-18 0H9V14h6v20z"
+					clipRule="evenodd"
+					d="M42 10H6C4.89543 10 4 10.8954 4 12V36C4 37.1046 4.89543 38 6 38H42C43.1046 38 44 37.1046 44 36V12C44 10.8954 43.1046 10 42 10ZM6 11.5H14.5V36.5H6C5.72386 36.5 5.5 36.2761 5.5 36V12C5.5 11.7239 5.72386 11.5 6 11.5ZM32 11.5H16V36.5H32V11.5ZM33.5 11.5V36.5H42C42.2761 36.5 42.5 36.2761 42.5 36V12C42.5 11.7239 42.2761 11.5 42 11.5H33.5Z"
+					fill="currentColor"
 				/>
 			</SVG>
 		),
