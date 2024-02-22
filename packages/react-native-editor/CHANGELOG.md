@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Prevent crash when autoscrolling to blocks [#59110]
+-   [*] Remove opacity change when images are being uploaded [#59264]
 
 ## 1.112.0
 -   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]
