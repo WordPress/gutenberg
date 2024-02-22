@@ -18,6 +18,7 @@ const meta: Meta< typeof Theme > = {
 		accent: { control: { type: 'color' } },
 		background: { control: { type: 'color' } },
 	},
+	tags: [ 'status-private' ],
 	parameters: {
 		badges: [ 'private' ],
 		controls: { expanded: true },

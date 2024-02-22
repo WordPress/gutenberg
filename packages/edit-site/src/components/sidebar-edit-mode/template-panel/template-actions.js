@@ -11,18 +11,12 @@ import { moreVertical } from '@wordpress/icons';
  */
 import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
-import ReplaceTemplateButton from './replace-template-button';
-import { useAvailablePatterns } from './hooks';
 
 export default function Actions( { template } ) {
-	const availablePatterns = useAvailablePatterns( template );
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
 
-	if (
-		! isRevertable &&
-		( ! availablePatterns.length || availablePatterns.length < 1 )
-	) {
+	if ( ! isRevertable ) {
 		return null;
 	}
 
@@ -48,11 +42,6 @@ export default function Actions( { template } ) {
 							{ __( 'Clear customizations' ) }
 						</MenuItem>
 					) }
-					<ReplaceTemplateButton
-						availableTemplates={ availablePatterns }
-						template={ template }
-						onClick={ onClose }
-					/>
 				</MenuGroup>
 			) }
 		</DropdownMenu>

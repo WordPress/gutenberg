@@ -25,7 +25,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
@@ -33,13 +32,11 @@ import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostTitle( _, forwardedRef ) {
 	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
 			getSettings();
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
 			placeholder: titlePlaceholder,
 			hasFixedToolbar: _hasFixedToolbar,
 		};

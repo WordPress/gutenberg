@@ -228,11 +228,6 @@ test.describe( 'Site Editor Performance', () => {
 					canvas: 'edit',
 				} );
 				await editor.openDocumentSettingsSidebar();
-				await page
-					.getByRole( 'button', {
-						name: 'Actions',
-					} )
-					.click();
 
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
@@ -241,7 +236,7 @@ test.describe( 'Site Editor Performance', () => {
 				const startTime = performance.now();
 
 				await page
-					.getByRole( 'menuitem', { name: 'Replace template' } )
+					.getByRole( 'button', { name: 'Transform into:' } )
 					.click();
 
 				const patterns = [

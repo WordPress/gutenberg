@@ -31,6 +31,7 @@ export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 		rel: __( 'Link Relationship' ),
 	},
 	'core/image': {
+		id: __( 'Image ID' ),
 		url: __( 'URL' ),
 		title: __( 'Title' ),
 		alt: __( 'Alt Text' ),

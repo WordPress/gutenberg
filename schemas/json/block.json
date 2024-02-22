@@ -341,6 +341,22 @@
 						}
 					}
 				},
+				"background": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific background property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"backgroundImage": {
+							"type": "boolean",
+							"description": "Allow blocks to define a background image.",
+							"default": false
+						},
+						"backgroundSize": {
+							"type": "boolean",
+							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
+							"default": false
+						}
+					}
+				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -578,6 +594,31 @@
 							"default": false
 						}
 					}
+				},
+				"interactivity": {
+					"description": "Indicates if the block is using Interactivity API features.",
+					"oneOf": [
+						{
+							"type": "boolean",
+							"description": "Indicates whether the block is using the Interactivity API directives.",
+							"default": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"clientNavigation": {
+									"type": "boolean",
+									"description": "Indicates whether a block is compatible with the Interactivity API client-side navigation.\n\nSet it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.",
+									"default": false
+								},
+								"interactive": {
+									"type": "boolean",
+									"description": "Indicates whether the block is using the Interactivity API directives.",
+									"default": false
+								}
+							}
+						}
+					]
 				}
 			},
 			"additionalProperties": true
@@ -678,31 +719,6 @@
 							}
 						}
 					]
-				},
-				"interactivity": {
-					"description": "Indicates if the block is using Interactivity API features.",
-					"oneOf": [
-						{
-							"type": "boolean",
-							"description": "Indicates whether the block is using the Interactivity API directives.",
-							"default": false
-						},
-						{
-							"type": "object",
-							"properties": {
-								"clientNavigation": {
-									"type": "boolean",
-									"description": "Indicates whether a block is compatible with the Interactivity API client-side navigation.\n\nSet it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.",
-									"default": false
-								},
-								"interactive": {
-									"type": "boolean",
-									"description": "Indicates whether the block is using the Interactivity API directives.",
-									"default": false
-								}
-							}
-						}
-					]
 				}
 			}
 		},
@@ -786,6 +802,20 @@
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"viewScriptModule": {
+			"description": "Block type frontend script module definition. It will be enqueued only when viewing the content on the front of the site.",
 			"oneOf": [
 				{
 					"type": "string"

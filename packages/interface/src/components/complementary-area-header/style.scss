@@ -7,6 +7,7 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		width: 100%;
+		margin: 0;
 	}
 
 	@include break-medium() {
@@ -17,6 +18,10 @@
 .interface-complementary-area-header {
 	background: $white;
 	padding-right: $grid-unit-05;
+
+	.interface-complementary-area-header__title {
+		margin: 0;
+	}
 
 	.components-button.has-icon {
 		display: none;
