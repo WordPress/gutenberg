@@ -493,8 +493,23 @@
 	margin-left: $grid-unit-10;
 }
 
-.dataviews-view-grid__card.has-no-pointer-events * {
-	pointer-events: none;
+.dataviews-view-grid__card {
+	position: relative;
+
+	&.has-no-pointer-events {
+		.dataviews-view-grid__content {
+			pointer-events: none;
+		}
+
+		.dataviews-view-grid__overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			cursor: cell;
+		}
+	}
 }
 .dataviews-filter-summary__popover {
 	.components-popover__content {
