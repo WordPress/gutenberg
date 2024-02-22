@@ -7,7 +7,7 @@ import { useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockPopover from '../block-popover';
+import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS } from './utils';
 
 export function GridVisualizer( { clientId } ) {
@@ -16,15 +16,13 @@ export function GridVisualizer( { clientId } ) {
 		return null;
 	}
 	return (
-		<BlockPopover
+		<BlockPopoverCover
 			className="block-editor-grid-visualizer"
 			clientId={ clientId }
-			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
-			shift={ false }
 		>
 			<GridVisualizerGrid blockElement={ blockElement } />
-		</BlockPopover>
+		</BlockPopoverCover>
 	);
 }
 

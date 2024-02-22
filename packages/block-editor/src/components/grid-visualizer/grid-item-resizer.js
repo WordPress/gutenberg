@@ -7,7 +7,7 @@ import { ResizableBox } from '@wordpress/components';
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockPopover from '../block-popover';
+import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
@@ -16,12 +16,10 @@ export function GridItemResizer( { clientId, onChange } ) {
 		return null;
 	}
 	return (
-		<BlockPopover
+		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
-			__unstableCoverTarget
 			__unstablePopoverSlot="block-toolbar"
-			shift={ false }
 		>
 			<ResizableBox
 				className="block-editor-grid-item-resizer__box"
@@ -77,7 +75,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 					} );
 				} }
 			/>
-		</BlockPopover>
+		</BlockPopoverCover>
 	);
 }
 
