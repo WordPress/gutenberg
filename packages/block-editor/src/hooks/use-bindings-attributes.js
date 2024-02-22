@@ -86,33 +86,29 @@ const BindingConnector = ( {
 	const setAttributes = blockProps.setAttributes;
 
 	const updateBoundAttibute = useCallback(
-		( newAttrValue ) => {
+		( newAttrValue, prevAttrValue ) => {
 			/*
 			 * If the attribute is a RichTextData instance,
 			 * (core/paragraph, core/heading, etc.)
-			 * convert it to HTML string and compare with the new value.
-			 * If they are the same, don't update the attribute.
+			 * convert it to HTML string.
 			 *
 			 * To do: it looks like a workaround.
 			 * Consider improving the attribute and metadata fields types.
 			 */
-			if (
-				attrValue instanceof RichTextData &&
-				attrValue.toHTMLString() === newAttrValue
-			) {
-				return;
+			if ( prevAttrValue instanceof RichTextData ) {
+				prevAttrValue = prevAttrValue.toHTMLString();
 			}
 
 			setAttributes( {
 				[ attrName ]: newAttrValue,
 			} );
 		},
-		[ attrName, attrValue, setAttributes ]
+		[ attrName, setAttributes ]
 	);
 
 	useEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttibute( propValue );
+			updateBoundAttibute( propValue, attrValue );
 		} else if ( placeholder ) {
 			/*
 			 * Placeholder fallback.
