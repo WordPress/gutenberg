@@ -12,7 +12,7 @@ $src_cdata    = $plugin_url . 'tovdom/cdata.js';
 wp_enqueue_script_module( 'tovdom-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "tovdom" }'>
+<div data-wp-interactive="tovdom">
 	<div data-testid="it should delete comments">
 		<!-- ##1## -->
 		<div data-testid="it should keep this node between comments">

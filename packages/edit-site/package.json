@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "5.28.1",
+	"version": "5.29.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -69,6 +69,7 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
+		"client-zip": "^2.4.4",
 		"colord": "^2.9.2",
 		"deepmerge": "^4.3.0",
 		"fast-deep-equal": "^3.1.3",

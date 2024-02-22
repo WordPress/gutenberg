@@ -11,15 +11,27 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { DocumentOutline } from '../';
+import DocumentOutline from '../';
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockTitle: () => 'Block Title',
 } ) );
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupMockSelect( blocks ) {
+	useSelect.mockImplementation( ( mapSelect ) => {
+		return mapSelect( () => ( {
+			getBlocks: () => blocks,
+			getEditedPostAttribute: () => null,
+			getPostType: () => null,
+		} ) );
+	} );
+}
 
 describe( 'DocumentOutline', () => {
 	let paragraph, headingH1, headingH2, headingH3, nestedHeading;
@@ -77,6 +89,7 @@ describe( 'DocumentOutline', () => {
 
 	describe( 'no header blocks present', () => {
 		it( 'should not render when no blocks provided', () => {
+			setupMockSelect( [] );
 			render( <DocumentOutline /> );
 
 			expect( screen.queryByRole( 'list' ) ).not.toBeInTheDocument();
@@ -87,7 +100,8 @@ describe( 'DocumentOutline', () => {
 				// Set client IDs to a predictable value.
 				return { ...block, clientId: `clientId_${ index }` };
 			} );
-			render( <DocumentOutline blocks={ blocks } /> );
+			setupMockSelect( blocks );
+			render( <DocumentOutline /> );
 
 			expect( screen.queryByRole( 'list' ) ).not.toBeInTheDocument();
 		} );
@@ -99,14 +113,16 @@ describe( 'DocumentOutline', () => {
 				// Set client IDs to a predictable value.
 				return { ...block, clientId: `clientId_${ index }` };
 			} );
-			render( <DocumentOutline blocks={ blocks } /> );
+			setupMockSelect( blocks );
+			render( <DocumentOutline /> );
 
 			expect( screen.getByRole( 'list' ) ).toMatchSnapshot();
 		} );
 
 		it( 'should render an item when only one heading provided', () => {
 			const blocks = [ headingH2 ];
-			render( <DocumentOutline blocks={ blocks } /> );
+			setupMockSelect( blocks );
+			render( <DocumentOutline /> );
 
 			const tableOfContentItem = within(
 				screen.getByRole( 'list' )
@@ -123,7 +139,8 @@ describe( 'DocumentOutline', () => {
 				headingH3,
 				paragraph,
 			];
-			render( <DocumentOutline blocks={ blocks } /> );
+			setupMockSelect( blocks );
+			render( <DocumentOutline /> );
 
 			expect(
 				within( screen.getByRole( 'list' ) ).getAllByRole( 'listitem' )
@@ -137,7 +154,8 @@ describe( 'DocumentOutline', () => {
 					return { ...block, clientId: `clientId_${ index }` };
 				}
 			);
-			render( <DocumentOutline blocks={ blocks } /> );
+			setupMockSelect( blocks );
+			render( <DocumentOutline /> );
 
 			expect( screen.getByRole( 'list' ) ).toMatchSnapshot();
 		} );
@@ -146,7 +164,8 @@ describe( 'DocumentOutline', () => {
 	describe( 'nested headings', () => {
 		it( 'should render even if the heading is nested', () => {
 			const blocks = [ headingH2, nestedHeading ];
-			render( <DocumentOutline blocks={ blocks } /> );
+			setupMockSelect( blocks );
+			render( <DocumentOutline /> );
 
 			// Unnested heading and nested heading should appear as items.
 			const tableOfContentItems = within(

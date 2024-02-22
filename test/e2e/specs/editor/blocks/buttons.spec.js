@@ -405,4 +405,80 @@ test.describe( 'Buttons', () => {
 <!-- /wp:buttons -->`
 		);
 	} );
+
+	test.describe( 'Block transforms', () => {
+		test.describe( 'FROM paragraph', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/buttons' );
+				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				expect( buttonBlock.name ).toBe( 'core/button' );
+				expect( buttonBlock.attributes.text ).toBe( 'initial content' );
+			} );
+
+			test( 'should preserve the metadata attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/buttons' );
+				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				expect( buttonBlock.name ).toBe( 'core/button' );
+				expect( buttonBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+
+			test( 'should preserve the block bindings', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'custom_field',
+									},
+								},
+							},
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/buttons' );
+				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				expect( buttonBlock.name ).toBe( 'core/button' );
+				expect(
+					buttonBlock.attributes.metadata.bindings
+				).toMatchObject( {
+					text: {
+						source: 'core/post-meta',
+						args: {
+							key: 'custom_field',
+						},
+					},
+				} );
+			} );
+		} );
+	} );
 } );

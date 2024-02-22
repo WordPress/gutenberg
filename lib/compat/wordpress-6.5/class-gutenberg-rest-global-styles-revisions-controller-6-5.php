@@ -69,6 +69,15 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_5 extends Gutenberg_RE
 			return $revision;
 		}
 
+		if ( (int) $parent->ID !== (int) $revision->post_parent ) {
+			return new WP_Error(
+				'rest_revision_parent_id_mismatch',
+				/* translators: %d: A post id. */
+				sprintf( __( 'The revision does not belong to the specified parent with id of "%d"' ), $parent->ID ),
+				array( 'status' => 404 )
+			);
+		}
+
 		$response = $this->prepare_item_for_response( $revision, $request );
 		return rest_ensure_response( $response );
 	}
