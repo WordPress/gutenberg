@@ -45,6 +45,7 @@ import {
 	createBlock,
 	cloneBlock,
 	getDefaultBlockName,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -239,7 +240,7 @@ function ButtonEdit( props ) {
 			}
 
 			const blockBindingsSource = unlock(
-				select( blockEditorStore )
+				select( blocksStore )
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
