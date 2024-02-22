@@ -134,7 +134,9 @@ export default function HeaderEditMode() {
 								className={ classnames(
 									'selected-block-tools-wrapper',
 									{
-										'is-collapsed': isBlockToolsCollapsed,
+										'is-collapsed':
+											isBlockToolsCollapsed ||
+											! hasBlockSelected,
 									}
 								) }
 							>
