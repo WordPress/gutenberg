@@ -105,7 +105,7 @@ To "activate" the Interactivity API in a DOM element (and its children), add the
 
 ## API Reference
 
-To take a deep dive in how the API works internally, the list of Directives and how Store works, click [here](./docs/api-reference.md).
+To take a deep dive in how the API works internally, the list of Directives, and how Store works, click [here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/).
 
 ## Docs & Examples
 
