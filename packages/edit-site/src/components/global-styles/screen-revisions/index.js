@@ -99,7 +99,6 @@ function ScreenRevisions() {
 			! editorCanvasContainerView.startsWith( 'global-styles-revisions' )
 		) {
 			goTo( '/' ); // Return to global styles main panel.
-			setEditorCanvasContainerView( editorCanvasContainerView );
 		}
 	}, [ editorCanvasContainerView ] );
 
