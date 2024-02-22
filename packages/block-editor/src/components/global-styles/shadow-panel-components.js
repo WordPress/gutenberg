@@ -24,12 +24,6 @@ import classNames from 'classnames';
  */
 import { unlock } from '../../lock-unlock';
 
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
-
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const defaultShadows = settings?.shadow?.presets?.default || [];
 	const themeShadows = settings?.shadow?.presets?.theme || [];
@@ -55,6 +49,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 }
 
 export function ShadowPresets( { presets, activeShadow, onSelect } ) {
+	const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
+		unlock( componentsPrivateApis );
 	const compositeStore = useCompositeStore();
 	return ! presets ? null : (
 		<Composite
@@ -79,6 +75,7 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 }
 
 export function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
+	const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 	return (
 		<CompositeItem
 			role="option"
