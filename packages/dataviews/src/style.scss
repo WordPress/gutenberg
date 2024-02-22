@@ -648,7 +648,8 @@
 		}
 
 		&:hover,
-		&:focus-visible {
+		&:focus-visible,
+		&[aria-expanded="true"] {
 			background: $gray-200;
 			color: $gray-900;
 		}
@@ -657,8 +658,9 @@
 			color: var(--wp-admin-theme-color);
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			&:hover,
+			&[aria-expanded="true"] {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
 			}
 		}
 
