@@ -85,6 +85,35 @@ function gutenberg_create_initial_post_types() {
 }
 
 /**
+ * Filters the user capabilities to grant the 'upload_fonts' capability as necessary.
+ *
+ * To grant the 'upload_fonts' capability, files modifications must be allowed, the fonts directory must be
+ * writable, and the user must have the 'edit_theme_options' capability.
+ *
+ * @since 5.6.0
+ *
+ * @param bool[] $allcaps An array of all the user's capabilities.
+ * @return bool[] Filtered array of the user's capabilities.
+ */
+function gutenberg_maybe_grant_upload_font_cap( $allcaps, $caps ) {
+	if ( ! in_array( 'upload_fonts', $caps, true ) ) {
+		return $allcaps;
+	}
+
+	$fonts_dir = wp_get_font_dir()['path'];
+	if (
+		wp_is_file_mod_allowed( 'can_upload_fonts' ) &&
+		wp_is_writable( $fonts_dir ) &&
+		! empty( $allcaps['edit_theme_options'] )
+	) {
+		$allcaps['upload_fonts'] = true;
+	}
+
+	return $allcaps;
+}
+add_filter( 'user_has_cap', 'gutenberg_maybe_grant_upload_font_cap', 10, 2 );
+
+/**
  * Initializes REST routes.
  *
  * @since 6.5
