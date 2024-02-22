@@ -147,21 +147,12 @@ function BlockBindingBridge( { bindings, props } ) {
 		};
 	}, [] );
 
-	if ( ! bindings ) {
-		return null;
-	}
-
 	const { name, attributes } = props;
 
 	return (
 		<>
 			{ Object.entries( bindings ).map(
 				( [ attrName, boundAttribute ], i ) => {
-					// Check if the block attribute can be bound.
-					if ( ! canBindAttribute( name, attrName ) ) {
-						return null;
-					}
-
 					// Bail early if the block doesn't have a valid source handler.
 					const source = getBlockBindingsSource(
 						boundAttribute.source
@@ -190,8 +181,17 @@ const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { attributes } = props;
 
-		// Bail early if the block doesn't have bindings.
-		const bindings = attributes?.metadata?.bindings;
+		/*
+		 * Create binding object filtering
+		 * only the attributes that can be bound.
+		 */
+		const bindings = Object.fromEntries(
+			Object.entries( attributes.metadata?.bindings || {} ).filter(
+				( [ attrName ] ) => canBindAttribute( props.name, attrName )
+			)
+		);
+
+		// If the block doesn't have any bindings, render the original block edit.
 		if ( ! bindings ) {
 			return <BlockEdit { ...props } />;
 		}
