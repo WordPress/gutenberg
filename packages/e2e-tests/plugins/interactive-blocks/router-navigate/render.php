@@ -17,7 +17,11 @@ if ( $attributes['disableNavigation'] ) {
 }
 
 if ( isset( $attributes['data'] ) ) {
-	$initial_state = array( 'router' => array( 'data' => $attributes['data'] ) );
+	$initial_state = array(
+		'state' => array(
+			'router' => array( 'data' => $attributes['data'] ),
+		),
+	);
 }
 ?>
 
@@ -68,6 +72,6 @@ HTML;
 	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
 </div>
 
-<script type="application/json" id="wp-interactivity-initial-state">
+<script type="application/json" id="wp-interactivity-data">
 	<?php echo isset( $initial_state ) ? json_encode( $initial_state ) : '{}'; ?>
 </script>
