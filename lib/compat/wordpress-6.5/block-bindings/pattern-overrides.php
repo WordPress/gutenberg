@@ -15,11 +15,11 @@
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_pattern_overrides_callback( $source_attrs, $block_instance, $attribute_name ) {
-	if ( empty( $block_instance->attributes['metadata']['id'] ) ) {
+	if ( empty( $block_instance->attributes['metadata']['name'] ) ) {
 		return null;
 	}
-	$block_id = $block_instance->attributes['metadata']['id'];
-	return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, 'values', $attribute_name ), null );
+	$metadata_name = $block_instance->attributes['metadata']['name'];
+	return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $metadata_name, 'values', $attribute_name ), null );
 }
 
 /**

@@ -1,108 +1,105 @@
 /**
- * External dependencies
- */
-import { nanoid } from 'nanoid';
-
-/**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, CheckboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { usePrevious } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 
-function PartialSyncingControls( { name, attributes, setAttributes } ) {
-	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
-	const attributeSources = syncedAttributes.map(
-		( attributeName ) =>
-			attributes.metadata?.bindings?.[ attributeName ]?.source
-	);
-	const isConnectedToOtherSources = attributeSources.every(
-		( source ) => source && source !== 'core/pattern-overrides'
-	);
-
-	// Render nothing if all supported attributes are connected to other sources.
-	if ( isConnectedToOtherSources ) {
-		return null;
+function removeBindings( bindings, syncedAttributes ) {
+	let updatedBindings = {};
+	for ( const attributeName of syncedAttributes ) {
+		// Omit any pattern override bindings from the `updatedBindings` object.
+		if (
+			bindings?.[ attributeName ]?.source !== 'core/pattern-overrides' &&
+			bindings?.[ attributeName ]?.source !== undefined
+		) {
+			updatedBindings[ attributeName ] = bindings[ attributeName ];
+		}
 	}
-
-	function updateBindings( isChecked ) {
-		let updatedBindings = {
-			...attributes?.metadata?.bindings,
-		};
-
-		if ( ! isChecked ) {
-			for ( const attributeName of syncedAttributes ) {
-				if (
-					updatedBindings[ attributeName ]?.source ===
-					'core/pattern-overrides'
-				) {
-					delete updatedBindings[ attributeName ];
-				}
-			}
-			if ( ! Object.keys( updatedBindings ).length ) {
-				updatedBindings = undefined;
-			}
-			setAttributes( {
-				metadata: {
-					...attributes.metadata,
-					bindings: updatedBindings,
-				},
-			} );
-			return;
-		}
-
-		for ( const attributeName of syncedAttributes ) {
-			if ( ! updatedBindings[ attributeName ] ) {
-				updatedBindings[ attributeName ] = {
-					source: 'core/pattern-overrides',
-				};
-			}
-		}
-
-		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( {
-				metadata: {
-					...attributes.metadata,
-					bindings: updatedBindings,
-				},
-			} );
-			return;
-		}
-
-		const id = nanoid( 6 );
-		setAttributes( {
-			metadata: {
-				...attributes.metadata,
-				id,
-				bindings: updatedBindings,
-			},
-		} );
+	if ( ! Object.keys( updatedBindings ).length ) {
+		updatedBindings = undefined;
 	}
-
-	return (
-		<InspectorControls group="advanced">
-			<BaseControl __nextHasNoMarginBottom>
-				<BaseControl.VisualLabel>
-					{ __( 'Pattern overrides' ) }
-				</BaseControl.VisualLabel>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Allow instance overrides' ) }
-					checked={ attributeSources.some(
-						( source ) => source === 'core/pattern-overrides'
-					) }
-					onChange={ ( isChecked ) => {
-						updateBindings( isChecked );
-					} }
-				/>
-			</BaseControl>
-		</InspectorControls>
-	);
+	return updatedBindings;
 }
 
-export default PartialSyncingControls;
+function setBindings( bindings, syncedAttributes ) {
+	const updatedBindings = { ...bindings };
+	for ( const attributeName of syncedAttributes ) {
+		if ( ! bindings?.[ attributeName ] ) {
+			updatedBindings[ attributeName ] = {
+				source: 'core/pattern-overrides',
+			};
+		}
+	}
+	return updatedBindings;
+}
+
+export default function useSetPatternBindings(
+	{ name, attributes, setAttributes },
+	currentPostType
+) {
+	const metadataName = attributes?.metadata?.name;
+	const prevMetadataName = usePrevious( metadataName ) ?? metadataName;
+	const bindings = attributes?.metadata?.bindings;
+
+	useEffect( () => {
+		// Bindings should only be created when editing a wp_block post type,
+		// and also when there's a change to the user given name for the block.
+		if (
+			currentPostType !== 'wp_block' ||
+			metadataName === prevMetadataName
+		) {
+			return;
+		}
+
+		const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
+		const attributeSources = syncedAttributes.map(
+			( attributeName ) =>
+				attributes.metadata?.bindings?.[ attributeName ]?.source
+		);
+		const isConnectedToOtherSources = attributeSources.every(
+			( source ) => source && source !== 'core/pattern-overrides'
+		);
+
+		// Avoid overwriting other (e.g. meta) bindings.
+		if ( isConnectedToOtherSources ) {
+			return;
+		}
+
+		let updatedBindings;
+
+		// The user given name for the block was deleted, remove the bindings.
+		if ( ! metadataName?.length && prevMetadataName?.length ) {
+			updatedBindings = removeBindings( bindings, syncedAttributes );
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
+			} );
+		}
+
+		// The user given name for the block was set, set the bindings.
+		if ( ! prevMetadataName?.length && metadataName.length ) {
+			updatedBindings = setBindings( bindings, syncedAttributes );
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
+			} );
+		}
+	}, [
+		bindings,
+		prevMetadataName,
+		metadataName,
+		currentPostType,
+		name,
+		attributes.metadata,
+		setAttributes,
+	] );
+}

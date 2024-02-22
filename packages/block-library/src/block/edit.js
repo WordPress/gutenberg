@@ -109,17 +109,17 @@ function applyInitialContentValuesToInnerBlocks(
 			content,
 			defaultValues
 		);
-		const blockId = block.attributes.metadata?.id;
-		if ( ! hasOverridableAttributes( block ) || ! blockId )
+		const metadataName = block.attributes.metadata?.name;
+		if ( ! metadataName || ! hasOverridableAttributes( block ) )
 			return { ...block, innerBlocks };
 		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] ??= {};
-			defaultValues[ blockId ][ attributeKey ] =
+			defaultValues[ metadataName ] ??= {};
+			defaultValues[ metadataName ][ attributeKey ] =
 				block.attributes[ attributeKey ];
 
-			const contentValues = content[ blockId ]?.values;
+			const contentValues = content[ metadataName ]?.values;
 			if ( contentValues?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
 			}
@@ -151,20 +151,20 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 			content,
 			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
 		);
-		const blockId = block.attributes.metadata?.id;
-		if ( ! hasOverridableAttributes( block ) || ! blockId ) continue;
+		const metadataName = block.attributes.metadata?.name;
+		if ( ! metadataName || ! hasOverridableAttributes( block ) ) continue;
 		const attributes = getOverridableAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
 				! isAttributeEqual(
 					block.attributes[ attributeKey ],
-					defaultValues[ blockId ][ attributeKey ]
+					defaultValues[ metadataName ][ attributeKey ]
 				)
 			) {
-				content[ blockId ] ??= { values: {}, blockName: block.name };
+				content[ metadataName ] ??= { values: {} };
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				content[ blockId ].values[ attributeKey ] =
+				content[ metadataName ].values[ attributeKey ] =
 					block.attributes[ attributeKey ] === undefined
 						? // TODO: We use an empty string to represent undefined for now until
 						  // we support a richer format for overrides and the block binding API.
