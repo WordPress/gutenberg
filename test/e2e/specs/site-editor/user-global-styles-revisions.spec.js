@@ -192,7 +192,7 @@ test.describe( 'Style Revisions', () => {
 		).toBeHidden();
 	} );
 
-	test( 'should close revisions panel', async ( {
+	test( 'should close revisions panel and leave style book open if activated', async ( {
 		page,
 		editor,
 		userGlobalStylesRevisions,
@@ -220,7 +220,7 @@ test.describe( 'Style Revisions', () => {
 
 		// The site editor canvas has been restored.
 		await expect(
-			page.locator( 'iframe[name="editor-canvas"]' )
+			page.locator( 'iframe[name="style-book-canvas"]' )
 		).toBeVisible();
 	} );
 
