@@ -87,10 +87,10 @@ function gutenberg_create_initial_post_types() {
 /**
  * Filters the user capabilities to grant the 'upload_fonts' capability as necessary.
  *
- * To grant the 'upload_fonts' capability, files modifications must be allowed, the fonts directory must be
+ * To grant the 'upload_fonts' capability, file modifications must be allowed, the fonts directory must be
  * writable, and the user must have the 'edit_theme_options' capability.
  *
- * @since 5.6.0
+ * @since 6.5.0
  *
  * @param bool[] $allcaps An array of all the user's capabilities.
  * @return bool[] Filtered array of the user's capabilities.
