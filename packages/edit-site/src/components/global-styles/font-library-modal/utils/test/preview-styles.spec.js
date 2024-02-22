@@ -172,6 +172,16 @@ describe( 'formatFontFamily', () => {
 			'"Abril Fatface", Times, serif'
 		);
 	} );
+
+	it( 'should not add quotes to generic names', () => {
+		expect(
+			formatFontFamily(
+				'Paren(thesis)Font, generic(kai), generic(fasongsong), generic( abc ), Helvetica Neue'
+			)
+		).toBe(
+			'"Paren(thesis)Font", generic(kai), generic(fasongsong), generic( abc ), "Helvetica Neue"'
+		);
+	} );
 } );
 
 describe( 'formatFontFaceName', () => {

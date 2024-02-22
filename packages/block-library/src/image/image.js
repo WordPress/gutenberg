@@ -10,6 +10,7 @@ import {
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
+	Dropdown,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -30,6 +31,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
 import { switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
@@ -177,6 +179,7 @@ export default function Image( {
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -408,6 +411,7 @@ export default function Image( {
 		lockHrefControls = false,
 		lockAltControls = false,
 		lockTitleControls = false,
+		lockCaption = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
@@ -440,6 +444,10 @@ export default function Image( {
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
+				lockCaption:
+					// Disable editing the caption if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the caption on the frontend.
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
@@ -512,6 +520,113 @@ export default function Image( {
 							label={ __( 'Upload to Media Library' ) }
 						/>
 					</ToolbarGroup>
+				</BlockControls>
+			) }
+			{ isContentOnlyMode && (
+				// Add some extra controls for content attributes when content only mode is active.
+				// With content only mode active, the inspector is hidden, so users need another way
+				// to edit these attributes.
+				<BlockControls group="other">
+					<Dropdown
+						popoverProps={ { position: 'bottom right' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								} }
+							>
+								{ _x(
+									'Alt',
+									'Alternative text for an image. Block toolbar label, a low character count is preferred.'
+								) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
+							<TextareaControl
+								className="wp-block-image__toolbar_content_textarea"
+								label={ __( 'Alternative text' ) }
+								value={ alt || '' }
+								onChange={ updateAlt }
+								disabled={ lockAltControls }
+								help={
+									lockAltControls ? (
+										<>
+											{ __(
+												'Connected to a custom field'
+											) }
+										</>
+									) : (
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
+								}
+								__nextHasNoMarginBottom
+							/>
+						) }
+					/>
+					<Dropdown
+						popoverProps={ { position: 'bottom right' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								} }
+							>
+								{ __( 'Title' ) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
+							<TextControl
+								className="wp-block-image__toolbar_content_textarea"
+								__nextHasNoMarginBottom
+								label={ __( 'Title attribute' ) }
+								value={ title || '' }
+								onChange={ onSetTitle }
+								disabled={ lockTitleControls }
+								help={
+									lockTitleControls ? (
+										<>
+											{ __(
+												'Connected to a custom field'
+											) }
+										</>
+									) : (
+										<>
+											{ __(
+												'Describe the role of this image on the page.'
+											) }
+											<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+												{ __(
+													'(Note: many devices and browsers do not display this text.)'
+												) }
+											</ExternalLink>
+										</>
+									)
+								}
+							/>
+						) }
+					/>
 				</BlockControls>
 			) }
 			<InspectorControls>
@@ -797,6 +912,7 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
+
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -804,6 +920,7 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
+				disableEditing={ lockCaption }
 			/>
 		</>
 	);

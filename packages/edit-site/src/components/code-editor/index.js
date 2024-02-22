@@ -32,7 +32,7 @@ export default function CodeEditor() {
 		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
 
 		return {
-			shortcut: getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
+			shortcut: getShortcutRepresentation( 'core/editor/toggle-mode' ),
 			content: editedRecord?.content,
 			blocks: editedRecord?.blocks,
 			type: _type,
