@@ -180,7 +180,7 @@ export default ( exception, { context, tags } ) => {
 		},
 		tags: {
 			...tags,
-			react_native_bridge_version: reactNativeBridgeVersion,
+			gutenberg_mobile_version: reactNativeBridgeVersion,
 		},
 	};
 };
