@@ -299,10 +299,24 @@ export default function ChildLayoutControl( {
 	};
 
 	useEffect( () => {
-		if ( selfStretch === 'fixed' && ! flexSize ) {
+		if (
+			( childLayout[ heightProp ] === 'fixed' ||
+				childLayout[ heightProp ] === 'fixedNoShrink' ) &&
+			! height
+		) {
 			onChange( {
 				...childLayout,
-				selfStretch: 'fit',
+				[ heightProp ]: undefined,
+			} );
+		}
+		if (
+			( childLayout[ widthProp ] === 'fixed' ||
+				childLayout[ widthProp ] === 'fixedNoShrink' ) &&
+			! width
+		) {
+			onChange( {
+				...childLayout,
+				[ widthProp ]: undefined,
 			} );
 		}
 	}, [] );

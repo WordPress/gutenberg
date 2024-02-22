@@ -573,7 +573,22 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$child_layout_styles       = array();
 
 	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
+	$self_align   = isset( $block['attrs']['style']['layout']['selfAlign'] ) ? $block['attrs']['style']['layout']['selfAlign'] : null;
+	$height       = isset( $block['attrs']['style']['layout']['height'] ) ? $block['attrs']['style']['layout']['height'] : null;
+	$width        = isset( $block['attrs']['style']['layout']['width'] ) ? $block['attrs']['style']['layout']['width'] : null;
 
+	$parent_layout_type = 'default';
+	if ( isset( $block['parentLayout']['type'] ) ) {
+		$parent_layout_type = $block['parentLayout']['type'];
+	} elseif ( isset( $block['parentLayout']['default']['type'] ) ) {
+		$parent_layout_type = $block['parentLayout']['default']['type'];
+	}
+
+	// Orientation is only used for flex layouts so its default is horizontal.
+	$parent_orientation     = isset( $block['parentLayout']['orientation'] ) ? $block['parentLayout']['orientation'] : 'horizontal';
+	$vertical_parent_layout = in_array( $parent_layout_type, array( 'constrained', 'default' ), true ) || ( 'flex' === $parent_layout_type && 'vertical' === $parent_orientation );
+
+	// Support for legacy flexSize value.
 	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
 		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
 		$child_layout_declarations['box-sizing'] = 'border-box';
@@ -581,6 +596,49 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$child_layout_declarations['flex-grow'] = '1';
 	}
 
+	if ( $vertical_parent_layout ) {
+		// Width styles.
+		if ( 'fixed' === $self_align && $width ) {
+			$child_layout_declarations['max-width'] = $width;
+		} elseif ( 'fixedNoShrink' === $self_align && $width ) {
+			$child_layout_declarations['width'] = $width;
+		} elseif ( 'fill' === $self_align ) {
+			$child_layout_declarations['align-self'] = 'stretch';
+		} elseif ( 'fit' === $self_align ) {
+			$child_layout_declarations['width'] = 'fit-content';
+		}
+		// Height styles.
+		if ( 'fixed' === $self_stretch && $height ) {
+			$child_layout_declarations['max-height'] = $height;
+			$child_layout_declarations['flex-basis'] = $height;
+		} elseif ( 'fixedNoShrink' === $self_stretch && $height ) {
+			$child_layout_declarations['height']      = $height;
+			$child_layout_declarations['flex-shrink'] = '0';
+			$child_layout_declarations['flex-basis']  = $height;
+		} elseif ( 'fill' === $self_stretch ) {
+			$child_layout_declarations['flex-grow'] = '1';
+		}
+	} elseif ( 'grid' !== $parent_layout_type ) {
+		// Width styles.
+		if ( 'fixed' === $self_stretch && $width ) {
+			$child_layout_declarations['flex-basis'] = $width;
+		} elseif ( 'fixedNoShrink' === $self_stretch && $width ) {
+			$child_layout_declarations['flex-shrink'] = '0';
+			$child_layout_declarations['flex-basis']  = $width;
+		} elseif ( 'fill' === $self_stretch ) {
+			$child_layout_declarations['flex-grow'] = '1';
+		}
+		// Height styles.
+		if ( 'fixed' === $self_align && $height ) {
+			$child_layout_declarations['max-height'] = $height;
+		} elseif ( 'fixedNoShrink' === $self_align && $height ) {
+			$child_layout_declarations['height'] = $height;
+		} elseif ( 'fill' === $self_align ) {
+			$child_layout_declarations['align-self'] = 'stretch';
+		}
+	}
+
+	// Grid specific styles.
 	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
 		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
 		$child_layout_declarations['grid-column'] = "span $column_span";
@@ -589,6 +647,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
 		$child_layout_declarations['grid-row'] = "span $row_span";
 	}
+
 	$child_layout_styles[] = array(
 		'selector'     => ".$container_content_class",
 		'declarations' => $child_layout_declarations,
@@ -902,6 +961,8 @@ add_filter(
 		 */
 		if ( $parent_block && isset( $parent_block->parsed_block['attrs']['layout'] ) ) {
 			$parsed_block['parentLayout'] = $parent_block->parsed_block['attrs']['layout'];
+		} elseif ( $parent_block && isset( $parent_block->block_type->supports['layout'] ) ) {
+			$parsed_block['parentLayout'] = $parent_block->block_type->supports['layout'];
 		}
 		return $parsed_block;
 	},

@@ -17,8 +17,15 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
 	} );
 	const layout = style?.layout ?? {};
-	const { selfStretch, flexSize, columnSpan, rowSpan, height, width } =
-		layout;
+	const {
+		selfStretch,
+		selfAlign,
+		flexSize,
+		columnSpan,
+		rowSpan,
+		height,
+		width,
+	} = layout;
 	const parentLayout = useLayout() || {};
 	const {
 		columnCount,
@@ -31,19 +38,11 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
 
-	const isFlowOrConstrained =
+	const isVerticalLayout =
 		parentLayout.type === 'constrained' ||
 		parentLayout.type === 'default' ||
-		parentLayout.type === undefined;
-
-	const widthProp =
-		isFlowOrConstrained || orientation === 'vertical'
-			? 'selfAlign'
-			: 'selfStretch';
-	const heightProp =
-		isFlowOrConstrained || orientation === 'vertical'
-			? 'selfStretch'
-			: 'selfAlign';
+		parentLayout.type === undefined ||
+		orientation === 'vertical';
 
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
@@ -59,100 +58,76 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				grid-column: span ${ columnSpan };
 			}`;
 		}
-		if ( isFlowOrConstrained || orientation === 'vertical' ) {
-			// set width
-			if ( layout[ widthProp ] === 'fixed' && width ) {
+		// All vertical layout types have the same styles.
+		if ( isVerticalLayout ) {
+			if ( selfAlign === 'fixed' && width ) {
 				css += `${ selector } {
 					max-width: ${ width };
 				}`;
-			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+			} else if ( selfAlign === 'fixedNoShrink' && width ) {
 				css += `${ selector } {
 					width: ${ width };
 				}`;
-			} else if ( layout[ widthProp ] === 'fill' ) {
+			} else if ( selfAlign === 'fill' ) {
+				/**
+				 * This style is only needed for flex layouts because
+				 * constrained children have alignment set and flow
+				 * children are 100% width by default.
+				 */
 				css += `${ selector } {
 					align-self: stretch;
 				}`;
-			} else if ( layout[ widthProp ] === 'fit' ) {
+			} else if ( selfAlign === 'fit' ) {
 				css += `${ selector } {
 					width: fit-content;
 				}`;
 			}
 
-			// set height
-			if ( layout[ heightProp ] === 'fixed' && height ) {
+			if ( selfStretch === 'fixed' && height ) {
+				// Max-height is needed for flow and constrained children.
 				css += `${ selector } {
 					max-height: ${ height };
-					flex-grow: 0;
-					flex-shrink: 1;
 					flex-basis: ${ height };
 				}`;
-			} else if ( layout[ heightProp ] === 'fixedNoShrink' && height ) {
+			} else if ( selfStretch === 'fixedNoShrink' && height ) {
+				// Height is needed for flow and constrained children.
 				css += `${ selector } {
 					height: ${ height };
 					flex-shrink: 0;
-					flex-grow: 0;
-					flex-basis: auto;
+					flex-basis: ${ height };
 				}`;
-			} else if ( layout[ heightProp ] === 'fill' ) {
+			} else if ( selfStretch === 'fill' ) {
 				css += `${ selector } {
 					flex-grow: 1;
-					flex-shrink: 1;
-				}`;
-			} else if ( layout[ heightProp ] === 'fit' ) {
-				css += `${ selector } {
-					flex-grow: 0;
-					flex-shrink: 0;
-					flex-basis: auto;
-					height: auto;
 				}`;
 			}
+			// Everything else that isn't a grid is a horizontal layout.
 		} else if ( parentLayoutType !== 'grid' ) {
-			// set width
-			if ( layout[ widthProp ] === 'fixed' && width ) {
+			if ( selfStretch === 'fixed' && width ) {
 				css += `${ selector } {
-					max-width: ${ width };
-					flex-grow: 0;
-					flex-shrink: 1;
 					flex-basis: ${ width };
 					
 				}`;
-			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+			} else if ( selfStretch === 'fixedNoShrink' && width ) {
 				css += `${ selector } {
-					width: ${ width };
 					flex-shrink: 0;
-					flex-grow: 0;
-					flex-basis: auto;
+					flex-basis: ${ width };
 				}`;
-			} else if ( layout[ widthProp ] === 'fill' ) {
+			} else if ( selfStretch === 'fill' ) {
 				css += `${ selector } {
 					flex-grow: 1;
-					flex-shrink: 1;
-					flex-basis: 100%;
-				}`;
-			} else if ( layout[ widthProp ] === 'fit' ) {
-				css += `${ selector } {
-					flex-grow: 0;
-					flex-shrink: 0;
-					flex-basis: auto;
-					width: fit-content;
 				}`;
 			}
 
-			// set height
-			if ( layout[ heightProp ] === 'fill' ) {
+			if ( selfAlign === 'fill' ) {
 				css += `${ selector } {
 					align-self: stretch;
 				}`;
-			} else if ( layout[ heightProp ] === 'fit' ) {
-				css += `${ selector } {
-						height: fit-content;
-					}`;
-			} else if ( layout[ heightProp ] === 'fixedNoShrink' && height ) {
+			} else if ( selfAlign === 'fixedNoShrink' && height ) {
 				css += `${ selector } {
 						height: ${ height };
 					}`;
-			} else if ( layout[ heightProp ] === 'fixed' && height ) {
+			} else if ( selfAlign === 'fixed' && height ) {
 				css += `${ selector } {
 						max-height: ${ height };
 					}`;
