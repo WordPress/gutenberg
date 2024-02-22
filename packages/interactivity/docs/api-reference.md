@@ -36,6 +36,7 @@ DOM elements are connected to data stored in the state and context through direc
   - [Setting the store](#setting-the-store)
     - [On the client side](#on-the-client-side)
     - [On the server side](#on-the-server-side)
+	- [Store methods](#store-public-functions)
 
 ## The directives
 
@@ -970,4 +971,77 @@ const { state } = store(
 
 // The following call works as expected.
 store( "myPlugin/private", { /* store part */ }, { lock: PRIVATE_LOCK } );
+```
+
+### Store client method
+
+Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
+
+  - getContext()
+  - getElement()
+
+#### getContext()
+
+Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists.
+
+```php
+// render.php
+<div data-wp-interactive="myPlugin" data-wp-context='{ "isOpen": false }'>
+	<button data-wp-on--click="actions.log">Log</button>
+</div>
+```
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      const context = getContext();
+			 // Logs "false"
+      console.log('context => ', context.isOpen)
+    },
+  },
+});
+```
+
+#### getElement()
+
+Retrieves a representation of the element where a function from the store is being evalutated. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
+It returns an object with two keys:
+
+##### ref
+
+`ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
+
+#### attributes
+
+`attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
+
+Those attributes will contain the directives of that element. In the button example:
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      const element = getElement();
+			 // Logs "false"
+      console.log('element attributes => ', element.attributes)
+    },
+  },
+});
+```
+
+The code will log:
+
+```json
+{
+	"data-wp-on--click": 'actions.increaseCounter',
+	"children": ['Log'],
+	"onclick": event => { evaluate(entry, event); }
+}
 ```
