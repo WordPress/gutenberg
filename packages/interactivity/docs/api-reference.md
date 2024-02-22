@@ -36,7 +36,7 @@ DOM elements are connected to data stored in the state and context through direc
   - [Setting the store](#setting-the-store)
     - [On the client side](#on-the-client-side)
     - [On the server side](#on-the-server-side)
-	- [Store methods](#store-public-functions)
+	- [Store client methods](#store-client-methods)
 
 ## The directives
 
@@ -973,7 +973,7 @@ const { state } = store(
 store( "myPlugin/private", { /* store part */ }, { lock: PRIVATE_LOCK } );
 ```
 
-### Store client method
+### Store client methods
 
 Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
 
