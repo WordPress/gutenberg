@@ -70,11 +70,12 @@ export default function useSetPatternBindings(
 			return;
 		}
 
-		let updatedBindings;
-
 		// The user given name for the block was deleted, remove the bindings.
 		if ( ! metadataName?.length && prevMetadataName?.length ) {
-			updatedBindings = removeBindings( bindings, syncedAttributes );
+			const updatedBindings = removeBindings(
+				bindings,
+				syncedAttributes
+			);
 			setAttributes( {
 				metadata: {
 					...attributes.metadata,
@@ -85,7 +86,7 @@ export default function useSetPatternBindings(
 
 		// The user given name for the block was set, set the bindings.
 		if ( ! prevMetadataName?.length && metadataName.length ) {
-			updatedBindings = setBindings( bindings, syncedAttributes );
+			const updatedBindings = setBindings( bindings, syncedAttributes );
 			setAttributes( {
 				metadata: {
 					...attributes.metadata,
