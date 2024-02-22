@@ -144,12 +144,9 @@ const BindingConnector = ( {
 };
 
 function BlockBindingBridge( { bindings, props } ) {
-	const { getBlockBindingsSource } = useSelect( ( select ) => {
-		return {
-			getBlockBindingsSource: unlock( select( blockEditorStore ) )
-				.getBlockBindingsSource,
-		};
-	}, [] );
+	const blockBindingsSources = unlock(
+		useSelect( blockEditorStore )
+	).getAllBlockBindingsSources();
 
 	const { name, attributes } = props;
 
@@ -158,9 +155,8 @@ function BlockBindingBridge( { bindings, props } ) {
 			{ Object.entries( bindings ).map(
 				( [ attrName, boundAttribute ], i ) => {
 					// Bail early if the block doesn't have a valid source handler.
-					const source = getBlockBindingsSource(
-						boundAttribute.source
-					);
+					const source =
+						blockBindingsSources[ boundAttribute.source ];
 					if ( ! source?.useSource ) {
 						return null;
 					}
