@@ -88,3 +88,21 @@ const { actions } = store( 'directive-context-navigate', {
 		},
 	},
 } );
+
+store( 'directive-context-watch', {
+	actions: {
+		increment: () => {
+			const ctx = getContext();
+			ctx.counter = ctx.counter + 1;
+		},
+	},
+	callbacks: {
+		countChanges: () => {
+			const ctx = getContext();
+			// Subscribe to changes in counter.
+			// eslint-disable-next-line no-unused-expressions
+			ctx.counter;
+			ctx.changes = ctx.changes + 1;
+		},
+	},
+});

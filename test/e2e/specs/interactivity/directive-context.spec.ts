@@ -313,4 +313,27 @@ test.describe( 'data-wp-context', () => {
 		await select2.click();
 		await expect( selected ).toHaveText( 'Text 2' );
 	} );
+
+	test( 'should not subscribe to parent context props if they exist in child', async ( {
+		page,
+	} ) => {
+		const counterParent = page.getByTestId( 'counter parent' );
+		const counterChild = page.getByTestId( 'counter child' );
+		const changes = page.getByTestId( 'counter changes' );
+
+		await expect( counterParent ).toHaveText( '0' );
+		await expect( counterChild ).toHaveText( '0' );
+		// The first render counts, so the changes counter starts at 1.
+		await expect( changes ).toHaveText( '1' );
+
+		await counterParent.click();
+		await expect( counterParent ).toHaveText( '1' );
+		await expect( counterChild ).toHaveText( '0' );
+		await expect( changes ).toHaveText( '1' );
+
+		await counterChild.click();
+		await expect( counterParent ).toHaveText( '1' );
+		await expect( counterChild ).toHaveText( '1' );
+		await expect( changes ).toHaveText( '2' );
+	} );
 } );
