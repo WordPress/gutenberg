@@ -25,11 +25,7 @@ export default function BlockBindingsButton( { clientId } ) {
 	return isConnected ? (
 		<ToolbarButton
 			icon={ connection }
-			label={ _x(
-				// TODO: Let's get this naming right
-				'Connected to a block bindings source',
-				'block toolbar button label'
-			) }
+			label={ _x( 'Connected', 'block toolbar button label' ) }
 			iconSize={ 24 }
 		></ToolbarButton>
 	) : null;
