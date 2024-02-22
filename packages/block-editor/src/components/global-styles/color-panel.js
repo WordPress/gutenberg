@@ -259,7 +259,7 @@ function ColorPanelDropdown( {
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<Tabs initialTabId={ currentTab?.key }>
+								<Tabs defaultTabId={ currentTab?.key }>
 									<Tabs.TabList>
 										{ tabs.map( ( tab ) => (
 											<Tabs.Tab

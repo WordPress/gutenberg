@@ -11,7 +11,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
-import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -477,13 +476,7 @@ export const revertTemplate =
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			dispatch.toggleDistractionFree();
-		}
+	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editSiteStoreName, name );
@@ -500,29 +493,21 @@ export const closeGeneralSidebar =
 			.disableComplementaryArea( editSiteStoreName );
 	};
 
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @deprecated
+ *
+ * @param {string} mode The editor mode.
+ */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry
-			.dispatch( 'core/preferences' )
-			.set( 'core', 'editorMode', mode );
-
-		// Unselect blocks when we switch to a non visual mode.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if ( mode === 'visual' ) {
-			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'text' ) {
-			const isDistractionFree = registry
-				.select( preferencesStore )
-				.get( 'core', 'distractionFree' );
-			if ( isDistractionFree ) {
-				dispatch.toggleDistractionFree();
-			}
-			speak( __( 'Code editor selected' ), 'assertive' );
-		}
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).switchEditorMode", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').switchEditorMode",
+		} );
+		registry.dispatch( editorStore ).switchEditorMode( mode );
 	};
 
 /**
@@ -552,64 +537,15 @@ export const setHasPageContentFocus =
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
+ *
+ * @deprecated
  */
 export const toggleDistractionFree =
 	() =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'fixedToolbar', false );
-		}
-		if ( ! isDistractionFree ) {
-			registry.batch( () => {
-				registry
-					.dispatch( preferencesStore )
-					.set( 'core', 'fixedToolbar', true );
-				registry.dispatch( editorStore ).setIsInserterOpened( false );
-				registry.dispatch( editorStore ).setIsListViewOpened( false );
-				dispatch.closeGeneralSidebar();
-			} );
-		}
-		registry.batch( () => {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', ! isDistractionFree );
-			registry
-				.dispatch( noticesStore )
-				.createInfoNotice(
-					isDistractionFree
-						? __( 'Distraction free off.' )
-						: __( 'Distraction free on.' ),
-					{
-						id: 'core/edit-site/distraction-free-mode/notice',
-						type: 'snackbar',
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: () => {
-									registry.batch( () => {
-										registry
-											.dispatch( preferencesStore )
-											.set(
-												'core',
-												'fixedToolbar',
-												isDistractionFree ? true : false
-											);
-										registry
-											.dispatch( preferencesStore )
-											.toggle(
-												'core',
-												'distractionFree'
-											);
-									} );
-								},
-							},
-						],
-					}
-				);
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).toggleDistractionFree", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
+		registry.dispatch( editorStore ).toggleDistractionFree();
 	};
