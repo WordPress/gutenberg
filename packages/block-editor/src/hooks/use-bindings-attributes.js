@@ -192,7 +192,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		);
 
 		// If the block doesn't have any bindings, render the original block edit.
-		if ( ! bindings ) {
+		if ( ! Object.keys( bindings ).length ) {
 			return <BlockEdit { ...props } />;
 		}
 
