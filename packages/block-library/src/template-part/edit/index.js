@@ -74,7 +74,7 @@ function ReplaceButton( {
 function TemplatesList( { availableTemplates, onSelect } ) {
 	const shownTemplates = useAsyncList( availableTemplates );
 
-	if ( ! availableTemplates || availableTemplates?.length < 2 ) {
+	if ( ! availableTemplates ) {
 		return null;
 	}
 
