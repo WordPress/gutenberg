@@ -7,20 +7,122 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 	Tooltip,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import {
+	useAsyncList,
+	useInstanceId,
+	useResizeObserver,
+} from '@wordpress/compose';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { __, isRTL } from '@wordpress/i18n';
+import { isAppleOS } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
+import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
+
+const {
+	useCompositeStoreV2: useCompositeStore,
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	CompositeRowV2: CompositeRow,
+} = unlock( componentsPrivateApis );
+
+const GridContext = createContext( {} );
+
+function Grid( { id, children, ...gridProps } ) {
+	const baseId = useInstanceId( Grid, 'view-grid', id );
+	const gridRef = useRef( null );
+	const store = useCompositeStore( {
+		focusWrap: 'horizontal',
+		rtl: isRTL(),
+	} );
+	const context = useMemo(
+		() => ( { ...store, baseId } ),
+		[ store, baseId ]
+	);
+
+	return (
+		<Composite
+			id={ baseId }
+			ref={ gridRef }
+			role="grid"
+			store={ store }
+			{ ...gridProps }
+		>
+			<GridContext.Provider value={ context }>
+				<GridRows baseId={ baseId } gridRef={ gridRef }>
+					{ children }
+				</GridRows>
+			</GridContext.Provider>
+		</Composite>
+	);
+}
+
+function GridRows( { baseId, gridRef, children } ) {
+	const [ columnCount, setColumnCount ] = useState( children?.length || 1 );
+	const [ resizeListener, { width: totalWidth } ] = useResizeObserver();
+
+	const referenceCell =
+		gridRef?.current?.querySelector( '[role="gridcell"]' ) || {};
+	const { offsetWidth: columnWidth = totalWidth } = referenceCell;
+
+	useEffect( () => {
+		if ( columnWidth && totalWidth ) {
+			setColumnCount(
+				Math.max( 1, Math.floor( totalWidth / columnWidth ) )
+			);
+		}
+	}, [ columnWidth, totalWidth ] );
+
+	const rows = useMemo(
+		() =>
+			Array.from(
+				{ length: Math.ceil( children?.length / columnCount ) },
+				( _, index ) =>
+					children.slice(
+						index * columnCount,
+						( index + 1 ) * columnCount
+					)
+			),
+		[ children, columnCount ]
+	);
+
+	return useMemo(
+		() => (
+			<>
+				{ resizeListener }
+				<div className="dataviews-view-grid__rows">
+					{ rows.map( ( row, index ) => (
+						<CompositeRow
+							className="dataviews-view-grid__row"
+							role="row"
+							id={ `${ baseId }-row-${ index }` }
+							key={ `${ baseId }-row-${ index }` }
+						>
+							{ row }
+						</CompositeRow>
+					) ) }
+				</div>
+			</>
+		),
+		[ baseId, resizeListener, rows ]
+	);
+}
 
 function GridItem( {
 	selection,
@@ -34,39 +136,63 @@ function GridItem( {
 	visibleFields,
 } ) {
 	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
-	const id = getItemId( item );
-	const isSelected = selection.includes( id );
+	const itemRef = useRef( null );
+	const { baseId, move, next, previous, up, down } =
+		useContext( GridContext );
+	const itemId = getItemId( item );
+	const id = `${ baseId }-item-${ itemId }`;
+	const isSelected = selection.includes( itemId );
+	const rtl = isRTL();
+	const movementMap = useMemo(
+		() =>
+			new Map( [
+				[ 'ArrowUp', up ],
+				[ 'ArrowDown', down ],
+				[ 'ArrowLeft', rtl ? next : previous ],
+				[ 'ArrowRight', rtl ? previous : next ],
+			] ),
+		[ down, next, previous, rtl, up ]
+	);
+
 	return (
-		<VStack
+		<CompositeItem
+			ref={ itemRef }
+			render={ <VStack /> }
 			spacing={ 0 }
-			key={ id }
+			key={ itemId }
+			id={ id }
+			role="gridcell"
+			aria-label={ primaryField?.getValue( { item } ) }
 			className={ classnames( 'dataviews-view-grid__card', {
 				'is-selected': isSelected,
 				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
 			onMouseDown={ ( event ) => {
-				if ( event.ctrlKey || event.metaKey ) {
+				if ( event.defaultPrevented ) return;
+
+				if ( isAppleOS() ? event.ctrlKey : event.metaKey ) {
 					setHasNoPointerEvents( true );
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
+					const setAsSelected = ! isSelected;
+					const selectedData = data.filter( ( _item ) => {
+						const _itemId = getItemId?.( _item );
+						const currentlyIncluded = selection.includes( _itemId );
+						return setAsSelected
+							? itemId === _itemId || currentlyIncluded
+							: itemId !== _itemId && currentlyIncluded;
+					} );
+					onSelectionChange( selectedData );
+				}
+			} }
+			onKeyDown={ ( event ) => {
+				if ( event.defaultPrevented ) return;
+
+				const { target, currentTarget, key } = event;
+
+				if ( target !== currentTarget ) {
+					if ( movementMap.has( key ) ) {
+						move( movementMap.get( key )() || id );
+					} else if ( key === 'Escape' ) {
+						move( id );
 					}
 				}
 			} }
@@ -120,7 +246,7 @@ function GridItem( {
 					);
 				} ) }
 			</VStack>
-		</VStack>
+		</CompositeItem>
 	);
 }
 
@@ -154,13 +280,7 @@ export default function ViewGrid( {
 	return (
 		<>
 			{ hasData && (
-				<Grid
-					gap={ 6 }
-					columns={ 2 }
-					alignment="top"
-					className="dataviews-view-grid"
-					aria-busy={ isLoading }
-				>
+				<Grid className="dataviews-view-grid" aria-busy={ isLoading }>
 					{ usedData.map( ( item ) => {
 						return (
 							<GridItem
