@@ -3,7 +3,7 @@
  */
 import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
@@ -85,6 +85,8 @@ const BindingConnector = ( {
 
 	const setAttributes = blockProps.setAttributes;
 
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
+
 	const updateBoundAttibute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
 			/*
@@ -99,11 +101,13 @@ const BindingConnector = ( {
 				prevAttrValue = prevAttrValue.toHTMLString();
 			}
 
-			setAttributes( {
-				[ attrName ]: newAttrValue,
+			syncDerivedUpdates( () => {
+				setAttributes( {
+					[ attrName ]: newAttrValue,
+				} );
 			} );
 		},
-		[ attrName, setAttributes ]
+		[ attrName, setAttributes, syncDerivedUpdates ]
 	);
 
 	useEffect( () => {
