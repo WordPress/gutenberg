@@ -265,6 +265,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				icon={ blockType?.icon?.src }
 				label={ blockType?.title }
 				variations={ variations }
+				instructions={ __( 'Divide into columns. Select a layout:' ) }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( nextVariation.attributes );

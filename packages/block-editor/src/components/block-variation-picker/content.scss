@@ -1,4 +1,4 @@
-.block-editor-block-variation-picker {
+/*.block-editor-block-variation-picker {
 	.components-placeholder__instructions {
 		// Defer to vertical margins applied by template picker options.
 		margin-bottom: 0;
@@ -9,15 +9,9 @@
 		// fieldset are the options and the skip button, oriented vertically.
 		flex-direction: column;
 	}
+}*/
 
-	&.has-many-variations .components-placeholder__fieldset {
-		// Allow options to occupy a greater amount of the available space if
-		// many options exist.
-		max-width: 90%;
-	}
-}
-
-.block-editor-block-variation-picker__variations.block-editor-block-variation-picker__variations {
+/*.block-editor-block-variation-picker__variations.block-editor-block-variation-picker__variations {
 	display: flex;
 	justify-content: flex-start;
 	flex-direction: row;
@@ -50,9 +44,9 @@
 		display: block;
 		line-height: 1.4;
 	}
-}
+}*/
 
-.block-editor-block-variation-picker__variation {
+/*.block-editor-block-variation-picker__variation {
 	width: 100%;
 
 	&.components-button.has-icon {
@@ -86,4 +80,53 @@
 	&:last-child {
 		margin-right: 0;
 	}
+}*/
+
+
+// @todo
+.block-editor-block-variation-picker__variations,
+.block-editor-block-variation-picker__skip,
+.wp-block-group-placeholder__variations {
+	list-style: none;
+	display: flex;
+	justify-content: center;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	gap: $grid-unit-10;
+
+	svg {
+		fill: $gray-400 !important;
+	}
+
+	svg:hover {
+		fill: var(--wp-admin-theme-color) !important;
+	}
+
+	& > li {
+		//margin: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
+		width: auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	/*& li > .wp-block-group-placeholder__variation-button {
+		width: 44px;
+		height: 32px;
+		padding: 0;
+		&:hover {
+			box-shadow: none;
+		}
+	}*/
+
+	/*.is-small,
+	.is-medium {
+		> li {
+			margin: $grid-unit-15;
+		}
+	}*/
+
 }
