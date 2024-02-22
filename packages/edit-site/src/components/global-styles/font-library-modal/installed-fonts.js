@@ -12,6 +12,8 @@ import {
 	Spinner,
 	FlexItem,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -37,6 +39,20 @@ function InstalledFonts() {
 		setNotice,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+
+	const customFontFamilyId =
+		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
+
+	const canUserDelete = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			return (
+				customFontFamilyId &&
+				canUser( 'delete', 'font-families', customFontFamilyId )
+			);
+		},
+		[ customFontFamilyId ]
+	);
 
 	const handleUnselectFont = () => {
 		handleSetLibraryFontSelected( null );
@@ -84,7 +100,9 @@ function InstalledFonts() {
 		: null;
 
 	const shouldDisplayDeleteButton =
-		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+		!! libraryFontSelected &&
+		libraryFontSelected?.source !== 'theme' &&
+		canUserDelete;
 
 	useEffect( () => {
 		handleSelectFont( libraryFontSelected );
