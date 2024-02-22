@@ -4969,6 +4969,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$raw_color_value = '#efefef';
 		$large_font      = '18px';
 		$small_font      = '12px';
+		$spacing         = 'clamp(1.5rem, 5vw, 2rem)';
 		$theme_json      = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -5005,6 +5006,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'size' => $large_font,
 								'name' => 'Font size large',
 								'slug' => 'large',
+							),
+						),
+					),
+					'spacing'    => array(
+						'spacingSizes' => array(
+							array(
+								'size' => $spacing,
+								'name' => '100',
+								'slug' => '100',
 							),
 						),
 					),
@@ -5077,7 +5087,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 						'core/columns'         => array(
 							'spacing' => array(
-								'margin' => 'var(--wp--preset--spacing--100)',
+								'blockGap' => 'var(--wp--preset--spacing--100)',
 							),
 						),
 					),
@@ -5128,6 +5138,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		 * WP_Theme_JSON_Resolver_Gutenberg::get_block_data() sets blockGap for supported blocks to `null` if the value is not defined.
 		 */
 		$this->assertNull( $styles['blocks']['core/post-template']['spacing']['blockGap'], 'core/post-template block: blockGap' );
+		$this->assertEquals( $spacing, $styles['blocks']['core/columns']['spacing']['blockGap'], 'core/columns block: blockGap' );
 	}
 
 	/**
