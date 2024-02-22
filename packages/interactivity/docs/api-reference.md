@@ -7,7 +7,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 
 DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=T4meh6lltJh6TCX51NTIu,DmIhxYSGFTL_ywZFbsmuSw)).
 
-![State & Directives](./assets/interactivity-state-directives.png)
+![State & Directives](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/packages/interactivity/docs/assets/interactivity-state-directives.png)
 
 ## Table of Contents
 
