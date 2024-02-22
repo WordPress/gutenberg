@@ -20,11 +20,37 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 	 * @access private
 	 */
 	class WP_Font_Utils {
+
+		/**
+		 * Adds surrounding quotes to font family names that contain special characters.
+		 *
+		 * It follows the recommendations from the CSS Fonts Module Level 4.
+		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $item A font family name.
+		 * @return string The font family name with surrounding quotes, if necessary.
+		 */
+		private static function maybe_add_quotes( $item ) {
+			// Matches strings that are not exclusively alphabetic characters or hyphens, and do not exactly follow the pattern generic(alphabetic characters or hyphens).
+			$regex = '/^(?!generic\([a-zA-Z\-]+\)$)(?!^[a-zA-Z\-]+$).+/';
+			$item  = trim( $item );
+			if ( preg_match( $regex, $item ) ) {
+				$item = trim( $item, "\"'" );
+				return '"' . $item . '"';
+			}
+			return $item;
+		}
+
 		/**
 		 * Sanitizes and formats font family names.
 		 *
-		 * - Applies `sanitize_text_field`
-		 * - Adds surrounding quotes to names that contain spaces and are not already quoted
+		 * - Applies `sanitize_text_field`.
+		 * - Adds surrounding quotes to names containing any characters that are not alphabetic or dashes.
+		 *
+		 * It follows the recommendations from the CSS Fonts Module Level 4.
+		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
 		 *
 		 * @since 6.5.0
 		 * @access private
@@ -39,26 +65,19 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				return '';
 			}
 
-			$font_family           = sanitize_text_field( $font_family );
-			$font_families         = explode( ',', $font_family );
-			$wrapped_font_families = array_map(
-				function ( $family ) {
-					$trimmed = trim( $family );
-					if ( ! empty( $trimmed ) && str_contains( $trimmed, ' ' ) && ! str_contains( $trimmed, "'" ) && ! str_contains( $trimmed, '"' ) ) {
-							return '"' . $trimmed . '"';
+			$output          = sanitize_text_field( $font_family );
+			$formatted_items = array();
+			if ( str_contains( $output, ',' ) ) {
+				$items = explode( ',', $output );
+				foreach ( $items as $item ) {
+					$formatted_item = self::maybe_add_quotes( $item );
+					if ( ! empty( $formatted_item ) ) {
+						$formatted_items[] = $formatted_item;
 					}
-					return $trimmed;
-				},
-				$font_families
-			);
-
-			if ( count( $wrapped_font_families ) === 1 ) {
-				$font_family = $wrapped_font_families[0];
-			} else {
-				$font_family = implode( ', ', $wrapped_font_families );
+				}
+				return implode( ', ', $formatted_items );
 			}
-
-			return $font_family;
+			return self::maybe_add_quotes( $output );
 		}
 
 		/**
@@ -233,8 +252,8 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 			return array(
 				'otf'   => 'application/vnd.ms-opentype',
 				'ttf'   => PHP_VERSION_ID >= 70400 ? 'font/sfnt' : $php_7_ttf_mime_type,
-				'woff'  => PHP_VERSION_ID >= 80100 ? 'font/woff' : 'application/font-woff',
-				'woff2' => PHP_VERSION_ID >= 80100 ? 'font/woff2' : 'application/font-woff2',
+				'woff'  => PHP_VERSION_ID >= 80112 ? 'font/woff' : 'application/font-woff',
+				'woff2' => PHP_VERSION_ID >= 80112 ? 'font/woff2' : 'application/font-woff2',
 			);
 		}
 	}

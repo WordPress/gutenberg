@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { click, press, type } from '@ariakit/test';
+import { click, press, sleep, type, waitFor } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect, CustomSelectItem } from '..';
+import { CustomSelect as UncontrolledCustomSelect, CustomSelectItem } from '..';
 import type { CustomSelectProps, LegacyCustomSelectProps } from '../types';
 
 const customClass = 'amber-skies';
@@ -51,12 +51,18 @@ const legacyProps = {
 
 const LegacyControlledCustomSelect = ( {
 	options,
+	onChange,
+	...restProps
 }: LegacyCustomSelectProps ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
-		<CustomSelect
-			{ ...legacyProps }
-			onChange={ ( { selectedItem }: any ) => setValue( selectedItem ) }
+		<UncontrolledCustomSelect
+			{ ...restProps }
+			options={ options }
+			onChange={ ( args: any ) => {
+				onChange?.( args );
+				setValue( args.selectedItem );
+			} }
 			value={ options.find(
 				( option: any ) => option.key === value.key
 			) }
@@ -66,7 +72,7 @@ const LegacyControlledCustomSelect = ( {
 
 describe( 'With Legacy Props', () => {
 	describe.each( [
-		[ 'Uncontrolled', CustomSelect ],
+		[ 'Uncontrolled', UncontrolledCustomSelect ],
 		[ 'Controlled', LegacyControlledCustomSelect ],
 	] )( '%s', ( ...modeAndComponent ) => {
 		const [ , Component ] = modeAndComponent;
@@ -100,12 +106,13 @@ describe( 'With Legacy Props', () => {
 		} );
 
 		it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
-			render( <CustomSelect { ...legacyProps } /> );
+			render( <Component { ...legacyProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
+			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -127,7 +134,7 @@ describe( 'With Legacy Props', () => {
 		} );
 
 		it( 'Should apply class only to options that have a className defined', async () => {
-			render( <CustomSelect { ...legacyProps } /> );
+			render( <Component { ...legacyProps } /> );
 
 			await click(
 				screen.getByRole( 'combobox', {
@@ -164,7 +171,7 @@ describe( 'With Legacy Props', () => {
 			const customStyles =
 				'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
-			render( <CustomSelect { ...legacyProps } /> );
+			render( <Component { ...legacyProps } /> );
 
 			await click(
 				screen.getByRole( 'combobox', {
@@ -197,9 +204,9 @@ describe( 'With Legacy Props', () => {
 			);
 		} );
 
-		it( 'does not show selected hint by default', () => {
+		it( 'does not show selected hint by default', async () => {
 			render(
-				<CustomSelect
+				<Component
 					{ ...legacyProps }
 					label="Custom select"
 					options={ [
@@ -211,14 +218,16 @@ describe( 'With Legacy Props', () => {
 					] }
 				/>
 			);
-			expect(
-				screen.getByRole( 'combobox', { name: 'Custom select' } )
-			).not.toHaveTextContent( 'Hint' );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'combobox', { name: 'Custom select' } )
+				).not.toHaveTextContent( 'Hint' )
+			);
 		} );
 
 		it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
 			render(
-				<CustomSelect
+				<Component
 					{ ...legacyProps }
 					label="Custom select"
 					options={ [
@@ -232,16 +241,18 @@ describe( 'With Legacy Props', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'combobox', {
-					expanded: false,
-				} )
-			).toHaveTextContent( /hint/i );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'combobox', {
+						expanded: false,
+					} )
+				).toHaveTextContent( /hint/i )
+			);
 		} );
 
 		it( 'shows selected hint in list of options when added', async () => {
 			render(
-				<CustomSelect
+				<Component
 					{ ...legacyProps }
 					label="Custom select"
 					options={ [
@@ -268,7 +279,7 @@ describe( 'With Legacy Props', () => {
 			const mockOnChange = jest.fn();
 
 			render(
-				<CustomSelect { ...legacyProps } onChange={ mockOnChange } />
+				<Component { ...legacyProps } onChange={ mockOnChange } />
 			);
 
 			await click(
@@ -312,9 +323,10 @@ describe( 'With Legacy Props', () => {
 			);
 
 			render(
-				<CustomSelect { ...legacyProps } onChange={ mockOnChange } />
+				<Component { ...legacyProps } onChange={ mockOnChange } />
 			);
 
+			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'combobox', {
@@ -330,12 +342,13 @@ describe( 'With Legacy Props', () => {
 
 		describe( 'Keyboard behavior and accessibility', () => {
 			it( 'Should be able to change selection using keyboard', async () => {
-				render( <CustomSelect { ...legacyProps } /> );
+				render( <Component { ...legacyProps } /> );
 
 				const currentSelectedItem = screen.getByRole( 'combobox', {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 
@@ -355,12 +368,13 @@ describe( 'With Legacy Props', () => {
 			} );
 
 			it( 'Should be able to type characters to select matching options', async () => {
-				render( <CustomSelect { ...legacyProps } /> );
+				render( <Component { ...legacyProps } /> );
 
 				const currentSelectedItem = screen.getByRole( 'combobox', {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				await press.Enter();
 				expect(
@@ -375,12 +389,13 @@ describe( 'With Legacy Props', () => {
 			} );
 
 			it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-				render( <CustomSelect { ...legacyProps } /> );
+				render( <Component { ...legacyProps } /> );
 
 				const currentSelectedItem = screen.getByRole( 'combobox', {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 
@@ -398,7 +413,7 @@ describe( 'With Legacy Props', () => {
 			} );
 
 			it( 'Should have correct aria-selected value for selections', async () => {
-				render( <CustomSelect { ...legacyProps } /> );
+				render( <Component { ...legacyProps } /> );
 
 				const currentSelectedItem = screen.getByRole( 'combobox', {
 					expanded: false,
@@ -455,29 +470,29 @@ describe( 'With Legacy Props', () => {
 describe( 'static typing', () => {
 	<>
 		{ /* @ts-expect-error - when `options` prop is passed, `onChange` should have legacy signature */ }
-		<CustomSelect
+		<UncontrolledCustomSelect
 			label="foo"
 			options={ [] }
 			onChange={ ( _: string | string[] ) => undefined }
 		/>
-		<CustomSelect
+		<UncontrolledCustomSelect
 			label="foo"
 			options={ [] }
 			onChange={ ( _: { selectedItem: unknown } ) => undefined }
 		/>
-		<CustomSelect
+		<UncontrolledCustomSelect
 			label="foo"
 			onChange={ ( _: string | string[] ) => undefined }
 		>
 			foobar
-		</CustomSelect>
+		</UncontrolledCustomSelect>
 		{ /* @ts-expect-error - when `children` are passed, `onChange` should have new default signature */ }
-		<CustomSelect
+		<UncontrolledCustomSelect
 			label="foo"
 			onChange={ ( _: { selectedItem: unknown } ) => undefined }
 		>
 			foobar
-		</CustomSelect>
+		</UncontrolledCustomSelect>
 	</>;
 } );
 
@@ -491,7 +506,7 @@ const defaultProps = {
 const ControlledCustomSelect = ( props: CustomSelectProps ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
-		<CustomSelect
+		<UncontrolledCustomSelect
 			{ ...props }
 			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
@@ -504,7 +519,7 @@ const ControlledCustomSelect = ( props: CustomSelectProps ) => {
 
 describe( 'With Default Props', () => {
 	describe.each( [
-		[ 'Uncontrolled', CustomSelect ],
+		[ 'Uncontrolled', UncontrolledCustomSelect ],
 		[ 'Controlled', ControlledCustomSelect ],
 	] )( '%s', ( ...modeAndComponent ) => {
 		const [ , Component ] = modeAndComponent;
@@ -544,6 +559,7 @@ describe( 'With Default Props', () => {
 				expanded: false,
 			} );
 
+			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -572,6 +588,7 @@ describe( 'With Default Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 
@@ -597,6 +614,7 @@ describe( 'With Default Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				await press.Enter();
 				expect(
@@ -617,6 +635,7 @@ describe( 'With Default Props', () => {
 					expanded: false,
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( currentSelectedItem ).toHaveFocus();
 

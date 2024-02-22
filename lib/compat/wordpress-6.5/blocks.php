@@ -57,7 +57,7 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  */
 function gutenberg_block_bindings_replace_html( $block_content, $block_name, string $attribute_name, $source_value ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-	if ( ! isset( $block_type->attributes[ $attribute_name ] ) ) {
+	if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
 		return $block_content;
 	}
 
@@ -157,18 +157,16 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 	 * @param WP_Block $block_instance The block instance.
 	 */
 function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
-	// Allowed blocks that support block bindings.
-	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
-	$allowed_blocks = array(
+	$supported_block_attrs = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
-	// If the block doesn't have the bindings property or isn't one of the allowed block types, return.
+	// If the block doesn't have the bindings property or isn't one of the supported block types, return.
 	if (
-		! isset( $allowed_blocks[ $block_instance->name ] ) ||
+		! isset( $supported_block_attrs[ $block_instance->name ] ) ||
 		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
 		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
 	) {
@@ -192,8 +190,8 @@ function gutenberg_process_block_bindings( $block_content, $parsed_block, $block
 
 	$modified_block_content = $block_content;
 	foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
-		// If the attribute is not in the allowed list, process next attribute.
-		if ( ! in_array( $attribute_name, $allowed_blocks[ $block_instance->name ], true ) ) {
+		// If the attribute is not in the supported list, process next attribute.
+		if ( ! in_array( $attribute_name, $supported_block_attrs[ $block_instance->name ], true ) ) {
 			continue;
 		}
 		// If no source is provided, or that source is not registered, process next attribute.

@@ -181,3 +181,8 @@ figure.wp-block-image:not(.wp-block) {
 		padding-right: 0;
 	}
 }
+
+.wp-block-image__toolbar_content_textarea {
+	// Corresponds to the size of the textarea in the block inspector.
+	width: 250px;
+}

@@ -33,6 +33,31 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		private static $instance = null;
 
 		/**
+		 * Supported source properties that can be passed to the registered source.
+		 *
+		 * @since 6.5.0
+		 * @var array
+		 */
+		private $allowed_source_properties = array(
+			'label',
+			'get_value_callback',
+			'uses_context',
+		);
+
+		/**
+		 * Supported blocks that can use the block bindings API.
+		 *
+		 * @since 6.5.0
+		 * @var array
+		 */
+		private $supported_blocks = array(
+			'core/paragraph',
+			'core/heading',
+			'core/image',
+			'core/button',
+		);
+
+		/**
 		 * Registers a new block bindings source.
 		 *
 		 * Sources are used to override block's original attributes with a value
@@ -48,18 +73,19 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		 * @param array    $source_properties {
 		 *     The array of arguments that are used to register a source.
 		 *
-		 *     @type string   $label              The label of the source.
-		 *     @type callback $get_value_callback A callback executed when the source is processed during block rendering.
-		 *                                        The callback should have the following signature:
+		 *     @type string   $label                   The label of the source.
+		 *     @type callback $get_value_callback      A callback executed when the source is processed during block rendering.
+		 *                                             The callback should have the following signature:
 		 *
-		 *                                        `function ($source_args, $block_instance,$attribute_name): mixed`
-		 *                                            - @param array    $source_args    Array containing source arguments
-		 *                                                                              used to look up the override value,
-		 *                                                                              i.e. {"key": "foo"}.
-		 *                                            - @param WP_Block $block_instance The block instance.
-		 *                                            - @param string   $attribute_name The name of the target attribute.
-		 *                                        The callback has a mixed return type; it may return a string to override
-		 *                                        the block's original value, null, false to remove an attribute, etc.
+		 *                                             `function ($source_args, $block_instance,$attribute_name): mixed`
+		 *                                                 - @param array    $source_args    Array containing source arguments
+		 *                                                                                   used to look up the override value,
+		 *                                                                                   i.e. {"key": "foo"}.
+		 *                                                 - @param WP_Block $block_instance The block instance.
+		 *                                                 - @param string   $attribute_name The name of the target attribute.
+		 *                                             The callback has a mixed return type; it may return a string to override
+		 *                                             the block's original value, null, false to remove an attribute, etc.
+		 *     @type array    $uses_context (optional) Array of values to add to block `uses_context` needed by the source.
 		 * }
 		 * @return WP_Block_Bindings_Source|false Source when the registration was successful, or `false` on failure.
 		 */
@@ -102,7 +128,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
-			/* Validate that the source properties contain the label */
+			// Validate that the source properties contain the label.
 			if ( ! isset( $source_properties['label'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -112,7 +138,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
-			/* Validate that the source properties contain the get_value_callback */
+			// Validate that the source properties contain the get_value_callback.
 			if ( ! isset( $source_properties['get_value_callback'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -122,11 +148,31 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				return false;
 			}
 
-			/* Validate that the get_value_callback is a valid callback */
+			// Validate that the get_value_callback is a valid callback.
 			if ( ! is_callable( $source_properties['get_value_callback'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'The "get_value_callback" parameter must be a valid callback.' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
+			// Validate that the uses_context parameter is an array.
+			if ( isset( $source_properties['uses_context'] ) && ! is_array( $source_properties['uses_context'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The "uses_context" parameter must be an array.' ),
+					'6.5.0'
+				);
+				return false;
+			}
+
+			// Validate that the source properties contain only allowed properties.
+			if ( ! empty( array_diff( array_keys( $source_properties ), $this->allowed_source_properties ) ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'The $source_properties array contains invalid properties.' ),
 					'6.5.0'
 				);
 				return false;
@@ -139,6 +185,22 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 
 			$this->sources[ $source_name ] = $source;
 
+			// Add `uses_context` defined by block bindings sources.
+			add_filter(
+				'register_block_type_args',
+				function ( $args, $block_name ) use ( $source ) {
+					if ( ! in_array( $block_name, $this->supported_blocks, true ) || empty( $source->uses_context ) ) {
+						return $args;
+					}
+					$original_use_context = isset( $args['uses_context'] ) ? $args['uses_context'] : array();
+					// Use array_values to reset the array keys.
+					$args['uses_context'] = array_values( array_unique( array_merge( $original_use_context, $source->uses_context ) ) );
+
+					return $args;
+				},
+				10,
+				2
+			);
 			return $source;
 		}
 

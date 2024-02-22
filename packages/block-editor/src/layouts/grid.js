@@ -8,9 +8,13 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	__experimentalNumberControl as NumberControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -64,13 +68,24 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
-		return layout?.columnCount ? (
-			<GridLayoutColumnsControl layout={ layout } onChange={ onChange } />
-		) : (
-			<GridLayoutMinimumWidthControl
-				layout={ layout }
-				onChange={ onChange }
-			/>
+		return (
+			<>
+				<GridLayoutTypeControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+				{ layout?.columnCount ? (
+					<GridLayoutColumnsControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) : (
+					<GridLayoutMinimumWidthControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				) }
+			</>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls() {
@@ -186,6 +201,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						value={ value }
 						units={ units }
 						min={ 0 }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -195,6 +212,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						min={ 0 }
 						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
 						withInputField={ false }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 			</Flex>
@@ -207,17 +226,101 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 	const { columnCount = 3 } = layout;
 
 	return (
-		<RangeControl
-			label={ __( 'Columns' ) }
-			value={ columnCount }
-			onChange={ ( value ) =>
-				onChange( {
-					...layout,
-					columnCount: value,
-				} )
-			}
-			min={ 1 }
-			max={ 6 }
-		/>
+		<fieldset>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Columns' ) }
+			</BaseControl.VisualLabel>
+			<Flex gap={ 4 }>
+				<FlexItem isBlock>
+					<NumberControl
+						size={ '__unstable-large' }
+						onChange={ ( value ) => {
+							/**
+							 * If the input is cleared, avoid switching
+							 * back to "Auto" by setting a value of "1".
+							 */
+							const validValue = value !== '' ? value : '1';
+							onChange( {
+								...layout,
+								columnCount: validValue,
+							} );
+						} }
+						value={ columnCount }
+						min={ 1 }
+						label={ __( 'Columns' ) }
+						hideLabelFromVision
+					/>
+				</FlexItem>
+				<FlexItem isBlock>
+					<RangeControl
+						value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
+						onChange={ ( value ) =>
+							onChange( {
+								...layout,
+								columnCount: value,
+							} )
+						}
+						min={ 1 }
+						max={ 16 }
+						withInputField={ false }
+						label={ __( 'Columns' ) }
+						hideLabelFromVision
+					/>
+				</FlexItem>
+			</Flex>
+		</fieldset>
+	);
+}
+
+// Enables switching between grid types
+function GridLayoutTypeControl( { layout, onChange } ) {
+	const { columnCount, minimumColumnWidth } = layout;
+
+	/**
+	 * When switching, temporarily save any custom values set on the
+	 * previous type so we can switch back without loss.
+	 */
+	const [ tempColumnCount, setTempColumnCount ] = useState(
+		columnCount || 3
+	);
+	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
+		minimumColumnWidth || '12rem'
+	);
+
+	const isManual = !! columnCount ? 'manual' : 'auto';
+
+	const onChangeType = ( value ) => {
+		if ( value === 'manual' ) {
+			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
+		} else {
+			setTempColumnCount( columnCount || 3 );
+		}
+		onChange( {
+			...layout,
+			columnCount: value === 'manual' ? tempColumnCount : null,
+			minimumColumnWidth:
+				value === 'auto' ? tempMinimumColumnWidth : null,
+		} );
+	};
+
+	return (
+		<ToggleGroupControl
+			__nextHasNoMarginBottom={ true }
+			label={ __( 'Type' ) }
+			value={ isManual }
+			onChange={ onChangeType }
+			isBlock={ true }
+		>
+			<ToggleGroupControlOption
+				key={ 'auto' }
+				value="auto"
+				label={ __( 'Auto' ) }
+			/>
+			<ToggleGroupControlOption
+				key={ 'manual' }
+				value="manual"
+				label={ __( 'Manual' ) }
+			/>
+		</ToggleGroupControl>
 	);
 }
