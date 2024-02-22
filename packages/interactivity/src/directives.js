@@ -39,13 +39,12 @@ const descriptor = Reflect.getOwnPropertyDescriptor;
 const proxifyContext = ( current, inherited = {} ) =>
 	new Proxy( current, {
 		get: ( target, k ) => {
-			// Subscribe to the inherited and current props.
-			const inheritedProp = inherited[ k ];
+			// Always subscribe to prop changes in the curren context.
 			const currentProp = target[ k ];
 
 			// Return the inherited prop when missing in target.
 			if ( ! ( k in target ) && k in inherited ) {
-				return inheritedProp;
+				return inherited[ k ];
 			}
 
 			// Proxify plain objects that are not listed in `ignore`.
@@ -54,11 +53,13 @@ const proxifyContext = ( current, inherited = {} ) =>
 				! contextAssignedObjects.get( target )?.has( k ) &&
 				isPlainObject( peek( target, k ) )
 			) {
-				return proxifyContext( currentProp, inheritedProp );
+				return proxifyContext( currentProp, inherited[ k ] );
 			}
 
-			// For other cases, return the value from target.
-			return currentProp;
+			// For other cases, return the value from target, but subscribing
+			// also to changes in the parent context when the current prop is
+			// not defined.
+			return k in target ? currentProp : inherited[ k ];
 		},
 		set: ( target, k, value ) => {
 			const obj =
