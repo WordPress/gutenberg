@@ -332,6 +332,21 @@ if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 	add_action( 'before_delete_post', '_wp_before_delete_font_face', 10, 2 );
 }
 
+/**
+ * Filters the block editor settings to enable or disable font uploads according to user capability.
+ *
+ * @since 6.5.0
+ *
+ * @param array $settings Block editor settings.
+ * @return array Block editor settings.
+ */
+function gutenberg_font_uploads_settings( $settings ) {
+	$settings['fontUploadsEnabled'] = current_user_can( 'upload_fonts' );
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_font_uploads_settings' );
+
 // @core-merge: Do not merge this back compat function, it is for supporting a legacy font family format only in Gutenberg.
 /**
  * Convert legacy font family posts to the new format.
