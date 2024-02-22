@@ -28,7 +28,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	}, [ name, blockExample, variation ] );
 
 	const viewportWidth = blockExample?.viewportWidth ?? null;
-	const previewHeight = '150px';
+	const previewHeight = 150;
 
 	if ( ! blockExample ) {
 		return null;
@@ -48,7 +48,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 						{
 							css: `
 								body{
-									min-height:${ previewHeight };
+									min-height:${ previewHeight }px;
 									display:flex;align-items:center;justify-content:center;
 								}
 							`,

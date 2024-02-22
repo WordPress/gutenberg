@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { layout, page, home, verse, plus } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ const PageItem = ( { postType = 'page', postId, ...props } ) => {
 };
 
 export default function SidebarNavigationScreenPages() {
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -220,12 +222,14 @@ export default function SidebarNavigationScreenPages() {
 								</Truncate>
 							</PageItem>
 						) ) }
-						<SidebarNavigationItem
-							className="edit-site-sidebar-navigation-screen-pages__see-all"
-							{ ...pagesLink }
-						>
-							{ __( 'Manage all pages' ) }
-						</SidebarNavigationItem>
+						{ ! isMobileViewport && (
+							<SidebarNavigationItem
+								className="edit-site-sidebar-navigation-screen-pages__see-all"
+								{ ...pagesLink }
+							>
+								{ __( 'Manage all pages' ) }
+							</SidebarNavigationItem>
+						) }
 					</VStack>
 				}
 			/>

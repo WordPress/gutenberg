@@ -308,7 +308,11 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
 							setAttributes( {
