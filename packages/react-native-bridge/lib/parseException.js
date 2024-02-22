@@ -106,11 +106,11 @@ const reverseEntries = ( stack ) => {
 
 // Based on function `createStackParser` of Sentry JavaScript SDK:
 // https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/utils/src/stacktrace.ts#L16-L59
-const parseStacktrace = ( stacktrace, skipFirst = 0 ) => {
+const parseStacktrace = ( stacktrace ) => {
 	const entries = [];
 	const lines = stacktrace.split( '\n' );
 
-	for ( let i = skipFirst; i < lines.length; i++ ) {
+	for ( let i = 0; i < lines.length; i++ ) {
 		const line = lines[ i ];
 		// Ignore lines over 1kb as they are unlikely to be valid entries.
 		if ( line.length > 1024 ) {
@@ -135,22 +135,13 @@ const parseStacktrace = ( stacktrace, skipFirst = 0 ) => {
 	return reverseEntries( entries );
 };
 
-// Based on function `getPopSize` of Sentry JavaScript SDK:
-// https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L123-L135
-const getPopSize = ( exception ) =>
-	exception && typeof exception.framesToPop === 'number'
-		? exception.framesToPop
-		: 0;
-
 // Based on function `parseStackFrames` of Sentry JavaScript SDK:
 // https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L100-L118
 const convertStacktraceToArray = ( exception ) => {
 	const stacktrace = exception.stacktrace || exception.stack || '';
 
-	const popSize = getPopSize( exception );
-
 	try {
-		return parseStacktrace( stacktrace, popSize );
+		return parseStacktrace( stacktrace );
 	} catch ( e ) {
 		// noop
 	}
