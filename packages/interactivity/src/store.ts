@@ -86,13 +86,13 @@ const handlers = {
 			}
 		}
 
-		const result = Reflect.get( target, key, receiver );
+		const result = Reflect.get( target, key );
 
 		// Check if the proxy is the store root and no key with that name exist. In
 		// that case, return an empty object for the requested key.
 		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
 			const obj = {};
-			Reflect.set( target, key, obj, receiver );
+			Reflect.set( target, key, obj );
 			return proxify( obj, ns );
 		}
 
@@ -148,6 +148,9 @@ const handlers = {
 		if ( isObject( result ) ) return proxify( result, ns );
 
 		return result;
+	},
+	set( target: any, key: string, value: any ) {
+		return Reflect.set( target, key, value );
 	},
 };
 
