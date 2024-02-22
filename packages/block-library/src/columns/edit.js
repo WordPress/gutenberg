@@ -40,6 +40,10 @@ import {
 	toWidthPrecision,
 } from './utils';
 
+const DEFAULT_BLOCK = {
+	name: 'core/column',
+};
+
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 	const { count, canInsertColumnBlock, minCount } = useSelect(
@@ -90,6 +94,8 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		className: classes,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		templateLock,
