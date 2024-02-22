@@ -314,7 +314,7 @@ test.describe( 'data-wp-context', () => {
 		await expect( selected ).toHaveText( 'Text 2' );
 	} );
 
-	test( 'should not subscribe to parent context props if they exist in child', async ( {
+	test( 'should not subscribe to parent context props if those also exist in child', async ( {
 		page,
 	} ) => {
 		const counterParent = page.getByTestId( 'counter parent' );
