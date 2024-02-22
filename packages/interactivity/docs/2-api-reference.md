@@ -47,7 +47,7 @@ _Example of directives used in the HTML markup_
 
 ```html
 <div
-  data-wp-interactive='{ "namespace": "myPlugin" }'
+  data-wp-interactive="myPlugin"
   data-wp-context='{ "isOpen": false }'
   data-wp-watch="callbacks.logIsOpen"
 >
@@ -69,14 +69,25 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 ### List of Directives
 
-With directives, we can directly manage behavior related to things such as side effects, state, event handlers, attributes or content.
+With directives, we can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
 
 #### `wp-interactive`
 
-The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). It includes a namespace to reference a specific store.
+The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). The directive includes a namespace to reference a specific store, that can be set as a `string` or an `object`.
 
 ```html
 <!-- Let's make this element and its children interactive and set the namespace -->
+<div
+  data-wp-interactive="myPlugin"
+  data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
+>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <div>
+    <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
+  </div>
+</div>
+```html
+<!-- This is also valid -->
 <div
   data-wp-interactive='{ "namespace": "myPlugin" }'
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
@@ -725,7 +736,7 @@ Note that, by default, references point to properties in the current namespace, 
 In the example below, we get `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
 
 ```html
-<div data-wp-interactive='{ "namespace": "myPlugin" }'>
+<div data-wp-interactive="myPlugin">
   <div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
 		<iframe ...></iframe>
 	</div>
@@ -906,40 +917,31 @@ store( "myPlugin", {
 
 #### On the server side
 
-> **Note**
-> We will rename `wp_store` to `wp_initial_state` in a future version.
+The state can also be initialized on the server using the `wp_interactivity_state()` function. You would typically do this in the `render.php` file of your block (the `render.php` templates were [introduced](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/) in WordPress 6.1).
 
-The state can also be initialized on the server using the `wp_store()` function. You would typically do this in the `render.php` file of your block (the `render.php` templates were [introduced](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/) in WordPress 6.1).
+The state defined on the server with `wp_interactivity_state()` gets merged with the stores defined in the view.js files.
 
-The state defined on the server with `wp_store()` gets merged with the stores defined in the view.js files.
-
-The `wp_store` function receives an [associative array](https://www.php.net/manual/en/language.types.array.php) as a parameter.
+The `wp_interactivity_state` function receives two arguments, a `string` with the namespace that will be used as a reference and an [associative array](https://www.php.net/manual/en/language.types.array.php) containing the values.
 
 _Example of store initialized from the server with a `state` = `{ someValue: 123 }`_
 
 ```php
 // render.php
-wp_store( array(
-  'myPlugin' => array(
-    'someValue' = 123
-  )
-);
+wp_interactivity_state( 'myPlugin', array (
+	'someValue' => get_some_value()
+));
 ```
 
 Initializing the state in the server also allows you to use any WordPress API. For example, you could use the Core Translation API to translate part of your state:
 
 ```php
 // render.php
-wp_store(
-  array(
-    "favoriteMovies" => array(
+wp_interactivity_state( 'favoriteMovies', array(
       "1" => array(
         "id" => "123-abc",
         "movieName" => __("someMovieName", "textdomain")
       ),
-    ),
-  )
-);
+) );
 ```
 
 ### Private stores

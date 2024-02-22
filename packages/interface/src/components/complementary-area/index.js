@@ -227,7 +227,9 @@ function ComplementaryArea( {
 					>
 						{ header || (
 							<>
-								<strong>{ title }</strong>
+								<h2 className="interface-complementary-area-header__title">
+									{ title }
+								</h2>
 								{ isPinnable && (
 									<Button
 										className="interface-complementary-area__pin-unpin-item"
