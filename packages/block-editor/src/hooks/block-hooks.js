@@ -33,6 +33,21 @@ function BlockHooksControlPure( { name, clientId } ) {
 		[ blockTypes, name ]
 	);
 
+	// In the case of the Navigation block the inner blocks are not retrieved via the innerBlocks property,
+	// but in the block's order. This function retrieves the inner blocks via the order tree.
+	const getInnerBlocksByOrderTree = useSelect( ( select ) => {
+		const { getBlock, getBlockOrder } = select( blockEditorStore );
+
+		return ( cId ) => {
+			const order = getBlockOrder( cId );
+			const blocks = order.map( ( id ) => {
+				const b = getBlock( id );
+				return b;
+			} );
+			return blocks;
+		};
+	} );
+
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
 			const { getBlock, getBlockIndex, getBlockRootClientId } =
@@ -40,7 +55,10 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 			return {
 				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength: getBlock( clientId )?.innerBlocks?.length,
+				innerBlocksLength:
+					getBlock( clientId )?.innerBlocks?.length > 0
+						? getBlock( clientId )?.innerBlocks?.length
+						: getInnerBlocksByOrderTree( clientId )?.length,
 				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
@@ -77,7 +95,13 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's child blocks (with the right block type) qualifies
 							// as a hooked first or last child block, as the block might've been automatically
 							// inserted and then moved around a bit by the user.
-							candidates = getBlock( clientId ).innerBlocks;
+							const currentBlock = getBlock( clientId );
+							if ( currentBlock.innerBlocks.length === 0 ) {
+								candidates =
+									getInnerBlocksByOrderTree( clientId );
+							} else {
+								candidates = currentBlock.innerBlocks;
+							}
 							break;
 					}
 
