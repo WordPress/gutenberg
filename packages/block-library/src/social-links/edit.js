@@ -36,6 +36,7 @@ const sizeOptions = [
 	{ name: __( 'Large' ), value: 'has-large-icon-size' },
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
+const DEFAULT_BLOCK = { name: 'core/social-link' };
 
 export function SocialLinksEdit( props ) {
 	const {
@@ -111,6 +112,8 @@ export function SocialLinksEdit( props ) {
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		placeholder: ! isSelected && SocialPlaceholder,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',

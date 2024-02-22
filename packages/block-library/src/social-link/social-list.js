@@ -32,3 +32,17 @@ export const getNameBySite = ( name ) => {
 	const variation = variations.find( ( v ) => v.name === name );
 	return variation ? variation.title : __( 'Social Icon' );
 };
+
+/**
+ * Retrieves the matching social service based on the URL.
+ *
+ * @param {string} url URL to match against.
+ * @return {Object} Social service variation.
+ */
+export function getMatchingService( url ) {
+	const variataion = variations.find( ( { patterns } ) =>
+		patterns?.some( ( pattern ) => pattern.test( url ) )
+	);
+
+	return variataion?.attributes?.service;
+}

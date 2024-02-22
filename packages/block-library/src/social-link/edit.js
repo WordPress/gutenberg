@@ -25,43 +25,53 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
+import { isURL, isEmail } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import {
+	getIconBySite,
+	getNameBySite,
+	getMatchingService,
+} from './social-list';
 
 const SocialLinkURLPopover = ( {
 	url,
 	setAttributes,
-	setPopover,
+	onClose,
 	popoverAnchor,
 	clientId,
 } ) => {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	return (
-		<URLPopover
-			anchor={ popoverAnchor }
-			aria-label={ __( 'Edit social link' ) }
-			onClose={ () => {
-				setPopover( false );
-				popoverAnchor?.focus();
-			} }
-		>
+		<URLPopover anchor={ popoverAnchor } onClose={ () => onClose( false ) }>
 			<form
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
-					setPopover( false );
 					popoverAnchor?.focus();
+					onClose( false );
 				} }
 			>
 				<div className="block-editor-url-input">
 					<URLInput
 						value={ url }
-						onChange={ ( nextURL ) =>
-							setAttributes( { url: nextURL } )
-						}
+						onChange={ ( nextURL ) => {
+							const nextAttributes = { url: nextURL };
+
+							if ( isURL( nextURL ) || isEmail( nextURL ) ) {
+								const matchingService = isEmail( nextURL )
+									? 'mail'
+									: getMatchingService( nextURL );
+
+								if ( matchingService ) {
+									nextAttributes.service = matchingService;
+								}
+							}
+
+							setAttributes( nextAttributes );
+						} }
 						placeholder={ __( 'Enter social link' ) }
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
@@ -107,7 +117,6 @@ const SocialLinkEdit = ( {
 		iconBackgroundColor,
 		iconBackgroundColorValue,
 	} = context;
-	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = clsx( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 		[ `has-${ iconColor }-color` ]: iconColor,
@@ -115,6 +124,7 @@ const SocialLinkEdit = ( {
 			iconBackgroundColor,
 	} );
 
+	const [ showPopover, setShowPopover ] = useState( ! url && ! service );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -169,7 +179,7 @@ const SocialLinkEdit = ( {
 				<button
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
-					onClick={ () => setPopover( true ) }
+					onClick={ () => setShowPopover( true ) }
 					aria-haspopup="dialog"
 				>
 					<IconComponent />
@@ -181,11 +191,11 @@ const SocialLinkEdit = ( {
 						{ socialLinkText }
 					</span>
 				</button>
-				{ isSelected && showURLPopover && (
+				{ isSelected && showPopover && (
 					<SocialLinkURLPopover
 						url={ url }
 						setAttributes={ setAttributes }
-						setPopover={ setPopover }
+						setPopover={ setPopoverAnchor }
 						popoverAnchor={ popoverAnchor }
 						clientId={ clientId }
 					/>
