@@ -12,17 +12,17 @@ import { _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockBindingsButton( { clientId } ) {
-	const { blockAttributes } = useSelect(
+	const isConnected = useSelect(
 		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
-			return {
-				blockAttributes: getBlockAttributes( clientId ),
-			};
+			const attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+
+			return !! attributes?.metadata?.bindings;
 		},
 		[ clientId ]
 	);
 
-	return blockAttributes?.metadata?.bindings ? (
+	return isConnected ? (
 		<ToolbarButton
 			icon={ connection }
 			label={ _x(
