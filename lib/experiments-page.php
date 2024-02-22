@@ -101,19 +101,6 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-form-blocks',
 		)
 	);
-
-	add_settings_field(
-		'gutenberg-group-grid-variation',
-		__( 'Grid variation for Group block ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
-			'id'    => 'gutenberg-group-grid-variation',
-		)
-	);
-
 	add_settings_field(
 		'gutenberg-no-tinymce',
 		__( 'Disable TinyMCE and Classic block', 'gutenberg' ),

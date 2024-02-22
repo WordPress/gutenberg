@@ -61,6 +61,7 @@ export function useEnter( props ) {
 						} ),
 					] );
 					__unstableMarkAutomaticChange();
+					return;
 				}
 			}
 

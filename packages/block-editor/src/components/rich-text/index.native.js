@@ -316,6 +316,7 @@ export function RichTextWrapper(
 						transformation.transform( { content: value.text } ),
 					] );
 					__unstableMarkAutomaticChange();
+					return;
 				}
 			}
 
