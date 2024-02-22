@@ -603,3 +603,24 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+add_action( 'template_redirect', function() {
+	if ( ! isset( $_GET['gutenberg-iframe'] ) ) {
+		return;
+	}
+
+	$assets = _gutenberg_get_iframed_editor_assets_6_4();
+	?><!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script>window.frameElement._load()</script>
+		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		<?php echo $assets['styles'] ?>
+		<?php echo $assets['scripts'] ?>
+	</head>
+	<body>
+		<script>document.currentScript.parentElement.remove()</script>
+	</body>
+</html><?php
+}, 0 );

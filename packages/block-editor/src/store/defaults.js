@@ -269,5 +269,5 @@ export const SETTINGS_DEFAULTS = {
 		},
 	],
 
-	__unstableResolvedAssets: { styles: [], scripts: [] },
+	__unstablePreviewUrl: '',
 };

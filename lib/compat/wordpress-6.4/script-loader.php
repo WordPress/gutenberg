@@ -104,6 +104,7 @@ add_filter(
 	static function ( $settings ) {
 		// We must override what core is passing now.
 		$settings['__unstableResolvedAssets'] = _gutenberg_get_iframed_editor_assets_6_4();
+		$settings['__unstablePreviewUrl'] = get_site_url( null, '?gutenberg-iframe' );
 		return $settings;
 	}
 );

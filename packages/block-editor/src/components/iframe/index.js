@@ -111,14 +111,13 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+	const { isPreviewMode, url } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
-			resolvedAssets: settings.__unstableResolvedAssets,
 			isPreviewMode: settings.__unstableIsPreviewMode,
+			url: settings.__unstablePreviewUrl,
 		};
 	}, [] );
-	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
@@ -219,8 +218,6 @@ function Iframe( {
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
 		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
-		${ styles }
-		${ scripts }
 	</head>
 	<body>
 		<script>document.currentScript.parentElement.remove()</script>
@@ -228,11 +225,13 @@ function Iframe( {
 </html>`;
 
 	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
+		const _src =
+			url ??
+			URL.createObjectURL(
+				new window.Blob( [ html ], { type: 'text/html' } )
+			);
+		return [ _src, () => ! html && URL.revokeObjectURL( _src ) ];
+	}, [ html, url ] );
 
 	useEffect( () => cleanup, [ cleanup ] );
 
