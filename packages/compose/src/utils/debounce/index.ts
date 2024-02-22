@@ -100,7 +100,7 @@ export interface DebouncedFunc< T extends ( ...args: any[] ) => any > {
  *
  * @return Returns the new debounced function.
  */
-export const debounce = < FunctionT extends ( ...args: unknown[] ) => unknown >(
+export const debounce = < FunctionT extends ( ...args: any[] ) => any >(
 	func: FunctionT,
 	wait: number,
 	options?: Partial< DebounceOptions >
