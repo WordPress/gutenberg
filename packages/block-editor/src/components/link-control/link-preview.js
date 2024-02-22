@@ -16,8 +16,9 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -33,6 +34,12 @@ export default function LinkPreview( {
 	hasUnlinkControl = false,
 	onRemove,
 } ) {
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -139,7 +146,7 @@ export default function LinkPreview( {
 					label={ sprintf(
 						// Translators: %s is a placeholder for the link URL and an optional colon, (if a Link URL is present).
 						__( 'Copy link%s' ), // Ends up looking like "Copy link: https://example.com".
-						isEmptyURL ? '' : ': ' + value.url
+						isEmptyURL || showIconLabels ? '' : ': ' + value.url
 					) }
 					ref={ ref }
 					disabled={ isEmptyURL }
