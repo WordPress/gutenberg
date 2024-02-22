@@ -3818,10 +3818,6 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			if ( empty( $style ) ) {
-				continue;
-			}
-
 			if ( 0 <= strpos( $style, 'var(' ) ) {
 				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
 

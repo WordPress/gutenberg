@@ -326,12 +326,6 @@ export default function SearchEdit( {
 			}
 		};
 
-		const iconDimensions = buttonRef?.current
-			? buttonRef.current.ownerDocument.defaultView.getComputedStyle(
-					buttonRef.current
-			  ).fontSize
-			: 24;
-
 		return (
 			<>
 				{ buttonUseIcon && (
@@ -347,7 +341,7 @@ export default function SearchEdit( {
 						onClick={ handleButtonClick }
 						ref={ buttonRef }
 					>
-						<Icon icon={ search } size={ iconDimensions } />
+						<Icon icon={ search } />
 					</button>
 				) }
 

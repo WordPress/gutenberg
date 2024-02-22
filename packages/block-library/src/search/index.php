@@ -132,48 +132,8 @@ function render_block_core_search( $attributes ) {
 			}
 		} else {
 			$button_classes[]       = 'has-icon';
-			$icon_dimensions        = '24';
-			$search_block_font_size = wp_get_global_styles(
-				array( 'typography', 'fontSize' ),
-				array(
-					'block_name' => 'core/search',
-					'transforms' => array( 'resolve-variables' ),
-				)
-			);
-
-			if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
-				$icon_dimensions = esc_attr( $attributes['style']['typography']['fontSize'] );
-			} elseif ( ! empty( $attributes['fontSize'] ) ) {
-				$font_size_presets = wp_get_global_settings( array( 'typography', 'fontSizes' ) );
-				/*
-				 * The prioritization of origins matches the order in which the block editor fetches settings.
-				 * Font sizes are sourced from either 'typography.fontSizes.custom' || 'typography.fontSizes.theme' || 'typography.fontSizes.default'.
-				 * See: `getBlockSettings()` packages/block-editor/src/store/get-block-settings.js
-				 * @TODO Abstract the logic to get presets from origin into a block-supports/typography.php helper function.
-				 * @TODO Maybe update to use null coalescing operator when PHP 7.0 is the minimum version.
-				 */
-				$font_size_presets_from_origin = array();
-
-				if ( ! empty( $font_size_presets['custom'] ) ) {
-					$font_size_presets_from_origin = $font_size_presets['custom'];
-				} elseif ( ! empty( $font_size_presets['theme'] ) ) {
-					$font_size_presets_from_origin = $font_size_presets['theme'];
-				} elseif ( ! empty( $font_size_presets['default'] ) ) {
-					$font_size_presets_from_origin = $font_size_presets['default'];
-				}
-
-				if ( ! empty( $font_size_presets_from_origin ) ) {
-					$font_size_preset_index = array_search( $attributes['fontSize'], array_column( $font_size_presets_from_origin, 'slug' ), true );
-					if ( isset( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] ) ) {
-						$icon_dimensions = esc_attr( $font_size_presets_from_origin[ $font_size_preset_index ]['size'] );
-					}
-				}
-			} elseif ( $search_block_font_size ) {
-				$icon_dimensions = esc_attr( $search_block_font_size );
-			}
-
 			$button_internal_markup =
-				'<svg class="search-icon" viewBox="0 0 24 24" width="' . $icon_dimensions . '" height="' . $icon_dimensions . '">
+				'<svg class="search-icon" viewBox="0 0 24 24" width="24" height="24">
 					<path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path>
 				</svg>';
 		}
