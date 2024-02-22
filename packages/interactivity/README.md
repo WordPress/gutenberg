@@ -3,9 +3,9 @@
 > **Note**
 > This package enables the API shared at [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project), participation is encouraged in testing this API providing feedback at the [discussions in GitHub](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api).
 
-The Interactivity API is available at WordPress Core from version 6.5 [Merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/)
+The Interactivity API is available at WordPress Core from version 6.5: [Merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/)
 
-These Core blocks are already powered by thi API:
+These Core blocks are already powered by the API:
 
 - Search
 - Query
