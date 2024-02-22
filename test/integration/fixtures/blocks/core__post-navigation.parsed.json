@@ -20,9 +20,9 @@
 				"innerContent": []
 			}
 		],
-		"innerHTML": "\n<nav class=\"wp-block-post-navigation\">\n\t\n\t\n</nav>\n",
+		"innerHTML": "\n<nav aria-label=\"Posts\" class=\"wp-block-post-navigation\">\n\t\n\t\n</nav>\n",
 		"innerContent": [
-			"\n<nav class=\"wp-block-post-navigation\">\n\t",
+			"\n<nav aria-label=\"Posts\" class=\"wp-block-post-navigation\">\n\t",
 			null,
 			"\n\t",
 			null,
