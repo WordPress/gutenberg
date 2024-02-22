@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 9.4.0 (2024-02-21)
+
+### Bug fix
+
+-   Fix `mariadb` version to LTS [#59237](https://github.com/WordPress/gutenberg/pull/59237)
+
 ## 9.3.0 (2024-02-09)
 
 ## 9.2.0 (2024-01-24)

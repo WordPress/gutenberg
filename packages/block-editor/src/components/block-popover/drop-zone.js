@@ -9,7 +9,7 @@ import { __unstableMotion as motion } from '@wordpress/components';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import BlockPopover from './index';
+import BlockPopoverCover from './cover';
 
 const animateVariants = {
 	hide: { opacity: 0, scaleY: 0.75 },
@@ -38,9 +38,8 @@ function BlockDropZonePopover( {
 	const reducedMotion = useReducedMotion();
 
 	return (
-		<BlockPopover
+		<BlockPopoverCover
 			clientId={ clientId }
-			__unstableCoverTarget
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
 			className="block-editor-block-popover__drop-zone"
@@ -56,7 +55,7 @@ function BlockDropZonePopover( {
 				}
 				className="block-editor-block-popover__drop-zone-foreground"
 			/>
-		</BlockPopover>
+		</BlockPopoverCover>
 	);
 }
 
