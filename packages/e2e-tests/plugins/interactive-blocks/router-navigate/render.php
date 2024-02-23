@@ -47,26 +47,28 @@ if ( isset( $attributes['data'] ) ) {
 		Timeout <span data-wp-text="state.timeout">NaN</span>
 	</button>
 
-	<?php
-	if ( isset( $attributes['links'] ) ) {
-		foreach ( $attributes['links'] as $key => $link ) {
-			$i = $key += 1;
-			echo <<<HTML
-			<a
-				data-testid="link $i"
-				data-wp-on--click="actions.navigate"
-				href="$link"
-			>link $i</a>
-			<a
-				data-testid="link $i with hash"
-				data-wp-on--click="actions.navigate"
-				data-force-navigation="true"
-				href="$link#link-$i-with-hash"
-			>link $i with hash</a>
+	<nav>
+		<?php
+		if ( isset( $attributes['links'] ) ) {
+			foreach ( $attributes['links'] as $key => $link ) {
+				$i = $key += 1;
+				echo <<<HTML
+				<a
+					data-testid="link $i"
+					data-wp-on--click="actions.navigate"
+					href="$link"
+				>link $i</a>
+				<a
+					data-testid="link $i with hash"
+					data-wp-on--click="actions.navigate"
+					data-force-navigation="true"
+					href="$link#link-$i-with-hash"
+				>link $i with hash</a>
 HTML;
+			}
 		}
-	}
-	?>
+		?>
+	</nav>
 	<div data-testid="prop1" data-wp-text="state.data.prop1"></div>
 	<div data-testid="prop2" data-wp-text="state.data.prop2"></div>
 	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
