@@ -79,17 +79,30 @@ export default function DataViews( {
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 3 } justify="flex-start">
 				<HStack
-					alignment="flex-start"
+					alignment="top"
 					justify="start"
 					className="dataviews-filters__view-actions"
 				>
-					{ search && (
-						<Search
-							label={ searchLabel }
+					<HStack
+						justify="start"
+						className="dataviews-filters__container"
+						wrap
+					>
+						{ search && (
+							<Search
+								label={ searchLabel }
+								view={ view }
+								onChangeView={ onChangeView }
+							/>
+						) }
+						<Filters
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
+							openedFilter={ openedFilter }
+							setOpenedFilter={ setOpenedFilter }
 						/>
-					) }
+					</HStack>
 					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
 						<BulkActions
 							actions={ actions }
@@ -104,19 +117,6 @@ export default function DataViews( {
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
-					/>
-				</HStack>
-				<HStack
-					justify="start"
-					className="dataviews-filters__container"
-					wrap
-				>
-					<Filters
-						fields={ _fields }
-						view={ view }
-						onChangeView={ onChangeView }
-						openedFilter={ openedFilter }
-						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
 				<ViewComponent
