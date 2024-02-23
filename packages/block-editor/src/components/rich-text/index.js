@@ -154,7 +154,7 @@ export function RichTextWrapper(
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	// Disable Rich Text editing if block bindings specify that.
-	const shouldDisableEditing = useShouldDisableEditing();
+	const shouldDisableEditing = useShouldDisableEditing( identifier );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,

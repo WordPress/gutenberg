@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,31 +12,29 @@ import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-export function useShouldDisableEditing() {
+export function useShouldDisableEditing( attributeName ) {
 	const { clientId, name: blockName } = useBlockEditContext();
-
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { getBlockBindingsSource } = unlock( useSelect( blocksStore ) );
-	const blockBindings = getBlockAttributes( clientId )?.metadata?.bindings;
-
-	if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
-		const blockTypeAttributes = getBlockType( blockName ).attributes;
-
-		for ( const [ attribute, args ] of Object.entries( blockBindings ) ) {
-			if ( blockTypeAttributes?.[ attribute ]?.source !== 'rich-text' ) {
-				break;
-			}
-
-			// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
-			const blockBindingsSource = getBlockBindingsSource( args.source );
+	return useSelect(
+		( select ) => {
 			if (
-				! blockBindingsSource ||
-				blockBindingsSource.lockAttributesEditing
+				! attributeName ||
+				! BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ]?.includes(
+					attributeName
+				)
 			) {
-				return true;
+				return false;
 			}
-		}
-	}
-
-	return false;
+			const blockBindings =
+				select( blockEditorStore ).getBlockAttributes( clientId )
+					?.metadata?.bindings;
+			if ( ! blockBindings?.[ attributeName ]?.source ) {
+				return false;
+			}
+			const blockBindingsSource = unlock(
+				select( blocksStore )
+			).getBlockBindingsSource( blockBindings[ attributeName ].source );
+			return blockBindingsSource?.lockAttributesEditing !== false;
+		},
+		[ clientId, blockName, attributeName ]
+	);
 }
