@@ -5,6 +5,7 @@ import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
@@ -26,7 +27,6 @@ import { chevronLeft } from '@wordpress/icons';
  */
 import { unlock } from '../../../lock-unlock';
 import { FontLibraryContext } from './context';
-import FontDemo from './font-demo';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
@@ -185,7 +185,13 @@ function InstalledFonts() {
 							} }
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
-						<FontDemo font={ libraryFontSelected } />
+						<Heading
+							level={ 2 }
+							size={ 13 }
+							className="edit-site-global-styles-header"
+						>
+							{ libraryFontSelected?.name }
+						</Heading>
 					</Flex>
 					{ notice && (
 						<>

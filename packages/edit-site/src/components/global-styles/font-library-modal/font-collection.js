@@ -46,7 +46,6 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
-import FontDemo from './font-demo';
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -358,7 +357,13 @@ function FontCollection( { slug } ) {
 							} }
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
-						<FontDemo font={ selectedFont } />
+						<Heading
+							level={ 2 }
+							size={ 13 }
+							className="edit-site-global-styles-header"
+						>
+							{ selectedFont?.name }
+						</Heading>
 					</Flex>
 					{ notice && (
 						<>
