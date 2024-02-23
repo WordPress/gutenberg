@@ -8,6 +8,7 @@ import {
 	MediaReplaceFlow,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -15,6 +16,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { ALLOWED_MEDIA_TYPES } from '../shared';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export default function CoverBlockControls( {
 	attributes,
@@ -51,10 +55,17 @@ export default function CoverBlockControls( {
 		setPrevMinHeightValue( minHeight );
 		setPrevMinHeightUnit( minHeightUnit );
 
-		// Set full height.
+		// Set full height, and clear any aspect ratio value.
 		return setAttributes( {
 			minHeight: 100,
 			minHeightUnit: 'vh',
+			style: cleanEmptyObject( {
+				...attributes?.style,
+				dimensions: {
+					...attributes?.style?.dimensions,
+					aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+				},
+			} ),
 		} );
 	};
 
