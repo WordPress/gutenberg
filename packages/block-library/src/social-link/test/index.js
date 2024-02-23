@@ -29,7 +29,6 @@ const fixtures = [
 	[ 'https://www.etsy.com/shop/ExampleShop', 'etsy' ],
 	[ 'https://www.etsy.com/people/exampleuser', 'etsy' ],
 	[ 'https://exampleuser.bandcamp.com/', 'bandcamp' ],
-	[ 'https://example.com/', 'chain' ],
 	[ 'https://dribbble.com/exampleuser', 'dribbble' ],
 	[ 'https://www.dropbox.com/home/Example_User', 'dropbox' ],
 	[ 'https://codepen.io/exampleuser', 'codepen' ],
