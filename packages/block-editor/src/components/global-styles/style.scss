@@ -21,14 +21,6 @@
 	}
 }
 
-// wrapper to clip the shadow beyond 6px
-.block-editor-global-styles__shadow-indicator-wrapper {
-	padding: $grid-unit-15 * 0.5;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
 // These styles are similar to the color palette.
 .block-editor-global-styles__shadow-indicator {
 	color: $gray-800;
@@ -36,9 +28,24 @@
 	border-radius: $radius-block-ui;
 	cursor: pointer;
 	padding: 0;
+	margin-right: $grid-unit-15;
+	margin-bottom: $grid-unit-15;
 
-	height: $button-size-small;
-	width: $button-size-small;
+	height: $button-size-small + 2 * $border-width;
+	width: $button-size-small + 2 * $border-width;
+	box-sizing: border-box;
+
+	transform: scale(1);
+	transition: transform 0.1s ease;
+	will-change: transform;
+
+	&:focus {
+		border: #{ $border-width * 2 } solid $gray-700;
+	}
+
+	&:hover {
+		transform: scale(1.2);
+	}
 }
 
 .block-editor-global-styles-advanced-panel__custom-css-input textarea {
