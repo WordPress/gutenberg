@@ -1,5 +1,8 @@
 # API Reference
 
+> **Note**
+> Interactivity API is only available for WordPress 6.5 and above.
+
 To add interactivity to blocks using the Interactivity API, developers can use:
 
 - **Directives** - added to the markup to add specific behavior to the DOM elements of the block.
@@ -7,7 +10,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 
 DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=T4meh6lltJh6TCX51NTIu,DmIhxYSGFTL_ywZFbsmuSw)).
 
-![State & Directives](assets/state-directives.png)
+![State & Directives](https://make.wordpress.org/core/files/2024/02/interactivity-state-directives.png)
 
 ## Table of Contents
 
@@ -69,7 +72,7 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 ### List of Directives
 
-With directives, we can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
+With directives, you can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
 
 #### `wp-interactive`
 
@@ -659,7 +662,7 @@ It would generate the following output:
 </ul>
 ```
 
-The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, we change the default prop `item` to `greeting`.
+The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, the default prop changes from `item` to `greeting`.
 
 ```html
 <ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
@@ -708,7 +711,7 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 
 The value assigned to a directive is a string pointing to a specific state, action, or side effect.
 
-In the following example, we use a getter to define the `state.isPlaying` derived value.
+In the following example, a getter is used to define the `state.isPlaying` derived value.
 
 ```js
 const { state } = store( "myPlugin", {
@@ -721,7 +724,7 @@ const { state } = store( "myPlugin", {
 } );
 ```
 
-And then, we use the string value `"state.isPlaying"` to assign the result of this selector to `data-bind--hidden`.
+And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-bind--hidden`.
 
 ```html
 <div data-bind--hidden="!state.isPlaying" ... >
@@ -731,9 +734,9 @@ And then, we use the string value `"state.isPlaying"` to assign the result of th
 
 These values assigned to directives are **references** to a particular property in the store. They are wired to the directives automatically so that each directive “knows” what store element refers to, without any additional configuration.
 
-Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property we want to access is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
+Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property accessed is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
 
-In the example below, we get `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
+The example below is getting `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
 
 ```html
 <div data-wp-interactive="myPlugin">
@@ -890,7 +893,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 #### On the client side
 
-*In the `view.js` file of each block* we can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
+*In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
 The `store` method used to set the store in javascript can be imported from `@wordpress/interactivity`.
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash } from '@wordpress/icons';
+import { trash, pages, drafts } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -51,11 +51,13 @@ export const DEFAULT_VIEWS = {
 		{
 			title: __( 'All pages' ),
 			slug: 'all',
+			icon: pages,
 			view: DEFAULT_PAGE_BASE,
 		},
 		{
 			title: __( 'Drafts' ),
 			slug: 'drafts',
+			icon: drafts,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [

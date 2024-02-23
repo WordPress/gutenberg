@@ -41,7 +41,7 @@ const tabsFromCollections = ( collections ) =>
 
 function FontLibraryModal( {
 	onRequestClose,
-	initialTabId = 'installed-fonts',
+	defaultTabId = 'installed-fonts',
 } ) {
 	const { collections, setNotice } = useContext( FontLibraryContext );
 
@@ -63,7 +63,7 @@ function FontLibraryModal( {
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs initialTabId={ initialTabId } onSelect={ onSelect }>
+				<Tabs defaultTabId={ defaultTabId } onSelect={ onSelect }>
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>
