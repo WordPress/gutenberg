@@ -261,8 +261,6 @@ function GlobalStylesEditorCanvasContainerLink() {
 				 */
 				if ( isRevisionsOpen ) {
 					goTo( '/' );
-				} else {
-					goTo( path );
 				}
 				break;
 			default:
