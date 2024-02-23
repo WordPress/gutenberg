@@ -13,7 +13,7 @@ import {
  */
 import { getFontFaceVariantName } from './utils';
 import { FontLibraryContext } from './context';
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
 
 function LibraryFontVariant( { face, font } ) {
@@ -45,7 +45,7 @@ function LibraryFontVariant( { face, font } ) {
 	);
 
 	return (
-		<div className="font-library-modal__library-font-variant">
+		<div className="font-library-modal__font-card">
 			<Flex justify="flex-start" align="center" gap="1rem">
 				<CheckboxControl
 					checked={ isInstalled }
@@ -54,8 +54,8 @@ function LibraryFontVariant( { face, font } ) {
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>
-					<FontFaceDemo
-						fontFace={ face }
+					<FontDemo
+						font={ face }
 						text={ displayName }
 						onClick={ handleToggleActivation }
 					/>
