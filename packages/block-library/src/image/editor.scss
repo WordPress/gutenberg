@@ -1,6 +1,12 @@
 // Provide special styling for the placeholder.
 // @todo: this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
+
+	&:not(.is-selected) .components-placeholder__fieldset {
+		// Show only is selected.
+		display: none;
+	}
+
 	// Show Placeholder style on-select.
 	&.is-selected .components-placeholder {
 		// Block UI appearance.
@@ -27,6 +33,8 @@
 			opacity: 0;
 		}
 	}
+
+
 	.block-bindings-media-placeholder-message {
 		opacity: 0;
 	}
