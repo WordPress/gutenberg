@@ -40,9 +40,25 @@ export default function ChildLayoutControl( {
 
 	const {
 		current: currentAlignment,
-		supported: supportedAlignments,
+		supported,
 		onChangeAlignment,
 	} = alignments || {};
+
+	/**
+	 * If supported alignments is true, it means that the block supports
+	 * both wide and full alignments. If false, it supports neither.
+	 */
+	let supportedAlignments;
+	switch ( supported ) {
+		case true:
+			supportedAlignments = [ 'wide', 'full' ];
+			break;
+		case false:
+			supportedAlignments = [];
+			break;
+		default:
+			supportedAlignments = supported;
+	}
 
 	const {
 		orientation = 'horizontal',
