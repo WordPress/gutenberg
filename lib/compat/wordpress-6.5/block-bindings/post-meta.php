@@ -28,6 +28,11 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 		return null;
 	}
 
+	// Check if the meta field is protected.
+	if ( is_protected_meta( $source_attrs['key'], 'post' ) ) {
+		return null;
+	}
+
 	return get_post_meta( $post_id, $source_attrs['key'], true );
 }
 
