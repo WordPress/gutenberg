@@ -113,7 +113,7 @@ test.describe( 'Font Library', () => {
 				page.getByRole( 'tab', { name: /upload/i } )
 			).toBeVisible( { timeout: 40000 } );
 
-			// Upload a local font
+			// Ensure font does not exist before uploading
 			if (
 				await page
 					.getByRole( 'button', { name: /commissioner/i } )
@@ -125,6 +125,8 @@ test.describe( 'Font Library', () => {
 				await page.getByRole( 'button', { name: /delete/i } ).click();
 				await page.getByRole( 'button', { name: /delete/i } ).click();
 			}
+
+			// Upload a local font
 			await page.getByRole( 'tab', { name: /upload/i } ).click();
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
 			await page.getByRole( 'button', { name: /upload font/i } ).click();
@@ -133,7 +135,7 @@ test.describe( 'Font Library', () => {
 				'./test/e2e/assets/Commissioner-Regular.ttf'
 			);
 
-			// Check font was installed
+			// Check font was installed successfully
 			await expect(
 				page
 					.getByLabel( 'Upload' )
@@ -216,7 +218,7 @@ test.describe( 'Font Library', () => {
 			page,
 			requestUtils,
 		} ) => {
-			// Upload a local font
+			// Upload a local font, so we can test the delete button
 			await requestUtils.deactivatePlugin(
 				'gutenberg-test-font-library-permissions'
 			);
