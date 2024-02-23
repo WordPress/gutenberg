@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
@@ -13,6 +13,7 @@ import { RichTextData } from '@wordpress/rich-text';
  */
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { useBlockEditContext } from '../components/block-edit/context';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -64,6 +65,7 @@ export function canBindAttribute( blockName, attributeName ) {
  * @param {Object} props            - The component props.
  * @param {string} props.attrName   - The attribute name.
  * @param {any}    props.attrValue  - The attribute value.
+ * @param {string} props.blockName  - The block name.
  * @param {Object} props.blockProps - The block props with bound attribute.
  * @param {Object} props.source     - Source handler.
  * @param {Object} props.args       - The arguments to pass to the source.
@@ -73,6 +75,7 @@ const BindingConnector = ( {
 	args,
 	attrName,
 	attrValue,
+	blockName,
 	blockProps,
 	source,
 } ) => {
@@ -80,8 +83,6 @@ const BindingConnector = ( {
 		blockProps,
 		args
 	);
-
-	const blockName = blockProps.name;
 
 	const setAttributes = blockProps.setAttributes;
 
@@ -156,12 +157,10 @@ const BindingConnector = ( {
 	return null;
 };
 
-function BlockBindingBridge( { bindings, props } ) {
+function BlockBindingBridge( { bindings, props, blockName, attributes } ) {
 	const blockBindingsSources = unlock(
-		useSelect( blockEditorStore )
+		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
-
-	const { name, attributes } = props;
 
 	return (
 		<>
@@ -176,7 +175,8 @@ function BlockBindingBridge( { bindings, props } ) {
 
 					return (
 						<BindingConnector
-							key={ `${ boundAttribute.source }-${ name }-${ attrName }-${ i }` }
+							key={ `${ boundAttribute.source }-${ blockName }-${ attrName }-${ i }` }
+							blockName={ blockName }
 							attrName={ attrName }
 							attrValue={ attributes[ attrName ] }
 							source={ source }
@@ -192,12 +192,14 @@ function BlockBindingBridge( { bindings, props } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { attributes } = props;
+		const { clientId, name: blockName } = useBlockEditContext();
+		const { getBlockAttributes } = useSelect( blockEditorStore );
 
 		/*
 		 * Create binding object filtering
 		 * only the attributes that can be bound.
 		 */
+		const attributes = getBlockAttributes( clientId );
 		const bindings = Object.fromEntries(
 			Object.entries( attributes.metadata?.bindings || {} ).filter(
 				( [ attrName ] ) => canBindAttribute( props.name, attrName )
@@ -211,7 +213,12 @@ const withBlockBindingSupport = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockBindingBridge bindings={ bindings } props={ props } />
+				<BlockBindingBridge
+					props={ props }
+					blockName={ blockName }
+					bindings={ bindings }
+					attributes={ attributes }
+				/>
 				<BlockEdit { ...props } />
 			</>
 		);
