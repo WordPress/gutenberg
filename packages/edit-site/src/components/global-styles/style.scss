@@ -103,7 +103,7 @@
 		// Shown in Windows 10 high contrast mode.
 		outline: 1px solid transparent;
 
-		&.is-color-variation {
+		.edit-site-global-styles-color-variations & {
 			padding: $grid-unit-10;
 		}
 	}

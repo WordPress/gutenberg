@@ -15,14 +15,13 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import StylesPreview from './preview';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation } ) {
+export default function Variation( { variation, children } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
@@ -86,11 +85,7 @@ export default function Variation( { variation } ) {
 				onBlur={ () => setIsFocused( false ) }
 			>
 				<div className="edit-site-global-styles-variations_item-preview">
-					<StylesPreview
-						label={ variation?.title }
-						isFocused={ isFocused }
-						withHoverView
-					/>
+					{ children( isFocused ) }
 				</div>
 			</div>
 		</GlobalStylesContext.Provider>

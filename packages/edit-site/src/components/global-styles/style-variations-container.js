@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import StylesPreview from './preview';
 import Variation from './variation';
 
 export default function StyleVariationsContainer() {
@@ -40,7 +41,15 @@ export default function StyleVariationsContainer() {
 			className="edit-site-global-styles-style-variations-container"
 		>
 			{ withEmptyVariation.map( ( variation, index ) => (
-				<Variation key={ index } variation={ variation } />
+				<Variation key={ index } variation={ variation }>
+					{ ( isFocused ) => (
+						<StylesPreview
+							label={ variation?.title }
+							withHoverView
+							isFocused={ isFocused }
+						/>
+					) }
+				</Variation>
 			) ) }
 		</Grid>
 	);
