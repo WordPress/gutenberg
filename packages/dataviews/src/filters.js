@@ -11,6 +11,7 @@ import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
 import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 const Filters = memo( function Filters( {
 	fields,
@@ -108,7 +109,11 @@ const Filters = memo( function Filters( {
 		);
 	}
 
-	return filterComponents;
+	return (
+		<HStack justify="flex-start" style={ { width: 'fit-content' } } wrap>
+			{ filterComponents }
+		</HStack>
+	);
 } );
 
 export default Filters;
