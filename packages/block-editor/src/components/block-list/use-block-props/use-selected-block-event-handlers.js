@@ -57,6 +57,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
+					target.blur();
 					insertDefaultBlock(
 						{},
 						getBlockRootClientId( clientId ),
