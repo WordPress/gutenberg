@@ -117,7 +117,11 @@ function PostAuthorEdit( {
 		<>
 			<BlockInfo>
 				<div className="wp-block-post-author__transform-button">
-					<Button variant="primary" onClick={ transformBlock }>
+					<Button
+						variant="primary"
+						onClick={ transformBlock }
+						__next40pxDefaultSize
+					>
 						{ __( 'Migrate block' ) }
 					</Button>
 				</div>
