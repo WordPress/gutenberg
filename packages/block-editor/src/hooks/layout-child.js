@@ -39,9 +39,9 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	const selector = `.wp-container-content-${ id }`;
 
 	const isVerticalLayout =
-		parentLayout.type === 'constrained' ||
-		parentLayout.type === 'default' ||
-		parentLayout.type === undefined ||
+		parentLayoutType === 'constrained' ||
+		parentLayoutType === 'default' ||
+		parentLayoutType === undefined ||
 		orientation === 'vertical';
 
 	let css = '';

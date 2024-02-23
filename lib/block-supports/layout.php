@@ -572,10 +572,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$child_layout_declarations = array();
 	$child_layout_styles       = array();
 
-	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
-	$self_align   = isset( $block['attrs']['style']['layout']['selfAlign'] ) ? $block['attrs']['style']['layout']['selfAlign'] : null;
-	$height       = isset( $block['attrs']['style']['layout']['height'] ) ? $block['attrs']['style']['layout']['height'] : null;
-	$width        = isset( $block['attrs']['style']['layout']['width'] ) ? $block['attrs']['style']['layout']['width'] : null;
+	$self_stretch = isset( $child_layout['selfStretch'] ) ? $child_layout['selfStretch'] : null;
+	$self_align   = isset( $child_layout['selfAlign'] ) ? $child_layout['selfAlign'] : null;
+	$height       = isset( $child_layout['height'] ) ? $child_layout['height'] : null;
+	$width        = isset( $child_layout['width'] ) ? $child_layout['width'] : null;
 
 	$parent_layout_type = 'default';
 	if ( isset( $block['parentLayout']['type'] ) ) {
@@ -589,8 +589,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$vertical_parent_layout = in_array( $parent_layout_type, array( 'constrained', 'default' ), true ) || ( 'flex' === $parent_layout_type && 'vertical' === $parent_orientation );
 
 	// Support for legacy flexSize value.
-	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
+	if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
+		$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
 		$child_layout_declarations['box-sizing'] = 'border-box';
 	} elseif ( 'fill' === $self_stretch ) {
 		$child_layout_declarations['flex-grow'] = '1';
@@ -639,12 +639,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	// Grid specific styles.
-	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
-		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
+	if ( isset( $child_layout['columnSpan'] ) ) {
+		$column_span                              = $child_layout['columnSpan'];
 		$child_layout_declarations['grid-column'] = "span $column_span";
 	}
-	if ( isset( $block['attrs']['style']['layout']['rowSpan'] ) ) {
-		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
+	if ( isset( $child_layout['rowSpan'] ) ) {
+		$row_span                              = $child_layout['rowSpan'];
 		$child_layout_declarations['grid-row'] = "span $row_span";
 	}
 
