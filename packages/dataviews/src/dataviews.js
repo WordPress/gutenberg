@@ -15,6 +15,7 @@ import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import BulkSelect from './bulk-select';
 import BulkActions from './bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
@@ -104,13 +105,22 @@ export default function DataViews( {
 						/>
 					</HStack>
 					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
-						<BulkActions
-							actions={ actions }
-							data={ data }
-							onSelectionChange={ onSetSelection }
-							selection={ selection }
-							getItemId={ getItemId }
-						/>
+						<>
+							<BulkSelect
+								actions={ actions }
+								data={ data }
+								onSelectionChange={ onSetSelection }
+								selection={ selection }
+								getItemId={ getItemId }
+							/>
+							<BulkActions
+								actions={ actions }
+								data={ data }
+								onSelectionChange={ onSetSelection }
+								selection={ selection }
+								getItemId={ getItemId }
+							/>
+						</>
 					) }
 					<ViewActions
 						fields={ _fields }

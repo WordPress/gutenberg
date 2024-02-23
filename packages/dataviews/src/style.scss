@@ -501,6 +501,10 @@
 	}
 }
 
+.dataviews-bulk-edit-button__selection-count {
+	flex-shrink: 0;
+}
+
 .dataviews-view-grid__title-actions .dataviews-view-table-selection-checkbox {
 	margin-left: $grid-unit-10;
 }

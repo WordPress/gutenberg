@@ -6,9 +6,9 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { cog } from '@wordpress/icons';
+import { bulkSelect, bulkSelected } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -50,56 +50,18 @@ function ActionWithModal( {
 	);
 }
 
-function BulkActionItem( { action, selectedItems, setActionWithModal } ) {
-	const eligibleItems = useMemo( () => {
-		return selectedItems.filter( ( item ) => action.isEligible( item ) );
-	}, [ action, selectedItems ] );
-
-	const shouldShowModal = !! action.RenderModal;
-
-	return (
-		<DropdownMenuItem
-			key={ action.id }
-			disabled={ eligibleItems.length === 0 }
-			hideOnClick={ ! shouldShowModal }
-			onClick={ async () => {
-				if ( shouldShowModal ) {
-					setActionWithModal( action );
-				} else {
-					await action.callback( eligibleItems );
-				}
-			} }
-			suffix={
-				eligibleItems.length > 0 ? eligibleItems.length : undefined
-			}
-		>
-			{ action.label }
-		</DropdownMenuItem>
-	);
-}
-
-function ActionsMenuGroup( { actions, selectedItems, setActionWithModal } ) {
-	return (
-		<>
-			<DropdownMenuGroup>
-				{ actions.map( ( action ) => (
-					<BulkActionItem
-						key={ action.id }
-						action={ action }
-						selectedItems={ selectedItems }
-						setActionWithModal={ setActionWithModal }
-					/>
-				) ) }
-			</DropdownMenuGroup>
-		</>
-	);
-}
-
-export default function BulkActions( { data, actions, selection, getItemId } ) {
-	const bulkActions = useMemo(
+export default function BulkSelectOptions( {
+	data,
+	actions,
+	selection,
+	onSelectionChange,
+	getItemId,
+} ) {
+	const bulkSelectOptions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
+	const areAllSelected = selection && selection.length === data.length;
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
 	const selectedItems = useMemo( () => {
@@ -108,11 +70,19 @@ export default function BulkActions( { data, actions, selection, getItemId } ) {
 		);
 	}, [ selection, data, getItemId ] );
 
-	if ( bulkActions.length === 0 ) {
+	if ( bulkSelectOptions.length === 0 ) {
 		return null;
 	}
 	return (
 		<>
+			{ selection.length > 0 && (
+				<div className="dataviews-bulk-edit-button__selection-count">
+					{
+						/* translators: %d: Number of items. */
+						sprintf( '%d selected', selection.length )
+					}
+				</div>
+			) }
 			<DropdownMenu
 				open={ isMenuOpen }
 				onOpenChange={ onMenuOpenChange }
@@ -123,29 +93,34 @@ export default function BulkActions( { data, actions, selection, getItemId } ) {
 						className="dataviews-bulk-edit-button"
 						__next40pxDefaultSize
 						size="compact"
-						label={
-							selection.length
-								? sprintf(
-										/* translators: %d: Number of items. */
-										_n(
-											'Edit %d item',
-											'Edit %d items',
-											selection.length
-										),
-										selection.length
-								  )
-								: __( 'Bulk edit' )
+						label={ __( 'Bulk select' ) }
+						icon={
+							selection.length === 0 ? bulkSelect : bulkSelected
 						}
-						icon={ cog }
-						disabled={ selection.length === 0 }
 					/>
 				}
 			>
-				<ActionsMenuGroup
-					actions={ bulkActions }
-					setActionWithModal={ setActionWithModal }
-					selectedItems={ selectedItems }
-				/>
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						disabled={ areAllSelected }
+						hideOnClick={ false }
+						onClick={ () => {
+							onSelectionChange( data );
+						} }
+						suffix={ data.length }
+					>
+						{ __( 'Select all' ) }
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						disabled={ selection.length === 0 }
+						hideOnClick={ false }
+						onClick={ () => {
+							onSelectionChange( [] );
+						} }
+					>
+						{ __( 'Deselect' ) }
+					</DropdownMenuItem>
+				</DropdownMenuGroup>
 			</DropdownMenu>
 			{ actionWithModal && (
 				<ActionWithModal
