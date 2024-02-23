@@ -85,6 +85,90 @@ function gutenberg_create_initial_post_types() {
 }
 
 /**
+ * Modify the `delete_post` meta capability for font post types.
+ *
+ * For font families and font faces containing attached font files, file
+ * system access is required by the user in order to delete posts.
+ *
+ * @param string[] $caps    The primitive capabilities required for the given capability.
+ * @param string   $cap     The capability being checked.
+ * @param int      $user_id The user ID.
+ * @param array    $args    Context for the capability check.
+ * @return string[] The modified primitive capabilities required for the given capability.
+ */
+function gutenberg_delete_font_post_meta_caps( $caps, $cap, $user_id, $args ) {
+	if ( in_array( 'do_not_allow', $caps, true ) ) {
+		// It's already known that the user is not allowed to perform the requested capability.
+		return $caps;
+	}
+
+	if ( 'delete_post' !== $cap ) {
+		// This filter is only concerned with the 'delete_post' meta capability.
+		return $caps;
+	}
+
+	$post = get_post( $args[0] );
+	if ( ! $post ) {
+		// Do not allow deleting posts that do not exist.
+		$caps[] = 'do_not_allow';
+		return $caps;
+	}
+
+	// Check for font post types.
+	$post_type = get_post_type( $post );
+	if ( 'wp_font_face' === $post_type ) {
+		// Are there any font files associated with this font face?
+		$font_files = get_post_meta( $post->ID, '_wp_font_face_file', false );
+		if ( empty( $font_files ) ) {
+			/*
+			* No font files.
+			*
+			* The user can delete the post based on the 'delete_post' meta capability.
+			*/
+			return $caps;
+		}
+
+		// The user can only delete the post if they can modify the file system.
+		$caps[] = 'upload_fonts';
+		return $caps;
+	}
+
+	if ( 'wp_font_family' === $post_type ) {
+		// Are there any font faces associated with this font family?
+		$font_faces = get_children(
+			array(
+				'post_parent' => $post->ID,
+				'post_type'   => 'wp_font_face',
+			)
+		);
+
+		if ( empty( $font_faces ) ) {
+			/*
+			 * No font faces.
+			 *
+			 * The user can delete the post based on the 'delete_post' meta capability.
+			 */
+			return $caps;
+		}
+
+		// If any of the font faces contain files, the user needs to be able to modify the file system.
+		foreach ( $font_faces as $font_face ) {
+			$font_files = get_post_meta( $font_face->ID, '_wp_font_face_file', false );
+			if ( ! empty( $font_files ) ) {
+				$caps[] = 'upload_fonts';
+				// File system caps are required, so no need to check further.
+				break;
+			}
+		}
+		return $caps;
+	}
+
+	// Return existing caps if the post type is not a font family or font face.
+	return $caps;
+}
+add_filter( 'map_meta_cap', 'gutenberg_delete_font_post_meta_caps', 10, 4 );
+
+/**
  * Filters the user capabilities to grant the 'upload_fonts' capability as necessary.
  *
  * To grant the 'upload_fonts' capability, file modifications must be allowed, the fonts directory must be
@@ -92,7 +176,7 @@ function gutenberg_create_initial_post_types() {
  *
  * @since 6.5.0
  *
- * @param bool[] $allcaps An array of all the user's capabilities.
+ * @param  bool[] $allcaps An array of all the user's capabilities.
  * @return bool[] Filtered array of the user's capabilities.
  */
 function gutenberg_maybe_grant_upload_font_cap( $allcaps, $caps ) {
