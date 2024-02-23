@@ -107,6 +107,7 @@ function Iframe( {
 	shouldZoom = false,
 	readonly,
 	forwardedRef: ref,
+	title = __( 'Editor canvas' ),
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode, isZoomOutMode } = useSelect(
@@ -301,7 +302,7 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
-				title={ __( 'Editor canvas' ) }
+				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
 						props.onKeyDown( event );

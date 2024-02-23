@@ -45,12 +45,26 @@ test.describe( 'Site editor navigation', () => {
 			page.getByRole( 'button', { name: 'Pages' } )
 		).toBeFocused();
 
-		// Test: Can navigate into the iframe using the keyboard
-		await editorNavigationUtils.tabToLabel( 'Editor Canvas' );
-		const editorCanvasButton = page.getByRole( 'button', {
-			name: 'Editor Canvas',
+		// Navigate to the Saved button first, as it precedes the editor iframe.
+		await editorNavigationUtils.tabToLabel( 'Saved' );
+		const savedButton = page.getByRole( 'button', {
+			name: 'Saved',
+		} );
+		await expect( savedButton ).toBeFocused();
+
+		// Test: Can navigate into the iframe using the keyboard.
+		// At this point the iframe has an ARIA role=button and it's labeled 'Edit'.
+		await editorNavigationUtils.tabToLabel( 'Edit' );
+
+		// Make sure to get the iframe with role=button.
+		const editorCanvasRegion = page.getByRole( 'region', {
+			name: 'Editor content',
+		} );
+		const editorCanvasButton = editorCanvasRegion.getByRole( 'button', {
+			name: 'Edit',
 		} );
 		await expect( editorCanvasButton ).toBeFocused();
+
 		// Enter into the site editor frame
 		await pageUtils.pressKeys( 'Enter' );
 		// Focus should be on the iframe without the button role
