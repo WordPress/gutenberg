@@ -183,6 +183,9 @@
 	}
 
 	.components-placeholder__fieldset {
+		// Show only is selected.
+		display: none;
+
 		width: auto;
 
 		// Unset intrinsic margins.
@@ -207,6 +210,10 @@
 		.components-button {
 			opacity: 1;
 			pointer-events: auto;
+		}
+
+		.components-placeholder__fieldset {
+			display: flex;
 		}
 	}
 
