@@ -7,7 +7,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 import { bulkSelect, bulkSelected } from '@wordpress/icons';
 
 /**
@@ -61,7 +61,6 @@ export default function BulkSelectOptions( {
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const areAllSelected = selection && selection.length === data.length;
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
 	const selectedItems = useMemo( () => {
@@ -69,6 +68,39 @@ export default function BulkSelectOptions( {
 			selection.includes( getItemId( item ) )
 		);
 	}, [ selection, data, getItemId ] );
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return bulkSelectOptions.some( ( action ) =>
+				action.isEligible( item )
+			);
+		} );
+	}, [ data, bulkSelectOptions ] );
+	const numberSelectableItems = selectableItems.length;
+	const areAllSelected =
+		selection && selection.length === numberSelectableItems;
+
+	const hasNonSelectableItemSelected = useMemo( () => {
+		return selectedItems.some( ( item ) => {
+			return ! selectableItems.includes( item );
+		} );
+	}, [ selectedItems, selectableItems ] );
+	useEffect( () => {
+		if ( hasNonSelectableItemSelected ) {
+			onSelectionChange(
+				selectedItems.filter( ( selectedItem ) => {
+					return selectableItems.some( ( item ) => {
+						return getItemId( selectedItem ) === getItemId( item );
+					} );
+				} )
+			);
+		}
+	}, [
+		hasNonSelectableItemSelected,
+		selectedItems,
+		selectableItems,
+		getItemId,
+		onSelectionChange,
+	] );
 
 	if ( bulkSelectOptions.length === 0 ) {
 		return null;
@@ -105,9 +137,9 @@ export default function BulkSelectOptions( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( data );
+							onSelectionChange( selectableItems );
 						} }
-						suffix={ data.length }
+						suffix={ numberSelectableItems }
 					>
 						{ __( 'Select all' ) }
 					</DropdownMenuItem>
