@@ -13,7 +13,7 @@
 add_filter(
 	'register_post_type_args',
 	function ( $args, $post_type ) {
-		if ( $post_type === 'wp_font_family' ) {
+		if ( 'wp_font_family' === $post_type ) {
 			$args['capabilities']['create_posts']           = 'do_not_allow';
 			$args['capabilities']['delete_published_posts'] = 'do_not_allow';
 		}
