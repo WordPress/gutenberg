@@ -7,7 +7,7 @@
 
 /**
  * Renders the 'core/legacy-widget' block.
- * 
+ *
  * @global int $wp_widget_factory.
  *
  * @param array $attributes The block attributes.
