@@ -35,8 +35,6 @@ export default function SingleSelectionCheckbox( {
 			checked={ isSelected }
 			label={ selectionLabel }
 			disabled={ disabled }
-			aria-disabled={ disabled }
-			tabindex={ 0 }
 			onChange={ () => {
 				if ( ! isSelected ) {
 					onSelectionChange(
