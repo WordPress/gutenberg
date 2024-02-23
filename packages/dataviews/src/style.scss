@@ -202,6 +202,12 @@
 	.dataviews-view-table__actions-column {
 		width: 1%;
 	}
+
+	&:has(tr.is-selected) {
+		.components-checkbox-control__input {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-view-list__primary-field,
