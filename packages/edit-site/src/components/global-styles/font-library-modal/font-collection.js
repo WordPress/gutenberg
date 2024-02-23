@@ -23,6 +23,8 @@ import {
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -215,6 +217,7 @@ function FontCollection( { slug } ) {
 			<InstallFooter
 				handleInstall={ handleInstall }
 				isDisabled={ fontsToInstall.length === 0 }
+				selectedFont={ selectedFont }
 			/>
 		);
 	} else if ( ! renderConfirmDialog && totalPages > 1 ) {
@@ -400,8 +403,18 @@ function PaginationFooter( { page, totalPages, setPage } ) {
 	);
 }
 
-function InstallFooter( { handleInstall, isDisabled } ) {
+function InstallFooter( { handleInstall, isDisabled, selectedFont } ) {
 	const { isInstalling } = useContext( FontLibraryContext );
+
+	const fontUploadsEnabled = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		return getEditorSettings().fontUploadsEnabled;
+	}, [] );
+
+	const isInstallButtonDisabled =
+		isDisabled ||
+		isInstalling ||
+		( ! fontUploadsEnabled && selectedFont?.fontFace?.length );
 
 	return (
 		<Flex justify="flex-end">
@@ -409,7 +422,7 @@ function InstallFooter( { handleInstall, isDisabled } ) {
 				variant="primary"
 				onClick={ handleInstall }
 				isBusy={ isInstalling }
-				disabled={ isDisabled || isInstalling }
+				disabled={ isInstallButtonDisabled }
 				__experimentalIsFocusable
 			>
 				{ __( 'Install' ) }

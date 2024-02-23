@@ -57,10 +57,11 @@ function FontLibraryModal( {
 
 	const tabs = [ DEFAULT_TAB ];
 
-	if ( canUserCreate && fontUploadsEnabled ) {
-		tabs.push( UPLOAD_TAB );
-		// In the future, font faces can be configured to use a remote url rather than a file upload as the font src property.
-		// In that case, collections tabs should still be shown when font uploads are disabled.
+	if ( canUserCreate ) {
+		if ( fontUploadsEnabled ) {
+			tabs.push( UPLOAD_TAB );
+		}
+
 		tabs.push( ...tabsFromCollections( collections || [] ) );
 	}
 
