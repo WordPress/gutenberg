@@ -33,6 +33,14 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 		return null;
 	}
 
+	// Check if the meta field is registered to be shown in REST.
+	// It follows the format: $wp_meta_keys[ $object_type ][ $object_subtype ][ $meta_key ].
+	global $wp_meta_keys;
+	$object_subtype = 'post' === $block_instance->context['postType'] ? '' : $block_instance->context['postType'];
+	if ( empty( $wp_meta_keys['post'][ $object_subtype ][ $source_attrs['key'] ]['show_in_rest'] ) || false === $wp_meta_keys['post'][ $object_subtype ][ $source_attrs['key'] ]['show_in_rest'] ) {
+		return null;
+	}
+
 	return get_post_meta( $post_id, $source_attrs['key'], true );
 }
 
