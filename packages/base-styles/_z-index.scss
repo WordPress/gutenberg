@@ -108,6 +108,9 @@ $z-layers: (
 	// Above the block list and the header.
 	".block-editor-block-popover": 31,
 
+	// Below the block toolbar.
+	".block-editor-grid-visualizer": 30,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 
