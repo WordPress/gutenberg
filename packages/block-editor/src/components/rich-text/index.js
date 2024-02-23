@@ -409,24 +409,13 @@ export function RichTextWrapper(
 					useEnter( {
 						removeEditorOnlyFormats,
 						value,
-						onReplace: (
-							blocks,
-							indexToSelect,
-							initialPosition
-						) => {
-							if ( ! shouldDisableEditing ) {
-								onReplace(
-									blocks,
-									indexToSelect,
-									initialPosition
-								);
-							}
-						},
+						onReplace,
 						onSplit,
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,
+						shouldDisableEditing,
 					} ),
 					useFirefoxCompat(),
 					anchorRef,

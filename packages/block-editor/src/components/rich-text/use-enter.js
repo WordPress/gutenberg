@@ -38,7 +38,12 @@ export function useEnter( props ) {
 				disableLineBreaks,
 				onSplitAtEnd,
 				onSplitAtDoubleLineEnd,
+				shouldDisableEditing,
 			} = propsRef.current;
+
+			if ( shouldDisableEditing ) {
+				return;
+			}
 
 			event.preventDefault();
 
