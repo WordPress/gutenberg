@@ -7,7 +7,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -125,20 +125,46 @@ export default function BulkActions( {
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const areAllSelected = selection && selection.length === data.length;
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
-	const numberSelectableItems = useMemo( () => {
+	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return bulkActions.some( ( action ) => action.isEligible( item ) );
-		} ).length;
+		} );
 	}, [ data, bulkActions ] );
+
+	const numberSelectableItems = selectableItems.length;
+	const areAllSelected =
+		selection && selection.length === numberSelectableItems;
 
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
 			selection.includes( getItemId( item ) )
 		);
 	}, [ selection, data, getItemId ] );
+
+	const hasNonSelectableItemSelected = useMemo( () => {
+		return selectedItems.some( ( item ) => {
+			return ! selectableItems.includes( item );
+		} );
+	}, [ selectedItems, selectableItems ] );
+	useEffect( () => {
+		if ( hasNonSelectableItemSelected ) {
+			onSelectionChange(
+				selectedItems.filter( ( selectedItem ) => {
+					return selectableItems.some( ( item ) => {
+						return getItemId( selectedItem ) === getItemId( item );
+					} );
+				} )
+			);
+		}
+	}, [
+		hasNonSelectableItemSelected,
+		selectedItems,
+		selectableItems,
+		getItemId,
+		onSelectionChange,
+	] );
 
 	if ( bulkActions.length === 0 ) {
 		return null;
@@ -181,7 +207,7 @@ export default function BulkActions( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( data );
+							onSelectionChange( selectableItems );
 						} }
 						suffix={ numberSelectableItems }
 					>

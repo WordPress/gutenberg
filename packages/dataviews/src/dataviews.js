@@ -119,7 +119,7 @@ export default function DataViews( {
 						/>
 					</HStack>
 					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
-						hasPossibleBulkAction(
+						hasPossibleBulkAction && (
 							<BulkActions
 								actions={ actions }
 								data={ data }
