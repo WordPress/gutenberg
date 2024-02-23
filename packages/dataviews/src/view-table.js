@@ -23,6 +23,7 @@ import {
 	useState,
 	Children,
 	Fragment,
+	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -190,8 +191,20 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 	);
 } );
 
-function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
-	const areAllSelected = selection.length === data.length;
+function BulkSelectionCheckbox( {
+	selection,
+	onSelectionChange,
+	data,
+	actions,
+} ) {
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return actions.some(
+				( action ) => action.supportsBulk && action.isEligible( item )
+			);
+		} );
+	}, [ data, actions ] );
+	const areAllSelected = selection.length === selectableItems.length;
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
@@ -202,7 +215,7 @@ function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
 				if ( areAllSelected ) {
 					onSelectionChange( [] );
 				} else {
-					onSelectionChange( data );
+					onSelectionChange( selectableItems );
 				}
 			} }
 			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
@@ -239,17 +252,16 @@ function TableRow( {
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
-						{ hasPossibleBulkAction && (
-							<SingleSelectionCheckbox
-								id={ id }
-								item={ item }
-								selection={ selection }
-								onSelectionChange={ onSelectionChange }
-								getItemId={ getItemId }
-								data={ data }
-								primaryField={ primaryField }
-							/>
-						) }
+						<SingleSelectionCheckbox
+							id={ id }
+							item={ item }
+							selection={ selection }
+							onSelectionChange={ onSelectionChange }
+							getItemId={ getItemId }
+							data={ data }
+							primaryField={ primaryField }
+							disabled={ ! hasPossibleBulkAction }
+						/>
 					</div>
 				</td>
 			) }
@@ -365,6 +377,7 @@ function ViewTable( {
 									selection={ selection }
 									onSelectionChange={ onSelectionChange }
 									data={ data }
+									actions={ actions }
 								/>
 							</th>
 						) }
