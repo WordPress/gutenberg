@@ -18,6 +18,8 @@ import {
 	Spinner,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
@@ -49,9 +51,24 @@ function InstalledFonts() {
 		setNotice,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+	const customFontFamilyId =
+		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
+
+	const canUserDelete = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			return (
+				customFontFamilyId &&
+				canUser( 'delete', 'font-families', customFontFamilyId )
+			);
+		},
+		[ customFontFamilyId ]
+	);
 
 	const shouldDisplayDeleteButton =
-		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+		!! libraryFontSelected &&
+		libraryFontSelected?.source !== 'theme' &&
+		canUserDelete;
 
 	const handleUninstallClick = () => {
 		setIsConfirmDeleteOpen( true );

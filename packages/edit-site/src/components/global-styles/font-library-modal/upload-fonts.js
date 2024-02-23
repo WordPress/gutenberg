@@ -13,6 +13,8 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useContext, useState } from '@wordpress/element';
 
 /**
@@ -30,6 +32,14 @@ const { ProgressBar } = unlock( componentsPrivateApis );
 function UploadFonts() {
 	const { installFont, notice, setNotice } = useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
+	const canUserCreate = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
+		return canUser( 'create', 'font-families' );
+	}, [] );
+
+	if ( ! canUserCreate ) {
+		return null;
+	}
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
