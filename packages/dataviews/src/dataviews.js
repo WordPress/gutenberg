@@ -20,6 +20,16 @@ import BulkActions from './bulk-actions';
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
 
+function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
+
 export default function DataViews( {
 	view,
 	onChangeView,
@@ -75,6 +85,11 @@ export default function DataViews( {
 			render: field.render || field.getValue,
 		} ) );
 	}, [ fields ] );
+
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 3 } justify="flex-start">
@@ -103,15 +118,16 @@ export default function DataViews( {
 							setOpenedFilter={ setOpenedFilter }
 						/>
 					</HStack>
-					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
-						<BulkActions
-							actions={ actions }
-							data={ data }
-							onSelectionChange={ onSetSelection }
-							selection={ selection }
-							getItemId={ getItemId }
-						/>
-					) }
+					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+						hasPossibleBulkAction && (
+							<BulkActions
+								actions={ actions }
+								data={ data }
+								onSelectionChange={ onSetSelection }
+								selection={ selection }
+								getItemId={ getItemId }
+							/>
+						) }
 					<ViewActions
 						fields={ _fields }
 						view={ view }
