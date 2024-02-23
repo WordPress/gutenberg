@@ -285,7 +285,7 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     func gutenbergDidRequestConnectionStatus() -> Bool
     
-    func gutenbergDidRequestLogException(_ exception: [AnyHashable: Any])
+    func gutenbergDidRequestLogException(_ exception: [AnyHashable: Any], with callback: @escaping () -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

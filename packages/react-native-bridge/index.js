@@ -536,14 +536,16 @@ export function toggleRedoButton( isDisabled ) {
 
 /**
  * Log exception to host app's crash logging service.
- * @param {Object} exception       Exception object
- * @param {Object} [extra]         Extra parameters to include in the exception (e.g. the block where the exception occurred)
- * @param {Object} [extra.context] Context of the exception.
- * @param {Object} [extra.tags]    Tags to associate with the exception.
+ * @param {Object}   exception       Exception object
+ * @param {Object}   [extra]         Extra parameters to include in the exception (e.g. the block where the exception occurred)
+ * @param {Object}   [extra.context] Context of the exception.
+ * @param {Object}   [extra.tags]    Tags to associate with the exception.
+ * @param {Function} [callback]      Callback triggered when the exception is sent.
  */
 export function logException(
 	exception,
-	{ context, tags } = { context: {}, tags: {} }
+	{ context, tags } = { context: {}, tags: {} },
+	callback = () => {}
 ) {
 	const parsedException = parseException( exception, { context, tags } );
 
@@ -552,10 +554,11 @@ export function logException(
 	if ( __DEV__ ) {
 		// eslint-disable-next-line no-console
 		console.info( 'Log exception', parsedException );
+		callback();
 		return;
 	}
 
-	RNReactNativeGutenbergBridge.logException( parsedException );
+	RNReactNativeGutenbergBridge.logException( parsedException, callback );
 }
 
 export default RNReactNativeGutenbergBridge;
