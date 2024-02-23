@@ -95,7 +95,7 @@ export function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 					style={ { boxShadow: shadow } }
 					showTooltip
 				>
-					{ isActive && <Icon icon={ check } /> }
+					{ isActive && <Icon icon={ check } size={ 22 } /> }
 				</Button>
 			}
 		/>

@@ -31,6 +31,9 @@
 	margin-right: $grid-unit-15;
 	margin-bottom: $grid-unit-15;
 
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	height: $button-size-small + 2 * $border-width;
 	width: $button-size-small + 2 * $border-width;
 	box-sizing: border-box;
