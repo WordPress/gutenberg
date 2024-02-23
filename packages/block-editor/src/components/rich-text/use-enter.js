@@ -69,7 +69,9 @@ export function useEnter( props ) {
 			const { text, start, end } = _value;
 
 			if ( shouldDisableEditing ) {
-				_value.text = '';
+				// Simulate the cursor is at the end of the rich text.
+				_value.start = _value.text?.length;
+				_value.end = _value.text?.length;
 				splitValue( {
 					value: _value,
 					onReplace,
