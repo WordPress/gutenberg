@@ -475,7 +475,7 @@ function withPersistentBlockChange( reducer ) {
 		}
 
 		const isExplicitPersistentChange =
-			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
+			// action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' || @todo: just for testing purposes
 			markNextChangeAsNotPersistent;
 
 		// Defer to previous state value (or default) unless changing or
