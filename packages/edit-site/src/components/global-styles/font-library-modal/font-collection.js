@@ -44,6 +44,7 @@ const DEFAULT_CATEGORY = {
 };
 
 const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
+const MIN_WINDOW_HEIGHT = 500;
 
 function FontCollection( { slug } ) {
 	const requiresPermission = slug === 'google-fonts';
@@ -123,7 +124,8 @@ function FontCollection( { slug } ) {
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
-	const pageSize = Math.floor( ( window.innerHeight - 417 ) / 61 );
+	const windowHeight = Math.max( window.innerHeight, MIN_WINDOW_HEIGHT );
+	const pageSize = Math.floor( ( windowHeight - 417 ) / 61 );
 	const totalPages = Math.ceil( fonts.length / pageSize );
 	const itemsStart = ( page - 1 ) * pageSize;
 	const itemsLimit = page * pageSize;
