@@ -275,21 +275,6 @@ export function setOpenedBlockSettingsMenu( clientId ) {
 	};
 }
 
-export function setStyleOverride( id, style ) {
-	return {
-		type: 'SET_STYLE_OVERRIDE',
-		id,
-		style,
-	};
-}
-
-export function deleteStyleOverride( id ) {
-	return {
-		type: 'DELETE_STYLE_OVERRIDE',
-		id,
-	};
-}
-
 /**
  * A higher-order action that mark every change inside a callback as "non-persistent"
  * and ignore pushing to the undo history stack. It's primarily used for synchronized

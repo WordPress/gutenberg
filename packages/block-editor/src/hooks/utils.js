@@ -18,8 +18,8 @@ import {
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
-import { store as blockEditorStore } from '../store';
-import { unlock } from '../lock-unlock';
+import { store as stylesStore } from '../store/styles';
+
 /**
  * External dependencies
  */
@@ -134,9 +134,8 @@ export function shouldSkipSerialization(
 }
 
 export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
-	const { setStyleOverride, deleteStyleOverride } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { setStyleOverride, deleteStyleOverride } =
+		useDispatch( stylesStore );
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.

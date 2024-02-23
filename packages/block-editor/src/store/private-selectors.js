@@ -168,17 +168,6 @@ export function getOpenedBlockSettingsMenu( state ) {
 	return state.openedBlockSettingsMenu;
 }
 
-/**
- * Returns all style overrides, intended to be merged with global editor styles.
- *
- * @param {Object} state Global application state.
- *
- * @return {Map} A map of style IDs to style overrides.
- */
-export function getStyleOverrides( state ) {
-	return state.styleOverrides;
-}
-
 /** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
 /**
  * Returns the registered inserter media categories through the public API.
