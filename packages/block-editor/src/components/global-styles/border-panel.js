@@ -22,11 +22,7 @@ import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { overrideOrigins } from '../../store/get-block-settings';
 import { setImmutably } from '../../utils/object';
 import { getBorderPanelLabel } from '../../hooks/border';
-import { ShadowPopover } from './shadow-panel-components';
-
-function useHasShadowControl( settings ) {
-	return !! settings?.shadow;
-}
+import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 
 export function useHasBorderPanel( settings ) {
 	const controls = [
@@ -54,6 +50,11 @@ function useHasBorderStyleControl( settings ) {
 
 function useHasBorderWidthControl( settings ) {
 	return settings?.border?.width;
+}
+
+function useHasShadowControl( settings ) {
+	const shadows = useShadowPresets( settings );
+	return !! settings?.shadow && shadows.length > 0;
 }
 
 function BorderToolsPanel( {
