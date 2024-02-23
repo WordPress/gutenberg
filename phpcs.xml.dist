@@ -62,6 +62,7 @@
 	     DO NOT REMOVE these rules; these files are "built" artifacts from Core
 	     and when they are removed it prevents keeping the repos in sync. -->
 	<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
+	<exclude-pattern>./packages/env/lib/object-cache/*.php</exclude-pattern>
 
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">

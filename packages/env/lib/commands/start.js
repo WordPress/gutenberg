@@ -166,12 +166,45 @@ module.exports = async function start( {
 			spinner,
 			debug
 		);
+
+		if ( 'memcached' === config.env.development.objectCache ) {
+			// Set up object cache drop-in if configured.
+			const memcachedFile = path.resolve(
+				__dirname,
+				'../object-cache/memcached.php'
+			);
+
+			fs.copyFile(
+				memcachedFile,
+				path.join(
+					config.env.development.coreSource.path,
+					'wp-content',
+					'object-cache.php'
+				)
+			);
+
+			fs.copyFile(
+				memcachedFile,
+				path.join(
+					config.env.tests.coreSource.path,
+					'wp-content',
+					'object-cache.php'
+				)
+			);
+		}
 	}
 
 	spinner.text = 'Starting WordPress.';
 
 	await dockerCompose.upMany(
-		[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
+		[
+			'wordpress',
+			'tests-wordpress',
+			'cli',
+			'tests-cli',
+			'object-cache',
+			'tests-object-cache',
+		],
 		{
 			...dockerComposeConfig,
 			commandOptions: shouldConfigureWp

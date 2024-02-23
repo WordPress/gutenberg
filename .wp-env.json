@@ -2,6 +2,7 @@
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
+	"objectCache": "memcached",
 	"env": {
 		"tests": {
 			"mappings": {

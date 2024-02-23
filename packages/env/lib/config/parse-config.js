@@ -18,6 +18,7 @@ const {
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
+	checkOneOfStrings,
 	checkValidURL,
 } = require( './validate-config' );
 const getConfigFromEnvironmentVars = require( './get-config-from-environment-vars' );
@@ -53,6 +54,7 @@ const mergeConfigs = require( './merge-configs' );
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {string|null}               objectCache   Type of object cache to set up. Supports "memcached" or none (null).
  */
 
 /**
@@ -85,6 +87,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	objectCache: null,
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -293,6 +296,12 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
 	}
 
+	if ( overrides.objectCache ) {
+		overrideConfig.objectCache = overrides.objectCache;
+		overrideConfig.env.development.objectCache = overrides.objectCache;
+		overrideConfig.env.tests.objectCache = overrides.objectCache;
+	}
+
 	return overrideConfig;
 }
 
@@ -453,6 +462,19 @@ async function parseEnvironmentConfig(
 			await parseCoreSource( config.core, options ),
 			options
 		);
+	}
+
+	if ( config.objectCache !== undefined ) {
+		// Support null as a valid input.
+		if ( config.objectCache !== null ) {
+			checkOneOfStrings(
+				configFile,
+				`${ environmentPrefix }objectCache`,
+				config.objectCache,
+				[ 'memcached' ]
+			);
+		}
+		parsedConfig.objectCache = config.objectCache;
 	}
 
 	if ( config.plugins !== undefined ) {

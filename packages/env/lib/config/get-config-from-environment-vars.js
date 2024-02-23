@@ -20,6 +20,7 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  * @property {?number}                  testsPort        An override for the testing environment's port.
  * @property {?WPSource}                coreSource       An override for all environment's coreSource.
  * @property {?string}                  phpVersion       An override for all environment's PHP version.
+ * @property {?string}                  objectCache      An override for all environment's object cache configuration.
  * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
  */
 
