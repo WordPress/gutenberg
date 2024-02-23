@@ -2044,20 +2044,6 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
-function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				useSource: action.useSource,
-				lockAttributesEditing: action.lockAttributesEditing ?? true,
-			},
-		};
-	}
-	return state;
-}
-
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2089,7 +2075,6 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	blockBindingsSources,
 } );
 
 function withAutomaticChangeReset( reducer ) {

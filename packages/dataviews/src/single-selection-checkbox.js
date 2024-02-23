@@ -11,6 +11,7 @@ export default function SingleSelectionCheckbox( {
 	data,
 	getItemId,
 	primaryField,
+	disabled,
 } ) {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
@@ -33,6 +34,7 @@ export default function SingleSelectionCheckbox( {
 			__nextHasNoMarginBottom
 			checked={ isSelected }
 			label={ selectionLabel }
+			disabled={ disabled }
 			onChange={ () => {
 				if ( ! isSelected ) {
 					onSelectionChange(

@@ -230,12 +230,14 @@ function GlobalStylesBlockLink() {
 }
 
 function GlobalStylesEditorCanvasContainerLink() {
-	const { goTo } = useNavigator();
+	const { goTo, location } = useNavigator();
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
 		[]
 	);
+	const path = location?.path;
+	const isRevisionsOpen = path === '/revisions';
 
 	// If the user switches the editor canvas container view, redirect
 	// to the appropriate screen. This effectively allows deep linking to the
@@ -249,11 +251,33 @@ function GlobalStylesEditorCanvasContainerLink() {
 			case 'global-styles-css':
 				goTo( '/css' );
 				break;
+			case 'style-book':
+				/*
+				 * The stand-alone style book is open
+				 * and the revisions panel is open,
+				 * close the revisions panel.
+				 * Otherwise keep the style book open while
+				 * browsing global styles panel.
+				 */
+				if ( isRevisionsOpen ) {
+					goTo( '/' );
+				}
+				break;
 			default:
+				/*
+				 * Example: the user has navigated to "Browse styles" or elsewhere
+				 * and changes the editorCanvasContainerView, e.g., closes the style book.
+				 * The panel should not be affected.
+				 * Exclude revisions panel from this behavior,
+				 * as it should close when the editorCanvasContainerView doesn't correspond.
+				 */
+				if ( path !== '/' && ! isRevisionsOpen ) {
+					return;
+				}
 				goTo( '/' );
 				break;
 		}
-	}, [ editorCanvasContainerView, goTo ] );
+	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
 
 function GlobalStylesUI() {
