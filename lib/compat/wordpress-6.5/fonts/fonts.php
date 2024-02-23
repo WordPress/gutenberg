@@ -185,10 +185,11 @@ function gutenberg_maybe_grant_upload_font_cap( $allcaps, $caps ) {
 	}
 
 	$fonts_dir = wp_get_font_dir()['path'];
+	$post_type = get_post_type_object( 'wp_font_face' );
 	if (
 		wp_is_file_mod_allowed( 'can_upload_fonts' ) &&
 		wp_is_writable( $fonts_dir ) &&
-		! empty( $allcaps['edit_theme_options'] )
+		current_user_can( $post_type->cap->create_posts )
 	) {
 		$allcaps['upload_fonts'] = true;
 	}
@@ -222,7 +223,7 @@ function gutenberg_init_font_library() {
 	}
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_font_library' );
+add_action( 'init', 'gutenberg_init_font_library' );
 
 
 if ( ! function_exists( 'wp_register_font_collection' ) ) {
