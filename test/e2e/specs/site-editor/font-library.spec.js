@@ -88,6 +88,8 @@ test.describe( 'Font Library', () => {
 	} );
 
 	test.describe( 'When user has permissions to edit font families', () => {
+		// Timeouts are increased in the following tests to account for the time it takes to load the font library tabs.
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'twentytwentythree' );
 		} );
@@ -173,6 +175,8 @@ test.describe( 'Font Library', () => {
 	} );
 
 	test.describe( 'When user does not have permission to edit font families', () => {
+		// Timeouts are increased in the following tests to account for the time it takes to load the font library tabs.
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'twentytwentythree' );
 			await requestUtils.activatePlugin(
