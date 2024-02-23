@@ -32,7 +32,7 @@ export function useEnter( props ) {
 			const {
 				removeEditorOnlyFormats,
 				value,
-				onReplaceCallback: onReplace,
+				onReplace,
 				onSplit,
 				onChange,
 				disableLineBreaks,
