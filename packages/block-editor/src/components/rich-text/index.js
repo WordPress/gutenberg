@@ -294,12 +294,7 @@ export function RichTextWrapper(
 	}
 
 	const TagName = tagName;
-	let tabIndex;
-	if ( shouldDisableEditing ) {
-		tabIndex = 0;
-	} else {
-		tabIndex = props.tabIndex === 0 ? null : props.tabIndex;
-	}
+	const tabIndex = props.tabIndex === 0 ? null : props.tabIndex;
 	return (
 		<>
 			{ isSelected && (
@@ -394,13 +389,13 @@ export function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				// Setting tabIndex to 0 is unnecessary, the element is already
+				// Setting tabIndex to 0 is unnecessary, if the element is already
 				// focusable because it's contentEditable. This also fixes a
 				// Safari bug where it's not possible to Shift+Click multi
 				// select blocks when Shift Clicking into an element with
 				// tabIndex because Safari will focus the element. However,
 				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={ tabIndex }
+				tabIndex={ shouldDisableEditing ? 0 : tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
