@@ -34,7 +34,10 @@ export default function CoverBlockControls( {
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
 		useState( minHeightUnit );
-	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
+	const isMinFullHeight =
+		minHeightUnit === 'vh' &&
+		minHeight === 100 &&
+		! attributes?.style?.dimensions?.aspectRatio;
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
 			// If there aren't previous values, take the default ones.
