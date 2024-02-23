@@ -91,14 +91,27 @@ const BindingConnector = ( {
 		( newAttrValue, prevAttrValue ) => {
 			/*
 			 * If the attribute is a RichTextData instance,
-			 * (core/paragraph, core/heading, etc.)
-			 * convert it to HTML string.
+			 * (core/paragraph, core/heading, core/button, etc.)
+			 * compare its HTML representation with the new value.
 			 *
 			 * To do: it looks like a workaround.
 			 * Consider improving the attribute and metadata fields types.
 			 */
 			if ( prevAttrValue instanceof RichTextData ) {
-				prevAttrValue = prevAttrValue.toHTMLString();
+				// Bail early if the Rich Text value is the same.
+				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
+					return;
+				}
+
+				/*
+				 * To preserve the value type,
+				 * convert the new value to a RichTextData instance.
+				 */
+				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
+			}
+
+			if ( prevAttrValue === newAttrValue ) {
+				return;
 			}
 
 			syncDerivedUpdates( () => {
