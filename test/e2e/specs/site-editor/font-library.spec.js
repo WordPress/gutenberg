@@ -106,10 +106,43 @@ test.describe( 'Font Library', () => {
 				.click();
 		} );
 
-		test( 'should display the "Upload" tab', async ( { page } ) => {
+		test( 'should display the "Upload" tab and upload a local font', async ( {
+			page,
+		} ) => {
 			await expect(
 				page.getByRole( 'tab', { name: /upload/i } )
 			).toBeVisible( { timeout: 40000 } );
+
+			// Upload a local font
+			if (
+				await page
+					.getByRole( 'button', { name: /commissioner/i } )
+					.isVisible( { timeout: 40000 } )
+			) {
+				await page
+					.getByRole( 'button', { name: /commissioner/i } )
+					.click();
+				await page.getByRole( 'button', { name: /delete/i } ).click();
+				await page.getByRole( 'button', { name: /delete/i } ).click();
+			}
+			await page.getByRole( 'tab', { name: /upload/i } ).click();
+			const fileChooserPromise = page.waitForEvent( 'filechooser' );
+			await page.getByRole( 'button', { name: /upload font/i } ).click();
+			const fileChooser = await fileChooserPromise;
+			await fileChooser.setFiles(
+				'./test/e2e/assets/Commissioner-Regular.ttf'
+			);
+
+			// Check font was installed
+			await expect(
+				page
+					.getByLabel( 'Upload' )
+					.getByText( 'Fonts were installed successfully.' )
+			).toBeVisible( { timeout: 40000 } );
+			await page.getByRole( 'tab', { name: /library/i } ).click();
+			await expect(
+				page.getByRole( 'button', { name: /commissioner/i } )
+			).toBeVisible();
 		} );
 
 		test( 'should display the default collections tab', async ( {
@@ -118,6 +151,22 @@ test.describe( 'Font Library', () => {
 			await expect(
 				page.getByRole( 'tab', { name: /install fonts/i } )
 			).toBeVisible( { timeout: 40000 } );
+		} );
+
+		test( 'should display the "Delete" button and delete the font', async ( {
+			page,
+		} ) => {
+			await page
+				.getByRole( 'button', { name: /commissioner/i } )
+				.click( { timeout: 40000 } );
+
+			await expect(
+				page.getByRole( 'button', { name: /delete/i } )
+			).toBeVisible( { timeout: 40000 } );
+
+			// Delete the font
+			await page.getByRole( 'button', { name: /delete/i } ).click();
+			await page.getByRole( 'button', { name: /delete/i } ).click();
 		} );
 	} );
 
@@ -161,6 +210,35 @@ test.describe( 'Font Library', () => {
 			await expect(
 				page.getByRole( 'tab', { name: /install fonts/i } )
 			).toBeHidden( { timeout: 40000 } );
+		} );
+
+		test( 'should not display the "Delete" button in the footer', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			// Upload a local font
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-font-library-permissions'
+			);
+			await page
+				.getByRole( 'tab', { name: /upload/i } )
+				.click( { timeout: 40000 } );
+			const fileChooserPromise = page.waitForEvent( 'filechooser' );
+			await page.getByRole( 'button', { name: /upload font/i } ).click();
+			const fileChooser = await fileChooserPromise;
+			await fileChooser.setFiles(
+				'./test/e2e/assets/Commissioner-Regular.ttf'
+			);
+			await requestUtils.activatePlugin(
+				'gutenberg-test-font-library-permissions'
+			);
+
+			await page.getByRole( 'tab', { name: /library/i } ).click();
+			await page.getByRole( 'button', { name: /commissioner/i } ).click();
+
+			await expect(
+				page.getByRole( 'button', { name: /delete/i } )
+			).toBeHidden();
 		} );
 	} );
 } );
