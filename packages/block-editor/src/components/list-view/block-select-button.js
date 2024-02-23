@@ -14,7 +14,12 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import {
+	Icon,
+	connection,
+	lockSmall as lock,
+	pinSmall,
+} from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -66,6 +71,7 @@ function ListViewBlockSelectButton(
 		getBlockRootClientId,
 		getBlockOrder,
 		getBlocksByClientId,
+		getBlockAttributes,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
 	const { duplicateBlocks, multiSelect, removeBlocks } =
@@ -74,6 +80,8 @@ function ListViewBlockSelectButton(
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 	const { rootClientId } = useListViewContext();
+
+	const isConnected = getBlockAttributes( clientId )?.metadata?.bindings;
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -278,9 +286,11 @@ function ListViewBlockSelectButton(
 							</Truncate>
 						</span>
 					) }
+					{ isConnected && <Icon icon={ connection } /> }
 					{ positionLabel && isSticky && (
 						<Tooltip text={ positionLabel }>
 							<Icon icon={ pinSmall } />
+							text
 						</Tooltip>
 					) }
 					{ images.length ? (
