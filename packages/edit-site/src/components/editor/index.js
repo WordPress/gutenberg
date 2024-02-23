@@ -14,7 +14,6 @@ import {
 	BlockBreadcrumb,
 	BlockToolbar,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 	BlockInspector,
 } from '@wordpress/block-editor';
 import {
@@ -56,7 +55,6 @@ import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 
-const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 const {
 	ExperimentalEditorProvider: EditorProvider,
 	InserterSidebar,
@@ -72,21 +70,6 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
-};
-
-// Prevent accidental removal of certain blocks, asking the user for
-// confirmation.
-const blockRemovalRules = {
-	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
-	'core/post-content': __(
-		'Post Content displays the content of a post or page.'
-	),
-	'core/post-template': __(
-		'Post Template displays each post or page in a Query Loop.'
-	),
-	'bindings/core/pattern-overrides': __(
-		'Blocks from synced patterns that can have overriden content.'
-	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -243,9 +226,6 @@ export default function Editor( { isLoading } ) {
 											<BlockToolbar hideDragHandle />
 										) }
 										<SiteEditorCanvas />
-										<BlockRemovalWarningModal
-											rules={ blockRemovalRules }
-										/>
 										<PatternModal />
 									</>
 								) }

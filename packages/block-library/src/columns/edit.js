@@ -40,6 +40,10 @@ import {
 	toWidthPrecision,
 } from './utils';
 
+const DEFAULT_BLOCK = {
+	name: 'core/column',
+};
+
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 	const { count, canInsertColumnBlock, minCount } = useSelect(
@@ -90,6 +94,8 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		className: classes,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		templateLock,
@@ -133,18 +139,19 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 			// If adding a new column, assign width to the new column equal to
 			// as if it were `1 / columns` of the total available space.
 			const newColumnWidth = toWidthPrecision( 100 / newColumns );
+			const newlyAddedColumns = newColumns - previousColumns;
 
 			// Redistribute in consideration of pending block insertion as
 			// constraining the available working width.
 			const widths = getRedistributedColumnWidths(
 				innerBlocks,
-				100 - newColumnWidth
+				100 - newColumnWidth * newlyAddedColumns
 			);
 
 			innerBlocks = [
 				...getMappedColumnWidths( innerBlocks, widths ),
 				...Array.from( {
-					length: newColumns - previousColumns,
+					length: newlyAddedColumns,
 				} ).map( () => {
 					return createBlock( 'core/column', {
 						width: `${ newColumnWidth }%`,

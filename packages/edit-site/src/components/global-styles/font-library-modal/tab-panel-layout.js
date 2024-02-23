@@ -11,6 +11,7 @@ import {
 	Button,
 	Notice,
 	FlexBlock,
+	FlexItem,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -27,6 +28,7 @@ function TabPanelLayout( {
 	handleBack,
 	children,
 	footer,
+	actions,
 } ) {
 	const { setNotice } = useContext( FontLibraryContext );
 
@@ -35,7 +37,11 @@ function TabPanelLayout( {
 			<Spacer margin={ 4 } />
 			<VStack spacing={ 4 } justify="space-between">
 				<VStack spacing={ 2 }>
-					<HStack justify="flex-start">
+					<HStack
+						justify={
+							!! handleBack ? 'flex-start' : 'space-between'
+						}
+					>
 						{ !! handleBack && (
 							<Button
 								variant="tertiary"
@@ -54,6 +60,7 @@ function TabPanelLayout( {
 								{ title }
 							</Heading>
 						) }
+						{ actions && <FlexItem>{ actions }</FlexItem> }
 					</HStack>
 					{ description && <Text>{ description }</Text> }
 					{ notice && (

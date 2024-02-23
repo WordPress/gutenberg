@@ -19,10 +19,11 @@ import {
 	FlexItem,
 	Flex,
 	Button,
+	DropdownMenu,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { search, closeSmall } from '@wordpress/icons';
+import { search, closeSmall, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,15 +42,15 @@ const DEFAULT_CATEGORY = {
 	slug: 'all',
 	name: _x( 'All', 'font categories' ),
 };
+
+const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
+const MIN_WINDOW_HEIGHT = 500;
+
 function FontCollection( { slug } ) {
 	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
-		return (
-			window.localStorage.getItem(
-				'wp-font-library-google-fonts-permission'
-			) === 'true'
-		);
+		return window.localStorage.getItem( LOCAL_STORAGE_ITEM ) === 'true';
 	};
 
 	const [ selectedFont, setSelectedFont ] = useState( null );
@@ -75,6 +76,11 @@ function FontCollection( { slug } ) {
 		window.addEventListener( 'storage', handleStorage );
 		return () => window.removeEventListener( 'storage', handleStorage );
 	}, [ slug, requiresPermission ] );
+
+	const revokeAccess = () => {
+		window.localStorage.setItem( LOCAL_STORAGE_ITEM, 'false' );
+		window.dispatchEvent( new Event( 'storage' ) );
+	};
 
 	useEffect( () => {
 		const fetchFontCollection = async () => {
@@ -118,7 +124,8 @@ function FontCollection( { slug } ) {
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
-	const pageSize = Math.floor( ( window.innerHeight - 417 ) / 61 );
+	const windowHeight = Math.max( window.innerHeight, MIN_WINDOW_HEIGHT );
+	const pageSize = Math.floor( ( windowHeight - 417 ) / 61 );
 	const totalPages = Math.ceil( fonts.length / pageSize );
 	const itemsStart = ( page - 1 ) * pageSize;
 	const itemsLimit = page * pageSize;
@@ -223,11 +230,33 @@ function FontCollection( { slug } ) {
 		);
 	}
 
+	const ActionsComponent = () => {
+		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
+			return null;
+		}
+		return (
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Actions' ) }
+				popoverProps={ {
+					position: 'bottom left',
+				} }
+				controls={ [
+					{
+						title: __( 'Revoke access to Google Fonts' ),
+						onClick: revokeAccess,
+					},
+				] }
+			/>
+		);
+	};
+
 	return (
 		<TabPanelLayout
 			title={
 				! selectedFont ? selectedCollection.name : selectedFont.name
 			}
+			actions={ <ActionsComponent /> }
 			description={
 				! selectedFont
 					? selectedCollection.description

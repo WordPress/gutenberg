@@ -390,23 +390,14 @@ class WP_Navigation_Block_Renderer {
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
-		// Sets the is-collapsed class when the navigation is set to always use the overlay.
-		// This saves us from needing to do this check in the view.js file (see the collapseNav function).
-		$is_collapsed_class = static::is_always_overlay( $attributes ) ? array( 'is-collapsed' ) : array();
-
 		$classes = array_merge(
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
 			$layout_class ? array( $layout_class ) : array(),
-			$text_decoration ? array( $text_decoration_class ) : array(),
-			$is_collapsed_class
+			$text_decoration ? array( $text_decoration_class ) : array()
 		);
 		return implode( ' ', $classes );
-	}
-
-	private static function is_always_overlay( $attributes ) {
-		return isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 	}
 
 	/**
@@ -435,12 +426,16 @@ class WP_Navigation_Block_Renderer {
 		$colors          = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
+		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
+			$is_hidden_by_default ? 'hidden-by-default' : '',
 			implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
+			$is_hidden_by_default ? 'always-shown' : '',
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
@@ -538,7 +533,7 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive, $attributes );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -552,32 +547,26 @@ class WP_Navigation_Block_Renderer {
 	 * @param array $attributes     The block attributes.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive, $attributes ) {
+	private static function get_nav_element_directives( $is_interactive ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = data_wp_context(
 			array(
-				'overlayOpenedBy' => array(),
+				'overlayOpenedBy' => array(
+					'click' => false,
+					'hover' => false,
+					'focus' => false,
+				),
 				'type'            => 'overlay',
 				'roleAttribute'   => '',
 				'ariaLabel'       => __( 'Menu' ),
 			)
 		);
 		$nav_element_directives = '
-		 data-wp-interactive="core/navigation"'
+		 data-wp-interactive="core/navigation" '
 		. $nav_element_context;
-
-		/*
-		* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
-		* is not needed for collapsing the menu because the class is set manually.
-		*/
-		if ( ! static::is_always_overlay( $attributes ) ) {
-			$nav_element_directives .= 'data-wp-init="callbacks.initNav"';
-			$nav_element_directives .= ' '; // space separator
-			$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
-		}
 
 		return $nav_element_directives;
 	}
@@ -779,7 +768,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 	) ) {
 		// Add directives to the parent `<li>`.
 		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
-		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": {}, "type": "submenu" }' );
+		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu" }' );
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
 		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
