@@ -23,6 +23,7 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import { GridVisualizer } from '../components/grid-visualizer';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -67,6 +68,7 @@ export default {
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
+		clientId,
 	} ) {
 		return (
 			<>
@@ -85,10 +87,13 @@ export default {
 						onChange={ onChange }
 					/>
 				) }
+				{ window.__experimentalEnableGridInteractivity && (
+					<GridVisualizer clientId={ clientId } />
+				) }
 			</>
 		);
 	},
-	toolBarControls: function DefaultLayoutToolbarControls() {
+	toolBarControls: function GridLayoutToolbarControls() {
 		return null;
 	},
 	getLayoutStyle: function getLayoutStyle( {
