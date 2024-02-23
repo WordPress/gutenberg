@@ -12,7 +12,6 @@
  * @internal
  */
 class Gutenberg_HTTP_Signaling_Server {
-
 	/**
 	 * Adds a wp_ajax action to handle the signaling server requests.
 	 */
@@ -33,7 +32,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		}
 
 		// Contains the subscriber id of the client reading or sending messages.
-		$subscriber_id = $_REQUEST['subscriber_id'];
+		$subscriber_id       = $_REQUEST['subscriber_id'];
 		$temporary_directory = get_temp_dir() . DIRECTORY_SEPARATOR;
 
 		// Example inside file: array( 2323232121 => array( 'message hello','handshake message' ) ).
@@ -45,7 +44,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 			static::handle_read_pending_messages( $subscriber_to_messages_path, $subscriber_id );
 		} else {
-			if ( empty( $_POST ) || empty( $_POST['message'] ) ) {
+			if ( empty( $_POST['message'] ) ) {
 				die( 'no message' );
 			}
 			$message = json_decode( wp_unslash( $_POST['message'] ), true );
@@ -171,7 +170,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		list( $fd, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
 		if ( ! $fd ) {
 			$retries = isset( $_COOKIE['signaling_server_retries'] ) ? intval( $_COOKIE['signaling_server_retries'] ) : 0;
-			$secure  = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
+			$secure  = 'https' === parse_url( home_url(), PHP_URL_SCHEME );
 			setcookie( 'signaling_server_retries', $retries + 1, time() + DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
 			echo 'id: ' . time() . PHP_EOL;
 			echo 'event: error' . PHP_EOL;
@@ -326,7 +325,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		flock( $fd_subscribers_last_connection, LOCK_EX );
 		$subscribers_to_last_connection_time                             = static::get_contents_from_file_descriptor( $fd_subscribers_last_connection );
 		$subscribers_to_last_connection_time[ $connected_subscriber_id ] = time();
-		$needs_cleanup = false;
+		$needs_cleanup                                                   = false;
 		foreach ( $subscribers_to_last_connection_time as $subscriber_id => $last_connection_time ) {
 			// cleanup connections older than 1 hour.
 			if ( $last_connection_time < time() - 1 * 60 * 60 ) {
