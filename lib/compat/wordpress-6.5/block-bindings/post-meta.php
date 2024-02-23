@@ -15,22 +15,22 @@
  */
 function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_instance ) {
 	if ( empty( $source_attrs['key'] ) ) {
-		return null;
+		return '';
 	}
 
 	if ( empty( $block_instance->context['postId'] ) ) {
-		return null;
+		return '';
 	}
 	$post_id = $block_instance->context['postId'];
 	// If a post isn't public, we need to prevent unauthorized users from accessing the post meta.
 	$post = get_post( $post_id );
 	if ( ( ! is_post_publicly_viewable( $post ) && ! current_user_can( 'read_post', $post_id ) ) || post_password_required( $post ) ) {
-		return null;
+		return '';
 	}
 
 	// Check if the meta field is protected.
 	if ( is_protected_meta( $source_attrs['key'], 'post' ) ) {
-		return null;
+		return '';
 	}
 
 	// Check if the meta field is registered to be shown in REST.
@@ -38,7 +38,7 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 	// Add fields registered for all subtypes.
 	$meta_keys = array_merge( $meta_keys, get_registered_meta_keys( 'post', '' ) );
 	if ( empty( $meta_keys[ $source_attrs['key'] ]['show_in_rest'] ) || false === $meta_keys[ $source_attrs['key'] ]['show_in_rest'] ) {
-		return null;
+		return '';
 	}
 
 	return get_post_meta( $post_id, $source_attrs['key'], true );
