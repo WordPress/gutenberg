@@ -13,13 +13,12 @@
  */
 class Gutenberg_HTTP_Signaling_Server {
 
-
 	/**
 	 * Adds a wp_ajax action to handle the signaling server requests.
 	 */
 	public static function init() {
 		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-		if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
+		if ( empty( $gutenberg_experiments['gutenberg-sync-collaboration'] ) ) {
 			return;
 		}
 		add_action( 'wp_ajax_gutenberg_signaling_server', array( __CLASS__, 'do_wp_ajax_action' ) );
@@ -29,18 +28,19 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * Handles a wp_ajax signaling server request.
 	 */
 	public static function do_wp_ajax_action() {
-		if ( empty( $_REQUEST ) || empty( $_REQUEST['subscriber_id'] ) ) {
+		if ( empty( $_REQUEST['subscriber_id'] ) ) {
 			die( 'no identifier' );
 		}
 
 		// Contains the subscriber id of the client reading or sending messages.
 		$subscriber_id = $_REQUEST['subscriber_id'];
+		$temporary_directory = get_temp_dir() . DIRECTORY_SEPARATOR;
 
 		// Example inside file: array( 2323232121 => array( 'message hello','handshake message' ) ).
-		$subscriber_to_messages_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_messages.txt';
+		$subscriber_to_messages_path = $temporary_directory . 'subscribers_to_messages.txt';
 
 		// Example inside file: array( 'doc1: array( 2323232121 ), 'doc2: array( 2323232123, 2323232121 ) ).
-		$topics_to_subscribers_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'topics_to_subscribers.txt';
+		$topics_to_subscribers_path = $temporary_directory . 'topics_to_subscribers.txt';
 
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 			static::handle_read_pending_messages( $subscriber_to_messages_path, $subscriber_id );
