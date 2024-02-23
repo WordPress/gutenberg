@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.4.0-rc.1",
+	"version": "17.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -98,7 +98,7 @@
 	"devDependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
-		"@ariakit/test": "^0.3.5",
+		"@ariakit/test": "^0.3.7",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -107,21 +107,22 @@
 		"@emotion/babel-plugin": "11.3.0",
 		"@emotion/jest": "11.7.1",
 		"@emotion/native": "11.0.0",
+		"@geometricpanda/storybook-addon-badges": "2.0.1",
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
 		"@playwright/test": "1.39.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
-		"@storybook/addon-a11y": "7.2.2",
-		"@storybook/addon-actions": "7.2.2",
-		"@storybook/addon-controls": "7.2.2",
-		"@storybook/addon-docs": "7.2.2",
-		"@storybook/addon-toolbars": "7.2.2",
-		"@storybook/addon-viewport": "7.2.2",
-		"@storybook/react": "7.2.2",
-		"@storybook/react-webpack5": "7.2.2",
-		"@storybook/source-loader": "7.2.2",
-		"@storybook/theming": "7.2.2",
+		"@storybook/addon-a11y": "7.6.15",
+		"@storybook/addon-actions": "7.6.15",
+		"@storybook/addon-controls": "7.6.15",
+		"@storybook/addon-docs": "7.6.15",
+		"@storybook/addon-toolbars": "7.6.15",
+		"@storybook/addon-viewport": "7.6.15",
+		"@storybook/react": "7.6.15",
+		"@storybook/react-webpack5": "7.6.15",
+		"@storybook/source-loader": "7.6.15",
+		"@storybook/theming": "7.6.15",
 		"@testing-library/jest-dom": "5.16.5",
 		"@testing-library/react": "14.0.0",
 		"@testing-library/react-native": "12.1.2",
@@ -177,14 +178,14 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
-		"browserslist": "4.21.10",
-		"caniuse-lite": "1.0.30001538",
+		"browserslist": "4.22.2",
+		"caniuse-lite": "1.0.30001579",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"commander": "9.2.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "10.2.0",
-		"core-js-builder": "3.31.0",
+		"core-js-builder": "3.35.1",
 		"cross-env": "3.2.4",
 		"css-loader": "6.2.0",
 		"cssnano": "6.0.1",
@@ -224,14 +225,14 @@
 		"node-fetch": "2.6.1",
 		"node-watch": "0.7.0",
 		"npm-run-all": "4.1.5",
-		"patch-package": "6.2.2",
+		"patch-package": "8.0.0",
 		"postcss": "8.4.16",
 		"postcss-loader": "6.2.1",
 		"prettier": "npm:wp-prettier@3.0.3",
 		"progress": "2.0.3",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
-		"react-native": "0.71.11",
+		"react-native": "0.71.15",
 		"react-native-url-polyfill": "1.1.2",
 		"react-refresh": "0.14.0",
 		"react-test-renderer": "18.2.0",
@@ -247,7 +248,7 @@
 		"snapshot-diff": "0.10.0",
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
-		"storybook": "7.2.2",
+		"storybook": "7.6.15",
 		"storybook-source-link": "2.0.9",
 		"strip-json-comments": "5.0.0",
 		"style-loader": "3.2.1",
@@ -319,6 +320,7 @@
 		"test:e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e  --runInBand --no-cache --verbose --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test:e2e:playwright": "wp-scripts test-playwright --config test/e2e/playwright.config.ts",
+		"test:e2e:playwright:debug": "wp-scripts test-playwright --config test/e2e/playwright.config.ts --ui",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
@@ -359,8 +361,7 @@
 			"wp-scripts lint-style"
 		],
 		"package-lock.json": [
-			"npm run lint:lockfile",
-			"node ./bin/check-latest-npm.js"
+			"npm run lint:lockfile"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
@@ -378,18 +379,5 @@
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
-	},
-	"wp-env": {
-		"plugin-dir": "gutenberg",
-		"plugin-name": "Gutenberg",
-		"docker-template": "./bin/docker-compose.override.yml.template",
-		"welcome-logo": [
-			",⁻⁻⁻·       .                 |",
-			"|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.",
-			"|   | |   | |     |---' |   | |   | |---' |     |   |",
-			"`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|",
-			"                                                `---'"
-		],
-		"welcome-build-command": "npm run dev"
 	}
 }

@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { layout, page, home, verse, plus } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ const PageItem = ( { postType = 'page', postId, ...props } ) => {
 };
 
 export default function SidebarNavigationScreenPages() {
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -137,14 +139,6 @@ export default function SidebarNavigationScreenPages() {
 	};
 
 	const pagesLink = useLink( { path: '/pages' } );
-	const manageAllPagesProps = window?.__experimentalAdminViews
-		? { ...pagesLink }
-		: {
-				href: 'edit.php?post_type=page',
-				onClick: () => {
-					document.location = 'edit.php?post_type=page';
-				},
-		  };
 
 	return (
 		<>
@@ -156,7 +150,7 @@ export default function SidebarNavigationScreenPages() {
 			) }
 			<SidebarNavigationScreen
 				title={ __( 'Pages' ) }
-				description={ __( 'Browse and edit pages on your site.' ) }
+				description={ __( 'Browse and manage pages.' ) }
 				actions={
 					<SidebarButton
 						icon={ plus }
@@ -228,12 +222,14 @@ export default function SidebarNavigationScreenPages() {
 								</Truncate>
 							</PageItem>
 						) ) }
-						<SidebarNavigationItem
-							className="edit-site-sidebar-navigation-screen-pages__see-all"
-							{ ...manageAllPagesProps }
-						>
-							{ __( 'Manage all pages' ) }
-						</SidebarNavigationItem>
+						{ ! isMobileViewport && (
+							<SidebarNavigationItem
+								className="edit-site-sidebar-navigation-screen-pages__see-all"
+								{ ...pagesLink }
+							>
+								{ __( 'Manage all pages' ) }
+							</SidebarNavigationItem>
+						) }
 					</VStack>
 				}
 			/>

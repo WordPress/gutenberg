@@ -134,9 +134,10 @@ test.describe( 'Draggable block', () => {
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
 		// @see https://github.com/microsoft/playwright/issues/17153
+		// Make sure mouse is > 30px within the block for bottom drop indicator to appear.
 		for ( let i = 0; i < 2; i += 1 ) {
 			await page.mouse.move(
-				secondParagraphBound.x,
+				secondParagraphBound.x + 32,
 				secondParagraphBound.y + secondParagraphBound.height * 0.75
 			);
 		}

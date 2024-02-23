@@ -233,6 +233,7 @@ The settings section has the following structure:
 		},
 		"custom": {},
 		"dimensions": {
+			"aspectRatio": false,
 			"minHeight": false,
 		},
 		"layout": {
@@ -293,10 +294,10 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
-- dimensions: minHeight
+- dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -773,6 +774,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"text": "value"
 		},
 		"dimensions": {
+			"aspectRatio": "value",
 			"minHeight": "value"
 		},
 		"filter": {

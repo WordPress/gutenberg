@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -119,10 +115,6 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
-		const inputClasses = classnames( className, {
-			// 'has-no-label': ! hideLabelFromVision,
-		} );
-
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
@@ -130,7 +122,7 @@ const LinkControlSearchInput = forwardRef(
 					__nextHasNoMarginBottom
 					label={ __( 'Link' ) }
 					hideLabelFromVision={ hideLabelFromVision }
-					className={ inputClasses }
+					className={ className }
 					value={ value }
 					onChange={ onInputChange }
 					placeholder={ placeholder ?? __( 'Search or type url' ) }

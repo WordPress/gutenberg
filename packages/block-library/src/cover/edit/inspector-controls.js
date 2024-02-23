@@ -24,6 +24,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -31,6 +32,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -163,7 +167,7 @@ export default function CoverInspectorControls( {
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ isImageBackground && (
 							<>
 								<ToggleControl
@@ -184,7 +188,8 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								label={ __( 'Focal point picker' ) }
+								__next40pxDefaultSize
+								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
 								onDragStart={ imperativeFocalPointPreview }
@@ -303,10 +308,23 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
+							setAttributes( {
+								minHeight: newMinHeight,
+								style: cleanEmptyObject( {
+									...attributes?.style,
+									dimensions: {
+										...attributes?.style?.dimensions,
+										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+									},
+								} ),
+							} )
 						}
 						onUnitChange={ ( nextUnit ) =>
 							setAttributes( {

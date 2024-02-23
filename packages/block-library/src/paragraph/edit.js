@@ -19,6 +19,7 @@ import {
 	RichText,
 	useBlockProps,
 	useSettings,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
@@ -50,9 +51,9 @@ function hasDropCapDisabled( align ) {
 }
 
 function DropCapControl( { clientId, attributes, setAttributes } ) {
-	// Please do no add a useSelect call to the paragraph block unconditionaly.
-	// Every useSelect added to a (frequestly used) block will degrade the load
-	// and type bit. By moving it within InspectorControls, the subscription is
+	// Please do not add a useSelect call to the paragraph block unconditionally.
+	// Every useSelect added to a (frequently used) block will degrade load
+	// and type performance. By moving it within InspectorControls, the subscription is
 	// now only added for the selected block(s).
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
 
@@ -108,28 +109,31 @@ function ParagraphBlock( {
 		} ),
 		style: { direction },
 	} );
+	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ align }
-					onChange={ ( newAlign ) =>
-						setAttributes( {
-							align: newAlign,
-							dropCap: hasDropCapDisabled( newAlign )
-								? false
-								: dropCap,
-						} )
-					}
-				/>
-				<ParagraphRTLControl
-					direction={ direction }
-					setDirection={ ( newDirection ) =>
-						setAttributes( { direction: newDirection } )
-					}
-				/>
-			</BlockControls>
+			{ blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<AlignmentControl
+						value={ align }
+						onChange={ ( newAlign ) =>
+							setAttributes( {
+								align: newAlign,
+								dropCap: hasDropCapDisabled( newAlign )
+									? false
+									: dropCap,
+							} )
+						}
+					/>
+					<ParagraphRTLControl
+						direction={ direction }
+						setDirection={ ( newDirection ) =>
+							setAttributes( { direction: newDirection } )
+						}
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls group="typography">
 				<DropCapControl
 					clientId={ clientId }

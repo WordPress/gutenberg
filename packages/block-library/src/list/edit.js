@@ -29,6 +29,9 @@ import OrderedListSettings from './ordered-list-settings';
 import { migrateToListV2 } from './utils';
 import TagName from './tag-name';
 
+const DEFAULT_BLOCK = {
+	name: 'core/list-item',
+};
 const TEMPLATE = [ [ 'core/list-item' ] ];
 const NATIVE_MARGIN_SPACING = 8;
 
@@ -125,7 +128,8 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list-item' ],
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		template: TEMPLATE,
 		templateLock: false,
 		templateInsertUpdatesSelection: true,

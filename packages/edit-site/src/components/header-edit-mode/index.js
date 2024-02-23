@@ -66,21 +66,12 @@ export default function HeaderEditMode() {
 			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			blockSelectionStart: getBlockSelectionStart(),
-			showIconLabels: getPreference(
-				editSiteStore.name,
-				'showIconLabels'
-			),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			hasFixedToolbar: getPreference(
-				editSiteStore.name,
-				'fixedToolbar'
-			),
-			isDistractionFree: getPreference(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			isDistractionFree: getPreference( 'core', 'distractionFree' ),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
@@ -136,7 +127,6 @@ export default function HeaderEditMode() {
 					<DocumentTools
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
-						showIconLabels={ showIconLabels }
 					/>
 					{ isTopToolbar && (
 						<>
@@ -144,7 +134,9 @@ export default function HeaderEditMode() {
 								className={ classnames(
 									'selected-block-tools-wrapper',
 									{
-										'is-collapsed': isBlockToolsCollapsed,
+										'is-collapsed':
+											isBlockToolsCollapsed ||
+											! hasBlockSelected,
 									}
 								) }
 							>
@@ -209,15 +201,14 @@ export default function HeaderEditMode() {
 							) }
 						>
 							<PreviewDropdown
-								showIconLabels={ showIconLabels }
 								disabled={
 									isFocusMode || ! hasDefaultEditorCanvasView
 								}
 							/>
 						</div>
 					) }
-					<PostViewLink showIconLabels={ showIconLabels } />
-					<SaveButton />
+					<PostViewLink />
+					<SaveButton size="compact" />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }

@@ -17,6 +17,7 @@ import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
+import { fetchBlockPatterns } from './fetch';
 
 /**
  * Requests authors from the REST API.
@@ -619,17 +620,7 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
-		const restPatterns = await apiFetch( {
-			path: '/wp/v2/block-patterns/patterns',
-		} );
-		const patterns = restPatterns?.map( ( pattern ) =>
-			Object.fromEntries(
-				Object.entries( pattern ).map( ( [ key, value ] ) => [
-					camelCase( key ),
-					value,
-				] )
-			)
-		);
+		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
@@ -670,42 +661,12 @@ export const getUserPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select } ) => {
+	async ( { dispatch } ) => {
 		const fallback = await apiFetch( {
-			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
-				_embed: true,
-			} ),
+			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback' ),
 		} );
 
-		const record = fallback?._embedded?.self;
-
 		dispatch.receiveNavigationFallbackId( fallback?.id );
-
-		if ( record ) {
-			// If the fallback is already in the store, don't invalidate navigation queries.
-			// Otherwise, invalidate the cache for the scenario where there were no Navigation
-			// posts in the state and the fallback created one.
-			const existingFallbackEntityRecord = select.getEntityRecord(
-				'postType',
-				'wp_navigation',
-				fallback?.id
-			);
-			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
-			dispatch.receiveEntityRecords(
-				'postType',
-				'wp_navigation',
-				record,
-				undefined,
-				invalidateNavigationQueries
-			);
-
-			// Resolve to avoid further network requests.
-			dispatch.finishResolution( 'getEntityRecord', [
-				'postType',
-				'wp_navigation',
-				fallback?.id,
-			] );
-		}
 	};
 
 export const getDefaultTemplateId =

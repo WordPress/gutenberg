@@ -7,7 +7,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import BlockPopover from '../components/block-popover';
+import BlockPopoverCover from '../components/block-popover/cover';
 import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedCSS( element, property ) {
@@ -78,14 +78,11 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	}
 
 	return (
-		<BlockPopover
+		<BlockPopoverCover
 			clientId={ clientId }
-			__unstableCoverTarget
-			__unstableRefreshSize={ margin }
 			__unstablePopoverSlot="block-toolbar"
-			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
-		</BlockPopover>
+		</BlockPopoverCover>
 	);
 }
