@@ -21,6 +21,24 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
 
+export function useHasAPossibleBulkAction( actions, item ) {
+	return useMemo( () => {
+		return actions.some( ( action ) => {
+			return action.supportsBulk && action.isEligible( item );
+		} );
+	}, [ actions, item ] );
+}
+
+export function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
+
 function ActionWithModal( {
 	action,
 	selectedItems,
@@ -102,6 +120,7 @@ export default function BulkActions( { data, actions, selection, getItemId } ) {
 	);
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
+
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
 			selection.includes( getItemId( item ) )
