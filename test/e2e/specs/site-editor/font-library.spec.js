@@ -15,12 +15,12 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
-				.getByRole( 'button', { name: /typography styles/i } )
+				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
 			const manageFontsIcon = page.getByRole( 'button', {
-				name: /manage fonts/i,
+				name: 'Manage Fonts',
 			} );
 			await expect( manageFontsIcon ).toBeVisible();
 		} );
@@ -37,12 +37,12 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
-				.getByRole( 'button', { name: /typography styles/i } )
+				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
 			const manageFontsIcon = page.getByRole( 'button', {
-				name: /manage fonts/i,
+				name: 'Manage Fonts',
 			} );
 			await expect( manageFontsIcon ).toBeVisible();
 		} );
@@ -50,13 +50,13 @@ test.describe( 'Font Library', () => {
 		test( 'should open the "Manage Fonts" modal when clicking the "Manage Fonts" icon', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
-				.getByRole( 'button', { name: /typography styles/i } )
+				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: /manage fonts/i,
+					name: 'Manage Fonts',
 				} )
 				.click();
 			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
@@ -68,21 +68,21 @@ test.describe( 'Font Library', () => {
 		test( 'should show font variant panel when clicking on a font family', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
-				.getByRole( 'button', { name: /typography styles/i } )
+				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
 			await page
 				.getByRole( 'button', {
 					name: /manage fonts/i,
 				} )
 				.click();
-			await page.getByRole( 'button', { name: /system font/i } ).click();
+			await page.getByRole( 'button', { name: 'System Font' } ).click();
 			await expect(
-				page.getByRole( 'heading', { name: /system font/i } )
+				page.getByRole( 'heading', { name: 'System Font' } )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'checkbox', { name: /system font normal/i } )
+				page.getByRole( 'checkbox', { name: 'System Font Normal' } )
 			).toBeVisible();
 		} );
 	} );
@@ -95,13 +95,13 @@ test.describe( 'Font Library', () => {
 		test.beforeEach( async ( { admin, editor, page } ) => {
 			await admin.visitSiteEditor();
 			await editor.canvas.locator( 'body' ).click();
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
-				.getByRole( 'button', { name: /typography styles/i } )
+				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: /manage fonts/i,
+					name: 'Manage Fonts',
 				} )
 				.click();
 		} );
@@ -110,26 +110,26 @@ test.describe( 'Font Library', () => {
 			page,
 		} ) => {
 			await expect(
-				page.getByRole( 'tab', { name: /upload/i } )
+				page.getByRole( 'tab', { name: 'Upload' } )
 			).toBeVisible( { timeout: 40000 } );
 
 			// Ensure font does not exist before uploading
 			if (
 				await page
-					.getByRole( 'button', { name: /commissioner/i } )
-					.isVisible( { timeout: 40000 } )
+					.getByRole( 'button', { name: 'Commissioner' } )
+					.isVisible( { timeout: 60000 } )
 			) {
 				await page
-					.getByRole( 'button', { name: /commissioner/i } )
+					.getByRole( 'button', { name: 'Commissioner' } )
 					.click();
-				await page.getByRole( 'button', { name: /delete/i } ).click();
-				await page.getByRole( 'button', { name: /delete/i } ).click();
+				await page.getByRole( 'button', { name: 'Delete' } ).click();
+				await page.getByRole( 'button', { name: 'Delete' } ).click();
 			}
 
 			// Upload a local font
-			await page.getByRole( 'tab', { name: /upload/i } ).click();
+			await page.getByRole( 'tab', { name: 'Upload' } ).click();
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
-			await page.getByRole( 'button', { name: /upload font/i } ).click();
+			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
 			const fileChooser = await fileChooserPromise;
 			await fileChooser.setFiles(
 				'./test/e2e/assets/Commissioner-Regular.ttf'
@@ -141,9 +141,9 @@ test.describe( 'Font Library', () => {
 					.getByLabel( 'Upload' )
 					.getByText( 'Fonts were installed successfully.' )
 			).toBeVisible( { timeout: 40000 } );
-			await page.getByRole( 'tab', { name: /library/i } ).click();
+			await page.getByRole( 'tab', { name: 'Library' } ).click();
 			await expect(
-				page.getByRole( 'button', { name: /commissioner/i } )
+				page.getByRole( 'button', { name: 'Commissioner' } )
 			).toBeVisible();
 		} );
 
@@ -151,7 +151,7 @@ test.describe( 'Font Library', () => {
 			page,
 		} ) => {
 			await expect(
-				page.getByRole( 'tab', { name: /install fonts/i } )
+				page.getByRole( 'tab', { name: 'Install Fonts' } )
 			).toBeVisible( { timeout: 40000 } );
 		} );
 
@@ -159,16 +159,16 @@ test.describe( 'Font Library', () => {
 			page,
 		} ) => {
 			await page
-				.getByRole( 'button', { name: /commissioner/i } )
+				.getByRole( 'button', { name: 'Commissioner' } )
 				.click( { timeout: 40000 } );
 
 			await expect(
-				page.getByRole( 'button', { name: /delete/i } )
+				page.getByRole( 'button', { name: 'Delete' } )
 			).toBeVisible( { timeout: 40000 } );
 
 			// Delete the font
-			await page.getByRole( 'button', { name: /delete/i } ).click();
-			await page.getByRole( 'button', { name: /delete/i } ).click();
+			await page.getByRole( 'button', { name: 'Delete' } ).click();
+			await page.getByRole( 'button', { name: 'Delete' } ).click();
 		} );
 	} );
 
@@ -183,13 +183,13 @@ test.describe( 'Font Library', () => {
 		test.beforeEach( async ( { admin, editor, page } ) => {
 			await admin.visitSiteEditor();
 			await editor.canvas.locator( 'body' ).click();
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
-				.getByRole( 'button', { name: /typography styles/i } )
+				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: /manage fonts/i,
+					name: 'Manage Fonts',
 				} )
 				.click();
 		} );
@@ -202,7 +202,7 @@ test.describe( 'Font Library', () => {
 
 		test( 'should not display the "Upload" tab', async ( { page } ) => {
 			await expect(
-				page.getByRole( 'tab', { name: /upload/i } )
+				page.getByRole( 'tab', { name: 'Upload' } )
 			).toBeHidden( { timeout: 40000 } );
 		} );
 
@@ -210,7 +210,7 @@ test.describe( 'Font Library', () => {
 			page,
 		} ) => {
 			await expect(
-				page.getByRole( 'tab', { name: /install fonts/i } )
+				page.getByRole( 'tab', { name: 'Install Fonts' } )
 			).toBeHidden( { timeout: 40000 } );
 		} );
 
@@ -223,10 +223,10 @@ test.describe( 'Font Library', () => {
 				'gutenberg-test-font-library-permissions'
 			);
 			await page
-				.getByRole( 'tab', { name: /upload/i } )
+				.getByRole( 'tab', { name: 'Upload' } )
 				.click( { timeout: 40000 } );
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
-			await page.getByRole( 'button', { name: /upload font/i } ).click();
+			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
 			const fileChooser = await fileChooserPromise;
 			await fileChooser.setFiles(
 				'./test/e2e/assets/Commissioner-Regular.ttf'
@@ -235,11 +235,11 @@ test.describe( 'Font Library', () => {
 				'gutenberg-test-font-library-permissions'
 			);
 
-			await page.getByRole( 'tab', { name: /library/i } ).click();
-			await page.getByRole( 'button', { name: /commissioner/i } ).click();
+			await page.getByRole( 'tab', { name: 'Library' } ).click();
+			await page.getByRole( 'button', { name: 'Commissioner' } ).click();
 
 			await expect(
-				page.getByRole( 'button', { name: /delete/i } )
+				page.getByRole( 'button', { name: 'Delete' } )
 			).toBeHidden();
 		} );
 	} );
