@@ -175,21 +175,20 @@ export function useShadowPresets( settings ) {
 		const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
 		const { default: defaultShadows, theme: themeShadows } =
 			settings?.shadow?.presets;
-		const unsetShadow = [
-			{
-				name: __( 'Unset' ),
-				slug: 'unset',
-				shadow: 'none',
-			},
-		];
+		const unsetShadow = {
+			name: __( 'Unset' ),
+			slug: 'unset',
+			shadow: 'none',
+		};
 
-		// show unset option only in global styles
-		const isGlobalStyles = settings?.hasOwnProperty( 'appearanceTools' );
-
-		return [
-			...( isGlobalStyles ? unsetShadow : EMPTY_ARRAY ),
+		const shadowPresets = [
 			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
 			...( themeShadows || EMPTY_ARRAY ),
 		];
+		if ( shadowPresets.length ) {
+			shadowPresets.unshift( unsetShadow );
+		}
+
+		return shadowPresets;
 	}, [ settings ] );
 }
