@@ -22,9 +22,17 @@
 		font-weight: 500;
 		font-size: 11px;
 	}
+
+	// Add padding so the focus state outline (box-shadow) of font list items is visible
+	.components-navigator-screen {
+		padding: 3px;
+	}
 }
 
 .font-library-modal__tabpanel-layout {
+
+	margin-top: $grid-unit-40;
+
 	.font-library-modal__tabpanel-layout__footer {
 		border-top: 1px solid $gray-300;
 		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
@@ -47,6 +55,10 @@
 	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
 
+	&:hover {
+		background-color: $gray-100;
+	}
+
 	.font-library-modal__font-card__name {
 		font-weight: bold;
 	}
@@ -54,12 +66,6 @@
 	.font-library-modal__font-card__count {
 		color: $gray-700;
 	}
-}
-
-.font-library-modal__library-font-variant {
-	border: 1px solid $gray-200;
-	padding: $grid-unit-20;
-	margin-top: -1px; /* To collapse the margin with the previous element */
 }
 
 .font-library-modal__font-variant_demo-image {
@@ -117,6 +123,7 @@ button.font-library-modal__upload-area {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	margin-top: $grid-unit-80;
 
 	h3 {
 		font-size: 1.4rem;
@@ -124,7 +131,7 @@ button.font-library-modal__upload-area {
 
 	.components-card {
 		width: 50%;
-		min-width: 250px;
-		max-width: 350px;
+		min-width: 350px;
+		max-width: 400px;
 	}
 }
