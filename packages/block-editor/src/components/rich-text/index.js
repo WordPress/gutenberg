@@ -19,7 +19,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -151,9 +151,7 @@ export function RichTextWrapper(
 		let disableBoundBlocks = false;
 		if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
 			const blockTypeAttributes = getBlockType( blockName ).attributes;
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			for ( const [ attribute, args ] of Object.entries(
 				blockBindings
 			) ) {

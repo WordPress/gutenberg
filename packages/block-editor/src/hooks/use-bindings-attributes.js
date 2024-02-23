@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -33,18 +33,16 @@ const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
 			const { clientId, name: blockName } = useBlockEditContext();
-			const { getBlockBindingsSource } = unlock(
-				useSelect( blockEditorStore )
-			);
+			const blockBindingsSources = unlock(
+				useSelect( blocksStore )
+			).getAllBlockBindingsSources();
 			const { getBlockAttributes } = useSelect( blockEditorStore );
 
 			const updatedAttributes = getBlockAttributes( clientId );
 			if ( updatedAttributes?.metadata?.bindings ) {
 				Object.entries( updatedAttributes.metadata.bindings ).forEach(
 					( [ attributeName, settings ] ) => {
-						const source = getBlockBindingsSource(
-							settings.source
-						);
+						const source = blockBindingsSources[ settings.source ];
 
 						if ( source && source.useSource ) {
 							// Second argument (`updateMetaValue`) will be used to update the value in the future.
