@@ -29,7 +29,12 @@ import {
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { search, closeSmall, moreVertical, chevronLeft } from '@wordpress/icons';
+import {
+	search,
+	closeSmall,
+	moreVertical,
+	chevronLeft,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
