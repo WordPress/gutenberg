@@ -294,6 +294,12 @@ export function RichTextWrapper(
 	}
 
 	const TagName = tagName;
+	let tabIndex;
+	if ( shouldDisableEditing ) {
+		tabIndex = 0;
+	} else {
+		tabIndex = props.tabIndex === 0 ? null : props.tabIndex;
+	}
 	return (
 		<>
 			{ isSelected && (
@@ -394,11 +400,7 @@ export function RichTextWrapper(
 				// select blocks when Shift Clicking into an element with
 				// tabIndex because Safari will focus the element. However,
 				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={
-					props.tabIndex === 0 && ! shouldDisableEditing
-						? null
-						: props.tabIndex
-				}
+				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
