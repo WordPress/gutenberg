@@ -324,7 +324,7 @@ export function parseQuantityAndUnitFromRawValue(
 	}
 
 	// if match failed, return the default unit.
-	if ( ! unitToReturn ) {
+	if ( quantityToReturn && ! unitToReturn ) {
 		unitToReturn = DEFAULT_UNIT.value;
 	}
 

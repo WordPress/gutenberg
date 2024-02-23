@@ -7,6 +7,7 @@ import {
 	getValidParsedQuantityAndUnit,
 	getUnitsWithCurrentUnit,
 	parseQuantityAndUnitFromRawValue,
+	DEFAULT_UNIT,
 } from '../utils';
 import type { WPUnitControlUnit } from '../types';
 
@@ -253,11 +254,11 @@ describe( 'UnitControl utils', () => {
 			// Test undefined.
 			[ undefined, undefined, undefined ],
 			// Test integers and non-integers.
-			[ 1, 1, undefined ],
-			[ 1.25, 1.25, undefined ],
-			[ '123', 123, undefined ],
-			[ '1.5', 1.5, undefined ],
-			[ '0.75', 0.75, undefined ],
+			[ 1, 1, DEFAULT_UNIT.value ],
+			[ 1.25, 1.25, DEFAULT_UNIT.value ],
+			[ '123', 123, DEFAULT_UNIT.value ],
+			[ '1.5', 1.5, DEFAULT_UNIT.value ],
+			[ '0.75', 0.75, DEFAULT_UNIT.value ],
 			// Valid simple CSS values.
 			[ '20px', 20, 'px' ],
 			[ '0.8em', 0.8, 'em' ],
