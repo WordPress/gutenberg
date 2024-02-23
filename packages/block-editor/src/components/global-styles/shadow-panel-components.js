@@ -174,7 +174,7 @@ export function useShadowPresets( settings ) {
 
 		const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
 		const { default: defaultShadows, theme: themeShadows } =
-			settings?.shadow?.presets;
+			settings?.shadow?.presets ?? {};
 		const unsetShadow = {
 			name: __( 'Unset' ),
 			slug: 'unset',
