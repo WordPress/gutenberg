@@ -25,7 +25,7 @@ export default function Actions( { template } ) {
 			icon={ moreVertical }
 			label={ __( 'Actions' ) }
 			className="edit-site-template-card__actions"
-			toggleProps={ { isSmall: true } }
+			toggleProps={ { size: 'small' } }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
