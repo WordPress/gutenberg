@@ -10,7 +10,6 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
-import { useShouldDisableEditing } from '../../rich-text/use-should-disable-editing';
 
 /**
  * Adds block behaviour:
@@ -24,7 +23,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 	const { getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
 	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
-	const shouldDisableEditing = useShouldDisableEditing();
 
 	return useRefEffect(
 		( node ) => {
@@ -59,11 +57,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
-					// If the block is a bound rich text block, we should
-					// blur the target so focus can be set to the new block.
-					if ( shouldDisableEditing ) {
-						target.blur();
-					}
 					insertDefaultBlock(
 						{},
 						getBlockRootClientId( clientId ),
