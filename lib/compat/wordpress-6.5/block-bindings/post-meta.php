@@ -34,10 +34,10 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 	}
 
 	// Check if the meta field is registered to be shown in REST.
-	// It follows the format: $wp_meta_keys[ $object_type ][ $object_subtype ][ $meta_key ].
-	global $wp_meta_keys;
-	$object_subtype = 'post' === $block_instance->context['postType'] ? '' : $block_instance->context['postType'];
-	if ( empty( $wp_meta_keys['post'][ $object_subtype ][ $source_attrs['key'] ]['show_in_rest'] ) || false === $wp_meta_keys['post'][ $object_subtype ][ $source_attrs['key'] ]['show_in_rest'] ) {
+	$meta_keys = get_registered_meta_keys( 'post', $block_instance->context['postType'] );
+	// Add fields registered for all subtypes.
+	$meta_keys = array_merge( $meta_keys, get_registered_meta_keys( 'post', '' ) );
+	if ( empty( $meta_keys[ $source_attrs['key'] ]['show_in_rest'] ) || false === $meta_keys[ $source_attrs['key'] ]['show_in_rest'] ) {
 		return null;
 	}
 
