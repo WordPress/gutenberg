@@ -41,10 +41,6 @@ export function useEnter( props ) {
 				shouldDisableEditing,
 			} = propsRef.current;
 
-			if ( shouldDisableEditing ) {
-				return;
-			}
-
 			event.preventDefault();
 
 			const _value = { ...value };
@@ -72,7 +68,14 @@ export function useEnter( props ) {
 
 			const { text, start, end } = _value;
 
-			if ( event.shiftKey ) {
+			if ( shouldDisableEditing ) {
+				_value.text = '';
+				splitValue( {
+					value: _value,
+					onReplace,
+					onSplit,
+				} );
+			} else if ( event.shiftKey ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( _value, '\n' ) );
 				}

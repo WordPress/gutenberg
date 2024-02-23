@@ -293,12 +293,23 @@ function ButtonEdit( props ) {
 						...spacingProps.style,
 						...shadowProps.style,
 					} }
-					onSplit={ ( value ) =>
-						createBlock( 'core/button', {
-							...attributes,
-							text: value,
-						} )
-					}
+					onSplit={ ( value, isOriginal ) => {
+						let newAttributes;
+						if ( isOriginal || value ) {
+							newAttributes = {
+								...attributes,
+								text: value,
+							};
+						}
+						const block = createBlock(
+							'core/button',
+							newAttributes
+						);
+						if ( isOriginal ) {
+							block.clientId = clientId;
+						}
+						return block;
+					} }
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
