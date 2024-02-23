@@ -12,7 +12,7 @@ import {
 	forwardRef,
 	createContext,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { select, dispatch, useDispatch, useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
@@ -194,7 +194,7 @@ export function RichTextWrapper(
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
-	const { selectionChange } = useDispatch( blockEditorStore );
+	const { selectionChange, selectBlock } = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
@@ -332,6 +332,17 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	const onReplaceCallback = shouldDisableEditing
+		? ( blocks ) => {
+				// Find block that does not have the clientId
+				const blockToFocus = blocks.find(
+					( block ) => block.clientId !== clientId
+				);
+
+				// selectBlock( blockToFocus.clientId );
+		  }
+		: onReplace;
+
 	const TagName = tagName;
 	return (
 		<>
@@ -396,7 +407,7 @@ export function RichTextWrapper(
 						value,
 						formatTypes,
 						tagName,
-						onReplace,
+						onReplaceCallback,
 						onSplit,
 						__unstableEmbedURLOnPaste,
 						pastePlainText,
@@ -409,7 +420,7 @@ export function RichTextWrapper(
 					useEnter( {
 						removeEditorOnlyFormats,
 						value,
-						onReplace,
+						onReplaceCallback,
 						onSplit,
 						onChange,
 						disableLineBreaks,
