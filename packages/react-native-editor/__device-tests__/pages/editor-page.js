@@ -206,24 +206,18 @@ class EditorPage {
 	}
 
 	/**
-	 * Selects a block by its type.
+	 * Selects a block.
 	 *
-	 * @param {string} blockType      The type of the block to select.
-	 * @param {Object} options        Additional options.
-	 * @param {number} options.index  The index of the block to select (default: 1).
-	 * @param {Object} options.offset The offset of the block to select (default: { x: 0, y: 0 }).
+	 * @param {import('webdriverio').ChainablePromiseElement} block                           The block to select.
+	 * @param {Object}                                        options                         Configuration options.
+	 * @param {Object}                                        [options.offset={ x: 0, y: 0 }] The offset for the click position.
+	 * @param {number|Function}                               [options.offset.x=0]            The x-coordinate offset or a function that calculates the offset based on the block's width.
+	 * @param {number|Function}                               [options.offset.y=0]            The y-coordinate offset or a function that calculates the offset based on the block's height.
 	 *
-	 * @return {import('webdriverio').ChainablePromiseArray} The selected block element.
+	 * @return {import('webdriverio').ChainablePromiseElement} The selected block.
 	 */
-	async selectBlockByType(
-		blockType,
-		{ index = 1, offset = { x: 0, y: 0 } } = {}
-	) {
-		const locator = isAndroid()
-			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockType } Block. Row ${ index }")]`
-			: `-ios predicate string:label == '${ blockType } Block. Row ${ index }'`;
-		const block = await this.driver.$$( locator )[ 0 ];
-
+	async selectBlock( block, options = {} ) {
+		const { offset = { x: 0, y: 0 } } = options;
 		const size = await block.getSize();
 
 		let offsetX = offset.x;
