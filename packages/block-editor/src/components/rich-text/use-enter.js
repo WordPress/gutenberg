@@ -72,12 +72,9 @@ export function useEnter( props ) {
 				// Simulate the cursor is at the end of the rich text.
 				_value.start = _value.text?.length;
 				_value.end = _value.text?.length;
-				splitValue( {
-					value: _value,
-					onReplace,
-					onSplit,
-				} );
-			} else if ( event.shiftKey ) {
+			}
+
+			if ( event.shiftKey && ! shouldDisableEditing ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( _value, '\n' ) );
 				}
