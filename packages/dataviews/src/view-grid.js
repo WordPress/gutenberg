@@ -86,7 +86,6 @@ function GridItem( {
 				justify="space-between"
 				className="dataviews-view-grid__title-actions"
 			>
-				{ hasBulkAction && (
 				<SingleSelectionCheckbox
 					id={ id }
 					item={ item }
@@ -95,8 +94,8 @@ function GridItem( {
 					getItemId={ getItemId }
 					data={ data }
 					primaryField={ primaryField }
+					disabled={ ! hasBulkAction }
 				/>
-				) }
 				<HStack className="dataviews-view-grid__primary-field">
 					{ primaryField?.render( { item } ) }
 				</HStack>
