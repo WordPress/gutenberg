@@ -86,4 +86,81 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'When user has permissions to edit font families', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentythree' );
+		} );
+
+		test.beforeEach( async ( { admin, editor, page } ) => {
+			await admin.visitSiteEditor();
+			await editor.canvas.locator( 'body' ).click();
+			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page
+				.getByRole( 'button', { name: /typography styles/i } )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: /manage fonts/i,
+				} )
+				.click();
+		} );
+
+		test( 'should display the "Upload" tab', async ( { page } ) => {
+			await expect(
+				page.getByRole( 'tab', { name: /upload/i } )
+			).toBeVisible( { timeout: 40000 } );
+		} );
+
+		test( 'should display the default collections tab', async ( {
+			page,
+		} ) => {
+			await expect(
+				page.getByRole( 'tab', { name: /install fonts/i } )
+			).toBeVisible( { timeout: 40000 } );
+		} );
+	} );
+
+	test.describe( 'When user does not have permission to edit font families', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentythree' );
+			await requestUtils.activatePlugin(
+				'gutenberg-test-font-library-permissions'
+			);
+		} );
+
+		test.beforeEach( async ( { admin, editor, page } ) => {
+			await admin.visitSiteEditor();
+			await editor.canvas.locator( 'body' ).click();
+			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page
+				.getByRole( 'button', { name: /typography styles/i } )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: /manage fonts/i,
+				} )
+				.click();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-font-library-permissions'
+			);
+		} );
+
+		test( 'should not display the "Upload" tab', async ( { page } ) => {
+			await expect(
+				page.getByRole( 'tab', { name: /upload/i } )
+			).toBeHidden( { timeout: 40000 } );
+		} );
+
+		test( 'should not display the default collections tab', async ( {
+			page,
+		} ) => {
+			await expect(
+				page.getByRole( 'tab', { name: /install fonts/i } )
+			).toBeHidden( { timeout: 40000 } );
+		} );
+	} );
 } );
