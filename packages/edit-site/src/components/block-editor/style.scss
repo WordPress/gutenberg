@@ -62,8 +62,6 @@
 
 	.components-resizable-box__container {
 		margin: 0 auto;
-		// Removing this will cancel the bottom margins in the iframe.
-		overflow: auto;
 	}
 
 	&.is-view-mode {

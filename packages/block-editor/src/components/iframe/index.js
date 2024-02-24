@@ -138,6 +138,8 @@ function Iframe( {
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 
+			documentElement.classList.add( '__iframe__html' );
+
 			clearerRef( documentElement );
 
 			// Ideally ALL classes that are added through get_body_class should
@@ -243,7 +245,6 @@ function Iframe( {
 	useEffect( () => {
 		if ( iframeDocument && scale !== 1 ) {
 			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
-			iframeDocument.documentElement.style.transformOrigin = 'top center';
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
 			iframeDocument.documentElement.style.marginBottom = `${
 				-marginFromScaling * 2 + frameSize
