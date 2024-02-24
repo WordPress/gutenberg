@@ -108,7 +108,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			styles={ styles }
 			iframeProps={ {
 				expand: isZoomOutMode,
-				scale: isZoomOutMode ? 0.45 : undefined,
+				scale: isZoomOutMode ? 0.5 : undefined,
 				frameSize: isZoomOutMode ? 100 : undefined,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
