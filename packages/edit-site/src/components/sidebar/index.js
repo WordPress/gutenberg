@@ -62,7 +62,7 @@ function SidebarScreens() {
 			<SidebarScreenWrapper path="/navigation">
 				<SidebarNavigationScreenNavigationMenus />
 			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/navigation/:postType/:postId">
+			<SidebarScreenWrapper path="/navigation/:postId">
 				<SidebarNavigationScreenNavigationMenu />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/wp_global_styles">
