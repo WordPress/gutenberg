@@ -22,7 +22,7 @@ export default function ColorVariations( { variations } ) {
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
-				columns={ 2 }
+				columns={ 3 }
 				className="edit-site-global-styles-color-variations"
 			>
 				{ variations.map( ( variation, index ) => (
@@ -42,7 +42,7 @@ export default function ColorVariations( { variations } ) {
 								>
 									<ZStack isLayered={ false } offset={ -8 }>
 										{ colors
-											.slice( 0, 5 )
+											.slice( 0, 2 )
 											.map( ( { color }, colorIndex ) => (
 												<ColorIndicatorWrapper
 													key={ `${ color }-${ colorIndex }` }

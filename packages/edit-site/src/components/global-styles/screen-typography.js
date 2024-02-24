@@ -1,14 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
-import { chevronLeft, chevronRight } from '@wordpress/icons';
-import {
-	FlexItem,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 
@@ -16,10 +10,9 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import TypographyElements from './typography-elements';
-import { IconWithCurrentColor } from './icon-with-current-color';
+import TypographyVariations from './variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
-import { NavigationButtonAsItem } from './navigation-button';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 function ScreenTypography() {
@@ -50,30 +43,12 @@ function ScreenTypography() {
 					{ ! window.__experimentalDisableFontLibrary && (
 						<VStack spacing={ 3 }>
 							{ fontLibraryEnabled && <FontFamilies /> }
-							{ !! typographyVariations.length && (
-								<ItemGroup isBordered>
-									<NavigationButtonAsItem
-										path="/typography/typesets"
-										aria-label={ __( 'Typesets' ) }
-									>
-										<HStack justify="space-between">
-											<FlexItem>
-												{ __( 'Typesets' ) }
-											</FlexItem>
-											<IconWithCurrentColor
-												icon={
-													isRTL()
-														? chevronLeft
-														: chevronRight
-												}
-											/>
-										</HStack>
-									</NavigationButtonAsItem>
-								</ItemGroup>
-							) }
 						</VStack>
 					) }
 					<TypographyElements />
+					{ !! typographyVariations.length && (
+						<TypographyVariations />
+					) }
 				</VStack>
 			</div>
 		</>

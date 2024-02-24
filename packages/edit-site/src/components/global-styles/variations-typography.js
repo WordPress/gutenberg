@@ -141,7 +141,7 @@ export default function TypographyVariations() {
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
-				columns={ 2 }
+				columns={ 3 }
 				className="edit-site-global-styles-style-variations-container"
 			>
 				{ typographyVariations && typographyVariations.length

@@ -33,7 +33,6 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
-import ScreenTypographyTypesets from './screen-typography-typesets';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenLayout from './screen-layout';
@@ -327,10 +326,6 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/typography/button">
 				<ScreenTypographyElement element="button" />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/typography/typesets">
-				<ScreenTypographyTypesets />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/colors">
