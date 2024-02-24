@@ -30,7 +30,7 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
-
+import calculateScale from '../../utils/calculate-scale';
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
@@ -104,26 +104,46 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
-	scale = 1,
-	frameSize = 0,
 	readonly,
 	forwardedRef: ref,
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return {
-			resolvedAssets: settings.__unstableResolvedAssets,
-			isPreviewMode: settings.__unstableIsPreviewMode,
-		};
-	}, [] );
+	const { resolvedAssets, isPreviewMode, isZoomOutMode } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetEditorMode } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				resolvedAssets: settings.__unstableResolvedAssets,
+				isPreviewMode: settings.__unstableIsPreviewMode,
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			};
+		},
+		[]
+	);
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
+	const [
+		contentResizeListener,
+		{ height: contentHeight, width: contentWidth },
+	] = useResizeObserver();
+
+	const scale = ! isZoomOutMode
+		? 1
+		: calculateScale(
+				{
+					maxWidth: 1000,
+					minWidth: 400,
+					maxScale: 0.45,
+					minScale: 0.9,
+				},
+				contentWidth
+		  );
+	const frameSize = isZoomOutMode ? 100 : 0;
+
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
