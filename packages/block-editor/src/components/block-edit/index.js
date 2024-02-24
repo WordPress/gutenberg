@@ -14,6 +14,7 @@ import {
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
 	blockEditingModeKey,
+	blockBindingsKey,
 } from './context';
 
 /**
@@ -41,7 +42,8 @@ export default function BlockEdit( {
 		attributes = {},
 		__unstableLayoutClassNames,
 	} = props;
-	const { layout = null } = attributes;
+	const { layout = null, metadata = {} } = attributes;
+	const { bindings } = metadata;
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
@@ -62,6 +64,7 @@ export default function BlockEdit( {
 					[ mayDisplayControlsKey ]: mayDisplayControls,
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
 					[ blockEditingModeKey ]: blockEditingMode,
+					[ blockBindingsKey ]: bindings,
 				} ),
 				[
 					name,
@@ -73,6 +76,7 @@ export default function BlockEdit( {
 					mayDisplayControls,
 					mayDisplayParentControls,
 					blockEditingMode,
+					bindings,
 				]
 			) }
 		>
