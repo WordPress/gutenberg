@@ -138,7 +138,7 @@ function Iframe( {
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 
-			documentElement.classList.add( '__iframe__html' );
+			documentElement.classList.add( 'block-editor-iframe__html' );
 
 			clearerRef( documentElement );
 
