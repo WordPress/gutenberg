@@ -63,6 +63,42 @@ const getFontFamilyNames = ( themeJson ) => {
 	return [ bodyFontFamily?.name, headingFontFamily?.name ];
 };
 
+const TypePreview = ( { variation } ) => {
+	const { base } = useContext( GlobalStylesContext );
+	const [ bodyFontFamilies, headingFontFamilies ] = getFontFamilies(
+		mergeBaseAndUserConfigs( base, variation )
+	);
+	const bodyPreviewStyle = bodyFontFamilies
+		? getFamilyPreviewStyle( bodyFontFamilies )
+		: {};
+	const headingPreviewStyle = headingFontFamilies
+		? getFamilyPreviewStyle( headingFontFamilies )
+		: {};
+	return (
+		<motion.div
+			style={ {
+				fontSize: '32px',
+				lineHeight: '50px',
+			} }
+			animate={ {
+				scale: 1,
+				opacity: 1,
+			} }
+			initial={ {
+				scale: 0.1,
+				opacity: 0,
+			} }
+			transition={ {
+				delay: 0.3,
+				type: 'tween',
+			} }
+		>
+			<span style={ headingPreviewStyle }>A</span>
+			<span style={ bodyPreviewStyle }>a</span>
+		</motion.div>
+	);
+};
+
 export default function TypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
@@ -115,63 +151,9 @@ export default function TypographyVariations() {
 									key={ index }
 									variation={ variation }
 								>
-									{ () => {
-										const [
-											bodyFontFamilies,
-											headingFontFamilies,
-										] = getFontFamilies(
-											mergeBaseAndUserConfigs(
-												base,
-												variation
-											)
-										);
-										const bodyPreviewStyle =
-											bodyFontFamilies
-												? getFamilyPreviewStyle(
-														bodyFontFamilies
-												  )
-												: {};
-										const headingPreviewStyle =
-											headingFontFamilies
-												? getFamilyPreviewStyle(
-														headingFontFamilies
-												  )
-												: {};
-
-										return (
-											<motion.div
-												style={ {
-													fontSize: '32px',
-													lineHeight: '50px',
-												} }
-												animate={ {
-													scale: 1,
-													opacity: 1,
-												} }
-												initial={ {
-													scale: 0.1,
-													opacity: 0,
-												} }
-												transition={ {
-													delay: 0.3,
-													type: 'tween',
-												} }
-											>
-												<span
-													style={
-														headingPreviewStyle
-													}
-												>
-													A
-												</span>
-												<span
-													style={ bodyPreviewStyle }
-												>
-													a
-												</span>
-											</motion.div>
-										);
-									} }
+									{ () => (
+										<TypePreview variation={ variation } />
+									) }
 								</Variation>
 							);
 					  } )
