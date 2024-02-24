@@ -106,7 +106,6 @@ function Iframe( {
 	tabIndex = 0,
 	scale = 1,
 	frameSize = 0,
-	expand = false,
 	readonly,
 	forwardedRef: ref,
 	...props
@@ -138,6 +137,8 @@ function Iframe( {
 			const { contentDocument, ownerDocument } = node;
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
+
+			documentElement.classList.add( 'block-editor-iframe__html' );
 
 			clearerRef( documentElement );
 
@@ -241,6 +242,21 @@ function Iframe( {
 	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
 	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
 
+	useEffect( () => {
+		if ( iframeDocument && scale !== 1 ) {
+			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
+			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
+			iframeDocument.documentElement.style.marginBottom = `${
+				-marginFromScaling * 2 + frameSize
+			}px`;
+			return () => {
+				iframeDocument.documentElement.style.transform = '';
+				iframeDocument.documentElement.style.marginTop = '';
+				iframeDocument.documentElement.style.marginBottom = '';
+			};
+		}
+	}, [ scale, frameSize, marginFromScaling, iframeDocument ] );
+
 	return (
 		<>
 			{ tabIndex >= 0 && before }
@@ -250,19 +266,7 @@ function Iframe( {
 				style={ {
 					border: 0,
 					...props.style,
-					height: expand ? contentHeight : props.style?.height,
-					marginTop:
-						scale !== 1
-							? -marginFromScaling + frameSize
-							: props.style?.marginTop,
-					marginBottom:
-						scale !== 1
-							? -marginFromScaling + frameSize
-							: props.style?.marginBottom,
-					transform:
-						scale !== 1
-							? `scale( ${ scale } )`
-							: props.style?.transform,
+					height: props.style?.height,
 					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }

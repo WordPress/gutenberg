@@ -107,7 +107,6 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
-				expand: isZoomOutMode,
 				scale: isZoomOutMode ? 0.45 : undefined,
 				frameSize: isZoomOutMode ? 100 : undefined,
 				className: classnames(
