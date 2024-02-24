@@ -40,7 +40,7 @@ import {
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
 import { unlock } from '../../lock-unlock';
-import MaybeDisableNonMainBlocks from './disable-non-main-blocks';
+import useZoomOutBlockEditingMode from './use-zoom-out-block-editing-mode';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -121,9 +121,10 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 
+	useZoomOutBlockEditingMode();
+
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
-			<MaybeDisableNonMainBlocks />
 			<div { ...innerBlocksProps } />
 			{ !! temporarilyEditingAsBlocks && (
 				<StopEditingAsBlocksOnOutsideSelect
