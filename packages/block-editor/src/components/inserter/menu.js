@@ -81,6 +81,7 @@ function InserterMenu(
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
 	const showMedia = mediaCategories.length > 0 && ! isZoomOutMode;
+	const showBlocks = ! isZoomOutMode;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
@@ -252,21 +253,21 @@ function InserterMenu(
 								__experimentalInsertionIndex
 							}
 							showBlockDirectory
-							showBlocks={ ! isZoomOutMode }
+							showBlocks={ showBlocks }
 							shouldFocusBlock={ shouldFocusBlock }
 						/>
 					</div>
 				) }
 				{ showAsTabs && (
 					<InserterTabs
-						showBlocks={ ! isZoomOutMode }
+						showBlocks={ showBlocks }
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
 						tabsContents={ inserterTabsContents }
 					/>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && ! isZoomOutMode && (
+				{ ! delayedFilterValue && ! showAsTabs && showBlocks && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>
