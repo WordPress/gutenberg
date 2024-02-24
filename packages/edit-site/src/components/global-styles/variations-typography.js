@@ -76,10 +76,7 @@ const TypePreview = ( { variation } ) => {
 		: {};
 	return (
 		<motion.div
-			style={ {
-				fontSize: '32px',
-				lineHeight: '50px',
-			} }
+			className="edit-site-global-styles-type-preview"
 			animate={ {
 				scale: 1,
 				opacity: 1,

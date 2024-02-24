@@ -95,6 +95,7 @@
 	box-sizing: border-box;
 	// To round the outline in Windows 10 high contrast mode.
 	border-radius: $radius-block-ui;
+	cursor: pointer;
 
 	.edit-site-global-styles-variations_item-preview {
 		padding: $border-width * 2;
@@ -202,4 +203,14 @@
 
 .edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
 	fill: currentColor;
+}
+
+.edit-site-global-styles-color-variation {
+	height: 28px;
+}
+
+.edit-site-global-styles-type-preview {
+	font-size: 22px;
+	line-height: 44px;
+	text-align: center;
 }
