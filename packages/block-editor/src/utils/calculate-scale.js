@@ -1,7 +1,7 @@
-const clamp = ( lowerlimit, x, upperlimit ) => {
-	if ( x < lowerlimit ) return lowerlimit;
-	if ( x > upperlimit ) return upperlimit;
-	return x;
+const clamp = ( lowerlimit, width, upperlimit ) => {
+	if ( width < lowerlimit ) return lowerlimit;
+	if ( width > upperlimit ) return upperlimit;
+	return width;
 };
 
 export default function calculateScale( scaleConfig, width ) {
