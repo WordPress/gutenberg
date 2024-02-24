@@ -5,6 +5,7 @@ import { useContext } from '@wordpress/element';
 import {
 	__experimentalGrid as Grid,
 	__experimentalVStack as VStack,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -138,10 +139,22 @@ export default function TypographyVariations() {
 												: {};
 
 										return (
-											<div
+											<motion.div
 												style={ {
 													fontSize: '32px',
 													lineHeight: '50px',
+												} }
+												animate={ {
+													scale: 1,
+													opacity: 1,
+												} }
+												initial={ {
+													scale: 0.1,
+													opacity: 0,
+												} }
+												transition={ {
+													delay: 0.3,
+													type: 'tween',
 												} }
 											>
 												<span
@@ -156,7 +169,7 @@ export default function TypographyVariations() {
 												>
 													a
 												</span>
-											</div>
+											</motion.div>
 										);
 									} }
 								</Variation>
