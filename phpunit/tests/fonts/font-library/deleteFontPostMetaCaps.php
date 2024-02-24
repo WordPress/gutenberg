@@ -11,14 +11,6 @@
  * @covers gutenberg_delete_font_post_meta_caps
  */
 class Tests_Fonts_GutenbergDeleteFontPostMetaCaps extends WP_UnitTestCase {
-	public function set_up() {
-		parent::set_up();
-	}
-
-	public function tear_down() {
-		parent::tear_down();
-	}
-
 	public function test_should_return_original_caps_when_do_not_allow_is_present() {
 		$caps   = array( 'don_not_allow' );
 		$result = gutenberg_delete_font_post_meta_caps( $caps, 'some_cap', 1, array( 999 ) );
