@@ -130,30 +130,33 @@ export default function TypographyVariations() {
 														bodyFontFamilies
 												  )
 												: {};
-										const headingPreviewStyle = {
-											...( headingFontFamilies &&
-												getFamilyPreviewStyle(
-													headingFontFamilies
-												) ),
-											fontSize: '16px',
-										};
+										const headingPreviewStyle =
+											headingFontFamilies
+												? getFamilyPreviewStyle(
+														headingFontFamilies
+												  )
+												: {};
+
 										return (
-											<VStack>
-												<div
+											<div
+												style={ {
+													fontSize: '32px',
+													lineHeight: '50px',
+												} }
+											>
+												<span
 													style={
 														headingPreviewStyle
 													}
 												>
-													{ headingFontFamilies?.name ||
-														variation?.title }
-												</div>
-												<div style={ bodyPreviewStyle }>
-													{ bodyFontFamilies?.name ||
-														__(
-															'Typography styles'
-														) }
-												</div>
-											</VStack>
+													A
+												</span>
+												<span
+													style={ bodyPreviewStyle }
+												>
+													a
+												</span>
+											</div>
 										);
 									} }
 								</Variation>
