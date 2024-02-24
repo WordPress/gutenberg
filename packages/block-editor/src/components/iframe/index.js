@@ -104,6 +104,7 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
+	shouldZoom = false,
 	readonly,
 	forwardedRef: ref,
 	...props
@@ -135,17 +136,18 @@ function Iframe( {
 	// content within the viewport.
 	// At 1000px wide, the iframe is scaled to 45%.
 	// At 400px wide, the iframe is scaled to 90%.
-	const scale = ! isZoomOutMode
-		? 1
-		: calculateScale(
-				{
-					maxWidth: 1000,
-					minWidth: 400,
-					maxScale: 0.45,
-					minScale: 0.9,
-				},
-				contentWidth
-		  );
+	const scale =
+		isZoomOutMode && shouldZoom
+			? calculateScale(
+					{
+						maxWidth: 1000,
+						minWidth: 400,
+						maxScale: 0.45,
+						minScale: 0.9,
+					},
+					contentWidth
+			  )
+			: 1;
 	const frameSize = isZoomOutMode ? 100 : 0;
 
 	const setRef = useRefEffect( ( node ) => {

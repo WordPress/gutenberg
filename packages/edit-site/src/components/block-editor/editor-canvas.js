@@ -107,6 +107,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
+				shouldZoom: true,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
 					{
