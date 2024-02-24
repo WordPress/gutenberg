@@ -8,7 +8,7 @@ class Test_Gutenberg_Maybe_Upload_Font_Cap extends WP_UnitTestCase {
 	 * @return string[]
 	 */
 	public function mock_wp_get_font_dir() {
-		return array( 'path' => '/valid/font/directory' );
+		return array( 'path' => get_temp_dir() );
 	}
 
 	/**
@@ -16,25 +16,10 @@ class Test_Gutenberg_Maybe_Upload_Font_Cap extends WP_UnitTestCase {
 	 *
 	 * @param string $context
 	 *
-	 * @return true|void
+	 * @return bool
 	 */
 	public function mock_wp_is_file_mod_allowed( $context ) {
-		if ( $context === 'can_upload_fonts' ) {
-			return true;
-		}
-	}
-
-	/**
-	 * Mock the wp_is_writable function to return true.
-	 *
-	 * @param string $path
-	 *
-	 * @return true|void
-	 */
-	public function mock_wp_is_writable( $path ) {
-		if ( $path === '/valid/font/directory' ) {
-			return true;
-		}
+		return true;
 	}
 
 	/**
@@ -48,8 +33,8 @@ class Test_Gutenberg_Maybe_Upload_Font_Cap extends WP_UnitTestCase {
 	 * @return string[]
 	 */
 	public function mock_current_user_can( $caps, $cap, $user_id, $args ) {
-		if ( $cap === 'create_posts' && isset( $args[0] ) && $args[0] === 'wp_font_face' ) {
-			return array( 'exist' ); // The 'exist' cap is a minimal capability that all users have
+		if ( $cap === 'edit_theme_options' ) {
+			return array( 'exist' );
 		}
 
 		return $caps;
@@ -57,17 +42,15 @@ class Test_Gutenberg_Maybe_Upload_Font_Cap extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		add_filter( 'wp_get_font_dir', array( $this, 'mock_wp_get_font_dir' ) );
-		add_filter( 'wp_is_file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed' ) );
-		add_filter( 'wp_is_writable', array( $this, 'mock_wp_is_writable' ) );
+		add_filter( 'font_dir', array( $this, 'mock_wp_get_font_dir' ) );
+		add_filter( 'file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed' ) );
 		add_filter( 'map_meta_cap', array( $this, 'mock_current_user_can' ), 10, 4 );
 	}
 
 	public function tear_down() {
-		remove_filter( 'wp_get_font_dir', array( $this, 'mock_wp_get_font_dir' ) );
-		remove_filter( 'wp_is_file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed' ) );
-		remove_filter( 'wp_is_writable', array( $this, 'mock_wp_is_writable' ) );
-		remove_filter( 'map_meta_cap', array( $this, 'mock_current_user_can' ), 10 );
+		add_filter( 'font_dir', array( $this, 'mock_wp_get_font_dir' ) );
+		add_filter( 'file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed' ) );
+		add_filter( 'map_meta_cap', array( $this, 'mock_current_user_can' ), 10 );
 
 		parent::tear_down();
 	}
