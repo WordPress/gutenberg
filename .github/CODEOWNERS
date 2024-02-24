@@ -125,7 +125,7 @@
 /packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
 
 # Project Management
-/.github
+/.github                                        @desrosj
 /packages/project-management-automation
 /packages/report-flaky-tests                    @kevin940726
 
