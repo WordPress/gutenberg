@@ -26,6 +26,7 @@ import { getBlockType, store as blocksStore } from '@wordpress/blocks';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
+import { blockBindingsKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
@@ -117,11 +118,9 @@ export function RichTextWrapper(
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const {
-		clientId,
-		isSelected: isBlockSelected,
-		name: blockName,
-	} = useBlockEditContext();
+	const context = useBlockEditContext();
+	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const blockBindings = context[ blockBindingsKey ];
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -129,12 +128,10 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
+		const { getSelectionStart, getSelectionEnd } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const blockBindings =
-			getBlockAttributes( clientId )?.metadata?.bindings;
 
 		let isSelected;
 
@@ -147,48 +144,57 @@ export function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		// Disable Rich Text editing if block bindings specify that.
-		let disableBoundBlocks = false;
-		if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
-			const blockTypeAttributes = getBlockType( blockName ).attributes;
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			for ( const [ attribute, args ] of Object.entries(
-				blockBindings
-			) ) {
-				if (
-					blockTypeAttributes?.[ attribute ]?.source !== 'rich-text'
-				) {
-					break;
-				}
-
-				// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
-				const blockBindingsSource = getBlockBindingsSource(
-					args.source
-				);
-				if (
-					! blockBindingsSource ||
-					blockBindingsSource.lockAttributesEditing
-				) {
-					disableBoundBlocks = true;
-					break;
-				}
-			}
-		}
-
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			disableBoundBlocks,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, disableBoundBlocks } =
-		useSelect( selector, [
-			clientId,
-			identifier,
-			originalIsSelected,
-			isBlockSelected,
-		] );
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		originalIsSelected,
+		isBlockSelected,
+	] );
+
+	const disableBoundBlocks = useSelect(
+		( select ) => {
+			// Disable Rich Text editing if block bindings specify that.
+			let _disableBoundBlocks = false;
+			if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
+				const blockTypeAttributes =
+					getBlockType( blockName ).attributes;
+				const { getBlockBindingsSource } = unlock(
+					select( blocksStore )
+				);
+				for ( const [ attribute, args ] of Object.entries(
+					blockBindings
+				) ) {
+					if (
+						blockTypeAttributes?.[ attribute ]?.source !==
+						'rich-text'
+					) {
+						break;
+					}
+
+					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+					const blockBindingsSource = getBlockBindingsSource(
+						args.source
+					);
+					if (
+						! blockBindingsSource ||
+						blockBindingsSource.lockAttributesEditing
+					) {
+						_disableBoundBlocks = true;
+						break;
+					}
+				}
+			}
+
+			return _disableBoundBlocks;
+		},
+		[ blockBindings, blockName ]
+	);
 
 	const shouldDisableEditing = disableEditing || disableBoundBlocks;
 
