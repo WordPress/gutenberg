@@ -188,6 +188,16 @@ function Preview( { item, viewType } ) {
 	);
 }
 
+function computeFilters( activeView ) {
+	switch ( activeView ) {
+		case 'all':
+			return [];
+
+		default:
+			return [ { field: 'author', operator: 'in', value: activeView } ];
+	}
+}
+
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
@@ -199,32 +209,14 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			...DEFAULT_VIEW,
 			type: usedType,
 			layout: defaultConfigPerViewType[ usedType ],
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'in',
-								value: activeView,
-							},
-					  ]
-					: [],
+			filters: computeFilters( activeView ),
 		};
 	}, [ layout, activeView ] );
 	const [ view, setView ] = useState( defaultView );
 	useEffect( () => {
 		setView( ( currentView ) => ( {
 			...currentView,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'in',
-								value: activeView,
-							},
-					  ]
-					: [],
+			filters: computeFilters( activeView ),
 		} ) );
 	}, [ activeView ] );
 
@@ -362,7 +354,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				if (
 					filter.field === 'author' &&
 					filter.operator === OPERATOR_IN &&
-					!! filter.value
+					filter.value
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text === filter.value;
@@ -370,7 +362,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				} else if (
 					filter.field === 'author' &&
 					filter.operator === OPERATOR_NOT_IN &&
-					!! filter.value
+					filter.value
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text !== filter.value;
