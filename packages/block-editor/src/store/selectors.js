@@ -2980,13 +2980,31 @@ export const isGroupable = createRegistrySelector(
 );
 
 export const getSectionsContainerClientId = createRegistrySelector(
-	( select ) => ( state ) => {
-		const { getGroupingBlockName } = select( blocksStore );
-		const groupBlocks = getBlocksByName( state, getGroupingBlockName() );
+	( select ) =>
+		( state, postType = 'page' ) => {
+			const CONTENT_TYPES = [ 'post', 'page' ];
 
-		return groupBlocks.find(
-			( clientId ) =>
-				getBlockAttributes( state, clientId )?.tagName === 'main'
-		);
-	}
+			if ( CONTENT_TYPES.includes( postType ) ) {
+				const postContentBlocks = getBlocksByName(
+					state,
+					'core/post-content'
+				);
+
+				if ( postContentBlocks?.length > 0 ) {
+					return postContentBlocks[ 0 ];
+				}
+			}
+
+			const { getGroupingBlockName } = select( blocksStore );
+
+			const groupBlocks = getBlocksByName(
+				state,
+				getGroupingBlockName()
+			);
+
+			return groupBlocks.find(
+				( clientId ) =>
+					getBlockAttributes( state, clientId )?.tagName === 'main'
+			);
+		}
 );
