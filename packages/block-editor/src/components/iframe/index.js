@@ -131,6 +131,10 @@ function Iframe( {
 		{ height: contentHeight, width: contentWidth },
 	] = useResizeObserver();
 
+	// When zoom-out mode is enabled, the iframe is scaled down to fit the
+	// content within the viewport.
+	// At 1000px wide, the iframe is scaled to 45%.
+	// At 400px wide, the iframe is scaled to 90%.
 	const scale = ! isZoomOutMode
 		? 1
 		: calculateScale(
