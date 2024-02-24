@@ -1,6 +1,6 @@
 <?php
 /**
- * Test gutenberg_maybe_grant_upload_font_cap().
+ * Test gutenberg_delete_font_post_meta_caps().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,15 +8,33 @@
  * @group fonts
  * @group font-library
  *
- * @covers gutenberg_maybe_grant_upload_font_cap
+ * @covers gutenberg_delete_font_post_meta_caps
  */
-class Tests_Fonts_GutenbergMaybeGrantUploadFontCap extends WP_UnitTestCase {
+class Tests_Fonts_GutenbergDeleteFontPostMetaCaps extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 	}
 
 	public function tear_down() {
 		parent::tear_down();
+	}
+
+	public function test_should_return_original_caps_when_do_not_allow_is_present() {
+		$caps = array( 'don_not_allow' );
+		$result = gutenberg_delete_font_post_meta_caps( $caps, 'some_cap', 1, array( 999 ) );
+		$this->assertSameSetsWithIndex( $caps, $result );
+	}
+
+	public function test_should_return_original_caps_if_not_delete_post_capability() {
+		$caps = array( 'my_capability' );
+		$result = gutenberg_delete_font_post_meta_caps( $caps, 'some_cap', 1, array( 999 ) );
+		$this->assertSameSetsWithIndex( $caps, $result );
+	}
+
+	public function test_should_add_do_not_allow_for_non_existent_post() {
+		$caps = array( 'my_capability' );
+		$result = gutenberg_delete_font_post_meta_caps( $caps, 'delete_post', 1, array( 999 ) );
+		$this->assertContainsEquals( 'do_not_allow', $result );
 	}
 
 	// Test non-font post types should return original capabilities
