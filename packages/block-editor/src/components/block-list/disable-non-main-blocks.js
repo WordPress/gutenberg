@@ -27,11 +27,16 @@ function DisableNonMainBlocks() {
 	const { mainBlockClientId, clientIds } = useSelect( ( select ) => {
 		const { getSectionsContainerClientId, getClientIdsOfDescendants } =
 			select( blockEditorStore );
+
+		// TODO: We need a better API as using the post type
+		// in block editor package is not allowed.
+		const postType = select( 'core/editor' ).getCurrentPostType();
+
 		return {
 			clientIds: getClientIdsOfDescendants(
 				getSectionsContainerClientId()
 			),
-			mainBlockClientId: getSectionsContainerClientId(),
+			mainBlockClientId: getSectionsContainerClientId( postType ),
 		};
 	}, [] );
 
