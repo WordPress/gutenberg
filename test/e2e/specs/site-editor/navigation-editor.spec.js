@@ -37,6 +37,7 @@ test.describe( 'Editing Navigation Menus', () => {
 			await admin.visitSiteEditor( {
 				postId: createdMenu?.id,
 				postType: 'wp_navigation',
+				canvas: 'edit',
 			} );
 
 			// Open List View.
