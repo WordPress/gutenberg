@@ -7,6 +7,7 @@ import readline from 'readline';
 import { spawnSync } from 'node:child_process';
 
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
@@ -336,7 +337,7 @@ function reportSummaryNextSteps( successes, failures ) {
 		nextSteps.push( `Remove the ${ LABEL } label` );
 
 		if ( LABEL === 'Backport to WP Beta/RC' ) {
-			nextSteps.push( 'Add the "Backported to WP Core" label' );
+			nextSteps.push( `Add the "${ BACKPORT_COMPLETED_LABEL }" label` );
 		}
 
 		nextSteps.push( 'Request a backport to wordpress-develop if required' );
@@ -375,7 +376,7 @@ function GHcommentAndRemoveLabel( pr ) {
 				'edit',
 				number,
 				'--add-label',
-				'Backported to WP Core',
+				BACKPORT_COMPLETED_LABEL,
 			] );
 		}
 
