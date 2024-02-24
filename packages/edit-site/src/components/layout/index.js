@@ -70,7 +70,7 @@ export default function Layout() {
 
 	const {
 		isDistractionFree,
-		isZoomOut,
+		isZoomOutMode,
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
@@ -97,7 +97,7 @@ export default function Layout() {
 				'core',
 				'distractionFree'
 			),
-			isZoomOut:
+			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
 				'zoom-out',
 			hasBlockSelected:
@@ -176,7 +176,7 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
-						'is-zoom-out': isZoomOut,
+						'is-zoom-out': isZoomOutMode,
 					}
 				) }
 			>
