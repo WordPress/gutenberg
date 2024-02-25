@@ -31,7 +31,7 @@ export function useCanEditEntity( kind, name, recordId ) {
  * @param {Function} args.onChange     Function called when the media is uploaded.
  * @param {Function} args.onError      Function called when an error happens.
  */
-export function useUploadMediaFromBlobURL( args ) {
+export function useUploadMediaFromBlobURL( args = {} ) {
 	const latestArgs = useRef( args );
 	const { getSettings } = useSelect( blockEditorStore );
 
