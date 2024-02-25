@@ -442,6 +442,20 @@ _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
+### useNetworkConnectivity
+
+Returns the current network connectivity status provided by `window.navigator`.
+
+_Usage_
+
+```jsx
+const { isConnected } = useNetworkConnectivity();
+```
+
+_Returns_
+
+-   `NetworkInformation`: Network information.
+
 ### usePrevious
 
 Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.

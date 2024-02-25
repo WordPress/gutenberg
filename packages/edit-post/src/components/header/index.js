@@ -15,6 +15,7 @@ import {
 	PostPreviewButton,
 	store as editorStore,
 	DocumentBar,
+	OfflineStatus,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -170,6 +171,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__settings"
 			>
+				<OfflineStatus />
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because

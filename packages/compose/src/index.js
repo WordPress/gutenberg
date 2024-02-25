@@ -46,3 +46,4 @@ export { default as useRefEffect } from './hooks/use-ref-effect';
 export { default as __experimentalUseDropZone } from './hooks/use-drop-zone';
 export { default as useFocusableIframe } from './hooks/use-focusable-iframe';
 export { default as __experimentalUseFixedWindowList } from './hooks/use-fixed-window-list';
+export { default as useNetworkConnectivity } from './hooks/use-network-connectivity';
