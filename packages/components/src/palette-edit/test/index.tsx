@@ -118,6 +118,16 @@ describe( 'PaletteEdit', () => {
 		},
 	];
 
+	it( 'should be rendered as a gradient palette when the `isGradient` prop is enabled', () => {
+		render( <PaletteEdit { ...defaultProps } isGradient /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Add gradient',
+			} )
+		).toBeVisible();
+	} );
+
 	it( 'shows heading label', () => {
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 

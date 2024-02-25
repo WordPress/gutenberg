@@ -82,6 +82,7 @@ export default function GradientPalettePanel( { name } ) {
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
 					popoverProps={ popoverProps }
+					isGradient
 				/>
 			) }
 			{ !! defaultGradients &&
@@ -95,6 +96,7 @@ export default function GradientPalettePanel( { name } ) {
 						paletteLabel={ __( 'Default' ) }
 						paletteLabelLevel={ 3 }
 						popoverProps={ popoverProps }
+						isGradient
 					/>
 				) }
 			<PaletteEdit
@@ -107,6 +109,7 @@ export default function GradientPalettePanel( { name } ) {
 				) }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
+				isGradient
 			/>
 			{ !! duotonePalette && !! duotonePalette.length && (
 				<div>
