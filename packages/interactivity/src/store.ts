@@ -26,10 +26,10 @@ const deepMerge = ( target: any, source: any ) => {
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
 			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				if ( ! target[ key ] ) target[ key ] = {};
 				deepMerge( target[ key ], source[ key ] );
 			} else {
-				Object.assign( target, { [ key ]: source[ key ] } );
+				target[ key ] = source[ key ];
 			}
 		}
 	}
