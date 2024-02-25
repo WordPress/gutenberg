@@ -29,7 +29,12 @@ const deepMerge = ( target: any, source: any ) => {
 				if ( ! target[ key ] ) target[ key ] = {};
 				deepMerge( target[ key ], source[ key ] );
 			} else {
-				target[ key ] = source[ key ];
+				try {
+					target[ key ] = source[ key ];
+				} catch ( e ) {
+					// Assignemnts fail for properties that are only getters.
+					// When that's the case, the assignment is simply ignored.
+				}
 			}
 		}
 	}
