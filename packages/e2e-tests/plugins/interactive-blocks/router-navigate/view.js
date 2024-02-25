@@ -8,6 +8,11 @@ const { state } = store( 'router', {
 		status: 'idle',
 		navigations: 0,
 		timeout: 10000,
+		data: {
+			get getterProp() {
+				return `value from getter (${ state.data.prop1 })`;
+			}
+		}
 	},
 	actions: {
 		*navigate( e ) {

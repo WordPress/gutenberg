@@ -14,7 +14,11 @@ test.describe( 'Router navigate', () => {
 			alias: 'router navigate - link 1',
 			attributes: {
 				title: 'Link 1',
-				data: { prop1: 'link 1', prop3: 'link 1' },
+				data: {
+					getterProp: 'value from link1',
+					prop1: 'link 1',
+					prop3: 'link 1',
+				},
 			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
@@ -22,7 +26,11 @@ test.describe( 'Router navigate', () => {
 			attributes: {
 				title: 'Main',
 				links: [ link1, link2 ],
-				data: { prop1: 'main', prop2: 'main' },
+				data: {
+					getterProp: 'value from main',
+					prop1: 'main',
+					prop2: 'main',
+				},
 			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
@@ -225,5 +233,33 @@ test.describe( 'Router navigate', () => {
 		await expect( prop1 ).toHaveText( 'main' );
 		await expect( prop2 ).toHaveText( 'main' );
 		await expect( prop3 ).toHaveText( 'link 1' );
+	} );
+
+	test( 'should not try to overwrite getters with values from the initial data', async ( {
+		page,
+	} ) => {
+		const title = page.getByTestId( 'title' );
+		const getter = page.getByTestId( 'getterProp' );
+
+		// Title should start in 'Main' and the getter prop should be the one
+		// returned once hydrated.
+		await expect( title ).toHaveText( 'Main' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
+
+		await page.getByTestId( 'link 1' ).click();
+
+		// Title should have changed. If not, that means there was an error
+		// during render. The getter should return the correct value.
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( getter ).toHaveText( 'value from getter (link 1)' );
+
+		// Same behavior navigating back and forward.
+		await page.goBack();
+		await expect( title ).toHaveText( 'Main' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
+
+		await page.goForward();
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( getter ).toHaveText( 'value from getter (link 1)' );
 	} );
 } );

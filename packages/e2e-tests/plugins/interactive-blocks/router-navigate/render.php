@@ -69,6 +69,7 @@ HTML;
 		}
 		?>
 	</nav>
+	<div data-testid="getterProp" data-wp-text="state.data.getterProp"></div>
 	<div data-testid="prop1" data-wp-text="state.data.prop1"></div>
 	<div data-testid="prop2" data-wp-text="state.data.prop2"></div>
 	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
