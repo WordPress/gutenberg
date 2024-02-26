@@ -222,7 +222,7 @@ describe( 'listener hook tests', () => {
 			} );
 			const { rerender } = render( <TestedOutput /> );
 
-			rerender( <TestedOutput id={ 20 } /> );
+			rerender( <TestedOutput /> );
 
 			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
 			act( () => {
