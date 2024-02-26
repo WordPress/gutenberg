@@ -24,11 +24,10 @@
 				.replace( matchedRedirect.from, matchedRedirect.to )
 		);
 
+		const { pathname, origin } = window.location;
+		// The decodeURIComponent keeps the slashes intact, to match how Storybook presents the `path` param.
 		const newUrl =
-			window.location.origin +
-			window.location.pathname +
-			'?' +
-			decodeURIComponent( params.toString() );
+			new URL( pathname, origin ) + '?' + decodeURIComponent( params );
 
 		window.location.replace( newUrl );
 	} )();
