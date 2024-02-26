@@ -93,21 +93,27 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 
 	// Set a fallbackRatio to use before the throttled ratio has been set.
 	const fallbackRatio = width ? width / normalizedWidth : 1;
-	// Use the throttled ratio if it has been calculated, otherwise
-	// use the fallback ratio. The throttled ratio is used to avoid
-	// an endless loop of updates at particular viewport heights.
-	// See: https://github.com/WordPress/gutenberg/issues/55112
+	/*
+	 * Use the throttled ratio if it has been calculated, otherwise
+	 * use the fallback ratio. The throttled ratio is used to avoid
+	 * an endless loop of updates at particular viewport heights.
+	 * See: https://github.com/WordPress/gutenberg/issues/55112
+	 */
 	const ratio = ratioState ? ratioState : fallbackRatio;
 
 	const { highlightedColors } = useStylesPreviewColors();
 
-	// Reset leaked styles from WP common.css and remove main content layout padding and border.
+	/*
+	 * Reset leaked styles from WP common.css and remove main content layout padding and border.
+	 * Add pointer cursor to the body to indicate the iframe is interactive,
+	 * similar to Typography variation previews.
+	 */
 	const editorStyles = useMemo( () => {
 		if ( styles ) {
 			return [
 				...styles,
 				{
-					css: 'html{overflow:hidden}body{min-width: 0;padding: 0;border: none;}',
+					css: 'html{overflow:hidden}body{min-width: 0;padding: 0;border: none;cursor: pointer;}',
 					isGlobalStyles: true,
 				},
 			];

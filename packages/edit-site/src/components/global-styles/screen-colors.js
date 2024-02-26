@@ -46,7 +46,7 @@ function ScreenColors() {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-colors">
-				<VStack spacing={ 10 }>
+				<VStack spacing={ 3 }>
 					<Palette />
 
 					<StylesColorPanel

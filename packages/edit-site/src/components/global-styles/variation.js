@@ -24,8 +24,8 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 export default function Variation( { variation, children } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
-	const context = useMemo( () => {
-		return {
+	const context = useMemo(
+		() => ( {
 			user: {
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
@@ -33,16 +33,15 @@ export default function Variation( { variation, children } ) {
 			base,
 			merged: mergeBaseAndUserConfigs( base, variation ),
 			setUserConfig: () => {},
-		};
-	}, [ variation, base ] );
+		} ),
+		[ variation, base ]
+	);
 
 	const selectVariation = () => {
-		setUserConfig( () => {
-			return {
-				settings: variation.settings,
-				styles: variation.styles,
-			};
-		} );
+		setUserConfig( () => ( {
+			settings: variation.settings,
+			styles: variation.styles,
+		} ) );
 	};
 
 	const selectOnEnter = ( event ) => {
@@ -52,9 +51,10 @@ export default function Variation( { variation, children } ) {
 		}
 	};
 
-	const isActive = useMemo( () => {
-		return areGlobalStyleConfigsEqual( user, variation );
-	}, [ user, variation ] );
+	const isActive = useMemo(
+		() => areGlobalStyleConfigsEqual( user, variation ),
+		[ user, variation ]
+	);
 
 	let label = variation?.title;
 	if ( variation?.description ) {
