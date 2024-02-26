@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl, Tooltip } from '@wordpress/components';
 
 export default function SingleSelectionCheckbox( {
 	selection,
@@ -29,33 +29,39 @@ export default function SingleSelectionCheckbox( {
 			: __( 'Deselect item' );
 	}
 	return (
-		<CheckboxControl
-			className="dataviews-view-table-selection-checkbox"
-			__nextHasNoMarginBottom
-			checked={ isSelected }
-			label={ selectionLabel }
-			disabled={ disabled }
-			onChange={ () => {
-				if ( ! isSelected ) {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId === id || selection.includes( itemId )
-							);
-						} )
-					);
-				} else {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId !== id && selection.includes( itemId )
-							);
-						} )
-					);
-				}
-			} }
-		/>
+		<Tooltip
+			text={ disabled ? __( 'Bulk actions are not applicable' ) : null }
+		>
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				__nextHasNoMarginBottom
+				checked={ isSelected }
+				label={ selectionLabel }
+				aria-disabled={ disabled }
+				onChange={ () => {
+					if ( ! isSelected ) {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId === id ||
+									selection.includes( itemId )
+								);
+							} )
+						);
+					} else {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId !== id &&
+									selection.includes( itemId )
+								);
+							} )
+						);
+					}
+				} }
+			/>
+		</Tooltip>
 	);
 }
