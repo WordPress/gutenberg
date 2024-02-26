@@ -1008,7 +1008,7 @@ store( "myPlugin", {
 
 #### getElement()
 
-Retrieves a representation of the element where a function from the store is being evalutated. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
+Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
 It returns an object with two keys:
 
 ##### ref
