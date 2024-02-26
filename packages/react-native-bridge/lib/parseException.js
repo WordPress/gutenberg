@@ -15,6 +15,8 @@ const isHermesEnabled = () => {
 	return !! global.HermesInternal;
 };
 
+// Based on environment functions of Sentry React Native SDK:
+// https://github.com/getsentry/sentry-react-native/blob/e0f0885fa26f28909e28001fb7c25270655588cf/src/js/utils/environment.ts
 const getReactNativeContext = () => {
 	const isTurboModuleEnabled =
 		typeof global.__turboModuleProxy !== 'undefined';
