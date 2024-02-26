@@ -21,17 +21,19 @@ import DataviewsTemplatesSidebarContent from './content';
 
 const config = {
 	[ TEMPLATE_POST_TYPE ]: {
-		title: __( 'All templates' ),
+		title: __( 'Manage templates' ),
 		description: __(
 			'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 		),
+		contentTitle: __( 'All templates' ),
 	},
 	[ TEMPLATE_PART_POST_TYPE ]: {
-		title: __( 'All template parts' ),
+		title: __( 'Manage template parts' ),
 		description: __(
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
 		backPath: '/patterns',
+		contentTitle: __( 'All template parts' ),
 	},
 };
 
@@ -62,7 +64,7 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 				<DataviewsTemplatesSidebarContent
 					activeView={ activeView }
 					postType={ postType }
-					config={ config }
+					title={ config[ postType ].contentTitle }
 				/>
 			}
 		/>
