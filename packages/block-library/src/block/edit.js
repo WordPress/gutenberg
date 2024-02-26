@@ -119,7 +119,7 @@ function applyInitialContentValuesToInnerBlocks(
 			defaultValues[ metadataName ][ attributeKey ] =
 				block.attributes[ attributeKey ];
 
-			const contentValues = content[ metadataName ]?.values;
+			const contentValues = content[ metadataName ];
 			if ( contentValues?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
 			}
@@ -161,10 +161,10 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 					defaultValues[ metadataName ][ attributeKey ]
 				)
 			) {
-				content[ metadataName ] ??= { values: {} };
+				content[ metadataName ] ??= {};
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				content[ metadataName ].values[ attributeKey ] =
+				content[ metadataName ][ attributeKey ] =
 					block.attributes[ attributeKey ] === undefined
 						? // TODO: We use an empty string to represent undefined for now until
 						  // we support a richer format for overrides and the block binding API.
