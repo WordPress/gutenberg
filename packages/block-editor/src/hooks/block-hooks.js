@@ -6,7 +6,6 @@ import { Fragment, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	PanelBody,
-	PanelRow,
 	ToggleControl,
 } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -162,13 +161,11 @@ function BlockHooksControlPure( { name, clientId } ) {
 				title={ __( 'Plugins' ) }
 				initialOpen={ true }
 			>
-				<PanelRow>
-					<p className="block-editor-hooks__block-hooks-helptext">
-						{ __(
-							'Manage the inclusion of blocks added automatically by plugins.'
-						) }
-					</p>
-				</PanelRow>
+				<p className="block-editor-hooks__block-hooks-helptext">
+					{ __(
+						'Manage the inclusion of blocks added automatically by plugins.'
+					) }
+				</p>
 				{ Object.keys( groupedHookedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
