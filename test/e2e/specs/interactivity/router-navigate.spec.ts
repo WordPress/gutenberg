@@ -21,24 +21,28 @@ test.describe( 'Router navigate', () => {
 				},
 			},
 		} );
-		await utils.addPostWithBlock( 'test/router-navigate', {
-			alias: 'router navigate - main',
-			attributes: {
-				title: 'Main',
-				links: [ link1, link2 ],
-				data: {
-					getterProp: 'value from main',
-					prop1: 'main',
-					prop2: 'main',
-				},
-			},
-		} );
-		await utils.addPostWithBlock( 'test/router-navigate', {
+		const link3 = await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - disabled',
 			attributes: {
 				title: 'Main (navigation disabled)',
 				links: [ link1, link2 ],
 				disableNavigation: true,
+				data: {
+					getterProp: 'value from main (navigation disabled)',
+					prop1: 'main (navigation disabled)',
+				},
+			},
+		} );
+		await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - main',
+			attributes: {
+				title: 'Main',
+				links: [ link1, link2, link3 ],
+				data: {
+					getterProp: 'value from main',
+					prop1: 'main',
+					prop2: 'main',
+				},
 			},
 		} );
 	} );
@@ -59,7 +63,7 @@ test.describe( 'Router navigate', () => {
 		const link1 = utils.getLink( 'router navigate - link 1' );
 		const link2 = utils.getLink( 'router navigate - link 2' );
 
-		const navigations = page.getByTestId( 'router navigations' );
+		const navigations = page.getByTestId( 'router navigations pending' );
 		const status = page.getByTestId( 'router status' );
 		const title = page.getByTestId( 'title' );
 
@@ -104,7 +108,7 @@ test.describe( 'Router navigate', () => {
 	} ) => {
 		const link1 = utils.getLink( 'router navigate - link 1' );
 
-		const navigations = page.getByTestId( 'router navigations' );
+		const navigations = page.getByTestId( 'router navigations pending' );
 		const status = page.getByTestId( 'router status' );
 		const title = page.getByTestId( 'title' );
 
@@ -190,12 +194,12 @@ test.describe( 'Router navigate', () => {
 	} ) => {
 		await page.goto( utils.getLink( 'router navigate - disabled' ) );
 
-		const navigations = page.getByTestId( 'router navigations' );
+		const count = page.getByTestId( 'router navigations count' );
 		const status = page.getByTestId( 'router status' );
 		const title = page.getByTestId( 'title' );
 
 		// Check some elements to ensure the page has hydrated.
-		await expect( navigations ).toHaveText( '0' );
+		await expect( count ).toHaveText( '0' );
 		await expect( status ).toHaveText( 'idle' );
 
 		await page.getByTestId( 'link 1' ).click();
@@ -204,7 +208,7 @@ test.describe( 'Router navigate', () => {
 		await expect( title ).toHaveText( 'Link 1' );
 
 		// Check that client-navigations count has not increased.
-		await expect( navigations ).toHaveText( '0' );
+		await expect( count ).toHaveText( '0' );
 	} );
 
 	test( 'should overwrite the state with the one serialized in the new page', async ( {

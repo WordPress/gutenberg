@@ -17,10 +17,9 @@ if ( $attributes['disableNavigation'] ) {
 }
 
 if ( isset( $attributes['data'] ) ) {
-	$initial_state = array(
-		'state' => array(
-			'router' => array( 'data' => $attributes['data'] ),
-		),
+	wp_interactivity_state(
+		'router',
+		array( 'data' => $attributes['data'] )
 	);
 }
 ?>
@@ -32,8 +31,12 @@ if ( isset( $attributes['data'] ) ) {
 	<h2 data-testid="title"><?php echo $attributes['title']; ?></h2>
 
 	<output
-		data-testid="router navigations"
-		data-wp-text="state.navigations"
+		data-testid="router navigations pending"
+		data-wp-text="state.navigations.pending"
+	>NaN</output>
+	<output
+		data-testid="router navigations count"
+		data-wp-text="state.navigations.count"
 	>NaN</output>
 	<output
 		data-testid="router status"
@@ -74,7 +77,3 @@ HTML;
 	<div data-testid="prop2" data-wp-text="state.data.prop2"></div>
 	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
 </div>
-
-<script type="application/json" id="wp-interactivity-data">
-	<?php echo isset( $initial_state ) ? json_encode( $initial_state ) : '{}'; ?>
-</script>

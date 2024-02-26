@@ -6,7 +6,10 @@ import { store } from '@wordpress/interactivity';
 const { state } = store( 'router', {
 	state: {
 		status: 'idle',
-		navigations: 0,
+		navigations: {
+			pending: 0,
+			count: 0,
+		},
 		timeout: 10000,
 		data: {
 			get getterProp() {
@@ -18,7 +21,8 @@ const { state } = store( 'router', {
 		*navigate( e ) {
 			e.preventDefault();
 
-			state.navigations += 1;
+			state.navigations.count += 1;
+			state.navigations.pending += 1;
 			state.status = 'busy';
 
 			const force = e.target.dataset.forceNavigation === 'true';
@@ -29,9 +33,9 @@ const { state } = store( 'router', {
 			);
 			yield actions.navigate( e.target.href, { force, timeout } );
 
-			state.navigations -= 1;
+			state.navigations.pending -= 1;
 
-			if ( state.navigations === 0 ) {
+			if ( state.navigations.pending === 0 ) {
 				state.status = 'idle';
 			}
 		},
