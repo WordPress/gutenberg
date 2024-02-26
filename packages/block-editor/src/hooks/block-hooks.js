@@ -35,12 +35,12 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
-			const { getBlock, getBlockIndex, getBlockRootClientId } =
+			const { getBlocks, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
 
 			return {
 				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength: getBlock( clientId )?.innerBlocks?.length,
+				innerBlocksLength: getBlocks( clientId )?.length,
 				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
@@ -49,7 +49,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const hookedBlockClientIds = useSelect(
 		( select ) => {
-			const { getBlock, getGlobalBlockCount } =
+			const { getBlocks, getGlobalBlockCount } =
 				select( blockEditorStore );
 
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
@@ -69,7 +69,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's siblings (with the right block type) qualifies
 							// as a hooked block (inserted `before` or `after` the current one), as the block
 							// might've been automatically inserted and then moved around a bit by the user.
-							candidates = getBlock( rootClientId )?.innerBlocks;
+							candidates = getBlocks( rootClientId );
 							break;
 
 						case 'first_child':
@@ -77,7 +77,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's child blocks (with the right block type) qualifies
 							// as a hooked first or last child block, as the block might've been automatically
 							// inserted and then moved around a bit by the user.
-							candidates = getBlock( clientId ).innerBlocks;
+							candidates = getBlocks( clientId );
 							break;
 					}
 
