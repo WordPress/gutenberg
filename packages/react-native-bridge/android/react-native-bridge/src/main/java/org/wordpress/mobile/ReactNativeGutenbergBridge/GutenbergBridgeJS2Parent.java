@@ -4,7 +4,6 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
@@ -63,6 +62,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     interface ConnectionStatusCallback {
         void onRequestConnectionStatus(boolean isConnected);
+    }
+
+    interface LogExceptionCallback {
+        void onLogException();
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -190,4 +193,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void toggleRedoButton(boolean isDisabled);
 
     void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
+
+    void logException(ReadableMap exception, LogExceptionCallback jsCallback);
 }

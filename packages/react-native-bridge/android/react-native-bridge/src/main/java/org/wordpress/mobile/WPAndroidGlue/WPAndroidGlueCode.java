@@ -615,6 +615,11 @@ public class WPAndroidGlueCode {
                 boolean isConnected = mOnConnectionStatusEventListener.onRequestConnectionStatus();
                 connectionStatusCallback.onRequestConnectionStatus(isConnected);
             }
+
+            @Override
+            public void logException(final ReadableMap exception, LogExceptionCallback logExceptionCallback) {
+                logExceptionCallback.onLogException();
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
