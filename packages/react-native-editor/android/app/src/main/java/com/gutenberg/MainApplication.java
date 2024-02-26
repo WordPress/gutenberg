@@ -313,6 +313,12 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback) {
                 connectionStatusCallback.onRequestConnectionStatus(true);
             }
+
+            @Override
+            public void logException(final ReadableMap exception, LogExceptionCallback logExceptionCallback) {
+                Log.d("LogException", String.format("Gutenberg requested logging exception: %s", exception));
+                logExceptionCallback.onLogException();
+            }
         }, isDarkMode());
 
         return new DefaultReactNativeHost(this) {
