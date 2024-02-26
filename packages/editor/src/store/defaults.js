@@ -10,7 +10,6 @@ import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
  * @property {boolean}       richEditingEnabled    Whether rich editing is enabled or not
  * @property {boolean}       codeEditingEnabled    Whether code editing is enabled or not
  * @property {boolean}       fontLibraryEnabled    Whether the font library is enabled or not.
- * @property {boolean}       fontUploadsEnabled    Whether uploading fonts in the font library is enabled or not.
  * @property {boolean}       enableCustomFields    Whether the WordPress custom fields are enabled or not.
  *                                                 true  = the user has opted to show the Custom Fields panel at the bottom of the editor.
  *                                                 false = the user has opted to hide the Custom Fields panel at the bottom of the editor.
@@ -29,7 +28,6 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	richEditingEnabled: true,
 	codeEditingEnabled: true,
 	fontLibraryEnabled: true,
-	fontUploadsEnabled: true,
 	enableCustomFields: undefined,
 	defaultRenderingMode: 'post-only',
 };

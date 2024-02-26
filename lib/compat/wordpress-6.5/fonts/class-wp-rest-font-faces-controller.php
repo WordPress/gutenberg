@@ -326,14 +326,6 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			$settings    = $request->get_param( 'font_face_settings' );
 			$file_params = $request->get_file_params();
 
-			if ( ! empty( $file_params ) && ! current_user_can( 'upload_fonts' ) ) {
-				return new WP_Error(
-					'rest_cannot_upload_fonts',
-					__( 'You are not allowed to upload font files.', 'gutenberg' ),
-					array( 'status' => 403 )
-				);
-			}
-
 			// Check that the necessary font face properties are unique.
 			$query = new WP_Query(
 				array(

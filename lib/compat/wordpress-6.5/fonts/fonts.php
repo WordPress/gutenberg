@@ -85,35 +85,6 @@ function gutenberg_create_initial_post_types() {
 }
 
 /**
- * Filters the user capabilities to grant the 'upload_fonts' capability as necessary.
- *
- * To grant the 'upload_fonts' capability, file modifications must be allowed, the fonts directory must be
- * writable, and the user must have the 'edit_theme_options' capability.
- *
- * @since 6.5.0
- *
- * @param bool[] $allcaps An array of all the user's capabilities.
- * @return bool[] Filtered array of the user's capabilities.
- */
-function gutenberg_maybe_grant_upload_font_cap( $allcaps, $caps ) {
-	if ( ! in_array( 'upload_fonts', $caps, true ) ) {
-		return $allcaps;
-	}
-
-	$fonts_dir = wp_get_font_dir()['path'];
-	if (
-		wp_is_file_mod_allowed( 'can_upload_fonts' ) &&
-		wp_is_writable( $fonts_dir ) &&
-		! empty( $allcaps['edit_theme_options'] )
-	) {
-		$allcaps['upload_fonts'] = true;
-	}
-
-	return $allcaps;
-}
-add_filter( 'user_has_cap', 'gutenberg_maybe_grant_upload_font_cap', 10, 2 );
-
-/**
  * Initializes REST routes.
  *
  * @since 6.5
@@ -331,21 +302,6 @@ if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 	}
 	add_action( 'before_delete_post', '_wp_before_delete_font_face', 10, 2 );
 }
-
-/**
- * Filters the block editor settings to enable or disable font uploads according to user capability.
- *
- * @since 6.5.0
- *
- * @param array $settings Block editor settings.
- * @return array Block editor settings.
- */
-function gutenberg_font_uploads_settings( $settings ) {
-	$settings['fontUploadsEnabled'] = current_user_can( 'upload_fonts' );
-
-	return $settings;
-}
-add_filter( 'block_editor_settings_all', 'gutenberg_font_uploads_settings' );
 
 // @core-merge: Do not merge this back compat function, it is for supporting a legacy font family format only in Gutenberg.
 /**
