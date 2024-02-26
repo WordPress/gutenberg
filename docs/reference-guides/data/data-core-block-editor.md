@@ -10,6 +10,31 @@ Namespace: `core/block-editor`.
 
 Checks if a given block has controlled inner blocks.
 
+An example of an inner block controller is a template part block, which provides its own blocks from the template part entity data source.
+
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { areInnerBlocksControlled, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Retrieve the clientId of the block to check.
+	const blockToCheck = getBlocks()[ 0 ]?.clientId;
+
+	return areInnerBlocksControlled( blockToCheck ) ? (
+		<p>{ __( 'Inner blocks are controlled' ) }</p>
+	) : (
+		<p>{ __( 'Inner blocks are NOT controlled' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -22,6 +47,29 @@ _Returns_
 ### canEditBlock
 
 Determines if the given block is allowed to be edited.
+
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { canEditBlock, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Retrieve the clientId of the block to check.
+	const blockToCheck = getBlocks()[ 0 ]?.clientId;
+
+	return canEditBlock( blockToCheck?.clientId ) ? (
+		<p>{ __( 'Block is editable.' ) }</p>
+	) : (
+		<p>{ __( 'Block is NOT editable.' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -77,6 +125,29 @@ _Returns_
 
 Determines if the given block is allowed to be moved.
 
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { canMoveBlock, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Retrieve the clientId of the block to check.
+	const blockToCheck = getBlocks()[ 0 ]?.clientId;
+
+	return canMoveBlock( blockToCheck ) ? (
+		<p>{ __( 'Block is movable.' ) }</p>
+	) : (
+		<p>{ __( 'Block is NOT moveable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
@@ -91,10 +162,36 @@ _Returns_
 
 Determines if the given blocks are allowed to be moved.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { canMoveBlocks, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Get all the blocks in the editor.
+	const availableBlocks = getBlocks();
+
+	// Define the list of blocks to check.
+	const blocksToCheck = [
+		availableBlocks[ 0 ]?.clientId,
+		availableBlocks[ 1 ]?.clientId,
+	];
+
+	return canMoveBlocks( blocksToCheck ) ? (
+		<p>{ __( 'Blocks are movable.' ) }</p>
+	) : (
+		<p>{ __( 'Blocks are NOT moveable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be moved.
+-   _clientIds_ `Array`: The block client IDs to be moved.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -104,6 +201,28 @@ _Returns_
 ### canRemoveBlock
 
 Determines if the given block is allowed to be deleted.
+
+_Usage_
+
+```js
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+const ExampleComponent = () => {
+	const { canRemoveBlock, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Get all the blocks in the editor.
+	const availableBlocks = getBlocks();
+
+	return canRemoveBlock( availableBlocks[ 0 ]?.clientId ) ? (
+		<p>{ __( 'Blocks is removable.' ) }</p>
+	) : (
+		<p>{ __( 'Blocks is NOT removable.' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -119,10 +238,36 @@ _Returns_
 
 Determines if the given blocks are allowed to be removed.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { canRemoveBlocks, getBlocks } = useSelect(
+		( select ) => select( blockEditorStore ),
+		[]
+	);
+
+	// Get all the blocks in the editor.
+	const availableBlocks = getBlocks();
+
+	// Define the list of blocks to check.
+	const blocksToCheck = [
+		availableBlocks[ 0 ]?.clientId,
+		availableBlocks[ 1 ]?.clientId,
+	];
+
+	return canRemoveBlocks( blocksToCheck ) ? (
+		<p>{ __( 'Blocks are removable.' ) }</p>
+	) : (
+		<p>{ __( 'Blocks are NOT removable.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be removed.
+-   _clientIds_ `Array`: The block client IDs to be removed.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
