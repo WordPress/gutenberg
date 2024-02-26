@@ -640,7 +640,6 @@
 	&:has(+ .dataviews-search-widget-listbox) {
 		border-bottom: 1px solid $gray-200;
 		padding-bottom: $grid-unit-10;
-		margin-bottom: $grid-unit-05;
 	}
 
 	&:empty {
