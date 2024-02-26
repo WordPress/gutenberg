@@ -14,12 +14,12 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-12
+        runs-on: macos-14
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
                 native-test-name: [gutenberg-editor-rendering]
-                api-level: [29]
+                api-level: [33]
 
         steps:
             - name: checkout
@@ -66,8 +66,8 @@ jobs:
                   force-avd-creation: false
                   emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: false
-                  arch: x86_64
-                  profile: Nexus 6
+                  arch: arm64-v8a
+                  profile: Pixel 3 XL
                   script: echo "Generated AVD snapshot for caching."
 
             - name: Run tests
@@ -77,8 +77,8 @@ jobs:
                   force-avd-creation: false
                   emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: true
-                  arch: x86_64
-                  profile: Nexus 6
+                  arch: arm64-v8a
+                  profile: Pixel 3 XL
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
             - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
