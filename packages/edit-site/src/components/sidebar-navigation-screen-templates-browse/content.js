@@ -31,7 +31,7 @@ function TemplateDataviewItem( { template, isActive } ) {
 export default function DataviewsTemplatesSidebarContent( {
 	activeView,
 	postType,
-	config,
+	title,
 } ) {
 	const { records } = useEntityRecords( 'postType', postType, {
 		per_page: -1,
@@ -54,7 +54,7 @@ export default function DataviewsTemplatesSidebarContent( {
 		<ItemGroup>
 			<DataViewItem
 				slug={ 'all' }
-				title={ config[ postType ].title }
+				title={ title }
 				icon={ layout }
 				isActive={ activeView === 'all' }
 				isCustom="false"
