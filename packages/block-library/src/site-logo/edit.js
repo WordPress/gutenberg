@@ -331,7 +331,7 @@ const SiteLogo = ( {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								label={ __( 'Use as site icon' ) }
+								label={ __( 'Use as Site Icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
