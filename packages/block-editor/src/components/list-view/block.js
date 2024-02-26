@@ -77,8 +77,6 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle =
-		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
 
 	const { block, blockName, blockEditingMode } = useSelect(
 		( select ) => {
@@ -93,6 +91,13 @@ function ListViewBlock( {
 		},
 		[ clientId ]
 	);
+
+	const listViewItemLabel =
+		block.attributes?.label || // Visible label of a block item e.g. for Navigation link block.
+		blockInformation?.name || // Custom Block name for user-renamed blocks: attributes?.metadata?.name.
+		blockInformation?.title || // Synced pattern name or Block type name e.g. 'Paragraph': resusableTitle || blockType.title;
+		__( 'Untitled' ); // Fallback title.
+
 	const allowRightClickOverrides = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().allowRightClickOverrides,
@@ -251,15 +256,9 @@ function ListViewBlock( {
 		? sprintf(
 				// translators: %s: The title of the block. This string indicates a link to select the locked block.
 				__( '%s (locked)' ),
-				blockTitle
+				listViewItemLabel
 		  )
-		: blockTitle;
-
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s' ),
-		blockTitle
-	);
+		: listViewItemLabel;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -405,7 +404,7 @@ function ListViewBlock( {
 							clientIds={ dropdownClientIds }
 							block={ block }
 							icon={ moreVertical }
-							label={ settingsAriaLabel }
+							label={ __( 'Actions' ) }
 							popoverProps={ {
 								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
 							} }
