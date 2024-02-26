@@ -1110,6 +1110,56 @@
 		"stylesProperties": {
 			"type": "object",
 			"properties": {
+				"background": {
+					"description": "Background styles",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Sets the `background-image` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundPosition": {
+							"description": "Sets the `background-position` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundRepeat": {
+							"description": "Sets the `background-repeat` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundSize": {
+							"description": "Sets the `background-size` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					}
+				},
 				"border": {
 					"description": "Border styles.",
 					"type": "object",
