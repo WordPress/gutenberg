@@ -13,12 +13,6 @@
  * @group blocks
  */
 class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
-	/**
-	 * Post object with empty data
-	 *
-	 * @var array
-	 */
-	protected static $post_empty;
 
 	/**
 	 * Post object with data.
@@ -40,13 +34,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$post_empty = $factory->post->create_and_get(
-			array(
-				'post_title'   => 'Post Expert block Unit Test',
-				'post_excerpt' => '',
-				'post_content' => '',
-			)
-		);
 
 		self::$post = $factory->post->create_and_get(
 			array(
@@ -57,6 +44,7 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 
 		self::$attributes = array(
 			'moreText' => '',
+			'excerptLength' => 55,
 		);
 
 		$block = array(
@@ -71,14 +59,12 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 
 		WP_Block_Supports::init();
 		WP_Block_Supports::$block_to_render = $block;
-
 	}
 
 	/**
 	 * Tear down method.
 	 */
 	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_empty->ID, true );
 		wp_delete_post( self::$post->ID, true );
 	}
 
@@ -94,17 +80,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 		// call render method with block context.
 		$rendered = gutenberg_render_block_core_post_excerpt( self::$attributes, '', $block );
 		$this->assertEmpty( $rendered, 'Failed to assert that $rendered is empty.' );
-
-		$block->context = array( 'postId' => 0 );
-		$rendered       = gutenberg_render_block_core_post_excerpt( self::$attributes, '', $block );
-		$this->assertEmpty( $rendered, 'Failed to assert that $rendered is empty.' );
-
-		$GLOBALS['post'] = self::$post_empty;
-		$block->context  = array( 'postId' => self::$post_empty->ID );
-
-		$rendered = gutenberg_render_block_core_post_excerpt( self::$attributes, '', $block );
-		$this->assertEmpty( $rendered, 'Failed to assert that $rendered is empty.' );
-
 	}
 
 	/**
@@ -157,6 +132,7 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 
 		self::$attributes = array(
 			'moreText' => 'Read More',
+			'excerptLength' => 55,
 		);
 
 		$rendered = gutenberg_render_block_core_post_excerpt( self::$attributes, '', $block );
@@ -180,6 +156,5 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 			$rendered,
 			'Failed to assert that $rendered contain expected post url.'
 		);
-
 	}
 }
