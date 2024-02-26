@@ -1059,7 +1059,7 @@ The Interactivity API comes with handy functions on the PHP part. Apart from [se
 ### wp_interactivity_config
 
 `wp_interactivity_config` allows to set or get a configuration array, referenced to a store namespace.
-The configuration is also available at the client, but it is static information.
+The configuration is also available on the client, but it is static information.
 
 Consider it a global setting for interactions of a site, that won't be updated on user interactions.
 
@@ -1075,7 +1075,7 @@ An example of getting:
   wp_interactivity_config( 'myPlugin' );
 ```
 
-This config can be retrieved in the client:
+This config can be retrieved on the client:
 
 ```js
 // view.js
