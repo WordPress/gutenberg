@@ -556,7 +556,7 @@ export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
 		since: '6.5',
 		alternative: `select( 'core/editor' ).getRenderingMode`,
 	} );
-	return select( editorStore ).getCurrentPostType() !== 'post-only';
+	return select( editorStore ).getCurrentPostType() === 'wp_template';
 } );
 
 /**
