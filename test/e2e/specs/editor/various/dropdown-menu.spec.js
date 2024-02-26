@@ -13,9 +13,11 @@ test.describe( 'Dropdown Menu', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		const menuItems = page.locator(
-			'[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'
-		);
+		const menuItems = page
+			.getByRole( 'menu', { name: 'Options' } )
+			.locator(
+				'[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'
+			);
 		const totalItems = await menuItems.count();
 
 		// Catch any issues with the selector, which could cause a false positive test result.
