@@ -15,7 +15,7 @@
  */
 function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_instance ) {
 	if ( empty( $source_attrs['key'] ) ) {
-		return '';
+		return null;
 	}
 
 	if ( empty( $block_instance->context['postId'] ) ) {
