@@ -164,7 +164,7 @@ const parseException = ( originalException ) => {
 	return exception;
 };
 
-export default ( exception, { context, tags } ) => {
+export default ( exception, { context, tags } = {} ) => {
 	return {
 		...parseException( exception ),
 		context: {
