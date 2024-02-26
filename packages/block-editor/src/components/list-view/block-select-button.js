@@ -290,7 +290,6 @@ function ListViewBlockSelectButton(
 					{ positionLabel && isSticky && (
 						<Tooltip text={ positionLabel }>
 							<Icon icon={ pinSmall } />
-							text
 						</Tooltip>
 					) }
 					{ images.length ? (
