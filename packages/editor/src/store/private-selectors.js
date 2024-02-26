@@ -49,26 +49,3 @@ export const getInsertionPoint = createRegistrySelector(
 export function getListViewToggleRef( state ) {
 	return state.listViewToggleRef;
 }
-
-export const getPageContentBlocks = createRegistrySelector(
-	( select ) =>
-		( state, rootClientId = '' ) => {
-			const { getBlockOrder, getBlockName } = select( blockEditorStore );
-			const contentIds = [];
-			for ( const clientId of getBlockOrder( rootClientId ) ) {
-				const blockName = getBlockName( clientId );
-				if (
-					blockName === 'core/post-title' ||
-					blockName === 'core/post-featured-image' ||
-					blockName === 'core/post-content'
-				) {
-					contentIds.push( clientId );
-				} else if ( blockName !== 'core/query' ) {
-					contentIds.push(
-						...getPageContentBlocks( state, clientId )
-					);
-				}
-			}
-			return contentIds;
-		}
-);
