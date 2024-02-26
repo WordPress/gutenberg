@@ -51,9 +51,6 @@ jobs:
             - name: Prepare tests setup
               run: npm run native test:e2e:setup
 
-            - name: Temp list available devices
-              run: avdmanager list
-
             - name: Gradle cache
               uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
 
