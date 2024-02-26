@@ -1,21 +1,6 @@
 #!/bin/bash -e
 
-# =================================================================
-# Appium Drivers
-#
-# NOTE: Please update the following versions when upgrading Appium.
-# =================================================================
-UI_AUTOMATOR_2_VERSION="2.32.3"
-XCUITEST_VERSION="5.7.0"
-
 set -o pipefail
-
-if command -v appium >/dev/null 2>&1; then
-	APPIUM_CMD="appium"
-else
-	# Use relative path to access the locally installed appium
-	APPIUM_CMD="../../../node_modules/.bin/appium"
-fi
 
 function log_info() {
 	printf "ℹ️  $1\n"
@@ -28,34 +13,6 @@ function log_success {
 function log_error() {
 	printf "❌ $1\n"
 }
-
-output=$($APPIUM_CMD driver list --installed --json)
-
-# UiAutomator2 driver installation
-matched_version=$(echo "$output" | jq -r '.uiautomator2.version // empty')
-if [ -z "$matched_version" ]; then
-	log_info "UiAutomator2 not installed, installing version $UI_AUTOMATOR_2_VERSION..."
-	$APPIUM_CMD driver install "uiautomator2@$UI_AUTOMATOR_2_VERSION"
-elif [ "$matched_version" = "$UI_AUTOMATOR_2_VERSION" ]; then
-	log_info "UiAutomator2 version $UI_AUTOMATOR_2_VERSION is available."
-else
-	log_info "UiAutomator2 version $matched_version is installed, replacing it with version $UI_AUTOMATOR_2_VERSION..."
-	$APPIUM_CMD driver uninstall uiautomator2
-	$APPIUM_CMD driver install "uiautomator2@$UI_AUTOMATOR_2_VERSION"
-fi
-
-# XCUITest driver installation
-matched_version=$(echo "$output" | jq -r '.xcuitest.version // empty')
-if [ -z "$matched_version" ]; then
-	log_info "XCUITest not installed, installing version $XCUITEST_VERSION..."
-	$APPIUM_CMD driver install "xcuitest@$XCUITEST_VERSION"
-elif [ "$matched_version" = "$XCUITEST_VERSION" ]; then
-	log_info "XCUITest version $XCUITEST_VERSION is available."
-else
-	log_info "XCUITest version $matched_version is installed, replacing it with version $XCUITEST_VERSION..."
-	$APPIUM_CMD driver uninstall xcuitest
-	$APPIUM_CMD driver install "xcuitest@$XCUITEST_VERSION"
-fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
 IOS_PLATFORM_VERSION=$(jq -r '.ios.local.platformVersion' "$CONFIG_FILE")
