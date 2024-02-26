@@ -75,8 +75,12 @@ jobs:
                   emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: false
                   arch: arm64-v8a
-                  profile: Pixel XL
+                  target: google_apis
+                  profile: Pixel 3 XL
                   script: echo "Generated AVD snapshot for caching."
+
+            - name: Start Appium
+              run: (npm run native appium:start) &
 
             - name: Run tests
               uses: reactivecircus/android-emulator-runner@6b0df4b0efb23bb0ec63d881db79aefbc976e4b2 # v2.30.1
@@ -86,7 +90,8 @@ jobs:
                   emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: true
                   arch: arm64-v8a
-                  profile: Pixel XL
+                  target: google_apis
+                  profile: Pixel 3 XL
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
             - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
