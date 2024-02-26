@@ -421,18 +421,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func toggleRedoButton(_ isDisabled: Bool) {
         self.delegate?.gutenbergDidRequestToggleRedoButton(isDisabled)
     }
-
-	@objc
-	func requestConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
-		callback([self.delegate?.gutenbergDidRequestConnectionStatus() ?? true])
-	}
+    
+    @objc
+    func requestConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
+        callback([self.delegate?.gutenbergDidRequestConnectionStatus() ?? true])
+    }
 
     @objc
-	func logException(_ exception: [AnyHashable: Any], callback: @escaping RCTResponseSenderBlock) {
+    func logException(_ exception: [AnyHashable: Any], callback: @escaping RCTResponseSenderBlock) {
         self.delegate?.gutenbergDidRequestLogException(exception) {
             callback(nil)
         }
-	}
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
