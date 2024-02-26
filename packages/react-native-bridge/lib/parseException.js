@@ -89,26 +89,11 @@ const parseStacktraceLine = ( line ) => {
 	};
 };
 
-// Based on function `stripSentryFramesAndReverse` of Sentry React Native SDK:
+// Based on function `createStackParser` and `parseStackFrames` of Sentry JavaScript SDK:
+// - https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/utils/src/stacktrace.ts#L16-L59
+// - https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L100-L118
+// And function `stripSentryFramesAndReverse` of Sentry React Native SDK:
 // https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/utils/src/stacktrace.ts#L80-L117
-const reverseEntries = ( stack ) => {
-	if ( ! stack.length ) {
-		return [];
-	}
-
-	const reverseStack = Array.from( stack ).reverse();
-
-	return reverseStack.slice( 0, STACKTRACE_LIMIT ).map( ( entry ) => ( {
-		...entry,
-		filename:
-			entry.filename || reverseStack[ reverseStack.length - 1 ].filename,
-	} ) );
-};
-
-// Based on function `createStackParser` of Sentry JavaScript SDK:
-// https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/utils/src/stacktrace.ts#L16-L59
-// And function `parseStackFrames` of Sentry JavaScript SDK:
-// https://github.com/getsentry/sentry-javascript/blob/de681dcf7d6dac69da9374bbdbe2e2f7e00f0fdc/packages/browser/src/eventbuilder.ts#L100-L118
 const parseStacktrace = ( exception ) => {
 	const plainStacktrace = exception.stacktrace || exception.stack || '';
 	const entries = [];
@@ -136,7 +121,14 @@ const parseStacktrace = ( exception ) => {
 		}
 	}
 
-	return reverseEntries( entries );
+	const reverseEntries = Array.from( entries ).reverse();
+
+	return reverseEntries.slice( 0, STACKTRACE_LIMIT ).map( ( entry ) => ( {
+		...entry,
+		filename:
+			entry.filename ||
+			reverseEntries[ reverseEntries.length - 1 ].filename,
+	} ) );
 };
 
 // Based on function `extractMessage` of Sentry JavaScript SDK:
