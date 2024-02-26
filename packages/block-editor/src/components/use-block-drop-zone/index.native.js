@@ -1,14 +1,17 @@
 /**
  * External dependencies
  */
-import { useSharedValue } from 'react-native-reanimated';
+import {
+	runOnJS,
+	useDerivedValue,
+	useSharedValue,
+} from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { useThrottle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,6 +20,8 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockListContext } from '../block-list/block-list-context';
 import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
+
+const UPDATE_TARGET_BLOCK_INDEX_THRESHOLD = 20; // In pixels
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 
@@ -111,6 +116,14 @@ export default function useBlockDropZone( {
 	rootClientId: targetRootClientId = '',
 } = {} ) {
 	const targetBlockIndex = useSharedValue( null );
+	const dragPosition = {
+		x: useSharedValue( 0 ),
+		y: useSharedValue( 0 ),
+	};
+	const prevDragPosition = {
+		x: useSharedValue( 0 ),
+		y: useSharedValue( 0 ),
+	};
 
 	const { getBlockListSettings, getSettings } = useSelect( blockEditorStore );
 	const { blocksLayouts, getBlockLayoutsOrderedByYCoord } =
@@ -118,43 +131,67 @@ export default function useBlockDropZone( {
 
 	const getSortedBlocksLayouts = useCallback( () => {
 		return getBlockLayoutsOrderedByYCoord( blocksLayouts.current );
+		// We use the value of `blocksLayouts` as the dependency.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ blocksLayouts.current ] );
 
 	const isRTL = getSettings().isRTL;
 
 	const onBlockDrop = useOnBlockDrop();
 
-	const throttled = useThrottle(
-		useCallback(
-			( event ) => {
-				const sortedBlockLayouts = getSortedBlocksLayouts();
+	const updateTargetBlockIndex = useCallback(
+		( event ) => {
+			const sortedBlockLayouts = getSortedBlocksLayouts();
 
-				const targetIndex = getNearestBlockIndex(
-					sortedBlockLayouts,
-					{ x: event.x, y: event.y },
-					getBlockListSettings( targetRootClientId )?.orientation,
-					isRTL
-				);
-				if ( targetIndex !== null ) {
-					targetBlockIndex.value = targetIndex ?? 0;
-				}
-			},
-			[
-				getSortedBlocksLayouts,
-				getNearestBlockIndex,
-				getBlockListSettings,
-				targetBlockIndex,
-			]
-		),
-		200
+			const targetIndex = getNearestBlockIndex(
+				sortedBlockLayouts,
+				{ x: event.x, y: event.y },
+				getBlockListSettings( targetRootClientId )?.orientation,
+				isRTL
+			);
+			if ( targetIndex !== null ) {
+				targetBlockIndex.value = targetIndex ?? 0;
+			}
+		},
+		[
+			getSortedBlocksLayouts,
+			getBlockListSettings,
+			targetRootClientId,
+			isRTL,
+			targetBlockIndex,
+		]
 	);
 
+	useDerivedValue( () => {
+		const x = dragPosition.x.value;
+		const y = dragPosition.y.value;
+		const prevX = prevDragPosition.x.value;
+		const prevY = prevDragPosition.y.value;
+		// `updateTargetBlockIndex` performs expensive calculations, so we throttle
+		// the call using a offset threshold based on the dragging position.
+		if (
+			Math.abs( x - prevX ) >= UPDATE_TARGET_BLOCK_INDEX_THRESHOLD ||
+			Math.abs( y - prevY ) >= UPDATE_TARGET_BLOCK_INDEX_THRESHOLD
+		) {
+			runOnJS( updateTargetBlockIndex )( { x, y } );
+			prevDragPosition.x.value = x;
+			prevDragPosition.y.value = y;
+			return true;
+		}
+		return false;
+	} );
+
 	return {
-		onBlockDragOver( event ) {
-			throttled( event );
+		onBlockDragOver( { x, y } ) {
+			dragPosition.x.value = x;
+			dragPosition.y.value = y;
+		},
+		onBlockDragOverWorklet( { x, y } ) {
+			'worklet';
+			dragPosition.x.value = x;
+			dragPosition.y.value = y;
 		},
 		onBlockDragEnd() {
-			throttled.cancel();
 			targetBlockIndex.value = null;
 		},
 		onBlockDrop: ( event ) => {

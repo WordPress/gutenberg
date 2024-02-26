@@ -16,7 +16,6 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
@@ -133,16 +132,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						paragraphBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 
 			it( 'does not enable drag mode when selected and editing text', async () =>
@@ -243,16 +232,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						imageBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 		} );
 
@@ -301,16 +280,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						galleryBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 
 			it( 'enables drag mode when nested block is selected', async () =>
@@ -332,20 +301,6 @@ describe( 'BlockDraggable', () => {
 
 					// Start dragging from nested block's content
 					fireLongPress( galleryItem, 'draggable-trigger-content' );
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// After dropping the block, the gallery item gets automatically selected.
-					// Hence, we have to select the gallery item again.
-					fireEvent.press( galleryItem );
-
-					// Start dragging from nested block's mobile toolbar
-					fireLongPress(
-						galleryItem,
-						'draggable-trigger-mobile-toolbar'
-					);
 					expect( getDraggableChip( screen ) ).toBeVisible();
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
@@ -390,16 +345,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						spacerBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 		} );
 	} );
@@ -437,7 +382,7 @@ describe( 'BlockDraggable', () => {
 			// activate the gesture. Since this not available in tests, the library
 			// displays a warning message.
 			expect( console ).toHaveWarnedWith(
-				'[react-native-gesture-handler] You have to use react-native-reanimated in order to control the state of the gesture.'
+				'[Reanimated] You can not use setGestureState in non-worklet function.'
 			);
 			expect( getEditorHtml() ).toMatchSnapshot(
 				'Paragraph block moved from first to second position'
@@ -465,7 +410,7 @@ describe( 'BlockDraggable', () => {
 			// activate the gesture. Since this not available in tests, the library
 			// displays a warning message.
 			expect( console ).toHaveWarnedWith(
-				'[react-native-gesture-handler] You have to use react-native-reanimated in order to control the state of the gesture.'
+				'[Reanimated] You can not use setGestureState in non-worklet function.'
 			);
 			expect( getEditorHtml() ).toMatchSnapshot(
 				'Spacer block moved from third to first position'

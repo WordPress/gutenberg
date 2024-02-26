@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-author",
-	"title": "Post Author",
+	"title": "Author",
 	"category": "theme",
 	"description": "Display post author details such as name, avatar, and bio.",
 	"textdomain": "default",
@@ -61,8 +61,10 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
-	"editorStyle": "wp-block-post-author-editor",
 	"style": "wp-block-post-author"
 }

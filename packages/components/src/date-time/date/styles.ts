@@ -10,7 +10,7 @@ import Button from '../../button';
 import { COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 export const Wrapper = styled.div`
 	box-sizing: border-box;
@@ -84,13 +84,13 @@ export const DayButton = styled( Button, {
 
 	&&& {
 		border-radius: 100%;
-		height: ${ space( 7 ) };
-		width: ${ space( 7 ) };
+		height: ${ space( 8 ) };
+		width: ${ space( 8 ) };
 
 		${ ( props ) =>
 			props.isSelected &&
 			`
-			background: ${ COLORS.ui.theme };
+			background: ${ COLORS.theme.accent };
 			color: ${ COLORS.white };
 			` }
 
@@ -106,9 +106,9 @@ export const DayButton = styled( Button, {
 		props.hasEvents &&
 		`
 		::before {
-			background: ${ props.isSelected ? COLORS.white : COLORS.ui.theme };
+			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
 			border-radius: 2px;
-			bottom: 0;
+			bottom: 2px;
 			content: " ";
 			height: 4px;
 			left: 50%;

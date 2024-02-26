@@ -19,6 +19,9 @@ export interface EntityRecordResolution< RecordType > {
 	/** The edited entity record */
 	editedRecord: Partial< RecordType >;
 
+	/** The edits to the edited entity record */
+	edits: Partial< RecordType >;
+
 	/** Apply local (in-browser) edits to the edited entity record */
 	edit: ( diff: Partial< RecordType > ) => void;
 
@@ -53,15 +56,17 @@ export interface Options {
 	enabled: boolean;
 }
 
+const EMPTY_OBJECT = {};
+
 /**
  * Resolves the specified entity record.
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param  kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
- * @param  name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param  recordId ID of the requested entity record.
- * @param  options  Optional hook options.
+ * @param    kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param    name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param    recordId ID of the requested entity record.
+ * @param    options  Optional hook options.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -86,8 +91,8 @@ export interface Options {
  *
  * @example
  * ```js
+ * import { useCallback } from 'react';
  * import { useDispatch } from '@wordpress/data';
- * import { useCallback } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  * import { TextControl } from '@wordpress/components';
  * import { store as noticeStore } from '@wordpress/notices';
@@ -152,37 +157,54 @@ export default function useEntityRecord< RecordType >(
 
 	const mutations = useMemo(
 		() => ( {
-			edit: ( record ) =>
-				editEntityRecord( kind, name, recordId, record ),
+			edit: ( record, editOptions: any = {} ) =>
+				editEntityRecord( kind, name, recordId, record, editOptions ),
 			save: ( saveOptions: any = {} ) =>
 				saveEditedEntityRecord( kind, name, recordId, {
 					throwOnError: true,
 					...saveOptions,
 				} ),
 		} ),
-		[ recordId ]
+		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits } = useSelect(
-		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(
-				kind,
-				name,
-				recordId
-			),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(
-				kind,
-				name,
-				recordId
-			),
-		} ),
-		[ kind, name, recordId ]
+	const { editedRecord, hasEdits, edits } = useSelect(
+		( select ) => {
+			if ( ! options.enabled ) {
+				return {
+					editedRecord: EMPTY_OBJECT,
+					hasEdits: false,
+					edits: EMPTY_OBJECT,
+				};
+			}
+
+			return {
+				editedRecord: select( coreStore ).getEditedEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				hasEdits: select( coreStore ).hasEditsForEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				edits: select( coreStore ).getEntityRecordNonTransientEdits(
+					kind,
+					name,
+					recordId
+				),
+			};
+		},
+		[ kind, name, recordId, options.enabled ]
 	);
 
 	const { data: record, ...querySelectRest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
-				return null;
+				return {
+					data: null,
+				};
 			}
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
@@ -193,6 +215,7 @@ export default function useEntityRecord< RecordType >(
 		record,
 		editedRecord,
 		hasEdits,
+		edits,
 		...querySelectRest,
 		...mutations,
 	};

@@ -19,7 +19,12 @@
 	color: $dark-primary;
 }
 
+.safeAreaContainer {
+	flex: 1;
+}
+
 .navigationContainer {
+	flex: 1;
 	overflow: hidden;
 }
 

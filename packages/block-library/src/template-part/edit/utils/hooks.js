@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 				'wp_template_part',
 				query
 			),
-			isLoading: _isResolving( 'getEntityRecords', [
+			isResolving: _isResolving( 'getEntityRecords', [
 				'postType',
 				'wp_template_part',
 				query,
@@ -61,7 +61,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 						templatePart.area === area )
 			) || []
 		);
-	}, [ templateParts, area ] );
+	}, [ templateParts, area, excludedId ] );
 
 	return {
 		templateParts: filteredTemplateParts,
@@ -83,15 +83,10 @@ export function useAlternativeBlockPatterns( area, clientId ) {
 			const blockNameWithArea = area
 				? `core/template-part/${ area }`
 				: 'core/template-part';
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return __experimentalGetPatternsByBlockTypes(
-				blockNameWithArea,
-				rootClientId
-			);
+			return getPatternsByBlockTypes( blockNameWithArea, rootClientId );
 		},
 		[ area, clientId ]
 	);

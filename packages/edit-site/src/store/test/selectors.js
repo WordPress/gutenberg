@@ -8,27 +8,15 @@ import { store as coreDataStore } from '@wordpress/core-data';
  */
 import {
 	getCanUserCreateMedia,
-	getSettings,
 	getEditedPostType,
 	getEditedPostId,
-	getReusableBlocks,
-	isInserterOpened,
-	isListViewOpened,
-	__unstableGetPreference,
+	isPage,
 } from '../selectors';
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
-	const getEntityRecords = jest.fn( () => [] );
-	const get = jest.fn();
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
-	};
-	getReusableBlocks.registry = {
-		select: jest.fn( () => ( { getEntityRecords } ) ),
-	};
-	__unstableGetPreference.registry = {
-		select: jest.fn( () => ( { get } ) ),
 	};
 
 	describe( 'getCanUserCreateMedia', () => {
@@ -38,75 +26,6 @@ describe( 'selectors', () => {
 				getCanUserCreateMedia.registry.select
 			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
-		} );
-	} );
-
-	describe( 'getReusableBlocks', () => {
-		it( "selects `getEntityRecords( 'postType', 'wp_block' )` from the core store", () => {
-			expect( getReusableBlocks() ).toEqual( [] );
-			expect( getReusableBlocks.registry.select ).toHaveBeenCalledWith(
-				coreDataStore
-			);
-			expect( getEntityRecords ).toHaveBeenCalledWith(
-				'postType',
-				'wp_block',
-				{
-					per_page: -1,
-				}
-			);
-		} );
-	} );
-
-	describe( 'getSettings', () => {
-		it( "returns the settings when the user can't create media", () => {
-			canUser.mockReturnValueOnce( false );
-			canUser.mockReturnValueOnce( false );
-			get.mockImplementation( ( scope, name ) => {
-				if ( name === 'focusMode' ) return false;
-				if ( name === 'fixedToolbar' ) return false;
-			} );
-			const state = {
-				settings: {},
-				preferences: {},
-				editedPost: { postType: 'wp_template' },
-			};
-			const setInserterOpened = () => {};
-			expect( getSettings( state, setInserterOpened ) ).toEqual( {
-				outlineMode: true,
-				focusMode: false,
-				hasFixedToolbar: false,
-				keepCaretInsideBlock: false,
-				showIconLabels: false,
-				__experimentalSetIsInserterOpened: setInserterOpened,
-				__experimentalReusableBlocks: [],
-				__experimentalPreferPatternsOnRoot: true,
-			} );
-		} );
-
-		it( 'returns the extended settings when the user can create media', () => {
-			get.mockImplementation( ( scope, name ) => {
-				if ( name === 'focusMode' ) return true;
-				if ( name === 'fixedToolbar' ) return true;
-			} );
-
-			const state = {
-				settings: { key: 'value' },
-				editedPost: { postType: 'wp_template_part' },
-			};
-			const setInserterOpened = () => {};
-
-			expect( getSettings( state, setInserterOpened ) ).toEqual( {
-				outlineMode: true,
-				key: 'value',
-				focusMode: true,
-				hasFixedToolbar: true,
-				keepCaretInsideBlock: false,
-				showIconLabels: false,
-				__experimentalSetIsInserterOpened: setInserterOpened,
-				__experimentalReusableBlocks: [],
-				mediaUpload: expect.any( Function ),
-				__experimentalPreferPatternsOnRoot: false,
-			} );
 		} );
 	} );
 
@@ -124,25 +43,24 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isInserterOpened', () => {
-		it( 'returns the block inserter panel isOpened state', () => {
+	describe( 'isPage', () => {
+		it( 'returns true if the edited post type is a page', () => {
 			const state = {
-				blockInserterPanel: true,
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
 			};
-			expect( isInserterOpened( state ) ).toBe( true );
-			state.blockInserterPanel = false;
-			expect( isInserterOpened( state ) ).toBe( false );
+			expect( isPage( state ) ).toBe( true );
 		} );
-	} );
 
-	describe( 'isListViewOpened', () => {
-		it( 'returns the list view panel isOpened state', () => {
+		it( 'returns false if the edited post type is a template', () => {
 			const state = {
-				listViewPanel: true,
+				editedPost: {
+					postType: 'wp_template',
+				},
 			};
-			expect( isListViewOpened( state ) ).toBe( true );
-			state.listViewPanel = false;
-			expect( isListViewOpened( state ) ).toBe( false );
+			expect( isPage( state ) ).toBe( false );
 		} );
 	} );
 } );

@@ -4,14 +4,17 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	writingFlowUtils: async ( { page }, use ) => {
-		await use( new WritingFlowUtils( { page } ) );
+	writingFlowUtils: async ( { page, editor }, use ) => {
+		await use( new WritingFlowUtils( { page, editor } ) );
 	},
 } );
 
-test.describe( 'Writing Flow', () => {
-	test.beforeEach( async ( { admin } ) => {
+test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -29,7 +32,7 @@ test.describe( 'Writing Flow', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/18928
 		await writingFlowUtils.addDemoContent();
 
-		const activeElementLocator = page.locator( ':focus' );
+		const activeElementLocator = editor.canvas.locator( ':focus' );
 
 		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
@@ -46,9 +49,11 @@ test.describe( 'Writing Flow', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		const activeElementBlockType = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
-		);
+		const activeElementBlockType = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			);
 		expect( activeElementBlockType ).toBe( 'core/columns' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -63,7 +68,42 @@ test.describe( 'Writing Flow', () => {
 		await expect( activeElementLocator ).toBeFocused();
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			},
+			{
+				name: 'core/columns',
+				attributes: {},
+				innerBlocks: [
+					{
+						name: 'core/column',
+						attributes: {},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1st col' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+						attributes: {},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '2nd col' },
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			},
+		] );
 	} );
 
 	test( 'Should navigate between inner and root blocks in navigation mode', async ( {
@@ -122,13 +162,13 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'Third' );
 
 		// Navigate to second paragraph.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 
 		// Bold second paragraph text.
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -138,18 +178,18 @@ test.describe( 'Writing Flow', () => {
 
 		// Arrow right from end of first should traverse to second, *BEFORE*
 		// the bolded text. Another press should move within inline boundary.
-		await pageUtils.pressKeyTimes( 'ArrowRight', 2 );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 		await page.keyboard.type( 'Inside' );
 
 		// Arrow left from end of beginning of inline boundary should move to
 		// the outside of the inline boundary.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 		await page.keyboard.press( 'ArrowLeft' ); // Separate for emphasis.
 		await page.keyboard.type( 'Before' );
 
 		// Likewise, test at the end of the inline boundary for same effect.
 		await page.keyboard.press( 'ArrowRight' ); // Move inside
-		await pageUtils.pressKeyTimes( 'ArrowRight', 12 );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 12 } );
 		await page.keyboard.type( 'Inside' );
 		await page.keyboard.press( 'ArrowRight' );
 
@@ -167,7 +207,22 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'FirstAfter' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Before<strong>InsideSecondInside</strong>After',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'BeforeThird' },
+			},
+		] );
 	} );
 
 	test( 'should navigate around nested inline boundaries', async ( {
@@ -176,18 +231,18 @@ test.describe( 'Writing Flow', () => {
 		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1 2' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'i' );
+		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'i' );
+		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.press( 'ArrowLeft' );
 
 		await expect.poll( editor.getEditedPostContent )
@@ -228,7 +283,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>a<br></p>
@@ -242,7 +297,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( 'b' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
@@ -258,7 +313,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>a<br>b</p>
@@ -273,7 +328,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p><br>a</p>
@@ -286,7 +341,7 @@ test.describe( 'Writing Flow', () => {
 		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p><br></p>
@@ -317,25 +372,25 @@ test.describe( 'Writing Flow', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'abc' ); // Need content to remove placeholder label.
 		await editor.selectBlocks(
-			page.locator( 'role=document[name="Block: Shortcode"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Shortcode"i]' )
 		);
 
 		// Should remain in title upon ArrowRight:
 		await page.keyboard.press( 'ArrowRight' );
 		await expect(
-			page.locator( 'role=document[name="Block: Shortcode"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Shortcode"i]' )
 		).toHaveClass( /is-selected/ );
 
 		// Should remain in title upon modifier + ArrowDown:
-		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+ArrowDown' );
 		await expect(
-			page.locator( 'role=document[name="Block: Shortcode"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Shortcode"i]' )
 		).toHaveClass( /is-selected/ );
 
 		// Should navigate to the next block.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
-			page.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
@@ -346,7 +401,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1 2 3' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', ' 3'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: ' 3'.length } );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent )
@@ -369,11 +424,10 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'alpha beta gamma' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', ' gamma'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: ' gamma'.length } );
 
-		await pageUtils.pressKeyWithModifier(
-			process.platform === 'darwin' ? 'alt' : 'primary',
-			'Backspace'
+		await pageUtils.pressKeys(
+			`${ process.platform === 'darwin' ? 'Alt' : 'primary' }+Backspace`
 		);
 
 		await expect.poll( editor.getEditedPostContent )
@@ -396,9 +450,9 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'alpha beta gamma' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', ' gamma'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: ' gamma'.length } );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'beta'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'beta'.length } );
 		await page.keyboard.up( 'Shift' );
 
 		await page.keyboard.press( 'Backspace' );
@@ -422,10 +476,15 @@ test.describe( 'Writing Flow', () => {
 		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyTimes( 'Enter', 10 );
+		await pageUtils.pressKeys( 'Enter', { times: 10 } );
 
 		// Check that none of the paragraph blocks have <br> in them.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject(
+			Array( 11 ).fill( {
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			} )
+		);
 	} );
 
 	test( 'should navigate empty paragraphs', async ( { editor, page } ) => {
@@ -439,7 +498,20 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '3' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '3' },
+			},
+		] );
 	} );
 
 	test( 'should navigate contenteditable with padding', async ( {
@@ -448,18 +520,27 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await page.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingTop = '100px';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
-		await page.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingBottom = '100px';
 		} );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
 	} );
 
 	test( 'should navigate contenteditable with normal line height', async ( {
@@ -468,13 +549,22 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await page.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.lineHeight = 'normal';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
 	} );
 
 	test( 'should not prematurely multi-select', async ( {
@@ -486,14 +576,23 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '><<' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '<<<' );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', '<<\n<<<'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: '<<\n<<<'.length } );
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '>' },
+			},
+		] );
 	} );
 
 	test( 'should merge paragraphs', async ( { editor, page } ) => {
@@ -578,8 +677,8 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
-		await pageUtils.pressKeyTimes( 'Delete', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+		await pageUtils.pressKeys( 'Delete', { times: 2 } );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>1</p>
@@ -597,7 +696,7 @@ test.describe( 'Writing Flow', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should preserve horizontal position when navigating vertically between blocks', async ( {
+	test( 'should preserve horizontal position when navigating vertically between blocks (-webkit)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -629,7 +728,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -651,7 +750,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await page.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingLeft = '100px';
 		} );
 		await page.keyboard.press( 'Enter' );
@@ -659,7 +758,20 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
 	} );
 
 	test( 'should extend selection into paragraph for list with longer last item', async ( {
@@ -675,10 +787,10 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'cd' );
 
 		// Selects part of the first list item, although invisible.
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Extends selection into the first paragraph
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Mixed selection, so all content will be removed.
@@ -697,8 +809,8 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 
-		const paragraphBlock = page
-			.locator( 'role=document[name="Paragraph block"i]' )
+		const paragraphBlock = editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.first();
 		const paragraphRect = await paragraphBlock.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
@@ -731,6 +843,7 @@ test.describe( 'Writing Flow', () => {
 	test( 'should not have a dead zone above an aligned block', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
@@ -745,7 +858,7 @@ test.describe( 'Writing Flow', () => {
 		await wideButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
@@ -761,8 +874,8 @@ test.describe( 'Writing Flow', () => {
 <figure class="wp-block-image alignwide"><img alt=""/></figure>
 <!-- /wp:image -->` );
 
-		const paragraphBlock = page.locator(
-			'role=document[name="Paragraph block"i]'
+		const paragraphBlock = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i]'
 		);
 
 		// Find a point outside the paragraph between the blocks where it's
@@ -784,24 +897,25 @@ test.describe( 'Writing Flow', () => {
 		await page.mouse.click( x, lowerInserterY );
 
 		await expect(
-			page.locator( 'role=document[name="Block: Image"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
 	test( 'should only consider the content as one tab stop', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
 		// Tab to the "Create table" button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		await expect(
-			page.locator( 'role=document[name="Block: Table"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Table"i]' )
 		).toBeVisible();
 		// Navigate to the second cell.
 		await page.keyboard.press( 'ArrowRight' );
@@ -813,28 +927,32 @@ test.describe( 'Writing Flow', () => {
 <!-- /wp:table -->` );
 	} );
 
-	test( 'should unselect all blocks when hitting double escape', async ( {
+	test( 'escape should toggle between edit and navigation modes', async ( {
 		page,
 		writingFlowUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Random Paragraph' );
 
+		// First escape enters navigation mode.
+		await page.keyboard.press( 'Escape' );
+		const navigationButton = page.getByLabel(
+			'Paragraph Block. Row 1. Random Paragraph'
+		);
+		await expect( navigationButton ).toBeVisible();
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 
-		// First escape enters navigaiton mode.
+		// Second escape Toggles back to Edit Mode
 		await page.keyboard.press( 'Escape' );
+		await expect( navigationButton ).toBeHidden();
+		const blockToolbar = page.getByLabel( 'Block tools' );
+
+		await expect( blockToolbar ).toBeVisible();
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-
-		// Second escape unselects the blocks.
-		await page.keyboard.press( 'Escape' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( undefined );
 	} );
 
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
@@ -866,7 +984,7 @@ test.describe( 'Writing Flow', () => {
 		await page.mouse.up();
 
 		await expect(
-			page.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
@@ -881,12 +999,12 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'second' );
 
 		// Multi select both paragraphs.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
@@ -898,16 +1016,17 @@ test.describe( 'Writing Flow', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should move to the start of the first line on ArrowUp', async ( {
+	test( 'should move to the start of the first line on ArrowUp (-firefox)', async ( {
 		page,
+		editor,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await page.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -927,20 +1046,21 @@ test.describe( 'Writing Flow', () => {
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			page.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^\.a+$/ );
 	} );
 
-	test( 'should vertically move the caret from corner to corner', async ( {
+	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
 		page,
+		editor,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await page.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -960,21 +1080,22 @@ test.describe( 'Writing Flow', () => {
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			page.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^a+\.a$/ );
 	} );
 
 	test( 'should vertically move the caret when pressing Alt', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await page.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -989,19 +1110,47 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.pressKeyWithModifier( 'alt', 'ArrowUp' );
+		await pageUtils.pressKeys( 'alt+ArrowUp' );
 		await page.keyboard.type( '.' );
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			page.locator( 'role=document[name="Paragraph block"i] >> nth = 0' )
+			editor.canvas.locator(
+				'role=document[name="Block: Paragraph"i] >> nth = 0'
+			)
 		).toHaveText( /^.a+$/ );
+	} );
+
+	test( 'should select synced pattern', async ( { page, editor } ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'synced' );
+
+		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'test' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			editor.canvas.locator(
+				'[data-type="core/block"] [data-type="core/paragraph"]'
+			)
+		).toBeVisible();
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/block"]' )
+		).toBeFocused();
 	} );
 } );
 
 class WritingFlowUtils {
-	constructor( { page } ) {
+	constructor( { page, editor } ) {
 		this.page = page;
+		this.editor = editor;
 
 		this.getActiveBlockName = this.getActiveBlockName.bind( this );
 	}
@@ -1020,19 +1169,23 @@ class WritingFlowUtils {
 		await this.page.keyboard.press( 'Enter' );
 		await this.page.keyboard.type( '/columns' );
 		await this.page.keyboard.press( 'Enter' );
-		await this.page.click(
-			'role=button[name="Two columns; equal split"i]'
-		);
-		await this.page.click( 'role=button[name="Add block"i]' );
+		await this.editor.canvas
+			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.click();
+		await this.editor.canvas
+			.locator( 'role=button[name="Add block"i]' )
+			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
-		await this.page.focus(
-			'role=document[name="Block: Column (2 of 2)"i]'
-		);
-		await this.page.click( 'role=button[name="Add block"i]' );
+		await this.editor.canvas
+			.locator( 'role=document[name="Block: Column (2 of 2)"i]' )
+			.focus();
+		await this.editor.canvas
+			.locator( 'role=button[name="Add block"i]' )
+			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);

@@ -65,10 +65,11 @@ Callback called when an upload error happens and receives an error message as an
 
 ### name
 
-The label of the replace button.
+A `string` value will be used as the label of the replace button. It can also accept `Phrasing content` elements(ex. `span`).
 
--   Type: `string`
+-   Type: `string|Element`
 -   Required: No
+-   Default: `Replace`
 
 ### createNotice
 

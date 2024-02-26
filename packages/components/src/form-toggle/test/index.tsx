@@ -15,8 +15,6 @@ import { useState } from '@wordpress/element';
 import FormToggle, { noop } from '..';
 import type { FormToggleProps } from '../types';
 
-jest.useFakeTimers();
-
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
@@ -81,9 +79,7 @@ describe( 'FormToggle', () => {
 
 	describe( 'Value', () => {
 		it( 'should flip the checked property when clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChange = jest.fn();
 			render( <ControlledFormToggle onChange={ onChange } /> );

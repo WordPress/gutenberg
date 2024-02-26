@@ -13,7 +13,11 @@ import styles from './gallery-styles.scss';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockCaption, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	RichText,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
@@ -60,13 +64,12 @@ export const Gallery = ( props ) => {
 		{},
 		{
 			contentResizeMode: 'stretch',
-			allowedBlocks: [ 'core/image' ],
 			orientation: 'horizontal',
 			renderAppender: false,
 			numColumns: displayedColumns,
 			marginHorizontal: TILE_SPACING,
 			marginVertical: TILE_SPACING,
-			__experimentalLayout: { type: 'default', alignments: [] },
+			layout: { type: 'default', alignments: [] },
 			gridProperties: {
 				numColumns: displayedColumns,
 			},
@@ -99,7 +102,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					! caption
+					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
 
 						  'Gallery caption. Empty'

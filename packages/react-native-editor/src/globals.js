@@ -11,6 +11,7 @@ import 'react-native-url-polyfill/auto';
  * Babel polyfills
  */
 import 'core-js/features/array/flat-map';
+import 'core-js/proposals/relative-indexing-method';
 
 /**
  * WordPress dependencies
@@ -43,6 +44,9 @@ const doc = jsdom.html( '', null, null );
 doc.implementation.createHTMLDocument = function ( html ) {
 	return jsdom.html( html, null, null );
 };
+
+// Flag used to enable a patch to `react-devtools-core` to support `jsdom-jscore-rn`.
+doc.__isJsdom = true;
 
 // `hpq` depends on `document` be available globally.
 global.document = doc;

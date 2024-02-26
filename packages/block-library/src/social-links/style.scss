@@ -95,14 +95,20 @@
 }
 
 // This needs specificity because themes usually override it with things like .widget-area a.
-.wp-block-social-links .wp-block-social-link .wp-block-social-link-anchor {
-	&,
-	&:hover,
-	&:active,
-	&:visited,
-	svg {
-		color: currentColor;
-		fill: currentColor;
+.wp-block-social-links .wp-block-social-link.wp-social-link {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+
+	.wp-block-social-link-anchor {
+		&,
+		&:hover,
+		&:active,
+		&:visited,
+		svg {
+			color: currentColor;
+			fill: currentColor;
+		}
 	}
 }
 
@@ -140,5 +146,15 @@
 	.wp-social-link a {
 		padding-left: calc((2/3) * 1em);
 		padding-right: calc((2/3) * 1em);
+	}
+}
+
+// Ensure the Snapchat label is visible when no custom
+// icon color or background color is set.
+.wp-block-social-links:not(.has-icon-color):not(.has-icon-background-color) {
+	.wp-social-link-snapchat {
+		.wp-block-social-link-label {
+			color: #000;
+		}
 	}
 }

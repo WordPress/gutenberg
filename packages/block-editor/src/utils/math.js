@@ -106,3 +106,15 @@ export function isPointContainedByRect( point, rect ) {
 		rect.bottom >= point.y
 	);
 }
+
+/**
+ * Is the point within the top and bottom boundaries of the rectangle.
+ *
+ * @param {WPPoint} point The point.
+ * @param {DOMRect} rect  The rectangle.
+ *
+ * @return {boolean} True if the point is within top and bottom of rectangle, false otherwise.
+ */
+export function isPointWithinTopAndBottomBoundariesOfRect( point, rect ) {
+	return rect.top <= point.y && rect.bottom >= point.y;
+}

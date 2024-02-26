@@ -6,8 +6,7 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, useViewportMatch } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -15,18 +14,21 @@ import { useState } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
-function PostSwitchToDraftButton( {
-	isSaving,
-	isPublished,
-	isScheduled,
-	onClick,
-} ) {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+export default function PostSwitchToDraftButton() {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
-	if ( ! isPublished && ! isScheduled ) {
-		return null;
-	}
+	const { editPost, savePost } = useDispatch( editorStore );
+	const { isSaving, isPublished, isScheduled } = useSelect( ( select ) => {
+		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } =
+			select( editorStore );
+		return {
+			isSaving: isSavingPost(),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+		};
+	}, [] );
+
+	const isDisabled = isSaving || ( ! isPublished && ! isScheduled );
 
 	let alertMessage;
 	if ( isPublished ) {
@@ -37,20 +39,25 @@ function PostSwitchToDraftButton( {
 
 	const handleConfirm = () => {
 		setShowConfirmDialog( false );
-		onClick();
+		editPost( { status: 'draft' } );
+		savePost();
 	};
 
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="editor-post-switch-to-draft"
 				onClick={ () => {
-					setShowConfirmDialog( true );
+					if ( ! isDisabled ) {
+						setShowConfirmDialog( true );
+					}
 				} }
-				disabled={ isSaving }
-				variant="tertiary"
+				aria-disabled={ isDisabled }
+				variant="secondary"
+				style={ { flexGrow: '1', justifyContent: 'center' } }
 			>
-				{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
+				{ __( 'Switch to draft' ) }
 			</Button>
 			<ConfirmDialog
 				isOpen={ showConfirmDialog }
@@ -62,24 +69,3 @@ function PostSwitchToDraftButton( {
 		</>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } =
-			select( editorStore );
-		return {
-			isSaving: isSavingPost(),
-			isPublished: isCurrentPostPublished(),
-			isScheduled: isCurrentPostScheduled(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( editorStore );
-		return {
-			onClick: () => {
-				editPost( { status: 'draft' } );
-				savePost();
-			},
-		};
-	} ),
-] )( PostSwitchToDraftButton );

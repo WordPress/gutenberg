@@ -59,7 +59,6 @@
 
 // Sibling inserter / "inbetweenserter".
 .block-editor-block-list__empty-block-inserter,
-.block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter {
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
@@ -83,42 +82,6 @@
 	background: var(--wp-admin-theme-color);
 	&:hover {
 		background: $gray-900;
-	}
-}
-
-/**
- * Block Toolbar when contextual.
- */
-
-.block-editor-block-contextual-toolbar {
-	// Block UI appearance.
-	display: inline-flex;
-	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-900;
-	}
-
-	&.is-fixed {
-		position: sticky;
-		top: 0;
-		width: 100%;
-		z-index: z-index(".block-editor-block-popover");
-		// Fill up when empty
-		min-height: $block-toolbar-height;
-		display: block;
-
-		border: none;
-		border-bottom: $border-width solid $gray-200;
-		border-radius: 0;
-
-		.block-editor-block-toolbar .components-toolbar-group,
-		.block-editor-block-toolbar .components-toolbar {
-			border-right-color: $gray-200;
-		}
 	}
 }
 
@@ -214,12 +177,37 @@
 }
 
 .components-popover.block-editor-block-list__block-popover {
+
 	// Position the block toolbar.
 	.block-editor-block-list__block-selection-button,
 	.block-editor-block-contextual-toolbar {
 		pointer-events: all;
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
+	}
+
+	.block-editor-block-contextual-toolbar {
+		border: $border-width solid $gray-900;
+		border-radius: $radius-block-ui;
+		overflow: visible; // allow the parent selector to be visible
+		position: static;
+		width: auto;
+
+		&.has-parent {
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+			.show-icon-labels & {
+				margin-left: 0;
+			}
+		}
+	}
+
+	.block-editor-block-toolbar {
+		overflow: visible;
+	}
+
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-900;
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
@@ -232,6 +220,42 @@
 		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
 		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
 		animation: hide-during-dragging 1ms linear forwards;
+	}
+
+	.block-editor-block-parent-selector {
+		position: absolute;
+		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+		&::before {
+			content: "";
+		}
+
+		.block-editor-block-parent-selector__button {
+			border: 1px solid $gray-900;
+			padding-right: 6px;
+			padding-left: 6px;
+			background-color: $white;
+
+			.show-icon-labels & {
+				padding-right: $grid-unit-15;
+				padding-left: $grid-unit-15;
+			}
+		}
+	}
+
+	// Show Icon Label Styles
+	.show-icon-labels & {
+
+		.block-editor-block-parent-selector {
+			position: relative;
+			left: auto;
+			margin-left: -$border-width;
+		}
+
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+			border-left: 1px solid $gray-900;
+		}
 	}
 }
 

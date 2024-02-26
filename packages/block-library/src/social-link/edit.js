@@ -6,11 +6,15 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { DELETE, BACKSPACE } from '@wordpress/keycodes';
+import { useDispatch } from '@wordpress/data';
+
 import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
@@ -32,46 +36,75 @@ const SocialLinkURLPopover = ( {
 	setAttributes,
 	setPopover,
 	popoverAnchor,
-} ) => (
-	<URLPopover anchor={ popoverAnchor } onClose={ () => setPopover( false ) }>
-		<form
-			className="block-editor-url-popover__link-editor"
-			onSubmit={ ( event ) => {
-				event.preventDefault();
-				setPopover( false );
-			} }
+	clientId,
+} ) => {
+	const { removeBlock } = useDispatch( blockEditorStore );
+	return (
+		<URLPopover
+			anchor={ popoverAnchor }
+			onClose={ () => setPopover( false ) }
 		>
-			<div className="block-editor-url-input">
-				<URLInput
-					__nextHasNoMarginBottom
-					value={ url }
-					onChange={ ( nextURL ) =>
-						setAttributes( { url: nextURL } )
-					}
-					placeholder={ __( 'Enter address' ) }
-					disableSuggestions={ true }
+			<form
+				className="block-editor-url-popover__link-editor"
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					setPopover( false );
+				} }
+			>
+				<div className="block-editor-url-input">
+					<URLInput
+						__nextHasNoMarginBottom
+						value={ url }
+						onChange={ ( nextURL ) =>
+							setAttributes( { url: nextURL } )
+						}
+						placeholder={ __( 'Enter address' ) }
+						disableSuggestions={ true }
+						onKeyDown={ ( event ) => {
+							if (
+								!! url ||
+								event.defaultPrevented ||
+								! [ BACKSPACE, DELETE ].includes(
+									event.keyCode
+								)
+							) {
+								return;
+							}
+							removeBlock( clientId );
+						} }
+					/>
+				</div>
+				<Button
+					icon={ keyboardReturn }
+					label={ __( 'Apply' ) }
+					type="submit"
 				/>
-			</div>
-			<Button
-				icon={ keyboardReturn }
-				label={ __( 'Apply' ) }
-				type="submit"
-			/>
-		</form>
-	</URLPopover>
-);
+			</form>
+		</URLPopover>
+	);
+};
 
 const SocialLinkEdit = ( {
 	attributes,
 	context,
 	isSelected,
 	setAttributes,
+	clientId,
 } ) => {
 	const { url, service, label, rel } = attributes;
-	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
+	const {
+		showLabels,
+		iconColor,
+		iconColorValue,
+		iconBackgroundColor,
+		iconBackgroundColorValue,
+	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
+		[ `has-${ iconColor }-color` ]: iconColor,
+		[ `has-${ iconBackgroundColor }-background-color` ]:
+			iconBackgroundColor,
 	} );
 
 	// Use internal state instead of a ref to make sure that the component
@@ -102,6 +135,7 @@ const SocialLinkEdit = ( {
 				>
 					<PanelRow>
 						<TextControl
+							__nextHasNoMarginBottom
 							label={ __( 'Link label' ) }
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
@@ -114,8 +148,9 @@ const SocialLinkEdit = ( {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
@@ -141,6 +176,7 @@ const SocialLinkEdit = ( {
 							setAttributes={ setAttributes }
 							setPopover={ setPopover }
 							popoverAnchor={ popoverAnchor }
+							clientId={ clientId }
 						/>
 					) }
 				</Button>

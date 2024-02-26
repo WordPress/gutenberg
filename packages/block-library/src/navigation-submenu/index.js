@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { addSubmenu } from '@wordpress/icons';
+import { page, addSubmenu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,14 +17,27 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: addSubmenu,
+	icon: ( { context } ) => {
+		if ( context === 'list-view' ) {
+			return page;
+		}
+		return addSubmenu;
+	},
+	__experimentalLabel( attributes, { context } ) {
+		const { label } = attributes;
 
-	__experimentalLabel: ( { label } ) => label,
+		const customName = attributes?.metadata?.name;
 
+		// In the list view, use the block's menu label as the label.
+		// If the menu label is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || label ) ) {
+			return attributes?.metadata?.name || label;
+		}
+
+		return label;
+	},
 	edit,
-
 	save,
-
 	transforms,
 };
 

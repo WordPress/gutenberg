@@ -12,4 +12,9 @@ module.exports = {
 			root: path.resolve( __dirname, '../react-native-aztec' ),
 		},
 	},
+	project: {
+		ios: {
+			sourceDir: './ios/',
+		},
+	},
 };

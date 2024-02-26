@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -11,16 +12,18 @@ import WelcomeGuideTemplate from './template';
 import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuide() {
-	const { isActive, isTemplateMode } = useSelect( ( select ) => {
-		const { isFeatureActive, isEditingTemplate } = select( editPostStore );
-		const _isTemplateMode = isEditingTemplate();
-		const feature = _isTemplateMode
+	const { isActive, isEditingTemplate } = useSelect( ( select ) => {
+		const { isFeatureActive } = select( editPostStore );
+		const { getCurrentPostType } = select( editorStore );
+		const _isEditingTemplate = getCurrentPostType() === 'wp_template';
+
+		const feature = _isEditingTemplate
 			? 'welcomeGuideTemplate'
 			: 'welcomeGuide';
 
 		return {
 			isActive: isFeatureActive( feature ),
-			isTemplateMode: _isTemplateMode,
+			isEditingTemplate: _isEditingTemplate,
 		};
 	}, [] );
 
@@ -28,5 +31,9 @@ export default function WelcomeGuide() {
 		return null;
 	}
 
-	return isTemplateMode ? <WelcomeGuideTemplate /> : <WelcomeGuideDefault />;
+	return isEditingTemplate ? (
+		<WelcomeGuideTemplate />
+	) : (
+		<WelcomeGuideDefault />
+	);
 }

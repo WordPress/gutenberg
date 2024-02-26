@@ -59,7 +59,7 @@ describe( 'Draggable', () => {
 			{ state: State.ACTIVE },
 		] );
 
-		expect( onLongPress ).toBeCalledTimes( 1 );
+		expect( onLongPress ).toHaveBeenCalledTimes( 1 );
 		expect( onLongPress ).toHaveBeenCalledWith( triggerId );
 	} );
 
@@ -110,17 +110,21 @@ describe( 'Draggable', () => {
 			},
 			{ state: State.END },
 		] );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			'[Reanimated] You can not use setGestureState in non-worklet function.'
+		);
 
-		expect( onDragStart ).toBeCalledTimes( 1 );
+		expect( onDragStart ).toHaveBeenCalledTimes( 1 );
 		expect( onDragStart ).toHaveBeenCalledWith( {
 			id: triggerId,
 			x: touchEvents[ 0 ].x,
 			y: touchEvents[ 0 ].y,
 		} );
-		expect( onDragOver ).toBeCalledTimes( 2 );
+		expect( onDragOver ).toHaveBeenCalledTimes( 2 );
 		expect( onDragOver ).toHaveBeenNthCalledWith( 1, touchEvents[ 1 ] );
 		expect( onDragOver ).toHaveBeenNthCalledWith( 2, touchEvents[ 2 ] );
-		expect( onDragEnd ).toBeCalledTimes( 1 );
+		expect( onDragEnd ).toHaveBeenCalledTimes( 1 );
 		expect( onDragEnd ).toHaveBeenCalledWith( {
 			id: triggerId,
 			x: touchEvents[ 2 ].x,

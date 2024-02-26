@@ -5,11 +5,6 @@ The `LetterSpacingControl` component renders a [`UnitControl`](https://github.co
 This component is used for blocks that display text, commonly inside a 
 [`ToolsPanelItem`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/tools-panel/tools-panel-item/README.md).
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

@@ -2,18 +2,19 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-import { map, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { getSyncProvider } from './sync';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -38,6 +39,24 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/base',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Site' ),
@@ -45,8 +64,26 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
+			return record?.title ?? __( 'Site Title' );
 		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/wp/v2/settings' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/site',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -55,6 +92,26 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		syncConfig: {
+			fetch: async ( id ) => {
+				return apiFetch( {
+					path: `/wp/v2/types/${ id }?context=edit`,
+				} );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/postType',
+		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -64,6 +121,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -148,8 +206,13 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // Should be different than name.
+		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -166,6 +229,15 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
+	},
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
 	},
 ];
 
@@ -204,6 +276,29 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
+const serialisableBlocksCache = new WeakMap();
+
+function makeBlockAttributesSerializable( attributes ) {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks ) {
+	return blocks.map( ( block ) => {
+		const { innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
 /**
  * Returns the list of post type entities.
  *
@@ -213,7 +308,7 @@ async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
 		path: '/wp/v2/types?context=view',
 	} );
-	return map( postTypes, ( postType, name ) => {
+	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
@@ -238,6 +333,48 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
+			syncConfig: {
+				fetch: async ( id ) => {
+					return apiFetch( {
+						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
+					} );
+				},
+				applyChangesToDoc: ( doc, changes ) => {
+					const document = doc.getMap( 'document' );
+
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if ( typeof value !== 'function' ) {
+							if ( key === 'blocks' ) {
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+
+								value = serialisableBlocksCache.get( value );
+							}
+
+							if ( document.get( key ) !== value ) {
+								document.set( key, value );
+							}
+						}
+					} );
+				},
+				fromCRDTDoc: ( doc ) => {
+					return doc.getMap( 'document' ).toJSON();
+				},
+			},
+			syncObjectType: 'postType/' + postType.name,
+			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }
@@ -251,7 +388,7 @@ async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
 	} );
-	return map( taxonomies, ( taxonomy, name ) => {
+	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
@@ -300,6 +437,15 @@ export const getMethodName = (
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 
+function registerSyncConfigs( configs ) {
+	configs.forEach( ( { syncObjectType, syncConfig } ) => {
+		getSyncProvider().register( syncObjectType, syncConfig );
+		const editSyncConfig = { ...syncConfig };
+		delete editSyncConfig.fetch;
+		getSyncProvider().register( syncObjectType + '--edit', editSyncConfig );
+	} );
+}
+
 /**
  * Loads the kind entities into the store.
  *
@@ -312,6 +458,12 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
+			if ( window.__experimentalEnableSync ) {
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					registerSyncConfigs( configs );
+				}
+			}
+
 			return configs;
 		}
 
@@ -323,6 +475,12 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
+		if ( window.__experimentalEnableSync ) {
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				registerSyncConfigs( configs );
+			}
+		}
+
 		dispatch( addEntities( configs ) );
 
 		return configs;

@@ -44,6 +44,12 @@ describe( 'listener hook tests', () => {
 				isViewportMatch: jest.fn(),
 			},
 		},
+		'core/preferences': {
+			...storeConfig,
+			selectors: {
+				get: jest.fn(),
+			},
+		},
 		[ STORE_NAME ]: {
 			...storeConfig,
 			actions: {
@@ -112,6 +118,7 @@ describe( 'listener hook tests', () => {
 				'getBlockSelectionStart',
 				true
 			);
+			setMockReturnValue( 'core/preferences', 'get', false );
 
 			render( <TestedOutput /> );
 
@@ -121,17 +128,50 @@ describe( 'listener hook tests', () => {
 		} );
 		it( 'opens document sidebar if block is not selected', () => {
 			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
 			setMockReturnValue(
 				'core/block-editor',
 				'getBlockSelectionStart',
 				false
 			);
+			setMockReturnValue( 'core/preferences', 'get', false );
 
 			render( <TestedOutput /> );
 
 			expect(
 				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
 			).toHaveBeenCalledWith( 'edit-post/document' );
+		} );
+		it( 'does not open block sidebar if block is selected and distraction free mode is on', () => {
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
+			setMockReturnValue(
+				'core/block-editor',
+				'getBlockSelectionStart',
+				true
+			);
+			setMockReturnValue( 'core/preferences', 'get', true );
+
+			render( <TestedOutput /> );
+
+			expect(
+				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
+			).toHaveBeenCalledTimes( 0 );
+		} );
+		it( 'does not open document sidebar if block is not selected and distraction free is on', () => {
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
+			setMockReturnValue(
+				'core/block-editor',
+				'getBlockSelectionStart',
+				false
+			);
+			setMockReturnValue( 'core/preferences', 'get', true );
+
+			render( <TestedOutput /> );
+
+			expect(
+				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
+			).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 

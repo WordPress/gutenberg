@@ -14,7 +14,7 @@ _Example:_
 This is how to pass a new color palette for the theme and disable the text color UI:
 
 ```php
-function filter_theme_json_theme( $theme_json ){
+function wpdocs_filter_theme_json_theme( $theme_json ){
 	$new_data = array(
 		'version'  => 2,
 		'settings' => array(
@@ -38,5 +38,5 @@ function filter_theme_json_theme( $theme_json ){
 
 	return $theme_json->update_with( $new_data );
 }
-add_filter( 'wp_theme_json_data_theme', 'filter_theme_json_theme' );
+add_filter( 'wp_theme_json_data_theme', 'wpdocs_filter_theme_json_theme' );
 ```

@@ -114,6 +114,7 @@ const embeddedContentSchema = {
 			'src',
 			'poster',
 			'preload',
+			'playsinline',
 			'autoplay',
 			'mediagroup',
 			'loop',

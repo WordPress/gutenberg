@@ -16,7 +16,7 @@ import { store as editWidgetsStore } from '../../store';
  * This is a duplicate of the component implemented in the editor package.
  * Duplicated here as edit-widgets doesn't depend on editor.
  *
- * @return {WPComponent} The component.
+ * @return {Component} The component.
  */
 export default function UnsavedChangesWarning() {
 	const isDirty = useSelect( ( select ) => {
@@ -32,7 +32,7 @@ export default function UnsavedChangesWarning() {
 		 *
 		 * @param {Event} event `beforeunload` event.
 		 *
-		 * @return {?string} Warning prompt message, if unsaved changes exist.
+		 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
 		 */
 		const warnIfUnsavedChanges = ( event ) => {
 			if ( isDirty ) {

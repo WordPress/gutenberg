@@ -297,8 +297,7 @@ _Returns_
 
 ### enableFocusLossObservation
 
-Adds an event listener to the document which throws an error if there is a
-loss of focus.
+Adds an event listener to the document which throws an error if there is a loss of focus.
 
 ### enablePageDialogAccept
 
@@ -362,8 +361,7 @@ _Returns_
 
 ### getAvailableBlockTransforms
 
-Returns an array of strings with all block titles,
-that the current selected block can be transformed into.
+Returns an array of strings with all block titles, that the current selected block can be transformed into.
 
 _Returns_
 
@@ -432,10 +430,7 @@ _Returns_
 
 ### getPageError
 
-Returns a promise resolving to one of either a string or null. A string will
-be resolved if an error message is present in the contents of the page. If no
-error is present, a null value will be resolved instead. This requires the
-environment be configured to display errors.
+Returns a promise resolving to one of either a string or null. A string will be resolved if an error message is present in the contents of the page. If no error is present, a null value will be resolved instead. This requires the environment be configured to display errors.
 
 _Related_
 
@@ -463,8 +458,7 @@ _Parameters_
 
 ### insertBlockDirectoryBlock
 
-Inserts a Block Directory block matching a given search term via the global
-inserter.
+Inserts a Block Directory block matching a given search term via the global inserter.
 
 _Parameters_
 
@@ -477,15 +471,6 @@ Inserts a pattern matching a given search term via the global inserter.
 _Parameters_
 
 -   _searchTerm_ `string`: The term by which to find the pattern to insert.
-
-### insertReusableBlock
-
-Inserts a reusable block matching a given search term via the global
-inserter.
-
-_Parameters_
-
--   _searchTerm_ `string`: The term by which to find the reusable block to insert.
 
 ### installPlugin
 
@@ -527,6 +512,10 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
+### isListViewOpen
+
+Undocumented declaration.
+
 ### isOfflineMode
 
 Undocumented declaration.
@@ -552,10 +541,13 @@ _Parameters_
 -   _username_ `?string`: String to be used as user credential.
 -   _password_ `?string`: String to be used as user credential.
 
+### logout
+
+Performs log out.
+
 ### mockOrTransform
 
-Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the
-deserialised JSON response for the request.
+Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the deserialised JSON response for the request.
 
 _Parameters_
 
@@ -622,8 +614,7 @@ _Parameters_
 
 ### pressKeyWithModifier
 
-Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
-is normalized to platform-specific modifier.
+Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier is normalized to platform-specific modifier.
 
 _Parameters_
 
@@ -632,8 +623,7 @@ _Parameters_
 
 ### publishPost
 
-Publishes the post, resolving once the request is complete (once a notice
-is displayed).
+Publishes the post, resolving once the request is complete (once a notice is displayed).
 
 _Returns_
 
@@ -641,8 +631,7 @@ _Returns_
 
 ### publishPostWithPrePublishChecksDisabled
 
-Publishes the post without the pre-publish checks,
-resolving once the request is complete (once a notice is displayed).
+Publishes the post without the pre-publish checks, resolving once the request is complete (once a notice is displayed).
 
 _Returns_
 
@@ -654,8 +643,7 @@ Clears all user meta preferences.
 
 ### saveDraft
 
-Saves the post as a draft, resolving once the request is complete (once the
-"Saved" indicator is displayed).
+Saves the post as a draft, resolving once the request is complete (once the "Saved" indicator is displayed).
 
 _Returns_
 
@@ -727,8 +715,7 @@ _Parameters_
 
 ### setClipboardData
 
-Sets the clipboard data that can be pasted with
-`pressKeyWithModifier( 'primary', 'v' )`.
+Sets the clipboard data that can be pasted with `pressKeyWithModifier( 'primary', 'v' )`.
 
 _Parameters_
 
@@ -794,8 +781,15 @@ _Parameters_
 
 ### showBlockToolbar
 
-The block toolbar is not always visible while typing.
-Call this function to reveal it.
+The block toolbar is not always visible while typing. Call this function to reveal it.
+
+### switchBlockInspectorTab
+
+Clicks on the block inspector tab button with the supplied label and waits for the tab switch.
+
+_Parameters_
+
+-   _label_ `string`: Aria label to find tab button by.
 
 ### switchEditorModeTo
 
@@ -807,13 +801,11 @@ _Parameters_
 
 ### switchUserToAdmin
 
-Switches the current user to the admin user (if the user
-running the test is not already the admin user).
+Switches the current user to the admin user (if the user running the test is not already the admin user).
 
 ### switchUserToTest
 
-Switches the current user to whichever user we should be
-running the tests as (if we're not already that user).
+Switches the current user to whichever user we should be running the tests as (if we're not already that user).
 
 ### toggleGlobalBlockInserter
 
@@ -908,10 +900,7 @@ _Parameters_
 
 ### waitForWindowDimensions
 
-Function that waits until the page viewport has the required dimensions.
-It is being used to address a problem where after using setViewport the execution may continue,
-without the new dimensions being applied.
-<https://github.com/GoogleChrome/puppeteer/issues/1751>
+Function that waits until the page viewport has the required dimensions. It is being used to address a problem where after using setViewport the execution may continue, without the new dimensions being applied. <https://github.com/GoogleChrome/puppeteer/issues/1751>
 
 _Parameters_
 
@@ -922,13 +911,7 @@ _Parameters_
 
 Queries the WordPress data module.
 
-`page.evaluate` - used in the function - returns `undefined`
-when it encounters a non-serializable value.
-Since we store many different values in the data module,
-you can end up with an `undefined` result. Before using
-this function, make sure the data you are querying
-doesn't contain non-serializable values, for example,
-functions, DOM element handles, etc.
+`page.evaluate` - used in the function - returns `undefined` when it encounters a non-serializable value. Since we store many different values in the data module, you can end up with an `undefined` result. Before using this function, make sure the data you are querying doesn't contain non-serializable values, for example, functions, DOM element handles, etc.
 
 _Related_
 

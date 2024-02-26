@@ -34,8 +34,7 @@ wp.data( 'core/preferences' ).setPersistenceLayer( persistenceLayer );
 
 ### create
 
-Creates a persistence layer that stores data in WordPress user meta via the
-REST API.
+Creates a persistence layer that stores data in WordPress user meta via the REST API.
 
 _Parameters_
 

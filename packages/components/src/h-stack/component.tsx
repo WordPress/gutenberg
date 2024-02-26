@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { contextConnect } from '../context';
 import { View } from '../view';
 import { useHStack } from './hook';
 import type { Props } from './types';
@@ -20,7 +21,6 @@ function UnconnectedHStack(
  *
  * `HStack` can render anything inside.
  *
- * @example
  * ```jsx
  * import {
  * 	__experimentalHStack as HStack,

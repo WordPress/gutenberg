@@ -29,6 +29,12 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			const { caption, alt, url } = attributes;
 

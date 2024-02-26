@@ -10,7 +10,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { InspectorControls, useSetting } from '@wordpress/block-editor';
+import { InspectorControls, useSettings } from '@wordpress/block-editor';
 
 const SCALE_OPTIONS = (
 	<>
@@ -49,13 +49,13 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { width, height, scale, sizeSlug },
+	attributes: { aspectRatio, width, height, scale, sizeSlug },
 	setAttributes,
 	imageSizeOptions = [],
 } ) => {
-	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || defaultUnits,
+		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
@@ -70,8 +70,66 @@ const DimensionControls = ( {
 		} );
 	};
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
+
+	const showScaleControl =
+		height || ( aspectRatio && aspectRatio !== 'auto' );
+
 	return (
-		<InspectorControls __experimentalGroup="dimensions">
+		<InspectorControls group="dimensions">
+			<ToolsPanelItem
+				hasValue={ () => !! aspectRatio }
+				label={ __( 'Aspect ratio' ) }
+				onDeselect={ () => setAttributes( { aspectRatio: undefined } ) }
+				resetAllFilter={ () => ( {
+					aspectRatio: undefined,
+				} ) }
+				isShownByDefault={ true }
+				panelId={ clientId }
+			>
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'Aspect ratio' ) }
+					value={ aspectRatio }
+					options={ [
+						// These should use the same values as AspectRatioDropdown in @wordpress/block-editor
+						{
+							label: __( 'Original' ),
+							value: 'auto',
+						},
+						{
+							label: __( 'Square' ),
+							value: '1',
+						},
+						{
+							label: __( '16:9' ),
+							value: '16/9',
+						},
+						{
+							label: __( '4:3' ),
+							value: '4/3',
+						},
+						{
+							label: __( '3:2' ),
+							value: '3/2',
+						},
+						{
+							label: __( '9:16' ),
+							value: '9/16',
+						},
+						{
+							label: __( '3:4' ),
+							value: '3/4',
+						},
+						{
+							label: __( '2:3' ),
+							value: '2/3',
+						},
+					] }
+					onChange={ ( nextAspectRatio ) =>
+						setAttributes( { aspectRatio: nextAspectRatio } )
+					}
+				/>
+			</ToolsPanelItem>
 			<ToolsPanelItem
 				className="single-column"
 				hasValue={ () => !! height }
@@ -116,7 +174,7 @@ const DimensionControls = ( {
 					units={ units }
 				/>
 			</ToolsPanelItem>
-			{ !! height && (
+			{ showScaleControl && (
 				<ToolsPanelItem
 					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
 					label={ scaleLabel }
@@ -132,6 +190,7 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
 						help={ scaleHelp[ scale ] }
@@ -149,7 +208,7 @@ const DimensionControls = ( {
 			{ !! imageSizeOptions.length && (
 				<ToolsPanelItem
 					hasValue={ () => !! sizeSlug }
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					onDeselect={ () =>
 						setAttributes( { sizeSlug: undefined } )
 					}
@@ -161,7 +220,7 @@ const DimensionControls = ( {
 				>
 					<SelectControl
 						__nextHasNoMarginBottom
-						label={ __( 'Image size' ) }
+						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }
 						options={ imageSizeOptions }
 						onChange={ ( nextSizeSlug ) =>

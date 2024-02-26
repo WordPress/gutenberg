@@ -6,18 +6,17 @@
 
 // Defaults.
 const DEFAULT_MAXIMUM_VIEWPORT_WIDTH = '1600px';
-const DEFAULT_MINIMUM_VIEWPORT_WIDTH = '768px';
+const DEFAULT_MINIMUM_VIEWPORT_WIDTH = '320px';
 const DEFAULT_SCALE_FACTOR = 1;
-const DEFAULT_MINIMUM_FONT_SIZE_FACTOR = 0.75;
+const DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MIN = 0.25;
+const DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MAX = 0.75;
 const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
 
 /**
- * Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
+ * Computes a fluid font-size value that uses clamp(). A minimum and maximum
  * font size OR a single font size can be specified.
  *
- * If a single font size is specified, it is scaled up and down by
- * minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
- * maximum sizes.
+ * If a single font size is specified, it is scaled up and down using a logarithmic scale.
  *
  * @example
  * ```js
@@ -33,14 +32,13 @@ const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
  * ```
  *
  * @param {Object}        args
- * @param {?string}       args.minimumViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
- * @param {?string}       args.maximumViewPortWidth  Maximum size up to which type will have fluidity. Optional if fontSize is specified.
- * @param {string|number} [args.fontSize]            Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
- * @param {?string}       args.maximumFontSize       Maximum font size for any clamp() calculation. Optional.
- * @param {?string}       args.minimumFontSize       Minimum font size for any clamp() calculation. Optional.
- * @param {?number}       args.scaleFactor           A scale factor to determine how fast a font scales within boundaries. Optional.
- * @param {?number}       args.minimumFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
- * @param {?string}       args.minimumFontSizeLimit  The smallest a calculated font size may be. Optional.
+ * @param {?string}       args.minimumViewportWidth Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+ * @param {?string}       args.maximumViewportWidth Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+ * @param {string|number} [args.fontSize]           Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+ * @param {?string}       args.maximumFontSize      Maximum font size for any clamp() calculation. Optional.
+ * @param {?string}       args.minimumFontSize      Minimum font size for any clamp() calculation. Optional.
+ * @param {?number}       args.scaleFactor          A scale factor to determine how fast a font scales within boundaries. Optional.
+ * @param {?string}       args.minimumFontSizeLimit The smallest a calculated font size may be. Optional.
  *
  * @return {string|null} A font-size value using clamp().
  */
@@ -48,10 +46,9 @@ export function getComputedFluidTypographyValue( {
 	minimumFontSize,
 	maximumFontSize,
 	fontSize,
-	minimumViewPortWidth = DEFAULT_MINIMUM_VIEWPORT_WIDTH,
-	maximumViewPortWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
+	minimumViewportWidth = DEFAULT_MINIMUM_VIEWPORT_WIDTH,
+	maximumViewportWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
 	scaleFactor = DEFAULT_SCALE_FACTOR,
-	minimumFontSizeFactor = DEFAULT_MINIMUM_FONT_SIZE_FACTOR,
 	minimumFontSizeLimit,
 } ) {
 	// Validate incoming settings and set defaults.
@@ -106,6 +103,26 @@ export function getComputedFluidTypographyValue( {
 		 * the given font size multiplied by the min font size scale factor.
 		 */
 		if ( ! minimumFontSize ) {
+			const fontSizeValueInPx =
+				fontSizeParsed.unit === 'px'
+					? fontSizeParsed.value
+					: fontSizeParsed.value * 16;
+
+			/*
+			 * The scale factor is a multiplier that affects how quickly the curve will move towards the minimum,
+			 * that is, how quickly the size factor reaches 0 given increasing font size values.
+			 * For a - b * log2(), lower values of b will make the curve move towards the minimum faster.
+			 * The scale factor is constrained between min and max values.
+			 */
+			const minimumFontSizeFactor = Math.min(
+				Math.max(
+					1 - 0.075 * Math.log2( fontSizeValueInPx ),
+					DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MIN
+				),
+				DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MAX
+			);
+
+			// Calculates the minimum font size.
 			const calculatedMinimumFontSize = roundToPrecision(
 				fontSizeParsed.value * minimumFontSizeFactor,
 				3
@@ -146,43 +163,49 @@ export function getComputedFluidTypographyValue( {
 	} );
 
 	// Viewport widths defined for fluid typography. Normalize units
-	const maximumViewPortWidthParsed = getTypographyValueAndUnit(
-		maximumViewPortWidth,
+	const maximumViewportWidthParsed = getTypographyValueAndUnit(
+		maximumViewportWidth,
 		{ coerceTo: fontSizeUnit }
 	);
-	const minumumViewPortWidthParsed = getTypographyValueAndUnit(
-		minimumViewPortWidth,
+	const minimumViewportWidthParsed = getTypographyValueAndUnit(
+		minimumViewportWidth,
 		{ coerceTo: fontSizeUnit }
 	);
 
 	// Protect against unsupported units.
 	if (
-		! maximumViewPortWidthParsed ||
-		! minumumViewPortWidthParsed ||
+		! maximumViewportWidthParsed ||
+		! minimumViewportWidthParsed ||
 		! minimumFontSizeRem
 	) {
 		return null;
 	}
 
+	// Calculates the linear factor denominator. If it's 0, we cannot calculate a fluid value.
+	const linearDenominator =
+		maximumViewportWidthParsed.value - minimumViewportWidthParsed.value;
+	if ( ! linearDenominator ) {
+		return null;
+	}
+
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
-	const minViewPortWidthOffsetValue = roundToPrecision(
-		minumumViewPortWidthParsed.value / 100,
+	const minViewportWidthOffsetValue = roundToPrecision(
+		minimumViewportWidthParsed.value / 100,
 		3
 	);
 
-	const viewPortWidthOffset =
-		roundToPrecision( minViewPortWidthOffsetValue, 3 ) + fontSizeUnit;
+	const viewportWidthOffset =
+		roundToPrecision( minViewportWidthOffsetValue, 3 ) + fontSizeUnit;
 	const linearFactor =
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
-			( maximumViewPortWidthParsed.value -
-				minumumViewPortWidthParsed.value ) );
+			linearDenominator );
 	const linearFactorScaled = roundToPrecision(
 		( linearFactor || 1 ) * scaleFactor,
 		3
 	);
-	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewPortWidthOffset }) * ${ linearFactorScaled })`;
+	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewportWidthOffset }) * ${ linearFactorScaled })`;
 
 	return `clamp(${ minimumFontSize }, ${ fluidTargetFontSize }, ${ maximumFontSize })`;
 }

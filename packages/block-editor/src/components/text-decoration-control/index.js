@@ -36,7 +36,7 @@ const TEXT_DECORATIONS = [
  * @param {Function} props.onChange    Handles change in text decoration selection.
  * @param {string}   [props.className] Additional class name to apply.
  *
- * @return {WPElement} Text decoration control.
+ * @return {Element} Text decoration control.
  */
 export default function TextDecorationControl( {
 	value,

@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`flags warnings with invalid css snapshot matches warnings 1`] = `
-Array [
-  Object {
+[
+  {
     "column": 7,
     "line": 2,
     "rule": "number-leading-zero",

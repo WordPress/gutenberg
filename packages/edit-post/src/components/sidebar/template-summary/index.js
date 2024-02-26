@@ -4,16 +4,12 @@
 import { Icon, layout } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { Flex, FlexItem, FlexBlock, PanelBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 function TemplateSummary() {
 	const template = useSelect( ( select ) => {
-		const { getEditedPostTemplate } = select( editPostStore );
-		return getEditedPostTemplate();
+		const { getCurrentPost } = select( editorStore );
+		return getCurrentPost();
 	}, [] );
 
 	if ( ! template ) {

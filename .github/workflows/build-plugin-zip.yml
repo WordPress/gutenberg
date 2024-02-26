@@ -56,7 +56,7 @@ jobs:
                 github.event.inputs.version == 'rc' ||
                 github.event.inputs.version == 'stable'
               ) || (
-                endsWith( github.ref, needs.compute-stable-branches.outputs.current_stable_branch ) &&
+                startsWith( github.ref, 'refs/heads/release/' ) &&
                 github.event.inputs.version == 'stable'
               )
             )
@@ -69,9 +69,10 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Compute old and new version
               id: get_version
@@ -122,7 +123,7 @@ jobs:
                   VERSION: ${{ steps.get_version.outputs.new_version }}
               run: |
                   cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package.json) > package.json
-                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package-lock.json) > package-lock.json
+                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version | .packages[""].version = $version' package-lock.json) > package-lock.json
                   sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" gutenberg.php
 
             - name: Commit the version bump to the release branch
@@ -164,14 +165,16 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
               with:
                   node-version-file: '.nvmrc'
+                  check-latest: true
                   cache: npm
 
             - name: Build Gutenberg plugin ZIP file
@@ -180,7 +183,7 @@ jobs:
                   NO_CHECKS: 'true'
 
             - name: Upload artifact
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               with:
                   name: gutenberg-plugin
                   path: ./gutenberg.zip
@@ -203,7 +206,7 @@ jobs:
 
             - name: Upload release notes artifact
               if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               with:
                   name: release-notes
                   path: ./release-notes.txt
@@ -219,11 +222,12 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Configure git user name and email
               run: |
@@ -266,12 +270,12 @@ jobs:
               run: echo "version=$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )" >> $GITHUB_OUTPUT
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+              uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+              uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
               with:
                   name: release-notes
 
@@ -307,18 +311,20 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   path: main
                   ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
                   ref: trunk
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Configure git user name and email (for publishing)
               run: |
@@ -326,11 +332,12 @@ jobs:
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
-            - name: Setup Node (for CLI)
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - name: Setup Node.js
+              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
+                  check-latest: true
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |

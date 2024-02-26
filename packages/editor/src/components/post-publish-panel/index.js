@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -56,7 +51,6 @@ export class PostPublishPanel extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			forceIsSaving,
 			isBeingScheduled,
 			isPublished,
 			isPublishSidebarEnabled,
@@ -92,10 +86,9 @@ export class PostPublishPanel extends Component {
 						<>
 							<div className="editor-post-publish-panel__header-publish-button">
 								<PostPublishButton
-									focusOnMount={ true }
+									focusOnMount
 									onSubmit={ this.onSubmit }
 									forceIsDirty={ forceIsDirty }
-									forceIsSaving={ forceIsSaving }
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
@@ -146,6 +139,7 @@ export default compose( [
 			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
+			isAutosavingPost,
 			isSavingPost,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
@@ -153,17 +147,14 @@ export default compose( [
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+			isPostTypeViewable: postType?.viewable,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};

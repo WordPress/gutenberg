@@ -8,6 +8,9 @@
 /**
  * Renders the `core/calendar` block on server.
  *
+ * @global int $monthnum.
+ * @global int $year.
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the block content.
@@ -33,10 +36,8 @@ function render_block_core_calendar( $attributes ) {
 			str_contains( $permalink_structure, '%monthnum%' ) &&
 			str_contains( $permalink_structure, '%year%' )
 		) {
-			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 			$monthnum = $attributes['month'];
-			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
-			$year = $attributes['year'];
+			$year     = $attributes['year'];
 		}
 	}
 
@@ -44,19 +45,21 @@ function render_block_core_calendar( $attributes ) {
 
 	// Text color.
 	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
-	$custom_text_color          = _wp_array_get( $attributes, array( 'style', 'color', 'text' ), null );
+	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
 
 	// Background Color.
 	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
-	$custom_background_color          = _wp_array_get( $attributes, array( 'style', 'color', 'background' ), null );
+	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
 	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
 	// Generate color styles and classes.
-	$styles        = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = empty( $styles['css'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['css'] ) );
 	$classnames    = empty( $styles['classnames'] ) ? '' : ' ' . esc_attr( $styles['classnames'] );
-
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classnames .= ' has-link-color';
+	}
 	// Apply color classes and styles to the calendar.
 	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( true, false ) );
 	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table' . $classnames, $calendar );
@@ -68,10 +71,8 @@ function render_block_core_calendar( $attributes ) {
 		$calendar
 	);
 
-	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	$monthnum = $previous_monthnum;
-	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
-	$year = $previous_year;
+	$year     = $previous_year;
 
 	return $output;
 }
@@ -118,6 +119,8 @@ function block_core_calendar_has_published_posts() {
 /**
  * Queries the database for any published post and saves
  * a flag whether any published post exists or not.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
  *
  * @return bool Has any published posts or not.
  */

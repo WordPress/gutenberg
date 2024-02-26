@@ -22,6 +22,7 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
+			bugfixes: true,
 			include: [
 				'proposal-nullish-coalescing-operator',
 				'proposal-logical-assignment-operators',
@@ -79,7 +80,7 @@ module.exports = ( api ) => {
 				{
 					scopeVariable: 'createElement',
 					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
+					source: 'react',
 					isDefault: false,
 				},
 			],
@@ -88,6 +89,7 @@ module.exports = ( api ) => {
 				{
 					pragma: 'createElement',
 					pragmaFrag: 'Fragment',
+					useSpread: true,
 				},
 			],
 			maybeGetPluginTransformRuntime(),

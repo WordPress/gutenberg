@@ -12,9 +12,9 @@ import { useSelect } from '@wordpress/data';
 import useIndentListItem from './use-indent-list-item';
 
 export default function useSpace( clientId ) {
-	const { getSelectionStart, getSelectionEnd } =
+	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
+	const indentListItem = useIndentListItem( clientId );
 
 	return useRefEffect(
 		( element ) => {
@@ -23,7 +23,6 @@ export default function useSpace( clientId ) {
 
 				if (
 					event.defaultPrevented ||
-					! canIndent ||
 					keyCode !== SPACE ||
 					// Only override when no modifiers are pressed.
 					shiftKey ||
@@ -31,6 +30,10 @@ export default function useSpace( clientId ) {
 					metaKey ||
 					ctrlKey
 				) {
+					return;
+				}
+
+				if ( getBlockIndex( clientId ) === 0 ) {
 					return;
 				}
 
@@ -50,6 +53,6 @@ export default function useSpace( clientId ) {
 				element.removeEventListener( 'keydown', onKeyDown );
 			};
 		},
-		[ canIndent, indentListItem ]
+		[ clientId, indentListItem ]
 	);
 }

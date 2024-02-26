@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -119,7 +118,7 @@ class GalleryImage extends Component {
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
+		if ( caption && ! mediaAttributes.caption ) {
 			const { caption: omittedCaption, ...restMediaAttributes } =
 				mediaAttributes;
 			mediaAttributes = restMediaAttributes;

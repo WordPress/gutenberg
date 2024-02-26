@@ -12,6 +12,7 @@ import { COLORS } from '../colors-values';
 import { breakpoint } from '../breakpoint';
 
 export const inputControl = css`
+	display: block;
 	font-family: ${ font( 'default.fontFamily' ) };
 	padding: 6px 8px;
 	${ inputStyleNeutral };

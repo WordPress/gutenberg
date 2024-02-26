@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from 'react';
  * Internal dependencies
  */
 import type { DropdownProps } from '../dropdown/types';
+import type { HeadingSize } from '../heading/types';
 
 export type ColorObject = {
 	name: string;
@@ -27,6 +28,7 @@ type PaletteProps = {
 	onChange: ( newColor?: string, index?: number ) => void;
 	value?: string;
 	actions?: ReactNode;
+	headingLevel?: HeadingSize;
 };
 
 export type SinglePaletteProps = PaletteProps & {
@@ -55,7 +57,7 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 *
 	 * @default []
 	 */
-	colors?: ( PaletteObject | ColorObject )[];
+	colors?: PaletteObject[] | ColorObject[];
 	/**
 	 * Whether to allow the user to pick a custom color on top of the predefined
 	 * choices (defined via the `colors` prop).
@@ -71,13 +73,52 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 */
 	enableAlpha?: boolean;
 	/**
+	 * The heading level.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
+	/**
 	 * Currently active value.
 	 */
 	value?: string;
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
-};
+} & (
+		| {
+				/**
+				 * A label to identify the purpose of the control.
+				 *
+				 * @todo [#54055] Either this or `aria-labelledby` should be required
+				 */
+				'aria-label'?: string;
+				'aria-labelledby'?: never;
+		  }
+		| {
+				/**
+				 * An ID of an element to provide a label for the control.
+				 *
+				 * @todo [#54055] Either this or `aria-label` should be required
+				 */
+				'aria-labelledby'?: string;
+				'aria-label'?: never;
+		  }
+	);

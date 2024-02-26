@@ -28,8 +28,7 @@ _Returns_
 
 ### documentHasSelection
 
-Check whether the current document has a selection. This includes focus in
-input fields, textareas, and general rich-text selection.
+Check whether the current document has a selection. This includes focus in input fields, textareas, and general rich-text selection.
 
 _Parameters_
 
@@ -41,9 +40,7 @@ _Returns_
 
 ### documentHasTextSelection
 
-Check whether the current document has selected text. This applies to ranges
-of text in the document, and not selection inside `<input>` and `<textarea>`
-elements.
+Check whether the current document has selected text. This applies to ranges of text in the document, and not selection inside `<input>` and `<textarea>` elements.
 
 See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects>.
 
@@ -57,9 +54,7 @@ _Returns_
 
 ### documentHasUncollapsedSelection
 
-Check whether the current document has any sort of (uncollapsed) selection.
-This includes ranges of text across elements and any selection inside
-textual `<input>` and `<textarea>` elements.
+Check whether the current document has any sort of (uncollapsed) selection. This includes ranges of text across elements and any selection inside textual `<input>` and `<textarea>` elements.
 
 _Parameters_
 
@@ -71,8 +66,7 @@ _Returns_
 
 ### focus
 
-Object grouping `focusable` and `tabbable` utils
-under the keys with the same name.
+Object grouping `focusable` and `tabbable` utils under the keys with the same name.
 
 ### getFilesFromDataTransfer
 
@@ -88,9 +82,7 @@ _Returns_
 
 ### getOffsetParent
 
-Returns the closest positioned element, or null under any of the conditions
-of the offsetParent specification. Unlike offsetParent, this function is not
-limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
+Returns the closest positioned element, or null under any of the conditions of the offsetParent specification. Unlike offsetParent, this function is not limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
 
 _Related_
 
@@ -122,8 +114,7 @@ _Returns_
 
 ### getRectangleFromRange
 
-Get the rectangle of a given Range. Returns `null` if no suitable rectangle
-can be found.
+Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found.
 
 _Parameters_
 
@@ -135,11 +126,12 @@ _Returns_
 
 ### getScrollContainer
 
-Given a DOM node, finds the closest scrollable container node.
+Given a DOM node, finds the closest scrollable container node or the node itself, if scrollable.
 
 _Parameters_
 
 -   _node_ `Element | null`: Node from which to start.
+-   _direction_ `?string`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
 
 _Returns_
 
@@ -147,8 +139,7 @@ _Returns_
 
 ### insertAfter
 
-Given two DOM nodes, inserts the former in the DOM as the next sibling of
-the latter.
+Given two DOM nodes, inserts the former in the DOM as the next sibling of the latter.
 
 _Parameters_
 
@@ -161,8 +152,7 @@ _Returns_
 
 ### isEmpty
 
-Recursively checks if an element is empty. An element is not empty if it
-contains text or contains elements with attributes such as images.
+Recursively checks if an element is empty. An element is not empty if it contains text or contains elements with attributes such as images.
 
 _Parameters_
 
@@ -174,8 +164,7 @@ _Returns_
 
 ### isEntirelySelected
 
-Check whether the contents of the element have been entirely selected.
-Returns true if there is no possibility of selection.
+Check whether the contents of the element have been entirely selected. Returns true if there is no possibility of selection.
 
 _Parameters_
 
@@ -203,7 +192,7 @@ Check whether the selection is horizontally at the edge of the container.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: Set to true to check left, false for right.
 
 _Returns_
@@ -262,8 +251,7 @@ _Returns_
 
 ### isTextField
 
-Check whether the given element is a text field, where text field is defined
-by the ability to select within the input, or that it is contenteditable.
+Check whether the given element is a text field, where text field is defined by the ability to select within the input, or that it is contenteditable.
 
 See: <https://html.spec.whatwg.org/#textFieldSelection>
 
@@ -281,7 +269,7 @@ Check whether the selection is vertically at the edge of the container.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: Set to true to check top, false for bottom.
 
 _Returns_

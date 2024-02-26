@@ -4,11 +4,6 @@ This component allows to display the selected block's variations which have the 
 
 By selecting such a variation an update to the selected block's attributes happen, based on the variation's attributes.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

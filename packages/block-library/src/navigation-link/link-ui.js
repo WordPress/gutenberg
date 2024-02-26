@@ -2,18 +2,42 @@
  * WordPress dependencies
  */
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { Popover, Button } from '@wordpress/components';
+import {
+	Popover,
+	Button,
+	VisuallyHidden,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalLinkControl as LinkControl,
-	BlockIcon,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { createInterpolateElement } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	createInterpolateElement,
+	useMemo,
+	useState,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
+import {
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { chevronLeftSmall, plus } from '@wordpress/icons';
+import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { PrivateQuickInserter: QuickInserter } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -41,90 +65,93 @@ export function getSuggestionsQuery( type, kind ) {
 			if ( kind === 'post-type' ) {
 				return { type: 'post', subtype: type };
 			}
-			return {};
+			return {
+				// for custom link which has no type
+				// always show pages as initial suggestions
+				initialSuggestionsSearchOptions: {
+					type: 'post',
+					subtype: 'page',
+					perPage: 20,
+				},
+			};
 	}
 }
 
-/**
- * Add transforms to Link Control
- *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Block client ID.
- */
-function LinkControlTransforms( { clientId } ) {
-	const { getBlock, blockTransforms } = useSelect(
+function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
+	const { rootBlockClientId } = useSelect(
 		( select ) => {
-			const {
-				getBlock: _getBlock,
-				getBlockRootClientId,
-				getBlockTransformItems,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId } = select( blockEditorStore );
 
 			return {
-				getBlock: _getBlock,
-				blockTransforms: getBlockTransformItems(
-					_getBlock( clientId ),
-					getBlockRootClientId( clientId )
-				),
+				rootBlockClientId: getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const { replaceBlock } = useDispatch( blockEditorStore );
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
-	const featuredBlocks = [
-		'core/page-list',
-		'core/site-logo',
-		'core/social-links',
-		'core/search',
-	];
-
-	const transforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
-
-	if ( ! transforms?.length ) {
-		return null;
-	}
+	const dialogTitleId = useInstanceId(
+		LinkControl,
+		`link-ui-block-inserter__title`
+	);
+	const dialogDescritionId = useInstanceId(
+		LinkControl,
+		`link-ui-block-inserter__description`
+	);
 
 	if ( ! clientId ) {
 		return null;
 	}
 
 	return (
-		<div className="link-control-transform">
-			<h3 className="link-control-transform__subheading">
-				{ __( 'Transform' ) }
-			</h3>
-			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
-					return (
-						<Button
-							key={ `transform-${ index }` }
-							onClick={ () =>
-								replaceBlock(
-									clientId,
-									switchToBlockType(
-										getBlock( clientId ),
-										item.name
-									)
-								)
-							}
-							className="link-control-transform__item"
-						>
-							<BlockIcon icon={ item.icon } />
-							{ item.title }
-						</Button>
-					);
-				} ) }
-			</div>
+		<div
+			className="link-ui-block-inserter"
+			role="dialog"
+			aria-labelledby={ dialogTitleId }
+			aria-describedby={ dialogDescritionId }
+			ref={ focusOnMountRef }
+		>
+			<VisuallyHidden>
+				<h2 id={ dialogTitleId }>{ __( 'Add block' ) }</h2>
+
+				<p id={ dialogDescritionId }>
+					{ __( 'Choose a block to add to your Navigation.' ) }
+				</p>
+			</VisuallyHidden>
+
+			<Button
+				className="link-ui-block-inserter__back"
+				icon={ chevronLeftSmall }
+				onClick={ ( e ) => {
+					e.preventDefault();
+					onBack();
+				} }
+				size="small"
+			>
+				{ __( 'Back' ) }
+			</Button>
+
+			<QuickInserter
+				rootClientId={ rootBlockClientId }
+				clientId={ clientId }
+				isAppender={ false }
+				prioritizePatterns={ false }
+				selectBlockOnInsert={ true }
+				hasSearch={ false }
+				onSelect={ onSelectBlock }
+			/>
 		</div>
 	);
 }
 
 export function LinkUI( props ) {
+	const [ addingBlock, setAddingBlock ] = useState( false );
+	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
+	const [ showBackdrop, setShowBackdrop ] = useState( true );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const pagesPermissions = useResourcePermissions( 'pages' );
+	const postsPermissions = useResourcePermissions( 'posts' );
 
 	async function handleCreate( pageTitle ) {
 		const postType = props.link.type || 'page';
@@ -154,60 +181,164 @@ export function LinkUI( props ) {
 	}
 
 	const { label, url, opensInNewTab, type, kind } = props.link;
-	const link = {
-		url,
-		opensInNewTab,
-		title: label && stripHTML( label ),
-	};
+
+	let userCanCreate = false;
+	if ( ! type || type === 'page' ) {
+		userCanCreate = pagesPermissions.canCreate;
+	} else if ( type === 'post' ) {
+		userCanCreate = postsPermissions.canCreate;
+	}
+
+	// Memoize link value to avoid overriding the LinkControl's internal state.
+	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
+	const link = useMemo(
+		() => ( {
+			url,
+			opensInNewTab,
+			title: label && stripHTML( label ),
+		} ),
+		[ label, opensInNewTab, url ]
+	);
+
+	const dialogTitleId = useInstanceId(
+		LinkUI,
+		`link-ui-link-control__title`
+	);
+	const dialogDescritionId = useInstanceId(
+		LinkUI,
+		`link-ui-link-control__description`
+	);
+
+	// Selecting a block should close the popover and also remove the (previously) automatically inserted
+	// link block so that the newly selected block can be inserted in its place.
+	const { onClose: onSelectBlock } = props;
 
 	return (
-		<Popover
-			placement="bottom"
-			onClose={ props.onClose }
-			anchor={ props.anchor }
-			shift
-		>
-			<LinkControl
-				hasTextControl
-				hasRichPreviews
-				className={ props.className }
-				value={ link }
-				showInitialSuggestions={ true }
-				withCreateSuggestion={ props.hasCreateSuggestion }
-				createSuggestion={ handleCreate }
-				createSuggestionButtonText={ ( searchTerm ) => {
-					let format;
+		<>
+			{ showBackdrop && (
+				<div
+					className="components-popover-pointer-events-trap"
+					aria-hidden="true"
+					onClick={ () => setShowBackdrop( false ) }
+				/>
+			) }
+			<Popover
+				placement="bottom"
+				onClose={ props.onClose }
+				anchor={ props.anchor }
+				shift
+			>
+				{ ! addingBlock && (
+					<div
+						role="dialog"
+						aria-labelledby={ dialogTitleId }
+						aria-describedby={ dialogDescritionId }
+					>
+						<VisuallyHidden>
+							<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
 
-					if ( type === 'post' ) {
-						/* translators: %s: search term. */
-						format = __( 'Create draft post: <mark>%s</mark>' );
-					} else {
-						/* translators: %s: search term. */
-						format = __( 'Create draft page: <mark>%s</mark>' );
-					}
+							<p id={ dialogDescritionId }>
+								{ __(
+									'Search for and add a link to your Navigation.'
+								) }
+							</p>
+						</VisuallyHidden>
+						<LinkControl
+							hasTextControl
+							hasRichPreviews
+							value={ link }
+							showInitialSuggestions={ true }
+							withCreateSuggestion={ userCanCreate }
+							createSuggestion={ handleCreate }
+							createSuggestionButtonText={ ( searchTerm ) => {
+								let format;
 
-					return createInterpolateElement(
-						sprintf( format, searchTerm ),
-						{
-							mark: <mark />,
-						}
-					);
-				} }
-				noDirectEntry={ !! type }
-				noURLSuggestion={ !! type }
-				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-				onChange={ props.onChange }
-				onRemove={ props.onRemove }
-				renderControlBottom={
-					! url
-						? () => (
-								<LinkControlTransforms
-									clientId={ props.clientId }
-								/>
-						  )
-						: null
-				}
-			/>
-		</Popover>
+								if ( type === 'post' ) {
+									/* translators: %s: search term. */
+									format = __(
+										'Create draft post: <mark>%s</mark>'
+									);
+								} else {
+									/* translators: %s: search term. */
+									format = __(
+										'Create draft page: <mark>%s</mark>'
+									);
+								}
+
+								return createInterpolateElement(
+									sprintf( format, searchTerm ),
+									{
+										mark: <mark />,
+									}
+								);
+							} }
+							noDirectEntry={ !! type }
+							noURLSuggestion={ !! type }
+							suggestionsQuery={ getSuggestionsQuery(
+								type,
+								kind
+							) }
+							onChange={ props.onChange }
+							onRemove={ props.onRemove }
+							onCancel={ props.onCancel }
+							renderControlBottom={ () =>
+								! link?.url?.length && (
+									<LinkUITools
+										focusAddBlockButton={
+											focusAddBlockButton
+										}
+										setAddingBlock={ () => {
+											setAddingBlock( true );
+											setFocusAddBlockButton( false );
+										} }
+									/>
+								)
+							}
+						/>
+					</div>
+				) }
+
+				{ addingBlock && (
+					<LinkUIBlockInserter
+						clientId={ props.clientId }
+						onBack={ () => {
+							setAddingBlock( false );
+							setFocusAddBlockButton( true );
+						} }
+						onSelectBlock={ onSelectBlock }
+					/>
+				) }
+			</Popover>
+		</>
 	);
 }
+
+const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
+	const blockInserterAriaRole = 'listbox';
+	const addBlockButtonRef = useRef();
+
+	// Focus the add block button when the popover is opened.
+	useEffect( () => {
+		if ( focusAddBlockButton ) {
+			addBlockButtonRef.current?.focus();
+		}
+	}, [ focusAddBlockButton ] );
+
+	return (
+		<VStack className="link-ui-tools">
+			<Button
+				ref={ addBlockButtonRef }
+				icon={ plus }
+				onClick={ ( e ) => {
+					e.preventDefault();
+					setAddingBlock( true );
+				} }
+				aria-haspopup={ blockInserterAriaRole }
+			>
+				{ __( 'Add block' ) }
+			</Button>
+		</VStack>
+	);
+};
+
+export default LinkUITools;

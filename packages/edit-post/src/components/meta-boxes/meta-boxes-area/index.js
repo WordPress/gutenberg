@@ -20,7 +20,7 @@ import { store as editPostStore } from '../../../store';
  *
  * @param {Object} props          Component props.
  * @param {string} props.location metabox location.
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function MetaBoxesArea( { location } ) {
 	const container = useRef( null );

@@ -3,10 +3,10 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
+	__experimentalItem as Item,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
@@ -17,147 +17,140 @@ import { useViewportMatch } from '@wordpress/compose';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { useLocation } from '../routes';
-import { store as editSiteStore } from '../../store';
 import AddNewTemplate from '../add-new-template';
+import SidebarButton from '../sidebar-button';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
-function omit( object, keys ) {
-	return Object.fromEntries(
-		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
-}
-
-const Item = ( { item } ) => {
-	const linkInfo = useLink( item.params );
-	const props = item.params
-		? { ...omit( item, 'params' ), ...linkInfo }
-		: item;
-	return <SidebarNavigationItem { ...props } />;
+const TemplateItem = ( { postType, postId, ...props } ) => {
+	const linkInfo = useLink( {
+		postType,
+		postId,
+	} );
+	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
 
-const config = {
-	wp_template: {
-		path: '/templates',
-		labels: {
-			title: __( 'Templates' ),
-			loading: __( 'Loading templates' ),
-			notFound: __( 'No templates found' ),
-			manage: __( 'Manage all templates' ),
-		},
-	},
-	wp_template_part: {
-		path: '/template-parts',
-		labels: {
-			title: __( 'Template parts' ),
-			loading: __( 'Loading template parts' ),
-			notFound: __( 'No template parts found' ),
-			manage: __( 'Manage all template parts' ),
-		},
-	},
-};
-
-export default function SidebarNavigationScreenTemplates( {
-	postType = 'wp_template',
-} ) {
-	const { params } = useLocation();
+export default function SidebarNavigationScreenTemplates() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-
-	// Ideally the URL params would be enough.
-	// Loading the editor should ideally redirect to the home page
-	// instead of fetching the edited entity here.
-	const { editedPostId, editedPostType } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		return {
-			editedPostId: getEditedPostId(),
-			editedPostType: getEditedPostType(),
-		};
-	}, [] );
-
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		postType,
-		{
-			per_page: -1,
-		}
+		TEMPLATE_POST_TYPE,
+		{ per_page: -1 }
 	);
-
-	let items = [];
-	if ( isLoading ) {
-		items = [
-			{
-				children: config[ postType ].labels.loading,
-			},
-		];
-	} else if ( ! templates && ! isLoading ) {
-		items = [
-			{
-				children: config[ postType ].labels.notFound,
-			},
-		];
-	} else {
-		items = templates?.map( ( template ) => ( {
-			params: {
-				postType,
-				postId: template.id,
-			},
-			children: decodeEntities(
-				template.title?.rendered || template.slug
-			),
-			'aria-current':
-				( params.postType === postType &&
-					params.postId === template.id ) ||
-				// This is a special case for the home page.
-				( editedPostId === template.id &&
-					editedPostType === postType &&
-					!! params.postId )
-					? 'page'
-					: undefined,
-		} ) );
-	}
-
+	const browseAllLink = useLink( { path: '/wp_template/all' } );
+	const canCreate = ! isMobileViewport;
 	return (
 		<SidebarNavigationScreen
-			path={ config[ postType ].path }
-			parentTitle={ __( 'Design' ) }
-			title={
-				<HStack justify="space-between">
-					<div style={ { flexShrink: 0 } }>
-						{ config[ postType ].labels.title }
-					</div>
-					{ ! isMobileViewport && (
-						<AddNewTemplate
-							templateType={ postType }
-							toggleProps={ {
-								className:
-									'edit-site-sidebar-navigation-screen-templates__add-button',
-							} }
-						/>
-					) }
-				</HStack>
+			title={ __( 'Templates' ) }
+			description={ __(
+				'Express the layout of your site with templates.'
+			) }
+			actions={
+				canCreate && (
+					<AddNewTemplate
+						templateType={ TEMPLATE_POST_TYPE }
+						toggleProps={ {
+							as: SidebarButton,
+						} }
+					/>
+				)
 			}
 			content={
 				<>
-					<ItemGroup>
-						{ items.map( ( item, index ) => (
-							<Item item={ item } key={ index } />
-						) ) }
-
-						<SidebarNavigationItem
-							className="edit-site-sidebar-navigation-screen-templates__see-all"
-							{ ...useLink( {
-								postType,
-								postId: undefined,
-							} ) }
-							aria-current={
-								params.postType === postType && ! params.postId
-									? 'page'
-									: undefined
-							}
-							children={ config[ postType ].labels.manage }
-						/>
-					</ItemGroup>
+					{ isLoading && __( 'Loading templates…' ) }
+					{ ! isLoading && (
+						<SidebarTemplatesList templates={ templates } />
+					) }
 				</>
 			}
+			footer={
+				! isMobileViewport && (
+					<SidebarNavigationItem withChevron { ...browseAllLink }>
+						{ __( 'Manage all templates' ) }
+					</SidebarNavigationItem>
+				)
+			}
 		/>
+	);
+}
+
+function TemplatesGroup( { title, templates } ) {
+	return (
+		<ItemGroup>
+			{ !! title && (
+				<Item className="edit-site-sidebar-navigation-screen-templates__templates-group-title">
+					{ title }
+				</Item>
+			) }
+			{ templates.map( ( template ) => (
+				<TemplateItem
+					postType={ TEMPLATE_POST_TYPE }
+					postId={ template.id }
+					key={ template.id }
+					withChevron
+				>
+					{ decodeEntities(
+						template.title?.rendered || template.slug
+					) }
+				</TemplateItem>
+			) ) }
+		</ItemGroup>
+	);
+}
+function SidebarTemplatesList( { templates } ) {
+	if ( ! templates?.length ) {
+		return (
+			<ItemGroup>
+				<Item>{ __( 'No templates found' ) }</Item>
+			</ItemGroup>
+		);
+	}
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
+	const { hierarchyTemplates, customTemplates, ...plugins } =
+		sortedTemplates.reduce(
+			( accumulator, template ) => {
+				const {
+					original_source: originalSource,
+					author_text: authorText,
+				} = template;
+				if ( originalSource === 'plugin' ) {
+					if ( ! accumulator[ authorText ] ) {
+						accumulator[ authorText ] = [];
+					}
+					accumulator[ authorText ].push( template );
+				} else if ( template.is_custom ) {
+					accumulator.customTemplates.push( template );
+				} else {
+					accumulator.hierarchyTemplates.push( template );
+				}
+				return accumulator;
+			},
+			{ hierarchyTemplates: [], customTemplates: [] }
+		);
+	return (
+		<VStack spacing={ 3 }>
+			{ !! hierarchyTemplates.length && (
+				<TemplatesGroup templates={ hierarchyTemplates } />
+			) }
+			{ !! customTemplates.length && (
+				<TemplatesGroup
+					title={ __( 'Custom' ) }
+					templates={ customTemplates }
+				/>
+			) }
+			{ Object.entries( plugins ).map(
+				( [ plugin, pluginTemplates ] ) => {
+					return (
+						<TemplatesGroup
+							key={ plugin }
+							title={ plugin }
+							templates={ pluginTemplates }
+						/>
+					);
+				}
+			) }
+		</VStack>
 	);
 }

@@ -8,6 +8,7 @@
 			"shortCodeTransforms": [],
 			"caption": "",
 			"imageCrop": true,
+			"randomOrder": false,
 			"fixedHeight": true,
 			"linkTo": "media",
 			"sizeSlug": "large",

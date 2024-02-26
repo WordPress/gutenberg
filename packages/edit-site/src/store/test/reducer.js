@@ -6,14 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import {
-	settings,
-	editedPost,
-	blockInserterPanel,
-	listViewPanel,
-} from '../reducer';
-
-import { setIsInserterOpened, setIsListViewOpened } from '../actions';
+import { settings, editedPost } from '../reducer';
 
 describe( 'state', () => {
 	describe( 'settings()', () => {
@@ -71,68 +64,6 @@ describe( 'state', () => {
 				id: 2,
 				context: { templateSlug: 'slug' },
 			} );
-		} );
-	} );
-
-	describe( 'blockInserterPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			expect( blockInserterPanel( true, {} ) ).toBe( true );
-		} );
-
-		it( 'should set the open state of the inserter panel', () => {
-			expect(
-				blockInserterPanel( false, setIsInserterOpened( true ) )
-			).toBe( true );
-			expect(
-				blockInserterPanel( true, setIsInserterOpened( false ) )
-			).toBe( false );
-		} );
-
-		it( 'should close the inserter when opening the list view panel', () => {
-			expect(
-				blockInserterPanel( true, setIsListViewOpened( true ) )
-			).toBe( false );
-		} );
-
-		it( 'should not change the state when closing the list view panel', () => {
-			expect(
-				blockInserterPanel( true, setIsListViewOpened( false ) )
-			).toBe( true );
-		} );
-	} );
-
-	describe( 'listViewPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( listViewPanel( undefined, {} ) ).toEqual( false );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			expect( listViewPanel( true, {} ) ).toBe( true );
-		} );
-
-		it( 'should set the open state of the list view panel', () => {
-			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
-				true
-			);
-			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'should close the list view when opening the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'should not change the state when closing the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
-				true
-			);
 		} );
 	} );
 } );

@@ -7,10 +7,12 @@ import {
 	initializeEditor,
 	render,
 	fireEvent,
-	waitFor,
+	waitForModalVisible,
 	within,
 	getBlock,
 	openBlockSettings,
+	setupMediaPicker,
+	setupPicker,
 } from 'test/helpers';
 
 /**
@@ -68,10 +70,23 @@ const COLOR_GRAY = '#abb8c3';
 const GRADIENT_GREEN =
 	'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)';
 
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'Take a Video',
+	'WordPress Media Library',
+];
+
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
-		<BlockEdit isSelected name={ cover.name } clientId={ 0 } { ...props } />
+		<BlockEdit
+			isSelected
+			mayDisplayControls
+			name={ cover.name }
+			clientId={ 0 }
+			{ ...props }
+		/>
 		<BottomSheetSettings isVisible />
 	</SlotFillProvider>
 );
@@ -127,6 +142,35 @@ describe( 'when no media is attached', () => {
 	} );
 } );
 
+describe( 'when no media is attached and overlay color is set', () => {
+	it( 'adds image', async () => {
+		const media = {
+			type: 'image',
+			id: 2000,
+			url: 'https://test.files.wordpress.com/local-image-1.mp4',
+		};
+		const { mediaPickerCallback } = setupMediaPicker();
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
+		} );
+		const { getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		fireEvent.press( getByText( 'Add image or video' ) );
+		selectOption( 'WordPress Media Library' );
+		await mediaPickerCallback( media );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+} );
+
 describe( 'when an image is attached', () => {
 	it( 'edits the image', async () => {
 		const screen = render(
@@ -169,9 +213,8 @@ describe( 'when an image is attached', () => {
 			/>
 		);
 		fireEvent.press( screen.getByLabelText( 'Edit image' ) );
-		const [ clearMediaButton ] = await screen.findAllByText(
-			'Clear Media'
-		);
+		const [ clearMediaButton ] =
+			await screen.findAllByText( 'Clear Media' );
 		fireEvent.press( clearMediaButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -185,15 +228,14 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'toggles a fixed background', async () => {
-		const { getByText } = render(
+		const screen = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		const fixedBackgroundButton = await waitFor( () =>
-			getByText( 'Fixed background' )
-		);
+		const fixedBackgroundButton =
+			await screen.findByText( 'Fixed background' );
 		fireEvent.press( fixedBackgroundButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -210,16 +252,19 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent(
-			screen.getByTestId( 'Slider Y-Axis Position' ),
+			screen.getByTestId( 'Slider Y-Axis Position', { hidden: true } ),
 			'valueChange',
 			'52'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\nFocalPoint > params.onFocalPointChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -235,15 +280,16 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
-			screen.getByText( ( attributes.focalPoint.x * 100 ).toString() )
+			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
+				hidden: true,
+			} )
 		);
 		fireEvent.changeText(
-			screen.getByLabelText( 'X-Axis Position' ),
+			screen.getByLabelText( 'X-Axis Position', { hidden: true } ),
 			'99'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
@@ -256,21 +302,25 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'discards canceled focal point changes', async () => {
-		const { getByText, getByLabelText } = render(
+		const screen = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await waitFor( () =>
-			getByText( 'Edit focal point' )
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
-			getByText( ( attributes.focalPoint.x * 100 ).toString() )
+			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
+				hidden: true,
+			} )
 		);
-		fireEvent.changeText( getByLabelText( 'X-Axis Position' ), '80' );
-		fireEvent.press( getByLabelText( 'Go back' ) );
+		fireEvent.changeText(
+			screen.getByLabelText( 'X-Axis Position', { hidden: true } ),
+			'80'
+		);
+		fireEvent.press( screen.getByLabelText( 'Go back' ) );
 
 		expect( setAttributes ).not.toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -314,9 +364,13 @@ describe( 'when an image is attached', () => {
 
 		// Update Opacity attribute
 		const opacityControl = getByLabelText( /Opacity/ );
-		fireEvent.press( within( opacityControl ).getByText( '50' ) );
-		const heightTextInput =
-			within( opacityControl ).getByDisplayValue( '50' );
+		fireEvent.press(
+			within( opacityControl ).getByText( '50', { hidden: true } )
+		);
+		const heightTextInput = within( opacityControl ).getByDisplayValue(
+			'50',
+			{ hidden: true }
+		);
 		fireEvent.changeText( heightTextInput, '20' );
 
 		// The decreasing button should be disabled
@@ -345,9 +399,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -356,7 +409,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -366,6 +419,10 @@ describe( 'color settings', () => {
 		// Find the selected color.
 		const colorPaletteButton = await screen.findByTestId( COLOR_PINK );
 		expect( colorPaletteButton ).toBeDefined();
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		// Select another color.
 		const newColorButton = await screen.findByTestId( COLOR_RED );
@@ -380,9 +437,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -391,7 +447,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -436,9 +492,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -447,7 +502,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -492,9 +547,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -503,7 +557,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -518,6 +572,36 @@ describe( 'color settings', () => {
 		fireEvent.press( resetButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'displays the hex color value in the custom color picker', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+
+		// Select a color from the placeholder palette.
+		const colorButton = screen.getByA11yHint(
+			'Navigates to custom color picker'
+		);
+		fireEvent.press( colorButton );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Assert label text before tapping color picker
+		expect( screen.getByText( 'Select a color' ) ).toBeVisible();
+
+		// Tap color picker
+		const colorPicker = screen.getByTestId( 'hsv-color-picker' );
+		fireEvent( colorPicker, 'onHuePickerPress', {
+			hue: 120,
+			saturation: 12,
+			value: 50,
+		} );
+
+		// Assert label hex value after tapping color picker
+		expect( screen.getByText( '#00FF00' ) ).toBeVisible();
 	} );
 } );
 
@@ -536,12 +620,12 @@ describe( 'minimum height settings', () => {
 		await openBlockSettings( screen );
 
 		// Set vw unit
-		fireEvent.press( getByText( 'px' ) );
-		fireEvent.press( getByText( 'Viewport width (vw)' ) );
+		fireEvent.press( getByText( 'px', { hidden: true } ) );
+		fireEvent.press( getByText( 'Viewport width (vw)', { hidden: true } ) );
 
 		// Update height attribute
-		fireEvent.press( getByText( '300' ) );
-		const heightTextInput = getByDisplayValue( '300' );
+		fireEvent.press( getByText( '300', { hidden: true } ) );
+		const heightTextInput = getByDisplayValue( '300', { hidden: true } );
 		fireEvent.changeText( heightTextInput, '20' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -561,8 +645,8 @@ describe( 'minimum height settings', () => {
 		await openBlockSettings( screen );
 
 		// Set the pixel unit
-		fireEvent.press( getByText( 'vw' ) );
-		fireEvent.press( getByText( 'Pixels (px)' ) );
+		fireEvent.press( getByText( 'vw', { hidden: true } ) );
+		fireEvent.press( getByText( 'Pixels (px)', { hidden: true } ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
@@ -592,14 +676,17 @@ describe( 'minimum height settings', () => {
 				await openBlockSettings( screen );
 
 				// Set the unit name
-				fireEvent.press( getByText( 'vw' ) );
-				fireEvent.press( getByText( unitName ) );
+				fireEvent.press( getByText( 'vw', { hidden: true } ) );
+				fireEvent.press( getByText( unitName, { hidden: true } ) );
 
 				// Update height attribute
 				const heightControl = getByLabelText( /Minimum height/ );
-				fireEvent.press( within( heightControl ).getByText( value ) );
-				const heightTextInput =
-					within( heightControl ).getByDisplayValue( value );
+				fireEvent.press(
+					within( heightControl ).getByText( value, { hidden: true } )
+				);
+				const heightTextInput = within(
+					heightControl
+				).getByDisplayValue( value, { hidden: true } );
 				fireEvent.changeText( heightTextInput, minValue );
 
 				// The decreasing button should be disabled

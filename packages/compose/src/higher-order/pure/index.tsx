@@ -17,8 +17,10 @@ import { createHigherOrderComponent } from '../../utils/create-higher-order-comp
 /**
  * Given a component returns the enhanced component augmented with a component
  * only re-rendering when its props/state change
+ *
+ * @deprecated Use `memo` or `PureComponent` instead.
  */
-const pure = createHigherOrderComponent( function < Props >(
+const pure = createHigherOrderComponent( function < Props extends {} >(
 	WrappedComponent: ComponentType< Props >
 ): ComponentType< Props > {
 	if ( WrappedComponent.prototype instanceof Component ) {
@@ -41,7 +43,6 @@ const pure = createHigherOrderComponent( function < Props >(
 			return <WrappedComponent { ...this.props } />;
 		}
 	};
-},
-'pure' );
+}, 'pure' );
 
 export default pure;

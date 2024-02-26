@@ -1,11 +1,11 @@
 .wp-block-separator {
-	border-top: 1px solid currentColor;
-	border-bottom: 1px solid currentColor;
+	border-top: 2px solid currentColor;
 	// Default, thin style, is stored in theme.scss so it can be opted out of
 
-	// Unset the left and right borders by default, otherwise some browsers will render them as "inset".
+	// Unset the left, right and bottom borders by default, otherwise some browsers will render them as "inset".
 	border-left: none;
 	border-right: none;
+	border-bottom: none;
 
 	// Dots style
 	&.is-style-dots {

@@ -1,9 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/gallery",
 	"title": "Gallery",
 	"category": "media",
+	"allowedBlocks": [ "core/image" ],
 	"description": "Display multiple images in a rich gallery.",
 	"keywords": [ "images", "photos" ],
 	"textdomain": "default",
@@ -46,8 +47,8 @@
 					"attribute": "data-id"
 				},
 				"caption": {
-					"type": "string",
-					"source": "html",
+					"type": "rich-text",
+					"source": "rich-text",
 					"selector": ".blocks-gallery-item__caption"
 				}
 			}
@@ -61,10 +62,10 @@
 		},
 		"shortCodeTransforms": {
 			"type": "array",
-			"default": [],
 			"items": {
 				"type": "object"
-			}
+			},
+			"default": []
 		},
 		"columns": {
 			"type": "number",
@@ -72,13 +73,17 @@
 			"maximum": 8
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": ".blocks-gallery-caption"
 		},
 		"imageCrop": {
 			"type": "boolean",
 			"default": true
+		},
+		"randomOrder": {
+			"type": "boolean",
+			"default": false
 		},
 		"fixedHeight": {
 			"type": "boolean",
@@ -115,7 +120,9 @@
 			"blockGap": [ "horizontal", "vertical" ],
 			"__experimentalSkipSerialization": [ "blockGap" ],
 			"__experimentalDefaultControls": {
-				"blockGap": true
+				"blockGap": true,
+				"margin": false,
+				"padding": false
 			}
 		},
 		"color": {
@@ -123,13 +130,16 @@
 			"background": true,
 			"gradients": true
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowEditing": false,
 			"default": {
 				"type": "flex"
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-gallery-editor",

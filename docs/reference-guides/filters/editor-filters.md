@@ -76,7 +76,7 @@ This is a PHP filter which is applied before sending settings to the WordPress b
 
 You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/).
 
-The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialiation can be filtered by a PHP WordPress plugin before being sent.
+The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialization can be filtered by a PHP WordPress plugin before being sent.
 
 _Example:_
 
@@ -84,14 +84,14 @@ _Example:_
 <?php
 // my-plugin.php
 
-function filter_block_editor_settings_when_post_provided( $editor_settings, $editor_context ) {
+function wpdocs_filter_block_editor_settings_when_post_provided( $editor_settings, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		$editor_settings['maxUploadFileSize'] = 12345;
 	}
 	return $editor_settings;
 }
 
-add_filter( 'block_editor_settings_all', 'filter_block_editor_settings_when_post_provided', 10, 2 );
+add_filter( 'block_editor_settings_all', 'wpdocs_filter_block_editor_settings_when_post_provided', 10, 2 );
 ```
 
 #### `block_editor_rest_api_preload_paths`
@@ -104,14 +104,14 @@ _Example:_
 <?php
 // my-plugin.php
 
-function filter_block_editor_rest_api_preload_paths_when_post_provided( $preload_paths, $editor_context ) {
+function wpdocs_filter_block_editor_rest_api_preload_paths_when_post_provided( $preload_paths, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		array_push( $preload_paths, array( '/wp/v2/blocks', 'OPTIONS' ) );
 	}
 	return $preload_paths;
 }
 
-add_filter( 'block_editor_rest_api_preload_paths', 'filter_block_editor_rest_api_preload_paths_when_post_provided', 10, 2 );
+add_filter( 'block_editor_rest_api_preload_paths', 'wpdocs_filter_block_editor_rest_api_preload_paths_when_post_provided', 10, 2 );
 ```
 
 ### Available default editor settings

@@ -75,15 +75,10 @@ describe( 'getBlockGapCSS', () => {
 		expect( result ).toBe( expected );
 	} );
 
-	it( 'should return an empty string if layout definitions cannot be found', () => {
+	it( 'should return an empty string if layout definitions is null', () => {
 		const expected = '';
 
-		const result = getBlockGapCSS(
-			'.my-container',
-			undefined,
-			'flex',
-			'3em'
-		);
+		const result = getBlockGapCSS( '.my-container', null, 'flex', '3em' );
 
 		expect( result ).toBe( expected );
 	} );

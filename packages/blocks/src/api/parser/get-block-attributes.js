@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -10,12 +9,22 @@ import memoize from 'memize';
  */
 import { pipe } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { attr, html, text, query, node, children, prop } from '../matchers';
-import { normalizeBlockType } from '../utils';
+import {
+	attr,
+	html,
+	text,
+	query,
+	node,
+	children,
+	prop,
+	richText,
+} from '../matchers';
+import { normalizeBlockType, getDefault } from '../utils';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -59,6 +68,9 @@ export const toBooleanAttributeMatcher = ( matcher ) =>
  */
 export function isOfType( value, type ) {
 	switch ( type ) {
+		case 'rich-text':
+			return value instanceof RichTextData;
+
 		case 'string':
 			return typeof value === 'string';
 
@@ -135,6 +147,7 @@ export function getBlockAttribute(
 		case 'property':
 		case 'html':
 		case 'text':
+		case 'rich-text':
 		case 'children':
 		case 'node':
 		case 'query':
@@ -153,7 +166,7 @@ export function getBlockAttribute(
 	}
 
 	if ( value === undefined ) {
-		value = attributeSchema.default;
+		value = getDefault( attributeSchema );
 	}
 
 	return value;
@@ -212,14 +225,23 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
 			return text( sourceConfig.selector );
+		case 'rich-text':
+			return richText(
+				sourceConfig.selector,
+				sourceConfig.__unstablePreserveWhiteSpace
+			);
 		case 'children':
 			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
-			const subMatchers = mapValues(
-				sourceConfig.query,
-				matcherFromSource
+			const subMatchers = Object.fromEntries(
+				Object.entries( sourceConfig.query ).map(
+					( [ key, subSourceConfig ] ) => [
+						key,
+						matcherFromSource( subSourceConfig ),
+					]
+				)
 			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
@@ -275,8 +297,13 @@ export function getBlockAttributes(
 	const doc = parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	const blockAttributes = mapValues( blockType.attributes, ( schema, key ) =>
-		getBlockAttribute( key, schema, doc, attributes, innerHTML )
+	const blockAttributes = Object.fromEntries(
+		Object.entries( blockType.attributes ?? {} ).map(
+			( [ key, schema ] ) => [
+				key,
+				getBlockAttribute( key, schema, doc, attributes, innerHTML ),
+			]
+		)
 	);
 
 	return applyFilters(

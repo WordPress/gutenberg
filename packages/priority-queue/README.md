@@ -18,8 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### createQueue
 
-Creates a context-aware queue that only executes
-the last task of a given context.
+Creates a context-aware queue that only executes the last task of a given context.
 
 _Usage_
 

@@ -1,4 +1,4 @@
-/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+/** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
 /**
  * Optimised equality check for format objects.

@@ -53,9 +53,7 @@ it( 'displays the message', () => {
 	expect( screen.getByText( 'A helpful message' ) ).toBeTruthy();
 } );
 
-// Skipped until `pointerEvents: 'box-none'` no longer erroneously prevents
-// triggering `onTouch*` on the element: https://github.com/callstack/react-native-testing-library/issues/897
-it.skip( 'dismisses when the screen is tapped', () => {
+it( 'dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
 			<Tooltip visible={ true } text="A helpful message">

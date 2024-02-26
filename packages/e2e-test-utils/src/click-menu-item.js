@@ -4,8 +4,8 @@
  * @param {string} label The label to search the menu item for.
  */
 export async function clickMenuItem( label ) {
-	const menuItems = await page.$x(
+	const menuItem = await page.waitForXPath(
 		`//*[@role="menu"]//*[text()="${ label }"]`
 	);
-	await menuItems[ 0 ].click();
+	await menuItem.click();
 }

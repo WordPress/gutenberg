@@ -18,10 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### escapeAmpersand
 
-Returns a string with ampersands escaped. Note that this is an imperfect
-implementation, where only ampersands which do not appear as a pattern of
-named, decimal, or hexadecimal character references are escaped. Invalid
-named references (i.e. ambiguous ampersand) are still permitted.
+Returns a string with ampersands escaped. Note that this is an imperfect implementation, where only ampersands which do not appear as a pattern of named, decimal, or hexadecimal character references are escaped. Invalid named references (i.e. ambiguous ampersand) are still permitted.
 
 _Related_
 
@@ -64,9 +61,7 @@ _Returns_
 
 ### escapeEditableHTML
 
-Returns an escaped Editable HTML element value. This is different from
-`escapeHTML`, because for editable HTML, ALL ampersands must be escaped in
-order to render the content correctly on the page.
+Returns an escaped Editable HTML element value. This is different from `escapeHTML`, because for editable HTML, ALL ampersands must be escaped in order to render the content correctly on the page.
 
 _Parameters_
 

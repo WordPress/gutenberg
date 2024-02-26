@@ -9,5 +9,6 @@ interface RNMedia {
     val caption: String
     val title: String
     val alt: String
+    val metadata: WritableMap
     fun toMap(): WritableMap
 }

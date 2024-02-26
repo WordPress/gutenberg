@@ -1,0 +1,20 @@
+[
+	{
+		"blockName": "core/list",
+		"attrs": {
+			"ordered": true,
+			"type": "A"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<li>Item 1</li>\n\t",
+				"innerContent": [ "\n\t<li>Item 1</li>\n\t" ]
+			}
+		],
+		"innerHTML": "\n<ol type=\"A\">\n\t\n</ol>\n",
+		"innerContent": [ "\n<ol type=\"A\">\n\t", null, "\n</ol>\n" ]
+	}
+]

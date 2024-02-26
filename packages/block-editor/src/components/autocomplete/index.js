@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { clone } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
@@ -44,7 +39,9 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
 		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
 			// Provide copies so filters may directly modify them.
 			if ( filteredCompleters === completers ) {
-				filteredCompleters = filteredCompleters.map( clone );
+				filteredCompleters = filteredCompleters.map(
+					( completer ) => ( { ...completer } )
+				);
 			}
 
 			filteredCompleters = applyFilters(

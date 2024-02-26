@@ -1,0 +1,100 @@
+[
+	{
+		"blockName": "core/form",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/form-input",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Name</span><input class=\"wp-block-form-input__input\" type=\"text\" name=\"name\" required aria-required=\"true\"/></label></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Name</span><input class=\"wp-block-form-input__input\" type=\"text\" name=\"name\" required aria-required=\"true\"/></label></div>\n"
+				]
+			},
+			{
+				"blockName": "core/form-input",
+				"attrs": {
+					"type": "email"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Email</span><input class=\"wp-block-form-input__input\" type=\"email\" name=\"email\" required aria-required=\"true\"/></label></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Email</span><input class=\"wp-block-form-input__input\" type=\"email\" name=\"email\" required aria-required=\"true\"/></label></div>\n"
+				]
+			},
+			{
+				"blockName": "core/form-input",
+				"attrs": {
+					"type": "url"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Website</span><input class=\"wp-block-form-input__input\" type=\"url\" name=\"website\" aria-required=\"false\"/></label></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Website</span><input class=\"wp-block-form-input__input\" type=\"url\" name=\"website\" aria-required=\"false\"/></label></div>\n"
+				]
+			},
+			{
+				"blockName": "core/form-input",
+				"attrs": {
+					"type": "textarea"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Comment</span><textarea class=\"wp-block-form-input__input\" name=\"comment\" required aria-required=\"true\"></textarea></label></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Comment</span><textarea class=\"wp-block-form-input__input\" name=\"comment\" required aria-required=\"true\"></textarea></label></div>\n"
+				]
+			},
+			{
+				"blockName": "core/form-submit-button",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/buttons",
+						"attrs": {},
+						"innerBlocks": [
+							{
+								"blockName": "core/button",
+								"attrs": {
+									"tagName": "button",
+									"type": "submit"
+								},
+								"innerBlocks": [],
+								"innerHTML": "\n<div class=\"wp-block-button\"><button type=\"submit\" class=\"wp-block-button__link wp-element-button\">Submit</button></div>\n",
+								"innerContent": [
+									"\n<div class=\"wp-block-button\"><button type=\"submit\" class=\"wp-block-button__link wp-element-button\">Submit</button></div>\n"
+								]
+							}
+						],
+						"innerHTML": "\n<div class=\"wp-block-buttons\"></div>\n",
+						"innerContent": [
+							"\n<div class=\"wp-block-buttons\">",
+							null,
+							"</div>\n"
+						]
+					}
+				],
+				"innerHTML": "\n<div class=\"wp-block-form-submit-button\"></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-form-submit-button\">",
+					null,
+					"</div>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<form class=\"wp-block-form\" enctype=\"text/plain\">\n\n\n\n\n\n\n\n\n\n</form>\n",
+		"innerContent": [
+			"\n<form class=\"wp-block-form\" enctype=\"text/plain\">\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n</form>\n"
+		]
+	}
+]

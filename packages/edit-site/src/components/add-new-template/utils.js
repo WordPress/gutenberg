@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -15,10 +10,23 @@ import { __, sprintf } from '@wordpress/i18n';
 import { blockMeta, post, archive } from '@wordpress/icons';
 
 /**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
+/**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
  * @property {string}        name The entity's name.
  */
+
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.split( '.' ).forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
 
 /**
  * Helper util to map records to add a `name` prop from a
@@ -32,7 +40,7 @@ import { blockMeta, post, archive } from '@wordpress/icons';
 export const mapToIHasNameAndId = ( entities, path ) => {
 	return ( entities || [] ).map( ( entity ) => ( {
 		...entity,
-		name: decodeEntities( get( entity, path ) ),
+		name: decodeEntities( getValueFromObjectPath( entity, path ) ),
 	} ) );
 };
 
@@ -45,9 +53,13 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 export const useExistingTemplates = () => {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-			} ),
+			select( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+				}
+			),
 		[]
 	);
 };
@@ -146,7 +158,7 @@ export function usePostTypeArchiveMenuItems() {
 						description: sprintf(
 							// translators: %s: Name of the post type e.g: "Post".
 							__(
-								'Displays an archive with the latests posts of type: %s.'
+								'Displays an archive with the latest posts of type: %s.'
 							),
 							postType.labels.singular_name
 						),

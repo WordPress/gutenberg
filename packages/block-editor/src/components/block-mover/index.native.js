@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Picker, ToolbarButton } from '@wordpress/components';
+import { Picker, ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
@@ -107,7 +107,7 @@ export const BlockMover = ( {
 	}
 
 	return (
-		<>
+		<ToolbarGroup>
 			<ToolbarButton
 				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
@@ -136,7 +136,7 @@ export const BlockMover = ( {
 				leftAlign={ true }
 				hideCancelButton={ Platform.OS !== 'ios' }
 			/>
-		</>
+		</ToolbarGroup>
 	);
 };
 

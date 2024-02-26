@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,12 +14,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
-import {
-	create,
-	replace,
-	toHTMLString,
-	__UNSTABLE_LINE_SEPARATOR,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -65,13 +58,14 @@ function parseBorderColor( styleString ) {
 }
 
 function multilineToInline( value ) {
-	return toHTMLString( {
-		value: replace(
-			create( { html: value, multilineTag: 'p' } ),
-			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
-			'\n'
-		),
-	} );
+	value = value || `<p></p>`;
+	const padded = `</p>${ value }<p>`;
+	const values = padded.split( `</p><p>` );
+
+	values.shift();
+	values.pop();
+
+	return values.join( '<br>' );
 }
 
 const v5 = {
@@ -435,11 +429,8 @@ const v2 = {
 			// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 			// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
-			const colors = get(
-				select( blockEditorStore ).getSettings(),
-				[ 'colors' ],
-				[]
-			);
+			const colors =
+				select( blockEditorStore ).getSettings().colors ?? [];
 			const colorObject = getColorObjectByAttributeValues(
 				colors,
 				mainColor

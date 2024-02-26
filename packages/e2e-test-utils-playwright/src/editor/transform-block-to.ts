@@ -6,10 +6,14 @@ import type { Editor } from './index';
 /**
  * Clicks the default block appender.
  *
- * @param {Editor} this
- * @param {string} name Block name.
+ * @param this
+ * @param name Block name.
  */
 export async function transformBlockTo( this: Editor, name: string ) {
+	await this.page.waitForFunction(
+		() => window?.wp?.blocks && window?.wp?.data
+	);
+
 	await this.page.evaluate(
 		( [ blockName ] ) => {
 			const clientIds = window.wp.data

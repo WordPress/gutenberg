@@ -7,5 +7,13 @@ module.exports = {
 	output: {
 		filename: 'index.min.js',
 	},
-	plugins: [ new DependencyExtractionWebpackPlugin() ],
+	plugins: [
+		new DependencyExtractionWebpackPlugin( {
+			requestToExternalModule( request ) {
+				return (
+					request.startsWith( '@wordpress/' ) || request === 'lodash'
+				);
+			},
+		} ),
+	],
 };

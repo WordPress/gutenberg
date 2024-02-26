@@ -1,0 +1,34 @@
+#!/bin/bash -eu
+
+set -o pipefail
+
+# Load configurations from JSON file
+CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
+IOS_DEVICE_NAME=$(jq -r '.ios.local.deviceName' "$CONFIG_FILE")
+IOS_PLATFORM_VERSION=$(jq -r '.ios.local.platformVersion' "$CONFIG_FILE")
+
+DEFAULT_DESTINATION="platform=iOS Simulator,name=$IOS_DEVICE_NAME,OS=$IOS_PLATFORM_VERSION"
+if [[ -z "${RN_EDITOR_E2E_IOS_DESTINATION-}" ]]; then
+	DESTINATION="$DEFAULT_DESTINATION"
+else
+	DESTINATION="$RN_EDITOR_E2E_IOS_DESTINATION"
+fi
+
+# Define xcodebuild in a variable so that we can conditionally pipe it through
+# the xcbeautify output parser
+XCODEBUILD_CMD="SKIP_BUNDLING=true \
+	xcodebuild \
+	-workspace ios/GutenbergDemo.xcworkspace \
+	-configuration Release \
+	-scheme GutenbergDemo \
+	-derivedDataPath ios/build/GutenbergDemo \
+	-destination '$DESTINATION'"
+
+# Check if xcbeautify is available
+if command -v xcbeautify >/dev/null 2>&1; then
+	# Pipe the output to xcbeautify
+	eval "$XCODEBUILD_CMD" | xcbeautify
+else
+	# Run xcodebuild without piping the output
+	eval "$XCODEBUILD_CMD"
+fi

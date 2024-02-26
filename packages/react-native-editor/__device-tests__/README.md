@@ -1,72 +1,97 @@
-# Overview
+# Mobile Gutenberg E2E Tests
 
-We use [appium](http://appium.io/) combined with [SauceLabs](https://saucelabs.com/) as an on-device testing solution for covering writing flows using Gutenberg blocks.
+The Mobile Gutenberg (MG) project maintains a suite of automated end-to-end (E2E) tests that uses [Appium](https://appium.io/docs/en/2.1/) to facilitate UI automation. The E2E tests run on iOS simulators and Android emulators to simulate an environment similar to that of an end user. This document provides an overview for running these tests on your local development computer.
 
-Appium is built on the idea that testing native apps shouldn't require including an SDK or recompiling your app. And that you should be able to use your preferred test practices, frameworks, and tools. Appium is an open source project and has made design and tool decisions to encourage a vibrant contributing community.
+## Setup
 
-SauceLabs is a cloud hosting platform that provides access to a variety of simulators, emulators and real devices.
+1. Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide for both iOS and Android, which covers setting up Xcode, Android Studio, the Android SDK.
+1. Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
+1. Install [`jq`](https://jqlang.github.io/jq/download/) via [Homebrew](https://brew.sh/) or your preferred package manager.
+1. `npm run native test:e2e:setup`
 
-## Getting set up to run the tests
+## Running Tests
 
-### Emulators && Simulators
+The process for running the E2E tests differ in subtle, important ways for iOS and Android respectively. Before running E2E tests, if you previously ran `npm run native start:reset`, **ensure the Metro development server is no longer running.**
 
-iOS: Once you've already set up XCode and the simulators you should be good to go to run the tests on an iOS simulator.
+### iOS
 
-Android: You'll need to have created the emulator images and fired up the desired emulator before running the tests against an Android emulator.
+The following script will launch the correct iOS simulator and run all of the E2E tests.
 
-### Real Devices
+```shell
+npm run native test:e2e:ios:local
+```
 
-TBA
+### Android
 
-## Running the tests locally
+The following script will launch the correct Android emulator and run all of the E2E tests.
 
-TLDR; to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
+```shell
+npm run native test:e2e:android:local
+```
 
-Those commands include the process to build a testable version of the app with these steps:
+## Filtering Test Runs
 
-1. Create the JS bundle via `test:e2e:bundle:(ios|android)`
-1. Compile the native app code via `test:e2e:build-app:(ios|android)`
-1. Call the test runner via `device-tests:local`
+By default, the E2E test scripts run all tests in the suite. While this is helpful for verifying all tests pass, the entire test suite takes a long time to complete. Running all tests is not very effective for local development.
 
-Once the JS bundle and native app code are created they can be re-used by the test runner `device-tests:local` in subsequent runs. While writing tests:
+You can filter which test runs by one of two ways:
 
--   If you only changed the native app code you can run only `test:e2e:build-app:(ios|android)` followed by `device-tests:local`
--   If you only changed JS app code you can run only `test:e2e:bundle:(ios|android)` followed by `device-tests:local`
--   If you didn't change native or JS app code but only have modified e2e tests under `__device-tests__` you only need to re-rerun `device-tests:local` which uses the pre-built native and JS app code
--   If it's the case you don't want to run the
-    full suite and want to run a specific file or files you can run `TEST_RN_PLATFORM=android npm run native device-tests <pattern>` where the pattern can just be the file name.
+-   Passing a file name argument to the CLI script.
+-   Leveraging Jest’s interactive watch mode.
 
-### Debugging
+```shell
+# Run a single test file on iOS
+npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 
-There's a debug variant of the command: `device-tests:debug`, which starts a Node.js process that listens for a debugging client. You can use any inspector client at that point to attach and add breakpoints. More information about that can be found here: https://nodejs.org/en/docs/guides/debugging-getting-started/
+# Enable watch mode on iOS
+npm run native test:e2e:ios:local -- -- -- --watch
+```
 
-You can also write `debugger;` in the JS code in any line to add a breakpoint.
+## Speeding Up Test Runs
 
-### Starting the Appium Server
+The `native test:e2e:(android|ios):local` script performs several steps via associated npm scripts.
 
-One of the Caveats to using Appium is the need for the Appium server to be running to interact with the Simulator or Device through Webdriver, as a result the appium server will need to be started before running the tests. To make the entire process easier in the `beforeAll` block of the tests an Appium instance is fired up on a default port of 4723. If you already have something running on that port and would rather not stop that you can change the port within the code that starts that up. At the moment that port number is referenced from the config located at `__device-tests__/helpers/serverConfigs.js`. The process is killed in the `afterAll` block but at the time of writing this there's a small chance some errors might cause it not to get there so it might be best to kill the process yourself if you think something is up. The server output when running the tests are written to `appium-out.log`, this can provide useful information when debugging the issues with the tests.
+-   Create the JavaScript bundle: `test:e2e:bundle:(ios|android)`
+-   Compile the app: `test:e2e:build-app:(ios|android)`
+-   Launch the test runner: `device-tests:local`
 
-### WebDriver capabilities
+While we must run all of these at least once to produce a testable app, it is often not necessary to run them each multiple times over while modifying or writing tests. To speed up multiple test runs, you can invoke the individual scripts as needed.
 
-Appium uses a config object that contains `capabilities` to define how it will connect to a simulator or device, this object is currently located in `__device-tests__/helpers/caps.js` and then referenced when firing up the driver. There are two values that I think are important to know and that's
+-   If you only modified the native app code, you can run `test:e2e:build-app:(ios|android)` followed by `device-tests:local`.
+-   If you only modified JavaScript app code, you can run `test:e2e:bundle:(ios|android)` followed by `device-tests:local`.
+-   If you only modified E2E tests code, you can run `device-tests:local`.
 
--   `platformVersion` which is the platform version of a connected adb device. e.g `9.0` for Android or `12.2` for iOS. The version used here is upper bounded by the max allowed on CI but feel free to change this value locally as needed.
--   `app` which is the absolute path to the `.app` or `.apk` file or the path relative to the **Appium root**. It's important to note that when using the relative paths it's not to the project folder but to the appium server, since by default we start up appium in the project root when running the paths appear relative to the root but if you were using another instance of the Appium server the relative path would need to come from there.
+By default `device-tests:local` runs tests for Android. To run tests on iOS, you can prefix the script with the `TEST_RN_PLATFORM` environment variable.
 
-A full spec on the capabilities can be found [here](http://appium.io/docs/en/writing-running-appium/caps/). If you'd like to change configurations like
-what port appium runs on or what device or emulator the tests should be executed on that file would be where you'd like to make that update.
+```shell
+# Run tests on iOS
+TEST_RN_PLATFORM=ios npm run native device-tests:local
 
-## The run process
+# Run tests on iOS with watch mode enabled
+TEST_RN_PLATFORM=ios npm run native device-tests:local -- -- --watch
+```
 
-At the moment when running locally, the app attempts to fire up an appium server and then connects to it via webdriver. Then
+## Debugging Tests
 
--   on Android, a debug version of the app is bundled, built, and used.
--   on iOS a release version is bundled built and used.
+Much like other development servers, values outputted to the console via `console.log` should display in the Jest test runner server log.
 
-**It's important to ensure that **metro is not running.** This would cause the value of the `__DEV__` variable to be true and load up the sample blocks.**
+Occasionally, it is helpful to inspect breakpoints during the execution of a test.The MG project includes a `device-tests:debug` script which sets the `--inspect` flag required for attaching an inspector. Additional details on attaching an inspector can be found in Node.js’ [Debugging Guide](https://nodejs.org/en/docs/guides/debugging-getting-started).
 
-After the build is complete, an appium server is fired up on port 4723 and the device tests are ran on the connected device/simulator.
+## Writing Tests
 
----
+Jest is the test runner for the E2E test suite. Reviewing the [Jest’s Introduction](https://jestjs.io/docs/getting-started) documentation provides an overview of writing JavaScript-based tests for Jest.
 
-To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md)
+The E2E tests utilize WebdriverIO as the Appium driver, which is an interface that allows Appium to automate a particular platform. The WebdriverIO documentation for [Appium](https://webdriver.io/docs/api/appium/) and the [driver object](https://webdriver.io/docs/api/browser) provides useful information for automating interactions with mobile apps.
+
+Additionally, the project’s E2E tests leverage a [Page Object](https://webdriver.io/docs/pageobjects/) pattern. The `editor-page.js` file defines methods managing all interactions with page UI. Tests themselves reside in separate files.
+
+Expanding the Page Object to interact with specific UI elements often requires determining a [locator strategy](https://saucelabs.com/resources/blog/advanced-locator-strategies) for the targeted UI element. Generally, an accessibility (a11y) identifier is preferred over an Xpath selector, which are slower and considered implementation details.
+
+Determining the correct selector query is often made easier by leveraging a tool to inspect the properties of UI elements.
+
+-   [**Appium Inspector**](https://github.com/appium/appium-inspector#readme) – cross-platform tool for inspecting UI elements and their properties.
+-   [**Android Studio Layout Inspector**](https://developer.android.com/studio/debug/layout-inspector) – Android tool allowing you to debug the layout of your app by showing a view hierarchy and allowing you to inspect the properties of each view.
+-   [**Xcode Accessibility Inspector**](https://developer.apple.com/documentation/accessibility/integrating_accessibility_into_your_app#4154486) – Xcode tool that displays all accessibility information for an element.
+
+## Continuous Integration
+
+In addition to running the E2E tests on local computers, the continuous integration (CI) server runs some of these tests on every Pull Request. Configuration for this can be found in the [.github configuration directory](/.github/workflows).

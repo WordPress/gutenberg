@@ -108,7 +108,7 @@ _Returns_
 
 Useful for when you wish to compile a bespoke set of CSS rules from a series of selector + declaration items.
 
-The Style Engine will return a sanitized and optimized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+The Style Engine will return a sanitized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
 
 You can call `wp_style_engine_get_stylesheet_from_css_rules()` multiple times, and, so long as your styles use the same `context` identifier, they will be stored together.
 
@@ -126,9 +126,30 @@ $styles = array(
         'selector'     => '.wp-tomato',
         'declarations' => array( 'padding' => '100px' )
     ),
+);
+
+$stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+    $styles,
     array(
-        'selector'     => '.wp-kumquat',
+        'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
+    )
+);
+print_r( $stylesheet ); // .wp-pumpkin{color:orange}.wp-tomato{color:red;padding:100px}
+```
+
+It's also possible to build simple, nested CSS rules using the `rules_group` key.
+
+```php
+$styles = array(
+    array(
+        'rules_group'  => '@media (min-width: 80rem)',
+        'selector'     => '.wp-carrot',
         'declarations' => array( 'color' => 'orange' )
+    ),
+    array(
+        'rules_group'  => '@media (min-width: 80rem)',
+        'selector'     => '.wp-tomato',
+        'declarations' => array( 'color' => 'red' )
     ),
 );
 
@@ -138,7 +159,7 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
         'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
     )
 );
-print_r( $stylesheet ); // .wp-pumpkin,.wp-kumquat{color:orange}.wp-tomato{color:red;padding:100px}
+print_r( $stylesheet ); // @media (min-width: 80rem){.wp-carrot{color:orange}}@media (min-width: 80rem){.wp-tomato{color:red;}}
 ```
 
 ### wp_style_engine_get_stylesheet_from_context()

@@ -17,39 +17,27 @@ concurrency:
 
 jobs:
     e2e-puppeteer:
-        name: Puppeteer - ${{ matrix.part }}
+        name: Puppeteer
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        strategy:
-            fail-fast: false
-            matrix:
-                part: [1, 2, 3, 4]
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build
 
             - name: Install WordPress
               run: |
                   npm run wp-env start
 
-            - name: Running the tests
-              run: |
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
-
             - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: failures-artifacts
@@ -57,7 +45,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: flaky-tests-report
@@ -65,25 +53,25 @@ jobs:
                   if-no-files-found: ignore
 
     e2e-playwright:
-        name: Playwright
+        name: Playwright - ${{ matrix.part }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4, 5, 6, 7, 8]
+                totalParts: [8]
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build
 
             - name: Install Playwright dependencies
               run: |
@@ -94,11 +82,13 @@ jobs:
                   npm run wp-env start
 
             - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: failures-artifacts
@@ -106,7 +96,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
               if: always()
               with:
                   name: flaky-tests-report
@@ -121,11 +111,12 @@ jobs:
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: actions/download-artifact@v3
+            - uses: actions/download-artifact@v4.1.2
               id: download_artifact
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
@@ -133,19 +124,14 @@ jobs:
                   name: flaky-tests-report
                   path: flaky-tests
 
-            - name: Use desired version of NodeJS
+            - name: Setup Node.js and install dependencies
               if: ${{ steps.download_artifact.outcome == 'success' }}
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               if: ${{ steps.download_artifact.outcome == 'success' }}
               # TODO: We don't have to build the entire project, just the action itself.
-              run: |
-                  npm ci
-                  npm run build:packages
+              run: npm run build:packages
 
             - name: Report flaky tests
               if: ${{ steps.download_artifact.outcome == 'success' }}

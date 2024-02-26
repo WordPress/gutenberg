@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
@@ -10,42 +10,14 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { store as postEditorStore } from '../../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 function WritingMenu() {
-	const registry = useRegistry();
-	const isDistractionFree = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree,
-		[]
-	);
-
-	const blocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
-		[]
-	);
-
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( postEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
-	const { selectBlock } = useDispatch( blockEditorStore );
-
-	const toggleDistractionFree = () => {
-		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', false );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-			if ( ! isDistractionFree && !! blocks.length ) {
-				selectBlock( blocks[ 0 ].clientId );
-			}
-		} );
+	const turnOffDistractionFree = () => {
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -56,9 +28,9 @@ function WritingMenu() {
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
-				disabled={ isDistractionFree }
+				scope="core"
 				name="fixedToolbar"
+				onToggle={ turnOffDistractionFree }
 				label={ __( 'Top toolbar' ) }
 				info={ __(
 					'Access all block and document tools in a single place'
@@ -67,7 +39,18 @@ function WritingMenu() {
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
+				name="distractionFree"
+				handleToggling={ false }
+				onToggle={ toggleDistractionFree }
+				label={ __( 'Distraction free' ) }
+				info={ __( 'Write with calmness' ) }
+				messageActivated={ __( 'Distraction free mode activated' ) }
+				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
+				shortcut={ displayShortcut.primaryShift( '\\' ) }
+			/>
+			<PreferenceToggleMenuItem
+				scope="core"
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
@@ -78,20 +61,10 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Show and hide admin UI' ) }
+				info={ __( 'Show and hide the admin user interface' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }
-			/>
-			<PreferenceToggleMenuItem
-				scope="core/edit-post"
-				name="distractionFree"
-				onToggle={ toggleDistractionFree }
-				label={ __( 'Distraction free' ) }
-				info={ __( 'Write with calmness' ) }
-				messageActivated={ __( 'Distraction free mode activated' ) }
-				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
-				shortcut={ displayShortcut.primaryShift( '\\' ) }
 			/>
 		</MenuGroup>
 	);

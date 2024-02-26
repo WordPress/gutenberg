@@ -21,7 +21,6 @@
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
-		"importsNotUsedAsValues": "error",
 
 		/* Module Resolution Options */
 		"moduleResolution": "node",

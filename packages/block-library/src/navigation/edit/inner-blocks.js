@@ -14,27 +14,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
-
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-	'core/site-title',
-	'core/site-logo',
-	'core/navigation-submenu',
-];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
-
-const LAYOUT = {
-	type: 'default',
-	alignments: [],
-};
+import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
 
 export default function NavigationInnerBlocks( {
 	clientId,
@@ -75,17 +55,6 @@ export default function NavigationInnerBlocks( {
 		'wp_navigation'
 	);
 
-	const shouldDirectInsert = useMemo(
-		() =>
-			blocks.every(
-				( { name } ) =>
-					name === 'core/navigation-link' ||
-					name === 'core/navigation-submenu' ||
-					name === 'core/page-list'
-			),
-		[ blocks ]
-	);
-
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
 	// appender.
@@ -112,9 +81,9 @@ export default function NavigationInnerBlocks( {
 			value: blocks,
 			onInput,
 			onChange,
-			allowedBlocks: ALLOWED_BLOCKS,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: shouldDirectInsert,
+			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
+			defaultBlock: DEFAULT_BLOCK,
+			directInsert: true,
 			orientation,
 			templateLock,
 
@@ -131,8 +100,9 @@ export default function NavigationInnerBlocks( {
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender
 					: false,
-			__experimentalLayout: LAYOUT,
 			placeholder: showPlaceholder ? placeholder : undefined,
+			__experimentalCaptureToolbars: true,
+			__unstableDisableLayoutClassNames: true,
 		}
 	);
 

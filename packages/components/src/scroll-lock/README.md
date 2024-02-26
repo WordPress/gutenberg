@@ -7,8 +7,8 @@ ScrollLock is a content-free React component for declaratively preventing scroll
 Declare scroll locking as part of modal UI.
 
 ```jsx
+import { useState } from 'react';
 import { ScrollLock, Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyScrollLock = () => {
 	const [ isScrollLocked, setIsScrollLocked ] = useState( false );

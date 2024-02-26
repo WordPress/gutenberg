@@ -9,8 +9,8 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
@@ -115,8 +115,8 @@ Collection of available units.
 Example:
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );

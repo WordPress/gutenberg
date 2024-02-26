@@ -9,6 +9,7 @@
 			"columns": 1,
 			"caption": "",
 			"imageCrop": true,
+			"randomOrder": false,
 			"fixedHeight": true,
 			"linkTo": "none",
 			"sizeSlug": "large",

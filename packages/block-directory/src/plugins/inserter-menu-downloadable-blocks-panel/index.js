@@ -16,13 +16,7 @@ function InserterMenuDownloadableBlocksPanel() {
 
 	return (
 		<__unstableInserterMenuExtension>
-			{ ( {
-				onSelect,
-				onHover,
-				filterValue,
-				hasItems,
-				rootClientId,
-			} ) => {
+			{ ( { onSelect, onHover, filterValue, hasItems } ) => {
 				if ( debouncedFilterValue !== filterValue ) {
 					debouncedSetFilterValue( filterValue );
 				}
@@ -35,7 +29,6 @@ function InserterMenuDownloadableBlocksPanel() {
 					<DownloadableBlocksPanel
 						onSelect={ onSelect }
 						onHover={ onHover }
-						rootClientId={ rootClientId }
 						filterValue={ debouncedFilterValue }
 						hasLocalBlocks={ hasItems }
 						isTyping={ filterValue !== debouncedFilterValue }

@@ -23,7 +23,7 @@ test.describe( 'block mover', () => {
 		} );
 
 		// Select a block so the block mover is rendered.
-		await page.focus( 'text=First Paragraph' );
+		await editor.canvas.locator( 'text=First Paragraph' ).focus();
 		await editor.showBlockToolbar();
 
 		const moveDownButton = page.locator(
@@ -47,7 +47,7 @@ test.describe( 'block mover', () => {
 			attributes: { content: 'First Paragraph' },
 		} );
 		// Select a block so the block mover has the possibility of being rendered.
-		await page.focus( 'text=First Paragraph' );
+		await editor.canvas.locator( 'text=First Paragraph' ).focus();
 		await editor.showBlockToolbar();
 
 		// Ensure no block mover exists when only one block exists on the page.

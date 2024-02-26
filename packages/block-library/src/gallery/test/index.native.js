@@ -3,7 +3,7 @@
  */
 import {
 	act,
-	changeTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getBlock,
 	getEditorHtml,
@@ -14,7 +14,9 @@ import {
 	setupMediaUpload,
 	triggerBlockListLayout,
 	within,
+	setupPicker,
 } from 'test/helpers';
+import { ActionSheetIOS } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -25,6 +27,8 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -35,6 +39,12 @@ import {
 	getGalleryItem,
 	generateGalleryBlock,
 } from './helpers';
+
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'WordPress Media Library',
+];
 
 const media = [
 	{
@@ -67,6 +77,24 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
+	it( "renders gallery block placeholder correctly if the block doesn't have inner blocks", async () => {
+		const getBlockSpy = jest
+			.spyOn( select( blockEditorStore ), 'getBlock' )
+			.mockReturnValue( {
+				innerBlocks: undefined,
+				attributes: {
+					content: '',
+				},
+			} );
+
+		const screen = await addGalleryBlock();
+
+		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+
+		getBlockSpy.mockReset();
+	} );
+
 	it( 'selects a gallery item', async () => {
 		const { galleryBlock } = await initializeWithGalleryBlock( {
 			numberOfItems: 1,
@@ -96,9 +124,42 @@ describe( 'Gallery block', () => {
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 	} );
 
-	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
-	// is addressed.
-	it.skip( 'displays media options picker when selecting the block', async () => {
+	it( 'displays correct media options picker', async () => {
+		// Initialize with an empty gallery
+		const screen = await initializeEditor( {
+			initialHtml: generateGalleryBlock( 0 ),
+		} );
+		const { getByText } = screen;
+
+		// Tap on Gallery block
+		const block = await getBlock( screen, 'Gallery' );
+		fireEvent.press( block );
+		fireEvent.press( within( block ).getByText( 'Add media' ) );
+
+		// Observe that media options picker is displayed
+		/* eslint-disable jest/no-conditional-expect */
+		if ( Platform.isIOS ) {
+			// On iOS the picker is rendered natively, so we have
+			// to check the arguments passed to `ActionSheetIOS`.
+			expect(
+				ActionSheetIOS.showActionSheetWithOptions
+			).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Choose images',
+					options: [ 'Cancel', ...MEDIA_OPTIONS ],
+				} ),
+				expect.any( Function )
+			);
+		} else {
+			expect( getByText( 'Choose images' ) ).toBeVisible();
+			MEDIA_OPTIONS.forEach( ( option ) =>
+				expect( getByText( option ) ).toBeVisible()
+			);
+		}
+		/* eslint-enable jest/no-conditional-expect */
+	} );
+
+	it( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -106,13 +167,13 @@ describe( 'Gallery block', () => {
 			} );
 
 		// Tap on Gallery block
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 
 		// Observe that media options picker is displayed
 		expect( getByText( 'Choose images' ) ).toBeVisible();
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 
-		// Dimiss the picker
+		// Dismiss the picker
 		if ( Platform.isIOS ) {
 			fireEvent.press( getByText( 'Cancel' ) );
 		} else {
@@ -166,14 +227,16 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Check gallery item caption is not visible
-		const galleryItemCaption = getByLabelText( /Image caption. Empty/ );
+		const galleryItemCaption = getByLabelText( /Image caption. Empty/, {
+			hidden: true,
+		} );
 		expect( galleryItemCaption ).not.toBeVisible();
 
 		// Set gallery caption
 		const captionField = within(
 			getByLabelText( /Gallery caption. Empty/ )
 		).getByPlaceholderText( 'Add caption' );
-		changeTextOfRichText(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption'
 		);
@@ -197,7 +260,7 @@ describe( 'Gallery block', () => {
 		// Set gallery item caption
 		const captionField =
 			within( galleryItem ).getByPlaceholderText( 'Add caption' );
-		changeTextOfRichText(
+		typeInRichText(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption'
 		);
@@ -213,11 +276,13 @@ describe( 'Gallery block', () => {
 			setupMediaPicker();
 
 		// Initialize with an empty gallery
-		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
+		const screen = await initializeWithGalleryBlock();
+		const { galleryBlock, getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		fireEvent.press( getByText( 'Choose from device' ) );
+		fireEvent.press( getByText( 'Add media' ) );
+		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
 		// Return media items picked
@@ -254,7 +319,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -308,7 +373,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Take a photo
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Take a Photo' ) );
 		expectMediaPickerCall( 'DEVICE_CAMERA', [ 'image' ], true );
 
@@ -362,7 +427,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from free photo library
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Free Photo Library' ) );
 		expectMediaPickerCall( 'stock-photo-library', [ 'image' ], true );
 
@@ -402,7 +467,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -444,10 +509,11 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc010
 	it( 'rearranges gallery items', async () => {
 		// Initialize with a gallery that contains three items
-		const { galleryBlock } = await initializeWithGalleryBlock( {
-			numberOfItems: 3,
-			media,
-		} );
+		const { getByLabelText, galleryBlock } =
+			await initializeWithGalleryBlock( {
+				numberOfItems: 3,
+				media,
+			} );
 
 		// Rearrange items (final disposition will be: Image 3 - Image 1 - Image 2)
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
@@ -456,7 +522,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem3 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem3 ).getByLabelText(
+				getByLabelText(
 					/Move block left from position 3 to position 2/
 				)
 			)
@@ -465,7 +531,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem1 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem1 ).getByLabelText(
+				getByLabelText(
 					/Move block right from position 1 to position 2/
 				)
 			)
@@ -501,7 +567,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from other apps
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Other Apps' ) );
 		expectMediaPickerCall( 'other-files', [ 'image' ], true );
 
@@ -537,7 +603,7 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
-		
+
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
 		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
@@ -552,6 +618,20 @@ describe( 'Gallery block', () => {
 		fireEvent.press( getByText( 'Media File' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'does not display MediaReplaceFlow component within the block toolbar', async () => {
+		const screen = await initializeWithGalleryBlock( {
+			numberOfItems: 3,
+			media,
+		} );
+		const { queryByTestId } = screen;
+
+		fireEvent.press( getBlock( screen, 'Gallery' ) );
+
+		// Expect the native MediaReplaceFlow component to not be present in the block toolbar
+		const mediaReplaceFlow = queryByTestId( 'media-replace-flow' );
+		expect( mediaReplaceFlow ).toBeNull();
 	} );
 
 	// Test cases related to TC013 - Settings - Columns
@@ -614,7 +694,7 @@ describe( 'Gallery block', () => {
 		await openBlockSettings( screen );
 
 		// Disable crop images setting
-		fireEvent.press( getByText( 'Crop images' ) );
+		fireEvent.press( getByText( 'Crop images to fit' ) );
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

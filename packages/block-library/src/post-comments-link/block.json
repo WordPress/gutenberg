@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"__experimental": "fse",
 	"name": "core/post-comments-link",
-	"title": "Post Comments Link",
+	"title": "Comments Link",
 	"category": "theme",
 	"description": "Displays the link to the current post comments.",
 	"textdomain": "default",
@@ -39,6 +39,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

@@ -11,8 +11,7 @@
 	flex-grow: 1;
 
 	> div:last-of-type,
-	.block-editor-writing-flow,
-	.block-editor-writing-flow > div {
+	.block-editor-writing-flow {
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;

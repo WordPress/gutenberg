@@ -34,6 +34,17 @@ public class RCTAztecViewManager: RCTViewManager {
         return view
     }
 
+    /// This method is similar to `executeBlock` but prepends the block to execute it before other pending blocks.
+    func executeBlockBeforeOthers(viewTag: NSNumber, block: @escaping (RCTAztecView) -> Void) {
+        self.bridge.uiManager.prependUIBlock { (uiManager, viewRegistry) in
+            let view = viewRegistry?[viewTag]
+            guard let aztecView = view as? RCTAztecView else {
+                return
+            }
+            block(aztecView)
+        }
+    }
+    
     func executeBlock(viewTag: NSNumber, block: @escaping (RCTAztecView) -> Void) {
         self.bridge.uiManager.addUIBlock { (uiManager, viewRegistry) in
             let view = viewRegistry?[viewTag]
@@ -69,7 +80,7 @@ public class RCTAztecViewManager: RCTViewManager {
     
     @objc
     func focus(_ viewTag: NSNumber) -> Void {
-        self.executeBlock(viewTag: viewTag) { (aztecView) in
+        self.executeBlockBeforeOthers(viewTag: viewTag) { (aztecView) in
             aztecView.reactFocus()
         }
     }

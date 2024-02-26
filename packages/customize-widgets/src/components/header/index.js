@@ -6,11 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createPortal, useState, useEffect } from '@wordpress/element';
-import { __, _x, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
+import { createPortal, useEffect, useState } from '@wordpress/element';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 
 /**

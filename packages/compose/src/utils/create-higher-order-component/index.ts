@@ -16,14 +16,14 @@ export type WithInjectedProps< C, I > = ComponentType<
  * Given a function mapping a component to an enhanced component and modifier
  * name, returns the enhanced component augmented with a generated displayName.
  *
- * @param  mapComponent Function mapping component to enhanced component.
- * @param  modifierName Seed name from which to generated display name.
+ * @param mapComponent Function mapping component to enhanced component.
+ * @param modifierName Seed name from which to generated display name.
  *
  * @return Component class with generated display name assigned.
  */
 export function createHigherOrderComponent<
 	TInner extends ComponentType< any >,
-	TOuter extends ComponentType< any >
+	TOuter extends ComponentType< any >,
 >( mapComponent: ( Inner: TInner ) => TOuter, modifierName: string ) {
 	return ( Inner: TInner ) => {
 		const Outer = mapComponent( Inner );
@@ -39,8 +39,8 @@ export function createHigherOrderComponent<
  *     hocName( 'MyMemo', Widget ) === 'MyMemo(Widget)';
  *     hocName( 'MyMemo', <div /> ) === 'MyMemo(Component)';
  *
- * @param  name  Name assigned to higher-order component's wrapper component.
- * @param  Inner Wrapped component inside higher-order component.
+ * @param name  Name assigned to higher-order component's wrapper component.
+ * @param Inner Wrapped component inside higher-order component.
  * @return       Wrapped name of higher-order component.
  */
 const hocName = ( name: string, Inner: ComponentType< any > ) => {

@@ -273,7 +273,7 @@ function Typewriter( { children } ) {
  * challenges in Internet Explorer, and is simply skipped, rendering the given
  * props children instead.
  *
- * @type {WPComponent}
+ * @type {Component}
  */
 const TypewriterOrIEBypass = isIE ? ( props ) => props.children : Typewriter;
 

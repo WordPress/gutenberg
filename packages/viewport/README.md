@@ -57,8 +57,7 @@ This package provides a set of HOCs to author components whose behavior should v
 
 #### ifViewportMatches
 
-Higher-order component creator, creating a new component which renders if
-the viewport query is satisfied.
+Higher-order component creator, creating a new component which renders if the viewport query is satisfied.
 
 _Related_
 
@@ -96,9 +95,7 @@ _Type_
 
 #### withViewportMatch
 
-Higher-order component creator, creating a new component which renders with
-the given prop names, where the value passed to the underlying component is
-the result of the query assigned as the object's value.
+Higher-order component creator, creating a new component which renders with the given prop names, where the value passed to the underlying component is the result of the query assigned as the object's value.
 
 _Related_
 

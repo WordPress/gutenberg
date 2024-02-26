@@ -1,80 +1,334 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { Pressable, View } from 'react-native';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, createRef, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	memo,
+} from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	useMobileGlobalStylesColors,
-	alignmentHelpers,
 	useGlobalStyles,
+	withFilters,
 } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
-	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
-	switchToBlockType,
+	getBlockType,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
+	isUnmodifiedDefaultBlock,
+	switchToBlockType,
 } from '@wordpress/blocks';
-import { useSetting } from '@wordpress/block-editor';
+import {
+	useDispatch,
+	useSelect,
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import styles from './block.scss';
 import BlockEdit from '../block-edit';
-import BlockInvalidWarning from './block-invalid-warning';
-import BlockMobileToolbar from '../block-mobile-toolbar';
-import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
+import BlockInvalidWarning from './block-invalid-warning';
+import BlockOutline from './block-outline';
+import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import useScrollUponInsertion from './use-scroll-upon-insertion';
+import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
 
-const emptyArray = [];
-function BlockForType( {
+const EMPTY_ARRAY = [];
+
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
+		newProps.className = classnames( propsA.className, propsB.className );
+	}
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
+		newProps.style = { ...propsA.style, ...propsB.style };
+	}
+
+	return newProps;
+}
+
+function BlockWrapper( {
+	accessibilityLabel,
+	blockCategory,
+	children,
+	clientId,
+	draggingClientId,
+	draggingEnabled,
+	hasInnerBlocks,
+	isDescendentBlockSelected,
+	isRootList,
+	isSelected,
+	isTouchable,
+	marginHorizontal,
+	marginVertical,
+	name,
+	onFocus,
+} ) {
+	const blockWrapperStyles = { flex: 1 };
+	const blockWrapperStyle = [
+		blockWrapperStyles,
+		{
+			marginVertical,
+			marginHorizontal,
+		},
+	];
+	const accessible = ! ( isSelected || isDescendentBlockSelected );
+
+	const ref = useRef();
+	const [ isLayoutCalculated, setIsLayoutCalculated ] = useState();
+	useScrollUponInsertion( {
+		clientId,
+		isSelected,
+		isLayoutCalculated,
+		elementRef: ref,
+	} );
+	const onLayout = useCallback( () => {
+		setIsLayoutCalculated( true );
+	}, [] );
+
+	return (
+		<Pressable
+			accessibilityLabel={ accessibilityLabel }
+			accessibilityRole="button"
+			accessible={ accessible }
+			disabled={ ! isTouchable }
+			onPress={ onFocus }
+			style={ blockWrapperStyle }
+			ref={ ref }
+			onLayout={ onLayout }
+		>
+			<BlockOutline
+				blockCategory={ blockCategory }
+				hasInnerBlocks={ hasInnerBlocks }
+				isRootList={ isRootList }
+				isSelected={ isSelected }
+				name={ name }
+			/>
+			<BlockDraggable
+				clientId={ clientId }
+				draggingClientId={ draggingClientId }
+				enabled={ draggingEnabled }
+				testID="draggable-trigger-content"
+			>
+				{ children }
+			</BlockDraggable>
+		</Pressable>
+	);
+}
+
+function BlockListBlock( {
 	attributes,
+	blockWidth: blockWrapperWidth,
+	canRemove,
 	clientId,
 	contentStyle,
-	getBlockWidth,
-	insertBlocksAfter,
+	isLocked,
 	isSelected,
-	onMerge,
+	isSelectionEnabled,
+	isStackedHorizontally,
+	isValid,
+	marginHorizontal,
+	marginVertical,
 	name,
-	onBlockFocus,
-	onChange,
 	onDeleteBlock,
+	onInsertBlocksAfter,
+	onMerge,
 	onReplace,
-	parentWidth,
 	parentBlockAlignment,
+	parentWidth,
+	rootClientId,
+	setAttributes,
+	toggleSelection,
 	wrapperProps,
-	blockWidth,
-	baseGlobalStyles,
 } ) {
+	const {
+		baseGlobalStyles,
+		blockCategory,
+		blockType,
+		draggingClientId,
+		draggingEnabled,
+		hasInnerBlocks,
+		isDescendantOfParentSelected,
+		isDescendentBlockSelected,
+		isParentSelected,
+		order,
+		mayDisplayControls,
+		blockEditingMode,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockCount,
+				getBlockHierarchyRootClientId,
+				getBlockIndex,
+				getBlockParents,
+				getSelectedBlockClientId,
+				getSettings,
+				hasSelectedInnerBlock,
+				getBlockName,
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
+			const currentBlockType = getBlockType( name || 'core/missing' );
+			const currentBlockCategory = currentBlockType?.category;
+			const blockOrder = getBlockIndex( clientId );
+			const descendentBlockSelected = hasSelectedInnerBlock(
+				clientId,
+				true
+			);
+			const selectedBlockClientId = getSelectedBlockClientId();
+
+			const parents = getBlockParents( clientId, true );
+			const parentSelected =
+				// Set false as a default value to prevent re-render when it's changed from null to false.
+				( selectedBlockClientId || false ) &&
+				selectedBlockClientId === rootClientId;
+
+			const selectedParents = clientId ? parents : [];
+			const descendantOfParentSelected =
+				selectedParents.includes( rootClientId );
+			const blockHasInnerBlocks = getBlockCount( clientId ) > 0;
+
+			// For blocks with inner blocks, we only enable the dragging in the nested
+			// blocks if any of them are selected. This way we prevent the long-press
+			// gesture from being disabled for elements within the block UI.
+			const isDraggingEnabled =
+				! blockHasInnerBlocks ||
+				isSelected ||
+				! descendentBlockSelected;
+			// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
+			// will be the top in the hierarchy.
+			const currentDraggingClientId =
+				getBlockHierarchyRootClientId( clientId );
+
+			const globalStylesBaseStyles =
+				getSettings()?.__experimentalGlobalStylesBaseStyles;
+
+			return {
+				baseGlobalStyles: globalStylesBaseStyles,
+				blockCategory: currentBlockCategory,
+				blockType: currentBlockType,
+				draggingClientId: currentDraggingClientId,
+				draggingEnabled: isDraggingEnabled,
+				hasInnerBlocks: blockHasInnerBlocks,
+				isDescendantOfParentSelected: descendantOfParentSelected,
+				isDescendentBlockSelected: descendentBlockSelected,
+				isParentSelected: parentSelected,
+				order: blockOrder,
+				mayDisplayControls:
+					isSelected ||
+					( isFirstMultiSelectedBlock( clientId ) &&
+						getMultiSelectedBlockClientIds().every(
+							( id ) => getBlockName( id ) === name
+						) ),
+				blockEditingMode: getBlockEditingMode( clientId ),
+			};
+		},
+		[ clientId, isSelected, name, rootClientId ]
+	);
+	const { removeBlock, selectBlock } = useDispatch( blockEditorStore );
+	const initialBlockWidth = blockWrapperWidth - 2 * marginHorizontal;
+	const [ blockWidth, setBlockWidth ] = useState( initialBlockWidth );
+	const parentLayout = useLayout() || {};
 	const defaultColors = useMobileGlobalStylesColors();
-	const fontSizes = useSetting( 'typography.fontSizes' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+
+	const onRemove = useCallback(
+		() => removeBlock( clientId ),
+		[ clientId, removeBlock ]
+	);
+	const onFocus = useCallback( () => {
+		if ( ! isSelected ) {
+			selectBlock( clientId );
+		}
+	}, [ selectBlock, clientId, isSelected ] );
+
+	const onLayout = useCallback(
+		( { nativeEvent } ) => {
+			const layoutWidth = Math.floor( nativeEvent.layout.width );
+
+			if ( ! blockWidth || ! layoutWidth ) {
+				return;
+			}
+
+			if ( blockWidth !== layoutWidth ) {
+				setBlockWidth( layoutWidth );
+			}
+		},
+		[ blockWidth, setBlockWidth ]
+	);
+
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType?.getEditWrapperProps ) {
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
+	}
+
+	// Inherited styles merged with block level styles.
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
 			baseGlobalStyles,
 			globalStyle,
-			wrapperProps.style,
+			wrapperProps?.style,
 			attributes,
 			defaultColors,
 			name,
-			fontSizes
+			fontSizes || EMPTY_ARRAY
 		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
-		defaultColors,
-		globalStyle,
-		// I couldn't simply use attributes and wrapperProps.styles as a dependency because they are almost always a new reference.
-		// Thanks to the JSON.stringify we check if the value is the same instead of reference.
-		JSON.stringify( wrapperProps.style ),
+		// It is crucial to keep the dependencies array minimal to prevent unnecessary calls that could negatively impact performance.
+		// JSON.stringify is used for the following purposes:
+		// 1. To create a single, comparable value from the globalStyle, wrapperProps.style, and attributes objects. This allows useMemo to
+		//    efficiently determine if a change has occurred in any of these objects.
+		// 2. To filter the attributes object, ensuring that only the relevant attributes (included in
+		//    GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES) are considered as dependencies. This reduces the likelihood of
+		//    unnecessary useMemo calls when other, unrelated attributes change.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		JSON.stringify( globalStyle ),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		JSON.stringify( wrapperProps?.style ),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify(
 			Object.fromEntries(
 				Object.entries( attributes ?? {} ).filter( ( [ key ] ) =>
@@ -84,386 +338,197 @@ function BlockForType( {
 		),
 	] );
 
-	const parentLayout = useLayout();
+	const isFocused = isSelected || isDescendentBlockSelected;
+	const isTouchable =
+		isSelected ||
+		isDescendantOfParentSelected ||
+		isParentSelected ||
+		! rootClientId;
+
+	const accessibilityLabel = getAccessibleBlockLabel(
+		blockType,
+		attributes,
+		order + 1
+	);
 
 	return (
-		<GlobalStylesContext.Provider value={ mergedStyle }>
-			<BlockEdit
-				name={ name }
-				isSelected={ isSelected }
-				attributes={ attributes }
-				setAttributes={ onChange }
-				onFocus={ onBlockFocus }
-				onReplace={ onReplace }
-				insertBlocksAfter={ insertBlocksAfter }
-				mergeBlocks={ onMerge }
-				// Block level styles.
-				wrapperProps={ wrapperProps }
-				// Inherited styles merged with block level styles.
-				style={ mergedStyle }
-				clientId={ clientId }
-				parentWidth={ parentWidth }
-				contentStyle={ contentStyle }
-				onDeleteBlock={ onDeleteBlock }
-				blockWidth={ blockWidth }
-				parentBlockAlignment={ parentBlockAlignment }
-				__unstableParentLayout={ parentLayout }
-			/>
-			<View onLayout={ getBlockWidth } />
-		</GlobalStylesContext.Provider>
+		<BlockWrapper
+			accessibilityLabel={ accessibilityLabel }
+			blockCategory={ blockCategory }
+			clientId={ clientId }
+			draggingClientId={ draggingClientId }
+			draggingEnabled={ draggingEnabled }
+			hasInnerBlocks={ hasInnerBlocks }
+			isDescendentBlockSelected={ isDescendentBlockSelected }
+			isFocused={ isFocused }
+			isRootList={ ! rootClientId }
+			isSelected={ isSelected }
+			isStackedHorizontally={ isStackedHorizontally }
+			isTouchable={ isTouchable }
+			marginHorizontal={ marginHorizontal }
+			marginVertical={ marginVertical }
+			name={ name }
+			onFocus={ onFocus }
+		>
+			{ () =>
+				! isValid ? (
+					<BlockInvalidWarning clientId={ clientId } />
+				) : (
+					<GlobalStylesContext.Provider value={ mergedStyle }>
+						<BlockEdit
+							attributes={ attributes }
+							blockWidth={ blockWidth }
+							clientId={ clientId }
+							contentStyle={ contentStyle }
+							insertBlocksAfter={
+								isLocked ? undefined : onInsertBlocksAfter
+							}
+							isSelected={ isSelected }
+							isSelectionEnabled={ isSelectionEnabled }
+							mergeBlocks={ canRemove ? onMerge : undefined }
+							name={ name }
+							onDeleteBlock={ onDeleteBlock }
+							onFocus={ onFocus }
+							onRemove={ canRemove ? onRemove : undefined }
+							onReplace={ canRemove ? onReplace : undefined }
+							parentBlockAlignment={ parentBlockAlignment }
+							parentWidth={ parentWidth }
+							setAttributes={ setAttributes }
+							style={ mergedStyle }
+							toggleSelection={ toggleSelection }
+							__unstableParentLayout={
+								Object.keys( parentLayout ).length
+									? parentLayout
+									: undefined
+							}
+							wrapperProps={ wrapperProps }
+							mayDisplayControls={ mayDisplayControls }
+							blockEditingMode={ blockEditingMode }
+						/>
+						<View onLayout={ onLayout } />
+					</GlobalStylesContext.Provider>
+				)
+			}
+		</BlockWrapper>
 	);
 }
 
-class BlockListBlock extends Component {
-	constructor() {
-		super( ...arguments );
+const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
+	const {
+		isBlockSelected,
+		getBlockMode,
+		isSelectionEnabled,
+		getTemplateLock,
+		getBlockWithoutAttributes,
+		getBlockAttributes,
+		canRemoveBlock,
+		canMoveBlock,
+	} = unlock( select( blockEditorStore ) );
+	const block = getBlockWithoutAttributes( clientId );
+	const attributes = getBlockAttributes( clientId );
+	const isSelected = isBlockSelected( clientId );
+	const templateLock = getTemplateLock( rootClientId );
+	const canRemove = canRemoveBlock( clientId, rootClientId );
+	const canMove = canMoveBlock( clientId, rootClientId );
 
-		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
-		this.onFocus = this.onFocus.bind( this );
-		this.getBlockWidth = this.getBlockWidth.bind( this );
+	// The fallback to `{}` is a temporary fix.
+	// This function should never be called when a block is not present in
+	// the state. It happens now because the order in withSelect rendering
+	// is not correct.
+	const { name, isValid } = block || {};
 
-		this.state = {
-			blockWidth: this.props.blockWidth - 2 * this.props.marginHorizontal,
-		};
+	// Do not add new properties here, use `useSelect` instead to avoid
+	// leaking new props to the public API (editor.BlockListBlock filter).
+	return {
+		mode: getBlockMode( clientId ),
+		isSelectionEnabled: isSelectionEnabled(),
+		isLocked: !! templateLock,
+		canRemove,
+		canMove,
+		// Users of the editor.BlockListBlock filter used to be able to
+		// access the block prop.
+		// Ideally these blocks would rely on the clientId prop only.
+		// This is kept for backward compatibility reasons.
+		block,
+		name,
+		attributes,
+		isValid,
+		isSelected,
+	};
+} );
 
-		this.anchorNodeRef = createRef();
-	}
+const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
+	const {
+		updateBlockAttributes,
+		insertBlocks,
+		mergeBlocks,
+		replaceBlocks,
+		toggleSelection,
+		__unstableMarkLastChangeAsPersistent,
+		moveBlocksToPosition,
+		removeBlock,
+	} = dispatch( blockEditorStore );
 
-	onFocus() {
-		const { firstToSelectId, isSelected, onSelect } = this.props;
-		if ( ! isSelected ) {
-			onSelect( firstToSelectId );
-		}
-	}
+	// Do not add new properties here, use `useDispatch` instead to avoid
+	// leaking new props to the public API (editor.BlockListBlock filter).
+	return {
+		setAttributes( newAttributes ) {
+			const { getMultiSelectedBlockClientIds } =
+				registry.select( blockEditorStore );
+			const multiSelectedBlockClientIds =
+				getMultiSelectedBlockClientIds();
+			const { clientId } = ownProps;
+			const clientIds = multiSelectedBlockClientIds.length
+				? multiSelectedBlockClientIds
+				: [ clientId ];
 
-	insertBlocksAfter( blocks ) {
-		this.props.onInsertBlocks( blocks, this.props.order + 1 );
+			updateBlockAttributes( clientIds, newAttributes );
+		},
+		onInsertBlocks( blocks, index ) {
+			const { rootClientId } = ownProps;
+			insertBlocks( blocks, index, rootClientId );
+		},
+		onInsertBlocksAfter( blocks ) {
+			const { clientId, rootClientId } = ownProps;
+			const { getBlockIndex } = registry.select( blockEditorStore );
+			const index = getBlockIndex( clientId );
+			insertBlocks( blocks, index + 1, rootClientId );
+		},
+		onMerge( forward ) {
+			const { clientId, rootClientId } = ownProps;
+			const {
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getBlock,
+				getBlockAttributes,
+				getBlockName,
+				getBlockOrder,
+				getBlockIndex,
+				getBlockRootClientId,
+				canInsertBlockType,
+			} = registry.select( blockEditorStore );
 
-		if ( blocks[ 0 ] ) {
-			// Focus on the first block inserted.
-			this.props.onSelect( blocks[ 0 ].clientId );
-		}
-	}
+			/**
+			 * Moves the block with clientId up one level. If the block type
+			 * cannot be inserted at the new location, it will be attempted to
+			 * convert to the default block type.
+			 *
+			 * @param {string}  _clientId       The block to move.
+			 * @param {boolean} changeSelection Whether to change the selection
+			 *                                  to the moved block.
+			 */
+			function moveFirstItemUp( _clientId, changeSelection = true ) {
+				const targetRootClientId = getBlockRootClientId( _clientId );
+				const blockOrder = getBlockOrder( _clientId );
+				const [ firstClientId ] = blockOrder;
 
-	getBlockWidth( { nativeEvent } ) {
-		const { layout } = nativeEvent;
-		const { blockWidth } = this.state;
-		const layoutWidth = Math.floor( layout.width );
-
-		if ( ! blockWidth || ! layoutWidth ) {
-			return;
-		}
-
-		if ( blockWidth !== layoutWidth ) {
-			this.setState( { blockWidth: layoutWidth } );
-		}
-	}
-
-	getBlockForType() {
-		const { blockWidth } = this.state;
-		return (
-			<BlockForType
-				{ ...this.props }
-				onBlockFocus={ this.onFocus }
-				insertBlocksAfter={ this.insertBlocksAfter }
-				getBlockWidth={ this.getBlockWidth }
-				blockWidth={ blockWidth }
-			/>
-		);
-	}
-
-	renderBlockTitle() {
-		return (
-			<View style={ styles.blockTitle }>
-				<Text>BlockType: { this.props.name }</Text>
-			</View>
-		);
-	}
-
-	render() {
-		const {
-			attributes,
-			blockType,
-			clientId,
-			icon,
-			isSelected,
-			isValid,
-			order,
-			title,
-			isDimmed,
-			isTouchable,
-			onDeleteBlock,
-			isStackedHorizontally,
-			isParentSelected,
-			getStylesFromColorScheme,
-			marginVertical,
-			marginHorizontal,
-			isInnerBlockSelected,
-			name,
-			draggingEnabled,
-			draggingClientId,
-		} = this.props;
-
-		if ( ! attributes || ! blockType ) {
-			return null;
-		}
-		const { blockWidth } = this.state;
-		const { align } = attributes;
-		const accessibilityLabel = getAccessibleBlockLabel(
-			blockType,
-			attributes,
-			order + 1
-		);
-		const { isFullWidth, isContainerRelated } = alignmentHelpers;
-		const accessible = ! ( isSelected || isInnerBlockSelected );
-		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-		const isScreenWidthEqual = blockWidth === screenWidth;
-		const isScreenWidthWider = blockWidth < screenWidth;
-		const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
-
-		return (
-			<TouchableWithoutFeedback
-				onPress={ this.onFocus }
-				accessible={ accessible }
-				accessibilityRole={ 'button' }
-			>
-				<View
-					style={ { flex: 1 } }
-					accessibilityLabel={ accessibilityLabel }
-				>
-					<View
-						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
-						accessibilityLabel={ accessibilityLabel }
-						style={ [
-							{ marginVertical, marginHorizontal, flex: 1 },
-							isDimmed && styles.dimmed,
-						] }
-					>
-						{ isSelected && (
-							<View
-								pointerEvents="box-none"
-								style={ [
-									styles.solidBorder,
-									isFullWidth( align ) &&
-										isScreenWidthWider &&
-										styles.borderFullWidth,
-									isFullWidth( align ) &&
-										isContainerRelated( name ) &&
-										isScreenWidthWider &&
-										styles.containerBorderFullWidth,
-									getStylesFromColorScheme(
-										styles.solidBorderColor,
-										styles.solidBorderColorDark
-									),
-								] }
-							/>
-						) }
-						{ isParentSelected && (
-							<View
-								style={ [
-									styles.dashedBorder,
-									getStylesFromColorScheme(
-										styles.dashedBorderColor,
-										styles.dashedBorderColorDark
-									),
-								] }
-							/>
-						) }
-						<BlockDraggable
-							clientId={ clientId }
-							draggingClientId={ draggingClientId }
-							enabled={ draggingEnabled }
-							testID="draggable-trigger-content"
-						>
-							{ () =>
-								isValid ? (
-									this.getBlockForType()
-								) : (
-									<BlockInvalidWarning
-										blockTitle={ title }
-										icon={ icon }
-										clientId={ clientId }
-									/>
-								)
-							}
-						</BlockDraggable>
-						<View
-							style={ styles.neutralToolbar }
-							ref={ this.anchorNodeRef }
-						>
-							{ isSelected && (
-								<BlockMobileToolbar
-									clientId={ clientId }
-									onDelete={ onDeleteBlock }
-									isStackedHorizontally={
-										isStackedHorizontally
-									}
-									blockWidth={ blockWidth }
-									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={ isFullWidthToolbar }
-									draggingClientId={ draggingClientId }
-								/>
-							) }
-						</View>
-					</View>
-				</View>
-			</TouchableWithoutFeedback>
-		);
-	}
-}
-
-// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
-const wrapperPropsCache = new WeakMap();
-const emptyObj = {};
-function getWrapperProps( value, getWrapperPropsFunction ) {
-	if ( ! getWrapperPropsFunction ) {
-		return emptyObj;
-	}
-	const cachedValue = wrapperPropsCache.get( value );
-	if ( ! cachedValue ) {
-		const wrapperProps = getWrapperPropsFunction( value );
-		wrapperPropsCache.set( value, wrapperProps );
-		return wrapperProps;
-	}
-	return cachedValue;
-}
-
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockIndex,
-			getBlockCount,
-			getSettings,
-			isBlockSelected,
-			getBlock,
-			getSelectedBlockClientId,
-			getLowestCommonAncestorWithSelectedBlock,
-			getBlockParents,
-			hasSelectedInnerBlock,
-			getBlockHierarchyRootClientId,
-		} = select( blockEditorStore );
-
-		const order = getBlockIndex( clientId );
-		const isSelected = isBlockSelected( clientId );
-		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
-		const block = getBlock( clientId );
-		const { name, attributes, isValid } = block || {};
-
-		const blockType = getBlockType( name || 'core/missing' );
-		const title = blockType?.title;
-		const icon = blockType?.icon;
-
-		const parents = getBlockParents( clientId, true );
-		const parentId = parents[ 0 ] || '';
-
-		const selectedBlockClientId = getSelectedBlockClientId();
-
-		const commonAncestor =
-			getLowestCommonAncestorWithSelectedBlock( clientId );
-		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
-		const firstToSelectId = commonAncestor
-			? parents[ commonAncestorIndex ]
-			: parents[ parents.length - 1 ];
-
-		const isParentSelected =
-			// Set false as a default value to prevent re-render when it's changed from null to false.
-			( selectedBlockClientId || false ) &&
-			selectedBlockClientId === parentId;
-
-		const selectedParents = selectedBlockClientId
-			? getBlockParents( selectedBlockClientId )
-			: [];
-		const isDescendantOfParentSelected =
-			selectedParents.includes( parentId );
-		const isTouchable =
-			isSelected ||
-			isDescendantOfParentSelected ||
-			isParentSelected ||
-			parentId === '';
-		const baseGlobalStyles =
-			getSettings()?.__experimentalGlobalStylesBaseStyles;
-
-		const hasInnerBlocks = getBlockCount( clientId ) > 0;
-		// For blocks with inner blocks, we only enable the dragging in the nested
-		// blocks if any of them are selected. This way we prevent the long-press
-		// gesture from being disabled for elements within the block UI.
-		const draggingEnabled =
-			! hasInnerBlocks ||
-			isSelected ||
-			! hasSelectedInnerBlock( clientId, true );
-		// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
-		// will be the top in the hierarchy.
-		const draggingClientId = getBlockHierarchyRootClientId( clientId );
-
-		return {
-			icon,
-			name: name || 'core/missing',
-			order,
-			title,
-			attributes,
-			blockType,
-			draggingClientId,
-			draggingEnabled,
-			isSelected,
-			isInnerBlockSelected,
-			isValid,
-			isParentSelected,
-			firstToSelectId,
-			isTouchable,
-			baseGlobalStyles,
-			wrapperProps: getWrapperProps(
-				attributes,
-				blockType.getEditWrapperProps
-			),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, registry ) => {
-		const {
-			insertBlocks,
-			mergeBlocks,
-			replaceBlocks,
-			selectBlock,
-			updateBlockAttributes,
-			moveBlocksToPosition,
-			removeBlock,
-		} = dispatch( blockEditorStore );
-
-		return {
-			onMerge( forward ) {
-				const { clientId, rootClientId } = ownProps;
-				const {
-					getPreviousBlockClientId,
-					getNextBlockClientId,
-					getBlock,
-					getBlockAttributes,
-					getBlockName,
-					getBlockOrder,
-					getBlockIndex,
-					getBlockRootClientId,
-					canInsertBlockType,
-				} = registry.select( blockEditorStore );
-
-				/**
-				 * Moves the block with clientId up one level. If the block type
-				 * cannot be inserted at the new location, it will be attempted to
-				 * convert to the default block type.
-				 *
-				 * @param {string}  _clientId       The block to move.
-				 * @param {boolean} changeSelection Whether to change the selection
-				 *                                  to the moved block.
-				 */
-				function moveFirstItemUp( _clientId, changeSelection = true ) {
-					const targetRootClientId =
-						getBlockRootClientId( _clientId );
-					const blockOrder = getBlockOrder( _clientId );
-					const [ firstClientId ] = blockOrder;
-
-					if (
-						blockOrder.length === 1 &&
-						isUnmodifiedBlock( getBlock( firstClientId ) )
-					) {
-						removeBlock( _clientId );
-					} else {
+				if (
+					blockOrder.length === 1 &&
+					isUnmodifiedBlock( getBlock( firstClientId ) )
+				) {
+					removeBlock( _clientId );
+				} else {
+					registry.batch( () => {
 						if (
 							canInsertBlockType(
 								getBlockName( firstClientId ),
@@ -483,15 +548,13 @@ export default compose( [
 							);
 
 							if ( replacement && replacement.length ) {
-								registry.batch( () => {
-									insertBlocks(
-										replacement,
-										getBlockIndex( _clientId ),
-										targetRootClientId,
-										changeSelection
-									);
-									removeBlock( firstClientId, false );
-								} );
+								insertBlocks(
+									replacement,
+									getBlockIndex( _clientId ),
+									targetRootClientId,
+									changeSelection
+								);
+								removeBlock( firstClientId, false );
 							}
 						}
 
@@ -501,85 +564,29 @@ export default compose( [
 						) {
 							removeBlock( _clientId, false );
 						}
-					}
+					} );
 				}
+			}
 
-				// For `Delete` or forward merge, we should do the exact same thing
-				// as `Backspace`, but from the other block.
-				if ( forward ) {
-					if ( rootClientId ) {
-						const nextRootClientId =
-							getNextBlockClientId( rootClientId );
+			// For `Delete` or forward merge, we should do the exact same thing
+			// as `Backspace`, but from the other block.
+			if ( forward ) {
+				if ( rootClientId ) {
+					const nextRootClientId =
+						getNextBlockClientId( rootClientId );
 
-						if ( nextRootClientId ) {
-							// If there is a block that follows with the same parent
-							// block name and the same attributes, merge the inner
-							// blocks.
-							if (
-								getBlockName( rootClientId ) ===
-								getBlockName( nextRootClientId )
-							) {
-								const rootAttributes =
-									getBlockAttributes( rootClientId );
-								const previousRootAttributes =
-									getBlockAttributes( nextRootClientId );
-
-								if (
-									Object.keys( rootAttributes ).every(
-										( key ) =>
-											rootAttributes[ key ] ===
-											previousRootAttributes[ key ]
-									)
-								) {
-									registry.batch( () => {
-										moveBlocksToPosition(
-											getBlockOrder( nextRootClientId ),
-											nextRootClientId,
-											rootClientId
-										);
-										removeBlock( nextRootClientId, false );
-									} );
-									return;
-								}
-							} else {
-								mergeBlocks( rootClientId, nextRootClientId );
-								return;
-							}
-						}
-					}
-
-					const nextBlockClientId = getNextBlockClientId( clientId );
-
-					if ( ! nextBlockClientId ) {
-						return;
-					}
-
-					if ( getBlockOrder( nextBlockClientId ).length ) {
-						moveFirstItemUp( nextBlockClientId, false );
-					} else {
-						mergeBlocks( clientId, nextBlockClientId );
-					}
-				} else {
-					const previousBlockClientId =
-						getPreviousBlockClientId( clientId );
-
-					if ( previousBlockClientId ) {
-						mergeBlocks( previousBlockClientId, clientId );
-					} else if ( rootClientId ) {
-						const previousRootClientId =
-							getPreviousBlockClientId( rootClientId );
-
-						// If there is a preceding block with the same parent block
-						// name and the same attributes, merge the inner blocks.
+					if ( nextRootClientId ) {
+						// If there is a block that follows with the same parent
+						// block name and the same attributes, merge the inner
+						// blocks.
 						if (
-							previousRootClientId &&
 							getBlockName( rootClientId ) ===
-								getBlockName( previousRootClientId )
+							getBlockName( nextRootClientId )
 						) {
 							const rootAttributes =
 								getBlockAttributes( rootClientId );
 							const previousRootAttributes =
-								getBlockAttributes( previousRootClientId );
+								getBlockAttributes( nextRootClientId );
 
 							if (
 								Object.keys( rootAttributes ).every(
@@ -590,33 +597,106 @@ export default compose( [
 							) {
 								registry.batch( () => {
 									moveBlocksToPosition(
-										getBlockOrder( rootClientId ),
-										rootClientId,
-										previousRootClientId
+										getBlockOrder( nextRootClientId ),
+										nextRootClientId,
+										rootClientId
 									);
-									removeBlock( rootClientId, false );
+									removeBlock( nextRootClientId, false );
 								} );
 								return;
 							}
+						} else {
+							mergeBlocks( rootClientId, nextRootClientId );
+							return;
 						}
-
-						moveFirstItemUp( rootClientId );
 					}
 				}
-			},
-			onInsertBlocks( blocks, index ) {
-				insertBlocks( blocks, index, ownProps.rootClientId );
-			},
-			onSelect( clientId = ownProps.clientId, initialPosition ) {
-				selectBlock( clientId, initialPosition );
-			},
-			onChange: ( attributes ) => {
-				updateBlockAttributes( ownProps.clientId, attributes );
-			},
-			onReplace( blocks, indexToSelect ) {
-				replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
-			},
-		};
-	} ),
-	withPreferredColorScheme,
-] )( BlockListBlock );
+
+				const nextBlockClientId = getNextBlockClientId( clientId );
+
+				if ( ! nextBlockClientId ) {
+					return;
+				}
+
+				if ( getBlockOrder( nextBlockClientId ).length ) {
+					moveFirstItemUp( nextBlockClientId, false );
+				} else {
+					mergeBlocks( clientId, nextBlockClientId );
+				}
+			} else {
+				const previousBlockClientId =
+					getPreviousBlockClientId( clientId );
+
+				if ( previousBlockClientId ) {
+					mergeBlocks( previousBlockClientId, clientId );
+				} else if ( rootClientId ) {
+					const previousRootClientId =
+						getPreviousBlockClientId( rootClientId );
+
+					// If there is a preceding block with the same parent block
+					// name and the same attributes, merge the inner blocks.
+					if (
+						previousRootClientId &&
+						getBlockName( rootClientId ) ===
+							getBlockName( previousRootClientId )
+					) {
+						const rootAttributes =
+							getBlockAttributes( rootClientId );
+						const previousRootAttributes =
+							getBlockAttributes( previousRootClientId );
+
+						if (
+							Object.keys( rootAttributes ).every(
+								( key ) =>
+									rootAttributes[ key ] ===
+									previousRootAttributes[ key ]
+							)
+						) {
+							registry.batch( () => {
+								moveBlocksToPosition(
+									getBlockOrder( rootClientId ),
+									rootClientId,
+									previousRootClientId
+								);
+								removeBlock( rootClientId, false );
+							} );
+							return;
+						}
+					}
+
+					moveFirstItemUp( rootClientId );
+				} else {
+					removeBlock( clientId );
+				}
+			}
+		},
+		onReplace( blocks, indexToSelect, initialPosition ) {
+			if (
+				blocks.length &&
+				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+			) {
+				__unstableMarkLastChangeAsPersistent();
+			}
+			replaceBlocks(
+				[ ownProps.clientId ],
+				blocks,
+				indexToSelect,
+				initialPosition
+			);
+		},
+		toggleSelection( selectionEnabled ) {
+			toggleSelection( selectionEnabled );
+		},
+	};
+} );
+
+export default compose(
+	memo,
+	applyWithSelect,
+	applyWithDispatch,
+	// Block is sometimes not mounted at the right time, causing it be undefined
+	// see issue for more info
+	// https://github.com/WordPress/gutenberg/issues/17013
+	ifCondition( ( { block } ) => !! block ),
+	withFilters( 'editor.BlockListBlock' )
+)( BlockListBlock );

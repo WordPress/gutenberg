@@ -17,7 +17,8 @@
 }
 
 .wp-block-spacer.is-hovered .block-library-spacer__resize-container,
-.block-library-spacer__resize-container.has-show-handle {
+.block-library-spacer__resize-container.has-show-handle,
+.wp-block-spacer.is-selected.custom-sizes-disabled {
 	background: rgba($black, 0.1);
 
 	.is-dark-theme & {
@@ -41,5 +42,7 @@
 
 	&.resize-horizontal {
 		margin-bottom: 0;
+		// Important is used to have higher specificity than the inline style set by re-resizable library.
+		height: 100% !important;
 	}
 }

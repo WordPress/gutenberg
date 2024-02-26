@@ -71,7 +71,8 @@ _Optional._ A list of autocompleters to use instead of the default.
 
 ### `preserveWhiteSpace: Boolean`
 
-_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
+_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space or
+trimmed.
 
 ## RichText.Content
 
@@ -79,44 +80,9 @@ _Optional._ Whether or not to preserve white space characters in the `value`. No
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
 ```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			source: 'html',
-			selector: 'h2',
-		},
-	},
-
-	edit: function( props ) {
-		return wp.element.createElement( wp.editor.RichText, {
-			tagName: 'h2',
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			}
-		} );
-	},
-
-	save: function( props ) {
-		return wp.element.createElement( wp.editor.RichText.Content, {
-			tagName: 'h2', value: props.attributes.content
-		} );
-	}
-} );
-```
-
-{% ESNext %}
-
-```js
-const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -145,7 +111,6 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-{% end %}
 
 ## RichTextToolbarButton
 
@@ -153,30 +118,10 @@ Slot to extend the format toolbar. Use it in the edit function of a `registerFor
 
 ### Example
 
-{% codetabs %}
-{% ES5 %}
 
 ```js
-wp.richText.registerFormatType( /* ... */, {
-	/* ... */
-	edit: function( props ) {
-		return wp.element.createElement(
-			wp.editor.RichTextToolbarButton, {
-				icon: 'editor-code',
-				title: 'My formatting button',
-				onClick: function() { /* ... */ }
-				isActive: props.isActive,
-			} );
-	},
-	/* ... */
-} );
-```
-
-{% ESNext %}
-
-```js
-import { registerFormatType } from 'wp-rich-text';
-import { richTextToolbarButton } from 'wp-editor';
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 
 registerFormatType( /* ... */, {
 	/* ... */
@@ -193,5 +138,3 @@ registerFormatType( /* ... */, {
 	/* ... */
 } );
 ```
-
-{% end %}

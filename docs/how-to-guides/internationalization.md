@@ -1,6 +1,6 @@
 # Internationalization
 
-## What is Internationalization?
+## What is internationalization?
 
 Internationalization is the process to provide multiple language support to software, in this case WordPress. Internationalization is often abbreviated as **i18n**, where 18 stands for the number of letters between the first _i_ and the last _n_.
 
@@ -24,11 +24,11 @@ function myguten_block_init() {
     wp_register_script(
         'myguten-script',
         plugins_url( 'block.js', __FILE__ ),
-        array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor' )
+        array( 'wp-blocks', 'react', 'wp-i18n', 'wp-block-editor' )
     );
 
     register_block_type( 'myguten/simple', array(
-		'api_version' => 2,
+		'api_version' => 3,
         'editor_script' => 'myguten-script',
     ) );
 }
@@ -37,16 +37,13 @@ add_action( 'init', 'myguten_block_init' );
 
 In your code, you can include the i18n functions. The most common function is **\_\_** (a double underscore) which provides translation of a simple string. Here is a basic block example:
 
-{% codetabs %}
-{% JSX %}
-
 ```js
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'myguten/simple', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
@@ -63,33 +60,6 @@ registerBlockType( 'myguten/simple', {
 	},
 } );
 ```
-
-{% Plain %}
-
-```js
-const { __ } = wp.i18n;
-const el = wp.element.createElement;
-const { registerBlockType } = wp.blocks;
-const { useBlockProps } = wp.blockEditor;
-
-registerBlockType( 'myguten/simple', {
-	title: __( 'Simple Block', 'myguten' ),
-	category: 'widgets',
-
-	edit: function () {
-		const blockProps = useBlockProps( { style: { color: 'red' } } );
-
-		return el( 'p', blockProps, __( 'Hello World', 'myguten' ) );
-	},
-
-	save: function () {
-		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
-		return el( 'p', blockProps, __( 'Hello World', 'myguten' ) );
-	},
-} );
-```
-
-{% end %}
 
 In the above example, the function will use the first argument for the string to be translated. The second argument is the text domain which must match the text domain slug specified by your plugin.
 
@@ -117,11 +87,11 @@ This is all you need to make your plugin JavaScript code translatable.
 
 When you set script translations for a handle WordPress will automatically figure out if a translations file exists on translate.wordpress.org, and if so ensure that it's loaded into `wp.i18n` before your script runs. With translate.wordpress.org, plugin authors also do not need to worry about setting up their own infrastructure for translations and can rely on a global community with dozens of active locales. Read more about [WordPress Translations](https://make.wordpress.org/meta/handbook/documentation/translations/).
 
-## Provide Your Own Translations
+## Provide your own translations
 
 You can create and ship your own translations with your plugin, if you have sufficient knowledge of the language(s) you can ensure the translations are available.
 
-### Create Translation File
+### Create the translation file
 
 The translation files must be in the JED 1.x JSON format.
 
@@ -234,7 +204,7 @@ This will generate the JSON file `myguten-eo-[md5].json` with the contents:
 }
 ```
 
-### Load Translation File
+### Load the translation file
 
 The final part is to tell WordPress where it can look to find the translation file. The `wp_set_script_translations` function accepts an optional third argument that is the path it will first check for translations. For example:
 
@@ -250,12 +220,12 @@ WordPress will check for a file in that path with the format `${domain}-${locale
 
 Using `make-json` automatically names the file with the md5 hash, so it is ready as-is. You could rename the file to use the handle instead, in which case the file name would be `myguten-eo-myguten-script.json`.
 
-### Test Translations
+### Test translations
 
 You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
 With the language set, create a new post, add the block, and you will see the translations used.
 
-### Filtering Translations
+### Filtering translations
 
 The outputs of the translation functions (`__()`, `_x()`, `_n()`, and `_nx()`) are filterable, see [i18n Filters](/docs/reference-guides/filters/i18n-filters.md) for full information.

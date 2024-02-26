@@ -18,7 +18,7 @@ export interface NestedHeadingData {
  * Takes a flat list of heading parameters and nests them based on each header's
  * immediate parent's level.
  *
- * @param  headingList The flat list of headings to nest.
+ * @param headingList The flat list of headings to nest.
  *
  * @return The nested list of headings.
  */

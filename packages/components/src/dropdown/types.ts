@@ -62,11 +62,8 @@ export type DropdownProps = {
 	 */
 	onClose?: () => void;
 	/**
-	 * A callback invoked when the state of the popover changes
+	 * A callback invoked when the state of the dropdown changes
 	 * from open to closed and vice versa.
-	 * The callback receives a boolean as a parameter.
-	 * If true, the popover will open.
-	 * If false, the popover will close.
 	 */
 	onToggle?: ( willOpen: boolean ) => void;
 	/**
@@ -81,16 +78,6 @@ export type DropdownProps = {
 		ComponentPropsWithoutRef< typeof Popover >,
 		'children'
 	>;
-	/**
-	 * The direction in which the popover should open
-	 * relative to its parent node.
-	 * Specify a y- and an x-axis as a space-separated string.
-	 * Supports "top", "bottom" y-axis,
-	 * and "left", "center", "right" x-axis.
-	 *
-	 * @default 'top center'
-	 */
-	position?: PopoverProps[ 'position' ];
 	/**
 	 * A callback invoked to render the content of the dropdown menu.
 	 * Its first argument is the same as the renderToggle prop.
@@ -112,4 +99,32 @@ export type DropdownProps = {
 	 * The style of the global container.
 	 */
 	style?: CSSProperties;
+	/**
+	 * Legacy way to specify the popover's position with respect to its anchor.
+	 * For details about the possible values, see the `Popover` component's docs.
+	 * _Note: this prop is deprecated. Use the `popoverProps.placement` prop
+	 * instead._
+	 *
+	 * @deprecated
+	 */
+	position?: PopoverProps[ 'position' ];
+	/**
+	 * The controlled open state of the dropdown.
+	 * Must be used in conjunction with `onToggle`.
+	 */
+	open?: boolean;
+	/**
+	 * The open state of the dropdown when initially rendered.
+	 * Use when you do not need to control its open state. It will be overridden
+	 * by the `open` prop if it is specified on the component's first render.
+	 */
+	defaultOpen?: boolean;
+};
+
+export type DropdownInternalContext = {
+	/**
+	 * This variant can be used to change the appearance of the component in
+	 * specific contexts, ie. when rendered inside the `Toolbar` component.
+	 */
+	variant?: 'toolbar';
 };

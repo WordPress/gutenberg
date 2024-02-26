@@ -16,4 +16,16 @@ const minHeight = {
 	},
 };
 
-export default [ minHeight ];
+const aspectRatio = {
+	name: 'aspectRatio',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'dimensions', 'aspectRatio' ],
+			'aspectRatio'
+		);
+	},
+};
+
+export default [ minHeight, aspectRatio ];

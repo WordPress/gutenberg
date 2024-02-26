@@ -75,5 +75,5 @@ export default function useGenerateDefaultNavigationTitle( clientId ) {
 				: title;
 
 		return titleWithCount || '';
-	}, [ isDisabled, area ] );
+	}, [ isDisabled, area, registry ] );
 }

@@ -6,11 +6,6 @@ This component is mostly used for blocks that display text, such as Heading, Par
 
 ![Post Title block alignment options](https://make.wordpress.org/core/files/2020/09/post-title-block-alignment-options.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

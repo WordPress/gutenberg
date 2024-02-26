@@ -42,7 +42,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		 *                        is to ensure the content exists.
 		 * @return string Block content.
 		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
+		$callback = static function ( $content, $block ) use ( $args, $block_name ) {
 
 			// Sanity check.
 			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {

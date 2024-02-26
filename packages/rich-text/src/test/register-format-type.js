@@ -171,7 +171,7 @@ describe( 'registerFormatType', () => {
 			className: 'invalid class name',
 		} );
 		expect( console ).toHaveErroredWith(
-			'A class name must begin with a letter, followed by any number of hyphens, letters, or numbers.'
+			'A class name must begin with a letter, followed by any number of hyphens, underscores, letters, or numbers.'
 		);
 		expect( format ).toBeUndefined();
 	} );

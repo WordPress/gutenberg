@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Group block transforms to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:group -->
+<div id="this-is-another-anchor" class="wp-block-group"><!-- wp:paragraph -->
+<p>One.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Two</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Three.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Group block transforms ungroups block 1`] = `
+"<!-- wp:paragraph -->
+<p>One.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Two</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Three.</p>
+<!-- /wp:paragraph -->"
+`;

@@ -7,7 +7,7 @@ import { __unstableCreateElement as createElement } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { name } from './block.json';
+import { getTransformedMetadata } from '../utils/get-transformed-metadata';
 
 const transforms = {
 	from: [
@@ -18,7 +18,7 @@ const transforms = {
 			transform: ( buttons ) =>
 				// Creates the buttons block.
 				createBlock(
-					name,
+					'core/buttons',
 					{},
 					// Loop the selected buttons.
 					buttons.map( ( attributes ) =>
@@ -34,14 +34,12 @@ const transforms = {
 			transform: ( buttons ) =>
 				// Creates the buttons block.
 				createBlock(
-					name,
+					'core/buttons',
 					{},
 					// Loop the selected buttons.
 					buttons.map( ( attributes ) => {
-						const element = createElement(
-							document,
-							attributes.content
-						);
+						const { content, metadata } = attributes;
+						const element = createElement( document, content );
 						// Remove any HTML tags.
 						const text = element.innerText || '';
 						// Get first url.
@@ -51,6 +49,13 @@ const transforms = {
 						return createBlock( 'core/button', {
 							text,
 							url,
+							metadata: getTransformedMetadata(
+								metadata,
+								'core/button',
+								( { content: contentBinding } ) => ( {
+									text: contentBinding,
+								} )
+							),
 						} );
 					} )
 				),

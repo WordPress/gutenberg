@@ -22,6 +22,7 @@ import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
+import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
@@ -35,6 +36,7 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useClipboardHandler(),
 			useInput(),
 			useDragSelection(),
 			useSelectionObserver(),
@@ -45,7 +47,6 @@ export function useWritingFlow() {
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = 0;
-					node.contentEditable = hasMultiSelection;
 
 					if ( ! hasMultiSelection ) {
 						return;
@@ -93,7 +94,7 @@ function WritingFlow( { children, ...props }, forwardedRef ) {
  * Handles selection and navigation across blocks. This component should be
  * wrapped around BlockList.
  *
- * @param {Object}    props          Component properties.
- * @param {WPElement} props.children Children to be rendered.
+ * @param {Object}  props          Component properties.
+ * @param {Element} props.children Children to be rendered.
  */
 export default forwardRef( WritingFlow );

@@ -161,8 +161,7 @@ _Parameters_
 
 ### persistStubPost
 
-Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
-shouldn't be saved via the API.
+Persists a stub post with given ID to core data store. The post is meant to be in-memory only and shouldn't be saved via the API.
 
 _Parameters_
 
@@ -175,8 +174,7 @@ _Returns_
 
 ### saveEditedWidgetAreas
 
-Converts all the blocks from edited widget areas into widgets,
-and submits a batch request to save everything at once.
+Converts all the blocks from edited widget areas into widgets, and submits a batch request to save everything at once.
 
 Creates a snackbar notice on either success or error.
 
@@ -186,8 +184,7 @@ _Returns_
 
 ### saveWidgetArea
 
-Converts all the blocks from a widget area specified by ID into widgets,
-and submits a batch request to save everything at once.
+Converts all the blocks from a widget area specified by ID into widgets, and submits a batch request to save everything at once.
 
 _Parameters_
 
@@ -199,8 +196,7 @@ _Returns_
 
 ### saveWidgetAreas
 
-Converts all the blocks from specified widget areas into widgets,
-and submits a batch request to save everything at once.
+Converts all the blocks from specified widget areas into widgets, and submits a batch request to save everything at once.
 
 _Parameters_
 

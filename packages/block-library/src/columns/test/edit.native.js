@@ -2,15 +2,18 @@
  * External dependencies
  */
 import {
+	act,
 	addBlock,
+	dismissModal,
 	fireEvent,
+	getBlock,
 	getEditorHtml,
 	initializeEditor,
+	openBlockActionsMenu,
 	openBlockSettings,
+	screen,
+	waitForModalVisible,
 	within,
-	getBlock,
-	waitFor,
-	dismissModal,
 } from 'test/helpers';
 
 /**
@@ -42,7 +45,7 @@ afterAll( () => {
 
 describe( 'Columns block', () => {
 	it( 'inserts block', async () => {
-		const screen = await initializeEditor();
+		await initializeEditor();
 
 		// Add block
 		await addBlock( screen, 'Columns' );
@@ -54,7 +57,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'adds a column block using the appender', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 
@@ -72,7 +75,7 @@ describe( 'Columns block', () => {
 
 	describe( 'when using the number of columns setting', () => {
 		it( 'adds a column block when incrementing the value', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText } = screen;
@@ -93,8 +96,33 @@ describe( 'Columns block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
+		it( 'adds at least 15 Column blocks without limitation', async () => {
+			await initializeEditor( {
+				initialHtml: TWO_COLUMNS_BLOCK_HTML,
+			} );
+			const { getByLabelText } = screen;
+
+			// Get block
+			const columnsBlock = await getBlock( screen, 'Columns' );
+			fireEvent.press( columnsBlock );
+
+			// Open block settings
+			await openBlockSettings( screen );
+
+			// Update the number of columns
+			const columnsControl = getByLabelText( /Number of columns/ );
+
+			for ( let x = 0; x < 15; x++ ) {
+				fireEvent( columnsControl, 'accessibilityAction', {
+					nativeEvent: { actionName: 'increment' },
+				} );
+			}
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
 		it( 'removes a column block when decrementing the value', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText } = screen;
@@ -116,20 +144,18 @@ describe( 'Columns block', () => {
 		} );
 
 		it( 'reaches the minimum limit of number of column blocks', async () => {
-			const screen = await initializeEditor();
-			const { getByLabelText, getByTestId } = screen;
+			await initializeEditor();
 
 			// Add block
 			await addBlock( screen, 'Columns' );
 
 			// Wait for the variations modal to be visible
-			await waitFor(
-				() => getByTestId( 'block-variation-modal' ).props.isVisible
+			const blockVariationModal = await screen.findByTestId(
+				'block-variation-modal'
 			);
+			await waitForModalVisible( blockVariationModal );
 
 			// Select a column variation
-			const blockVariationModal = getByTestId( 'block-variation-modal' );
-			await waitFor( () => blockVariationModal.props.isVisible );
 			const threeColumnLayout =
 				within( blockVariationModal ).getByLabelText(
 					/33 \/ 33 \/ 33 block/
@@ -144,7 +170,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Update the number of columns by adding one
-			const columnsControl = getByLabelText( /Number of columns/ );
+			const columnsControl = screen.getByLabelText( /Number of columns/ );
 			fireEvent( columnsControl, 'accessibilityAction', {
 				nativeEvent: { actionName: 'increment' },
 			} );
@@ -161,7 +187,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'removes column with the remove button', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -186,7 +212,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'removes the only one left Column with the remove button', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -223,7 +249,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'changes vertical alignment on Columns', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -246,41 +272,45 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'changes the vertical alignment on individual Column', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByLabelText(
+		const verticalAlignmentButton = screen.getByLabelText(
 			/Change vertical alignment/
 		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
-		const verticalTopAlignmentButton = getByLabelText( /Align top/ );
+		const verticalTopAlignmentButton = screen.getByLabelText( /Align top/ );
 		fireEvent.press( verticalTopAlignmentButton );
 
 		// Get the first column
 		const firstColumnBlock = await getBlock( screen, 'Column' );
 		fireEvent.press( firstColumnBlock );
+		// Inner blocks batch store updates with microtasks.
+		// To avoid `act` warnings, we let queued microtasks to be executed.
+		// Reference: https://t.ly/b95nA
+		await act( async () => {} );
 
 		// Open vertical alignment menu
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align bottom button
-		const verticalBottomAlignmentButton = getByLabelText( /Align bottom/ );
+		const verticalBottomAlignmentButton =
+			screen.getByLabelText( /Align bottom/ );
 		fireEvent.press( verticalBottomAlignmentButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'sets current vertical alignment on new Columns', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -309,20 +339,18 @@ describe( 'Columns block', () => {
 
 	describe( 'when using columns percentage mechanism', () => {
 		it( "updates the slider's input value", async () => {
-			const screen = await initializeEditor();
-			const { getByLabelText, getByTestId } = screen;
+			await initializeEditor();
 
 			// Add block
 			await addBlock( screen, 'Columns' );
 
 			// Wait for the variations modal to be visible
-			await waitFor(
-				() => getByTestId( 'block-variation-modal' ).props.isVisible
+			const blockVariationModal = await screen.findByTestId(
+				'block-variation-modal'
 			);
+			await waitForModalVisible( blockVariationModal );
 
 			// Select a column variation
-			const blockVariationModal = getByTestId( 'block-variation-modal' );
-			await waitFor( () => blockVariationModal.props.isVisible );
 			const threeColumnLayout =
 				within( blockVariationModal ).getByLabelText(
 					/33 \/ 33 \/ 33 block/
@@ -337,17 +365,21 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Get width control
-			const widthControl = getByLabelText( /Width. Value is/ );
-			fireEvent.press( within( widthControl ).getByText( '33.3' ) );
-			const widthTextInput =
-				within( widthControl ).getByDisplayValue( '33.3' );
+			const widthControl = screen.getByLabelText( /Width. Value is/ );
+			fireEvent.press(
+				within( widthControl ).getByText( '33.3', { hidden: true } )
+			);
+			const widthTextInput = within( widthControl ).getByDisplayValue(
+				'33.3',
+				{ hidden: true }
+			);
 			fireEvent.changeText( widthTextInput, '55.55555' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'sets custom values correctly', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText, getByTestId } = screen;
@@ -365,9 +397,13 @@ describe( 'Columns block', () => {
 
 			// Set custom width value for the first column
 			let widthControl = getByLabelText( /Width. Value is/ );
-			fireEvent.press( within( widthControl ).getByText( '50' ) );
-			let widthTextInput =
-				within( widthControl ).getByDisplayValue( '50' );
+			fireEvent.press(
+				within( widthControl ).getByText( '50', { hidden: true } )
+			);
+			let widthTextInput = within( widthControl ).getByDisplayValue(
+				'50',
+				{ hidden: true }
+			);
 			fireEvent.changeText( widthTextInput, '90' );
 
 			// Dismiss settings
@@ -384,8 +420,12 @@ describe( 'Columns block', () => {
 
 			// Set custom width value for the second column
 			widthControl = getByLabelText( /Width. Value is/ );
-			fireEvent.press( within( widthControl ).getByText( '50' ) );
-			widthTextInput = within( widthControl ).getByDisplayValue( '50' );
+			fireEvent.press(
+				within( widthControl ).getByText( '50', { hidden: true } )
+			);
+			widthTextInput = within( widthControl ).getByDisplayValue( '50', {
+				hidden: true,
+			} );
 			fireEvent.changeText( widthTextInput, '55.5' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -405,22 +445,18 @@ describe( 'Columns block', () => {
 		test.each( testData )(
 			'sets the predefined percentages for %s',
 			async ( layout ) => {
-				const screen = await initializeEditor();
-				const { getByTestId } = screen;
+				await initializeEditor();
 
 				// Add block
 				await addBlock( screen, 'Columns' );
 
 				// Wait for the variations modal to be visible
-				await waitFor(
-					() => getByTestId( 'block-variation-modal' ).props.isVisible
-				);
-
-				// Select a column variation
-				const blockVariationModal = getByTestId(
+				const blockVariationModal = await screen.findByTestId(
 					'block-variation-modal'
 				);
-				await waitFor( () => blockVariationModal.props.isVisible );
+				await waitForModalVisible( blockVariationModal );
+
+				// Select a column variation
 				const columnLayout =
 					within( blockVariationModal ).getByLabelText( layout );
 				fireEvent.press( columnLayout );
@@ -428,5 +464,33 @@ describe( 'Columns block', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			}
 		);
+	} );
+
+	it( 'transforms a nested Columns block into a Group block', async () => {
+		await initializeEditor( {
+			initialHtml: `<!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:columns -->
+			<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+			<div class="wp-block-column" style="flex-basis:100%"><!-- wp:paragraph -->
+			<p></p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:column --></div>
+			<!-- /wp:columns --></div>
+			<!-- /wp:group -->`,
+		} );
+
+		// Get Columns block
+		const columnsBlock = await getBlock( screen, 'Columns' );
+		fireEvent.press( columnsBlock );
+
+		// Open block actions menu
+		await openBlockActionsMenu( screen );
+
+		// Tap on the Transform block button
+		fireEvent.press( screen.getByLabelText( /Transform block…/ ) );
+
+		// Tap on the Group transform button
+		fireEvent.press( screen.getByLabelText( 'Group' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

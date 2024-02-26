@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, useRegistry } from '@wordpress/data';
@@ -35,14 +30,16 @@ export default function MetaBoxes( { location } ) {
 		[ location ]
 	);
 
+	const hasMetaBoxes = !! metaBoxes?.length;
+
 	// When editor is ready, initialize postboxes (wp core script) and metabox
 	// saving. This initializes all meta box locations, not just this specific
 	// one.
 	useEffect( () => {
-		if ( isEditorReady && ! areMetaBoxesInitialized ) {
+		if ( isEditorReady && hasMetaBoxes && ! areMetaBoxesInitialized ) {
 			registry.dispatch( editPostStore ).initializeMetaBoxes();
 		}
-	}, [ isEditorReady, areMetaBoxesInitialized ] );
+	}, [ isEditorReady, hasMetaBoxes, areMetaBoxesInitialized ] );
 
 	if ( ! areMetaBoxesInitialized ) {
 		return null;
@@ -50,7 +47,7 @@ export default function MetaBoxes( { location } ) {
 
 	return (
 		<>
-			{ map( metaBoxes, ( { id } ) => (
+			{ ( metaBoxes ?? [] ).map( ( { id } ) => (
 				<MetaBoxVisibility key={ id } id={ id } />
 			) ) }
 			<MetaBoxesArea location={ location } />

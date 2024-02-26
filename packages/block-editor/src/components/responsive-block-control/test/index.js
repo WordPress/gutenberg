@@ -15,8 +15,6 @@ import { SelectControl } from '@wordpress/components';
  */
 import ResponsiveBlockControl from '../index';
 
-jest.useFakeTimers();
-
 const inputId = 'input-12345678';
 
 const sizeOptions = [
@@ -246,9 +244,7 @@ describe( 'Default and Responsive modes', () => {
 	} );
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const ResponsiveBlockControlConsumer = () => {
 			const [ isResponsive, setIsResponsive ] = useState( false );
 

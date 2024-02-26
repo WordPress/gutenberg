@@ -5,6 +5,7 @@ import androidx.core.util.Consumer;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
@@ -29,8 +30,9 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     interface MediaUploadEventEmitter {
         void onUploadMediaFileClear(int mediaId);
         void onMediaFileUploadProgress(int mediaId, float progress);
-        void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
+        void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId, WritableNativeMap metadata);
         void onMediaFileUploadFailed(int mediaId);
+        void onMediaFileUploadPaused(int mediaId);
     }
 
     interface MediaSaveEventEmitter {
@@ -57,6 +59,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     interface BlockTypeImpressionsCallback {
         void onRequestBlockTypeImpressions(ReadableMap impressions);
+    }
+
+    interface ConnectionStatusCallback {
+        void onRequestConnectionStatus(boolean isConnected);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -145,6 +151,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
                                                      String blockName,
                                                      String blockTitle);
 
+    void requestEmbedFullscreenPreview(String content, String title);
+
     void gutenbergDidSendButtonPressedAction(String buttonType);
 
     void onShowUserSuggestions(Consumer<String> onResult);
@@ -176,4 +184,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestGotoCustomerSupportOptions();
 
     void sendEventToHost(String eventName, ReadableMap properties);
+
+    void toggleUndoButton(boolean isDisabled);
+
+    void toggleRedoButton(boolean isDisabled);
+
+    void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
 }

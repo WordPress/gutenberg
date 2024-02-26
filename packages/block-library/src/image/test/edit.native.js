@@ -7,7 +7,7 @@ import {
 	initializeEditor,
 	getEditorHtml,
 	render,
-	waitFor,
+	setupApiFetch,
 } from 'test/helpers';
 import { Image } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -22,10 +22,10 @@ import {
 	sendMediaUpload,
 	subscribeMediaUpload,
 } from '@wordpress/react-native-bridge';
-import { select } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-import '@wordpress/jest-console';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -45,7 +45,15 @@ function mockGetMedia( media ) {
 	jest.spyOn( select( coreStore ), 'getMedia' ).mockReturnValue( media );
 }
 
-const apiFetchPromise = Promise.resolve( {} );
+const FETCH_MEDIA = {
+	request: {
+		path: `/wp/v2/media/1?context=edit`,
+	},
+	response: {
+		source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+		id: 1,
+	},
+};
 
 const clipboardPromise = Promise.resolve( '' );
 Clipboard.getString.mockImplementation( () => clipboardPromise );
@@ -56,6 +64,18 @@ beforeAll( () => {
 	// Mock Image.getSize to avoid failed attempt to size non-existant image
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
+} );
+
+beforeEach( () => {
+	// Mock media fetch requests
+	setupApiFetch( [ FETCH_MEDIA ] );
+
+	// Invalidate `getMedia` resolutions to allow requesting to the API the same media id
+	dispatch( coreStore ).invalidateResolutionForStoreSelector( 'getMedia' );
+} );
+
+afterEach( () => {
+	apiFetch.mockReset();
 } );
 
 afterAll( () => {
@@ -78,8 +98,8 @@ describe( 'Image Block', () => {
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -105,8 +125,8 @@ describe( 'Image Block', () => {
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -132,8 +152,8 @@ describe( 'Image Block', () => {
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -151,7 +171,7 @@ describe( 'Image Block', () => {
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
-		await waitFor(
+		await act(
 			() => new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
 		);
 
@@ -169,30 +189,21 @@ describe( 'Image Block', () => {
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
-		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
-		);
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
 		fireEvent.press( screen.getByText( 'None' ) );
-		fireEvent.press( screen.getByText( 'Media File' ) );
-		await screen.findByText( 'Custom URL' );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
-		// Await asynchronous fetch of clipboard
-		await act( () => clipboardPromise );
 		fireEvent.changeText(
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
 		fireEvent.press( await screen.findByText( 'Custom URL' ) );
-		// Await asynchronous fetch of clipboard
-		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
@@ -211,8 +222,8 @@ describe( 'Image Block', () => {
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is not fetched via `getMedia` due to the presence of query parameters in the URL.
+		expect( apiFetch ).not.toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -236,8 +247,8 @@ describe( 'Image Block', () => {
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -267,8 +278,8 @@ describe( 'Image Block', () => {
 		</figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
-		// We must await the image fetch via `getMedia`
-		await act( () => apiFetchPromise );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
 
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
@@ -430,7 +441,7 @@ describe( 'Image Block', () => {
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 
-		fireEvent.press( screen.getByText( 'ADD IMAGE' ) );
+		fireEvent.press( screen.getByText( 'Add image' ) );
 		fireEvent.press( screen.getByText( 'WordPress Media Library' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":${ IMAGE.id },"sizeSlug":"large","linkDestination":"none"} -->

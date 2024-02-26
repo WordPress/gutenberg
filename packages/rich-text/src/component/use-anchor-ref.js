@@ -9,9 +9,12 @@ import deprecated from '@wordpress/deprecated';
  */
 import { getActiveFormat } from '../get-active-format';
 
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
-/** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
-/** @typedef {import('../create').RichTextValue} RichTextValue */
+/**
+ * @template T
+ * @typedef {import('@wordpress/element').RefObject<T>} RefObject<T>
+ */
+/** @typedef {import('../register-format-type').WPFormat} WPFormat */
+/** @typedef {import('../types').RichTextValue} RichTextValue */
 
 /**
  * This hook, to be used in a format type's Edit component, returns the active
@@ -23,7 +26,7 @@ import { getActiveFormat } from '../get-active-format';
  * @param {RefObject<HTMLElement>} $1.ref      React ref of the element
  *                                             containing  the editable content.
  * @param {RichTextValue}          $1.value    Value to check for selection.
- * @param {RichTextFormatType}     $1.settings The format type's settings.
+ * @param {WPFormat}               $1.settings The format type's settings.
  *
  * @return {Element|Range} The active element or selection range.
  */

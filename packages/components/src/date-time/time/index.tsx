@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 import BaseControl from '../../base-control';
 import Button from '../../button';
 import ButtonGroup from '../../button-group';
+import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimePickerProps } from '../types';
 import {
@@ -24,7 +25,6 @@ import {
 	TimeSeparator,
 	MinutesInput,
 	MonthSelectWrapper,
-	MonthSelect,
 	DayInput,
 	YearInput,
 	TimeWrapper,
@@ -33,9 +33,9 @@ import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
 import type { InputState } from '../../input-control/reducer/state';
+import type { InputAction } from '../../input-control/reducer/actions';
 import {
 	COMMIT,
-	InputAction,
 	PRESS_DOWN,
 	PRESS_UP,
 } from '../../input-control/reducer/actions';
@@ -51,7 +51,7 @@ function from12hTo24h( hours: number, isPm: boolean ) {
  * given width. For example, the hours and minutes inputs are padded to 2 so
  * that '4' appears as '04'.
  *
- * @param  pad How many digits the value should be.
+ * @param pad How many digits the value should be.
  */
 function buildPadInputStateReducer( pad: number ) {
 	return ( state: InputState, action: InputAction ) => {
@@ -127,7 +127,14 @@ export function TimePicker( {
 		method: 'hours' | 'minutes' | 'date' | 'year'
 	) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
-			if ( ! ( event.target instanceof HTMLInputElement ) ) {
+			// `instanceof` checks need to get the instance definition from the
+			// corresponding window object — therefore, the following logic makes
+			// the component work correctly even when rendered inside an iframe.
+			const HTMLInputElementInstance =
+				( event.target as HTMLInputElement )?.ownerDocument.defaultView
+					?.HTMLInputElement ?? HTMLInputElement;
+
+			if ( ! ( event.target instanceof HTMLInputElementInstance ) ) {
 				return;
 			}
 
@@ -174,7 +181,7 @@ export function TimePicker( {
 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
-			__next36pxDefaultSize
+			__next40pxDefaultSize
 			value={ day }
 			step={ 1 }
 			min={ 1 }
@@ -190,10 +197,11 @@ export function TimePicker( {
 
 	const monthField = (
 		<MonthSelectWrapper>
-			<MonthSelect
+			<SelectControl
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
 				hideLabelFromVision
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				value={ month }
 				options={ [
@@ -240,7 +248,7 @@ export function TimePicker( {
 							className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
 							label={ __( 'Hours' ) }
 							hideLabelFromVision
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							value={ hours }
 							step={ 1 }
 							min={ is12Hour ? 1 : 0 }
@@ -267,7 +275,7 @@ export function TimePicker( {
 							className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
 							label={ __( 'Minutes' ) }
 							hideLabelFromVision
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							value={ minutes }
 							step={ 1 }
 							min={ 0 }
@@ -294,6 +302,7 @@ export function TimePicker( {
 								variant={
 									am === 'AM' ? 'primary' : 'secondary'
 								}
+								__next40pxDefaultSize
 								onClick={ buildAmPmChangeCallback( 'AM' ) }
 							>
 								{ __( 'AM' ) }
@@ -303,6 +312,7 @@ export function TimePicker( {
 								variant={
 									am === 'PM' ? 'primary' : 'secondary'
 								}
+								__next40pxDefaultSize
 								onClick={ buildAmPmChangeCallback( 'PM' ) }
 							>
 								{ __( 'PM' ) }
@@ -338,7 +348,7 @@ export function TimePicker( {
 						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
 						label={ __( 'Year' ) }
 						hideLabelFromVision
-						__next36pxDefaultSize
+						__next40pxDefaultSize
 						value={ year }
 						step={ 1 }
 						min={ 1 }

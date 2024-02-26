@@ -26,9 +26,9 @@ const ComplementaryAreaHeader = ( {
 		<>
 			<div className="components-panel__header interface-complementary-area-header__small">
 				{ smallScreenTitle && (
-					<span className="interface-complementary-area-header__small-title">
+					<h2 className="interface-complementary-area-header__small-title">
 						{ smallScreenTitle }
-					</span>
+					</h2>
 				) }
 				{ toggleButton }
 			</div>

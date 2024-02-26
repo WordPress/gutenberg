@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	templateRevertUtils: async ( { page }, use ) => {
-		await use( new TemplateRevertUtils( { page } ) );
+	templateRevertUtils: async ( { editor, page }, use ) => {
+		await use( new TemplateRevertUtils( { editor, page } ) );
 	},
 } );
 
@@ -20,10 +20,10 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
-	test.beforeEach( async ( { admin, requestUtils, siteEditor } ) => {
+	test.beforeEach( async ( { admin, requestUtils, editor } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -39,12 +39,23 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await editor.saveSiteEditorEntities();
 
-		await page.click( 'role=button[name="Show template details"i]' );
+		const isTemplateTabVisible = await page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await page.click(
+				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			);
+		}
 
 		// The revert button isn't visible anymore.
 		await expect(
-			page.locator( 'role=menuitem[name=/Clear customizations/i]' )
-		).not.toBeVisible();
+			page.locator(
+				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+			)
+		).toBeHidden();
 	} );
 
 	test( 'should show the original content after revert', async ( {
@@ -248,7 +259,6 @@ test.describe( 'Template Revert', () => {
 		editor,
 		page,
 		templateRevertUtils,
-		siteEditor,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -267,7 +277,7 @@ test.describe( 'Template Revert', () => {
 
 		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.locator( 'body' ).click();
 		const contentAfter =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
@@ -275,12 +285,26 @@ test.describe( 'Template Revert', () => {
 } );
 
 class TemplateRevertUtils {
-	constructor( { page } ) {
+	constructor( { editor, page } ) {
+		this.editor = editor;
 		this.page = page;
 	}
 
 	async revertTemplate() {
-		await this.page.click( 'role=button[name="Show template details"i]' );
+		await this.editor.openDocumentSettingsSidebar();
+		const isTemplateTabVisible = await this.page
+			.locator(
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
+			)
+			.isVisible();
+		if ( isTemplateTabVisible ) {
+			await this.page.click(
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
+			);
+		}
+		await this.page.click(
+			'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
+		);
 		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'

@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"name": "core/widget-area",
 	"category": "widgets",
 	"attributes": {

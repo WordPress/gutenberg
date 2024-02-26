@@ -4,12 +4,14 @@
 import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Comment } from './comment';
+import type { GlobalStylesRevision } from './global-styles-revision';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
 import type { Page } from './page';
 import type { Plugin } from './plugin';
 import type { Post } from './post';
+import type { PostRevision } from './post-revision';
 import type { Settings } from './settings';
 import type { Sidebar } from './sidebar';
 import type { Taxonomy } from './taxonomy';
@@ -27,12 +29,14 @@ export type {
 	Attachment,
 	Comment,
 	Context,
+	GlobalStylesRevision,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
 	Page,
 	Plugin,
 	Post,
+	PostRevision,
 	Settings,
 	Sidebar,
 	Taxonomy,
@@ -82,12 +86,14 @@ export interface PerPackageEntityRecords< C extends Context > {
 	core:
 		| Attachment< C >
 		| Comment< C >
+		| GlobalStylesRevision< C >
 		| MenuLocation< C >
 		| NavMenu< C >
 		| NavMenuItem< C >
 		| Page< C >
 		| Plugin< C >
 		| Post< C >
+		| PostRevision< C >
 		| Settings< C >
 		| Sidebar< C >
 		| Taxonomy< C >

@@ -1,17 +1,3 @@
-.block-editor-block-contextual-toolbar.is-fixed {
-	// The top position used for the 'sticky' positioning.
-	top: 0;
-
-	// Offset the customizer's sidebar padding.
-	margin-left: -$grid-unit-15;
-	margin-right: -$grid-unit-15;
-	width: calc(100% + #{ $grid-unit-30 });
-
-	// Scroll sideways.
-	overflow-y: auto;
-	z-index: z-index(".customize-widgets__block-toolbar");
-}
-
 .customize-control-sidebar_block_editor .block-editor-block-list__block-popover {
 	// FloatingUI library used in Popover component forces us to have an "absolute" inline style.
 	// We need to override this in the customizer.

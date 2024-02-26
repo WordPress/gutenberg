@@ -14,13 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import BaseInputControl from '../';
 
-jest.useFakeTimers();
-
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
-
 const getInput = () => screen.getByTestId( 'input' );
 
 describe( 'InputControl', () => {
@@ -75,7 +68,7 @@ describe( 'InputControl', () => {
 
 	describe( 'Ensurance of focus for number inputs', () => {
 		it( 'should focus its input on mousedown events', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			render( <InputControl type="number" onFocus={ spy } /> );
 			const target = getInput();
@@ -92,7 +85,7 @@ describe( 'InputControl', () => {
 
 	describe( 'Value', () => {
 		it( 'should update value onChange', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			render(
 				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
@@ -107,7 +100,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			const heldKeySet = new Set();
 			const Example = () => {
@@ -178,7 +171,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			render(
 				<InputControl
@@ -198,7 +191,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should commit value when blurred if value is invalid', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spyChange = jest.fn();
 			render(
 				<InputControl

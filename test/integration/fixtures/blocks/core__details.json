@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/details",
+		"isValid": true,
+		"attributes": {
+			"showContent": false,
+			"summary": "Details Summary"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Details Content",
+					"dropCap": false,
+					"placeholder": "Type / to add a hidden block"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

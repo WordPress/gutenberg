@@ -31,7 +31,7 @@
 	];
 
 	registerBlockType( 'test/iframed-masonry-block', {
-		apiVersion: 2,
+		apiVersion: 3,
 		edit: function Edit() {
 			const ref = useRefEffect( ( node ) => {
 				const { ownerDocument } = node;

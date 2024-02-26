@@ -28,7 +28,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'textColor'       => array(
 						'type' => 'string',
@@ -69,7 +69,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -107,7 +107,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',

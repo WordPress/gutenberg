@@ -7,6 +7,7 @@ import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { EditorSnackbars } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -14,13 +15,23 @@ import { EditorSnackbars } from '@wordpress/editor';
 import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
 import Table from './table';
-import { useLocation } from '../routes';
 import useTitle from '../routes/use-title';
+import { unlock } from '../../lock-unlock';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function List() {
 	const {
-		params: { postType: templateType },
+		params: { path },
 	} = useLocation();
+	const templateType =
+		path === '/wp_template/all'
+			? TEMPLATE_POST_TYPE
+			: TEMPLATE_PART_POST_TYPE;
 
 	useRegisterShortcuts();
 

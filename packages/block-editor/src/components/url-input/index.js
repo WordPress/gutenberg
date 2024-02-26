@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
@@ -66,7 +65,6 @@ class URLInput extends Component {
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
-			isUpdatingSuggestions: false,
 			suggestionsValue: null,
 			selectedSuggestion: null,
 			suggestionsListboxId: '',
@@ -84,29 +82,17 @@ class URLInput extends Component {
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
-			this.suggestionNodes[ selectedSuggestion ] &&
-			! this.scrollingIntoView
+			this.suggestionNodes[ selectedSuggestion ]
 		) {
-			this.scrollingIntoView = true;
-			scrollIntoView(
-				this.suggestionNodes[ selectedSuggestion ],
-				this.autocompleteRef.current,
-				{
-					onlyScrollIfNeeded: true,
-				}
-			);
-
-			this.props.setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
+			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
+				behavior: 'instant',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
 		}
 
 		// Update suggestions when the value changes.
-		if (
-			prevProps.value !== value &&
-			! this.props.disableSuggestions &&
-			! this.state.isUpdatingSuggestions
-		) {
+		if ( prevProps.value !== value && ! this.props.disableSuggestions ) {
 			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it.
 				this.updateSuggestions( value );
@@ -183,7 +169,6 @@ class URLInput extends Component {
 		}
 
 		this.setState( {
-			isUpdatingSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -203,7 +188,6 @@ class URLInput extends Component {
 
 				this.setState( {
 					suggestions,
-					isUpdatingSuggestions: false,
 					suggestionsValue: value,
 					loading: false,
 					showSuggestions: !! suggestions.length,
@@ -235,9 +219,15 @@ class URLInput extends Component {
 				}
 
 				this.setState( {
-					isUpdatingSuggestions: false,
 					loading: false,
 				} );
+			} )
+			.finally( () => {
+				// If this is the current promise then reset the reference
+				// to allow for checking if a new request is made.
+				if ( this.suggestionsRequest === request ) {
+					this.suggestionsRequest = null;
+				}
 			} );
 
 		// Note that this assignment is handled *before* the async search request
@@ -255,11 +245,12 @@ class URLInput extends Component {
 
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
+		// or there is already a request in progress.
 		if (
 			value &&
 			! disableSuggestions &&
-			! this.state.isUpdatingSuggestions &&
-			! ( suggestions && suggestions.length )
+			! ( suggestions && suggestions.length ) &&
+			this.suggestionsRequest === null
 		) {
 			// Ensure the suggestions are updated with the current input value.
 			this.updateSuggestions( value );
@@ -267,6 +258,7 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
+		this.props.onKeyDown?.( event );
 		const { showSuggestions, selectedSuggestion, suggestions, loading } =
 			this.state;
 
@@ -309,11 +301,10 @@ class URLInput extends Component {
 
 				// Submitting while loading should trigger onSubmit.
 				case ENTER: {
-					event.preventDefault();
 					if ( this.props.onSubmit ) {
+						event.preventDefault();
 						this.props.onSubmit( null, event );
 					}
-
 					break;
 				}
 			}
@@ -434,6 +425,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
+			hideLabelFromVision = false,
 		} = this.props;
 
 		const {
@@ -452,6 +444,7 @@ class URLInput extends Component {
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
+			hideLabelFromVision,
 		};
 
 		const inputProps = {
@@ -468,7 +461,7 @@ class URLInput extends Component {
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
-			'aria-controls': suggestionsListboxId,
+			'aria-owns': suggestionsListboxId,
 			'aria-activedescendant':
 				selectedSuggestion !== null
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
@@ -531,7 +524,8 @@ class URLInput extends Component {
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
 				ref: this.bindSuggestionNode( index ),
-				'aria-selected': index === selectedSuggestion,
+				'aria-selected':
+					index === selectedSuggestion ? true : undefined,
 			};
 		};
 

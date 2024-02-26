@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RichText } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -20,12 +21,6 @@ const transforms = {
 					[ createBlock( 'core/paragraph', { content: value } ) ]
 				);
 			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( { anchor }, innerBlocks ) =>
-				createBlock( 'core/quote', { anchor }, innerBlocks ),
 		},
 		{
 			type: 'prefix',
@@ -117,35 +112,44 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { citation }, innerBlocks ) =>
+				RichText.isEmpty( citation )
+					? innerBlocks
+					: [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} ),
+					  ],
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { citation, anchor }, innerBlocks ) =>
 				createBlock(
 					'core/group',
 					{ anchor },
-					citation
-						? [
+					RichText.isEmpty( citation )
+						? innerBlocks
+						: [
 								...innerBlocks,
 								createBlock( 'core/paragraph', {
 									content: citation,
 								} ),
 						  ]
-						: innerBlocks
 				),
 		},
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( { citation }, innerBlocks ) =>
-				citation
-					? [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: citation,
-							} ),
-					  ]
-					: innerBlocks,
-		},
 	],
+	ungroup: ( { citation }, innerBlocks ) =>
+		RichText.isEmpty( citation )
+			? innerBlocks
+			: [
+					...innerBlocks,
+					createBlock( 'core/paragraph', {
+						content: citation,
+					} ),
+			  ],
 };
 
 export default transforms;

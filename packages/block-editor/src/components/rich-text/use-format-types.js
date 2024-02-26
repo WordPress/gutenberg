@@ -66,21 +66,21 @@ export function useFormatTypes( {
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, tagName } ) => {
+		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
 			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
 				return false;
 			}
 
 			if (
 				withoutInteractiveFormatting &&
-				interactiveContentTags.has( tagName )
+				( interactive || interactiveContentTags.has( tagName ) )
 			) {
 				return false;
 			}
 
 			return true;
 		} );
-	}, [ allFormatTypes, allowedFormats, interactiveContentTags ] );
+	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {

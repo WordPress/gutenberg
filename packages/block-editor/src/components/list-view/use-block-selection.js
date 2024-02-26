@@ -5,7 +5,7 @@ import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { UP, DOWN, HOME, END } from '@wordpress/keycodes';
+import { UP, DOWN, HOME, END, ESCAPE } from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -21,7 +21,6 @@ export default function useBlockSelection() {
 		getBlockName,
 		getBlockParents,
 		getBlockSelectionStart,
-		getBlockSelectionEnd,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		hasSelectedBlock,
@@ -30,9 +29,9 @@ export default function useBlockSelection() {
 	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
-		async ( event, clientId, destinationClientId ) => {
-			if ( ! event?.shiftKey ) {
-				selectBlock( clientId );
+		async ( event, clientId, destinationClientId, focusPosition ) => {
+			if ( ! event?.shiftKey && event?.keyCode !== ESCAPE ) {
+				selectBlock( clientId, focusPosition );
 				return;
 			}
 
@@ -40,6 +39,8 @@ export default function useBlockSelection() {
 			// the browser default behavior of opening the link in a new window.
 			event.preventDefault();
 
+			const isOnlyDeselection =
+				event.type === 'keydown' && event.keyCode === ESCAPE;
 			const isKeyPress =
 				event.type === 'keydown' &&
 				( event.keyCode === UP ||
@@ -64,10 +65,11 @@ export default function useBlockSelection() {
 			];
 
 			if (
-				isKeyPress &&
-				! selectedBlocks.some( ( blockId ) =>
-					clientIdWithParents.includes( blockId )
-				)
+				isOnlyDeselection ||
+				( isKeyPress &&
+					! selectedBlocks.some( ( blockId ) =>
+						clientIdWithParents.includes( blockId )
+					) )
 			) {
 				// Ensure that shift-selecting blocks via the keyboard only
 				// expands the current selection if focusing over already
@@ -76,35 +78,38 @@ export default function useBlockSelection() {
 				await clearSelectedBlock();
 			}
 
-			let startTarget = getBlockSelectionStart();
-			let endTarget = clientId;
+			// Update selection, if not only clearing the selection.
+			if ( ! isOnlyDeselection ) {
+				let startTarget = getBlockSelectionStart();
+				let endTarget = clientId;
 
-			// Handle keyboard behavior for selecting multiple blocks.
-			if ( isKeyPress ) {
-				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
-					// Set the starting point of the selection to the currently
-					// focused block, if there are no blocks currently selected.
-					// This ensures that as the selection is expanded or contracted,
-					// the starting point of the selection is anchored to that block.
-					startTarget = clientId;
+				// Handle keyboard behavior for selecting multiple blocks.
+				if ( isKeyPress ) {
+					if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+						// Set the starting point of the selection to the currently
+						// focused block, if there are no blocks currently selected.
+						// This ensures that as the selection is expanded or contracted,
+						// the starting point of the selection is anchored to that block.
+						startTarget = clientId;
+					}
+					if ( destinationClientId ) {
+						// If the user presses UP or DOWN, we want to ensure that the block they're
+						// moving to is the target for selection, and not the currently focused one.
+						endTarget = destinationClientId;
+					}
 				}
-				if ( destinationClientId ) {
-					// If the user presses UP or DOWN, we want to ensure that the block they're
-					// moving to is the target for selection, and not the currently focused one.
-					endTarget = destinationClientId;
-				}
+
+				const startParents = getBlockParents( startTarget );
+				const endParents = getBlockParents( endTarget );
+
+				const { start, end } = getCommonDepthClientIds(
+					startTarget,
+					endTarget,
+					startParents,
+					endParents
+				);
+				await multiSelect( start, end, null );
 			}
-
-			const startParents = getBlockParents( startTarget );
-			const endParents = getBlockParents( endTarget );
-
-			const { start, end } = getCommonDepthClientIds(
-				startTarget,
-				endTarget,
-				startParents,
-				endParents
-			);
-			await multiSelect( start, end, null );
 
 			// Announce deselected block, or number of deselected blocks if
 			// the total number of blocks deselected is greater than one.
@@ -145,7 +150,7 @@ export default function useBlockSelection() {
 			}
 
 			if ( label ) {
-				speak( label );
+				speak( label, 'assertive' );
 			}
 		},
 		[
@@ -154,7 +159,6 @@ export default function useBlockSelection() {
 			getBlockType,
 			getBlockParents,
 			getBlockSelectionStart,
-			getBlockSelectionEnd,
 			getSelectedBlockClientIds,
 			hasMultiSelection,
 			hasSelectedBlock,

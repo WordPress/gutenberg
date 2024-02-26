@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -5,12 +6,11 @@ const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const { existsSync } = require( 'fs' );
 const yaml = require( 'js-yaml' );
-const os = require( 'os' );
 
 /**
  * Internal dependencies
  */
-const { readConfig } = require( './config' );
+const { loadConfig, ValidationError } = require( './config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
@@ -39,8 +39,7 @@ module.exports = async function initConfig( {
 	xdebug = 'off',
 	writeChanges = false,
 } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const config = await readConfig( configPath );
+	const config = await loadConfig( path.resolve( '.' ) );
 	config.debug = debug;
 
 	// Adding this to the config allows the start command to understand that the
@@ -81,13 +80,23 @@ module.exports = async function initConfig( {
 			yaml.dump( dockerComposeConfig )
 		);
 
-		await writeFile(
-			path.resolve( config.workDirectoryPath, 'Dockerfile' ),
-			dockerFileContents(
-				dockerComposeConfig.services.wordpress.image,
-				config
-			)
-		);
+		// Write four Dockerfiles for each service we provided.
+		// (WordPress and CLI services, then a development and test environment for each.)
+		for ( const imageType of [ 'WordPress', 'CLI' ] ) {
+			for ( const envType of [ 'development', 'tests' ] ) {
+				await writeFile(
+					path.resolve(
+						config.workDirectoryPath,
+						`${
+							envType === 'tests' ? 'Tests-' : ''
+						}${ imageType }.Dockerfile`
+					),
+					imageType === 'WordPress'
+						? wordpressDockerFileContents( envType, config )
+						: cliDockerFileContents( envType, config )
+				);
+			}
+		}
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
 			'wp-env has not yet been initialized. Please run `wp-env start` to install the WordPress instance before using any other commands. This is only necessary to set up the environment for the first time; it is typically not necessary for the instance to be running after that in order to use other commands.'
@@ -99,80 +108,198 @@ module.exports = async function initConfig( {
 };
 
 /**
- * Checks the configured PHP version
- * against the minimum version supported by Xdebug
+ * Generates the Dockerfile used by wp-env's `wordpress` and `tests-wordpress` instances.
  *
- * @param {WPConfig} config
- * @return {boolean} Whether the PHP version is supported by Xdebug
+ * @param {string}   env    The environment we're installing -- development or tests.
+ * @param {WPConfig} config The configuration object.
+ * @return {string} The dockerfile contents.
  */
-function checkXdebugPhpCompatibility( config ) {
-	// By default, an undefined phpVersion uses the version on the docker image,
-	// which is supported by Xdebug 3.
-	const phpCompatibility = true;
+function wordpressDockerFileContents( env, config ) {
+	const phpVersion = config.env[ env ].phpVersion
+		? ':php' + config.env[ env ].phpVersion
+		: '';
 
-	// If PHP version is defined
-	// ensure it meets the Xdebug minimum compatibility requirment.
-	if ( config.env.development.phpVersion ) {
-		const versionTokens = config.env.development.phpVersion.split( '.' );
+	return `FROM wordpress${ phpVersion }
+
+# Update apt sources for archived versions of Debian.
+
+# stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
+RUN touch /etc/apt/sources.list
+RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
+RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
+
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN groupadd -o -g $HOST_GID $HOST_USERNAME || true
+RUN useradd -mlo -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
+
+# Install any dependencies we need in the container.
+${ installDependencies( 'wordpress', env, config ) }`;
+}
+
+/**
+ * Generates the Dockerfile used by wp-env's `cli` and `tests-cli` instances.
+ *
+ * @param {string}   env    The environment we're installing -- development or tests.
+ * @param {WPConfig} config The configuration object.
+ * @return {string} The dockerfile contents.
+ */
+function cliDockerFileContents( env, config ) {
+	const phpVersion = config.env[ env ].phpVersion
+		? '-php' + config.env[ env ].phpVersion
+		: '';
+
+	return `FROM wordpress:cli${ phpVersion }
+
+# Switch to root so we can create users.
+USER root
+
+# Create the host's user so that we can match ownership in the container.
+ARG HOST_USERNAME
+ARG HOST_UID
+ARG HOST_GID
+# When the IDs are already in use we can still safely move on.
+RUN addgroup -g $HOST_GID $HOST_USERNAME || true
+RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
+
+# Install any dependencies we need in the container.
+${ installDependencies( 'cli', env, config ) }
+
+# Switch back to the original user now that we're done.
+USER www-data
+
+# Have the container sleep infinitely to keep it alive for us to run commands on it.
+CMD [ "/bin/sh", "-c", "while true; do sleep 2073600; done" ]
+`;
+}
+
+/**
+ * Generates content for the Dockerfile to install dependencies.
+ *
+ * @param {string}   service The kind of service that we're installing dependencies on ('wordpress' or 'cli').
+ * @param {string}   env     The environment we're installing dependencies for ('development' or 'tests').
+ * @param {WPConfig} config  The configuration object.
+ * @return {string} The Dockerfile content for installing dependencies.
+ */
+function installDependencies( service, env, config ) {
+	let dockerFileContent = '';
+
+	// At times we may need to evaluate the environment. This is because the
+	// WordPress image uses Ubuntu while the CLI image uses Alpine.
+
+	// Start with some environment-specific dependency installations.
+	switch ( service ) {
+		case 'wordpress': {
+			dockerFileContent += `
+# Make sure we're working with the latest packages.
+RUN apt-get -qy update
+
+# Install some basic PHP dependencies.
+RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+
+# Install git
+RUN apt-get -qy install git
+
+# Set up sudo so they can have root access.
+RUN apt-get -qy install sudo
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+			break;
+		}
+		case 'cli': {
+			dockerFileContent += `
+# Make sure we're working with the latest packages.
+RUN apk update
+
+# Install some basic PHP dependencies.
+RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+
+# Set up sudo so they can have root access.
+RUN apk --no-cache add sudo linux-headers
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+			break;
+		}
+		default: {
+			throw new Error( `Invalid service "${ service }" given` );
+		}
+	}
+
+	dockerFileContent += getXdebugConfig(
+		config.xdebug,
+		config.env[ env ].phpVersion
+	);
+
+	// Add better PHP settings.
+	dockerFileContent += `
+RUN echo 'upload_max_filesize = 1G' >> /usr/local/etc/php/php.ini
+RUN echo 'post_max_size = 1G' >> /usr/local/etc/php/php.ini`;
+
+	// Make sure Composer is available for use in all services.
+	dockerFileContent += `
+RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+RUN export COMPOSER_HASH=\`curl -sS https://composer.github.io/installer.sig\` && php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$COMPOSER_HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('/tmp/composer-setup.php'); } echo PHP_EOL;"
+RUN php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+RUN rm /tmp/composer-setup.php`;
+
+	// Install any Composer packages we might need globally.
+	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
+	dockerFileContent += `
+USER $HOST_UID:$HOST_GID
+ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
+RUN composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
+USER root`;
+
+	return dockerFileContent;
+}
+
+/**
+ * Gets the Xdebug config based on the options in the config object.
+ *
+ * @param {string} xdebugMode The Xdebug mode set in the config.
+ * @param {string} phpVersion The php version set in the environment.
+ * @return {string} The Xdebug config -- can be an empty string when it's not used.
+ */
+function getXdebugConfig( xdebugMode = 'off', phpVersion ) {
+	if ( xdebugMode === 'off' ) {
+		return '';
+	}
+
+	let xdebugVersion = 'xdebug';
+
+	if ( phpVersion ) {
+		const versionTokens = phpVersion.split( '.' );
 		const majorVer = parseInt( versionTokens[ 0 ] );
 		const minorVer = parseInt( versionTokens[ 1 ] );
 
 		if ( isNaN( majorVer ) || isNaN( minorVer ) ) {
-			throw new Error(
+			throw new ValidationError(
 				'Something went wrong when parsing the PHP version.'
 			);
 		}
 
-		// Xdebug 3 supports 7.2 and higher
-		// Ensure user has specified a compatible PHP version.
+		// Throw an error if someone tries to use Xdebug with an unsupported PHP version.
+		// Xdebug 3 only supports 7.2 and higher.
 		if ( majorVer < 7 || ( majorVer === 7 && minorVer < 2 ) ) {
-			throw new Error( 'Cannot use XDebug 3 on PHP < 7.2.' );
+			throw new ValidationError(
+				`Cannot use XDebug 3 with PHP < 7.2. Your PHP version is ${ phpVersion }.`
+			);
+		}
+
+		// For now, we support PHP 7 by installing the final version of Xdebug to
+		// support PHP 7 when the environment uses that version. By default, use the
+		// latest version.
+		if ( majorVer === 7 ) {
+			xdebugVersion = 'xdebug-3.1.6';
 		}
 	}
-
-	return phpCompatibility;
-}
-
-/**
- * Generates the Dockerfile used by wp-env's development instance.
- *
- * @param {string}   image  The base docker image to use.
- * @param {WPConfig} config The configuration object.
- *
- * @return {string} The dockerfile contents.
- */
-function dockerFileContents( image, config ) {
-	// Don't install XDebug unless it is explicitly required.
-	let shouldInstallXdebug = false;
-
-	if ( config.xdebug !== 'off' ) {
-		const usingCompatiblePhp = checkXdebugPhpCompatibility( config );
-
-		if ( usingCompatiblePhp ) {
-			shouldInstallXdebug = true;
-		}
-	}
-
-	return `FROM ${ image }
-
-RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
-${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
-`;
-}
-
-function installXdebug( enableXdebug ) {
-	const isLinux = os.type() === 'Linux';
-	// Discover client host does not appear to work on macOS with Docker.
-	const clientDetectSettings = isLinux
-		? 'xdebug.discover_client_host=true'
-		: 'xdebug.client_host="host.docker.internal"';
 
 	return `
-# Install Xdebug:
-RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN if [ -z "$(pecl list | grep ${ xdebugVersion })" ] ; then pecl install ${ xdebugVersion } ; fi
 RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
-RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
-	`;
+RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.client_host="host.docker.internal"' >> /usr/local/etc/php/php.ini`;
 }

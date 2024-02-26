@@ -33,6 +33,11 @@
 
 .edit-site {
 	.edit-site-list {
+		flex-grow: 1;
+		background: $white;
+		border-radius: $radius-block-ui * 4;
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+
 		.interface-interface-skeleton__editor {
 			min-width: 100%;
 
@@ -125,15 +130,13 @@
 }
 
 .edit-site-list__rename-modal {
+	// The rename dropdown popover is open at the same time as the rename modal. The latter has to be higher.
+	z-index: z-index(".edit-site-list__rename-modal");
 	.components-base-control {
 		@include break-medium() {
 			width: $grid-unit * 40;
 		}
 	}
-}
-
-.edit-site-list__rename-modal-actions {
-	margin-top: $grid-unit-15;
 }
 
 .edit-site-template__actions {
@@ -145,46 +148,31 @@
 .edit-site-list-added-by__icon {
 	display: flex;
 	flex-shrink: 0;
-	position: relative;
-	align-items: center;
-	justify-content: center;
-	width: $grid-unit-40;
-	height: $grid-unit-40;
-	background: $gray-800;
-	border-radius: 100%;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
 
 	svg {
-		fill: $white;
-	}
-
-	&.is-customized::after {
-		position: absolute;
-		content: "";
-		background: var(--wp-admin-theme-color);
-		height: $grid-unit-10;
-		width: $grid-unit-10;
-		outline: 2px solid $white;
-		border-radius: 100%;
-		top: -1px;
-		right: -1px;
+		fill: currentColor;
 	}
 }
 
 .edit-site-list-added-by__avatar {
 	flex-shrink: 0;
 	overflow: hidden;
-	border-radius: 100%;
-	background: $gray-800;
-	width: $grid-unit-40;
-	height: $grid-unit-40;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	align-items: center;
+	justify-content: center;
+	display: flex;
 
 	img {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: 20px;
+		height: 20px;
 		object-fit: cover;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
+		border-radius: 100%;
 	}
 
 	&.is-loaded {
@@ -192,4 +180,9 @@
 			opacity: 1;
 		}
 	}
+}
+
+.edit-site-list-added-by__customized-info {
+	display: block;
+	color: $gray-700;
 }

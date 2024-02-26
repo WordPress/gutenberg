@@ -1,10 +1,18 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"__experimental": "fse",
 	"name": "core/post-comment",
-	"title": "Post Comment (deprecated)",
+	"title": "Comment (deprecated)",
 	"category": "theme",
+	"allowedBlocks": [
+		"core/avatar",
+		"core/comment-author-name",
+		"core/comment-content",
+		"core/comment-date",
+		"core/comment-edit-link",
+		"core/comment-reply-link"
+	],
 	"description": "This block is deprecated. Please use the Comments block instead.",
 	"textdomain": "default",
 	"attributes": {
@@ -17,6 +25,9 @@
 	},
 	"supports": {
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	}
 }

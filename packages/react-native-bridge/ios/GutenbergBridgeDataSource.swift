@@ -1,6 +1,6 @@
 import Aztec
 
-public protocol GutenbergBridgeDataSource: class {
+public protocol GutenbergBridgeDataSource: AnyObject {
     /// Asks the data source for the initial html content to be presented by the editor.
     /// Return `nil` to show the example content.
     ///

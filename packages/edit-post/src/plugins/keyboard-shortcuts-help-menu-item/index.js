@@ -5,17 +5,18 @@ import { MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../store';
+import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 
 export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 	return (
 		<MenuItem
 			onClick={ () => {
-				openModal( 'edit-post/keyboard-shortcut-help' );
+				openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 			} }
 			shortcut={ displayShortcut.access( 'h' ) }
 		>
@@ -25,7 +26,7 @@ export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const { openModal } = dispatch( editPostStore );
+	const { openModal } = dispatch( interfaceStore );
 
 	return {
 		openModal,

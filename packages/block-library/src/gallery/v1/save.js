@@ -70,7 +70,7 @@ export default function saveV1( { attributes } ) {
 									<RichText.Content
 										tagName="figcaption"
 										className={ classnames(
-											'blocks-gallery-item',
+											'blocks-gallery-item__caption',
 											__experimentalGetElementClassName(
 												'caption'
 											)

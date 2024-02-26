@@ -2,29 +2,52 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { ExternalLink } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import ScreenHeader from './header';
-import Subtitle from './subtitle';
-import CustomCSSControl from './custom-css';
+
+const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
+	blockEditorPrivateApis
+);
 
 function ScreenCSS() {
+	const description = __(
+		'Add your own CSS to customize the appearance and layout of your site.'
+	);
+	const [ style ] = useGlobalStyle( '', undefined, 'user', {
+		shouldDecodeEncode: false,
+	} );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
+		shouldDecodeEncode: false,
+	} );
+
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'CSS' ) }
-				description={ __(
-					'Add your own CSS to customize the appearance and layout of your site.'
-				) }
+				description={
+					<>
+						{ description }
+						<ExternalLink
+							href="https://wordpress.org/documentation/article/css/"
+							className="edit-site-global-styles-screen-css-help-link"
+						>
+							{ __( 'Learn more about CSS' ) }
+						</ExternalLink>
+					</>
+				}
 			/>
 			<div className="edit-site-global-styles-screen-css">
-				<VStack spacing={ 3 }>
-					<Subtitle>{ __( 'ADDITIONAL CSS' ) }</Subtitle>
-					<CustomCSSControl />
-				</VStack>
+				<StylesAdvancedPanel
+					value={ style }
+					onChange={ setStyle }
+					inheritedValue={ inheritedStyle }
+				/>
 			</div>
 		</>
 	);

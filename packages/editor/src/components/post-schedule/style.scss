@@ -1,0 +1,23 @@
+.editor-post-schedule__panel-dropdown {
+	width: 100%;
+}
+
+.editor-post-schedule__dialog {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+}
+
+.editor-post-schedule__dialog-toggle.components-button {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-align: left;
+	white-space: unset;
+	height: auto;
+
+	// The line height + the padding should be the same as the button size.
+	padding: math.div($button-size - $grid-unit-20, 2) 12px;
+	line-height: $grid-unit-20;
+}

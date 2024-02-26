@@ -11,7 +11,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
-	__experimentalGetMatchingVariation as getMatchingVariation,
 } from '@wordpress/block-editor';
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -19,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useScopedBlockVariations } from '../utils';
+import { useScopedBlockVariations, useBlockNameForPatterns } from '../utils';
 
 export default function QueryPlaceholder( {
 	attributes,
@@ -30,34 +29,36 @@ export default function QueryPlaceholder( {
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const blockProps = useBlockProps();
-
-	const { blockType, allVariations, hasPatterns } = useSelect(
+	const blockNameForPatterns = useBlockNameForPatterns(
+		clientId,
+		attributes
+	);
+	const { blockType, activeBlockVariation, hasPatterns } = useSelect(
 		( select ) => {
-			const { getBlockVariations, getBlockType } = select( blocksStore );
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-
 			return {
 				blockType: getBlockType( name ),
-				allVariations: getBlockVariations( name ),
-				hasPatterns: !! __experimentalGetPatternsByBlockTypes(
+				activeBlockVariation: getActiveBlockVariation(
 					name,
+					attributes
+				),
+				hasPatterns: !! getPatternsByBlockTypes(
+					blockNameForPatterns,
 					rootClientId
 				).length,
 			};
 		},
-		[ name, clientId ]
+		[ name, blockNameForPatterns, clientId, attributes ]
 	);
-
-	const matchingVariation = getMatchingVariation( attributes, allVariations );
 	const icon =
-		matchingVariation?.icon?.src ||
-		matchingVariation?.icon ||
+		activeBlockVariation?.icon?.src ||
+		activeBlockVariation?.icon ||
 		blockType?.icon?.src;
-	const label = matchingVariation?.title || blockType?.title;
+	const label = activeBlockVariation?.title || blockType?.title;
 	if ( isStartingBlank ) {
 		return (
 			<QueryVariationPicker

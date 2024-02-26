@@ -3,14 +3,14 @@
  */
 import {
 	PostTextEditor,
-	PostTitle,
-	TextEditorGlobalKeyboardShortcuts,
+	PostTitleRaw,
 	store as editorStore,
 } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,11 +21,27 @@ export default function TextEditor() {
 	const isRichEditingEnabled = useSelect( ( select ) => {
 		return select( editorStore ).getEditorSettings().richEditingEnabled;
 	}, [] );
-	const { switchEditorMode } = useDispatch( editPostStore );
+	const { switchEditorMode } = useDispatch( editorStore );
+
+	const { isWelcomeGuideVisible } = useSelect( ( select ) => {
+		const { isFeatureActive } = select( editPostStore );
+
+		return {
+			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
+		};
+	}, [] );
+
+	const titleRef = useRef();
+
+	useEffect( () => {
+		if ( isWelcomeGuideVisible ) {
+			return;
+		}
+		titleRef?.current?.focus();
+	}, [ isWelcomeGuideVisible ] );
 
 	return (
 		<div className="edit-post-text-editor">
-			<TextEditorGlobalKeyboardShortcuts />
 			{ isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
 					<h2>{ __( 'Editing code' ) }</h2>
@@ -39,7 +55,7 @@ export default function TextEditor() {
 				</div>
 			) }
 			<div className="edit-post-text-editor__body">
-				<PostTitle />
+				<PostTitleRaw ref={ titleRef } />
 				<PostTextEditor />
 			</div>
 		</div>

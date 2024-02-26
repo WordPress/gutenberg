@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalOffCanvasEditor as OffCanvasEditor,
+	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -12,135 +12,164 @@ import {
 	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
-import { LeafMoreMenu } from '../leaf-more-menu';
+import { unlock } from '../../lock-unlock';
+import DeletedNavigationWarning from './deleted-navigation-warning';
+import useNavigationMenu from '../use-navigation-menu';
+import LeafMoreMenu from './leaf-more-menu';
+import { updateAttributes } from '../../navigation-link/update-attributes';
+import { LinkUI } from '../../navigation-link/link-ui';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-const ExperimentMainContent = ( {
+function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
+		insertedBlock?.name
+	);
+	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	if ( ! showLinkControls ) {
+		return null;
+	}
+
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) return;
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
+		};
+
+	return (
+		<LinkUI
+			clientId={ insertedBlock?.clientId }
+			link={ insertedBlock?.attributes }
+			onClose={ () => {
+				setInsertedBlock( null );
+			} }
+			onChange={ ( updatedValue ) => {
+				updateAttributes(
+					updatedValue,
+					setInsertedBlockAttributes( insertedBlock?.clientId ),
+					insertedBlock?.attributes
+				);
+				setInsertedBlock( null );
+			} }
+			onCancel={ () => {
+				setInsertedBlock( null );
+			} }
+		/>
+	);
+}
+
+const MainContent = ( {
 	clientId,
 	currentMenuId,
 	isLoading,
 	isNavigationMenuMissing,
+	onCreateNew,
 } ) => {
-	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
-	// This is required else the list view will display the entire block tree.
-	const clientIdsTree = useSelect(
+	const hasChildren = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree } = select( blockEditorStore );
-			return __unstableGetClientIdsTree( clientId );
+			return !! select( blockEditorStore ).getBlockCount( clientId );
 		},
 		[ clientId ]
 	);
 
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
+
 	if ( currentMenuId && isNavigationMenuMissing ) {
-		return <p>{ __( 'Select or create a menu' ) }</p>;
+		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
 	}
 
 	if ( isLoading ) {
 		return <Spinner />;
 	}
 
-	return (
-		<OffCanvasEditor
-			blocks={ clientIdsTree }
-			isExpanded={ true }
-			selectBlockInCanvas={ false }
-			LeafMoreMenu={ LeafMoreMenu }
-		/>
-	);
-};
-
-const ExperimentControls = ( props ) => {
-	const {
-		createNavigationMenuIsSuccess,
-		createNavigationMenuIsError,
-		currentMenuId = null,
-		onCreateNew,
-		onSelectClassicMenu,
-		onSelectNavigationMenu,
-	} = props;
+	const description = navigationMenu
+		? sprintf(
+				/* translators: %s: The name of a menu. */
+				__( 'Structure for navigation menu: %s' ),
+				navigationMenu?.title || __( 'Untitled menu' )
+		  )
+		: __(
+				'You have not yet created any menus. Displaying a list of your Pages'
+		  );
 
 	return (
-		<>
-			<HStack className="wp-block-navigation-off-canvas-editor__header">
-				<Heading
-					className="wp-block-navigation-off-canvas-editor__title"
-					level={ 2 }
-				>
-					{ __( 'Menu' ) }
-				</Heading>
-				<NavigationMenuSelector
-					currentMenuId={ currentMenuId }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					onCreateNew={ onCreateNew }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					actionLabel={ actionLabel }
-				/>
-			</HStack>
-			<ExperimentMainContent { ...props } />
-		</>
-	);
-};
-
-const DefaultControls = ( props ) => {
-	const {
-		createNavigationMenuIsSuccess,
-		createNavigationMenuIsError,
-		currentMenuId = null,
-		isManageMenusButtonDisabled,
-		onCreateNew,
-		onSelectClassicMenu,
-		onSelectNavigationMenu,
-	} = props;
-
-	return (
-		<>
-			<NavigationMenuSelector
-				currentMenuId={ currentMenuId }
-				onSelectClassicMenu={ onSelectClassicMenu }
-				onSelectNavigationMenu={ onSelectNavigationMenu }
-				onCreateNew={ onCreateNew }
-				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-				createNavigationMenuIsError={ createNavigationMenuIsError }
-				actionLabel={ actionLabel }
+		<div className="wp-block-navigation__menu-inspector-controls">
+			{ ! hasChildren && (
+				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
+					{ __( 'This navigation menu is empty.' ) }
+				</p>
+			) }
+			<PrivateListView
+				rootClientId={ clientId }
+				isExpanded
+				description={ description }
+				showAppender
+				blockSettingsMenu={ LeafMoreMenu }
+				additionalBlockContent={ AdditionalBlockContent }
 			/>
-			<ManageMenusButton disabled={ isManageMenusButtonDisabled } />
-		</>
+		</div>
 	);
 };
 
 const MenuInspectorControls = ( props ) => {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
-		? 'list'
-		: undefined;
+	const {
+		createNavigationMenuIsSuccess,
+		createNavigationMenuIsError,
+		currentMenuId = null,
+		onCreateNew,
+		onSelectClassicMenu,
+		onSelectNavigationMenu,
+		isManageMenusButtonDisabled,
+		blockEditingMode,
+	} = props;
 
 	return (
-		<InspectorControls __experimentalGroup={ menuControlsSlot }>
-			<PanelBody
-				title={
-					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
-				}
-			>
-				{ isOffCanvasNavigationEditorEnabled ? (
-					<ExperimentControls { ...props } />
-				) : (
-					<DefaultControls { ...props } />
-				) }
+		<InspectorControls group="list">
+			<PanelBody title={ null }>
+				<HStack className="wp-block-navigation-off-canvas-editor__header">
+					<Heading
+						className="wp-block-navigation-off-canvas-editor__title"
+						level={ 2 }
+					>
+						{ __( 'Menu' ) }
+					</Heading>
+					{ blockEditingMode === 'default' && (
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
+							isManageMenusButtonDisabled={
+								isManageMenusButtonDisabled
+							}
+						/>
+					) }
+				</HStack>
+				<MainContent { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);

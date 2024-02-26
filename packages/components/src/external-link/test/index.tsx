@@ -9,16 +9,9 @@ import userEvent from '@testing-library/user-event';
  */
 import { ExternalLink } from '..';
 
-jest.useFakeTimers();
-
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
-
 describe( 'ExternalLink', () => {
 	test( 'should call function passed in onClick handler when clicking the link', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const onClickMock = jest.fn();
 
 		render(
@@ -37,7 +30,7 @@ describe( 'ExternalLink', () => {
 	} );
 
 	test( 'should prevent default action when clicking an internal anchor link without passing onClick prop', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 
 		render(
 			<ExternalLink href="#test">I&apos;m an anchor link!</ExternalLink>
@@ -60,7 +53,7 @@ describe( 'ExternalLink', () => {
 	} );
 
 	test( 'should call function passed in onClick handler and prevent default action when clicking an internal anchor link', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const onClickMock = jest.fn();
 
 		render(
@@ -81,7 +74,7 @@ describe( 'ExternalLink', () => {
 	} );
 
 	test( 'should not prevent default action when clicking a non anchor link without passing onClick prop', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 
 		render(
 			<ExternalLink href="https://wordpress.org">

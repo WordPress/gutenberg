@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import MediaReplaceFlow from '../';
 
-jest.useFakeTimers();
-
 const noop = () => {};
 
 function TestWrapper() {
@@ -34,16 +32,6 @@ function TestWrapper() {
 	);
 }
 
-/**
- * Returns the first found popover element up the DOM tree.
- *
- * @param {HTMLElement} element Element to start with.
- * @return {HTMLElement|null} Popover element, or `null` if not found.
- */
-function getWrappingPopoverElement( element ) {
-	return element.closest( '.components-popover' );
-}
-
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -57,9 +45,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'renders replace menu', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -71,19 +57,13 @@ describe( 'General media replace flow', () => {
 		);
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( uploadMenu )
-			).toBePositionedPopover()
-		);
+		await waitFor( () => expect( uploadMenu ).toBePositionedPopover() );
 
 		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
 
 	it( 'displays media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -98,17 +78,13 @@ describe( 'General media replace flow', () => {
 			name: 'example.media (opens in a new tab)',
 		} );
 
-		await waitFor( () =>
-			expect( getWrappingPopoverElement( link ) ).toBePositionedPopover()
-		);
+		await waitFor( () => expect( link ).toBePositionedPopover() );
 
 		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -121,22 +97,20 @@ describe( 'General media replace flow', () => {
 
 		await waitFor( () =>
 			expect(
-				getWrappingPopoverElement(
-					screen.getByRole( 'link', {
-						name: 'example.media (opens in a new tab)',
-					} )
-				)
+				screen.getByRole( 'link', {
+					name: 'example.media (opens in a new tab)',
+				} )
 			).toBePositionedPopover()
 		);
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} )
 		);
 
 		const mediaURLInput = screen.getByRole( 'combobox', {
-			name: 'URL',
+			name: 'Link',
 			expanded: false,
 		} );
 
@@ -145,7 +119,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Submit',
+				name: 'Save',
 			} )
 		);
 

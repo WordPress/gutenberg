@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/file",
 	"title": "File",
 	"category": "media",
@@ -21,8 +21,8 @@
 			"attribute": "id"
 		},
 		"fileName": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "a:not([download])"
 		},
 		"textLinkHref": {
@@ -42,8 +42,8 @@
 			"default": true
 		},
 		"downloadButtonText": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "a[download]"
 		},
 		"displayPreview": {
@@ -56,9 +56,22 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
+		},
+		"interactivity": true
 	},
-	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
 }

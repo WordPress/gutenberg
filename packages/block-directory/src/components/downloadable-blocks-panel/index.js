@@ -3,10 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,16 +15,73 @@ import DownloadableBlocksInserterPanel from './inserter-panel';
 import DownloadableBlocksNoResults from './no-results';
 import { store as blockDirectoryStore } from '../../store';
 
-function DownloadableBlocksPanel( {
-	downloadableItems,
+const EMPTY_ARRAY = [];
+
+const useDownloadableBlocks = ( filterValue ) =>
+	useSelect(
+		( select ) => {
+			const {
+				getDownloadableBlocks,
+				isRequestingDownloadableBlocks,
+				getInstalledBlockTypes,
+			} = select( blockDirectoryStore );
+
+			const hasPermission = select( coreStore ).canUser(
+				'read',
+				'block-directory/search'
+			);
+
+			let downloadableBlocks = EMPTY_ARRAY;
+			if ( hasPermission ) {
+				downloadableBlocks = getDownloadableBlocks( filterValue );
+
+				// Filter out blocks that are already installed.
+				const installedBlockTypes = getInstalledBlockTypes();
+				const installableBlocks = downloadableBlocks.filter(
+					( { name } ) => {
+						// Check if the block has just been installed, in which case it
+						// should still show in the list to avoid suddenly disappearing.
+						// `installedBlockTypes` only returns blocks stored in state
+						// immediately after installation, not all installed blocks.
+						const isJustInstalled = installedBlockTypes.some(
+							( blockType ) => blockType.name === name
+						);
+						const isPreviouslyInstalled = getBlockType( name );
+						return isJustInstalled || ! isPreviouslyInstalled;
+					}
+				);
+
+				// Keep identity of the `downloadableBlocks` array if nothing was filtered out
+				if ( installableBlocks.length !== downloadableBlocks.length ) {
+					downloadableBlocks = installableBlocks;
+				}
+
+				// Return identical empty array when there are no blocks
+				if ( downloadableBlocks.length === 0 ) {
+					downloadableBlocks = EMPTY_ARRAY;
+				}
+			}
+
+			return {
+				hasPermission,
+				downloadableBlocks,
+				isLoading: isRequestingDownloadableBlocks( filterValue ),
+			};
+		},
+		[ filterValue ]
+	);
+
+export default function DownloadableBlocksPanel( {
 	onSelect,
 	onHover,
 	hasLocalBlocks,
-	hasPermission,
-	isLoading,
 	isTyping,
+	filterValue,
 } ) {
-	if ( typeof hasPermission === 'undefined' || isLoading || isTyping ) {
+	const { hasPermission, downloadableBlocks, isLoading } =
+		useDownloadableBlocks( filterValue );
+
+	if ( hasPermission === undefined || isLoading || isTyping ) {
 		return (
 			<>
 				{ hasPermission && ! hasLocalBlocks && (
@@ -53,48 +109,20 @@ function DownloadableBlocksPanel( {
 		return null;
 	}
 
-	return !! downloadableItems.length ? (
+	if ( downloadableBlocks.length === 0 ) {
+		return hasLocalBlocks ? null : <DownloadableBlocksNoResults />;
+	}
+
+	return (
 		<DownloadableBlocksInserterPanel
-			downloadableItems={ downloadableItems }
+			downloadableItems={ downloadableBlocks }
 			hasLocalBlocks={ hasLocalBlocks }
 		>
 			<DownloadableBlocksList
-				items={ downloadableItems }
+				items={ downloadableBlocks }
 				onSelect={ onSelect }
 				onHover={ onHover }
 			/>
 		</DownloadableBlocksInserterPanel>
-	) : (
-		! hasLocalBlocks && <DownloadableBlocksNoResults />
 	);
 }
-
-export default compose( [
-	withSelect( ( select, { filterValue, rootClientId = null } ) => {
-		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
-			select( blockDirectoryStore );
-		const { canInsertBlockType } = select( blockEditorStore );
-
-		const hasPermission = select( coreStore ).canUser(
-			'read',
-			'block-directory/search'
-		);
-
-		function getInstallableBlocks( term ) {
-			return getDownloadableBlocks( term ).filter( ( block ) =>
-				canInsertBlockType( block, rootClientId, true )
-			);
-		}
-
-		const downloadableItems = hasPermission
-			? getInstallableBlocks( filterValue )
-			: [];
-		const isLoading = isRequestingDownloadableBlocks( filterValue );
-
-		return {
-			downloadableItems,
-			hasPermission,
-			isLoading,
-		};
-	} ),
-] )( DownloadableBlocksPanel );

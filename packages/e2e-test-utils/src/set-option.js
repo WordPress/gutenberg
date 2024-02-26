@@ -13,7 +13,6 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  * @param {string} value   The value to set the option to.
  *
  * @return {string} The previous value of the option.
- *
  */
 export async function setOption( setting, value ) {
 	await switchUserToAdmin();

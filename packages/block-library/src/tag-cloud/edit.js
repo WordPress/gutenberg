@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,13 +11,14 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	Disabled,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
@@ -44,7 +40,7 @@ const MAX_TAGS = 100;
 const MIN_FONT_SIZE = 0.1;
 const MAX_FONT_SIZE = 100;
 
-function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
+function TagCloudEdit( { attributes, setAttributes } ) {
 	const {
 		taxonomy,
 		showTagCounts,
@@ -53,14 +49,14 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		largestFontSize,
 	} = attributes;
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem' ],
 	} );
+	const taxonomies = useSelect(
+		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		[]
+	);
 
 	const getTaxonomyOptions = () => {
 		const selectOption = {
@@ -68,15 +64,14 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			value: '',
 			disabled: true,
 		};
-		const taxonomyOptions = map(
-			taxonomies?.filter( ( tax ) => !! tax.show_cloud ),
-			( item ) => {
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( tax ) => !! tax.show_cloud )
+			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			}
-		);
+			} );
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
@@ -118,6 +113,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post counts' ) }
 					checked={ showTagCounts }
 					onChange={ () =>
@@ -126,6 +122,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				/>
 				<RangeControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Number of tags' ) }
 					value={ numberOfTags }
 					onChange={ ( value ) =>
@@ -169,18 +166,16 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<>
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				<ServerSideRender
-					skipBlockSupportAttributes
-					block="core/tag-cloud"
-					attributes={ attributes }
-				/>
+				<Disabled>
+					<ServerSideRender
+						skipBlockSupportAttributes
+						block="core/tag-cloud"
+						attributes={ attributes }
+					/>
+				</Disabled>
 			</div>
 		</>
 	);
 }
 
-export default withSelect( ( select ) => {
-	return {
-		taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
-	};
-} )( TagCloudEdit );
+export default TagCloudEdit;

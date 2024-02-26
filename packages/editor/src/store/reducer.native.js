@@ -13,7 +13,6 @@ import {
 	postLock,
 	postSavingLock,
 	template,
-	isReady,
 	editorSettings,
 } from './reducer.js';
 
@@ -87,7 +86,6 @@ export default combineReducers( {
 	postLock,
 	postSavingLock,
 	template,
-	isReady,
 	editorSettings,
 	clipboard,
 	notices,

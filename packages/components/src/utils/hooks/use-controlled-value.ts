@@ -12,10 +12,10 @@ type Props< T > = {
 /**
  * Simplified and improved implementation of useControlledState.
  *
- * @param  props
- * @param  props.defaultValue
- * @param  props.value
- * @param  props.onChange
+ * @param props
+ * @param props.defaultValue
+ * @param props.value
+ * @param props.onChange
  * @return The controlled value and the value setter.
  */
 export function useControlledValue< T >( {

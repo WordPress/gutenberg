@@ -102,6 +102,130 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Points (pt)' ),
 		step: 1,
 	},
+	svw: {
+		value: 'svw',
+		label: isWeb ? 'svw' : __( 'Small viewport width (svw)' ),
+		a11yLabel: __( 'Small viewport width (svw)' ),
+		step: 0.1,
+	},
+	svh: {
+		value: 'svh',
+		label: isWeb ? 'svh' : __( 'Small viewport height (svh)' ),
+		a11yLabel: __( 'Small viewport height (svh)' ),
+		step: 0.1,
+	},
+	svi: {
+		value: 'svi',
+		label: isWeb
+			? 'svi'
+			: __( 'Viewport smallest size in the inline direction (svi)' ),
+		a11yLabel: __( 'Small viewport width or height (svi)' ),
+		step: 0.1,
+	},
+	svb: {
+		value: 'svb',
+		label: isWeb
+			? 'svb'
+			: __( 'Viewport smallest size in the block direction (svb)' ),
+		a11yLabel: __( 'Small viewport width or height (svb)' ),
+		step: 0.1,
+	},
+	svmin: {
+		value: 'svmin',
+		label: isWeb
+			? 'svmin'
+			: __( 'Small viewport smallest dimension (svmin)' ),
+		a11yLabel: __( 'Small viewport smallest dimension (svmin)' ),
+		step: 0.1,
+	},
+	lvw: {
+		value: 'lvw',
+		label: isWeb ? 'lvw' : __( 'Large viewport width (lvw)' ),
+		a11yLabel: __( 'Large viewport width (lvw)' ),
+		step: 0.1,
+	},
+	lvh: {
+		value: 'lvh',
+		label: isWeb ? 'lvh' : __( 'Large viewport height (lvh)' ),
+		a11yLabel: __( 'Large viewport height (lvh)' ),
+		step: 0.1,
+	},
+	lvi: {
+		value: 'lvi',
+		label: isWeb ? 'lvi' : __( 'Large viewport width or height (lvi)' ),
+		a11yLabel: __( 'Large viewport width or height (lvi)' ),
+		step: 0.1,
+	},
+	lvb: {
+		value: 'lvb',
+		label: isWeb ? 'lvb' : __( 'Large viewport width or height (lvb)' ),
+		a11yLabel: __( 'Large viewport width or height (lvb)' ),
+		step: 0.1,
+	},
+	lvmin: {
+		value: 'lvmin',
+		label: isWeb
+			? 'lvmin'
+			: __( 'Large viewport smallest dimension (lvmin)' ),
+		a11yLabel: __( 'Large viewport smallest dimension (lvmin)' ),
+		step: 0.1,
+	},
+	dvw: {
+		value: 'dvw',
+		label: isWeb ? 'dvw' : __( 'Dynamic viewport width (dvw)' ),
+		a11yLabel: __( 'Dynamic viewport width (dvw)' ),
+		step: 0.1,
+	},
+	dvh: {
+		value: 'dvh',
+		label: isWeb ? 'dvh' : __( 'Dynamic viewport height (dvh)' ),
+		a11yLabel: __( 'Dynamic viewport height (dvh)' ),
+		step: 0.1,
+	},
+	dvi: {
+		value: 'dvi',
+		label: isWeb ? 'dvi' : __( 'Dynamic viewport width or height (dvi)' ),
+		a11yLabel: __( 'Dynamic viewport width or height (dvi)' ),
+		step: 0.1,
+	},
+	dvb: {
+		value: 'dvb',
+		label: isWeb ? 'dvb' : __( 'Dynamic viewport width or height (dvb)' ),
+		a11yLabel: __( 'Dynamic viewport width or height (dvb)' ),
+		step: 0.1,
+	},
+	dvmin: {
+		value: 'dvmin',
+		label: isWeb
+			? 'dvmin'
+			: __( 'Dynamic viewport smallest dimension (dvmin)' ),
+		a11yLabel: __( 'Dynamic viewport smallest dimension (dvmin)' ),
+		step: 0.1,
+	},
+	dvmax: {
+		value: 'dvmax',
+		label: isWeb
+			? 'dvmax'
+			: __( 'Dynamic viewport largest dimension (dvmax)' ),
+		a11yLabel: __( 'Dynamic viewport largest dimension (dvmax)' ),
+		step: 0.1,
+	},
+	svmax: {
+		value: 'svmax',
+		label: isWeb
+			? 'svmax'
+			: __( 'Small viewport largest dimension (svmax)' ),
+		a11yLabel: __( 'Small viewport largest dimension (svmax)' ),
+		step: 0.1,
+	},
+	lvmax: {
+		value: 'lvmax',
+		label: isWeb
+			? 'lvmax'
+			: __( 'Large viewport largest dimension (lvmax)' ),
+		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
+		step: 0.1,
+	},
 };
 
 /**
@@ -130,9 +254,9 @@ export const DEFAULT_UNIT = allUnits.px;
  * Moving forward, ideally the value should be a string that contains both
  * the value and unit, example: '10px'
  *
- * @param  rawValue     The raw value as a string (may or may not contain the unit)
- * @param  fallbackUnit The unit used as a fallback, if not unit is detected in the `value`
- * @param  allowedUnits Units to derive from.
+ * @param rawValue     The raw value as a string (may or may not contain the unit)
+ * @param fallbackUnit The unit used as a fallback, if not unit is detected in the `value`
+ * @param allowedUnits Units to derive from.
  * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
  * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parse
  * from the raw value could not be matched against the list of allowed units.
@@ -152,7 +276,7 @@ export function getParsedQuantityAndUnit(
 /**
  * Checks if units are defined.
  *
- * @param  units List of units.
+ * @param units List of units.
  * @return Whether the list actually contains any units.
  */
 export function hasUnits(
@@ -168,8 +292,8 @@ export function hasUnits(
  * Parses a quantity and unit from a raw string value, given a list of allowed
  * units and otherwise falling back to the default unit.
  *
- * @param  rawValue     The raw value as a string (may or may not contain the unit)
- * @param  allowedUnits Units to derive from.
+ * @param rawValue     The raw value as a string (may or may not contain the unit)
+ * @param allowedUnits Units to derive from.
  * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
  * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed
  * from the raw value could not be matched against the list of allowed units.
@@ -208,10 +332,10 @@ export function parseQuantityAndUnitFromRawValue(
  * Parses quantity and unit from a raw value. Validates parsed value, using fallback
  * value if invalid.
  *
- * @param  rawValue         The next value.
- * @param  allowedUnits     Units to derive from.
- * @param  fallbackQuantity The fallback quantity, used in case it's not possible to parse a valid quantity from the raw value.
- * @param  fallbackUnit     The fallback unit, used in case it's not possible to parse a valid unit from the raw value.
+ * @param rawValue         The next value.
+ * @param allowedUnits     Units to derive from.
+ * @param fallbackQuantity The fallback quantity, used in case it's not possible to parse a valid quantity from the raw value.
+ * @param fallbackUnit     The fallback unit, used in case it's not possible to parse a valid unit from the raw value.
  * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
  * could not be parsed to a number correctly, and the `fallbackQuantity` was also `undefined`. The
  * unit can be `undefined` only if the unit parsed from the raw value could not be matched against
@@ -248,7 +372,7 @@ export function getValidParsedQuantityAndUnit(
  * Takes a unit value and finds the matching accessibility label for the
  * unit abbreviation.
  *
- * @param  unit Unit value (example: `px`)
+ * @param unit Unit value (example: `px`)
  * @return a11y label for the unit abbreviation
  */
 export function getAccessibleLabelForUnit( unit: string ): string | undefined {
@@ -259,8 +383,8 @@ export function getAccessibleLabelForUnit( unit: string ): string | undefined {
 /**
  * Filters available units based on values defined a list of allowed unit values.
  *
- * @param  allowedUnitValues Collection of allowed unit value strings.
- * @param  availableUnits    Collection of available unit objects.
+ * @param allowedUnitValues Collection of allowed unit value strings.
+ * @param availableUnits    Collection of available unit objects.
  * @return Filtered units.
  */
 export function filterUnitsWithSettings(
@@ -282,10 +406,10 @@ export function filterUnitsWithSettings(
  * TODO: ideally this hook shouldn't be needed
  * https://github.com/WordPress/gutenberg/pull/31822#discussion_r633280823
  *
- * @param  args                An object containing units, settingPath & defaultUnits.
- * @param  args.units          Collection of all potentially available units.
- * @param  args.availableUnits Collection of unit value strings for filtering available units.
- * @param  args.defaultValues  Collection of default values for defined units. Example: `{ px: 350, em: 15 }`.
+ * @param args                An object containing units, settingPath & defaultUnits.
+ * @param args.units          Collection of all potentially available units.
+ * @param args.availableUnits Collection of unit value strings for filtering available units.
+ * @param args.defaultValues  Collection of default values for defined units. Example: `{ px: 350, em: 15 }`.
  *
  * @return Filtered list of units, with their default values updated following the `defaultValues`
  * argument's property.
@@ -327,9 +451,9 @@ export const useCustomUnits = ( {
  * accurately displayed in the UI, even if the intention is to hide
  * the availability of that unit.
  *
- * @param  rawValue   Selected value to parse.
- * @param  legacyUnit Legacy unit value, if rawValue needs it appended.
- * @param  units      List of available units.
+ * @param rawValue   Selected value to parse.
+ * @param legacyUnit Legacy unit value, if rawValue needs it appended.
+ * @param units      List of available units.
  *
  * @return A collection of units containing the unit for the current value.
  */

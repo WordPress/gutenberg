@@ -1,7 +1,8 @@
+'use strict';
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 const util = require( 'util' );
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
@@ -27,9 +28,11 @@ const {
 	configureWordPress,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	canAccessWPORG,
 } = require( '../wordpress' );
 const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -41,11 +44,18 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  *
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
  * @param {boolean} options.update  If true, update sources.
  * @param {string}  options.xdebug  The Xdebug mode to set.
+ * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean} options.debug   True if debug mode is enabled.
  */
-module.exports = async function start( { spinner, debug, update, xdebug } ) {
+module.exports = async function start( {
+	spinner,
+	update,
+	xdebug,
+	scripts,
+	debug,
+} ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
@@ -68,15 +78,23 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	const configHash = md5( config );
 	const { workDirectoryPath, dockerComposeConfigPath } = config;
 	const shouldConfigureWp =
-		update ||
-		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
-			workDirectoryPath,
-		} ) );
+		( update ||
+			( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
+				workDirectoryPath,
+			} ) ) ) &&
+		// Don't reconfigure everything when we can't connect to the internet because
+		// the majority of update tasks involve connecting to the internet. (Such
+		// as downloading sources and pulling docker images.)
+		( await canAccessWPORG() );
 
 	const dockerComposeConfig = {
 		config: dockerComposeConfigPath,
 		log: config.debug,
 	};
+
+	if ( ! ( await canAccessWPORG() ) ) {
+		spinner.info( 'wp-env is offline' );
+	}
 
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
@@ -152,12 +170,20 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 	spinner.text = 'Starting WordPress.';
 
-	await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
-		...dockerComposeConfig,
-		commandOptions: shouldConfigureWp
-			? [ '--build', '--force-recreate' ]
-			: [],
-	} );
+	await dockerCompose.upMany(
+		[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
+		{
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		}
+	);
+
+	// Make sure we've consumed the custom CLI dockerfile.
+	if ( shouldConfigureWp ) {
+		await dockerCompose.buildOne( [ 'cli' ], { ...dockerComposeConfig } );
+	}
 
 	// Only run WordPress install/configuration when config has changed.
 	if ( shouldConfigureWp ) {
@@ -192,8 +218,12 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		} );
 	}
 
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterStart', config, spinner );
+	}
+
 	const siteUrl = config.env.development.config.WP_SITEURL;
-	const e2eSiteUrl = `http://${ config.env.tests.config.WP_TESTS_DOMAIN }:${ config.env.tests.port }/`;
+	const testsSiteUrl = config.env.tests.config.WP_SITEURL;
 
 	const { out: mySQLAddress } = await dockerCompose.port(
 		'mysql',
@@ -213,7 +243,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( 'WordPress test site started' )
-		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
+		.concat( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( `MySQL is listening on port ${ mySQLPort }` )
 		.concat(

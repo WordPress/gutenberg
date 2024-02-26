@@ -25,18 +25,11 @@ window.getHTMLPostContent = () => {
 };
 
 window.insertBlock = ( blockHTML ) => {
-	const { blockEditorSelect, blockEditorDispatch } =
-		window.getBlockEditorStore();
-
 	// Setup the editor with the inserted block.
 	const post = window.wp.data.select( 'core/editor' ).getCurrentPost();
 	window.wp.data
 		.dispatch( 'core/editor' )
 		.setupEditor( post, { content: blockHTML } );
-
-	// Select the first block.
-	const clientId = blockEditorSelect.getBlocks()[ 0 ].clientId;
-	blockEditorDispatch.selectBlock( clientId );
 
 	window.contentIncerted = true;
 };

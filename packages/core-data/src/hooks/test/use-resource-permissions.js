@@ -9,7 +9,7 @@ jest.mock( '@wordpress/api-fetch' );
 /**
  * External dependencies
  */
-import { act, render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -20,8 +20,6 @@ import useResourcePermissions from '../use-resource-permissions';
 describe( 'useResourcePermissions', () => {
 	let registry;
 	beforeEach( () => {
-		jest.useFakeTimers();
-
 		registry = createRegistry();
 		registry.register( coreDataStore );
 
@@ -32,11 +30,6 @@ describe( 'useResourcePermissions', () => {
 				} ),
 			},
 		} ) );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'retrieves the relevant permissions for a key-less resource', async () => {
@@ -58,18 +51,15 @@ describe( 'useResourcePermissions', () => {
 			canRead: false,
 		} );
 
-		// Required to make sure no updates happen outside of act()
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
-		} );
-
-		expect( data ).toEqual( {
-			status: 'SUCCESS',
-			isResolving: false,
-			hasResolved: true,
-			canCreate: true,
-			canRead: false,
-		} );
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+			} )
+		);
 	} );
 
 	it( 'retrieves the relevant permissions for a resource with a key', async () => {
@@ -93,19 +83,16 @@ describe( 'useResourcePermissions', () => {
 			canDelete: false,
 		} );
 
-		// Required to make sure no updates happen outside of act()
-		await act( async () => {
-			jest.advanceTimersByTime( 1 );
-		} );
-
-		expect( data ).toEqual( {
-			status: 'SUCCESS',
-			isResolving: false,
-			hasResolved: true,
-			canCreate: true,
-			canRead: false,
-			canUpdate: false,
-			canDelete: false,
-		} );
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+				canUpdate: false,
+				canDelete: false,
+			} )
+		);
 	} );
 } );

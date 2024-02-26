@@ -1,19 +1,20 @@
 /**
  * External dependencies
  */
-import { css, SerializedStyles } from '@emotion/react';
+import type { SerializedStyles } from '@emotion/react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
-import { baseLabelTypography, COLORS, rtl } from '../../utils';
+import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -79,7 +80,7 @@ export const Container = styled.div< ContainerProps >`
 `;
 
 type InputProps = {
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -96,10 +97,11 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 	} );
 };
 
-const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		compact: '13px',
 		'__unstable-large': '13px',
 	};
 
@@ -119,14 +121,14 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 
 export const getSizeConfig = ( {
 	inputSize: size,
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 }: InputProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
-			height: 36,
+			height: 40,
 			lineHeight: 1,
-			minHeight: 36,
+			minHeight: 40,
 			paddingLeft: space( 4 ),
 			paddingRight: space( 4 ),
 		},
@@ -134,6 +136,13 @@ export const getSizeConfig = ( {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
+			paddingLeft: space( 2 ),
+			paddingRight: space( 2 ),
+		},
+		compact: {
+			height: 32,
+			lineHeight: 1,
+			minHeight: 32,
 			paddingLeft: space( 2 ),
 			paddingRight: space( 2 ),
 		},
@@ -146,14 +155,8 @@ export const getSizeConfig = ( {
 		},
 	};
 
-	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			height: 30,
-			lineHeight: 1,
-			minHeight: 30,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
-		};
+	if ( ! __next40pxDefaultSize ) {
+		sizes.default = sizes.compact;
 	}
 
 	return sizes[ size as Size ] || sizes.default;
@@ -210,7 +213,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -260,23 +263,31 @@ export const LabelWrapper = styled( FlexItem )`
 
 type BackdropProps = {
 	disabled?: boolean;
+	isBorderless?: boolean;
 	isFocused?: boolean;
 };
 
 const backdropFocusedStyles = ( {
 	disabled,
+	isBorderless,
 	isFocused,
 }: BackdropProps ): SerializedStyles => {
-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
 
 	let boxShadow;
+	let outline;
+	let outlineOffset;
 
 	if ( isFocused ) {
-		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
+		borderColor = COLORS.ui.borderFocus;
+		boxShadow = CONFIG.controlBoxShadowFocus;
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline = `2px solid transparent`;
+		outlineOffset = `-2px`;
 	}
 
 	if ( disabled ) {
-		borderColor = COLORS.ui.borderDisabled;
+		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
 	}
 
 	return css( {
@@ -284,6 +295,8 @@ const backdropFocusedStyles = ( {
 		borderColor,
 		borderStyle: 'solid',
 		borderWidth: 1,
+		outline,
+		outlineOffset,
 	} );
 };
 

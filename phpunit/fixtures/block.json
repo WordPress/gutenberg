@@ -1,5 +1,6 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "common",
@@ -11,7 +12,7 @@
 	"icon": "star",
 	"description": "Shows warning, error or success notices…",
 	"keywords": [ "alert", "message" ],
-	"textDomain": "my-plugin",
+	"textdomain": "my-plugin",
 	"attributes": {
 		"message": {
 			"type": "string",

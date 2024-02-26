@@ -26,7 +26,7 @@ const MyThemableComponent = ( props: MyThemableComponentProps ) => {
 
 describe( 'Theme', () => {
 	describe( 'accent color', () => {
-		it( 'it does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
+		it( 'does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
 			render(
 				<Theme data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
@@ -49,7 +49,7 @@ describe( 'Theme', () => {
 			} );
 		} );
 
-		it( 'it defines the accent color (and its variations) as a CSS variable', () => {
+		it( 'defines the accent color (and its variations) as a CSS variable', () => {
 			render(
 				<Theme accent="#123abc" data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
@@ -66,7 +66,7 @@ describe( 'Theme', () => {
 	} );
 
 	describe( 'background color', () => {
-		it( 'it does not define the background color (and its dependent colors) as a CSS variable when the `background` prop is undefined', () => {
+		it( 'does not define the background color (and its dependent colors) as a CSS variable when the `background` prop is undefined', () => {
 			render(
 				<Theme data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
@@ -91,7 +91,7 @@ describe( 'Theme', () => {
 			} );
 		} );
 
-		it( 'it defines the background color (and its dependent colors) as a CSS variable', () => {
+		it( 'defines the background color (and its dependent colors) as a CSS variable', () => {
 			render(
 				<Theme background="#ffffff" data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>

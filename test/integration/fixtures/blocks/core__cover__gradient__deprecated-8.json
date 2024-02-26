@@ -9,7 +9,8 @@
 			"dimRatio": 100,
 			"backgroundType": "image",
 			"gradient": "electric-grass",
-			"isDark": false
+			"isDark": false,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

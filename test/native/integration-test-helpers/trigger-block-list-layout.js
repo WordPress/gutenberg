@@ -15,14 +15,20 @@ import { waitForStoreResolvers } from './wait-for-store-resolvers';
  * case any of the inner elements use selectors that are associated with store
  * resolvers.
  *
- * @param {import('react-test-renderer').ReactTestInstance} block           Block test instance to trigger layout event.
- * @param {Object}                                          [options]       Configuration options for the event.
- * @param {number}                                          [options.width] Width value to be passed to the event.
+ * @param {import('react-test-renderer').ReactTestInstance} block                    Block test instance to trigger layout event.
+ * @param {Object}                                          [options]                Configuration options for the event.
+ * @param {number}                                          [options.width]          Width value to be passed to the event.
+ * @param {number}                                          [options.blockListIndex] Block list index, for cases when there is more than one, like in inner blocks.
  */
-export const triggerBlockListLayout = async ( block, { width = 320 } = {} ) =>
+export const triggerBlockListLayout = async (
+	block,
+	{ width = 320, blockListIndex = 0 } = {}
+) =>
 	waitForStoreResolvers( () =>
 		fireEvent(
-			within( block ).getByTestId( 'block-list-wrapper' ),
+			within( block ).getAllByTestId( 'block-list-wrapper' )[
+				blockListIndex
+			],
 			'layout',
 			{
 				nativeEvent: {

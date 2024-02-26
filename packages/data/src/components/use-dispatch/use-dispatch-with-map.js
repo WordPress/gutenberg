@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useRef } from '@wordpress/element';
@@ -41,18 +36,25 @@ const useDispatchWithMap = ( dispatchMap, deps ) => {
 			registry.dispatch,
 			registry
 		);
-		return mapValues( currentDispatchProps, ( dispatcher, propName ) => {
-			if ( typeof dispatcher !== 'function' ) {
-				// eslint-disable-next-line no-console
-				console.warn(
-					`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
-				);
-			}
-			return ( ...args ) =>
-				currentDispatchMap
-					.current( registry.dispatch, registry )
-					[ propName ]( ...args );
-		} );
+		return Object.fromEntries(
+			Object.entries( currentDispatchProps ).map(
+				( [ propName, dispatcher ] ) => {
+					if ( typeof dispatcher !== 'function' ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
+						);
+					}
+					return [
+						propName,
+						( ...args ) =>
+							currentDispatchMap
+								.current( registry.dispatch, registry )
+								[ propName ]( ...args ),
+					];
+				}
+			)
+		);
 	}, [ registry, ...deps ] );
 };
 
