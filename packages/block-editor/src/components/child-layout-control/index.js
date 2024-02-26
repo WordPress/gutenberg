@@ -122,6 +122,11 @@ export default function ChildLayoutControl( {
 				key: 'fixedNoShrink',
 				value: 'fixedNoShrink',
 				name: __( 'Fixed' ),
+			},
+			{
+				key: 'fixed',
+				value: 'fixed',
+				name: __( 'Max Width' ),
 			}
 		);
 	} else if (
@@ -143,6 +148,11 @@ export default function ChildLayoutControl( {
 				key: 'fixedNoShrink',
 				value: 'fixedNoShrink',
 				name: __( 'Fixed' ),
+			},
+			{
+				key: 'fixed',
+				value: 'fixed',
+				name: __( 'Max Width' ),
 			}
 		);
 	} else if ( parentLayoutType === 'flex' && orientation === 'horizontal' ) {
@@ -220,6 +230,8 @@ export default function ChildLayoutControl( {
 				selectedValue = 'wide';
 			} else if ( selfAlign === 'fixedNoShrink' ) {
 				selectedValue = 'fixedNoShrink';
+			} else if ( selfAlign === 'fixed' ) {
+				selectedValue = 'fixed';
 			} else if ( selfAlign === 'fit' ) {
 				selectedValue = 'fit';
 			} else if ( parentLayoutType === 'constrained' ) {
@@ -231,6 +243,7 @@ export default function ChildLayoutControl( {
 			parentLayoutType === 'flex' &&
 			orientation === 'vertical'
 		) {
+			// If the parent layout is justified stretch, children should be fill by default.
 			const defaultSelfAlign =
 				justifyContent === 'stretch' ? 'fill' : 'fit';
 			selectedValue = selfAlign || defaultSelfAlign;
