@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 5.3.0 (2024-02-21)
+
+## 5.2.0 (2024-02-09)
+
+### Bug fixes
+
+-   Fix import type field in script module asset files ([#58770](https://github.com/WordPress/gutenberg/pull/58770)).
+
 ## 5.1.0 (2024-01-24)
 
 ## 5.0.0 (2024-01-10)

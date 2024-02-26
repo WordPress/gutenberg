@@ -2,21 +2,71 @@
 
 ## Unreleased
 
+### Bug Fix
 
-### Enhancements
+-   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 
--   `Button`: Update secondary variant to show the border even in a disabled state. ([#58606](https://github.com/WordPress/gutenberg/pull/58606)).
--   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
--   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
--   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304))
+## 27.0.0 (2024-02-21)
+
+### Breaking Changes
+
+-   `CustomSelectControl`: Remove deprecated `__nextUnconstrainedWidth` prop and promote to default behavior ([#58974](https://github.com/WordPress/gutenberg/pull/58974)).
 
 ### Bug Fix
 
+-   `ToolbarButton`: Center text for short labels ([#59117](https://github.com/WordPress/gutenberg/pull/59117)).
+
+### Internal
+
+-   `ColorPicker`: Style without accessing internal `InputControl` classes ([#59069](https://github.com/WordPress/gutenberg/pull/59069)).
+-   Add lint rules for theme color CSS var usage ([#59022](https://github.com/WordPress/gutenberg/pull/59022)).
+-   `FormTokenField`: Use `Element.scrollIntoView()` instead of `dom-scroll-into-view` ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
+-   Removing `dom-scroll-into-view` as a dependency of the components package ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
+-   Add higher-order function to ignore IME keydowns ([#59081](https://github.com/WordPress/gutenberg/pull/59081)).
+
+### Experimental
+
+-   `Tabs`: rename `initialTabId` prop to `defaultTabId` ([#59035](https://github.com/WordPress/gutenberg/pull/59035)).
+
+## 26.0.1 (2024-02-13)
+
+### Bug Fix
+
+-   `Modal`: Add `box-sizing` reset style ([#58905](https://github.com/WordPress/gutenberg/pull/58905)).
+-   `Popover`: Fix positioning in nested iframes by upgrading Floating UI packages to their latest versions ([#58932](https://github.com/WordPress/gutenberg/pull/58932)).
+
+### Experimental
+
+-   `CustomSelectControlV2`: Adapt component for legacy usage ([#57902](https://github.com/WordPress/gutenberg/pull/57902)).
+
+## 26.0.0 (2024-02-09)
+
+### Breaking Changes
+
+-   `FontSizePicker`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58702](https://github.com/WordPress/gutenberg/pull/58702)).
+-   `GradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58701](https://github.com/WordPress/gutenberg/pull/58701)).
+-   `CustomGradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58699](https://github.com/WordPress/gutenberg/pull/58699)).
+-   `AnglePickerControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58700](https://github.com/WordPress/gutenberg/pull/58700)).
+
+### Enhancements
+-   `Button`: Update secondary variant to show the border even in a disabled state. ([#58606](https://github.com/WordPress/gutenberg/pull/58606)).
+-   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+-   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
+-   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304)).
+-   Remove deprecation warnings for `__next36pxDefaultSize` prop ([#58703](https://github.com/WordPress/gutenberg/pull/58703)).
+-   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
+-   `FocalPointPicker`: Apply modern styling ([#58459](https://github.com/WordPress/gutenberg/pull/58459)).
+
+### Bug Fix
+
+-   `FocalPointPicker`: Allow `PointerCircle` to render in a default centered position when x and y coordinates are undefined ([#58592](https://github.com/WordPress/gutenberg/pull/58592)).
 -   `DateTime`: Add a timezone offset value for display purposes. ([#56682](https://github.com/WordPress/gutenberg/pull/56682)).
 -   `Placeholder`: Fix Placeholder component padding when body text font size is changed ([#58323](https://github.com/WordPress/gutenberg/pull/58323)).
 -   `Placeholder`: Fix Global Styles typography settings bleeding into placeholder component ([#58303](https://github.com/WordPress/gutenberg/pull/58303)).
 -   `PaletteEdit`: Fix palette item accessibility in details view ([#58214](https://github.com/WordPress/gutenberg/pull/58214)).
 -   `Snackbar`: Fix the auto-dismissal timers ([#58604](https://github.com/WordPress/gutenberg/pull/58604)).
+-   `Tabs`: Fix infinite loop in `useEffect` ([#58861](https://github.com/WordPress/gutenberg/pull/58861)).
+-   `Popover`: Add `box-sizing` reset style ([#58871](https://github.com/WordPress/gutenberg/pull/58871)).
 
 ### Experimental
 
@@ -25,14 +75,15 @@
 -   `Tabs`: improve controlled mode focus handling and keyboard navigation ([#57696](https://github.com/WordPress/gutenberg/pull/57696)).
 -   `Tabs`: prevent internal focus from updating too early ([#58625](https://github.com/WordPress/gutenberg/pull/58625)).
 -   Expand theming support in the `COLORS` variable object ([#58097](https://github.com/WordPress/gutenberg/pull/58097)).
-
-### Enhancements
-
--   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
+-   `CustomSelect`: disable `virtualFocus` to fix issue for screenreaders ([#58585](https://github.com/WordPress/gutenberg/pull/58585)).
 
 ### Internal
 
 -   `Composite`: Removing Reakit `Composite` implementation ([#58620](https://github.com/WordPress/gutenberg/pull/58620)).
+-   Removing Reakit as a dependency of the components package ([#58631](https://github.com/WordPress/gutenberg/pull/58631)).
+-   `CustomSelect`: add unit tests ([#58583](https://github.com/WordPress/gutenberg/pull/58583)).
+-   `InputBase`: Add `isBorderless` prop ([#58750](https://github.com/WordPress/gutenberg/pull/58750)).
+-   `SearchControl`: Replace internal implementation to use `InputControl` ([#56524](https://github.com/WordPress/gutenberg/pull/56524)).
 
 ## 25.16.0 (2024-01-24)
 

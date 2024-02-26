@@ -34,6 +34,15 @@ $block-editor-link-control-number-of-actions: 1;
 				content: attr(aria-label);
 			}
 		}
+
+		.block-editor-link-control__search-item-top {
+			gap: $grid-unit-10;
+
+			.components-button.has-icon {
+				min-width: inherit;
+				width: min-content;
+			}
+		}
 	}
 }
 
@@ -177,7 +186,7 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-header {
 		display: block;
 		flex-direction: row;
-		align-items: flex-start;
+		align-items: center;
 		margin-right: $grid-unit-10;
 		gap: $grid-unit-10;
 
@@ -244,6 +253,10 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-title {
 		border-radius: $radius-block-ui;
 		line-height: 1.1;
+
+		&:focus {
+			box-shadow: none;
+		}
 
 		&:focus-visible {
 			@include block-toolbar-button-style__focus();
@@ -336,13 +349,6 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
-.block-editor-link-control__drawer {
-	display: flex; // allow for ordering.
-	order: 30;
-	flex-direction: column;
-	flex-basis: 100%; // occupy full width.
-}
-
 // Inner div required to avoid padding/margin
 // causing janky animation.
 .block-editor-link-control__drawer-inner {
@@ -350,11 +356,6 @@ $block-editor-link-control-number-of-actions: 1;
 	flex-direction: column;
 	flex-basis: 100%; // occupy full width.
 	position: relative;
-}
-
-.block-editor-link-control__unlink {
-	padding-left: $grid-unit-20;
-	padding-right: $grid-unit-20;
 }
 
 .block-editor-link-control__setting {
@@ -424,9 +425,4 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control .block-editor-link-control__search-input-wrapper.has-actions .components-spinner {
 	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
 	right: $grid-unit-15;
-}
-
-.block-editor-link-control__search-item-action {
-	margin-left: auto; // push to far right hand side
-	flex-shrink: 0;
 }

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 27.3.0 (2024-02-21)
+
+## 27.2.0 (2024-02-09)
+
+### New Features
+
+-   Add experimental support for `viewScriptModule` field in block.json for `build` and `start` scripts ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
+
+### Enhancements
+
+-   Ensure that watched module builds detect block.json changes ([#57927](https://github.com/WordPress/gutenberg/pull/57927)).
+
+### Deprecations
+
+-   Experimental support for `viewModule` field in block.json is deprecated in favor of `viewScriptModule` ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
+
 ## 27.1.0 (2024-01-24)
 
 ## 27.0.0 (2024-01-10)

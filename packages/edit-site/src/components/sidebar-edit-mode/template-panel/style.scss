@@ -34,20 +34,11 @@ h3.edit-site-template-card__template-areas-title {
 	margin: 0 0 $grid-unit-10;
 }
 
-
-.edit-site-template-panel__replace-template-modal {
-	z-index: z-index(".edit-site-template-panel__replace-template-modal");
+.edit-site-template-card__templates-list {
+	margin-top: $grid-unit-20;
 }
 
-.edit-site-template-panel__replace-template-modal__content {
-	column-count: 2;
-	column-gap: $grid-unit-30;
-
-	@include break-medium() {
-		column-count: 3;
-	}
-
-	@include break-wide() {
-		column-count: 4;
-	}
+.edit-site-template-panel .block-editor-block-preview__container {
+	border-radius: 2px;
+	box-shadow: none;
 }

@@ -81,7 +81,6 @@ function ColorGradientControlInner( {
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
-				__nextHasNoMargin
 				value={ gradientValue }
 				onChange={
 					canChooseAColor
@@ -134,7 +133,7 @@ function ColorGradientControlInner( {
 					{ canChooseAColor && canChooseAGradient && (
 						<div>
 							<Tabs
-								initialTabId={
+								defaultTabId={
 									gradientValue
 										? TAB_IDS.gradient
 										: !! canChooseAColor && TAB_IDS.color

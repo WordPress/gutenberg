@@ -134,7 +134,9 @@ export default function HeaderEditMode() {
 								className={ classnames(
 									'selected-block-tools-wrapper',
 									{
-										'is-collapsed': isBlockToolsCollapsed,
+										'is-collapsed':
+											isBlockToolsCollapsed ||
+											! hasBlockSelected,
 									}
 								) }
 							>
@@ -206,7 +208,7 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<PostViewLink />
-					<SaveButton />
+					<SaveButton size="compact" />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }

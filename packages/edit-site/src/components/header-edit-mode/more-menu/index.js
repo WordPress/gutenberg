@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external } from '@wordpress/icons';
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
@@ -15,8 +15,11 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,29 +36,18 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
-import ModeSwitcher from '../mode-switcher';
-import { store as siteEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { ModeSwitcher } = unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
-	const registry = useRegistry();
-
-	const { closeGeneralSidebar } = useDispatch( siteEditorStore );
-	const { setIsInserterOpened, setIsListViewOpened } =
-		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const isBlockBasedTheme = useSelect( ( select ) => {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
 
-	const toggleDistractionFree = () => {
-		registry.batch( () => {
-			setPreference( 'core', 'fixedToolbar', true );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-		} );
-	};
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -90,9 +82,10 @@ export default function MoreMenu( { showIconLabels } ) {
 							<PreferenceToggleMenuItem
 								scope="core"
 								name="distractionFree"
-								onToggle={ toggleDistractionFree }
 								label={ __( 'Distraction free' ) }
 								info={ __( 'Write with calmness' ) }
+								handleToggling={ false }
+								onToggle={ toggleDistractionFree }
 								messageActivated={ __(
 									'Distraction free mode activated'
 								) }

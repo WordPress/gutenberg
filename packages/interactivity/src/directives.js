@@ -10,26 +10,123 @@ import { deepSignal, peek } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
-const isObject = ( item ) =>
-	item && typeof item === 'object' && ! Array.isArray( item );
+// Assigned objects should be ignore during proxification.
+const contextAssignedObjects = new WeakMap();
 
-const mergeDeepSignals = ( target, source, overwrite ) => {
+const isPlainObject = ( item ) =>
+	item && typeof item === 'object' && item.constructor === Object;
+
+const descriptor = Reflect.getOwnPropertyDescriptor;
+
+/**
+ * Wrap a context object with a proxy to reproduce the context stack. The proxy
+ * uses the passed `inherited` context as a fallback to look up for properties
+ * that don't exist in the given context. Also, updated properties are modified
+ * where they are defined, or added to the main context when they don't exist.
+ *
+ * By default, all plain objects inside the context are wrapped, unless it is
+ * listed in the `ignore` option.
+ *
+ * @param {Object} current   Current context.
+ * @param {Object} inherited Inherited context, used as fallback.
+ *
+ * @return {Object} The wrapped context object.
+ */
+const proxifyContext = ( current, inherited = {} ) =>
+	new Proxy( current, {
+		get: ( target, k ) => {
+			// Always subscribe to prop changes in the current context.
+			const currentProp = target[ k ];
+
+			// Return the inherited prop when missing in target.
+			if ( ! ( k in target ) && k in inherited ) {
+				return inherited[ k ];
+			}
+
+			// Proxify plain objects that are not listed in `ignore`.
+			if (
+				k in target &&
+				! contextAssignedObjects.get( target )?.has( k ) &&
+				isPlainObject( peek( target, k ) )
+			) {
+				return proxifyContext( currentProp, inherited[ k ] );
+			}
+
+			/*
+			 * For other cases, return the value from target, also subscribing
+			 * to changes in the parent context when the current prop is
+			 * not defined.
+			 */
+			return k in target ? currentProp : inherited[ k ];
+		},
+		set: ( target, k, value ) => {
+			const obj =
+				k in target || ! ( k in inherited ) ? target : inherited;
+
+			// Values that are objects should not be proxified so they point to
+			// the original object and don't inherit unexpected properties.
+			if ( value && typeof value === 'object' ) {
+				if ( ! contextAssignedObjects.has( obj ) ) {
+					contextAssignedObjects.set( obj, new Set() );
+				}
+				contextAssignedObjects.get( obj ).add( k );
+			}
+
+			obj[ k ] = value;
+			return true;
+		},
+		ownKeys: ( target ) => [
+			...new Set( [
+				...Object.keys( inherited ),
+				...Object.keys( target ),
+			] ),
+		],
+		getOwnPropertyDescriptor: ( target, k ) =>
+			descriptor( target, k ) || descriptor( inherited, k ),
+	} );
+
+/**
+ * Recursively update values within a deepSignal object.
+ *
+ * @param {Object} target A deepSignal instance.
+ * @param {Object} source Object with properties to update in `target`
+ */
+const updateSignals = ( target, source ) => {
 	for ( const k in source ) {
-		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
-			mergeDeepSignals(
-				target[ `$${ k }` ].peek(),
-				source[ `$${ k }` ].peek(),
-				overwrite
-			);
-		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
-			target[ `$${ k }` ] = source[ `$${ k }` ];
+		if (
+			isPlainObject( peek( target, k ) ) &&
+			isPlainObject( peek( source, k ) )
+		) {
+			updateSignals( target[ `$${ k }` ].peek(), source[ k ] );
+		} else {
+			target[ k ] = source[ k ];
 		}
 	}
+};
+
+/**
+ * Recursively clone the passed object.
+ *
+ * @param {Object} source Source object.
+ * @return {Object} Cloned object.
+ */
+const deepClone = ( source ) => {
+	if ( isPlainObject( source ) ) {
+		return Object.fromEntries(
+			Object.entries( source ).map( ( [ key, value ] ) => [
+				key,
+				deepClone( value ),
+			] )
+		);
+	}
+	if ( Array.isArray( source ) ) {
+		return source.map( ( i ) => deepClone( i ) );
+	}
+	return source;
 };
 
 const newRule =
@@ -102,29 +199,25 @@ export default () => {
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 			const currentValue = useRef( deepSignal( {} ) );
-			const passedValues = context.map( ( { value } ) => value );
-
-			currentValue.current = useMemo( () => {
-				const newValue = context
-					.map( ( c ) => deepSignal( { [ c.namespace ]: c.value } ) )
-					.reduceRight( mergeDeepSignals );
-
-				mergeDeepSignals( newValue, inheritedValue );
-				mergeDeepSignals( currentValue.current, newValue, true );
-				return currentValue.current;
-			}, [ inheritedValue, ...passedValues ] );
-
-			return (
-				<Provider value={ currentValue.current }>{ children }</Provider>
+			const defaultEntry = context.find(
+				( { suffix } ) => suffix === 'default'
 			);
+
+			// No change should be made if `defaultEntry` does not exist.
+			const contextStack = useMemo( () => {
+				if ( defaultEntry ) {
+					const { namespace, value } = defaultEntry;
+					updateSignals( currentValue.current, {
+						[ namespace ]: deepClone( value ),
+					} );
+				}
+				return proxifyContext( currentValue.current, inheritedValue );
+			}, [ defaultEntry, inheritedValue ] );
+
+			return <Provider value={ contextStack }>{ children }</Provider>;
 		},
 		{ priority: 5 }
 	);
-
-	// data-wp-body
-	directive( 'body', ( { props: { children } } ) => {
-		return createPortal( children, document.body );
-	} );
 
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
@@ -160,15 +253,15 @@ export default () => {
 	// data-wp-class--[classname]
 	directive(
 		'class',
-		( { directives: { class: className }, element, evaluate } ) => {
-			className
+		( { directives: { class: classNames }, element, evaluate } ) => {
+			classNames
 				.filter( ( { suffix } ) => suffix !== 'default' )
 				.forEach( ( entry ) => {
-					const name = entry.suffix;
-					const result = evaluate( entry, { className: name } );
+					const className = entry.suffix;
+					const result = evaluate( entry );
 					const currentClass = element.props.class || '';
 					const classFinder = new RegExp(
-						`(^|\\s)${ name }(\\s|$)`,
+						`(^|\\s)${ className }(\\s|$)`,
 						'g'
 					);
 					if ( ! result )
@@ -177,8 +270,8 @@ export default () => {
 							.trim();
 					else if ( ! classFinder.test( currentClass ) )
 						element.props.class = currentClass
-							? `${ currentClass } ${ name }`
-							: name;
+							? `${ currentClass } ${ className }`
+							: className;
 
 					useInit( () => {
 						/*
@@ -187,29 +280,29 @@ export default () => {
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							element.ref.current.classList.remove( name );
+							element.ref.current.classList.remove( className );
 						} else {
-							element.ref.current.classList.add( name );
+							element.ref.current.classList.add( className );
 						}
 					} );
 				} );
 		}
 	);
 
-	// data-wp-style--[style-key]
+	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
-				const key = entry.suffix;
-				const result = evaluate( entry, { key } );
+				const styleProp = entry.suffix;
+				const result = evaluate( entry );
 				element.props.style = element.props.style || {};
 				if ( typeof element.props.style === 'string' )
 					element.props.style = cssStringToObject(
 						element.props.style
 					);
-				if ( ! result ) delete element.props.style[ key ];
-				else element.props.style[ key ] = result;
+				if ( ! result ) delete element.props.style[ styleProp ];
+				else element.props.style[ styleProp ] = result;
 
 				useInit( () => {
 					/*
@@ -218,9 +311,9 @@ export default () => {
 					 * because it only needs to do it the first time.
 					 */
 					if ( ! result ) {
-						element.ref.current.style.removeProperty( key );
+						element.ref.current.style.removeProperty( styleProp );
 					} else {
-						element.ref.current.style[ key ] = result;
+						element.ref.current.style[ styleProp ] = result;
 					}
 				} );
 			} );
@@ -247,7 +340,11 @@ export default () => {
 					 * property excluding the following special cases. We follow Preact's
 					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					 */
-					if (
+					if ( attribute === 'style' ) {
+						if ( typeof result === 'string' )
+							el.style.cssText = result;
+						return;
+					} else if (
 						attribute !== 'width' &&
 						attribute !== 'height' &&
 						attribute !== 'href' &&
@@ -355,15 +452,16 @@ export default () => {
 
 			const list = evaluate( entry );
 			return list.map( ( item ) => {
-				const mergedContext = deepSignal( {} );
-
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
-				const newValue = deepSignal( {
-					[ namespace ]: { [ itemProp ]: item },
-				} );
-				mergeDeepSignals( newValue, inheritedValue );
-				mergeDeepSignals( mergedContext, newValue, true );
+				const itemContext = deepSignal( { [ namespace ]: {} } );
+				const mergedContext = proxifyContext(
+					itemContext,
+					inheritedValue
+				);
+
+				// Set the item after proxifying the context.
+				mergedContext[ namespace ][ itemProp ] = item;
 
 				const scope = { ...getScope(), context: mergedContext };
 				const key = eachKey

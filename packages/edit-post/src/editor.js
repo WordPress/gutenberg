@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	ErrorBoundary,
 	PostLockedModal,
@@ -11,7 +11,6 @@ import {
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
 
 /**
@@ -21,7 +20,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import usePostHistory from './hooks/use-post-history';
+import useNavigateToEntityRecord from './hooks/use-navigate-to-entity-record';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -32,73 +31,53 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, initialPost, goBack } =
-		usePostHistory( initialPostId, initialPostType );
+	const {
+		initialPost,
+		currentPost,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
+	} = useNavigateToEntityRecord( initialPostId, initialPostType );
 
-	const { hasInlineToolbar, post, preferredStyleVariations, template } =
-		useSelect(
-			( select ) => {
-				const { isFeatureActive, getEditedPostTemplate } =
-					select( editPostStore );
-				const { getEntityRecord, getPostType, canUser } =
-					select( coreStore );
-				const { getEditorSettings } = select( editorStore );
+	const { post, template } = useSelect(
+		( select ) => {
+			const { getEditedPostTemplate } = select( editPostStore );
+			const { getEntityRecord, getPostType, canUser } =
+				select( coreStore );
+			const { getEditorSettings } = select( editorStore );
 
-				const postObject = getEntityRecord(
-					'postType',
-					currentPost.postType,
-					currentPost.postId
-				);
+			const postObject = getEntityRecord(
+				'postType',
+				currentPost.postType,
+				currentPost.postId
+			);
 
-				const supportsTemplateMode =
-					getEditorSettings().supportsTemplateMode;
-				const isViewable =
-					getPostType( currentPost.postType )?.viewable ?? false;
-				const canEditTemplate = canUser( 'create', 'templates' );
-				return {
-					hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-					preferredStyleVariations: select( preferencesStore ).get(
-						'core/edit-post',
-						'preferredStyleVariations'
-					),
-					template:
-						supportsTemplateMode &&
-						isViewable &&
-						canEditTemplate &&
-						currentPost.postType !== 'wp_template'
-							? getEditedPostTemplate()
-							: null,
-					post: postObject,
-				};
-			},
-			[ currentPost.postType, currentPost.postId ]
-		);
-
-	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
-	const defaultRenderingMode =
-		currentPost.postType === 'wp_template' ? 'all' : 'post-only';
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
+			const isViewable =
+				getPostType( currentPost.postType )?.viewable ?? false;
+			const canEditTemplate = canUser( 'create', 'templates' );
+			return {
+				template:
+					supportsTemplateMode &&
+					isViewable &&
+					canEditTemplate &&
+					currentPost.postType !== 'wp_template'
+						? getEditedPostTemplate()
+						: null,
+				post: postObject,
+			};
+		},
+		[ currentPost.postType, currentPost.postId ]
+	);
 
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
-			getPostLinkProps,
-			goBack,
-			defaultRenderingMode,
-			__experimentalPreferredStyleVariations: {
-				value: preferredStyleVariations,
-				onChange: updatePreferredStyleVariations,
-			},
-			hasInlineToolbar,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			defaultRenderingMode: 'post-only',
 		} ),
-		[
-			settings,
-			hasInlineToolbar,
-			preferredStyleVariations,
-			updatePreferredStyleVariations,
-			getPostLinkProps,
-			goBack,
-			defaultRenderingMode,
-		]
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
 
 	if ( ! post ) {

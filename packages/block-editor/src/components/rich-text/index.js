@@ -19,13 +19,14 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
+import { blockBindingsKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
@@ -46,6 +47,7 @@ import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
+import { BLOCK_BINDINGS_ALLOWED_BLOCKS } from '../../hooks/use-bindings-attributes';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -108,6 +110,7 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
+		disableEditing,
 		...props
 	},
 	forwardedRef
@@ -115,11 +118,9 @@ export function RichTextWrapper(
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const {
-		clientId,
-		isSelected: isBlockSelected,
-		name: blockName,
-	} = useBlockEditContext();
+	const context = useBlockEditContext();
+	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const blockBindings = context[ blockBindingsKey ];
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -127,12 +128,10 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
+		const { getSelectionStart, getSelectionEnd } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const blockBindings =
-			getBlockAttributes( clientId )?.metadata?.bindings;
 
 		let isSelected;
 
@@ -145,43 +144,60 @@ export function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		// Disable Rich Text editing if block bindings specify that.
-		let shouldDisableEditing = false;
-		if ( blockBindings ) {
-			const blockTypeAttributes = getBlockType( blockName ).attributes;
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
-			for ( const [ attribute, args ] of Object.entries(
-				blockBindings
-			) ) {
-				// If any of the attributes with source "rich-text" is part of the bindings,
-				// has a source with `lockAttributesEditing`, disable it.
-				if (
-					blockTypeAttributes?.[ attribute ]?.source ===
-						'rich-text' &&
-					getBlockBindingsSource( args.source )?.lockAttributesEditing
-				) {
-					shouldDisableEditing = true;
-					break;
-				}
-			}
-		}
-
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			shouldDisableEditing,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, shouldDisableEditing } =
-		useSelect( selector, [
-			clientId,
-			identifier,
-			originalIsSelected,
-			isBlockSelected,
-		] );
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		originalIsSelected,
+		isBlockSelected,
+	] );
+
+	const disableBoundBlocks = useSelect(
+		( select ) => {
+			// Disable Rich Text editing if block bindings specify that.
+			let _disableBoundBlocks = false;
+			if ( blockBindings && blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) {
+				const blockTypeAttributes =
+					getBlockType( blockName ).attributes;
+				const { getBlockBindingsSource } = unlock(
+					select( blocksStore )
+				);
+				for ( const [ attribute, args ] of Object.entries(
+					blockBindings
+				) ) {
+					if (
+						blockTypeAttributes?.[ attribute ]?.source !==
+						'rich-text'
+					) {
+						break;
+					}
+
+					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+					const blockBindingsSource = getBlockBindingsSource(
+						args.source
+					);
+					if (
+						! blockBindingsSource ||
+						blockBindingsSource.lockAttributesEditing
+					) {
+						_disableBoundBlocks = true;
+						break;
+					}
+				}
+			}
+
+			return _disableBoundBlocks;
+		},
+		[ blockBindings, blockName ]
+	);
+
+	const shouldDisableEditing = disableEditing || disableBoundBlocks;
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -347,7 +363,6 @@ export function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					editableContentElement={ anchorRef.current }
-					value={ value }
 				/>
 			) }
 			<TagName
@@ -355,6 +370,7 @@ export function RichTextWrapper(
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
+				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
@@ -433,19 +449,34 @@ export function RichTextWrapper(
 	);
 }
 
-const ForwardedRichTextContainer = withDeprecations(
+// This is the private API for the RichText component.
+// It allows access to all props, not just the public ones.
+export const PrivateRichText = withDeprecations(
 	forwardRef( RichTextWrapper )
 );
 
-ForwardedRichTextContainer.Content = Content;
-ForwardedRichTextContainer.isEmpty = ( value ) => {
+PrivateRichText.Content = Content;
+PrivateRichText.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
 
+// This is the public API for the RichText component.
+// We wrap the PrivateRichText component to hide some props from the public API.
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-export default ForwardedRichTextContainer;
+const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+	return (
+		<PrivateRichText ref={ ref } { ...props } disableEditing={ false } />
+	);
+} );
+
+PublicForwardedRichTextContainer.Content = Content;
+PublicForwardedRichTextContainer.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
+};
+
+export default PublicForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';

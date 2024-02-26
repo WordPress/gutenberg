@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	useBlockProps,
@@ -10,11 +10,14 @@ import {
 	RecursionProvider,
 	useHasRecursion,
 	InspectorControls,
+	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import { PanelBody, Spinner, Modal, MenuItem } from '@wordpress/components';
+import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -24,10 +27,12 @@ import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
+import { mapTemplatePartToBlockPattern } from './utils/map-template-part-to-block-pattern';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
+	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 
 function ReplaceButton( {
@@ -43,7 +48,6 @@ function ReplaceButton( {
 		templatePartId
 	);
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const canReplace =
 		isEntityAvailable &&
@@ -67,11 +71,29 @@ function ReplaceButton( {
 	);
 }
 
+function TemplatesList( { availableTemplates, onSelect } ) {
+	const shownTemplates = useAsyncList( availableTemplates );
+
+	if ( ! availableTemplates ) {
+		return null;
+	}
+
+	return (
+		<BlockPatternsList
+			label={ __( 'Templates' ) }
+			blockPatterns={ availableTemplates }
+			shownPatterns={ shownTemplates }
+			onClickPattern={ onSelect }
+		/>
+	);
+}
+
 export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
 } ) {
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -82,14 +104,11 @@ export default function TemplatePartEdit( {
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
 		useState( false );
 
-	// Set the postId block attribute if it did not exist,
-	// but wait until the inner blocks have loaded to allow
-	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const { isResolved, hasInnerBlocks, isMissing, area } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+			const { getBlockCount } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -108,7 +127,7 @@ export default function TemplatePartEdit( {
 				: false;
 
 			return {
-				innerBlocks: getBlocks( clientId ),
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
 				isResolved: hasResolvedEntity,
 				isMissing:
 					hasResolvedEntity &&
@@ -120,16 +139,32 @@ export default function TemplatePartEdit( {
 		[ templatePartId, attributes.area, clientId ]
 	);
 
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
 
+	const canReplace =
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
+
+	const createFromBlocks = useCreateTemplatePartFromBlocks(
+		area,
+		setAttributes
+	);
+
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
 	if (
-		innerBlocks.length === 0 &&
+		! hasInnerBlocks &&
 		( ( slug && ! theme ) || ( slug && isMissing ) )
 	) {
 		return (
@@ -157,6 +192,28 @@ export default function TemplatePartEdit( {
 		);
 	}
 
+	const partsAsPatterns = templateParts.map( ( templatePart ) =>
+		mapTemplatePartToBlockPattern( templatePart )
+	);
+
+	const onTemplatePartSelect = ( templatePart ) => {
+		setAttributes( {
+			slug: templatePart.slug,
+			theme: templatePart.theme,
+			area: undefined,
+		} );
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: template part title. */
+				__( 'Template Part "%s" replaceed.' ),
+				templatePart.title?.rendered || templatePart.slug
+			),
+			{
+				type: 'snackbar',
+			}
+		);
+	};
+
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
@@ -167,7 +224,7 @@ export default function TemplatePartEdit( {
 						isEntityAvailable={ isEntityAvailable }
 						templatePartId={ templatePartId }
 						defaultWrapper={ areaObject.tagName }
-						hasInnerBlocks={ innerBlocks.length > 0 }
+						hasInnerBlocks={ hasInnerBlocks }
 					/>
 				</InspectorControls>
 				{ isPlaceholder && (
@@ -210,12 +267,39 @@ export default function TemplatePartEdit( {
 						);
 					} }
 				</BlockSettingsMenuControls>
+
+				{ canReplace &&
+					( partsAsPatterns.length > 0 ||
+						blockPatterns.length > 0 ) && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Replace' ) }>
+								<TemplatesList
+									availableTemplates={ partsAsPatterns }
+									onSelect={ ( pattern ) => {
+										onTemplatePartSelect(
+											pattern.templatePart
+										);
+									} }
+								/>
+								<TemplatesList
+									availableTemplates={ blockPatterns }
+									onSelect={ ( pattern, blocks ) => {
+										createFromBlocks(
+											blocks,
+											pattern.title
+										);
+									} }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
+
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
 						tagName={ TagName }
 						blockProps={ blockProps }
 						postId={ templatePartId }
-						hasInnerBlocks={ innerBlocks.length > 0 }
+						hasInnerBlocks={ hasInnerBlocks }
 						layout={ layout }
 					/>
 				) }

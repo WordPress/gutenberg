@@ -16,19 +16,6 @@ class WP_Navigation_Block_Renderer {
 	private static $has_submenus = false;
 
 	/**
-	 * Used to determine which blocks are wrapped in an <li>.
-	 *
-	 * @var array
-	 */
-	private static $nav_blocks_wrapped_in_list_item = array(
-		'core/navigation-link',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
-
-	/**
 	 * Used to determine which blocks need an <li> wrapper.
 	 *
 	 * @var array
@@ -117,7 +104,23 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not a block needs a list item wrapper.
 	 */
 	private static function does_block_need_a_list_item_wrapper( $block ) {
-		return in_array( $block->name, static::$needs_list_item_wrapper, true );
+
+		/**
+		 * Filter the list of blocks that need a list item wrapper.
+		 *
+		 * Affords the ability to customize which blocks need a list item wrapper when rendered
+		 * within a core/navigation block.
+		 * This is useful for blocks that are not list items but should be wrapped in a list
+		 * item when used as a child of a navigation block.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $needs_list_item_wrapper The list of blocks that need a list item wrapper.
+		 * @return array The list of blocks that need a list item wrapper.
+		 */
+		$needs_list_item_wrapper = apply_filters( 'block_core_navigation_listable_blocks', static::$needs_list_item_wrapper );
+
+		return in_array( $block->name, $needs_list_item_wrapper, true );
 	}
 
 	/**
@@ -161,7 +164,9 @@ class WP_Navigation_Block_Renderer {
 		$is_list_open      = false;
 
 		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, static::$nav_blocks_wrapped_in_list_item, true );
+			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
+			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item       = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -176,7 +181,7 @@ class WP_Navigation_Block_Renderer {
 				$inner_blocks_html .= '</ul>';
 			}
 
-			$inner_blocks_html .= static::get_markup_for_inner_block( $inner_block );
+			$inner_blocks_html .= $inner_block_markup;
 		}
 
 		if ( $is_list_open ) {
@@ -213,7 +218,7 @@ class WP_Navigation_Block_Renderer {
 			// it encounters whitespace. This code strips it.
 			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
-			if ( function_exists( 'get_hooked_block_markup' ) ) {
+			if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
 				// Run Block Hooks algorithm to inject hooked blocks.
 				$markup         = block_core_navigation_insert_hooked_blocks( $blocks, $navigation_post );
 				$root_nav_block = parse_blocks( $markup )[0];
@@ -385,23 +390,14 @@ class WP_Navigation_Block_Renderer {
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
-		// Sets the is-collapsed class when the navigation is set to always use the overlay.
-		// This saves us from needing to do this check in the view.js file (see the collapseNav function).
-		$is_collapsed_class = static::is_always_overlay( $attributes ) ? array( 'is-collapsed' ) : array();
-
 		$classes = array_merge(
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
 			$layout_class ? array( $layout_class ) : array(),
-			$text_decoration ? array( $text_decoration_class ) : array(),
-			$is_collapsed_class
+			$text_decoration ? array( $text_decoration_class ) : array()
 		);
 		return implode( ' ', $classes );
-	}
-
-	private static function is_always_overlay( $attributes ) {
-		return isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 	}
 
 	/**
@@ -430,12 +426,16 @@ class WP_Navigation_Block_Renderer {
 		$colors          = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
+		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
+			$is_hidden_by_default ? 'hidden-by-default' : '',
 			implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
+			$is_hidden_by_default ? 'always-shown' : '',
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
@@ -533,7 +533,7 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive, $attributes );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -547,34 +547,26 @@ class WP_Navigation_Block_Renderer {
 	 * @param array $attributes     The block attributes.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive, $attributes ) {
+	private static function get_nav_element_directives( $is_interactive ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
-		$nav_element_context    = wp_json_encode(
+		$nav_element_context    = data_wp_context(
 			array(
-				'overlayOpenedBy' => array(),
+				'overlayOpenedBy' => array(
+					'click' => false,
+					'hover' => false,
+					'focus' => false,
+				),
 				'type'            => 'overlay',
 				'roleAttribute'   => '',
 				'ariaLabel'       => __( 'Menu' ),
-			),
-			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
+			)
 		);
 		$nav_element_directives = '
-			data-wp-interactive=\'{"namespace":"core/navigation"}\'
-			data-wp-context=\'' . $nav_element_context . '\'
-		';
-
-		/*
-		* When the navigation's 'overlayMenu' attribute is set to 'always', JavaScript
-		* is not needed for collapsing the menu because the class is set manually.
-		*/
-		if ( ! static::is_always_overlay( $attributes ) ) {
-			$nav_element_directives .= 'data-wp-init="callbacks.initNav"';
-			$nav_element_directives .= ' '; // space separator
-			$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
-		}
+		 data-wp-interactive="core/navigation" '
+		. $nav_element_context;
 
 		return $nav_element_directives;
 	}
@@ -588,6 +580,17 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
+			$suffix = wp_scripts_get_suffix();
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
+			}
+
+			wp_register_script_module(
+				'@wordpress/block-library/navigation',
+				isset( $module_url ) ? $module_url : includes_url( "blocks/navigation/view{$suffix}.js" ),
+				array( '@wordpress/interactivity' ),
+				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			);
 			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
 		}
 	}
@@ -764,8 +767,8 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		)
 	) ) {
 		// Add directives to the parent `<li>`.
-		$tags->set_attribute( 'data-wp-interactive', '{ "namespace": "core/navigation" }' );
-		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": {}, "type": "submenu" }' );
+		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
+		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu" }' );
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
 		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
@@ -1010,7 +1013,7 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 
-		if ( function_exists( 'get_hooked_block_markup' ) ) {
+		if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
 			// Run Block Hooks algorithm to inject hooked blocks.
 			// We have to run it here because we need the post ID of the Navigation block to track ignored hooked blocks.
 			$markup = block_core_navigation_insert_hooked_blocks( $fallback_blocks, $navigation_post );
@@ -1096,17 +1099,6 @@ function register_block_core_navigation() {
 		array(
 			'render_callback' => 'render_block_core_navigation',
 		)
-	);
-
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$module_url = gutenberg_url( '/build/interactivity/navigation.min.js' );
-	}
-
-	wp_register_script_module(
-		'@wordpress/block-library/navigation',
-		isset( $module_url ) ? $module_url : includes_url( 'blocks/navigation/view.min.js' ),
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }
 
@@ -1366,25 +1358,28 @@ function block_core_navigation_get_most_recently_published_navigation() {
 }
 
 /**
- * Insert hooked blocks into a Navigation block.
+ * Accepts the serialized markup of a block and its inner blocks, and returns serialized markup of the inner blocks.
  *
- * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
- * this function inserts hooked blocks into it, and returns the serialized inner blocks in a
- * mock Navigation block wrapper.
- *
- * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
- * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
- * of those hooked blocks should be exempted from insertion.
+ * @param string $serialized_block The serialized markup of a block and its inner blocks.
+ * @return string
+ */
+function block_core_navigation_remove_serialized_parent_block( $serialized_block ) {
+	$start = strpos( $serialized_block, '-->' ) + strlen( '-->' );
+	$end   = strrpos( $serialized_block, '<!--' );
+	return substr( $serialized_block, $start, $end - $start );
+}
+
+/**
+ * Mock a parsed block for the Navigation block given its inner blocks and the `wp_navigation` post object.
+ * The `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is queried to add the `metadata.ignoredHookedBlocks` attribute.
  *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
- * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ *
+ * @return array the normalized parsed blocks.
  */
-function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
-	$before_block_visitor = null;
-	$after_block_visitor  = null;
-	$hooked_blocks        = get_hooked_blocks();
-	$attributes           = array();
+function block_core_navigation_mock_parsed_block( $inner_blocks, $post ) {
+	$attributes = array();
 
 	if ( isset( $post->ID ) ) {
 		$ignored_hooked_blocks = get_post_meta( $post->ID, '_wp_ignored_hooked_blocks', true );
@@ -1402,15 +1397,62 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 		'innerBlocks'  => $inner_blocks,
 		'innerContent' => array_fill( 0, count( $inner_blocks ), null ),
 	);
-	$before_block_visitor     = null;
-	$after_block_visitor      = null;
+
+	return $mock_anchor_parent_block;
+}
+
+/**
+ * Insert hooked blocks into a Navigation block.
+ *
+ * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
+ * this function inserts hooked blocks into it, and returns the serialized inner blocks in a
+ * mock Navigation block wrapper.
+ *
+ * If there are any hooked blocks that need to be inserted as the Navigation block's first or last
+ * children, the `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is checked to see if any
+ * of those hooked blocks should be exempted from insertion.
+ *
+ * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
+ * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
+ * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ */
+function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
+	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
+	$hooked_blocks         = get_hooked_blocks();
+	$before_block_visitor  = null;
+	$after_block_visitor   = null;
 
 	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
-		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post );
-		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post );
+		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
+		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
 	}
 
-	return traverse_and_serialize_block( $mock_anchor_parent_block, $before_block_visitor, $after_block_visitor );
+	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
+}
+
+/**
+ * Insert ignoredHookedBlocks meta into the Navigation block and its inner blocks.
+ *
+ * Given a Navigation block's inner blocks and its corresponding `wp_navigation` post object,
+ * this function inserts ignoredHookedBlocks meta into it, and returns the serialized inner blocks in a
+ * mock Navigation block wrapper.
+ *
+ * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
+ * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
+ * @return string Serialized inner blocks in mock Navigation block wrapper, with hooked blocks inserted, if any.
+ */
+function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks, $post ) {
+	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
+	$hooked_blocks         = get_hooked_blocks();
+	$before_block_visitor  = null;
+	$after_block_visitor   = null;
+
+	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
+		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+	}
+
+	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
 }
 
 /**
@@ -1419,12 +1461,11 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	// We run the Block Hooks mechanism so it will return the list of ignored hooked blocks
-	// in the mock root Navigation block's metadata attribute.
-	// We ignore the rest of the returned `$markup`; `$post->post_content` already has the hooked
-	// blocks inserted, whereas `$markup` will have them inserted twice.
-	$blocks                = parse_blocks( $post->post_content );
-	$markup                = block_core_navigation_insert_hooked_blocks( $blocks, $post );
+	// We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
+	// all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
+	$blocks = parse_blocks( $post->post_content );
+	$markup = block_core_navigation_set_ignored_hooked_blocks_metadata( $blocks, $post );
+
 	$root_nav_block        = parse_blocks( $markup )[0];
 	$ignored_hooked_blocks = isset( $root_nav_block['attrs']['metadata']['ignoredHookedBlocks'] )
 		? $root_nav_block['attrs']['metadata']['ignoredHookedBlocks']
@@ -1438,11 +1479,25 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 		}
 		update_post_meta( $post->ID, '_wp_ignored_hooked_blocks', json_encode( $ignored_hooked_blocks ) );
 	}
+
+	$serialized_inner_blocks = block_core_navigation_remove_serialized_parent_block( $markup );
+
+	wp_update_post(
+		array(
+			'ID'           => $post->ID,
+			'post_content' => $serialized_inner_blocks,
+		)
+	);
 }
+
+// Before adding our filter, we verify if it's already added in Core.
+// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+$rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ignore_hooked_blocks_meta';
 
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
-if ( function_exists( 'get_hooked_block_markup' ) ) {
+if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
 	add_action( 'rest_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10, 3 );
 }
 
@@ -1462,9 +1517,7 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	$content       = block_core_navigation_insert_hooked_blocks( $parsed_blocks, $post );
 
 	// Remove mock Navigation block wrapper.
-	$start   = strpos( $content, '-->' ) + strlen( '-->' );
-	$end     = strrpos( $content, '<!--' );
-	$content = substr( $content, $start, $end - $start );
+	$content = block_core_navigation_remove_serialized_parent_block( $content );
 
 	$response->data['content']['raw']      = $content;
 	$response->data['content']['rendered'] = apply_filters( 'the_content', $content );
@@ -1472,8 +1525,13 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	return $response;
 }
 
+// Before adding our filter, we verify if it's already added in Core.
+// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+$rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_hooked_blocks_into_rest_response';
+
 // Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
 // that are not present in Gutenberg's WP 6.5 compatibility layer.
-if ( function_exists( 'get_hooked_block_markup' ) ) {
+if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }

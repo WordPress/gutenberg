@@ -1,5 +1,6 @@
 .components-tooltip {
-	background: $black; // TODO: Discuss with designers.
+	background: $black;
+	font-family: $default-font;
 	border-radius: $radius-block-ui;
 	color: $gray-100;
 	text-align: center;
