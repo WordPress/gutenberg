@@ -61,13 +61,26 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		// All vertical layout types have the same styles.
 		if ( isVerticalLayout ) {
 			if ( selfAlign === 'fixed' && width ) {
+				/**
+				 * Once layout rule specificity is lowered,
+				 * the !important can be removed.
+				 */
 				css += `${ selector } {
-					max-width: ${ width };
+					max-width: ${ width } !important;
 				}`;
 			} else if ( selfAlign === 'fixedNoShrink' && width ) {
 				css += `${ selector } {
 					width: ${ width };
 				}`;
+				/**
+				 * A max-width reset is needed to override constrained
+				 * layout styles.
+				 */
+				if ( parentLayoutType === 'constrained' ) {
+					css += `${ selector } {
+						max-width: none !important;
+					}`;
+				}
 			} else if ( selfAlign === 'fill' ) {
 				/**
 				 * This style is only needed for flex layouts because

@@ -599,9 +599,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( $has_vertical_parent_layout ) {
 		// Width styles.
 		if ( 'fixed' === $self_align && $width ) {
-			$child_layout_declarations['max-width'] = $width;
+			/**
+			 * !important is a (hopefully) temporary override for
+			 * the constrained layout styles, the specificity of
+			 * which should be lowered soon.
+			 */
+			$child_layout_declarations['max-width'] = "$width !important";
 		} elseif ( 'fixedNoShrink' === $self_align && $width ) {
 			$child_layout_declarations['width'] = $width;
+			if ( 'constrained' === $parent_layout_type ) {
+				$child_layout_declarations['max-width'] = 'none !important';
+			}
 		} elseif ( 'fill' === $self_align ) {
 			$child_layout_declarations['align-self'] = 'stretch';
 		} elseif ( 'fit' === $self_align ) {
