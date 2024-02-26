@@ -33,8 +33,13 @@ jobs:
                   distribution: 'corretto'
                   java-version: '17'
 
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - run: npm ci
 
             - name: Restore tests setup cache
               uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
