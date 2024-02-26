@@ -18,9 +18,14 @@ import { useSelect } from '@wordpress/data';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	cleanEmptyObject,
+	shouldSkipSerialization,
+	useBlockSettings,
+} from './utils';
 import {
 	useHasBorderPanel,
+	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
@@ -220,14 +225,21 @@ export function hasShadowSupport( blockName ) {
 	return hasBlockSupport( blockName, SHADOW_SUPPORT_KEY );
 }
 
-export function getBorderPanelLabel( {
+export function useBorderPanelLabel( {
 	blockName,
 	hasBorderControl,
 	hasShadowControl,
 } = {} ) {
+	const settings = useBlockSettings( blockName );
+	const controls = useHasBorderPanelControls( settings );
+
 	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
-		hasBorderControl = hasBorderSupport( blockName );
-		hasShadowControl = hasShadowSupport( blockName );
+		hasBorderControl =
+			controls?.hasBorderColor ||
+			controls?.hasBorderStyle ||
+			controls?.hasBorderWidth ||
+			controls?.hasBorderRadius;
+		hasShadowControl = controls?.hasShadow;
 	}
 
 	if ( hasBorderControl && hasShadowControl ) {
