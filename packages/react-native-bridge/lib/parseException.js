@@ -56,7 +56,7 @@ const parseStacktraceLine = ( line ) => {
 	let colno = parts[ 4 ] ? +parts[ 4 ] : undefined;
 
 	if ( filename ) {
-		// Filter out unneeded pars from filename
+		// Filter out unneeded parts from filename
 		filename = filename
 			.replace( /^file:\/\//, '' )
 			.replace( /^address at /, '' )
@@ -72,10 +72,11 @@ const parseStacktraceLine = ( line ) => {
 		}
 	}
 
-	// Check Hermes Bytecode Frame and convert to 1-based column
+	// Check Hermes Bytecode stack trace and convert to 1-based column
 	if ( isHermesEnabled() && lineno === 1 && colno !== undefined ) {
-		// hermes bytecode columns are 0-based, while v8 and jsc are 1-based
-		// Hermes frames without debug info have always line = 1 and col points to a bytecode pos
+		// hermes bytecode columns are 0-based, while v8 and jsc are 1-based.
+		// Hermes stack trace without debug info have always line with value 1
+		// and column points to a bytecode position.
 		// https://github.com/facebook/react/issues/21792#issuecomment-873171991
 		colno += 1;
 	}
