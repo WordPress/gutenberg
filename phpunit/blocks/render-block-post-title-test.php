@@ -37,7 +37,7 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 
 		self::$attributes = array(
 			'textAlign'  => '',
-			'level'      => 0,
+			'level'      => 2,
 			'isLink'     => false,
 			'linkTarget' => '',
 			'rel'        => '',
@@ -55,7 +55,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 
 		WP_Block_Supports::init();
 		WP_Block_Supports::$block_to_render = $block;
-
 	}
 
 	/**
@@ -104,14 +103,9 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 			'Passed $rendered does not contain post title string.'
 		);
 		$this->assertStringContainsString(
-			'</p',
+			'</h2>',
 			$rendered,
-			'Passed $rendered does not contain html P tag.'
-		);
-		$this->assertStringContainsString(
-			'</p>',
-			$rendered,
-			'Passed $rendered does not contain html P tag.'
+			'Passed $rendered does not contain html heading tag.'
 		);
 		$this->assertStringNotContainsString(
 			get_permalink( self::$post->ID ),
@@ -124,7 +118,7 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 			'Passed $rendered contain html anchor tag.'
 		);
 		$this->assertStringNotContainsString(
-			'has-text-align',
+			'has-text-align-left',
 			$rendered,
 			'Passed $rendered contain expected string.'
 		);
@@ -174,6 +168,5 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 			$rendered,
 			'Passed $rendered does not contain expected string.'
 		);
-
 	}
 }
