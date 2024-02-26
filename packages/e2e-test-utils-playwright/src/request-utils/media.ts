@@ -25,7 +25,7 @@ export interface Media {
  * List all media files.
  *
  * @see https://developer.wordpress.org/rest-api/reference/media/#list-media
- * @param  this
+ * @param this
  */
 async function listMedia( this: RequestUtils ) {
 	const response = await this.rest< Media[] >( {
@@ -43,8 +43,8 @@ async function listMedia( this: RequestUtils ) {
  * Upload a media file.
  *
  * @see https://developer.wordpress.org/rest-api/reference/media/#create-a-media-item
- * @param  this
- * @param  filePathOrData The path or data of the file being uploaded.
+ * @param this
+ * @param filePathOrData The path or data of the file being uploaded.
  */
 async function uploadMedia(
 	this: RequestUtils,
@@ -70,8 +70,8 @@ async function uploadMedia(
  * delete a media file.
  *
  * @see https://developer.wordpress.org/rest-api/reference/media/#delete-a-media-item
- * @param  this
- * @param  mediaId The ID of the media file.
+ * @param this
+ * @param mediaId The ID of the media file.
  */
 async function deleteMedia( this: RequestUtils, mediaId: number ) {
 	const response = await this.rest( {
@@ -86,7 +86,7 @@ async function deleteMedia( this: RequestUtils, mediaId: number ) {
 /**
  * delete all media files.
  *
- * @param  this
+ * @param this
  */
 async function deleteAllMedia( this: RequestUtils ) {
 	const files = await this.listMedia();

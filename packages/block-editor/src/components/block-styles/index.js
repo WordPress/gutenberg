@@ -13,7 +13,6 @@ import {
 	__experimentalTruncate as Truncate,
 	Popover,
 } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -68,6 +67,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 					return (
 						<Button
+							__next40pxDefaultSize
 							className={ classnames(
 								'block-editor-block-styles__item',
 								{
@@ -96,7 +96,11 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 				} ) }
 			</div>
 			{ hoveredStyle && ! isMobileViewport && (
-				<Popover placement="left-start" offset={ 20 }>
+				<Popover
+					placement="left-start"
+					offset={ 34 }
+					focusOnMount={ false }
+				>
 					<div
 						className="block-editor-block-styles__preview-panel"
 						onMouseLeave={ () => styleItemHandler( null ) }
@@ -115,12 +119,3 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 }
 
 export default BlockStyles;
-
-BlockStyles.Slot = () => {
-	deprecated( 'BlockStyles.Slot', {
-		version: '6.4',
-		since: '6.2',
-	} );
-
-	return null;
-};

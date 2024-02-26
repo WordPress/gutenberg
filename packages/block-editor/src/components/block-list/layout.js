@@ -7,7 +7,7 @@ import { createContext, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { getLayoutType } from '../../layouts';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 
 export const defaultLayout = { type: 'default' };
 
@@ -27,7 +27,7 @@ export function useLayout() {
 
 export function LayoutStyle( { layout = {}, css, ...props } ) {
 	const layoutType = getLayoutType( layout.type );
-	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 
 	if ( layoutType ) {

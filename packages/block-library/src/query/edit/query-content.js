@@ -8,18 +8,19 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	useSetting,
 	store as blockEditorStore,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
+import EnhancedPaginationModal from './enhanced-pagination-modal';
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -36,29 +37,23 @@ export default function QueryContent( {
 		query,
 		displayLayout,
 		tagName: TagName = 'div',
-		layout = {},
+		query: { inherit } = {},
 	} = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
-	const { themeSupportsLayout } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return { themeSupportsLayout: getSettings()?.supportsLayout };
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = ! layout?.type
-		? { ...defaultLayout, ...layout, type: 'default' }
-		: { ...defaultLayout, ...layout };
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
+		const { getEntityRecord, canUser } = select( coreStore );
+		const settingPerPage = canUser( 'read', 'settings' )
+			? +getEntityRecord( 'root', 'site' )?.posts_per_page
+			: +getSettings().postsPerPage;
 		return {
-			postsPerPage:
-				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
+			postsPerPage: settingPerPage || DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
 	// There are some effects running where some initialization logic is
@@ -72,14 +67,18 @@ export default function QueryContent( {
 	// would cause to override previous wanted changes.
 	useEffect( () => {
 		const newQuery = {};
-		if ( ! query.perPage && postsPerPage ) {
+		// When we inherit from global query always need to set the `perPage`
+		// based on the reading settings.
+		if ( inherit && query.perPage !== postsPerPage ) {
+			newQuery.perPage = postsPerPage;
+		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage ] );
+	}, [ query.perPage, postsPerPage, inherit ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -94,26 +93,47 @@ export default function QueryContent( {
 		setAttributes( {
 			displayLayout: { ...displayLayout, ...newDisplayLayout },
 		} );
+	const htmlElementMessages = {
+		main: __(
+			'The <main> element should be used for the primary content of your document only. '
+		),
+		section: __(
+			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+		),
+		aside: __(
+			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+		),
+	};
+
 	return (
 		<>
-			<QueryInspectorControls
+			<EnhancedPaginationModal
 				attributes={ attributes }
-				setQuery={ updateQuery }
-				setDisplayLayout={ updateDisplayLayout }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
 			/>
+			<InspectorControls>
+				<QueryInspectorControls
+					attributes={ attributes }
+					setQuery={ updateQuery }
+					setDisplayLayout={ updateDisplayLayout }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</InspectorControls>
 			<BlockControls>
 				<QueryToolbar
 					name={ name }
 					clientId={ clientId }
 					attributes={ attributes }
 					setQuery={ updateQuery }
-					setDisplayLayout={ updateDisplayLayout }
 					openPatternSelectionModal={ openPatternSelectionModal }
 				/>
 			</BlockControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
@@ -125,6 +145,7 @@ export default function QueryContent( {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
+					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
 			<TagName { ...innerBlocksProps } />

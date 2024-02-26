@@ -1,17 +1,6 @@
 # Element
 
-Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
-
-You may find yourself asking, "Why an abstraction layer?". For a few reasons:
-
--   In many applications, especially those extended by a rich plugin ecosystem as is the case with WordPress, it's wise to create interfaces to underlying third-party code. The thinking is that if ever a need arises to change or even replace the underlying implementation, it can be done without catastrophic rippling effects to dependent code, so long as the interface stays the same.
--   It provides a mechanism to shield implementers by omitting features with uncertain futures (`createClass`, `PropTypes`).
--   It helps avoid incompatibilities between versions by ensuring that every plugin operates on a single centralized version of the code.
-
-On the `wp.element` global object, you will find the following, ordered roughly by the likelihood you'll encounter it in your code:
-
--   [`createElement`](https://reactjs.org/docs/react-api.html#createelement)
--   [`render`](https://reactjs.org/docs/react-dom.html#render)
+Element is a package that builds on top of [React](https://reactjs.org/) and provide a set of utilities to work with React components and React elements.
 
 ## Installation
 
@@ -23,31 +12,6 @@ npm install @wordpress/element --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
-## Usage
-
-Let's render a customized greeting into an empty element:
-
-```html
-<div id="greeting"></div>
-<script>
-	function Greeting( props ) {
-		return wp.element.createElement(
-			'span',
-			null,
-			'Hello ' + props.toWhom + '!'
-		);
-	}
-
-	wp.element.createRoot(document.getElementById( 'greeting' ))
-		.render(
-			wp.element.createElement( Greeting, { toWhom: 'World' } )
-		)
-	);
-</script>
-```
-
-Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
-
 ## Why React?
 
 At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md), we observe the following technical requirements:
@@ -58,27 +22,6 @@ At the risk of igniting debate surrounding any single "best" front-end framework
 At its most basic, React provides a simple input / output mechanism. **Given a set of inputs ("props"), a developer describes the output to be shown on the page.** This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
 
 The offerings of any framework necessarily become more complex as these requirements increase; many front-end frameworks prescribe ideas around page routing, retrieving and updating data, and managing layout. React is not immune to this, but the introduced complexity is rarely caused by React itself, but instead managing an arrangement of supporting tools. By moving these concerns out of sight to the internals of the system (WordPress core code), we can minimize the responsibilities of plugin authors to a small, clear set of touch points.
-
-## JSX
-
-While not at all a requirement to use React, [JSX](https://reactjs.org/docs/introducing-jsx.html) is a recommended syntax extension to compose elements more expressively. Through a build process, JSX is converted back to the `createElement` syntax you see earlier in this document.
-
-If you've configured [Babel](http://babeljs.io/) for your project, you can opt in to JSX syntax by specifying the `pragma` option of the [`transform-react-jsx` plugin](https://www.npmjs.com/package/babel-plugin-transform-react-jsx) in your [`.babelrc` configuration](http://babeljs.io/docs/usage/babelrc/).
-
-```json
-{
-	"plugins": [
-		[
-			"transform-react-jsx",
-			{
-				"pragma": "createElement"
-			}
-		]
-	]
-}
-```
-
-This assumes that you will import the `createElement` function in any file where you use JSX. Alternatively, consider using the [`@wordpress/babel-plugin-import-jsx-pragma` Babel plugin](https://www.npmjs.com/package/@wordpress/babel-plugin-import-jsx-pragma) to automate the import of this function.
 
 ## API
 
@@ -94,12 +37,12 @@ Creates a copy of an element with extended props.
 
 _Parameters_
 
--   _element_ `WPElement`: Element
+-   _element_ `Element`: Element
 -   _props_ `?Object`: Props to apply to cloned element
 
 _Returns_
 
--   `WPElement`: Cloned element.
+-   `Element`: Cloned element.
 
 ### Component
 
@@ -131,24 +74,21 @@ _Returns_
 
 ### createElement
 
-Returns a new element of given type. Type can be either a string tag name or
-another function which itself returns an element.
+Returns a new element of given type. Type can be either a string tag name or another function which itself returns an element.
 
 _Parameters_
 
 -   _type_ `?(string|Function)`: Tag name or element creator
 -   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
--   _children_ `...WPElement`: Descendant elements
+-   _children_ `...Element`: Descendant elements
 
 _Returns_
 
--   `WPElement`: Element.
+-   `Element`: Element.
 
 ### createInterpolateElement
 
-This function creates an interpolated element from a passed in string with
-specific tags matching how the string should be converted to an element via
-the conversion map value.
+This function creates an interpolated element from a passed in string with specific tags matching how the string should be converted to an element via the conversion map value.
 
 _Usage_
 
@@ -170,11 +110,11 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Object`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record<string, Element>`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `WPElement`: A wp element.
+-   `Element`: A wp element.
 
 ### createPortal
 
@@ -186,14 +126,12 @@ _Related_
 
 _Parameters_
 
--   _child_ `import('./react').WPElement`: Any renderable child, such as an element, string, or fragment.
+-   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 ### createRef
 
-Returns an object tracking a reference to a rendered element via its
-`current` property as either a DOMElement or Element, dependent upon the
-type of element rendered with the ref attribute.
+Returns an object tracking a reference to a rendered element via its `current` property as either a DOMElement or Element, dependent upon the type of element rendered with the ref attribute.
 
 _Returns_
 
@@ -205,7 +143,11 @@ Creates a new React root for the target DOM node.
 
 _Related_
 
--   <https://reactjs.org/docs/react-dom-client.html#createroot>
+-   <https://react.dev/reference/react-dom/client/createRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### findDOMNode
 
@@ -213,14 +155,19 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `import('./react').WPComponent`: Component's instance.
+-   _component_ `import('react').ComponentType`: Component's instance.
+
+### flushSync
+
+Forces React to flush any updates inside the provided callback synchronously.
+
+_Parameters_
+
+-   _callback_ `Function`: Callback to run synchronously.
 
 ### forwardRef
 
-Component enhancer used to enable passing a ref to its wrapped component.
-Pass a function argument which receives `props` and `ref` as its arguments,
-returning an element using the forwarded ref. The return value is a new
-component which forwards its ref.
+Component enhancer used to enable passing a ref to its wrapped component. Pass a function argument which receives `props` and `ref` as its arguments, returning an element using the forwarded ref. The return value is a new component which forwards its ref.
 
 _Parameters_
 
@@ -228,7 +175,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
 ### Fragment
 
@@ -236,12 +183,13 @@ A component which renders its children without any wrapping element.
 
 ### hydrate
 
+> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
+
 Hydrates a given element into the target DOM node.
 
-_Parameters_
+_Related_
 
--   _element_ `import('./react').WPElement`: Element to hydrate.
--   _target_ `HTMLElement`: DOM node into which element should be hydrated.
+-   <https://react.dev/reference/react-dom/hydrate>
 
 ### hydrateRoot
 
@@ -249,7 +197,11 @@ Creates a new React root for the target DOM node and hydrates it with a pre-gene
 
 _Related_
 
--   <https://reactjs.org/docs/react-dom-client.html#hydrateroot>
+-   <https://react.dev/reference/react-dom/client/hydrateRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### isEmptyElement
 
@@ -265,7 +217,7 @@ _Returns_
 
 ### isValidElement
 
-Checks if an object is a valid WPElement.
+Checks if an object is a valid React Element.
 
 _Parameters_
 
@@ -273,7 +225,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: true if objectToTest is a valid WPElement and false otherwise.
+-   `boolean`: true if objectToTest is a valid React Element and false otherwise.
 
 ### lazy
 
@@ -289,14 +241,13 @@ _Related_
 
 ### Platform
 
-Component used to detect the current Platform being used.
-Use Platform.OS === 'web' to detect if running on web enviroment.
+Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
 
 This is the same concept as the React Native implementation.
 
 _Related_
 
--   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
+-   <https://reactnative.dev/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
 
 _Usage_
 
@@ -311,12 +262,15 @@ const placeholderLabel = Platform.select( {
 } );
 ```
 
+### PureComponent
+
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#reactpurecomponent>
+
 ### RawHTML
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where
-it is desirable to render dangerous HTML without needing a wrapper element.
-To preserve additional props, a `div` wrapper _will_ be created if any props
-aside from `children` are passed.
+Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
 
 _Parameters_
 
@@ -328,12 +282,13 @@ _Returns_
 
 ### render
 
+> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
+
 Renders a given element into the target DOM node.
 
-_Parameters_
+_Related_
 
--   _element_ `import('./react').WPElement`: Element to render.
--   _target_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/render>
 
 ### renderToString
 
@@ -380,11 +335,13 @@ _Returns_
 
 ### unmountComponentAtNode
 
+> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
+
 Removes any mounted element from the target DOM node.
 
-_Parameters_
+_Related_
 
--   _target_ `Element`: DOM node in which element is to be removed
+-   <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
 ### useCallback
 

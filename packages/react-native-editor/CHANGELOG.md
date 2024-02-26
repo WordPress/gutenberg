@@ -10,6 +10,218 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Prevent crash when autoscrolling to blocks [#59110]
+-   [*] Remove opacity change when images are being uploaded [#59264]
+-   [*] Media & Text blocks correctly show an error message when the attached video upload fails [#59288]
+
+## 1.112.0
+-   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]
+-   [**] Prevent images from temporarily disappearing when uploading media [#57869]
+-   [**] Fix crash occurring on large post on Android [#58266]
+
+## 1.111.2
+-   [*] [internal] Remove `mediaFilesCollectionBlock` initial prop [#58140]
+
+## 1.111.1
+-   [**] Video block: Fix logic for displaying empty state based on source presence [#58015]
+-   [**] Fix crash when RichText values are not defined [#58088]
+
+## 1.111.0
+-   [**] Image block media uploads display a custom error message when there is no internet connection [#56937]
+-   [*] Fix missing custom color indicator for custom gradients [#57605]
+-   [**] Display a notice when a network connection unavailable [#56934]
+
+## 1.110.1
+-   [**] Fix crash when RichText values are not defined [#58088]
+
+## 1.110.0
+-   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
+-   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
+-   [*] Fix crash when blockType wrapperProps are not defined [#56846]
+-   [*] Guard against an Image block styles crash due to null block values [#56903]
+-   [**] Fix crash when sharing unsupported media types on Android [#56791]
+-   [**] Fix regressions with wrapper props and font size customization [#56985]
+-   [***] Avoid keyboard dismiss when interacting with text blocks [#57070]
+-   [**] Auto-scroll upon block insertion [#57273]
+-   [*] Unselect blocks using the hardware back button (Android) [#57279]
+
+## 1.109.3
+-   [**] Fix duplicate/unresponsive options in font size settings. [#56985]
+
+## 1.109.2
+-   [**] Fix issue related to text color format and receiving in rare cases an undefined ref from `RichText` component [#56686]
+-   [**] Fixes a crash on pasting MS Word list markup [#56653]
+-   [**] Address rare cases where a null value is passed to a heading block, causing a crash [#56757]
+-   [**] Fixes a crash related to HTML to blocks conversion when no transformations are available [#56723]
+-   [**] Fixes a crash related to undefined attributes in `getFormatColors` function of `RichText` component [#56684]
+-   [**] Fixes an issue with custom color variables not being parsed when using global styles [#56752]
+
+## 1.109.1
+-   [***] Fix issue when backspacing in an empty Paragraph block [#56496]
+
+## 1.109.0
+-   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
+-   [*] In the deeply nested block warning, only display the ungroup option for blocks that support it [#56445]
+
+## 1.108.0
+-   [*] Fix error when pasting deeply nested structure content [#55613]
+-   [*] Fix crash related to accessing undefined value in `TextColorEdit` [#55664]
+
+## 1.107.0
+-   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
+-   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
+-   [*] Classic block: Add option to convert to blocks [#55461]
+
+## 1.106.0
+-   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
+-   [*] Fix quote block border visibility when used with block based themes in dark mode [#54964]
+
+## 1.105.0
+-   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
+-   [*] Prevent crashes when setting an invalid media URL for Video or Audio blocks [#54834]
+-   [**] Fallback to Twitter provider when embedding X URLs [#54876]
+-   [*] [internal] Update Ruby version from 2.7.4 to 3.2.2 [#54897]
+
+## 1.104.0
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
+
+## 1.103.3
+-   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
+
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
+## 1.103.1
+-   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
+
+## 1.103.0
+-   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
+-   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
+-   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
+-   [*] Fix horizontal rule style extensions [#53917]
+-   [*] Add block outline to all Social Link blocks when selected [#54011]
+-   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
+
+## 1.102.1
+- [**] Fix Voice Over and assistive keyboards [#53895]
+
+## 1.102.0
+-   [*] Display custom color value in mobile Cover Block color picker [#51414]
+-   [**] Display outline around selected Social Link block [#53377]
+-   [**] Fixes font customization not getting updated on iOS [#53391]
+
+## 1.101.2
+-  [**] Fix Voice Over and assistive keyboards [#53895]
+
+## 1.101.1
+-   [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
+
+## 1.101.0
+-   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
+-   [*] Remove Gallery caption button on mobile [#53010]
+-   [**] Upgrade React Native to 0.71.11 [#51303]
+-   [*] Upgrade Gradle to 8.2.1 & AGP to 8.1.0 [#52872]
+-   [*] Fix Gallery block selection when adding media [#53127]
+
+## 1.100.2
+-   [**] Fix iOS Focus loop for RichText components [#53217]
+
+## 1.100.1
+-   [**] Add WP hook for registering non-core blocks [#52791]
+
+## 1.100.0
+-   [**] Add media inserter buttons to editor toolbar [#51827]
+-   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
+-   [**] Move the undo/redo buttons to the navigation bar [#51766]
+-   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
+-   [**] Update Editor toolbar icons and colors [#52336]
+-   [*] Update Block Settings button border [#52715]
+
+## 1.99.1
+- [**] Fix crash related to removing a block under certain conditions [#52595]
+
+## 1.99.0
+-   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+-   [**] Fix a crash related to Reanimated when closing the editor [#52320]
+
+## 1.98.1
+-   [*] fix: Display heading level dropdown icons and labels [#52004]
+
+## 1.98.0
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [*] Fix cursor positioning when dictating text on iOS [#51227]
+
+## 1.97.1
+-   [**] Fix crash when using the delete key to remove a single button [#51435]
+-   [*] Ensure text input field is not editable when Bottom sheet cell is disabled [#51567]
+
+## 1.97.0
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
+-   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+-   [*] Display lock icon in disabled state of `Cell` component [#50907]
+
+## 1.96.1
+-   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
+
+## 1.96.0
+-   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
+-   [*] Add disabled style to `Cell` component [#50665]
+-   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
+-   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
+
+## 1.95.0
+-   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
+-   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [*] Use host app namespace in reusable block message [#50478]
+-   [**] Configuring a link to open in a new tab no longer results in a partial loss of edit history (undo and redo) [#50460]
+
+## 1.94.0
+-   [*] Split pasted content between title and body. [#37169]
+
+## 1.93.1
+-   [**] Fix regression with the Color hook and ColorPanel. [#49917]
+
+## 1.93.0
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+
+## 1.92.1
+-   [*] Avoid empty Gallery block error [#49557]
+
+## 1.92.0
+* No User facing changes *
+
+## 1.91.0
+-   [*] Allow new block transformations for most blocks. [#48792]
+
+## 1.90.0
+-   [*] Fix parsing of css units for null matched values [#48484]
+-   [*] Spacer block - Add initial support for spacing presets [#47258]
+-   [*] Support Visual Regression testing [#47845]
+-   [*] Add metadata parameter to media upload events [#48103]  
+
+## 1.89.1 
+-   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
+
+## 1.89.0 
+* No User facing changes *
+
+## 1.88.0 
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
+
+## 1.87.1
+-   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
+-   [*] RichText - Parse CSS values and avoid setting undefined ones [#47080]
 
 ## 1.87.0
 -   [*] Add capabilities to force only Core blocks and control Support section [#46215]
@@ -467,8 +679,8 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.42.0
 
 -   [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
--   [**] Button block - Add link picker to the block settings [#26206]
--   [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
+-   [**] Button block - Add link picker to the block settings [#26206]
+-   [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
 -   [*] Fix theme colors syncing with the editor [#26821]
 -   [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 

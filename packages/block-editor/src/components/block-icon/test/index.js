@@ -71,8 +71,8 @@ describe( 'BlockIcon', () => {
 		);
 
 		expect( getIconWrapper( container ) ).toHaveStyle( {
-			backgroundColor: 'white',
-			color: 'black',
+			backgroundColor: 'rgb(255, 255, 255)',
+			color: 'rgb(0, 0, 0)',
 		} );
 	} );
 } );

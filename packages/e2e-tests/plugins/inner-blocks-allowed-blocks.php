@@ -12,7 +12,7 @@
  */
 function enqueue_inner_blocks_allowed_blocks_script() {
 	wp_enqueue_script(
-		'gutenberg-test-block-icons',
+		'gutenberg-test-inner-blocks-allowed-blocks',
 		plugins_url( 'inner-blocks-allowed-blocks/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
@@ -24,5 +24,4 @@ function enqueue_inner_blocks_allowed_blocks_script() {
 		true
 	);
 }
-
-add_action( 'init', 'enqueue_inner_blocks_allowed_blocks_script' );
+add_action( 'enqueue_block_assets', 'enqueue_inner_blocks_allowed_blocks_script' );

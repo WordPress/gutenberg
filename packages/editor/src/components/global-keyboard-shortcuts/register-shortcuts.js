@@ -13,6 +13,16 @@ function EditorKeyboardShortcutsRegister() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
+			name: 'core/editor/toggle-mode',
+			category: 'global',
+			description: __( 'Switch between visual editor and code editor.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/editor/save',
 			category: 'global',
 			description: __( 'Save your changes.' ),
@@ -52,6 +62,26 @@ function EditorKeyboardShortcutsRegister() {
 							character: 'y',
 						},
 				  ],
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/toggle-list-view',
+			category: 'global',
+			description: __( 'Open the block list view.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'o',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/toggle-distraction-free',
+			category: 'global',
+			description: __( 'Toggle distraction free mode.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: '\\',
+			},
 		} );
 	}, [ registerShortcut ] );
 

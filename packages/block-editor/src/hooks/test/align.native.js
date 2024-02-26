@@ -83,7 +83,7 @@ describe( 'Align options', () => {
 					expect( paragraphBlock ).toBeVisible();
 
 					// Open alignments menu
-					const alignmentButtons = getByLabelText( 'Align' );
+					const alignmentButtons = getByLabelText( 'Align text' );
 					fireEvent.press( alignmentButtons );
 
 					// Select alignment option.
@@ -108,9 +108,10 @@ describe( 'Align options', () => {
 				expect( groupBlock ).toBeVisible();
 
 				// Trigger inner blocks layout
-				const innerBlockListWrapper = await within(
-					groupBlock
-				).findByTestId( 'block-list-wrapper' );
+				const innerBlockListWrapper =
+					await within( groupBlock ).findByTestId(
+						'block-list-wrapper'
+					);
 				fireEvent( innerBlockListWrapper, 'layout', {
 					nativeEvent: {
 						layout: {

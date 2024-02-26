@@ -1,4 +1,4 @@
-# Version 1 Reference
+# Theme.json Version 1 Reference
 
 Theme.json version 2 has been released, see the [theme.json migration guide](/docs/reference-guides/theme-json-reference/theme-json-migrations.md#migrating-from-v1-to-v2) for updating to the latest version.
 

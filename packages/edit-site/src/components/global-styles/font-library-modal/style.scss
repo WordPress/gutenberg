@@ -1,0 +1,137 @@
+.font-library-modal {
+	// @todo: If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content {
+		padding-top: 0;
+	}
+
+	.font-library-modal__subtitle {
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 11px;
+	}
+
+	// Add padding so the focus state outline (box-shadow) of font list items is visible
+	.components-navigator-screen {
+		padding: 3px;
+	}
+}
+
+.font-library-modal__tabpanel-layout {
+
+	margin-top: $grid-unit-40;
+
+	.font-library-modal__tabpanel-layout__footer {
+		border-top: 1px solid $gray-300;
+		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
+		padding: $grid-unit-20 $grid-unit-40;
+		position: absolute;
+		bottom: $grid-unit-40;
+		width: 100%;
+		background-color: $white;
+	}
+}
+
+.font-library-modal__tabpanel-layout .components-base-control__field {
+	margin-bottom: 0;
+}
+
+.font-library-modal__font-card {
+	border: 1px solid $gray-200;
+	width: 100%;
+	height: auto;
+	padding: $grid-unit-20;
+	margin-top: -1px; /* To collapse the margin with the previous element */
+
+	&:hover {
+		background-color: $gray-100;
+	}
+
+	.font-library-modal__font-card__name {
+		font-weight: bold;
+	}
+
+	.font-library-modal__font-card__count {
+		color: $gray-700;
+	}
+}
+
+.font-library-modal__font-variant_demo-image {
+	display: block;
+	height: $grid-unit-30;
+	width: auto;
+}
+
+.font-library-modal__font-variant_demo-text {
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: opacity 0.3s ease-in-out;
+	@include reduce-motion("transition");
+}
+
+.font-library-modal__font-variant {
+	border-bottom: 1px solid $gray-200;
+	padding-bottom: $grid-unit-20;
+}
+
+.font-library-modal__tabs {
+	[role="tablist"] {
+		position: sticky;
+		top: 0;
+		border-bottom: 1px solid $gray-300;
+		background: $white;
+		margin: 0 #{$grid-unit-40 * -1};
+		padding: 0 $grid-unit-20;
+		z-index: 1;
+	}
+}
+
+.font-library-modal__upload-area {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	height: $grid-unit-80 * 4; // 256px
+	width: 100%;
+}
+
+button.font-library-modal__upload-area {
+	background-color: $gray-100;
+}
+
+.font-library-modal__local-fonts {
+	margin: 0 auto;
+	width: 80%;
+
+	.font-library-modal__upload-area__text {
+		color: $gray-700;
+	}
+}
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: $grid-unit-80;
+
+	h3 {
+		font-size: 1.4rem;
+	}
+
+	.components-card {
+		width: 50%;
+		min-width: 350px;
+		max-width: 400px;
+	}
+}

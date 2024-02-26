@@ -45,6 +45,10 @@ const Overlay = ( {
 		...borderProps.style,
 	};
 
+	if ( ! colorGradientSettings.hasColorsOrGradients ) {
+		return null;
+	}
+
 	return (
 		<>
 			{ !! dimRatio && (
@@ -64,7 +68,7 @@ const Overlay = ( {
 					style={ overlayStyles }
 				/>
 			) }
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				<ColorGradientSettingsDropdown
 					__experimentalIsRenderedInSidebar
 					settings={ [
@@ -109,6 +113,7 @@ const Overlay = ( {
 						max={ 100 }
 						step={ 10 }
 						required
+						__next40pxDefaultSize
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>

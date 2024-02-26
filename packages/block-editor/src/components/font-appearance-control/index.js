@@ -63,7 +63,7 @@ const FONT_WEIGHTS = [
  * @param {boolean} hasFontWeights Whether font weights are enabled and present.
  * @return {string} A label representing what font appearance is being edited.
  */
-export const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
+const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 	if ( ! hasFontStyles ) {
 		return __( 'Font weight' );
 	}
@@ -80,7 +80,7 @@ export const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
  *
  * @param {Object} props Component props.
  *
- * @return {WPElement} Font appearance control.
+ * @return {Element} Font appearance control.
  */
 export default function FontAppearanceControl( props ) {
 	const {
@@ -215,7 +215,6 @@ export default function FontAppearanceControl( props ) {
 				onChange={ ( { selectedItem } ) =>
 					onChange( selectedItem.style )
 				}
-				__nextUnconstrainedWidth
 			/>
 		)
 	);

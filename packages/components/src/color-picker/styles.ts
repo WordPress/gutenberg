@@ -9,29 +9,20 @@ import styled from '@emotion/styled';
 import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
-import {
-	BackdropUI,
-	Container as InputControlContainer,
-} from '../input-control/styles/input-control-styles';
 import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
-	${ InputControlContainer } {
-		width: ${ space( 24 ) };
-	}
+	width: ${ space( 24 ) };
 `;
 
 export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };
 	width: 5em;
-	${ BackdropUI } {
-		display: none;
-	}
 `;
 
 export const RangeControl = styled( InnerRangeControl )`
@@ -76,7 +67,6 @@ export const ColorfulWrapper = styled.div`
 		align-items: center;
 		width: 216px;
 		height: auto;
-		overflow: hidden;
 	}
 
 	.react-colorful__saturation {

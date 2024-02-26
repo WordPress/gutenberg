@@ -7,7 +7,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
-import { name } from './block.json';
+import { getTransformedMetadata } from '../utils/get-transformed-metadata';
 
 const transforms = {
 	from: [
@@ -16,12 +16,20 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, anchor, align: textAlign } ) =>
-					createBlock( name, {
-						content,
-						anchor,
-						textAlign,
-					} )
+				attributes.map(
+					( { content, anchor, align: textAlign, metadata } ) =>
+						createBlock( 'core/heading', {
+							content,
+							anchor,
+							textAlign,
+							metadata: getTransformedMetadata(
+								metadata,
+								'core/heading',
+								( { content: contentBinding } ) => ( {
+									content: contentBinding,
+								} )
+							),
+						} )
 				),
 		},
 		{
@@ -42,7 +50,10 @@ const transforms = {
 				};
 			},
 			transform( node ) {
-				const attributes = getBlockAttributes( name, node.outerHTML );
+				const attributes = getBlockAttributes(
+					'core/heading',
+					node.outerHTML
+				);
 				const { textAlign } = node.style || {};
 
 				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
@@ -55,14 +66,14 @@ const transforms = {
 					attributes.align = textAlign;
 				}
 
-				return createBlock( name, attributes );
+				return createBlock( 'core/heading', attributes );
 			},
 		},
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
 			transform( content ) {
-				return createBlock( name, {
+				return createBlock( 'core/heading', {
 					level,
 					content,
 				} );
@@ -71,12 +82,7 @@ const transforms = {
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'enter',
 			regExp: new RegExp( `^/(h|H)${ level }$` ),
-			transform( content ) {
-				return createBlock( name, {
-					level,
-					content,
-				} );
-			},
+			transform: () => createBlock( 'core/heading', { level } ),
 		} ) ),
 	],
 	to: [
@@ -85,8 +91,18 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align } ) =>
-					createBlock( 'core/paragraph', { content, align } )
+				attributes.map( ( { content, textAlign: align, metadata } ) =>
+					createBlock( 'core/paragraph', {
+						content,
+						align,
+						metadata: getTransformedMetadata(
+							metadata,
+							'core/paragraph',
+							( { content: contentBinding } ) => ( {
+								content: contentBinding,
+							} )
+						),
+					} )
 				),
 		},
 	],

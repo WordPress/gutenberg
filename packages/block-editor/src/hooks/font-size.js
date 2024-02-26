@@ -4,8 +4,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,7 +13,6 @@ import {
 	getFontSizeClass,
 	getFontSizeObjectByValue,
 	FontSizePicker,
-	getComputedFluidTypographyValue,
 } from '../components/font-sizes';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import {
@@ -23,8 +20,11 @@ import {
 	transformStyles,
 	shouldSkipSerialization,
 } from './utils';
-import useSetting from '../components/use-setting';
-import { store as blockEditorStore } from '../store';
+import { useSettings } from '../components/use-settings';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -56,19 +56,23 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject font size.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} props           Additional props applied to save element.
+ * @param {Object} blockNameOrType Block type.
+ * @param {Object} attributes      Block attributes.
  *
  * @return {Object} Filtered props applied to save element.
  */
-function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBlockSupport( blockType, FONT_SIZE_SUPPORT_KEY ) ) {
+function addSaveProps( props, blockNameOrType, attributes ) {
+	if ( ! hasBlockSupport( blockNameOrType, FONT_SIZE_SUPPORT_KEY ) ) {
 		return props;
 	}
 
 	if (
-		shouldSkipSerialization( blockType, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' )
+		shouldSkipSerialization(
+			blockNameOrType,
+			TYPOGRAPHY_SUPPORT_KEY,
+			'fontSize'
+		)
 	) {
 		return props;
 	}
@@ -83,43 +87,18 @@ function addSaveProps( props, blockType, attributes ) {
 }
 
 /**
- * Filters registered block settings to expand the block edit wrapper
- * by applying the desired styles and classnames.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_SIZE_SUPPORT_KEY ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
-}
-
-/**
  * Inspector control panel containing the font size related configuration
  *
  * @param {Object} props
  *
- * @return {WPElement} Font size edit element.
+ * @return {Element} Font size edit element.
  */
 export function FontSizeEdit( props ) {
 	const {
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
-	const fontSizes = useSetting( 'typography.fontSizes' );
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
@@ -152,44 +131,8 @@ export function FontSizeEdit( props ) {
 			withReset={ false }
 			withSlider
 			size="__unstable-large"
-			__nextHasNoMarginBottom
 		/>
 	);
-}
-
-/**
- * Checks if there is a current value set for the font size block support.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a font size value set.
- */
-export function hasFontSizeValue( props ) {
-	const { fontSize, style } = props.attributes;
-	return !! fontSize || !! style?.typography?.fontSize;
-}
-
-/**
- * Resets the font size block support attribute. This can be used when
- * disabling the font size support controls for a block via a progressive
- * discovery panel.
- *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
- */
-export function resetFontSize( { attributes = {}, setAttributes } ) {
-	const { style } = attributes;
-
-	setAttributes( {
-		fontSize: undefined,
-		style: cleanEmptyObject( {
-			...style,
-			typography: {
-				...style?.typography,
-				fontSize: undefined,
-			},
-		} ),
-	} );
 }
 
 /**
@@ -199,7 +142,7 @@ export function resetFontSize( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const fontSizes = useSetting( 'typography.fontSizes' );
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 	const hasFontSizes = !! fontSizes?.length;
 
 	return (
@@ -207,68 +150,79 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 	);
 }
 
-/**
- * Add inline styles for font sizes.
- * Ideally, this is not needed and themes load the font-size classes on the
- * editor.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-const withFontSizeInlineStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const fontSizes = useSetting( 'typography.fontSizes' );
-		const {
-			name: blockName,
-			attributes: { fontSize, style },
-			wrapperProps,
-		} = props;
+function useBlockProps( { name, fontSize, style } ) {
+	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
+		'typography.fontSizes',
+		'typography.fluid',
+		'layout'
+	);
 
-		// Only add inline styles if the block supports font sizes,
-		// doesn't skip serialization of font sizes,
-		// doesn't already have an inline font size,
-		// and does have a class to extract the font size from.
-		if (
-			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
-			shouldSkipSerialization(
-				blockName,
-				TYPOGRAPHY_SUPPORT_KEY,
-				'fontSize'
-			) ||
-			! fontSize ||
-			style?.typography?.fontSize
-		) {
-			return <BlockListBlock { ...props } />;
-		}
+	/*
+	 * Only add inline styles if the block supports font sizes,
+	 * doesn't skip serialization of font sizes,
+	 * and has either a custom font size or a preset font size.
+	 */
+	if (
+		! hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY ) ||
+		shouldSkipSerialization( name, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' ) ||
+		( ! fontSize && ! style?.typography?.fontSize )
+	) {
+		return;
+	}
 
-		const fontSizeValue = getFontSize(
-			fontSizes,
-			fontSize,
-			style?.typography?.fontSize
-		).size;
+	let props;
 
-		const newProps = {
-			...props,
-			wrapperProps: {
-				...wrapperProps,
-				style: {
-					fontSize: fontSizeValue,
-					...wrapperProps?.style,
-				},
+	if ( style?.typography?.fontSize ) {
+		const fluidSettings = getFluidTypographyOptionsFromSettings( {
+			typography: {
+				fluid: fluidTypographySettings,
+			},
+			layout: layoutSettings,
+		} );
+
+		props = {
+			style: {
+				fontSize: getTypographyFontSizeValue(
+					{ size: style.typography.fontSize },
+					fluidSettings
+				),
 			},
 		};
+	}
 
-		return <BlockListBlock { ...newProps } />;
+	if ( fontSize ) {
+		props = {
+			style: {
+				fontSize: getFontSize(
+					fontSizes,
+					fontSize,
+					style?.typography?.fontSize
+				).size,
+			},
+		};
+	}
+
+	if ( ! props ) {
+		return;
+	}
+
+	return addSaveProps( props, name, { fontSize } );
+}
+
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'fontSize', 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
 	},
-	'withFontSizeInlineStyles'
-);
+};
 
 const MIGRATION_PATHS = {
 	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
 };
 
-export function addTransforms( result, source, index, results ) {
+function addTransforms( result, source, index, results ) {
 	const destinationBlockType = result.name;
 	const activeSupports = {
 		fontSize: hasBlockSupport(
@@ -286,78 +240,6 @@ export function addTransforms( result, source, index, results ) {
 	);
 }
 
-/**
- * Allow custom font sizes to appear fluid when fluid typography is enabled at
- * the theme level.
- *
- * Adds a custom getEditWrapperProps() callback to all block types that support
- * font sizes. Then, if fluid typography is enabled, this callback will swap any
- * custom font size in style.fontSize with a fluid font size (i.e. one that uses
- * clamp()).
- *
- * It's important that this hook runs after 'core/style/addEditProps' sets
- * style.fontSize as otherwise fontSize will be overwritten.
- *
- * @param {Object} blockType Block settings object.
- */
-function addEditPropsForFluidCustomFontSizes( blockType ) {
-	if (
-		! hasBlockSupport( blockType, FONT_SIZE_SUPPORT_KEY ) ||
-		shouldSkipSerialization( blockType, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' )
-	) {
-		return blockType;
-	}
-
-	const existingGetEditWrapperProps = blockType.getEditWrapperProps;
-
-	blockType.getEditWrapperProps = ( attributes ) => {
-		const wrapperProps = existingGetEditWrapperProps
-			? existingGetEditWrapperProps( attributes )
-			: {};
-
-		const fontSize = wrapperProps?.style?.fontSize;
-
-		// TODO: This sucks! We should be using useSetting( 'typography.fluid' )
-		// or even useSelect( blockEditorStore ). We can't do either here
-		// because getEditWrapperProps is a plain JavaScript function called by
-		// BlockListBlock and not a React component rendered within
-		// BlockListContext.Provider. If we set fontSize using editor.
-		// BlockListBlock instead of using getEditWrapperProps then the value is
-		// clobbered when the core/style/addEditProps filter runs.
-		const fluidTypographyConfig =
-			select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.typography?.fluid;
-
-		const fluidTypographySettings =
-			typeof fluidTypographyConfig === 'object'
-				? fluidTypographyConfig
-				: {};
-
-		const newFontSize =
-			fontSize && !! fluidTypographyConfig
-				? getComputedFluidTypographyValue( {
-						fontSize,
-						minimumFontSizeLimit:
-							fluidTypographySettings?.minFontSize,
-				  } )
-				: null;
-
-		if ( newFontSize === null ) {
-			return wrapperProps;
-		}
-
-		return {
-			...wrapperProps,
-			style: {
-				...wrapperProps?.style,
-				fontSize: newFontSize,
-			},
-		};
-	};
-
-	return blockType;
-}
-
 addFilter(
 	'blocks.registerBlockType',
 	'core/font/addAttribute',
@@ -365,30 +247,7 @@ addFilter(
 );
 
 addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/font/addSaveProps',
-	addSaveProps
-);
-
-addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/font-size/with-font-size-inline-styles',
-	withFontSizeInlineStyles
-);
-
-addFilter(
 	'blocks.switchToBlockType.transformedBlock',
 	'core/font-size/addTransforms',
 	addTransforms
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/font-size/addEditPropsForFluidCustomFontSizes',
-	addEditPropsForFluidCustomFontSizes,
-	// Run after 'core/style/addEditProps' so that the style object has already
-	// been translated into inline CSS.
-	11
 );

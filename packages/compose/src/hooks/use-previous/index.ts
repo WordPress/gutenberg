@@ -7,7 +7,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Use something's value from the previous render.
  * Based on https://usehooks.com/usePrevious/.
  *
- * @param  value The value to track.
+ * @param value The value to track.
  *
  * @return The value from the previous render.
  */

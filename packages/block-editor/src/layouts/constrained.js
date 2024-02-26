@@ -21,10 +21,11 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
 	name: 'constrained',
@@ -32,8 +33,13 @@ export default {
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
+		layoutBlockSupport = {},
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
+		const {
+			allowJustification = true,
+			allowCustomContentAndWideSize = true,
+		} = layoutBlockSupport;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -57,80 +63,86 @@ export default {
 				label: __( 'Justify items right' ),
 			},
 		];
+		const [ availableUnits ] = useSettings( 'spacing.units' );
 		const units = useCustomUnits( {
-			availableUnits: useSetting( 'spacing.units' ) || [
-				'%',
-				'px',
-				'em',
-				'rem',
-				'vw',
-			],
+			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
 		return (
 			<>
-				<div className="block-editor-hooks__layout-controls">
-					<div className="block-editor-hooks__layout-controls-unit">
-						<UnitControl
-							label={ __( 'Content' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ contentSize || wideSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									contentSize: nextWidth,
-								} );
-							} }
-							units={ units }
-						/>
-						<Icon icon={ positionCenter } />
-					</div>
-					<div className="block-editor-hooks__layout-controls-unit">
-						<UnitControl
-							label={ __( 'Wide' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ wideSize || contentSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									wideSize: nextWidth,
-								} );
-							} }
-							units={ units }
-						/>
-						<Icon icon={ stretchWide } />
-					</div>
-				</div>
-				<p className="block-editor-hooks__layout-controls-helptext">
-					{ __(
-						'Customize the width for all elements that are assigned to the center or wide columns.'
-					) }
-				</p>
-				<ToggleGroupControl
-					label={ __( 'Justification' ) }
-					value={ justifyContent }
-					onChange={ onJustificationChange }
-				>
-					{ justificationOptions.map( ( { value, icon, label } ) => {
-						return (
-							<ToggleGroupControlOptionIcon
-								key={ value }
-								value={ value }
-								icon={ icon }
-								label={ label }
-							/>
-						);
-					} ) }
-				</ToggleGroupControl>
+				{ allowCustomContentAndWideSize && (
+					<>
+						<div className="block-editor-hooks__layout-controls">
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									className="block-editor-hooks__layout-controls-unit-input"
+									label={ __( 'Content' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ contentSize || wideSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										onChange( {
+											...layout,
+											contentSize: nextWidth,
+										} );
+									} }
+									units={ units }
+								/>
+								<Icon icon={ positionCenter } />
+							</div>
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									className="block-editor-hooks__layout-controls-unit-input"
+									label={ __( 'Wide' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ wideSize || contentSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										onChange( {
+											...layout,
+											wideSize: nextWidth,
+										} );
+									} }
+									units={ units }
+								/>
+								<Icon icon={ stretchWide } />
+							</div>
+						</div>
+						<p className="block-editor-hooks__layout-controls-helptext">
+							{ __(
+								'Customize the width for all elements that are assigned to the center or wide columns.'
+							) }
+						</p>
+					</>
+				) }
+				{ allowJustification && (
+					<ToggleGroupControl
+						__nextHasNoMarginBottom
+						label={ __( 'Justification' ) }
+						value={ justifyContent }
+						onChange={ onJustificationChange }
+					>
+						{ justificationOptions.map(
+							( { value, icon, label } ) => {
+								return (
+									<ToggleGroupControlOptionIcon
+										key={ value }
+										value={ value }
+										icon={ icon }
+										label={ label }
+									/>
+								);
+							}
+						) }
+					</ToggleGroupControl>
+				) }
 			</>
 		);
 	},
@@ -143,7 +155,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { contentSize, wideSize, justifyContent } = layout;
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );

@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/button",
 	"title": "Button",
 	"category": "design",
@@ -9,6 +9,15 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"tagName": {
+			"type": "string",
+			"enum": [ "a", "button" ],
+			"default": "a"
+		},
+		"type": {
+			"type": "string",
+			"default": "button"
+		},
 		"textAlign": {
 			"type": "string"
 		},
@@ -16,30 +25,35 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "href"
+			"attribute": "href",
+			"__experimentalRole": "content"
 		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
-			"selector": "a",
-			"attribute": "title"
+			"selector": "a,button",
+			"attribute": "title",
+			"__experimentalRole": "content"
 		},
 		"text": {
-			"type": "string",
-			"source": "html",
-			"selector": "a"
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "a,button",
+			"__experimentalRole": "content"
 		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "target"
+			"attribute": "target",
+			"__experimentalRole": "content"
 		},
 		"rel": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "rel"
+			"attribute": "rel",
+			"__experimentalRole": "content"
 		},
 		"placeholder": {
 			"type": "string"
@@ -83,6 +97,9 @@
 			}
 		},
 		"reusable": false,
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -91,13 +108,22 @@
 			}
 		},
 		"__experimentalBorder": {
+			"color": true,
 			"radius": true,
+			"style": true,
+			"width": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"radius": true
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-button .wp-block-button__link"
+		"__experimentalSelector": ".wp-block-button .wp-block-button__link",
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },

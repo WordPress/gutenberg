@@ -9,6 +9,7 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { undoIgnoreBlocks } from '../../store/undo-ignore';
 
 const noop = () => {};
 
@@ -79,7 +80,8 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
+		registry.select( blockEditorStore );
 	const isControlled = useSelect(
 		( select ) => {
 			return (
@@ -123,6 +125,19 @@ export default function useBlockSync( {
 				pendingChanges.current.incoming = controlledBlocks;
 			}
 			resetBlocks( controlledBlocks );
+		}
+	};
+
+	// Clean up the changes made by setControlledBlocks() when the component
+	// containing useBlockSync() unmounts.
+	const unsetControlledBlocks = () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		if ( clientId ) {
+			setHasControlledInnerBlocks( clientId, false );
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, [] );
+		} else {
+			resetBlocks( [] );
 		}
 	};
 
@@ -182,8 +197,6 @@ export default function useBlockSync( {
 
 	useEffect( () => {
 		const {
-			getSelectionStart,
-			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
@@ -220,7 +233,6 @@ export default function useBlockSync( {
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
-
 			if (
 				areBlocksDifferent &&
 				( pendingChanges.current.incoming ||
@@ -253,6 +265,10 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
+				const undoIgnore = undoIgnoreBlocks.has( blocks );
+				if ( undoIgnore ) {
+					undoIgnoreBlocks.delete( blocks );
+				}
 				updateParent( blocks, {
 					selection: {
 						selectionStart: getSelectionStart(),
@@ -260,11 +276,21 @@ export default function useBlockSync( {
 						initialPosition:
 							getSelectedBlocksInitialCaretPosition(),
 					},
+					undoIgnore,
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
-		} );
+		}, blockEditorStore );
 
-		return () => unsubscribe();
+		return () => {
+			subscribed.current = false;
+			unsubscribe();
+		};
 	}, [ registry, clientId ] );
+
+	useEffect( () => {
+		return () => {
+			unsetControlledBlocks();
+		};
+	}, [] );
 }

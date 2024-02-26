@@ -1,6 +1,4 @@
 .editor-post-trash.components-button {
-	display: flex;
+	flex-grow: 1;
 	justify-content: center;
-	margin-top: $grid-unit-05;
-	width: 100%;
 }

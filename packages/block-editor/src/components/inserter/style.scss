@@ -22,6 +22,8 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
+	overflow-y: hidden;
+
 	&.show-as-tabs {
 		gap: 0;
 	}
@@ -35,6 +37,7 @@ $block-inserter-tabs-height: 44px;
 	.components-popover__content {
 		border: none;
 		outline: none;
+		box-shadow: $shadow-popover;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -42,10 +45,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
+				border-radius: $radius-block-ui $radius-block-ui 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-block-ui $radius-block-ui;
 			}
 
 			&.components-button {
@@ -58,7 +63,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs .components-tab-panel__tabs {
+	.block-editor-inserter__tabs div[role="tablist"] {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -103,10 +108,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-
-	.components-search-control__icon {
-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
-	}
 }
 
 .block-editor-inserter__tabs {
@@ -115,10 +116,10 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
-	.components-tab-panel__tabs {
+	div[role="tablist"] {
 		border-bottom: $border-width solid $gray-300;
 
-		.components-tab-panel__tabs-item {
+		button[role="tab"] {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
 			&[id$="reusable"] {
@@ -130,7 +131,7 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	.components-tab-panel__tab-content {
+	div[role="tabpanel"] {
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -211,15 +212,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__preview-container__popover {
+	top: $grid-unit-20 !important;
+}
+
 .block-editor-inserter__preview-container {
 	display: none;
-	width: 300px;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-300;
-	position: absolute;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
+	width: $sidebar-width;
+	padding: $grid-unit-20;
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
@@ -227,12 +227,14 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
-	.block-editor-block-card {
-		padding: $grid-unit-20;
+	.block-editor-block-preview__container {
+		height: 100%;
 	}
 
-	.block-editor-block-card__title {
-		font-size: $default-font-size;
+	.block-editor-block-card {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
 	}
 }
 
@@ -285,6 +287,11 @@ $block-inserter-tabs-height: 44px;
 	div[role="listitem"]:last-child {
 		margin-top: auto;
 	}
+
+	.block-editor-inserter__patterns-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+	}
 }
 
 .block-editor-inserter__patterns-category-dialog {
@@ -292,13 +299,10 @@ $block-inserter-tabs-height: 44px;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
 	position: absolute;
-	padding: $grid-unit-40 $grid-unit-30;
 	top: 0;
 	left: 0;
 	height: 100%;
 	width: 100%;
-	overflow-y: auto;
-	scrollbar-gutter: stable both-edges;
 
 	@include break-medium {
 		left: 100%;
@@ -307,12 +311,19 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-block-patterns-list {
-		margin-top: $grid-unit-30;
+		overflow-y: auto;
+		flex-grow: 1;
+		height: 100%;
+		padding: $grid-unit-20 $grid-unit-30;
 	}
+}
 
+.block-editor-block-patterns-list__list-item {
 	.block-editor-block-preview__container {
 		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-		&:hover {
+	}
+	&:hover {
+		.block-editor-block-preview__container {
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
@@ -320,9 +331,17 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-category-panel {
 	padding: 0 $grid-unit-20;
-
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 	@include break-medium {
 		padding: 0;
+	}
+	.block-editor-inserter__patterns-category-panel-header {
+		padding: 16px $grid-unit-30;
+	}
+	.block-editor-inserter__patterns-category-no-results {
+		margin-top: $grid-unit-30;
 	}
 }
 
@@ -342,6 +361,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
+	border-radius: $radius-block-ui;
 }
 
 .block-editor-inserter__tips {
@@ -423,7 +443,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-20;
+		top: $header-height + $grid-unit-15;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
@@ -450,12 +470,18 @@ $block-inserter-tabs-height: 44px;
 	&__list {
 		margin-left: $sidebar-width;
 		padding: $grid-unit-30 0 $grid-unit-40;
+		.block-editor-patterns__sync-status-filter {
+			.components-input-control__container {
+				width: 380px;
+			}
+		}
 	}
 
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-gap: $grid-unit-40;
 		grid-template-columns: repeat(1, 1fr);
+		margin-bottom: $grid-unit-20;
 
 		@include break-xlarge() {
 			grid-template-columns: repeat(2, 1fr);
@@ -508,7 +534,10 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	&__media-category {
+	.block-editor-inserter__media-tabs__media-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+
 		&.is-selected {
 			color: var(--wp-admin-theme-color);
 			position: relative;
@@ -564,8 +593,10 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__media-panel {
-	height: 100%;
+	min-height: 100%;
 	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
 
 	@include break-medium {
 		padding: 0;
@@ -576,20 +607,21 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex: 1;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		&.components-search-control {
-			input[type="search"].components-search-control__input {
-				background: $white;
-			}
+		// TODO: Consider using the Theme component to automatically adapt to a gray background.
+		&:not(:focus-within) {
+			--wp-components-color-background: #{$white};
 		}
 	}
 }
 
 .block-editor-inserter__media-list {
 	margin-top: $grid-unit-20;
-	&__list-item {
+	.block-editor-inserter__media-list__list-item {
+		position: relative;
 		cursor: pointer;
 		margin-bottom: $grid-unit-30;
 
@@ -600,33 +632,82 @@ $block-inserter-tabs-height: 44px;
 		&[draggable="true"] .block-editor-block-preview__container {
 			cursor: grab;
 		}
+
+		&.is-hovered {
+			.block-editor-inserter__media-list__item-preview {
+				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			}
+
+			.block-editor-inserter__media-list__item-preview-options > button {
+				display: block;
+			}
+		}
+
+		.block-editor-inserter__media-list__item-preview-options {
+			position: absolute;
+			right: $grid-unit-10;
+			top: $grid-unit-10;
+
+			> button {
+				background: $white;
+				border-radius: $radius-block-ui;
+				display: none;
+
+				// These styles are important so as focus isn't lost
+				// when the button is focused and we hover away.
+				&.is-opened,
+				&:focus {
+					display: block;
+				}
+
+				&:hover {
+					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+			}
+		}
 	}
 
-	&__item {
+	.block-editor-inserter__media-list__item {
 		height: 100%;
 
-		&-preview {
+		.block-editor-inserter__media-list__item-preview {
 			display: flex;
 			align-items: center;
 			overflow: hidden;
-			border-radius: 4px;
+			border-radius: 2px;
 
 			> * {
 				margin: 0 auto;
 				max-width: 100%;
 			}
+
+			.block-editor-inserter__media-list__item-preview-spinner {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				justify-content: center;
+				background: rgba($white, 0.7);
+				align-items: center;
+				pointer-events: none;
+			}
 		}
 
-		&:hover &-preview {
-			box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
-		}
-
-		&:focus &-preview {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		&:focus .block-editor-inserter__media-list__item-preview {
+			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
 	}
 }
 
@@ -637,5 +718,62 @@ $block-inserter-tabs-height: 44px;
 
 	> * {
 		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
+.reusable-blocks-menu-items__rename-hint {
+	align-items: top;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
+	display: flex;
+	flex-direction: row;
+	max-width: 380px;
+}
+
+.reusable-blocks-menu-items__rename-hint-content {
+	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
+}
+
+.reusable-blocks-menu-items__rename-hint-dismiss {
+	// The dismiss button has a lot of empty space through its padding.
+	// Apply margin to visually align the icon with the top of the text to its left.
+	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
+}
+
+.components-menu-group .reusable-blocks-menu-items__rename-hint {
+	margin: 0;
+}
+
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
+	}
+}
+
+.is-zoom-out {
+	.block-editor-inserter__menu {
+		display: flex;
+	}
+
+	.block-editor-inserter__patterns-category-dialog {
+		position: static;
 	}
 }

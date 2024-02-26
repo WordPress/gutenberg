@@ -45,7 +45,7 @@ if ( isPackageInstalled( 'typescript' ) ) {
 			parser: '@typescript-eslint/parser',
 			rules: {
 				'no-duplicate-imports': 'off',
-				'@typescript-eslint/no-duplicate-imports': 'error',
+				'import/no-duplicates': 'error',
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',

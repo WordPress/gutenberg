@@ -24,10 +24,18 @@ export async function withReanimatedTimer( fn ) {
 		global.requestAnimationFrame = ( callback ) =>
 			setTimeout( callback, FRAME_TIME );
 
+		// Reanimated uses a custom `now` function to advance animations. In order to be able to use
+		// Jest timer functions to advance animations we need to set the fake timers' internal clock.
+		// Reference: https://t.ly/0S__f
+		const reanimatedNowMockCopy = global.ReanimatedDataMock.now;
+		global.ReanimatedDataMock.now = jest.now;
+
 		const result = await fn();
 
 		// As part of the clean up, we run all pending timers that might have been derived from animations.
 		act( () => jest.runOnlyPendingTimers() );
+
+		global.ReanimatedDataMock.now = reanimatedNowMockCopy;
 
 		return result;
 	} );

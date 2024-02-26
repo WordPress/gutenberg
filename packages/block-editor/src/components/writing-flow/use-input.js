@@ -31,11 +31,10 @@ export default function useInput() {
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
-			if ( ! hasMultiSelection() ) {
-				return;
-			}
-			// Prevent the browser to format something when we have multiselection.
-			if ( event.inputType?.startsWith( 'format' ) ) {
+			// If writing flow is editable, NEVER allow the browser to alter the
+			// DOM. This will cause React errors (and the DOM should only be
+			// altered in a controlled fashion).
+			if ( node.contentEditable === 'true' ) {
 				event.preventDefault();
 			}
 		}

@@ -39,8 +39,7 @@ _Returns_
 
 Formats a date (like `wp_date()` in PHP), translating it into site's locale.
 
-Backward Compatibility Notice: if `timezone` is set to `true`, the function
-behaves like `gmdateI18n`.
+Backward Compatibility Notice: if `timezone` is set to `true`, the function behaves like `gmdateI18n`.
 
 _Related_
 
@@ -105,8 +104,7 @@ _Returns_
 
 ### gmdateI18n
 
-Formats a date (like `wp_date()` in PHP), translating it into site's locale
-and using the UTC timezone.
+Formats a date (like `wp_date()` in PHP), translating it into site's locale and using the UTC timezone.
 
 _Parameters_
 
@@ -116,6 +114,19 @@ _Parameters_
 _Returns_
 
 -   `string`: Formatted date.
+
+### humanTimeDiff
+
+Returns a human-readable time difference between two dates, like human_time_diff() in PHP.
+
+_Parameters_
+
+-   _from_ `Moment | Date | string`: From date, in the WP timezone.
+-   _to_ `Moment | Date | string | undefined`: To date, formatted in the WP timezone.
+
+_Returns_
+
+-   `string`: Human-readable time difference.
 
 ### isInTheFuture
 

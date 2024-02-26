@@ -54,6 +54,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						} }
 						value={ aspect }
 						aspectRatios={ [
+							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
 							{
 								title: __( 'Original' ),
 								aspect: defaultAspect,
@@ -73,10 +74,6 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						} }
 						value={ aspect }
 						aspectRatios={ [
-							{
-								title: __( '16:10' ),
-								aspect: 16 / 10,
-							},
 							{
 								title: __( '16:9' ),
 								aspect: 16 / 9,
@@ -100,10 +97,6 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						} }
 						value={ aspect }
 						aspectRatios={ [
-							{
-								title: __( '10:16' ),
-								aspect: 10 / 16,
-							},
 							{
 								title: __( '9:16' ),
 								aspect: 9 / 16,

@@ -2,14 +2,15 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { colord, extend, Colord } from 'colord';
+import type { Colord } from 'colord';
+import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
  */
 import { useCallback, useState, useMemo } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -18,8 +19,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	useContextSystem,
 	contextConnect,
-	WordPressComponentProps,
-} from '../ui/context';
+	ContextSystemProvider,
+} from '../context';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -32,17 +33,9 @@ import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
 
-import type { ColorType } from './types';
+import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );
-
-export interface ColorPickerProps {
-	enableAlpha?: boolean;
-	color?: string;
-	onChange?: ( color: string ) => void;
-	defaultValue?: string;
-	copyFormat?: ColorType;
-}
 
 const options = [
 	{ label: 'RGB', value: 'rgb' as const },
@@ -50,8 +43,11 @@ const options = [
 	{ label: 'Hex', value: 'hex' as const },
 ];
 
-const ColorPicker = (
-	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
+// `isBorderless` is still experimental and not a public prop for InputControl yet.
+const BORDERLESS_SELECT_CONTROL_CONTEXT = { InputBase: { isBorderless: true } };
+
+const UnconnectedColorPicker = (
+	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
@@ -60,8 +56,24 @@ const ColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+
+		// Context
+		onPickerDragStart,
+		onPickerDragEnd,
 		...divProps
-	} = useContextSystem( props, 'ColorPicker' );
+	} = useContextSystem<
+		ColorPickerProps & {
+			onPickerDragStart?: ( event: MouseEvent ) => void;
+			onPickerDragEnd?: ( event: MouseEvent ) => void;
+		}
+	>( props, 'ColorPicker' );
+
+	const [ containerEl, setContainerEl ] = useState< HTMLElement | null >(
+		null
+	);
+	const containerRef = ( node: HTMLElement | null ) => {
+		setContainerEl( node );
+	};
 
 	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const [ color, setColor ] = useControlledValue( {
@@ -88,24 +100,34 @@ const ColorPicker = (
 	);
 
 	return (
-		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+		<ColorfulWrapper
+			ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+			{ ...divProps }
+		>
 			<Picker
+				containerEl={ containerEl }
 				onChange={ handleChange }
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
+				onDragStart={ onPickerDragStart }
+				onDragEnd={ onPickerDragEnd }
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
-					<SelectControl
-						__nextHasNoMarginBottom
-						options={ options }
-						value={ colorType }
-						onChange={ ( nextColorType ) =>
-							setColorType( nextColorType as ColorType )
-						}
-						label={ __( 'Color format' ) }
-						hideLabelFromVision
-					/>
+					<ContextSystemProvider
+						value={ BORDERLESS_SELECT_CONTROL_CONTEXT }
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							options={ options }
+							value={ colorType }
+							onChange={ ( nextColorType ) =>
+								setColorType( nextColorType as ColorType )
+							}
+							label={ __( 'Color format' ) }
+							hideLabelFromVision
+						/>
+					</ContextSystemProvider>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
@@ -124,6 +146,9 @@ const ColorPicker = (
 	);
 };
 
-const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
+export const ColorPicker = contextConnect(
+	UnconnectedColorPicker,
+	'ColorPicker'
+);
 
-export default ConnectedColorPicker;
+export default ColorPicker;

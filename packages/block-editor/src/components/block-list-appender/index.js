@@ -39,56 +39,31 @@ function DefaultAppender( { rootClientId } ) {
 	);
 }
 
-function useAppender( rootClientId, CustomAppender ) {
-	const { hideInserter, isParentSelected } = useSelect(
-		( select ) => {
-			const {
-				getTemplateLock,
-				getSelectedBlockClientId,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
-
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-				isParentSelected:
-					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId ),
-			};
-		},
-		[ rootClientId ]
-	);
-
-	if ( hideInserter || CustomAppender === false ) {
-		return null;
-	}
-
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		return <CustomAppender />;
-	}
-
-	if ( ! isParentSelected ) {
-		return null;
-	}
-
-	return <DefaultAppender rootClientId={ rootClientId } />;
-}
-
-function BlockListAppender( {
+export default function BlockListAppender( {
 	rootClientId,
-	renderAppender,
+	CustomAppender,
 	className,
 	tagName: TagName = 'div',
 } ) {
-	const appender = useAppender( rootClientId, renderAppender );
-
-	if ( ! appender ) {
-		return null;
-	}
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			// Ideally we should also check for `isDragging` but currently it
+			// requires a lot more setup. We can revisit this once we refactor
+			// the DnD utility hooks.
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
+			);
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<TagName
@@ -101,10 +76,9 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames(
-				'block-list-appender wp-block',
-				className
-			) }
+			className={ classnames( 'block-list-appender wp-block', className, {
+				'is-drag-over': isDragOver,
+			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
 			// should collapse the selection to the end of that selection and
@@ -119,9 +93,11 @@ function BlockListAppender( {
 			// have commonly targeted that attribute for margins.
 			data-block
 		>
-			{ appender }
+			{ CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			) }
 		</TagName>
 	);
 }
-
-export default BlockListAppender;

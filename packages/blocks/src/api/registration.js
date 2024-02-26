@@ -1,11 +1,6 @@
 /* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 
 /**
- * External dependencies
- */
-import { camelCase } from 'change-case';
-
-/**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
@@ -15,14 +10,14 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
-import { BLOCK_ICON_DEFAULT } from './constants';
 import { store as blocksStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
  * An icon type definition. One of a Dashicon slug, an element,
  * or a component.
  *
- * @typedef {(string|WPElement|WPComponent)} WPIcon
+ * @typedef {(string|Element|Component)} WPIcon
  *
  * @see https://developer.wordpress.org/resource/dashicons/
  */
@@ -117,10 +112,10 @@ import { store as blocksStore } from '../store';
  * @property {string[]}           [keywords]    Additional keywords to produce block
  *                                              type as result in search interfaces.
  * @property {Object}             [attributes]  Block type attributes.
- * @property {WPComponent}        [save]        Optional component describing
+ * @property {Component}          [save]        Optional component describing
  *                                              serialized markup structure of a
  *                                              block type.
- * @property {WPComponent}        edit          Component rendering an element to
+ * @property {Component}          edit          Component rendering an element to
  *                                              manipulate the attributes of a block
  *                                              in the context of an editor.
  * @property {WPBlockVariation[]} [variations]  The list of block variations.
@@ -128,8 +123,6 @@ import { store as blocksStore } from '../store';
  *                                              the block preview. When not defined
  *                                              then no preview is shown.
  */
-
-export const serverSideBlockDefinitions = {};
 
 function isObject( object ) {
 	return object !== null && typeof object === 'object';
@@ -142,43 +135,9 @@ function isObject( object ) {
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	for ( const blockName of Object.keys( definitions ) ) {
-		// Don't overwrite if already set. It covers the case when metadata
-		// was initialized from the server.
-		if ( serverSideBlockDefinitions[ blockName ] ) {
-			// We still need to polyfill `apiVersion` for WordPress version
-			// lower than 5.7. If it isn't present in the definition shared
-			// from the server, we try to fallback to the definition passed.
-			// @see https://github.com/WordPress/gutenberg/pull/29279
-			if (
-				serverSideBlockDefinitions[ blockName ].apiVersion ===
-					undefined &&
-				definitions[ blockName ].apiVersion
-			) {
-				serverSideBlockDefinitions[ blockName ].apiVersion =
-					definitions[ blockName ].apiVersion;
-			}
-			// The `ancestor` prop is not included in the definitions shared
-			// from the server yet, so it needs to be polyfilled as well.
-			// @see https://github.com/WordPress/gutenberg/pull/39894
-			if (
-				serverSideBlockDefinitions[ blockName ].ancestor ===
-					undefined &&
-				definitions[ blockName ].ancestor
-			) {
-				serverSideBlockDefinitions[ blockName ].ancestor =
-					definitions[ blockName ].ancestor;
-			}
-			continue;
-		}
-
-		serverSideBlockDefinitions[ blockName ] = Object.fromEntries(
-			Object.entries( definitions[ blockName ] )
-				.filter(
-					( [ , value ] ) => value !== null && value !== undefined
-				)
-				.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
-		);
+	const { addBootstrappedBlockType } = unlock( dispatch( blocksStore ) );
+	for ( const [ name, blockType ] of Object.entries( definitions ) ) {
+		addBootstrappedBlockType( name, blockType );
 	}
 }
 
@@ -203,10 +162,13 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'attributes',
 		'providesContext',
 		'usesContext',
+		'selectors',
 		'supports',
 		'styles',
 		'example',
 		'variations',
+		'blockHooks',
+		'allowedBlocks',
 	];
 
 	const settings = Object.fromEntries(
@@ -236,7 +198,8 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * For more in-depth information on registering a custom block see the [Create a block tutorial](docs/how-to-guides/block-tutorial/README.md)
+ * For more in-depth information on registering a custom block see the
+ * [Create a block tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
  *
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
@@ -253,7 +216,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * } );
  * ```
  *
- * @return {?WPBlockType} The block, if it has been successfully registered;
+ * @return {WPBlockType | undefined} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
 export function registerBlockType( blockNameOrMetadata, settings ) {
@@ -277,28 +240,16 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
+	const { addBootstrappedBlockType, addUnprocessedBlockType } = unlock(
+		dispatch( blocksStore )
+	);
+
 	if ( isObject( blockNameOrMetadata ) ) {
-		unstable__bootstrapServerSideBlockDefinitions( {
-			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
-		} );
+		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
+		addBootstrappedBlockType( name, metadata );
 	}
 
-	const blockType = {
-		name,
-		icon: BLOCK_ICON_DEFAULT,
-		keywords: [],
-		attributes: {},
-		providesContext: {},
-		usesContext: [],
-		supports: {},
-		styles: [],
-		variations: [],
-		save: () => null,
-		...serverSideBlockDefinitions?.[ name ],
-		...settings,
-	};
-
-	dispatch( blocksStore ).__experimentalRegisterBlockType( blockType );
+	addUnprocessedBlockType( name, settings );
 
 	return select( blocksStore ).getBlockType( name );
 }
@@ -424,7 +375,7 @@ export function unregisterBlockCollection( namespace ) {
  * };
  * ```
  *
- * @return {?WPBlockType} The previous block value, if it has been successfully
+ * @return {WPBlockType | undefined} The previous block value, if it has been successfully
  *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
@@ -510,6 +461,10 @@ export function setDefaultBlockName( name ) {
 /**
  * Assigns name of block for handling block grouping interactions.
  *
+ * This function lets you select a different block to group other blocks in instead of the
+ * default `core/group` block. This function must be used in a component or when the DOM is fully
+ * loaded. See https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dom-ready/
+ *
  * @param {string} name Block name.
  *
  * @example
@@ -520,7 +475,7 @@ export function setDefaultBlockName( name ) {
  *
  *     return (
  *         <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
- *             { __( 'Set the default block to Heading' ) }
+ *             { __( 'Wrap in columns' ) }
  *         </Button>
  *     );
  * };
@@ -658,7 +613,8 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 /**
  * Registers a new block style for the given block.
  *
- * For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
+ * For more information on connecting the styles with CSS
+ * [the official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/#styles).
  *
  * @param {string} blockName      Name of block (example: “core/latest-posts”).
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
@@ -737,7 +693,8 @@ export const getBlockVariations = ( blockName, scope ) => {
 /**
  * Registers a new block variation for the given block type.
  *
- * For more information on block variations see [the official documentation ](/docs/reference-guides/block-api/block-variations.md)
+ * For more information on block variations see
+ * [the official documentation ](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/).
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.

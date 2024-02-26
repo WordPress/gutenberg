@@ -15,7 +15,7 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 	/**
 	 * Post object.
 	 *
-	 * @var array
+	 * @var object
 	 */
 	protected static $post;
 
@@ -76,7 +76,7 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 			'minHeight'        => '100px',
 		);
 
-		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
+		$content  = '<div class="wp-block-cover" style="min-height:100px"><span></span><div class="wp-block-cover__inner-container"></div></div>';
 		$rendered = gutenberg_render_block_core_cover( $attributes, $content );
 
 		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );

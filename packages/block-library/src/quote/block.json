@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/quote",
 	"title": "Quote",
 	"category": "text",
@@ -17,10 +17,9 @@
 			"__experimentalRole": "content"
 		},
 		"citation": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "cite",
-			"default": "",
 			"__experimentalRole": "content"
 		},
 		"align": {
@@ -29,7 +28,9 @@
 	},
 	"supports": {
 		"anchor": true,
+		"html": false,
 		"__experimentalOnEnter": true,
+		"__experimentalOnMerge": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -40,17 +41,26 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true
+				"fontSize": true
 			}
 		},
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
+		},
+		"spacing": {
+			"blockGap": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

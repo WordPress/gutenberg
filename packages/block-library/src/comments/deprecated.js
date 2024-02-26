@@ -12,7 +12,7 @@ const v1 = {
 			default: 'div',
 		},
 	},
-	apiVersion: 2,
+	apiVersion: 3,
 	supports: {
 		align: [ 'wide', 'full' ],
 		html: false,

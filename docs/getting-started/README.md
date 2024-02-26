@@ -1,60 +1,41 @@
 # Getting Started
 
-Welcome! Let's get started building with blocks. Blocks are at the core of extending WordPress. You can create custom blocks, your own block patterns, or combine them together to build a block theme. At a high level, here are a few ways to begin your journey but read on to explore more:
+Welcome to the Getting Started documentation. From setting up your development environment and building your first block to understanding the fundamentals, this section is the perfect starting point if you are new to block development or want to improve your skills.
 
-- Learn more about where this work is going by [reviewing the long term roadmap](https://wordpress.org/about/roadmap/).
-- Explore the [GitHub repo](https://github.com/WordPress/gutenberg/) to see the latest issues and PRs folks are working on, especially [Good First Issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22).
-- Join the [Slack community](https://make.wordpress.org/chat/) to join meetings, ongoing conversations, and more. 
-- Take courses on how to use the block editor and more on [Learn WordPress](https://learn.wordpress.org/). 
-- Expand your knowledge by reviewing more developer docs at the overall [developer.wordpress.org resource](https://developer.wordpress.org/).
-- Subscribe to [updates on Make Core](https://make.wordpress.org/core/), the main site where ongoing project updates happen.
+## Navigating this chapter
 
-## Tutorials
+Use the following links to locate a topic within this chapter. If you have never built a block before, consider reading through the documentation in the order listed.
 
-[Development Environment](/docs/getting-started/devenv/README.md) - A guide to setup your local environment for JavaScript development for creating plugins, themes, and the tools you will need to extend WordPress or contribute to the block editor.
+- **[Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/):** Set up the right development environment to create blocks and get introduced to basic tools for block development such as [`wp-env`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/), [`create-block`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/), and [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/)
+- **[Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/):** Get a custom block up and running in less than one minute.
+- **[Tutorial: Build your first block](https://developer.wordpress.org/block-editor/getting-started/tutorial/):** Learn how to build a fully functional custom block from the ground up.
+- **[Fundamentals of Block Development](https://developer.wordpress.org/block-editor/getting-started/fundamentals/):** Learn the most relevant concepts in block development.
+- **[Glossary](https://developer.wordpress.org/block-editor/getting-started/glossary/):** A glossary of common terms you will encounter when working with the Block Editor.
+- **[Frequently Asked Questions](https://developer.wordpress.org/block-editor/getting-started/faq/):** Common questions (and answers) that have come up from the last few years of Gutenberg's development. 
 
-[Create a Block Tutorial](/docs/getting-started/create-block/README.md) - Learn how to create your first block for the WordPress block editor.
+## Keeping up with the WordPress project
 
-[Full Site Editing](/docs/getting-started/full-site-editing.md) - Full Site Editing (FSE) is an umbrella project name for the collection of features that bring the experience and extendability of blocks to all parts of your site—from settings and styles, to templates and themes, and more.
+Once you have finished reviewing this chapter, you will have a solid understanding of blocks and how to develop for the Block Editor, but what's next? 
 
--   Learn [about using theme.json](/docs/how-to-guides/themes/theme-json.md) to define settings and styles for your theme.
+The WordPress project, and Gutenberg in particular, iterates quickly. Staying up-to-date on all the changes can be challenging. So, here are a few essential developer resources you should be aware of. Each person will have their own unique needs in keeping up with a project of this scale, so choose what's right for you.
 
--   [Create a Block Theme](/docs/how-to-guides/themes/create-block-theme.md) - Learn how block themes use blocks to build templates and the theme.json to provide styles.
--   [Convert as Classic Theme to a Block Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/) - Learn how to adopt various pieces of full site editing in your classic theme.
+- **[WordPress Roadmap](https://wordpress.org/about/roadmap/):** The high-level roadmap for WordPress and Gutenberg.
+- **[Make Core](https://make.wordpress.org/core/):** The primary blog for WordPress Core where all major project updates are posted.
+- **[WordPress Slack](https://make.wordpress.org/chat/):** The official Slack community for all WordPress contributors is the hub for team meetings, ongoing conversations, and more. Make sure to join the `#core` and `#core-editor` channels.
+- **[Gutenberg GitHub repository](https://github.com/WordPress/gutenberg/):** This is where all Block Editor development happens. Keeping a close eye on the repository will give you a real-time understanding of what’s being worked on by fellow contributors.
+- **[Keeping up with Gutenberg](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/):** A compilation of Gutenberg-related posts from the many [Make teams](https://make.wordpress.org/), including Core, Design, Meta, and Themes.
+- **["What's new in Gutenberg?"](https://make.wordpress.org/core/tag/gutenberg-new/):** Biweekly posts published on Make Core with each Gutenberg release. They are a great way to review the most relevant new features and the full changelog.
+- **["What's new for developers?"](https://developer.wordpress.org/news/):** Monthly posts on the WordPress Developer Blog that showcase the most important developer-related changes that happened in WordPress the previous month.
 
-## Ways to Stay Informed
+## Additional resources
 
-New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 
+For more resources on block development and extending the Block Editor, review the additional sections here in the Block Editor Handbook. Further practical examples are also available in the [block-development-examples](https://github.com/wptrainingteam/block-development-examples) GitHub repository.
 
-**Yearly:**
+If you are looking for more educational content, check out [Learn WordPress](https://learn.wordpress.org/), where you can find [tutorials](https://learn.wordpress.org/tutorials/), [courses](https://learn.wordpress.org/courses/), and [online workshops](https://learn.wordpress.org/online-workshops/). Here is a selection of current offerings:
 
-The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phases of Gutenberg updated by project leadership. This is the highest level overview of the changes coming to WordPress.
-
-**Quarterly:**
-
-[Quarterly Updates](https://make.wordpress.org/updates/tag/quarterly-updates/) from Contribution Teams. These updates give an overview on what each team is working on, struggling with, and how to get involved.
-
-**Monthly:**
-
-[“What’s Next In Gutenberg?” posts](https://make.wordpress.org/core/tag/gutenberg-next/). These updates are wrangled by the Core Editor team and highlight areas of work aligned with the Gutenberg roadmap for contributors to help, how to get involved, and more. 
-
-[Block Based Themes Meeting](https://make.wordpress.org/themes/tags/block-based-meeting/). These meetings are currently wrangled in the #themereview Slack channel and are dedicated to sharing FSE changes that will specifically impact themes. Agendas and summaries are shared on the [Make Themes blog](https://make.wordpress.org/themes/). 
-
-**Biweekly:**
-
-[“What’s New In Gutenberg?” release posts](https://make.wordpress.org/core/tag/gutenberg-new/). These updates are wrangled by the Core Editor team and focus on what’s been released in each biweekly Gutenberg release. They include the most relevant features released and a full changelog.
-
-**Weekly:**
-
-[Core Editor meetings](https://make.wordpress.org/core/tag/core-editor-summary/). These meetings are wrangled by volunteer members in the #core-editor Slack channel. [Agendas](https://make.wordpress.org/core/tag/core-editor-summary/) and [summaries](https://make.wordpress.org/core/tag/core-editor-summary/) are shared on the [Make Core blog](https://make.wordpress.org/core/). They focus on task coordination and relevant discussions around Gutenberg releases. There is an Open Floor period in each chat where people can suggest topics to discuss.
-
-[Weekly Theme Related Gutenberg Updates](https://make.wordpress.org/themes/tags/gutenberg-themes-roundup/). These posts are focused on themes, including everything from current discussions to recent changes, as well as helpful resources for theme authors. 
-
-**Daily:**
-
-Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers. 
-
--   [Glossary](/docs/explanations/glossary.md)
--   [Frequently Asked Questions](/docs/explanations/faq.md)
--   [Project History](/docs/explanations/history.md)
--   [Outreach](/docs/getting-started/outreach.md)
+-   [Intro to Block Development: Build Your First Custom Block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/)
+-   [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/)
+-   [Using the WordPress Data Layer](https://learn.wordpress.org/course/using-the-wordpress-data-layer/)
+-   [Registering Block Patterns](https://learn.wordpress.org/workshop/registering-block-patterns/)
+-   [Intro to Gutenberg Block Development](https://learn.wordpress.org/workshop/intro-to-gutenberg-block-development/)
+-   [Intro to Publishing with the Block Editor](https://learn.wordpress.org/workshop/intro-to-publishing-with-the-block-editor/)

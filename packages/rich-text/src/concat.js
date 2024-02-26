@@ -5,7 +5,7 @@
 import { normaliseFormats } from './normalise-formats';
 import { create } from './create';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Concats a pair of rich text values. Not that this mutates `a` and does NOT

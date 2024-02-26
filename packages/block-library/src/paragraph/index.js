@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -33,9 +28,19 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
+			if ( customName ) {
+				return customName;
+			}
+
 			const { content } = attributes;
-			return isEmpty( content ) ? __( 'Empty' ) : content;
+			return ! content || content.length === 0 ? __( 'Empty' ) : content;
 		}
 	},
 	transforms,

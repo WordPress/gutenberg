@@ -12,7 +12,9 @@ test.describe( 'Code', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '```' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<?php' );
@@ -38,10 +40,126 @@ test.describe( 'Code', () => {
 		await editor.insertBlock( { name: 'core/code' } );
 
 		// Test to see if HTML and white space is kept.
-		await pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
+		pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test.describe( 'Block transforms', () => {
+		test.describe( 'FROM paragraph', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/code' );
+				const codeBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( codeBlock.name ).toBe( 'core/code' );
+				expect( codeBlock.attributes.content ).toBe(
+					'initial content'
+				);
+			} );
+
+			test( 'should preserve the metadata name attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/code' );
+				const codeBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( codeBlock.name ).toBe( 'core/code' );
+				expect( codeBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+		} );
+
+		test.describe( 'FROM HTML', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/html',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/code' );
+				const codeBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( codeBlock.name ).toBe( 'core/code' );
+				expect( codeBlock.attributes.content ).toBe(
+					'initial content'
+				);
+			} );
+
+			test( 'should preserve the metadata name attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/html',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/code' );
+				const codeBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( codeBlock.name ).toBe( 'core/code' );
+				expect( codeBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+		} );
+
+		test.describe( 'TO paragraph', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/code',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/paragraph' );
+				const codeBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( codeBlock.name ).toBe( 'core/paragraph' );
+				expect( codeBlock.attributes.content ).toBe(
+					'initial content'
+				);
+			} );
+
+			test( 'should preserve the metadata name attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/code',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/paragraph' );
+				const codeBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( codeBlock.name ).toBe( 'core/paragraph' );
+				expect( codeBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+		} );
 	} );
 } );

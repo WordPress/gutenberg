@@ -93,14 +93,14 @@ function PostAuthorEdit( {
 	};
 
 	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
+	const showAuthorControl =
+		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
 
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ !! postId &&
-						! isDescendentOfQueryLoop &&
-						authorOptions.length &&
+					{ showAuthorControl &&
 						( ( showCombobox && (
 							<ComboboxControl
 								__nextHasNoMarginBottom
@@ -120,6 +120,7 @@ function PostAuthorEdit( {
 							/>
 						) ) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
 						onChange={ () =>
@@ -140,6 +141,7 @@ function PostAuthorEdit( {
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show bio' ) }
 						checked={ showBio }
 						onChange={ () =>
@@ -147,12 +149,14 @@ function PostAuthorEdit( {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link author name to author page' ) }
 						checked={ isLink }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 					/>
 					{ isLink && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {
@@ -192,7 +196,6 @@ function PostAuthorEdit( {
 					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
 						<RichText
 							className="wp-block-post-author__byline"
-							multiline={ false }
 							aria-label={ __( 'Post author byline text' ) }
 							placeholder={ __( 'Write byline…' ) }
 							value={ byline }

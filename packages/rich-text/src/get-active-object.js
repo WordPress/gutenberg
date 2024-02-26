@@ -4,8 +4,8 @@
 
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
 /**
  * Gets the active object, if there is any.

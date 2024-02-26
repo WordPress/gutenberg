@@ -40,7 +40,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     public static final String ARG_BLOCK_CONTENT = "block_content";
 
     private static final String INJECT_LOCAL_STORAGE_SCRIPT_TEMPLATE = "localStorage.setItem('WP_DATA_USER_%d','%s')";
-    private static final String INJECT_CSS_SCRIPT_TEMPLATE = "window.injectCss('%s')";
+    private static final String INJECT_CSS_SCRIPT_TEMPLATE = "window.injectCss('%s', '%s')";
     private static final String INJECT_GET_HTML_POST_CONTENT_SCRIPT = "window.getHTMLPostContent();";
     private static final String INJECT_ON_SHOW_CONTEXT_MENU_SCRIPT = "window.onShowContextMenu();";
     private static final String INJECT_ON_HIDE_CONTEXT_MENU_SCRIPT = "window.onHideContextMenu();";
@@ -327,16 +327,16 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mWebView.evaluateJavascript(injectCssScript, message -> {
             if (message != null) {
                 String editorStyle = getFileContentFromAssets("gutenberg-web-single-block/editor-style-overrides.css");
-                editorStyle = removeWhiteSpace(removeNewLines(editorStyle));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle));
+                editorStyle = removeNewLines(editorStyle);
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle, "editor-style-overrides"));
 
                 String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
                 injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript, "wp-bar-override"));
 
                 String injectExternalCssScript = getOnGutenbergReadyExternalStyles();
                 injectExternalCssScript = removeWhiteSpace(removeNewLines(injectExternalCssScript));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectExternalCssScript));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectExternalCssScript, "external-styles"));
             }
         });
     }

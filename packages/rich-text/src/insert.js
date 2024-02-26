@@ -5,7 +5,7 @@
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Insert a Rich Text value, an HTML string, or a plain text string, into a

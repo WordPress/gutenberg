@@ -1,24 +1,25 @@
 /**
- * External dependencies
- */
-import { unescape as unescapeString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+
 /**
  * Internal dependencies
  */
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
+import type { TreeSelectProps, Tree, Truthy } from './types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
-function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+function getSelectOptions(
+	tree: Tree[],
+	level = 0
+): NonNullable< TreeSelectProps[ 'options' ] > {
 	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
 			label:
-				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
+				'\u00A0'.repeat( level * 3 ) + decodeEntities( treeNode.name ),
 		},
 		...getSelectOptions( treeNode.children || [], level + 1 ),
 	] );
@@ -27,7 +28,6 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
 /**
  * TreeSelect component is used to generate select input fields.
  *
- * @example
  * ```jsx
  * import { TreeSelect } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
@@ -73,14 +73,16 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
  * ```
  */
 
-export function TreeSelect( {
-	label,
-	noOptionLabel,
-	onChange,
-	selectedId,
-	tree = [],
-	...props
-}: TreeSelectProps ) {
+export function TreeSelect( props: TreeSelectProps ) {
+	const {
+		label,
+		noOptionLabel,
+		onChange,
+		selectedId,
+		tree = [],
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp( props );
+
 	const options = useMemo( () => {
 		return [
 			noOptionLabel && { value: '', label: noOptionLabel },
@@ -92,7 +94,7 @@ export function TreeSelect( {
 		<SelectControl
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
-			{ ...props }
+			{ ...restProps }
 		/>
 	);
 }

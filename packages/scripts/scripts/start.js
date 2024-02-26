@@ -10,6 +10,10 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 const { getArgFromCLI, getWebpackArgs, hasArgInCLI } = require( '../utils' );
 const EXIT_ERROR_CODE = 1;
 
+if ( hasArgInCLI( '--experimental-modules' ) ) {
+	process.env.WP_EXPERIMENTAL_MODULES = true;
+}
+
 if ( hasArgInCLI( '--webpack-no-externals' ) ) {
 	process.env.WP_NO_EXTERNALS = true;
 }
@@ -30,11 +34,14 @@ process.env.WP_SRC_DIRECTORY = hasArgInCLI( '--webpack-src-dir' )
 	? getArgFromCLI( '--webpack-src-dir' )
 	: 'src';
 
-const { status } = spawn(
-	resolveBin( 'webpack' ),
-	[ hasArgInCLI( '--hot' ) ? 'serve' : 'watch', ...getWebpackArgs() ],
-	{
-		stdio: 'inherit',
-	}
-);
+const webpackArgs = getWebpackArgs();
+if ( hasArgInCLI( '--hot' ) ) {
+	webpackArgs.unshift( 'serve' );
+} else if ( ! hasArgInCLI( '--no-watch' ) ) {
+	webpackArgs.unshift( 'watch' );
+}
+
+const { status } = spawn( resolveBin( 'webpack' ), webpackArgs, {
+	stdio: 'inherit',
+} );
 process.exit( status === null ? EXIT_ERROR_CODE : status );

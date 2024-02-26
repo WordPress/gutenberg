@@ -6,7 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useCardMedia } from './hook';
 import type { MediaProps } from '../types';
@@ -21,7 +22,8 @@ function UnconnectedCardMedia(
 }
 
 /**
- * `CardMedia` provides a container for media elements within a `Card`.
+ * `CardMedia` provides a container for full-bleed content within a `Card`,
+ * such as images, video, or even just a background color.
  *
  * @example
  * ```jsx

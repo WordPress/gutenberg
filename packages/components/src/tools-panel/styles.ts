@@ -14,7 +14,7 @@ import {
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
 import { COLORS, CONFIG, rtl } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 
 const toolsPanelGrid = {
 	columns: ( columns: number ) => css`
@@ -148,7 +148,7 @@ export const DropdownMenu = css`
 `;
 
 export const ResetLabel = styled.span`
-	color: ${ COLORS.ui.themeDark10 };
+	color: ${ COLORS.theme.accentDarker10 };
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;

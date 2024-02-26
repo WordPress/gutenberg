@@ -25,6 +25,7 @@ const {
 	findPluginReleaseBranchName,
 } = require( './common' );
 const { join } = require( 'path' );
+const pluginConfig = require( '../config' );
 
 /**
  * Release type names.
@@ -82,24 +83,14 @@ async function checkoutNpmReleaseBranch( {
 	/*
 	 * Create the release branch.
 	 *
-	 * Note that we are grabbing an arbitrary depth of commits
-	 * during the fetch. When `lerna` attempts to determine if
-	 * a package needs an update, it looks at `git` history,
-	 * and if we have pruned that history it will pre-emptively
-	 * publish when it doesn't need to.
-	 *
-	 * We could set a different arbitrary depth if this isn't
-	 * long enough or if it's excessive. We could also try and
-	 * find a way to more specifically fetch what we expect to
-	 * change. For example, if we knew we'll be performing
-	 * updates every two weeks, we might be conservative and
-	 * use `--shallow-since=4.weeks.ago`.
-	 *
-	 * At the time of writing, a depth of 100 pulls in all
-	 * `trunk` commits from within the past week.
+	 * Note that we are grabbing an arbitrary depth of commits (999) during the fetch.
+	 * When Lerna attempts to determine if a package needs an update, it looks at
+	 * `git` history to find the commit created during the previous npm publishing.
+	 * Lerna assumes that all packages need publishing if it can't access
+	 * the necessary information.
 	 */
 	await SimpleGit( gitWorkingDirectoryPath )
-		.fetch( npmReleaseBranch, [ '--depth=100' ] )
+		.fetch( 'origin', npmReleaseBranch, [ '--depth=999' ] )
 		.checkout( npmReleaseBranch );
 	log(
 		'>> The local npm release branch ' +
@@ -149,6 +140,7 @@ async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
 		 */
 		await repo
 			.raw( 'rm', '-r', '.' )
+			.fetch( 'origin', pluginReleaseBranch, [ '--depth=1' ] )
 			.raw( 'checkout', `origin/${ pluginReleaseBranch }`, '--', '.' );
 
 		const { commit: commitHash } = await repo.commit(
@@ -196,10 +188,9 @@ async function updatePackages( config ) {
 	);
 	const changelogFilesPublicPackages = changelogFiles.filter(
 		( changelogPath ) => {
-			const pkg = require( path.join(
-				path.dirname( changelogPath ),
-				'package.json'
-			) );
+			const pkg = require(
+				path.join( path.dirname( changelogPath ), 'package.json' )
+			);
 			return pkg.private !== true;
 		}
 	);
@@ -411,13 +402,27 @@ async function publishPackagesToNpm( {
 		);
 	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
 		log( '>> Publishing modified packages to npm.' );
-		await command(
-			`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		try {
+			await command(
+				`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		} catch {
+			log(
+				'>> Trying to finish failed publishing of modified npm packages.'
+			);
+			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
+			await command(
+				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		}
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
@@ -431,13 +436,27 @@ async function publishPackagesToNpm( {
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command(
-			`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		try {
+			await command(
+				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		} catch {
+			log(
+				'>> Trying to finish failed publishing of modified npm packages.'
+			);
+			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
+			await command(
+				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		}
 	}
 
 	const afterCommitHash = await SimpleGit( gitWorkingDirectoryPath ).revparse(
@@ -530,7 +549,11 @@ async function runPackagesRelease( config, customMessages ) {
 			config.abortMessage,
 			async () => {
 				log( '>> Cloning the Git repository' );
-				await SimpleGit( gitPath ).clone( config.gitRepositoryURL );
+				await SimpleGit().clone(
+					pluginConfig.gitRepositoryURL,
+					gitPath,
+					[ '--depth=1', '--no-single-branch' ]
+				);
 				log( `   >> successfully clone into: ${ gitPath }` );
 			}
 		);

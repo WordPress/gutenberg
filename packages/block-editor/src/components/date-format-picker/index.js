@@ -9,8 +9,8 @@ import {
 	ExternalLink,
 	VisuallyHidden,
 	CustomSelectControl,
-	BaseControl,
 	ToggleControl,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 // So that we can illustrate the different formats in the dropdown properly,
@@ -50,14 +50,12 @@ export default function DateFormatPicker( {
 		<fieldset className="block-editor-date-format-picker">
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<ToggleControl
-				label={
-					<>
-						{ __( 'Default format' ) }
-						<span className="block-editor-date-format-picker__default-format-toggle-control__hint">
-							{ dateI18n( defaultFormat, EXAMPLE_DATE ) }
-						</span>
-					</>
-				}
+				__nextHasNoMarginBottom
+				label={ __( 'Default format' ) }
+				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+					defaultFormat,
+					EXAMPLE_DATE
+				) }` }
 				checked={ ! format }
 				onChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )
@@ -80,12 +78,19 @@ function NonDefaultControls( { format, onChange } ) {
 	// formats.
 	const suggestedFormats = [
 		...new Set( [
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			'Y-m-d',
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'n/j/Y', 'short date format' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'n/j/Y g:i A', 'short date format with time' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j, Y', 'medium date format' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j, Y g:i A', 'medium date format with time' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'F j, Y', 'long date format' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j', 'short date format without the year' ),
 		] ),
 	];
@@ -110,31 +115,29 @@ function NonDefaultControls( { format, onChange } ) {
 	);
 
 	return (
-		<>
-			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
-				<CustomSelectControl
-					__nextUnconstrainedWidth
-					label={ __( 'Choose a format' ) }
-					options={ [ ...suggestedOptions, customOption ] }
-					value={
-						isCustom
-							? customOption
-							: suggestedOptions.find(
-									( option ) => option.format === format
-							  ) ?? customOption
+		<VStack>
+			<CustomSelectControl
+				label={ __( 'Choose a format' ) }
+				options={ [ ...suggestedOptions, customOption ] }
+				value={
+					isCustom
+						? customOption
+						: suggestedOptions.find(
+								( option ) => option.format === format
+						  ) ?? customOption
+				}
+				onChange={ ( { selectedItem } ) => {
+					if ( selectedItem === customOption ) {
+						setIsCustom( true );
+					} else {
+						setIsCustom( false );
+						onChange( selectedItem.format );
 					}
-					onChange={ ( { selectedItem } ) => {
-						if ( selectedItem === customOption ) {
-							setIsCustom( true );
-						} else {
-							setIsCustom( false );
-							onChange( selectedItem.format );
-						}
-					} }
-				/>
-			</BaseControl>
+				} }
+			/>
 			{ isCustom && (
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
@@ -145,7 +148,7 @@ function NonDefaultControls( { format, onChange } ) {
 							Link: (
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/formatting-date-and-time/'
+										'https://wordpress.org/documentation/article/customize-date-and-time-format/'
 									) }
 								/>
 							),
@@ -155,6 +158,6 @@ function NonDefaultControls( { format, onChange } ) {
 					onChange={ ( value ) => onChange( value ) }
 				/>
 			) }
-		</>
+		</VStack>
 	);
 }

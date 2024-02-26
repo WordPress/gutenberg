@@ -16,22 +16,46 @@ import { safeHTML } from '@wordpress/dom';
 function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
 	const hasContent = !! originalUndelimitedContent;
-	const hasHTMLBlock = useSelect(
+	const { hasFreeformBlock, hasHTMLBlock } = useSelect(
 		( select ) => {
 			const { canInsertBlockType, getBlockRootClientId } =
 				select( blockEditorStore );
 
-			return canInsertBlockType(
-				'core/html',
-				getBlockRootClientId( clientId )
-			);
+			return {
+				hasFreeformBlock: canInsertBlockType(
+					'core/freeform',
+					getBlockRootClientId( clientId )
+				),
+				hasHTMLBlock: canInsertBlockType(
+					'core/html',
+					getBlockRootClientId( clientId )
+				),
+			};
 		},
 		[ clientId ]
 	);
 
 	const actions = [];
 	let messageHTML;
-	if ( hasContent && hasHTMLBlock ) {
+
+	const convertToHtmlButton = (
+		<Button key="convert" onClick={ convertToHTML } variant="primary">
+			{ __( 'Keep as HTML' ) }
+		</Button>
+	);
+
+	if ( hasContent && ! hasFreeformBlock && ! originalName ) {
+		if ( hasHTMLBlock ) {
+			messageHTML = __(
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'
+			);
+			actions.push( convertToHtmlButton );
+		} else {
+			messageHTML = __(
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, or remove it entirely. Alternatively, you can refresh the page to use the Classic block.'
+			);
+		}
+	} else if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(
@@ -39,11 +63,7 @@ function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 			),
 			originalName
 		);
-		actions.push(
-			<Button key="convert" onClick={ convertToHTML } variant="primary">
-				{ __( 'Keep as HTML' ) }
-			</Button>
-		);
+		actions.push( convertToHtmlButton );
 	} else {
 		messageHTML = sprintf(
 			/* translators: %s: block name */

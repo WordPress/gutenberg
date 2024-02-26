@@ -44,126 +44,17 @@ const restrictedImports = [
 	},
 	{
 		name: 'lodash',
-		importNames: [
-			'camelCase',
-			'capitalize',
-			'castArray',
-			'chunk',
-			'clamp',
-			'cloneDeep',
-			'compact',
-			'concat',
-			'countBy',
-			'debounce',
-			'deburr',
-			'defaults',
-			'defaultTo',
-			'delay',
-			'difference',
-			'differenceWith',
-			'dropRight',
-			'each',
-			'escape',
-			'escapeRegExp',
-			'every',
-			'extend',
-			'filter',
-			'find',
-			'findIndex',
-			'findKey',
-			'findLast',
-			'first',
-			'flatMap',
-			'flatten',
-			'flattenDeep',
-			'flow',
-			'flowRight',
-			'forEach',
-			'fromPairs',
-			'has',
-			'identity',
-			'includes',
-			'invoke',
-			'isArray',
-			'isBoolean',
-			'isEqual',
-			'isFinite',
-			'isFunction',
-			'isMatch',
-			'isNil',
-			'isNumber',
-			'isObject',
-			'isObjectLike',
-			'isPlainObject',
-			'isString',
-			'isUndefined',
-			'keyBy',
-			'keys',
-			'last',
-			'lowerCase',
-			'mapKeys',
-			'maxBy',
-			'memoize',
-			'negate',
-			'noop',
-			'nth',
-			'omit',
-			'omitBy',
-			'once',
-			'orderby',
-			'overEvery',
-			'partial',
-			'partialRight',
-			'pick',
-			'random',
-			'reduce',
-			'reject',
-			'repeat',
-			'reverse',
-			'size',
-			'snakeCase',
-			'some',
-			'sortBy',
-			'startCase',
-			'startsWith',
-			'stubFalse',
-			'stubTrue',
-			'sum',
-			'sumBy',
-			'take',
-			'throttle',
-			'times',
-			'toString',
-			'trim',
-			'truncate',
-			'unionBy',
-			'uniq',
-			'uniqBy',
-			'uniqueId',
-			'uniqWith',
-			'upperFirst',
-			'values',
-			'without',
-			'words',
-			'xor',
-			'zip',
-		],
-		message:
-			'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
+		message: 'Please use native functionality instead.',
 	},
 	{
-		name: 'reakit',
+		name: '@ariakit/react',
 		message:
-			'Please use Reakit API through `@wordpress/components` instead.',
+			'Please use Ariakit API through `@wordpress/components` instead.',
 	},
 	{
 		name: 'redux',
 		importNames: [ 'combineReducers' ],
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
-	},
-	{
-		name: 'puppeteer-testing-library',
-		message: '`puppeteer-testing-library` is still experimental.',
 	},
 	{
 		name: '@emotion/css',
@@ -185,11 +76,6 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
-	{
-		name: '@wordpress/edit-navigation',
-		message:
-			"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
-	},
 ];
 
 module.exports = {
@@ -197,6 +83,7 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
 	globals: {
 		wp: 'off',
@@ -240,6 +127,13 @@ module.exports = {
 						allowTypeImports: true,
 					},
 				],
+			},
+		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
 		],
 		'no-restricted-syntax': [
@@ -349,7 +243,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
 				'react-hooks/exhaustive-deps': 'error',
@@ -357,7 +256,7 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
-			excludedFiles: [ 'test/e2e/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
@@ -367,10 +266,13 @@ module.exports = {
 				'packages/react-native-*/**/*.[tj]s?(x)',
 				'test/native/**/*.[tj]s?(x)',
 				'test/e2e/**/*.[tj]s?(x)',
+				'test/performance/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
+				'plugin:jest/recommended',
 			],
 		},
 		{
@@ -384,9 +286,21 @@ module.exports = {
 		{
 			files: [
 				'test/e2e/**/*.[tj]s',
+				'test/performance/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
-			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-playwright',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./test/performance/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
@@ -408,6 +322,10 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
 			},
 		},
 		{
@@ -432,6 +350,31 @@ module.exports = {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
+						message:
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
 			},
 		},
 		{
@@ -461,6 +404,12 @@ module.exports = {
 						],
 					},
 				],
+			},
+		},
+		{
+			files: [ 'packages/interactivity*/src/**' ],
+			rules: {
+				'react/react-in-jsx-scope': 'error',
 			},
 		},
 	],

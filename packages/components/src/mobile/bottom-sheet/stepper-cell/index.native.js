@@ -144,6 +144,7 @@ class BottomSheetStepperCell extends Component {
 			openUnitPicker,
 			decimalNum,
 			cellContainerStyle,
+			disabled,
 		} = this.props;
 		const { inputValue } = this.state;
 		const isMinValue = value === min;
@@ -215,6 +216,7 @@ class BottomSheetStepperCell extends Component {
 						labelStyle={ labelStyle }
 						leftAlign={ true }
 						separatorType={ separatorType }
+						disabled={ disabled }
 					>
 						<View style={ preview && containerStyle }>
 							{ preview }

@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -74,7 +74,12 @@
 					"description": "Settings related to shadows.",
 					"type": "object",
 					"properties": {
-						"palette": {
+						"defaultPresets": {
+							"description": "Allow users to choose shadows from the default shadow presets.",
+							"type": "boolean",
+							"default": true
+						},
+						"presets": {
 							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
@@ -97,7 +102,8 @@
 								"additionalProperties": false
 							}
 						}
-					}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
@@ -194,7 +200,7 @@
 							}
 						},
 						"link": {
-							"description": "Allow users to set link colors.",
+							"description": "Allow users to set link colors in a block.",
 							"type": "boolean",
 							"default": false
 						},
@@ -222,7 +228,17 @@
 							}
 						},
 						"text": {
-							"description": "Allow users to set text colors.",
+							"description": "Allow users to set text colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"heading": {
+							"description": "Allow users to set heading colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"button": {
+							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
 							"default": true
 						}
@@ -231,12 +247,40 @@
 				}
 			}
 		},
+		"settingsPropertiesBackground": {
+			"type": "object",
+			"properties": {
+				"background": {
+					"description": "Settings related to background.",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Allow users to set a background image.",
+							"type": "boolean",
+							"default": false
+						},
+						"backgroundSize": {
+							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesDimensions": {
+			"type": "object",
 			"properties": {
 				"dimensions": {
 					"description": "Settings related to dimensions.",
 					"type": "object",
 					"properties": {
+						"aspectRatio": {
+							"description": "Allow users to set an aspect ratio.",
+							"type": "boolean",
+							"default": false
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
@@ -259,8 +303,55 @@
 							"type": "string"
 						},
 						"wideSize": {
-							"description": "Sets the max-width of wide (`.alignwide`) content.",
+							"description": "Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes",
 							"type": "string"
+						},
+						"allowEditing": {
+							"description": "Disable the layout UI controls.",
+							"type": "boolean",
+							"default": true
+						},
+						"allowCustomContentAndWideSize": {
+							"description": "Enable or disable the custom content and wide size controls.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesLightbox": {
+			"type": "object",
+			"properties": {
+				"lightbox": {
+					"description": "Settings related to the lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether the lightbox is enabled or not.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesPosition": {
+			"type": "object",
+			"properties": {
+				"position": {
+					"description": "Settings related to position.",
+					"type": "object",
+					"properties": {
+						"sticky": {
+							"description": "Allow users to set sticky position.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -298,7 +389,8 @@
 							"items": {
 								"type": "string"
 							},
-							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ],
+							"minItems": 1
 						},
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
@@ -306,7 +398,7 @@
 							"default": true
 						},
 						"spacingSizes": {
-							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--spacing--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
 								"type": "object",
@@ -328,11 +420,11 @@
 							}
 						},
 						"spacingScale": {
-							"description": "Settings to auto-generate space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Settings to auto-generate space size presets for the space size selector.\nGenerates a custom property (--wp--preset--spacing--{slug}`) per preset value.",
 							"type": "object",
 							"properties": {
 								"operator": {
-									"description": "With + or * depending on whether scale is generated by increment or mulitplier.",
+									"description": "With + or * depending on whether scale is generated by increment or multiplier.",
 									"type": "string",
 									"enum": [ "+", "*" ],
 									"default": "*"
@@ -359,9 +451,31 @@
 										"px",
 										"em",
 										"rem",
-										"vh",
+										"%",
 										"vw",
-										"%"
+										"svw",
+										"lvw",
+										"dvw",
+										"vh",
+										"svh",
+										"lvh",
+										"dvh",
+										"vi",
+										"svi",
+										"lvi",
+										"dvi",
+										"vb",
+										"svb",
+										"lvb",
+										"dvb",
+										"vmin",
+										"svmin",
+										"lvmin",
+										"dvmin",
+										"vmax",
+										"svmax",
+										"lvmax",
+										"dvmax"
 									],
 									"default": "rem"
 								}
@@ -402,7 +516,15 @@
 									"type": "object",
 									"properties": {
 										"minFontSize": {
-											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
+											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, at a minimum, this value.",
+											"type": "string"
+										},
+										"maxViewportWidth": {
+											"description": "Allow users to set custom a max viewport width in px, rem or em, used to set the maximum size boundary of a fluid font size.",
+											"type": "string"
+										},
+										"minViewportWidth": {
+											"description": "Allow users to set a custom min viewport width in px, rem or em, used to set the minimum size boundary of a fluid font size.",
 											"type": "string"
 										}
 									},
@@ -424,10 +546,20 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textColumns": {
+							"description": "Allow users to set the number of text columns.",
+							"type": "boolean",
+							"default": false
+						},
 						"textDecoration": {
 							"description": "Allow users to set custom text decorations.",
 							"type": "boolean",
 							"default": true
+						},
+						"writingMode": {
+							"description": "Allow users to set the writing mode.",
+							"type": "boolean",
+							"default": false
 						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
@@ -458,7 +590,7 @@
 										"type": "string"
 									},
 									"fluid": {
-										"description": "Specifics the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
+										"description": "Specifies the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
 										"oneOf": [
 											{
 												"type": "object",
@@ -488,6 +620,7 @@
 							"type": "array",
 							"items": {
 								"type": "object",
+								"description": "Font family preset",
 								"properties": {
 									"name": {
 										"description": "Name of the font family preset, translatable.",
@@ -505,96 +638,7 @@
 										"description": "Array of font-face declarations.",
 										"type": "array",
 										"items": {
-											"type": "object",
-											"properties": {
-												"fontFamily": {
-													"description": "CSS font-family value.",
-													"type": "string",
-													"default": ""
-												},
-												"fontStyle": {
-													"description": "CSS font-style value.",
-													"type": "string",
-													"default": "normal"
-												},
-												"fontWeight": {
-													"description": "List of available font weights, separated by a space.",
-													"default": "400",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "integer"
-														}
-													]
-												},
-												"fontDisplay": {
-													"description": "CSS font-display value.",
-													"type": "string",
-													"default": "fallback",
-													"enum": [
-														"auto",
-														"block",
-														"fallback",
-														"swap",
-														"optional"
-													]
-												},
-												"src": {
-													"description": "Paths or URLs to the font files.",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "array",
-															"items": {
-																"type": "string"
-															}
-														}
-													],
-													"default": []
-												},
-												"fontStretch": {
-													"description": "CSS font-stretch value.",
-													"type": "string"
-												},
-												"ascentOverride": {
-													"description": "CSS ascent-override value.",
-													"type": "string"
-												},
-												"descentOverride": {
-													"description": "CSS descent-override value.",
-													"type": "string"
-												},
-												"fontVariant": {
-													"description": "CSS font-variant value.",
-													"type": "string"
-												},
-												"fontFeatureSettings": {
-													"description": "CSS font-feature-settings value.",
-													"type": "string"
-												},
-												"fontVariationSettings": {
-													"description": "CSS font-variation-settings value.",
-													"type": "string"
-												},
-												"lineGapOverride": {
-													"description": "CSS line-gap-override value.",
-													"type": "string"
-												},
-												"sizeAdjust": {
-													"description": "CSS size-adjust value.",
-													"type": "string"
-												},
-												"unicodeRange": {
-													"description": "CSS unicode-range value.",
-													"type": "string"
-												}
-											},
-											"required": [ "fontFamily", "src" ],
-											"additionalProperties": false
+											"$ref": "#/definitions/fontFace"
 										}
 									}
 								},
@@ -605,6 +649,92 @@
 					"additionalProperties": false
 				}
 			}
+		},
+		"fontFace": {
+			"type": "object",
+			"properties": {
+				"fontFamily": {
+					"description": "CSS font-family value.",
+					"type": "string",
+					"default": ""
+				},
+				"fontStyle": {
+					"description": "CSS font-style value.",
+					"type": "string",
+					"default": "normal"
+				},
+				"fontWeight": {
+					"description": "List of available font weights, separated by a space.",
+					"default": "400",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "integer"
+						}
+					]
+				},
+				"fontDisplay": {
+					"description": "CSS font-display value.",
+					"type": "string",
+					"default": "fallback",
+					"enum": [ "auto", "block", "fallback", "swap", "optional" ]
+				},
+				"src": {
+					"description": "Paths or URLs to the font files.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					],
+					"default": []
+				},
+				"fontStretch": {
+					"description": "CSS font-stretch value.",
+					"type": "string"
+				},
+				"ascentOverride": {
+					"description": "CSS ascent-override value.",
+					"type": "string"
+				},
+				"descentOverride": {
+					"description": "CSS descent-override value.",
+					"type": "string"
+				},
+				"fontVariant": {
+					"description": "CSS font-variant value.",
+					"type": "string"
+				},
+				"fontFeatureSettings": {
+					"description": "CSS font-feature-settings value.",
+					"type": "string"
+				},
+				"fontVariationSettings": {
+					"description": "CSS font-variation-settings value.",
+					"type": "string"
+				},
+				"lineGapOverride": {
+					"description": "CSS line-gap-override value.",
+					"type": "string"
+				},
+				"sizeAdjust": {
+					"description": "CSS size-adjust value.",
+					"type": "string"
+				},
+				"unicodeRange": {
+					"description": "CSS unicode-range value.",
+					"type": "string"
+				}
+			},
+			"required": [ "fontFamily", "src" ],
+			"additionalProperties": false
 		},
 		"settingsPropertiesCustom": {
 			"type": "object",
@@ -618,10 +748,14 @@
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBackground" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
+				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
 				{ "$ref": "#/definitions/settingsPropertiesCustom" }
@@ -636,10 +770,14 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"background": {},
 						"border": {},
-						"shadow": {},
 						"color": {},
+						"dimensions": {},
 						"layout": {},
+						"lightbox": {},
+						"position": {},
+						"shadow": {},
 						"spacing": {},
 						"typography": {},
 						"custom": {}
@@ -652,9 +790,7 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"type": "object",
-					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
-					"additionalProperties": false
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -666,35 +802,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"type": "object",
-					"allOf": [
-						{
-							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
-						},
-						{
-							"type": "object",
-							"properties": {
-								"border": {
-									"description": "Settings related to borders.\nGutenberg plugin required.",
-									"type": "object",
-									"properties": {
-										"radius": {
-											"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
-											"type": "boolean",
-											"default": false
-										}
-									}
-								}
-							}
-						},
-						{ "$ref": "#/definitions/settingsPropertiesColor" },
-						{ "$ref": "#/definitions/settingsPropertiesLayout" },
-						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
-						{
-							"$ref": "#/definitions/settingsPropertiesTypography"
-						},
-						{ "$ref": "#/definitions/settingsPropertiesCustom" }
-					]
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -714,6 +822,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -729,13 +840,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/embed": {
@@ -774,6 +903,9 @@
 				"core/list": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -792,10 +924,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/paragraph": {
@@ -804,7 +942,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments-count": {
@@ -837,6 +981,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -847,6 +994,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query-pagination": {
@@ -865,6 +1015,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/rss": {
@@ -1253,6 +1406,34 @@
 					},
 					"additionalProperties": false
 				},
+				"dimensions": {
+					"description": "Dimensions styles",
+					"type": "object",
+					"properties": {
+						"aspectRatio": {
+							"description": "Sets the `aspect-ratio` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"minHeight": {
+							"description": "Sets the `min-height` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					}
+				},
 				"spacing": {
 					"description": "Spacing styles.",
 					"type": "object",
@@ -1443,8 +1624,23 @@
 								}
 							]
 						},
+						"textColumns": {
+							"description": "Sets the `column-count` CSS property.",
+							"type": "string"
+						},
 						"textDecoration": {
 							"description": "Sets the `text-decoration` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"writingMode": {
+							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
 								{
 									"type": "string"
@@ -1564,6 +1760,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
@@ -1605,6 +1802,12 @@
 								},
 								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":any-link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
 							"additionalProperties": false
@@ -1633,6 +1836,12 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":visited": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
@@ -1706,6 +1915,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1721,13 +1933,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/embed": {
@@ -1766,6 +1996,9 @@
 				"core/list": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1784,10 +2017,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
@@ -1796,7 +2035,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-comments-count": {
@@ -1829,6 +2074,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1839,6 +2087,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query-pagination": {
@@ -1857,6 +2108,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/rss": {
@@ -1940,6 +2194,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
@@ -1948,11 +2203,22 @@
 						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						},
+						"variations": {
+							"$ref": "#/definitions/stylesVariationPropertiesComplete"
 						}
 					},
 					"additionalProperties": false
 				}
 			]
+		},
+		"stylesVariationPropertiesComplete": {
+			"type": "object",
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
 		}
 	},
 	"type": "object",
@@ -1970,6 +2236,10 @@
 			"type": "string",
 			"description": "Title of the global styles variation. If not defined, the file name will be used."
 		},
+		"description": {
+			"type": "string",
+			"description": "Description of the global styles variation."
+		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
@@ -1983,12 +2253,16 @@
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
+						"background": {},
 						"color": {},
 						"layout": {},
+						"lightbox": {},
 						"spacing": {},
 						"typography": {},
 						"border": {},
 						"shadow": {},
+						"position": {},
+						"dimensions": {},
 						"custom": {},
 						"blocks": {
 							"description": "Settings defined on a per-block basis.",

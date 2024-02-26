@@ -49,7 +49,6 @@ const legacyData = {
 			},
 			editorMode: 'text',
 			hiddenBlockTypes: [ 'core/heading', 'core/list' ],
-			preferredStyleVariations: { 'core/quote': 'plain' },
 			localAutosaveInterval: 15,
 		},
 	},
@@ -114,9 +113,6 @@ const alreadyConvertedData = {
 				fullscreenMode: false,
 				hiddenBlockTypes: [ 'core/audio', 'core/cover' ],
 				editorMode: 'visual',
-				preferredStyleVariations: {
-					'core/quote': 'large',
-				},
 				inactivePanels: [],
 				openPanels: [ 'post-status' ],
 				complementaryArea: 'edit-post/block',
@@ -137,49 +133,46 @@ const alreadyConvertedData = {
 describe( 'convertLegacyData', () => {
 	it( 'converts to the expected format', () => {
 		expect( convertLegacyData( legacyData ) ).toMatchInlineSnapshot( `
-		Object {
-		  "core/customize-widgets": Object {
+		{
+		  "core/customize-widgets": {
 		    "fixedToolbar": true,
 		    "keepCaretInsideBlock": true,
 		    "welcomeGuide": false,
 		  },
-		  "core/edit-post": Object {
+		  "core/edit-post": {
 		    "complementaryArea": "edit-post/document",
 		    "editorMode": "text",
 		    "fixedToolbar": true,
-		    "hiddenBlockTypes": Array [
+		    "hiddenBlockTypes": [
 		      "core/heading",
 		      "core/list",
 		    ],
-		    "inactivePanels": Array [
+		    "inactivePanels": [
 		      "post-excerpt",
 		    ],
-		    "openPanels": Array [
+		    "openPanels": [
 		      "post-status",
 		      "taxonomy-panel-category",
 		    ],
-		    "pinnedItems": Object {
+		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
-		    },
-		    "preferredStyleVariations": Object {
-		      "core/quote": "plain",
 		    },
 		    "welcomeGuide": false,
 		  },
-		  "core/edit-site": Object {
+		  "core/edit-site": {
 		    "complementaryArea": "edit-site/global-styles",
 		    "fixedToolbar": true,
 		    "focusMode": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },
-		  "core/edit-widgets": Object {
+		  "core/edit-widgets": {
 		    "complementaryArea": "edit-widgets/block-areas",
 		    "fixedToolbar": true,
 		    "keepCaretInsideBlock": true,
 		    "welcomeGuide": false,
 		  },
-		  "third-party-plugin": Object {
+		  "third-party-plugin": {
 		    "thirdPartyFeature": true,
 		  },
 		}
@@ -189,35 +182,32 @@ describe( 'convertLegacyData', () => {
 	it( 'retains already converted data', () => {
 		expect( convertLegacyData( alreadyConvertedData ) )
 			.toMatchInlineSnapshot( `
-		Object {
-		  "core/edit-post": Object {
+		{
+		  "core/edit-post": {
 		    "complementaryArea": "edit-post/block",
 		    "editorMode": "visual",
 		    "fixedToolbar": true,
 		    "fullscreenMode": false,
-		    "hiddenBlockTypes": Array [
+		    "hiddenBlockTypes": [
 		      "core/audio",
 		      "core/cover",
 		    ],
-		    "inactivePanels": Array [],
-		    "openPanels": Array [
+		    "inactivePanels": [],
+		    "openPanels": [
 		      "post-status",
 		    ],
-		    "pinnedItems": Object {
+		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
-		    },
-		    "preferredStyleVariations": Object {
-		      "core/quote": "large",
 		    },
 		    "welcomeGuide": false,
 		  },
-		  "core/edit-site": Object {
+		  "core/edit-site": {
 		    "complementaryArea": "edit-site/global-styles",
 		    "fixedToolbar": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },
-		  "core/edit-widgets": Object {
+		  "core/edit-widgets": {
 		    "complementaryArea": "edit-widgets/block-areas",
 		    "fixedToolbar": true,
 		    "showBlockBreadcrumbs": false,

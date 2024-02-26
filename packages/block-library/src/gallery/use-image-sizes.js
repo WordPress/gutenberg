@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
 
 /**
  * Calculates the image sizes that are avaible for the current gallery images in order to
- * populate the 'Image size' selector.
+ * populate the 'Resolution' selector.
  *
  * @param {Array}    images      Basic image block data taken from current gallery innerBlock
  * @param {boolean}  isSelected  Is the block currently selected in the editor.
@@ -35,17 +30,9 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 				}
 
 				const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-					const defaultUrl = get( img, [
-						'sizes',
-						size.slug,
-						'url',
-					] );
-					const mediaDetailsUrl = get( img, [
-						'media_details',
-						'sizes',
-						size.slug,
-						'source_url',
-					] );
+					const defaultUrl = img.sizes?.[ size.slug ]?.url;
+					const mediaDetailsUrl =
+						img.media_details?.sizes?.[ size.slug ]?.source_url;
 					return {
 						...currentSizes,
 						[ size.slug ]: defaultUrl || mediaDetailsUrl,

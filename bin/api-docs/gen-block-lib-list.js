@@ -155,14 +155,20 @@ function readBlockJSON( filename ) {
 			? processObjWithInnerKeys( augmentSupports( blockjson.supports ) )
 			: [];
 	const attributes = getTruthyKeys( blockjson.attributes );
+	const parent = blockjson.parent
+		? '\n' + `-	**Parent:** ${ blockjson.parent.join( ', ' ) }`
+		: '';
+	const experimental = blockjson.__experimental
+		? '\n' + `-	**Experimental:** ${ blockjson.__experimental }`
+		: '';
 
 	return `
 ## ${ blockjson.title }
 
 ${ blockjson.description } ([Source](${ sourcefile }))
 
--	**Name:** ${ blockjson.name }
--	**Category:** ${ blockjson.category }
+-	**Name:** ${ blockjson.name }${ experimental }
+-	**Category:** ${ blockjson.category }${ parent }
 -	**Supports:** ${ supportsList.sort().join( ', ' ) }
 -	**Attributes:** ${ attributes.sort().join( ', ' ) }
 `;

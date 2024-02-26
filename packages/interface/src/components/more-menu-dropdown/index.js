@@ -28,7 +28,7 @@ export default function MoreMenuDropdown( {
 			icon={ moreVertical }
 			label={ label }
 			popoverProps={ {
-				position: 'bottom left',
+				placement: 'bottom-end',
 				...popoverProps,
 				className: classnames(
 					'interface-more-menu-dropdown__content',
@@ -38,6 +38,7 @@ export default function MoreMenuDropdown( {
 			toggleProps={ {
 				tooltipPosition: 'bottom',
 				...toggleProps,
+				size: 'compact',
 			} }
 		>
 			{ ( onClose ) => children( onClose ) }

@@ -6,18 +6,6 @@
  */
 
 /**
- * Get the class name used on block level presets.
- *
- * @access private
- *
- * @param array $block Block object.
- * @return string      The unique class name.
- */
-function _gutenberg_get_presets_class_name( $block ) {
-	return 'wp-settings-' . md5( serialize( $block ) );
-}
-
-/**
  * Update the block content with block level presets class name.
  *
  * @access private
@@ -38,34 +26,19 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 	}
 
 	// return early if no settings are found on the block attributes.
-	$block_settings = _wp_array_get( $block, array( 'attrs', 'settings' ), null );
+	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
 		return $block_content;
 	}
 
-	$class_name = _gutenberg_get_presets_class_name( $block );
-
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
-	// Retrieve the opening tag of the first HTML element.
-	$html_element_matches = array();
-	preg_match( '/<[^>]+>/', $block_content, $html_element_matches, PREG_OFFSET_CAPTURE );
-	$first_element = $html_element_matches[0][0];
-	// If the first HTML element has a class attribute just add the new class
-	// as we do on layout and duotone.
-	if ( strpos( $first_element, 'class="' ) !== false ) {
-		$content = preg_replace(
-			'/' . preg_quote( 'class="', '/' ) . '/',
-			'class="' . $class_name . ' ',
-			$block_content,
-			1
-		);
-	} else {
-		// If the first HTML element has no class attribute we should inject the attribute before the attribute at the end.
-		$first_element_offset = $html_element_matches[0][1];
-		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
+	// Add the class name to the first element, presuming it's the wrapper, if it exists.
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+	if ( $tags->next_tag() ) {
+		$tags->add_class( _wp_get_presets_class_name( $block ) );
 	}
 
-	return $content;
+	return $tags->get_updated_html();
 }
 
 /**
@@ -86,12 +59,12 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	}
 
 	// return early if no settings are found on the block attributes.
-	$block_settings = _wp_array_get( $block, array( 'attrs', 'settings' ), null );
+	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
 		return null;
 	}
 
-	$class_name = '.' . _gutenberg_get_presets_class_name( $block );
+	$class_name = '.' . _wp_get_presets_class_name( $block );
 
 	// the root selector for preset variables needs to target every possible block selector
 	// in order for the general setting to override any bock specific setting of a parent block or
@@ -100,14 +73,17 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	$registry                = WP_Block_Type_Registry::get_instance();
 	$blocks                  = $registry->get_all_registered();
 	foreach ( $blocks as $block_type ) {
-		if (
-			isset( $block_type->supports['__experimentalSelector'] ) &&
-			is_string( $block_type->supports['__experimentalSelector'] )
-		) {
-			$variables_root_selector .= ',' . $block_type->supports['__experimentalSelector'];
+		// We only want to append selectors for block's using custom selectors
+		// i.e. not `wp-block-<name>`.
+		$has_custom_selector =
+			( isset( $block_type->supports['__experimentalSelector'] ) && is_string( $block_type->supports['__experimentalSelector'] ) ) ||
+			( isset( $block_type->selectors['root'] ) && is_string( $block_type->selectors['root'] ) );
+
+		if ( $has_custom_selector ) {
+			$variables_root_selector .= ',' . wp_get_block_css_selector( $block_type );
 		}
 	}
-	$variables_root_selector = WP_Theme_JSON_6_1::scope_selector( $class_name, $variables_root_selector );
+	$variables_root_selector = WP_Theme_JSON_Gutenberg::scope_selector( $class_name, $variables_root_selector );
 
 	// Remove any potentially unsafe styles.
 	$theme_json_shape  = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
@@ -130,7 +106,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 		)
 	);
 
-	// include preset css classes on the the stylesheet.
+	// include preset css classes on the stylesheet.
 	$styles .= $theme_json_object->get_stylesheet(
 		array( 'presets' ),
 		null,
@@ -141,11 +117,18 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	);
 
 	if ( ! empty( $styles ) ) {
-		gutenberg_enqueue_block_support_styles( $styles );
+		/*
+		 * This method is deprecated since WordPress 6.2.
+		 * We could enqueue these styles separately,
+		 * or print them out with other settings presets.
+		 */
+		wp_enqueue_block_support_styles( $styles );
 	}
 
 	return null;
 }
-
+// Remove WordPress core filter to avoid rendering duplicate settings style blocks.
+remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10, 2 );
+remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10, 2 );
 add_filter( 'render_block', '_gutenberg_add_block_level_presets_class', 10, 2 );
 add_filter( 'pre_render_block', '_gutenberg_add_block_level_preset_styles', 10, 2 );

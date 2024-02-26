@@ -19,7 +19,7 @@
 const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const filenamify = require( 'filenamify' );
-const NodeEnvironment = require( 'jest-environment-node' );
+const NodeEnvironment = require( 'jest-environment-node' ).default;
 const chalk = require( 'chalk' );
 
 /**
@@ -42,21 +42,13 @@ const KEYS = {
 	ENTER: '\r',
 };
 
-const root = process.env.GITHUB_WORKSPACE || process.cwd();
-const ARTIFACTS_PATH = path.resolve(
-	root,
-	process.env.WP_ARTIFACTS_PATH || 'artifacts'
-);
+const { WP_ARTIFACTS_PATH } = process.env;
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
 	// the setTimeout function, see https://github.com/facebook/jest/blob/v23.1.0/packages/jest-runtime/src/index.js#L823
 	setTimeout( timeout ) {
-		if ( this.global.jasmine ) {
-			this.global.jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
-		} else {
-			this.global[ Symbol.for( 'TEST_TIMEOUT_SYMBOL' ) ] = timeout;
-		}
+		this.global[ Symbol.for( 'TEST_TIMEOUT_SYMBOL' ) ] = timeout;
 	}
 
 	async setup() {
@@ -176,7 +168,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		await this.global.jestPuppeteer.resetBrowser();
 
 		try {
-			await mkdir( ARTIFACTS_PATH, { recursive: true } );
+			await mkdir( WP_ARTIFACTS_PATH, { recursive: true } );
 		} catch ( err ) {
 			if ( err.code !== 'EEXIST' ) {
 				throw err;
@@ -210,11 +202,11 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			replacement: '-',
 		} );
 		await writeFile(
-			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
+			path.join( WP_ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
 			await this.global.page.content()
 		);
 		await this.global.page.screenshot( {
-			path: path.join( ARTIFACTS_PATH, `${ fileName }.jpg` ),
+			path: path.join( WP_ARTIFACTS_PATH, `${ fileName }.jpg` ),
 		} );
 	}
 

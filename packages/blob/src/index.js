@@ -1,9 +1,4 @@
 /**
- * Browser dependencies
- */
-const { createObjectURL, revokeObjectURL } = window.URL;
-
-/**
  * @type {Record<string, File|undefined>}
  */
 const cache = {};
@@ -16,7 +11,7 @@ const cache = {};
  * @return {string} The blob URL.
  */
 export function createBlobURL( file ) {
-	const url = createObjectURL( file );
+	const url = window.URL.createObjectURL( file );
 
 	cache[ url ] = file;
 
@@ -56,7 +51,7 @@ export function getBlobTypeByURL( url ) {
  */
 export function revokeBlobURL( url ) {
 	if ( cache[ url ] ) {
-		revokeObjectURL( url );
+		window.URL.revokeObjectURL( url );
 	}
 
 	delete cache[ url ];
@@ -65,7 +60,7 @@ export function revokeBlobURL( url ) {
 /**
  * Check whether a url is a blob url.
  *
- * @param {string} url The URL.
+ * @param {string|undefined} url The URL.
  *
  * @return {boolean} Is the url a blob url?
  */
@@ -74,4 +69,44 @@ export function isBlobURL( url ) {
 		return false;
 	}
 	return url.indexOf( 'blob:' ) === 0;
+}
+
+/**
+ * Downloads a file, e.g., a text or readable stream, in the browser.
+ * Appropriate for downloading smaller file sizes, e.g., < 5 MB.
+ *
+ * Example usage:
+ *
+ * ```js
+ * 	const fileContent = JSON.stringify(
+ * 		{
+ * 			"title": "My Post",
+ * 		},
+ * 		null,
+ * 		2
+ * 	);
+ * 	const filename = 'file.json';
+ *
+ * 	downloadBlob( filename, fileContent, 'application/json' );
+ * ```
+ *
+ * @param {string}   filename    File name.
+ * @param {BlobPart} content     File content (BufferSource | Blob | string).
+ * @param {string}   contentType (Optional) File mime type. Default is `''`.
+ */
+export function downloadBlob( filename, content, contentType = '' ) {
+	if ( ! filename || ! content ) {
+		return;
+	}
+
+	const file = new window.Blob( [ content ], { type: contentType } );
+	const url = window.URL.createObjectURL( file );
+	const anchorElement = document.createElement( 'a' );
+	anchorElement.href = url;
+	anchorElement.download = filename;
+	anchorElement.style.display = 'none';
+	document.body.appendChild( anchorElement );
+	anchorElement.click();
+	document.body.removeChild( anchorElement );
+	window.URL.revokeObjectURL( url );
 }

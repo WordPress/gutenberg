@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -10,23 +9,23 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlocksManageButton from './reusable-blocks-manage-button';
 
-function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
+export default function ReusableBlocksMenuItems( { rootClientId } ) {
 	return (
-		<>
-			<ReusableBlockConvertButton
-				clientIds={ clientIds }
-				rootClientId={ rootClientId }
-			/>
-			{ clientIds.length === 1 && (
-				<ReusableBlocksManageButton clientId={ clientIds[ 0 ] } />
+		<BlockSettingsMenuControls>
+			{ ( { onClose, selectedClientIds } ) => (
+				<>
+					<ReusableBlockConvertButton
+						clientIds={ selectedClientIds }
+						rootClientId={ rootClientId }
+						onClose={ onClose }
+					/>
+					{ selectedClientIds.length === 1 && (
+						<ReusableBlocksManageButton
+							clientId={ selectedClientIds[ 0 ] }
+						/>
+					) }
+				</>
 			) }
-		</>
+		</BlockSettingsMenuControls>
 	);
 }
-
-export default withSelect( ( select ) => {
-	const { getSelectedBlockClientIds } = select( blockEditorStore );
-	return {
-		clientIds: getSelectedBlockClientIds(),
-	};
-} )( ReusableBlocksMenuItems );

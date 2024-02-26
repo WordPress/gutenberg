@@ -19,7 +19,7 @@ import { forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
@@ -226,7 +226,9 @@ function InputField(
 			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
 			inputSize={ size }
-			value={ value }
+			// Fallback to `''` to avoid "uncontrolled to controlled" warning.
+			// See https://github.com/WordPress/gutenberg/pull/47250 for details.
+			value={ value ?? '' }
 			type={ type }
 		/>
 	);

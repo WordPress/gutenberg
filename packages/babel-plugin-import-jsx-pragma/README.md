@@ -38,7 +38,7 @@ _Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/b
 
 As the `@babel/plugin-transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
 
-For example, if you are using the `@wordpress/element` package, you may want to use the following configuration:
+For example, if you are using the `react` package, you may want to use the following configuration:
 
 ```js
 // .babelrc.js
@@ -49,7 +49,7 @@ module.exports = {
 			{
 				scopeVariable: 'createElement',
 				scopeVariableFrag: 'Fragment',
-				source: '@wordpress/element',
+				source: 'react',
 				isDefault: false,
 			},
 		],

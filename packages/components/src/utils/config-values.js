@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { space } from '../ui/utils/space';
+import { space } from './space';
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '36px';
@@ -9,14 +9,14 @@ const CONTROL_PADDING_X = '12px';
 
 const CONTROL_PROPS = {
 	controlSurfaceColor: COLORS.white,
-	controlTextActiveColor: COLORS.ui.theme,
+	controlTextActiveColor: COLORS.theme.accent,
 	controlPaddingX: CONTROL_PADDING_X,
 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
 	controlBackgroundColor: COLORS.white,
 	controlBorderRadius: '2px',
 	controlBoxShadow: 'transparent',
-	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
+	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
@@ -67,6 +67,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	cardPaddingSmall: `${ space( 4 ) }`,
 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+	popoverShadow: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
 	surfaceBackgroundColor: COLORS.white,
 	surfaceBackgroundSubtleColor: '#F3F3F3',
 	surfaceBackgroundTintColor: '#F5F5F5',

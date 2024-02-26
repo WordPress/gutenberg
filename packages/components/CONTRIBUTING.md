@@ -7,7 +7,7 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
 For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
-
+- [Introducing new components](#introducing-new-components)
 - [Compatibility](#compatibility)
 - [Compound components](#compound-components)
 - [Components & Hooks](#components--hooks)
@@ -19,7 +19,71 @@ For an example of a component that follows these requirements, take a look at [`
 - [Documentation](#documentation)
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
-- [TypeScript migration guide](#refactoring-a-component-to-typescript)
+- [Component versioning](#component-versioning)
+
+## Introducing new components
+
+### Does it belong in the component library?
+
+A component library should include components that are generic and flexible enough to work across a variety of products. It should include what’s shared across many products and omit what’s not.
+
+To determine if a component should be added, ask yourself:
+
+-   Could this component be used by other products/plugins?
+-   Does the new component overlap (in functionality or visual design) with any existing components?
+-   How much effort will be required to make and maintain?
+-   Is there a clear purpose for the component?
+
+Here’s a flowchart that can help determine if a new component is necessary:
+
+[![New component flowchart](https://wordpress.org/gutenberg/files/2019/07/New_component_flowchart.png)](https://coggle.it/diagram/WtUSrld3uAYZHsn-/t/new-ui-component/992b38cbe685d897b4aec6d0dd93cc4b47c06e0d4484eeb0d7d9a47fb2c48d94)
+
+### First steps
+
+If you have a component you'd like added or changed, start by opening a GitHub issue. Include a detailed description in which you:
+
+-   Explain the rationale
+-   Detail the intended behavior
+-   Clarify whether it’s a variation of an existing component, or a new asset
+-   Include mockups of any fidelity (optional)
+-   Include any inspirations from other products (optional)
+
+This issue will be used to discuss the proposed changes and track progress. Reviewers start by discussing the proposal to determine if it's appropriate for WordPress Components, or if there's overlap with an existing component.
+
+It’s encouraged to surface works-in-progress. If you’re not able to complete all of the parts yourself, someone in the community may be able to pick up where you left off.
+
+### Next steps
+
+Once the team has discussed and approved the change, it's time to start implementing it.
+
+1. **Provide a rationale**: Explain how your component will add value to the system and the greater product ecosystem. Be sure to include any user experience and interaction descriptions.
+2. **Draft documentation**: New components need development, design, and accessibility guidelines. Additionally, if your change adds additional behavior or expands a component’s features, those changes will need to be fully documented as well. Read through existing component documentation for examples. Start with a rough draft, and reviewers will help polish documentation.
+3. **Provide working code**: The component or enhancement must be built in React. See the [developer contribution guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/README.md).
+4. **Create a design spec**: Create sizing and styling annotations for all aspects of the component. This spec should provide a developer with everything they need to create the design in code. [Figma automatically does this for you](https://help.figma.com/article/32-developer-handoff).
+
+Remember, it’s unlikely that all parts will be done by one person. Contribute where you can, and others will help.
+
+### Component refinement
+
+Before a component is published it will need to be fine-tuned:
+
+1. **Expand** the features of the component to a minimum. Agree on what features should be included.
+2. **Reduce** scope and leave off features lacking consensus.
+3. **Quality assurance**: each contribution must adhere to system standards.
+
+#### Quality assurance
+
+To ensure quality, each component should be tested. The testing process should be done during the development of the component and before the component is published.
+
+-   **Accessibility**: Has the design and implementation accounted for accessibility? Please use the [WordPress accessibility guidelines](https://make.wordpress.org/accessibility/handbook/best-practices/). You must use the "Needs Accessibility Feedback" label and get a review from the accessibility team. It's best to request a review early (at the documentation stage) in order to ensure the component is designed inclusively from the outset.
+-   **Visual quality**: Does the component apply visual style — color, typography, icons, space, borders, and more — using appropriate variables, and does it follow [visual guidelines](https://make.wordpress.org/design/handbook/design-guide/)? You must use the "Needs Design Feedback" label and get a review from the design team.
+-   **Documentation**: Ensure that the component has proper documentation for development, design, and accessibility.
+-   **Sufficient states & variations**: Does it cover all the necessary variations (primary, secondary, dense, etc.) and states (default, hover, active, disabled, loading, etc.), within the intended scope?
+-   **Functionality**: Do all behaviors function as expected?
+-   **Responsiveness**: Does it incorporate responsive behaviors as needed? Is the component designed from a mobile-first perspective? Do all touch interactions work as expected?
+-   **Content resilience**: Is each dynamic word or image element resilient to too much, too little, and no content at all, respectively? How long can labels be, and what happens when you run out of space?
+-   **Composability**: Does it fit well when placed next to or layered with other components to form a larger composition?
+-   **Browser support**: Has the component visual quality and accuracy been checked across Safari, Chrome, Firefox, IE, etc? Please adhere to our [browser support requirements](https://github.com/WordPress/gutenberg/blob/HEAD/packages/browserslist-config/index.js).
 
 ## Compatibility
 
@@ -174,7 +238,63 @@ TDB -->
 
 ## TypeScript
 
-We strongly encourage using TypeScript for all new components. Components should be typed using the `WordPressComponent` type.
+We strongly encourage using TypeScript for all new components.
+
+Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package:
+
+```ts
+type NumberControlProps = Omit<
+	InputControlProps,
+	'isDragEnabled' | 'min' | 'max'
+> & {
+	/* Additional props specific to NumberControl */
+};
+```
+
+Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate:
+
+```ts
+/**
+ * Renders with elevation styles (box shadow).
+ *
+ * @default false
+ * @deprecated
+ */
+isElevated?: boolean;
+```
+
+Prefer `unknown` to `any`, and in general avoid it when possible.
+
+If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
+
+```ts
+import type { WordPressComponentProps } from '../context';
+import type { ComponentOwnProps } from './types';
+
+function UnconnectedMyComponent(
+	// The resulting type will include:
+	// - all props defined in `ComponentOwnProps`
+	// - all HTML props/attributes from the component specified as the second
+	//   parameter (`div` in this example)
+	// - the special `as` prop (which marks the component as polymorphic),
+	//   unless the third parameter is `false`
+	props:  WordPressComponentProps< ComponentOwnProps, 'div', true >
+) { /* ... */ }
+```
+
+### Considerations for the docgen
+
+Make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
+
+```js
+function UnconnectedMyComponent() { /* ... */ }
+
+// 👇 Without this named export, the docgen will not work!
+export const MyComponent = contextConnect( UnconnectedMyComponent, 'MyComponent' );
+export default MyComponent;
+```
+
+On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
 
 <!-- TODO: add to the previous paragraph once the composision section gets added to this document.
 (more details about polymorphism can be found above in the "Components composition" section). -->
@@ -263,7 +383,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card/hook.ts`
 //=========================================================================
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem } from '../../context';
 
 export function useCard( props ) {
 	// Read any derived registered prop from the Context System in the `Card` namespace
@@ -277,7 +397,7 @@ export function useCard( props ) {
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card/component.ts`
 //=========================================================================
-import { contextConnect, ContextSystemProvider } from '../../ui/context';
+import { contextConnect, ContextSystemProvider } from '../../context';
 
 function Card( props, forwardedRef ) {
 	const {
@@ -314,7 +434,7 @@ export default ConnectedCard;
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card-body/hook.ts`
 //=========================================================================
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem } from '../../context';
 
 export function useCardBody( props ) {
 	// Read any derived registered prop from the Context System in the `CardBody` namespace.
@@ -361,7 +481,7 @@ Primary.args = {
 };
 ```
 
-A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
+A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
 The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.tsx)).
 
@@ -473,105 +593,73 @@ component-family-name/
 └── utils.ts
 ```
 
-## Refactoring a component to TypeScript
+## Component versioning
 
-*Note: This section assumes that the local developer environment is set up correctly, including TypeScript linting. We also strongly recommend using an IDE that supports TypeScript.*
+As the needs of the package evolve with time, sometimes we may opt to fully rewrite an existing component — either to introduce substantial changes, support new features, or swap the implementation details.
 
-Given a component folder (e.g. `packages/components/src/unit-control`):
+### Glossary
 
-1. Remove the folder from the exclude list in `tsconfig.json`, if it isn’t already.
-2. Remove any `// @ts-nocheck` comments in the folder, if any.
-3. Rename `*.js{x}` files to `*.ts{x}` (except stories and unit tests).
-4. Run `npm run dev` and take note of all the errors (your IDE should also flag them).
-5. Since we want to focus on one component’s folder at the time, if any errors are coming from files outside of the folder that is being refactored, there are two potential approaches:
-	1. Following those same guidelines, refactor those dependencies first.
-		1. Ideally, start from the “leaf” of the dependency tree and slowly work your way up the chain.
-		2. Resume work on this component once all dependencies have been refactored.
-	2. Alternatively:
-		1. For each of those files, add `// @ts-nocheck` at the start of the file.
-		2. If the components in the ignored files are destructuring props directly from the function's arguments, move the props destructuring to the function's body (this is to avoid TypeScript errors from trying to infer the props type):
+Here is some terminology that will be used in the upcoming sections:
 
-			```jsx
-			// Before:
-			function MyComponent( { myProp1, myProp2, ...restProps } ) { /* ... */ }
+- "Legacy" component: the version(s) of the component that existsted on `trunk` before the rewrite;
+- API surface: the component's public APIs. It includes the list of components (and sub-components) exported from the package, their props, any associated React context. It does not include internal classnames and internal DOM structure of the components.
 
-			// After:
-			function MyComponent( props ) {
-				const {  myProp1, myProp2, ...restProps } = props;
+### Approaches
 
-				/* ... */
-			}
-			```
+We identified two approaches to the task.
 
-		3. Remove the folders from the exclude list in the `tsconfig.json` file.
-		4. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
-		5. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
-6. Create a new `types.ts` file.
-7. Slowly work your way through fixing the TypeScript errors in the folder:
-	1. Try to avoid introducing any runtime changes, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
-	2. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
-	3. Use existing HTML types when possible? (e.g. `required` for an input field?)
-	4. Use the `CSSProperties` type where it makes sense.
-	5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
-	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
+#### Swap the implementation, keep the same API surface
 
-		```tsx
-		import type { WordPressComponentProps } from '../ui/context';
-		import type { ComponentOwnProps } from './types';
+One possible approach is to keep the existing API surface and only swap the internal implementation of the component.
 
-		function UnconnectedMyComponent(
-			// The resulting type will include:
-			// - all props defined in `ComponentOwnProps`
-			// - all HTML props/attributes from the component specified as the second
-			//   parameter (`div` in this example)
-			// - the special `as` prop (which marks the component as polymorphic),
-			//   unless the third parameter is `false`
-			props:  WordPressComponentProps< ComponentOwnProps, 'div', true >
-		) { /* ... */ }
-		```
+This is by far the simplest approach, since it doesn't involve making changes to the API surface.
 
-	7. As shown in the previous examples, make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
+If the existing API surface is not a good fit for the new implementation, or if it is not possible (or simply not desirable) to preserve backward compatibility with the existing implementation, there is another approach that can be used.
 
-		```jsx
-		function UnconnectedMyComponent() { /* ... */ }
+#### Create a new component (or component family)
 
-		// 👇 Without this named export, the docgen will not work!
-		export const MyComponent = contextConnect( UnconnectedMyComponent, 'MyComponent' );
-		export default MyComponent;
-		```
+This second approach involves creating a new, separate version (ie. export) of the component. Having two separate exports will help to keep the package tree-shakeable, and it will make it easier to potentially deprecated and remove the legacy component.
 
-	8. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
-	9. Prefer `unknown` to `any`, and in general avoid it when possible.
-8. On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
-9. Make sure that:
-	1. tests still pass;
-	2. storybook examples work as expected.
-	3. the component still works as expected in its usage in Gutenberg;
-	4. the JSDocs comments on `types.ts` and README docs are aligned.
-10. Convert Storybook examples to TypeScript (and from knobs to controls, if necessary) ([example](https://github.com/WordPress/gutenberg/pull/39320)).
-	1. Update all consumers of the component to potentially extend the newly added types (e.g. make `UnitControl` props extend `NumberControl` props after `NumberControl` types are made available).
-	2. Rename Story extension from `.js` to `.tsx`.
-	3. Rewrite the `meta` story object, and export it as default. In particular, make sure you add the following settings under the `parameters` key:
+If possible, the legacy version of the component should be rewritten so that it uses the same underlying implementation of the new version, with an extra API "translation" layer to adapt the legacy API surface to the new API surface, e.g:
 
-		```tsx
-		const meta: ComponentMeta< typeof MyComponent > = {
-			parameters: {
-				controls: { expanded: true },
-				docs: { source: { state: 'open' } },
-			},
-		};
-		```
+```
+// legacy-component/index.tsx
 
-		These options will display prop descriptions in the `Canvas ▸ Controls` tab, and expand code snippets in the `Docs` tab.
+function LegacyComponent( props ) {
+	const newProps = useTranslateLegacyPropsToNewProps( props );
 
-	4. Go to the component in Storybook and check the props table in the Docs tab. If there are props that shouldn't be there, check that your types are correct, or consider `Omit`-ing props that shouldn't be exposed.
-		1. Use the `parameters.controls.exclude` property on the `meta` object to hide props from the docs.
-		2. Use the `argTypes` prop on the `meta` object to customize how each prop in the docs can be interactively controlled by the user (tip: use `control: { type: null }` to remove the interactive controls from a prop, without hiding the prop from the docs).
-		3. See the [official docs](https://storybook.js.org/docs/react/essentials/controls) for more details.
-	5. Comment out all existing stories.
-	6. Create a default template, where the component is being used in the most “vanilla” way possible.
-	7. Use the template for the `Default` story, which will serve as an interactive doc playground.
-	8. Add more focused stories as you see fit. These non-default stories should illustrate specific scenarios and usages of the component. A developer looking at the Docs tab should be able to understand what each story is demonstrating. Add JSDoc comments to stories when necessary.
-11. Convert unit tests.
-	1. Rename test file extensions from `.js` to `.tsx`.
-	2. Fix all TypeScript errors.
+	return ( <NewComponentImplementation { ...newProps } /> );
+}
+
+// new-component/index.tsx
+function NewComponent( props ) {
+	return ( <NewComponentImplementation { ...props } /> );
+}
+
+// new-component/implementation.tsx
+function NewComponentImplementation( props ) {
+	// implementation
+}
+
+```
+
+In case that is not possible (eg. too difficult to reconciliate new and legacy implementations, or impossible to preserve backward compatibility), then the legacy implementation can stay as-is.
+
+In any case, extra attention should be payed to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning when the above scenario happens — or even better, aliasing to the correct version of the component.
+
+##### Naming
+
+When it comes to naming the newly added component, there are two options.
+
+If there is a good reason for it, pick a new name for the component. For example, some legacy components have names that don't correspond to the corrent name of UI widget that they implement (for example, `TabPanel` should be called `Tabs`, and `Modal` should be called `Dialog`).
+
+Alternatively, version the component name. For example, the new version of `Component` could be called `ComponentV2`. This also applies for namespaced subcomponents (ie. `ComponentV2.SubComponent`).
+
+### Methodology
+
+Regardless of the chosen approach, we recommend adopting the following methodology:
+
+1. First, make sure that the legacy component is well covered by automated tests. Using those tests against the new implementation will serve as a great first layer to make sure that we don't break backward compatibility where necessary, and that we are otherwise aware of any differences in behavior;
+2. Create a new temporary folder, so that all the work can be done without affecting publicly exported APIs; make it explicit in the README, JSDocs and Storybook (by using badges) that the components are WIP and shouldn't be used outside of the components package;
+3. Once the first iteration of the new component(s) is complete, start testing it by exporting it via private APIs, and replacing usages of the legacy component across the Gutenberg repository. This process is great to gather more feedback, spot bugs and missing features;
+4. Once all usages are migrated, you can replace the legacy component with the new implementation, and delete the temporary folder and private exports. Don't forget to write a dev note when necessary.

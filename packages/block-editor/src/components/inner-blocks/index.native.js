@@ -1,12 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import {
-	getBlockType,
-	__unstableGetInnerBlocksProps as getInnerBlocksProps,
-} from '@wordpress/blocks';
+import { __unstableGetInnerBlocksProps as getInnerBlocksProps } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,18 +12,19 @@ import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
-import getBlockContext from './get-block-context';
+import useBlockContext from './use-block-context';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import BlockListCompact from '../block-list/block-list-compact';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
+import WarningMaxDepthExceeded from './warning-max-depth-exceeded';
+import { MAX_NESTING_DEPTH } from './constants';
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
@@ -78,9 +76,15 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
+		__experimentalCaptureToolbars: captureToolbars,
 		orientation,
 		renderAppender,
 		renderFooterAppender,
@@ -95,17 +99,38 @@ function UncontrolledInnerBlocks( props ) {
 		horizontalAlignment,
 		filterInnerBlocks,
 		blockWidth,
-		__experimentalLayout: layout = defaultLayout,
+		layout = defaultLayout,
 		gridProperties,
-		useCompactList,
 	} = props;
 
-	const block = useSelect(
-		( select ) => select( blockEditorStore ).getBlock( clientId ),
-		[ clientId ]
-	) || { innerBlocks: [] };
+	const context = useBlockContext( clientId );
 
-	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
+	const { nestingLevel, parentLock } = useSelect(
+		( select ) => {
+			const { getBlockParents, getTemplateLock, getBlockRootClientId } =
+				select( blockEditorStore );
+			return {
+				nestingLevel: getBlockParents( clientId )?.length,
+				parentLock: getTemplateLock( getBlockRootClientId( clientId ) ),
+			};
+		},
+		[ clientId ]
+	);
+
+	useNestedSettingsUpdate(
+		clientId,
+		parentLock,
+		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
+		templateLock,
+		captureToolbars,
+		orientation,
+		layout
+	);
 
 	useInnerBlockTemplateSync(
 		clientId,
@@ -114,45 +139,35 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const BlockListComponent = useCompactList ? BlockListCompact : BlockList;
-
-	let blockList = (
-		<BlockListComponent
-			marginVertical={ marginVertical }
-			marginHorizontal={ marginHorizontal }
-			rootClientId={ clientId }
-			renderAppender={ renderAppender }
-			renderFooterAppender={ renderFooterAppender }
-			withFooter={ false }
-			orientation={ orientation }
-			parentWidth={ parentWidth }
-			horizontalAlignment={ horizontalAlignment }
-			horizontal={ horizontal }
-			contentResizeMode={ contentResizeMode }
-			contentStyle={ contentStyle }
-			onAddBlock={ onAddBlock }
-			onDeleteBlock={ onDeleteBlock }
-			filterInnerBlocks={ filterInnerBlocks }
-			gridProperties={ gridProperties }
-			blockWidth={ blockWidth }
-		/>
-	);
-
-	// Wrap context provider if (and only if) block has context to provide.
-	const blockType = getBlockType( block.name );
-	if ( blockType && blockType.providesContext ) {
-		const context = getBlockContext( block.attributes, blockType );
-
-		blockList = (
-			<LayoutProvider value={ layout }>
-				<BlockContextProvider value={ context }>
-					{ blockList }
-				</BlockContextProvider>
-			</LayoutProvider>
-		);
+	if ( nestingLevel >= MAX_NESTING_DEPTH ) {
+		return <WarningMaxDepthExceeded clientId={ clientId } />;
 	}
 
-	return blockList;
+	return (
+		<LayoutProvider value={ layout }>
+			<BlockContextProvider value={ context }>
+				<BlockList
+					marginVertical={ marginVertical }
+					marginHorizontal={ marginHorizontal }
+					rootClientId={ clientId }
+					renderAppender={ renderAppender }
+					renderFooterAppender={ renderFooterAppender }
+					withFooter={ false }
+					orientation={ orientation }
+					parentWidth={ parentWidth }
+					horizontalAlignment={ horizontalAlignment }
+					horizontal={ horizontal }
+					contentResizeMode={ contentResizeMode }
+					contentStyle={ contentStyle }
+					onAddBlock={ onAddBlock }
+					onDeleteBlock={ onDeleteBlock }
+					filterInnerBlocks={ filterInnerBlocks }
+					gridProperties={ gridProperties }
+					blockWidth={ blockWidth }
+				/>
+			</BlockContextProvider>
+		</LayoutProvider>
+	);
 }
 
 /**

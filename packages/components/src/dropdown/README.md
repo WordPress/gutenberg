@@ -13,7 +13,7 @@ const MyDropdown = () => (
 	<Dropdown
 		className="my-container-class-name"
 		contentClassName="my-popover-content-classname"
-		position="bottom right"
+		popoverProps={ { placement: 'bottom-start' } }
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<Button
 				variant="primary"
@@ -41,6 +41,12 @@ className of the global container
 ### `contentClassName`: `string`
 
 If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a child of the container node.
+
+-   Required: No
+
+### `defaultOpen`: `boolean`
+
+The open state of the dropdown when initially rendered. Use when you do not need to control its open state. It will be overridden by the `open` prop if it is specified on the component's first render.
 
 -   Required: No
 
@@ -74,11 +80,15 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
+### `open`: `boolean`
+
+The controlled open state of the dropdown. Must be used in conjunction with `onToggle`.
+
+-   Required: No
+
 ### `onToggle`: `( willOpen: boolean ) => void`
 
-A callback invoked when the state of the popover changes from open to closed and vice versa.
-
-The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+A callback invoked when the state of the dropdown changes from open to closed and vice versa.
 
 -   Required: No
 
@@ -89,13 +99,6 @@ Properties of popoverProps object will be passed as props to the `Popover` compo
 Use this object to access properties/features of the `Popover` component that are not already exposed in the `Dropdown` component, e.g.: the ability to have the popover without an arrow.
 
 -   Required: No
-
-### `position`: `PopoverProps[ 'position' ]`
-
-The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
-
--   Required: No
--   Default: `"top center"`
 
 ### `renderContent`: `( props: CallbackProps ) => ReactNode`
 

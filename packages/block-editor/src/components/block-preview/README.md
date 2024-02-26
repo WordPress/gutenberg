@@ -30,26 +30,26 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 
 Set `viewportWidth` to `0` to make the viewport the same width as the container.
 
-### `__experimentalPadding`
+### minHeight
 
--   **Type** `Int`
--   **Default** `undefined`
+Minimum height of the preview iframe in pixels.
 
-Padding for the preview container body.
+-   **Type:** `Int`
+-   **Default:** `undefined`
 
-### `__experimentalStyles`
+### `additionalStyles`
 
 List of additional editor styles to load into the preview iframe. Each object
 should contain a `css` attribute. See `EditorStyles` for more info.
 
 ```jsx
 <BlockPreview
-    blocks={ blocks }
-	__experimentalStyles={ [
-		{ css: '.wp-block { margin: 16px; }' },
+	blocks={ blocks }
+	additionalStyles={ [
+		{ css: 'body { padding: 16px; }' },
 	] }
 />
 ```
 
--   **Type** `Int`
+-   **Type** `Array`
 -   **Default** `[]`

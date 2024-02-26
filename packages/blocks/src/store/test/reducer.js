@@ -31,24 +31,25 @@ describe( 'unprocessedBlockTypes', () => {
 
 	it( 'should add a new block type', () => {
 		const original = deepFreeze( {
-			'core/paragraph': { name: 'core/paragraph' },
+			'core/paragraph': { title: 'Paragraph' },
 		} );
 
 		const state = unprocessedBlockTypes( original, {
 			type: 'ADD_UNPROCESSED_BLOCK_TYPE',
-			blockType: { name: 'core/code' },
+			name: 'core/code',
+			blockType: { title: 'Code' },
 		} );
 
 		expect( state ).toEqual( {
-			'core/paragraph': { name: 'core/paragraph' },
-			'core/code': { name: 'core/code' },
+			'core/paragraph': { title: 'Paragraph' },
+			'core/code': { title: 'Code' },
 		} );
 	} );
 
 	it( 'should remove unprocessed block types', () => {
 		const original = deepFreeze( {
-			'core/paragraph': { name: 'core/paragraph' },
-			'core/code': { name: 'core/code' },
+			'core/paragraph': { title: 'Paragraph' },
+			'core/code': { title: 'Code' },
 		} );
 
 		const state = blockTypes( original, {
@@ -57,7 +58,7 @@ describe( 'unprocessedBlockTypes', () => {
 		} );
 
 		expect( state ).toEqual( {
-			'core/paragraph': { name: 'core/paragraph' },
+			'core/paragraph': { title: 'Paragraph' },
 		} );
 	} );
 } );

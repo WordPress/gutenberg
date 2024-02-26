@@ -19,8 +19,8 @@ const themes = {
 		accent: '#3858e9',
 		background: '#f0f0f0',
 	},
-	modern: {
-		accent: '#3858e9',
+	classic: {
+		accent: '#007cba',
 	},
 };
 

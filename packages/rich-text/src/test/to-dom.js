@@ -1,19 +1,9 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
-
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 describe( 'recordToDom', () => {
 	beforeAll( () => {
@@ -21,19 +11,16 @@ describe( 'recordToDom', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach(
-		( { description, multilineTag, record, startPath, endPath } ) => {
-			// eslint-disable-next-line jest/valid-title
-			it( description, () => {
-				const { body, selection } = toDom( {
-					value: record,
-					multilineTag,
-				} );
-				expect( body ).toMatchSnapshot();
-				expect( selection ).toEqual( { startPath, endPath } );
+	spec.forEach( ( { description, record, startPath, endPath } ) => {
+		// eslint-disable-next-line jest/valid-title
+		it( description, () => {
+			const { body, selection } = toDom( {
+				value: record,
 			} );
-		}
-	);
+			expect( body ).toMatchSnapshot();
+			expect( selection ).toEqual( { startPath, endPath } );
+		} );
+	} );
 } );
 
 describe( 'applyValue', () => {

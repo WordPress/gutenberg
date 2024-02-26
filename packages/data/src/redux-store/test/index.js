@@ -4,8 +4,6 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
-jest.useRealTimers();
-
 describe( 'controls', () => {
 	let registry;
 
@@ -285,6 +283,78 @@ describe( 'resolveSelect', () => {
 		expect( Object.keys( registry.resolveSelect( 'store' ) ) ).toEqual( [
 			'getItems',
 			'getItemsNoResolver',
+		] );
+	} );
+} );
+
+describe( 'normalizing args', () => {
+	it( 'should call the __unstableNormalizeArgs method of the selector for both the selector and the resolver', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		const normalizingFunction = jest.fn( ( ...args ) => args );
+
+		selector.__unstableNormalizeArgs = normalizingFunction;
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+			resolvers: {
+				getItems: () => 'items',
+			},
+		} );
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( normalizingFunction ).toHaveBeenCalledWith( [ 'foo', 'bar' ] );
+
+		// Needs to be called twice:
+		// 1. When the selector is called.
+		// 2. When the resolver is fullfilled.
+		expect( normalizingFunction ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should not call the __unstableNormalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.__unstableNormalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+			resolvers: {
+				getItems: () => 'items',
+			},
+		} );
+
+		// Called with no args so the __unstableNormalizeArgs method should not be called.
+		registry.select( 'store' ).getItems();
+
+		expect( selector.__unstableNormalizeArgs ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should call the __unstableNormalizeArgs method on the selectors without resolvers', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.__unstableNormalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+		} );
+
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( selector.__unstableNormalizeArgs ).toHaveBeenCalledWith( [
+			'foo',
+			'bar',
 		] );
 	} );
 } );

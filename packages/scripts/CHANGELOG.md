@@ -2,6 +2,152 @@
 
 ## Unreleased
 
+## 27.3.0 (2024-02-21)
+
+## 27.2.0 (2024-02-09)
+
+### New Features
+
+-   Add experimental support for `viewScriptModule` field in block.json for `build` and `start` scripts ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
+
+### Enhancements
+
+-   Ensure that watched module builds detect block.json changes ([#57927](https://github.com/WordPress/gutenberg/pull/57927)).
+
+### Deprecations
+
+-   Experimental support for `viewModule` field in block.json is deprecated in favor of `viewScriptModule` ([#57437](https://github.com/WordPress/gutenberg/pull/57437)).
+
+## 27.1.0 (2024-01-24)
+
+## 27.0.0 (2024-01-10)
+
+### New Features
+
+-   Add experimental support for `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).
+
+### Breaking Changes
+
+-   Drop support for Node.js versions < 18.
+
+## 26.19.0 (2023-12-13)
+
+### Bug Fix
+
+-   Fix CSS imports not minified ([#56516](https://github.com/WordPress/gutenberg/pull/56516)).
+
+## 26.18.0 (2023-11-29)
+
+### Internal
+
+-   The bundled `jest-dev-server` dependency has been updated from `^6.0.2` to `^9.0.1` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+## 26.17.0 (2023-11-16)
+
+## 26.16.0 (2023-11-02)
+
+## 26.15.0 (2023-10-18)
+
+## 26.14.0 (2023-10-05)
+
+### Internal
+
+-   The bundled `@pmmmwh/react-refresh-webpack-plugin` dependency has been updated from requiring `^0.5.2` to requiring `^0.5.11` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `browserslist` dependency has been updated from requiring `^4.21.9` to requiring `^4.21.10` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `react-refresh` dependency has been updated from requiring `^0.10.0` to requiring `^0.14.0` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack` dependency has been updated from requiring `^5.47.1` to requiring `^5.88.2` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^4.4.2` to requiring `^4.9.1` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-cli` dependency has been updated from requiring `^4.9.1` to requiring `^5.1.4` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-dev-server` dependency has been updated from requiring `^4.4.0` to requiring `^4.15.1` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+
+## 26.13.0 (2023-09-20)
+
+### Enhancements
+
+-   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
+-   The bundled `wp-prettier` dependency has been upgraded from `2.8.5` to `3.0.3` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
+
+### Bug Fix
+
+-   Correctly resolve entry points when the directory is symlinked ([#54212](https://github.com/WordPress/gutenberg/pull/54212)).
+
+## 26.12.0 (2023-08-31)
+
+## 26.11.0 (2023-08-16)
+
+### Enhancement
+
+-   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636).
+-   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+-   The bundled `cssnano` dependency has been updated from requiring ^5.07 to requiring ^6.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+
+### Bug Fix
+
+-   Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))
+
+## 26.10.0 (2023-08-10)
+
+## 26.9.0 (2023-07-20)
+
+## 26.8.0 (2023-07-05)
+
+## 26.7.0 (2023-06-23)
+
+## 26.6.0 (2023-06-07)
+
+### Enhancements
+
+-   The bundled `terser-webpack-plugin` dependency has been updated from requiring `^5.1.4` to requiring `^5.3.9` ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).
+-   Optimize updating render paths when developing blocks with the `start` command ([#51162](https://github.com/WordPress/gutenberg/pull/51162)).
+
+### Bug Fixes
+
+-   Ensure files listed in `render` field of `block.json` files are always copied to the build folder when using the `start` command ([#50939](https://github.com/WordPress/gutenberg/pull/50939)).
+
+## 26.5.0 (2023-05-24)
+
+## 26.4.0 (2023-05-10)
+
+## 26.3.0 (2023-04-26)
+
+### Enhancements
+
+-   License check script supports conjunctive (AND) licenses ([46801](https://github.com/WordPress/gutenberg/pull/46801)).
+
+## 26.2.0 (2023-04-12)
+
+## 26.1.0 (2023-03-29)
+
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.6.2` to `2.8.5` ([#49258](https://github.com/WordPress/gutenberg/pull/49258)).
+
+## 26.0.0 (2023-03-15)
+
+### Breaking Changes
+
+-   Started using Jest v29 instead of v27 as a dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+
+## 25.5.1 (2023-03-06)
+
+### Bug Fix
+
+-   Fix `render.php` isn't copied in Windows OS ([#48735](https://github.com/WordPress/gutenberg/pull/48735)).
+
+## 25.5.0 (2023-03-01)
+
+## 25.4.0 (2023-02-15)
+
+### New Features
+
+-   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
+-   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
+-   Add `--no-watch` option to allow creating the unminified/dev JS without starting the watcher ([#44237](https://github.com/WordPress/gutenberg/pull/44237)).
+
+## 25.3.0 (2023-02-01)
+
+## 25.2.0 (2023-01-11)
+
 ## 25.1.0 (2023-01-02)
 
 ## 25.0.0 (2022-12-14)
@@ -178,7 +324,7 @@
 ### New Features
 
 -   Added a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
--   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
 -   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
 

@@ -50,6 +50,8 @@ export type ModalProps = {
 	className?: string;
 	/**
 	 * Label on the close button.
+	 *
+	 * @default `__( 'Close' )`
 	 */
 	closeButtonLabel?: string;
 	/**
@@ -66,7 +68,17 @@ export type ModalProps = {
 	 *
 	 * @default true
 	 */
-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	focusOnMount?:
+		| Parameters< typeof useFocusOnMount >[ 0 ]
+		| 'firstContentElement';
+	/**
+	 * Elements that are injected into the modal header to the left of the close button (if rendered).
+	 * Hidden if `__experimentalHideHeader` is `true`.
+	 *
+	 * @default null
+	 */
+	headerActions?: ReactNode;
+
 	/**
 	 * If this property is added, an icon will be added before the title.
 	 */
@@ -84,6 +96,15 @@ export type ModalProps = {
 	 * @default false
 	 */
 	isFullScreen?: boolean;
+	/**
+	 * If this property is added it will cause the modal to render at a preset
+	 * width, or expand to fill the screen. This prop will be ignored if
+	 * `isFullScreen` is set to `true`.
+	 *
+	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
+	 * modal's contents, or via CSS using the `style` prop.
+	 */
+	size?: 'small' | 'medium' | 'large' | 'fill';
 	/**
 	 *  Handle the key down on the modal frame `div`.
 	 */

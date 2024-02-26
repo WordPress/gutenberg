@@ -1,6 +1,6 @@
 # ToolbarGroup
 
-A ToolbarGroup can be used to create subgroups of controls inside a [Toolbar](/packages/components/src/toolbar/README.md).
+A ToolbarGroup can be used to create subgroups of controls inside a [Toolbar](/packages/components/src/toolbar/toolbar/README.md).
 
 ## Usage
 
@@ -30,4 +30,4 @@ ToolbarGroup will pass all HTML props to the underlying element.
 
 ## Related components
 
--   ToolbarGroup may contain [ToolbarButton](/packages/components/src/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar-Item/README.md) as children.
+-   ToolbarGroup may contain [ToolbarButton](/packages/components/src/toolbar/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar/toolbar-item/README.md) as children.

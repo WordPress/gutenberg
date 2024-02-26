@@ -8,23 +8,29 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarButton } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from '../components/routes';
 import { useLink } from '../components/routes/link';
+import { unlock } from '../lock-unlock';
+import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function EditTemplatePartMenuItem( { attributes } ) {
 	const { theme, slug } = attributes;
 	const { params } = useLocation();
 	const templatePart = useSelect(
 		( select ) => {
-			return select( coreStore ).getEntityRecord(
+			const { getCurrentTheme, getEntityRecord } = select( coreStore );
+
+			return getEntityRecord(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				// Ideally this should be an official public API.
-				`${ theme }//${ slug }`
+				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
 			);
 		},
 		[ theme, slug ]
@@ -34,9 +40,10 @@ function EditTemplatePartMenuItem( { attributes } ) {
 		{
 			postId: templatePart?.id,
 			postType: templatePart?.type,
+			canvas: 'edit',
 		},
 		{
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || templatePart?.id,
 		}
 	);
 
@@ -45,16 +52,14 @@ function EditTemplatePartMenuItem( { attributes } ) {
 	}
 
 	return (
-		<BlockControls group="other">
-			<ToolbarButton
-				{ ...linkProps }
-				onClick={ ( event ) => {
-					linkProps.onClick( event );
-				} }
-			>
-				{ __( 'Edit' ) }
-			</ToolbarButton>
-		</BlockControls>
+		<ToolbarButton
+			{ ...linkProps }
+			onClick={ ( event ) => {
+				linkProps.onClick( event );
+			} }
+		>
+			{ __( 'Edit' ) }
+		</ToolbarButton>
 	);
 }
 
@@ -65,9 +70,11 @@ export const withEditBlockControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				{ isDisplayed && (
-					<EditTemplatePartMenuItem attributes={ attributes } />
+					<BlockControls group="other">
+						<EditTemplatePartMenuItem attributes={ attributes } />
+					</BlockControls>
 				) }
 			</>
 		);
