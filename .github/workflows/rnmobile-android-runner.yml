@@ -73,7 +73,7 @@ jobs:
                   disable-animations: false
                   arch: arm64-v8a
                   target: google_apis
-                  profile: Pixel 3 XL
+                  profile: pixel_3_xl
                   script: echo "Generated AVD snapshot for caching."
 
             - name: Start Appium
@@ -88,7 +88,7 @@ jobs:
                   disable-animations: true
                   arch: arm64-v8a
                   target: google_apis
-                  profile: Pixel 3 XL
+                  profile: pixel_3_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
             - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
