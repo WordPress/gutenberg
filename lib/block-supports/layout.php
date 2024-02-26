@@ -585,8 +585,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	// Orientation is only used for flex layouts so its default is horizontal.
-	$parent_orientation     = isset( $block['parentLayout']['orientation'] ) ? $block['parentLayout']['orientation'] : 'horizontal';
-	$vertical_parent_layout = in_array( $parent_layout_type, array( 'constrained', 'default' ), true ) || ( 'flex' === $parent_layout_type && 'vertical' === $parent_orientation );
+	$parent_orientation         = isset( $block['parentLayout']['orientation'] ) ? $block['parentLayout']['orientation'] : 'horizontal';
+	$has_vertical_parent_layout = in_array( $parent_layout_type, array( 'constrained', 'default' ), true ) || ( 'flex' === $parent_layout_type && 'vertical' === $parent_orientation );
 
 	// Support for legacy flexSize value.
 	if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
@@ -596,7 +596,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$child_layout_declarations['flex-grow'] = '1';
 	}
 
-	if ( $vertical_parent_layout ) {
+	if ( $has_vertical_parent_layout ) {
 		// Width styles.
 		if ( 'fixed' === $self_align && $width ) {
 			$child_layout_declarations['max-width'] = $width;
