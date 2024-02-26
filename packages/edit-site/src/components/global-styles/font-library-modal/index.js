@@ -8,7 +8,6 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -50,17 +49,11 @@ function FontLibraryModal( {
 		const { canUser } = select( coreStore );
 		return canUser( 'create', 'font-families' );
 	}, [] );
-	const fontUploadsEnabled = useSelect( ( select ) => {
-		const { getEditorSettings } = select( editorStore );
-		return getEditorSettings().fontUploadsEnabled;
-	}, [] );
 
 	const tabs = [ DEFAULT_TAB ];
 
-	if ( canUserCreate && fontUploadsEnabled ) {
+	if ( canUserCreate ) {
 		tabs.push( UPLOAD_TAB );
-		// In the future, font faces can be configured to use a remote url rather than a file upload as the font src property.
-		// In that case, collections tabs should still be shown when font uploads are disabled.
 		tabs.push( ...tabsFromCollections( collections || [] ) );
 	}
 

@@ -565,7 +565,7 @@ class WP_Navigation_Block_Renderer {
 			)
 		);
 		$nav_element_directives = '
-		 data-wp-interactive="core/navigation"'
+		 data-wp-interactive="core/navigation" '
 		. $nav_element_context;
 
 		return $nav_element_directives;

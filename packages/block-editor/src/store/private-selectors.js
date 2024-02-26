@@ -341,14 +341,6 @@ export function getLastFocus( state ) {
 	return state.lastFocus;
 }
 
-export function getAllBlockBindingsSources( state ) {
-	return state.blockBindingsSources;
-}
-
-export function getBlockBindingsSource( state, sourceName ) {
-	return state.blockBindingsSources[ sourceName ];
-}
-
 /**
  * Returns true if the user is dragging anything, or false otherwise. It is possible for a
  * user to be dragging data from outside of the editor, so this selector is separate from
