@@ -266,4 +266,32 @@ test.describe( 'Router navigate', () => {
 		await expect( title ).toHaveText( 'Link 1' );
 		await expect( getter ).toHaveText( 'value from getter (link 1)' );
 	} );
+
+	test( 'should force a page reload when navigating to a page with `clientNavigationDisabled`', async ( {
+		page,
+	} ) => {
+		const count = page.getByTestId( 'router navigations count' );
+		const title = page.getByTestId( 'title' );
+
+		// Check the cound to ensure the page has hydrated.
+		await expect( count ).toHaveText( '0' );
+
+		// Navigate to a page without clientNavigationDisabled.
+		await page.getByTestId( 'link 1' ).click();
+
+		// Check the page has updated and the navigation count has increased.
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( count ).toHaveText( '1' );
+
+		await page.goBack();
+		await expect( title ).toHaveText( 'Main' );
+		await expect( count ).toHaveText( '1' );
+
+		// Navigate to a page with clientNavigationDisabled.
+		await page.getByTestId( 'link 3' ).click();
+
+		// Check the page has updated and the navigation count is zero.
+		await expect( title ).toHaveText( 'Main (navigation disabled)' );
+		await expect( count ).toHaveText( '0' );
+	} );
 } );

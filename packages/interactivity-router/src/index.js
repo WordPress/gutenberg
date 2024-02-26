@@ -188,7 +188,11 @@ export const { state, actions } = store( 'core/router', {
 			// out, and let the newer execution to update the HTML.
 			if ( navigatingTo !== href ) return;
 
-			if ( page ) {
+			if (
+				page &&
+				! page.initialData?.config?.[ 'core/router' ]
+					?.clientNavigationDisabled
+			) {
 				renderRegions( page );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
