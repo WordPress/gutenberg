@@ -16,6 +16,32 @@ import { unlock } from '../../lock-unlock';
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 /**
+ * Removes all instances of a property from an object.
+ *
+ * @param {Object} object   The object to remove the property from.
+ * @param {string} property The property to remove.
+ * @return {Object} The modified object.
+ */
+export function removePropertyFromObject( object, property ) {
+	if ( ! property || typeof property !== 'string' ) {
+		return object;
+	}
+
+	if ( typeof object !== 'object' || ! Object.keys( object ).length ) {
+		return object;
+	}
+
+	for ( const key in object ) {
+		if ( key === property ) {
+			delete object[ key ];
+		} else if ( typeof object[ key ] === 'object' ) {
+			removePropertyFromObject( object[ key ], property );
+		}
+	}
+	return object;
+}
+
+/**
  * A convenience wrapper for `useThemeStyleVariationsByProperty()` that fetches the current theme style variations,
  * and user-defined global style/settings object.
  *
@@ -39,7 +65,10 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		variations,
 		property,
 		filter,
-		baseVariation,
+		baseVariation: removePropertyFromObject(
+			cloneDeep( baseVariation ),
+			property
+		),
 	} );
 }
 
@@ -74,6 +103,10 @@ export const filterObjectByProperty = ( object, property ) => {
 
 /**
  * Returns a new object with only the properties specified in `property`.
+ * Optional merges the baseVariation object with the variation object.
+ * Note: this function will only overwrite the specified property in baseVariation if it exists.
+ * The baseVariation will not be otherwise modified. To strip a property from the baseVariation object, use `removePropertyFromObject`.
+ * See useCurrentMergeThemeStyleVariationsWithUserConfig for an example of how to use this function.
  *
  * @param {Object}   props               Object of hook args.
  * @param {Object[]} props.variations    The theme style variations to filter.
