@@ -40,6 +40,11 @@ DOM elements are connected to data stored in the state and context through direc
     - [On the client side](#on-the-client-side)
     - [On the server side](#on-the-server-side)
 	- [Store client methods](#store-client-methods)
+	  - [getContext()](#getcontext)
+		- [getElement()](#getelement)
+- [Server Functions](#server-functions)
+  - [wp_interactivity_config](#wp_interactivity_config)
+	- [wp_interactivity_process_directives](#wp_interactivity_process_directives)
 
 ## The directives
 
@@ -1014,11 +1019,11 @@ store( "myPlugin", {
 Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
 It returns an object with two keys:
 
-#### ref
+##### ref
 
 `ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
 
-#### attributes
+##### attributes
 
 `attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
 
@@ -1058,24 +1063,42 @@ The configuration is also available at the client, but it is static information.
 
 Consider it a global setting for interactions of a site, that won't be updated on user interactions.
 
-An example:
+An example of setting:
 
 ```php
 	wp_interactivity_config( 'myPlugin', array( 'showLikeButton' => is_user_logged_in() ) );
+```
+
+An example of getting:
+
+```php
+  wp_interactivity_config( 'myPlugin' );
+```
+
+This config can be retrieved in the client:
+
+```js
+// view.js
+
+const { showLikeButton } = getConfig();
 ```
 
 ### wp_interactivity_process_directives
 
 `wp_interactivity_process_directives` returns the updated HTML after the directives have been processed.
 
-It is the Core function of the Interactivity API, and is public so any HTML can be processed, regarding whether is a block or not.
+It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether is a block or not.
+
+This code
 
 ```php
-$html_content = '<div data-wp-bind--text="myPlugin::state.message"></div>';
-
-// Process directives in HTML content.
-wp_interactivity_state( 'myPlugin', array( 'message' => 'hello world!' ) );
+wp_interactivity_state( 'myPlugin', array( 'greeting' => 'Hello, World!' ) );
+$html = '<div data-wp-text="myPlugin::state.greeting"></div>';
 $processed_html = wp_interactivity_process_directives( $html_content );
+echo $processed_html;
+```
 
-// output: <div data-wp-bind--text="myPlugin::state.message">hello world!</div>
+will output:
+```html
+<div data-wp-text="create-block::state.greeting">Hello, World!</div>
 ```
