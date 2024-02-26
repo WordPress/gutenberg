@@ -67,7 +67,7 @@ jobs:
                   emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: false
                   arch: arm64-v8a
-                  profile: Pixel 3 XL
+                  profile: Pixel XL
                   script: echo "Generated AVD snapshot for caching."
 
             - name: Run tests
@@ -78,7 +78,7 @@ jobs:
                   emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: true
                   arch: arm64-v8a
-                  profile: Pixel 3 XL
+                  profile: Pixel XL
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
             - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
