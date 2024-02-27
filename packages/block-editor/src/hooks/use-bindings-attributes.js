@@ -210,7 +210,19 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		const { clientId, name: blockName } = useBlockEditContext();
 		const { getBlockAttributes } = useSelect( blockEditorStore );
 
-		const [ , setBoundAttributes ] = useState( {} );
+		/*
+		 * Collect and update the bound attributes
+		 * in a separate state.
+		 */
+		const [ boundAttributes, setBoundAttributes ] = useState( {} );
+		const updateBoundAttributes = useCallback(
+			( newAttributes ) =>
+				setBoundAttributes( ( prev ) => ( {
+					...prev,
+					...newAttributes,
+				} ) ),
+			[]
+		);
 
 		/*
 		 * Create binding object filtering
@@ -222,13 +234,6 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				( [ attrName ] ) => canBindAttribute( props.name, attrName )
 			)
 		);
-
-		const updateBoundAttributes = useCallback( ( newAttributes ) => {
-			setBoundAttributes( ( prev ) => ( {
-				...prev,
-				...newAttributes,
-			} ) );
-		}, [] );
 
 		return (
 			<>
@@ -242,7 +247,10 @@ const withBlockBindingSupport = createHigherOrderComponent(
 					/>
 				) }
 
-				<BlockEdit { ...props } />
+				<BlockEdit
+					{ ...props }
+					attributes={ { ...attributes, ...boundAttributes } }
+				/>
 			</>
 		);
 	},
