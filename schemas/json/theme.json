@@ -1118,10 +1118,25 @@
 							"description": "Sets the `background-image` CSS property.",
 							"oneOf": [
 								{
+									"description": "A URL to an image file.",
 									"type": "string"
 								},
 								{
 									"$ref": "#/definitions/refComplete"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"source": {
+											"description": "The origin of the image.",
+											"type": "string"
+										},
+										"url": {
+											"description": "A URL to an image file.",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
 								}
 							]
 						},
@@ -1158,7 +1173,8 @@
 								}
 							]
 						}
-					}
+					},
+					"additionalProperties": false
 				},
 				"border": {
 					"description": "Border styles.",

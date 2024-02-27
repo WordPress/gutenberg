@@ -2150,6 +2150,15 @@ class WP_Theme_JSON_Gutenberg {
 				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
 			}
 
+			// Processes background styles.
+			if ( $value_path[0] === 'background' ) {
+				$value = gutenberg_get_background_support_styles(
+					array(
+						$value_path[1] => $value,
+					)
+				)['declarations'][ $css_property ];
+			}
+
 			if ( 'aspect-ratio' === $css_property ) {
 				// For aspect ratio to work, other dimensions rules must be unset.
 				// This ensures that a fixed height does not override the aspect ratio.
