@@ -178,7 +178,7 @@ function BlockBindingBridge( { blockName, blockProps, bindings, attributes } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map(
-				( [ attrName, boundAttribute ], i ) => {
+				( [ attrName, boundAttribute ] ) => {
 					// Bail early if the block doesn't have a valid source handler.
 					const source =
 						blockBindingsSources[ boundAttribute.source ];
@@ -188,7 +188,7 @@ function BlockBindingBridge( { blockName, blockProps, bindings, attributes } ) {
 
 					return (
 						<BindingConnector
-							key={ `${ boundAttribute.source }-${ blockName }-${ attrName }-${ i }` }
+							key={ attrName }
 							blockName={ blockName }
 							attrName={ attrName }
 							attrValue={ attributes[ attrName ] }
