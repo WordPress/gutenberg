@@ -110,22 +110,24 @@ test.describe( 'Font Library', () => {
 
 		test( 'should display the "Upload" tab and upload a local font', async ( {
 			page,
+			request,
 		} ) => {
 			await expect(
 				page.getByRole( 'tab', { name: 'Upload' } )
 			).toBeVisible( { timeout: 40000 } );
 
 			// Ensure font does not exist before uploading
-			if (
-				await page
-					.getByRole( 'button', { name: 'Commissioner' } )
-					.isVisible( { timeout: 60000 } )
-			) {
-				await page
-					.getByRole( 'button', { name: 'Commissioner' } )
-					.click();
-				await page.getByRole( 'button', { name: 'Delete' } ).click();
-				await page.getByRole( 'button', { name: 'Delete' } ).click();
+			const installedFonts = await request.get(
+				`/wp-json/wp/v2/font-families`
+			);
+			console.log( installedFonts );
+			const commissionerFont = await request.get(
+				`/wp-json/wp/v2/font-families?slug=commissioner&_embed=true`
+			);
+			if ( commissionerFont.length > 0 ) {
+				await request.delete(
+					`/wp-json/wp/v2/font-families/${ commissionerFont[ 0 ].id }?force=true`
+				);
 			}
 
 			// Upload a local font
