@@ -10,7 +10,7 @@ This block template can be used by running the following command:
 npx @wordpress/create-block --template @wordpress/create-block-interactive-template
 ```
 
-It requires at least WordPress 16.5 or Gutenberg 17.7.
+It requires at least WordPress 6.5 or Gutenberg 17.7.
 
 ## Contributing to this package
 
