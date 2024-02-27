@@ -127,8 +127,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
  *
  * Note that Font faces that were added to the set using the CSS @font-face rule
  * remain connected to the corresponding CSS, and cannot be deleted.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
  */
-export function unloadFontFaceInBrowser( fontFace, addTo = 'all' ) {
+export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
 	const unloadFontFace = ( fonts ) => {
 		fonts.forEach( ( f ) => {
 			if (
@@ -141,11 +143,11 @@ export function unloadFontFaceInBrowser( fontFace, addTo = 'all' ) {
 		} );
 	};
 
-	if ( addTo === 'document' || addTo === 'all' ) {
+	if ( removeFrom === 'document' || removeFrom === 'all' ) {
 		unloadFontFace( document.fonts );
 	}
 
-	if ( addTo === 'iframe' || addTo === 'all' ) {
+	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
 		const iframeDocument = document.querySelector(
 			'iframe[name="editor-canvas"]'
 		).contentDocument;
