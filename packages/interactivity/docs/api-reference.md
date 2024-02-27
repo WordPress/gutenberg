@@ -797,7 +797,92 @@ const { state } = store( "myPlugin", {
 
 #### Actions
 
-Usually triggered by the `data-wp-on` directive (using event listeners) or other actions.
+Actions are just regular JavaScript functions. Usually triggered by the `data-wp-on` directive (using event listeners) or other actions.
+
+```ts
+const { state, actions } = store("myPlugin", {
+  actions: {
+    selectItem: (id?: number) => {
+      const context = getContext();
+      // `id` is optional here, so this action can be used in a directive.
+      state.selected = id || context.id;
+    }
+    otherAction: () => {
+      // but it can also be called from other actions.
+      actions.selectItem(123); // it works and type is correct
+    }
+  }
+});
+```
+
+##### Async actions
+
+Async actions should use generators instead of async/await.
+
+In async functions, the control is passed to the function itself. The caller of the function has no way to know if the function is awaiting, and more importantly, if the await is resolved and the function has resumed execution. We need that information to be able to restore the scope.
+
+Imagine a block that has two buttons. One lives inside a context that has `isOpen: true` and the other `isOpen: false`:
+
+```html
+<div data-wp-context='{ "isOpen": true }'>
+  <button data-wp-on--click="actions.someAction">Click</button>
+</div>
+
+<div data-wp-context='{ "isOpen": false }'>
+  <button data-wp-on--click="actions.someAction">Click</button>
+</div>
+```
+
+The action is async and needs to await a long delay.
+
+```ts
+store("myPlugin", {
+  state: {
+    get isOpen() {
+      return getContext().isOpen;
+    },
+  },
+  actions: {
+    someAction: async () => {
+      state.isOpen; // This context is always correct because it's synchronous.
+      await longDelay();
+      state.isOpen; // This may not get the proper context unless we "restore" it.
+    },
+  },
+});
+```
+
+- The user clicks the first button.
+- The scope points to the first context, where `isOpen: true`.
+- The first access to `state.isOpen` is correct because `getContext` returns the current scope.
+- The action starts awaiting a long delay.
+- Before the action resumes, the user clicks the second button.
+- The scope is changed to the second context, where `isOpen: false`.
+- The first access to `state.isOpen` is correct because `getContext` returns the current scope.
+- The second action starts awaiting a long delay.
+- The first action finishes awaiting and resumes its execution.
+- The second access to `state.isOpen` of the first action is incorrect, because `getContext` now returns the wrong scope.
+
+We need to be able to know when async actions start awaiting and resume operations, so we can restore the proper scope, and that's what generators do.
+
+The previous store will work fine if it is written like this:
+```js
+store("myPlugin", {
+  state: {
+    get isOpen() {
+      return getContext().isOpen;
+    },
+  },
+  actions: {
+    someAction: function* () {
+      state.isOpen; // This context is correct because it's synchronous.
+      yield longDelay(); // With generators, the caller controls when to resume this function.
+      state.isOpen; // This context is correct because we restored the proper scope before we resumed the function.
+    },
+  },
+});
+```
+
 
 #### Side Effects
 
