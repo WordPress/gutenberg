@@ -78,9 +78,6 @@ const createEditFunctionWithBindingsAttribute = () =>
 			}
 
 			return (
-				// TODO: only set this if the block is connected to a source.
-				// this might not be a good way to do it if a block can have child
-				// blocks that are NOT connected to a source.
 				<BlockEdit
 					key="edit"
 					{ ...props }
