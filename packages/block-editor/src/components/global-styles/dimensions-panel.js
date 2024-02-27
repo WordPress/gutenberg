@@ -12,7 +12,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalView as View,
@@ -388,30 +387,10 @@ export default function DimensionsPanel( {
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
-	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
-	const {
-		type: parentType,
-		default: { type: defaultParentType = 'default' } = {},
-	} = settings?.parentLayout ?? {};
-	const parentLayoutType = parentType || defaultParentType;
-	const flexResetLabel =
-		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
-	const childLayoutResetLabel =
-		parentLayoutType === 'flex' ? flexResetLabel : __( 'Grid spans' );
 
 	const setChildLayout = ( newChildLayout ) => {
 		onChange( setImmutably( value, [ 'layout' ], newChildLayout ) );
 	};
-
-	const resetChildLayoutValue = () => {
-		setChildLayout( {
-			selfStretch: undefined,
-			flexSize: undefined,
-			columnSpan: undefined,
-			rowSpan: undefined,
-		} );
-	};
-	const hasChildLayoutValue = () => !! value?.layout;
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -422,6 +401,9 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				selfAlign: undefined,
+				width: undefined,
+				height: undefined,
 				columnSpan: undefined,
 				rowSpan: undefined,
 			} ),
@@ -639,25 +621,17 @@ export default function DimensionsPanel( {
 				</ToolsPanelItem>
 			) }
 			{ showChildLayoutControl && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasChildLayoutValue }
-					label={ childLayoutResetLabel }
-					onDeselect={ resetChildLayoutValue }
+				<ChildLayoutControl
+					value={ childLayout }
+					onChange={ setChildLayout }
+					parentLayout={ settings?.parentLayout }
+					alignments={ alignments }
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout
 					}
 					panelId={ panelId }
-				>
-					<ChildLayoutControl
-						value={ childLayout }
-						onChange={ setChildLayout }
-						parentLayout={ settings?.parentLayout }
-						alignments={ alignments }
-					/>
-				</VStack>
+				/>
 			) }
 			{ showMinHeightControl && (
 				<ToolsPanelItem

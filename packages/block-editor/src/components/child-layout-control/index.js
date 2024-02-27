@@ -7,6 +7,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalInputControl as InputControl,
 	__experimentalHStack as HStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -14,12 +15,14 @@ import { useEffect } from '@wordpress/element';
 /**
  * Form to edit the child layout value.
  *
- * @param {Object}   props              Props.
- * @param {Object}   props.value        The child layout value.
- * @param {Function} props.onChange     Function to update the child layout value.
- * @param {Object}   props.parentLayout The parent layout value.
+ * @param {Object}   props                  Props.
+ * @param {Object}   props.value            The child layout value.
+ * @param {Function} props.onChange         Function to update the child layout value.
+ * @param {Object}   props.parentLayout     The parent layout value.
  * @param {Object}   props.alignments
  *
+ * @param {boolean}  props.isShownByDefault
+ * @param {string}   props.panelId
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
@@ -27,6 +30,8 @@ export default function ChildLayoutControl( {
 	onChange,
 	parentLayout,
 	alignments,
+	isShownByDefault,
+	panelId,
 } ) {
 	const {
 		selfStretch,
@@ -36,7 +41,7 @@ export default function ChildLayoutControl( {
 		selfAlign,
 		height,
 		width,
-	} = childLayout;
+	} = childLayout || {};
 
 	const {
 		current: currentAlignment,
@@ -83,6 +88,41 @@ export default function ChildLayoutControl( {
 		isFlowOrConstrained || orientation === 'vertical'
 			? 'selfStretch'
 			: 'selfAlign';
+
+	//ToolsPanelItem-specific functions.
+	const resetWidthValue = () => {
+		// If alignment has been set via the width control, unset it.
+		if (
+			( selfAlign === 'wide' && currentAlignment === 'wide' ) ||
+			( selfAlign === 'fill' && currentAlignment === 'full' )
+		) {
+			onChangeAlignment( undefined );
+		}
+		onChange( {
+			selfStretch: undefined,
+			flexSize: undefined,
+			selfAlign: undefined,
+			width: undefined,
+		} );
+	};
+	const resetHeightValue = () => {
+		onChange( {
+			selfStretch: undefined,
+			flexSize: undefined,
+			selfAlign: undefined,
+			height: undefined,
+		} );
+	};
+	const resetGridSpanValue = () => {
+		onChange( {
+			columnSpan: undefined,
+			rowSpan: undefined,
+		} );
+	};
+	const hasWidthValue = () => !! childLayout[ widthProp ];
+	const hasHeightValue = () => !! childLayout[ heightProp ];
+	const hasGridSpanValue = () =>
+		!! ( childLayout.columnSpan || childLayout.rowSpan );
 
 	const widthOptions = [];
 
@@ -354,7 +394,15 @@ export default function ChildLayoutControl( {
 		<>
 			{ parentLayoutType !== 'grid' && (
 				<>
-					<HStack style={ { alignItems: 'flex-end' } }>
+					<HStack
+						style={ { alignItems: 'flex-end' } }
+						as={ ToolsPanelItem }
+						hasValue={ hasWidthValue }
+						label={ __( 'Width' ) }
+						onDeselect={ resetWidthValue }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
 						<FlexBlock>
 							<CustomSelectControl
 								label={ __( 'Width' ) }
@@ -382,7 +430,15 @@ export default function ChildLayoutControl( {
 							</FlexBlock>
 						) }
 					</HStack>
-					<HStack style={ { alignItems: 'flex-end' } }>
+					<HStack
+						style={ { alignItems: 'flex-end' } }
+						as={ ToolsPanelItem }
+						hasValue={ hasHeightValue }
+						label={ __( 'Height' ) }
+						onDeselect={ resetHeightValue }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
 						<FlexBlock>
 							<CustomSelectControl
 								label={ __( 'Height' ) }
@@ -413,7 +469,14 @@ export default function ChildLayoutControl( {
 				</>
 			) }
 			{ parentLayoutType === 'grid' && (
-				<HStack>
+				<HStack
+					as={ ToolsPanelItem }
+					hasValue={ hasGridSpanValue }
+					label={ __( 'Grid spans' ) }
+					onDeselect={ resetGridSpanValue }
+					isShownByDefault={ isShownByDefault }
+					panelId={ panelId }
+				>
 					<InputControl
 						size={ '__unstable-large' }
 						label={ __( 'Column Span' ) }
