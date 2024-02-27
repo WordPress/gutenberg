@@ -833,24 +833,7 @@ Imagine a block that has two buttons. One lives inside a context that has `isOpe
 </div>
 ```
 
-The action is async and needs to await a long delay.
-
-```ts
-store("myPlugin", {
-  state: {
-    get isOpen() {
-      return getContext().isOpen;
-    },
-  },
-  actions: {
-    someAction: async () => {
-      state.isOpen; // This context is always correct because it's synchronous.
-      await longDelay();
-      state.isOpen; // This may not get the proper context unless we "restore" it.
-    },
-  },
-});
-```
+If the action is async and needs to await a long delay.
 
 - The user clicks the first button.
 - The scope points to the first context, where `isOpen: true`.
@@ -865,7 +848,7 @@ store("myPlugin", {
 
 We need to be able to know when async actions start awaiting and resume operations, so we can restore the proper scope, and that's what generators do.
 
-The previous store will work fine if it is written like this:
+The store will work fine if it is written like this:
 ```js
 store("myPlugin", {
   state: {
