@@ -43,7 +43,7 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 		);
 
 		self::$attributes = array(
-			'moreText' => '',
+			'moreText' 		=> '',
 			'excerptLength' => 55,
 		);
 
@@ -131,7 +131,7 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 		);
 
 		self::$attributes = array(
-			'moreText' => 'Read More',
+			'moreText' 		=> 'Read More',
 			'excerptLength' => 55,
 		);
 
