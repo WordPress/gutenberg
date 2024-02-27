@@ -412,12 +412,21 @@ async function loadSiteEntity() {
 		meta: {},
 	};
 
+	// @todo: Check why this isn't picking up preloaded data.
 	const site = await apiFetch( {
 		path: '/wp/v2/settings',
 		method: 'OPTIONS',
 	} );
 
-	const labels = site?.schema?.properties ?? {};
+	const labels = {};
+	Object.entries( site?.schema?.properties ?? {} ).forEach(
+		( [ key, value ] ) => {
+			// Ignore properties `title` and `type` keys.
+			if ( typeof value === 'object' && value.title ) {
+				labels[ key ] = value.title;
+			}
+		}
+	);
 
 	return [ { ...entity, meta: { labels } } ];
 }
@@ -458,17 +467,15 @@ function registerSyncConfigs( configs ) {
 /**
  * Loads the kind entities into the store.
  *
- * @param {string} kind Kind
- * @param {string} name Name
+ * @param {string}  kind Kind
+ * @param {?string} name Name
  * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig =
 	( kind, name ) =>
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
-		const hasConfig = !! configs?.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const hasConfig = !! select.getEntityConfig( kind, name );
 
 		if ( configs?.length > 0 && hasConfig ) {
 			if ( window.__experimentalEnableSync ) {
