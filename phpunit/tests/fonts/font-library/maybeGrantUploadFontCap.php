@@ -18,10 +18,10 @@ class Tests_Fonts_GutenbergMaybeGrantUploadFontCap extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		add_filter( 'font_dir', array( $this, 'mock_wp_get_font_dir' ) );
-		add_filter( 'file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed' ) );
-		add_filter( 'file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed_return_false' ) );
-		add_filter( 'map_meta_cap', array( $this, 'mock_current_user_can' ), 10 );
+		remove_filter( 'font_dir', array( $this, 'mock_wp_get_font_dir' ) );
+		remove_filter( 'file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed' ) );
+		remove_filter( 'file_mod_allowed', array( $this, 'mock_wp_is_file_mod_allowed_return_false' ) );
+		remove_filter( 'map_meta_cap', array( $this, 'mock_current_user_can' ), 10 );
 		parent::tear_down();
 	}
 

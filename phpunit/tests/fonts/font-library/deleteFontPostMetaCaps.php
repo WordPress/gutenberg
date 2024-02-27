@@ -14,13 +14,17 @@ class Tests_Fonts_GutenbergDeleteFontPostMetaCaps extends WP_UnitTestCase {
 	public function test_should_return_original_caps_when_do_not_allow_is_present() {
 		$caps   = array( 'don_not_allow' );
 		$result = gutenberg_delete_font_post_meta_caps( $caps, 'some_cap', 1, array( 999 ) );
-		$this->assertSameSetsWithIndex( $caps, $result );
+		ksort( $caps );
+		ksort( $result );
+		$this->assertSame( $caps, $result, 'The original capabilities should not be changed when do_not_allow is present.' );
 	}
 
 	public function test_should_return_original_caps_if_not_delete_post_capability() {
 		$caps   = array( 'my_capability' );
 		$result = gutenberg_delete_font_post_meta_caps( $caps, 'some_cap', 1, array( 999 ) );
-		$this->assertSameSetsWithIndex( $caps, $result );
+		ksort( $caps );
+		ksort( $result );
+		$this->assertSame( $caps, $result, 'The original capabilities should not be changed if no delete_post capability.' );
 	}
 
 	public function test_should_add_do_not_allow_for_non_existent_post() {
