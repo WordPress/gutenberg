@@ -6,6 +6,10 @@
 
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 
+### Internal
+
+-   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
+
 ## 27.0.0 (2024-02-21)
 
 ### Breaking Changes
@@ -23,7 +27,6 @@
 -   `FormTokenField`: Use `Element.scrollIntoView()` instead of `dom-scroll-into-view` ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
 -   Removing `dom-scroll-into-view` as a dependency of the components package ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
 -   Add higher-order function to ignore IME keydowns ([#59081](https://github.com/WordPress/gutenberg/pull/59081)).
--   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
 
 ### Experimental
 
