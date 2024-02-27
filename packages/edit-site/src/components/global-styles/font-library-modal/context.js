@@ -162,16 +162,6 @@ function FontLibraryProvider( { children } ) {
 	// Demo
 	const [ loadedFontUrls ] = useState( new Set() );
 
-	// Theme data
-	const { site, currentTheme } = useSelect( ( select ) => {
-		return {
-			site: select( coreStore ).getSite(),
-			currentTheme: select( coreStore ).getCurrentTheme(),
-		};
-	} );
-	const themeUrl =
-		site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
-
 	const getAvailableFontsOutline = ( availableFontFamilies ) => {
 		const outline = availableFontFamilies.reduce( ( acc, font ) => {
 			const availableFontFaces =
@@ -416,7 +406,7 @@ function FontLibraryProvider( { children } ) {
 		// If the font doesn't have a src, don't load it.
 		if ( ! fontFace.src ) return;
 		// Get the src of the font.
-		const src = getDisplaySrcFromFontFace( fontFace.src, themeUrl );
+		const src = getDisplaySrcFromFontFace( fontFace.src );
 		// If the font is already loaded, don't load it again.
 		if ( ! src || loadedFontUrls.has( src ) ) return;
 		// Load the font in the browser.
