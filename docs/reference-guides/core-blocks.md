@@ -61,7 +61,6 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 -	**Name:** core/buttons
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** 
 
 ## Calendar
 
@@ -116,6 +115,7 @@ This block is deprecated. Please use the Avatar block instead. ([Source](https:/
 -	**Name:** core/comment-author-avatar
 -	**Experimental:** fse
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), ~~html~~, ~~inserter~~
 -	**Attributes:** height, width
 
@@ -125,6 +125,7 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 
 -	**Name:** core/comment-author-name
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, linkTarget, textAlign
 
@@ -134,6 +135,7 @@ Displays the contents of a comment. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/comment-content
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
@@ -143,6 +145,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 
 -	**Name:** core/comment-date
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** format, isLink
 
@@ -152,6 +155,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** linkTarget, textAlign
 
@@ -161,6 +165,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
@@ -172,7 +177,6 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Category:** design
 -	**Parent:** core/comments
 -	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Comments
 
@@ -211,7 +215,6 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Category:** theme
 -	**Parent:** core/comments-pagination
 -	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Comments Previous Page
 
@@ -229,6 +232,7 @@ Displays a title with the number of comments. ([Source](https://github.com/WordP
 
 -	**Name:** core/comments-title
 -	**Category:** theme
+-	**Ancestor:** core/comments
 -	**Supports:** align, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
 -	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
 
@@ -275,7 +279,6 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/footnotes
 -	**Category:** text
 -	**Supports:** color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** 
 
 ## Form
 
@@ -294,6 +297,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/form-input
 -	**Experimental:** true
 -	**Category:** common
+-	**Ancestor:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
 
@@ -304,7 +308,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** 
+-	**Ancestor:** core/form
 -	**Attributes:** type
 
 ## Form Submit Button
@@ -314,8 +318,7 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** 
--	**Attributes:** 
+-	**Ancestor:** core/form
 
 ## Classic
 
@@ -491,7 +494,6 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Category:** design
 -	**Parent:** core/post-content
 -	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:** 
 
 ## Page List
 
@@ -603,7 +605,6 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** 
 
 ## Date
 
@@ -649,7 +650,6 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Post Terms
 
@@ -714,7 +714,6 @@ Contains the block elements used to render content when no query results are fou
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Pagination
 
@@ -722,6 +721,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
+-	**Ancestor:** core/query
 -	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow, showLabel
 
