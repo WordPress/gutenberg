@@ -3,15 +3,14 @@
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -61,23 +60,28 @@ export function canBindAttribute( blockName, attributeName ) {
  * This component is responsible for detecting and
  * propagating data changes from the source to the block.
  *
- * @param {Object} props            - The component props.
- * @param {string} props.attrName   - The attribute name.
- * @param {Object} props.blockProps - The block props with bound attribute.
- * @param {Object} props.source     - Source handler.
- * @param {Object} props.args       - The arguments to pass to the source.
+ * @param {Object}   props               - The component props.
+ * @param {string}   props.attrName      - The attribute name.
+ * @param {Object}   props.blockProps    - The block props with bound attribute.
+ * @param {Object}   props.source        - Source handler.
+ * @param {Object}   props.args          - The arguments to pass to the source.
+ * @param {Function} props.setAttributes - The block setAttributes function.
  * @return {null}                     This is a data-handling component. Render nothing.
  */
-const BindingConnector = ( { args, attrName, blockProps, source } ) => {
+const BindingConnector = ( {
+	args,
+	attrName,
+	blockProps,
+	source,
+	setAttributes,
+} ) => {
 	const { placeholder, value: propValue } = source.useSource(
 		blockProps,
 		args
 	);
 
-	const { setAttributes, name } = blockProps;
+	const { name } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
-
-	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
 	const updateBoundAttibute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
@@ -106,13 +110,12 @@ const BindingConnector = ( { args, attrName, blockProps, source } ) => {
 				return;
 			}
 
-			syncDerivedUpdates( () => {
-				setAttributes( {
-					[ attrName ]: newAttrValue,
-				} );
-			} );
+			setAttributes( ( attributes ) => ( {
+				...attributes,
+				[ attrName ]: newAttrValue,
+			} ) );
 		},
-		[ attrName, setAttributes, syncDerivedUpdates ]
+		[ attrName, setAttributes ]
 	);
 
 	useEffect( () => {
@@ -154,12 +157,13 @@ const BindingConnector = ( { args, attrName, blockProps, source } ) => {
  * to the source handlers.
  * For this, it creates a BindingConnector for each bound attribute.
  *
- * @param {Object} props            - The component props.
- * @param {Object} props.blockProps - The BlockEdit props object.
- * @param {Object} props.bindings   - The block bindings settings.
+ * @param {Object}   props                     - The component props.
+ * @param {Object}   props.blockProps          - The BlockEdit props object.
+ * @param {Object}   props.bindings            - The block bindings settings.
+ * @param {Function} props.setParentAttributes - The parent setAttributes function.
  * @return {null}                     This is a data-handling component. Render nothing.
  */
-function BlockBindingBridge( { blockProps, bindings } ) {
+function BlockBindingBridge( { blockProps, bindings, setParentAttributes } ) {
 	const blockBindingsSources = unlock(
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
@@ -182,6 +186,7 @@ function BlockBindingBridge( { blockProps, bindings } ) {
 							source={ source }
 							blockProps={ blockProps }
 							args={ boundAttribute.args }
+							setAttributes={ setParentAttributes }
 						/>
 					);
 				}
@@ -192,6 +197,10 @@ function BlockBindingBridge( { blockProps, bindings } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const [ parentAttributes, setParentAttributes ] = useState(
+			props.attributes
+		);
+
 		/*
 		 * Create binding object filtering
 		 * only the attributes that can be bound.
@@ -208,9 +217,10 @@ const withBlockBindingSupport = createHigherOrderComponent(
 					<BlockBindingBridge
 						blockProps={ props }
 						bindings={ bindings }
+						setParentAttributes={ setParentAttributes }
 					/>
 				) }
-				<BlockEdit { ...props } />
+				<BlockEdit { ...props } attributes={ parentAttributes } />
 			</>
 		);
 	},
