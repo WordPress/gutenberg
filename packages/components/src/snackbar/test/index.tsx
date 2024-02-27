@@ -154,10 +154,10 @@ describe( 'Snackbar', () => {
 			);
 
 			const snackbar = screen.getByTestId( testId );
-			const actions = within( snackbar ).getAllByRole( 'link' );
+			const action = within( snackbar ).getByRole( 'link' );
 
-			expect( actions ).toHaveLength( 1 );
-			expect( actions[ 0 ] ).toHaveTextContent( 'One' );
+			expect( action ).toBeVisible();
+			expect( action ).toHaveTextContent( 'One' );
 		} );
 
 		it( 'should be rendered as a link when the `url` prop is set', () => {
