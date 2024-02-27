@@ -15,9 +15,6 @@ describe( 'SnackbarList', () => {
 	afterEach( () => {
 		jest.resetAllMocks();
 	} );
-	afterAll( () => {
-		jest.clearAllMocks();
-	} );
 
 	it( 'should get focus after a snackbar is dismissed', async () => {
 		render(
