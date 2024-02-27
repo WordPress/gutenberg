@@ -52,11 +52,15 @@ describe( 'getKindEntities', () => {
 		const dispatch = jest.fn();
 		const select = {
 			getEntitiesConfig: jest.fn( () => entities ),
+			getEntityConfig: jest.fn( () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ) ),
 		};
 		const entities = [ { kind: 'postType' } ];
 		await getOrLoadEntitiesConfig(
 			'postType',
-			undefined
+			'post'
 		)( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
@@ -65,6 +69,7 @@ describe( 'getKindEntities', () => {
 		const dispatch = jest.fn();
 		const select = {
 			getEntitiesConfig: jest.fn( () => [] ),
+			getEntityConfig: jest.fn( () => undefined ),
 		};
 		await getOrLoadEntitiesConfig(
 			'unknownKind',
@@ -88,6 +93,7 @@ describe( 'getKindEntities', () => {
 		const dispatch = jest.fn();
 		const select = {
 			getEntitiesConfig: jest.fn( () => [] ),
+			getEntityConfig: jest.fn( () => undefined ),
 		};
 		triggerFetch.mockImplementation( () => fetchedEntities );
 
