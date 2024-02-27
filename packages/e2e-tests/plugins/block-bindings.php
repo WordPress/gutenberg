@@ -21,7 +21,6 @@ function gutenberg_test_block_bindings_register_custom_fields() {
 			'default'      => 'Value of the text_custom_field',
 		)
 	);
-	// TODO: Change url.
 	register_meta(
 		'post',
 		'url_custom_field',
@@ -30,6 +29,25 @@ function gutenberg_test_block_bindings_register_custom_fields() {
 			'type'         => 'string',
 			'single'       => true,
 			'default'      => '#url-custom-field',
+		)
+	);
+	register_meta(
+		'post',
+		'_protected_field',
+		array(
+			'type'    => 'string',
+			'single'  => true,
+			'default' => 'protected field value',
+		)
+	);
+	register_meta(
+		'post',
+		'show_in_rest_false_field',
+		array(
+			'show_in_rest' => false,
+			'type'         => 'string',
+			'single'       => true,
+			'default'      => 'show_in_rest false field value',
 		)
 	);
 }
