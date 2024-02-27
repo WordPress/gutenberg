@@ -18,7 +18,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import styles from './style';
+import styles from './style.scss';
 
 function getContent() {
 	try {
