@@ -1,0 +1,39 @@
+.error-boundary__container {
+	flex-grow: 1;
+	justify-content: flex-start;
+}
+
+.error-boundary__message {
+	font-size: 16;
+}
+
+.error-boundary__actions-container {
+	margin-top: 16px;
+	justify-content: center;
+	flex-direction: row;
+}
+
+.copy-button__container {
+	background-color: $light-primary;
+	border-radius: 3px;
+	padding: $grid-unit $grid-unit-20;
+	margin-top: 8px;
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+.copy-button__container--dark {
+	color: $background-dark-secondary;
+	background-color: $gray-20;
+}
+
+.copy-button__text {
+	text-align: center;
+	color: $white;
+	font-size: 16;
+	font-weight: 400;
+}
+
+.copy-button__text--dark {
+	color: $black;
+}
