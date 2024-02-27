@@ -58,10 +58,6 @@ const getFontFamilies = ( themeJson ) => {
 
 	return [ bodyFontFamily, headingFontFamily ];
 };
-const getFontFamilyNames = ( themeJson ) => {
-	const [ bodyFontFamily, headingFontFamily ] = getFontFamilies( themeJson );
-	return [ bodyFontFamily?.name, headingFontFamily?.name ];
-};
 
 const TypePreview = ( { variation } ) => {
 	const { base } = useContext( GlobalStylesContext );
@@ -111,32 +107,33 @@ export default function TypographyVariations() {
 		} );
 
 	const { base } = useContext( GlobalStylesContext );
-	const uniqueTypographyVariations = [];
-	const uniqueTypographyNames = [];
-	const isDup = ( x, y ) => {
-		return uniqueTypographyNames.find( ( it ) => {
-			return JSON.stringify( it ) === JSON.stringify( [ x, y ] );
-		} );
-	};
 
 	/*
-		@TODO: not convinced about this yet. Originally, it skipped variations that didn't have
-		any heading/body fonts, and therefore names.
-		If we want to pull all "variations", then probably the first iteration is to name the variations according to their titles.
+	 * Filter duplicate variations based on the font families used in the variation.
 	 */
-	typographyVariations?.forEach( ( variation ) => {
-		const [ bodyFontFamilyName, headingFontFamilyName ] =
-			getFontFamilyNames( mergeBaseAndUserConfigs( base, variation ) );
-		if ( ! isDup( bodyFontFamilyName, headingFontFamilyName ) ) {
-			uniqueTypographyVariations.push( variation );
-			if ( bodyFontFamilyName && headingFontFamilyName ) {
-				uniqueTypographyNames.push( [
-					bodyFontFamilyName,
-					headingFontFamilyName,
-				] );
-			}
-		}
-	} );
+	const uniqueTypographyVariations = typographyVariations?.length
+		? Object.values(
+				typographyVariations.reduce( ( acc, variation ) => {
+					const [ bodyFontFamily, headingFontFamily ] =
+						getFontFamilies(
+							mergeBaseAndUserConfigs( base, variation )
+						);
+					if (
+						headingFontFamily?.name &&
+						bodyFontFamily?.name &&
+						! acc[
+							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
+						]
+					) {
+						acc[
+							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
+						] = variation;
+					}
+
+					return acc;
+				}, {} )
+		  )
+		: [];
 
 	return (
 		<VStack spacing={ 3 }>
