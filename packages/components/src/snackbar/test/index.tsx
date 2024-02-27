@@ -52,7 +52,7 @@ describe( 'Snackbar', () => {
 		const snackbar = screen.getByTestId( testId );
 		const icon = within( snackbar ).getByTestId( 'icon' );
 
-		expect( icon ).toBeInTheDocument();
+		expect( icon ).toBeVisible();
 	} );
 
 	it( 'should be dismissible by clicking the snackbar', async () => {
