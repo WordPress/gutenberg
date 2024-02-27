@@ -89,6 +89,16 @@ function BlockHooksControlPure( {
 							// inserted and then moved around a bit by the user.
 							candidates = getBlocks( clientId );
 							break;
+
+						default:
+							// If we haven't found a blockHooks field with a relative position for the hooked
+							// block, it means that it was added by a filter. In this case, we look for the block
+							// both among the current block's siblings and its children.
+							candidates = [
+								...getBlocks( rootClientId ),
+								...getBlocks( clientId ),
+							];
+							break;
 					}
 
 					const hookedBlock = candidates?.find(
