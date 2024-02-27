@@ -16,6 +16,7 @@ import { normalizeIconObject } from '@wordpress/blocks';
 import styles from './style.scss';
 
 function Warning( {
+	actions,
 	title,
 	message,
 	icon,
@@ -53,6 +54,7 @@ function Warning( {
 			) }
 			{ title && <Text style={ titleStyle }>{ title }</Text> }
 			{ message && <Text style={ messageStyle }>{ message }</Text> }
+			{ actions }
 		</View>
 	);
 }
