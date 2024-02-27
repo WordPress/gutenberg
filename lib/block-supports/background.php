@@ -30,12 +30,18 @@ function gutenberg_register_background_support( $block_type ) {
 	}
 }
 
-// @TODO tests.
+/**
+ * Given a theme.json or block background styles, returns the background styles for a block.
+ *
+ * @param  array  $background_styles Background style properties.
+ * @return array                     Style engine array of CSS string and style declarations.
+ */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
 	$background_image_source = $background_styles['backgroundImage']['source'] ?? null;
 
 	if ( is_string( $background_styles['backgroundImage'] ) ) {
-		$url = $background_styles['backgroundImage'];
+		$url                                 = $background_styles['backgroundImage'];
+		$background_image_source             = 'file';
 		$background_styles['backgroundImage'] = array(
 			'url'    => $url,
 		);
