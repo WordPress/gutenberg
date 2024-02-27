@@ -1,58 +1,23 @@
 # API Reference
 
-> **Note**
-> Interactivity API is only available for WordPress 6.5 and above.
+<div class="callout callout-warning">
+Interactivity API is only available for WordPress 6.5 and above.
+</div>
 
-To add interactivity to blocks using the Interactivity API, developers can use:
+To add interactions to blocks using the Interactivity API, developers can use:
 
-- **Directives** - added to the markup to add specific behavior to the DOM elements of the block.
-- **Store** - that contains the logic and data (state, actions, or side effects, among others) needed for the behavior.
+- **Directives:** Added to the markup to add specific behavior to the DOM elements of the block
+- **Store:** Contains the logic and data (state, actions, side effects, etc.) needed for the behavior
 
 DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=T4meh6lltJh6TCX51NTIu,DmIhxYSGFTL_ywZFbsmuSw)).
 
 ![State & Directives](https://make.wordpress.org/core/files/2024/02/interactivity-state-directives.png)
 
-## Table of Contents
-
-- [The directives](#the-directives)
-  - [List of Directives](#list-of-directives)
-    - [`wp-interactive`](#wp-interactive) ![](https://img.shields.io/badge/DECLARATIVE-afd2e3.svg)
-    - [`wp-context`](#wp-context) ![](https://img.shields.io/badge/STATE-afd2e3.svg)
-    - [`wp-bind`](#wp-bind) ![](https://img.shields.io/badge/ATTRIBUTES-afd2e3.svg)
-    - [`wp-class`](#wp-class) ![](https://img.shields.io/badge/ATTRIBUTES-afd2e3.svg)
-    - [`wp-style`](#wp-style) ![](https://img.shields.io/badge/ATTRIBUTES-afd2e3.svg)
-    - [`wp-text`](#wp-text) ![](https://img.shields.io/badge/CONTENT-afd2e3.svg)
-    - [`wp-on`](#wp-on) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
-    - [`wp-on-window`](#wp-on-window) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
-    - [`wp-on-document`](#wp-on-document) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
-    - [`wp-watch`](#wp-watch) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
-    - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
-    - [`wp-run`](#wp-run) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
-    - [`wp-key`](#wp-key) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
-    - [`wp-each`](#wp-each) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
-  - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
-- [The store](#the-store)
-  - [Elements of the store](#elements-of-the-store)
-    - [State](#state)
-    - [Actions](#actions)
-    - [Side Effects](#side-effects)
-  - [Setting the store](#setting-the-store)
-    - [On the client side](#on-the-client-side)
-    - [On the server side](#on-the-server-side)
-	- [Store client methods](#store-client-methods)
-	  - [getContext()](#getcontext)
-		- [getElement()](#getelement)
-- [Server Functions](#server-functions)
-  - [wp_interactivity_config](#wp_interactivity_config)
-	- [wp_interactivity_process_directives](#wp_interactivity_process_directives)
-
-## The directives
+## What are directives?
 
 Directives are custom attributes that are added to the markup of your block to add behavior to its DOM elements. This can be done in the `render.php` file (for dynamic blocks) or the `save.js` file (for static blocks).
 
-Interactivity API directives use the `data-` prefix.
-
-_Example of directives used in the HTML markup_
+Interactivity API directives use the `data-` prefix. Here's an example of directives used in HTML markup.
 
 ```html
 <div
@@ -76,11 +41,11 @@ _Example of directives used in the HTML markup_
 
 Directives can also be injected dynamically using the [HTML Tag Processor](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2).
 
-### List of Directives
+With directives, you can directly manage interactions such as side effects, state, event handlers, attributes, or content.
 
-With directives, you can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
+## List of Directives
 
-#### `wp-interactive`
+### `wp-interactive`
 
 The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). The directive includes a namespace to reference a specific store, that can be set as a `string` or an `object`.
 
@@ -95,7 +60,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
 </div>
-```html
+
 <!-- This is also valid -->
 <div
   data-wp-interactive='{ "namespace": "myPlugin" }'
@@ -111,13 +76,11 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
 > **Note**
 > The use of `data-wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `data-wp-interactive` has not been added for the sake of simplicity. Also, the `data-wp-interactive` directive will be injected automatically in the future.
 
-#### `wp-context`
+### `wp-context`
 
 It provides a **local** state available to a specific HTML node and its children.
 
 The `wp-context` directive accepts a stringified JSON as a value.
-
-_Example of `wp-context` directive_
 
 ```php
 //render.php
@@ -141,9 +104,7 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 Different contexts can be defined at different levels, and deeper levels will merge their own context with any parent one:
 
@@ -162,13 +123,9 @@ Different contexts can be defined at different levels, and deeper levels will me
 </div>
 ```
 
-#### `wp-bind`
+### `wp-bind`
 
-It allows setting HTML attributes on elements based on a boolean or string value.
-
-> This directive follows the syntax `data-wp-bind--attribute`.
-
-_Example of `wp-bind` directive_
+This directive allows setting HTML attributes on elements based on a boolean or string value. It follows the syntax `data-wp-bind--attribute`. 
 
 ```html
 <li data-wp-context='{ "isMenuOpen": false }'>
@@ -200,34 +157,28 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 The `wp-bind` directive is executed:
 
-- When the element is created.
-- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference).
+- When the element is created
+- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
 
 When `wp-bind` directive references a callback to get its final value:
 
 - The `wp-bind` directive will be executed each time there's a change on any of the properties of the `state` or `context` used inside this callback.
 - The returned value in the callback function is used to change the value of the associated attribute.
 
-The `wp-bind` will do different things over the DOM element is applied, depending on its value:
+The `wp-bind` will do different things when the DOM element is applied, depending on its value:
 
-  - If the value is `true`, the attribute is added: `<div attribute>`.
-  - If the value is `false`, the attribute is removed: `<div>`.
-  - If the value is a string, the attribute is added with its value assigned: `<div attribute="value"`.
-  - If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`.
+  - If the value is `true`, the attribute is added: `<div attribute>`
+  - If the value is `false`, the attribute is removed: `<div>`
+  - If the value is a string, the attribute is added with its value assigned: `<div attribute="value"`
+  - If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`
 
-#### `wp-class`
+### `wp-class`
 
-It adds or removes a class to an HTML element, depending on a boolean value.
-
-> This directive follows the syntax `data-wp-class--classname`.
-
-_Example of `wp-class` directive_
+This directive adds or removes a class to an HTML element, depending on a boolean value. It follows the syntax `data-wp-class--classname`.
 
 ```html
 <div>
@@ -261,26 +212,20 @@ store( "myPlugin", {
   }
 } );
 ```
-
 </details>
-<br/>
 
 The `wp-class` directive is executed:
 
-- When the element is created.
-- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference).
+- When the element is created
+- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
 
 When `wp-class` directive references a callback to get its final boolean value, the callback receives the class name: `className`.
 
 The boolean value received by the directive is used to toggle (add when `true` or remove when `false`) the associated class name from the `class` attribute.
 
-#### `wp-style`
+### `wp-style`
 
-It adds or removes inline style to an HTML element, depending on its value.
-
-> This directive follows the syntax `data-wp-style--css-property`.
-
-_Example of `wp-style` directive_
+This directive adds or removes inline style to an HTML element, depending on its value. It follows the syntax `data-wp-style--css-property`. 
 
 ```html
 <div data-wp-context='{ "color": "red" }' >
@@ -303,23 +248,21 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 The `wp-style` directive is executed:
 
-- When the element is created.
-- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference).
+- When the element is created
+- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
 
 When `wp-style` directive references a callback to get its final value, the callback receives the class style property: `css-property`.
 
-The value received by the directive is used to add or remove the style attribute with the associated CSS property: :
+The value received by the directive is used to add or remove the style attribute with the associated CSS property:
 
-- If the value is `false`, the style attribute is removed: `<div>`.
-- If the value is a string, the attribute is added with its value assigned: `<div style="css-property: value;">`.
+- If the value is `false`, the style attribute is removed: `<div>`
+- If the value is a string, the attribute is added with its value assigned: `<div style="css-property: value;">`
 
-#### `wp-text`
+### `wp-text`
 
 It sets the inner text of an HTML element.
 
@@ -345,24 +288,18 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 The `wp-text` directive is executed:
 
-- When the element is created.
-- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference).
+- When the element is created
+- Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
 
 The returned value is used to change the inner content of the element: `<div>value</div>`.
 
-#### `wp-on`
+### `wp-on`
 
-It runs code on dispatched DOM events like `click` or `keyup`.
-
-> The syntax of this directive is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
-
-_Example of `wp-on` directive_
+This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`). 
 
 ```php
 <button data-wp-on--click="actions.logTime" >
@@ -382,24 +319,20 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 The `wp-on` directive is executed each time the associated event is triggered.
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
 
-#### `wp-on-window`
+### `wp-on-window`
 
-It allows to attach global window events like `resize`, `copy`, `focus` and then execute a defined callback when those happen.
+This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
 
 [List of supported window events.](https://developer.mozilla.org/en-US/docs/Web/API/Window#events)
 
-> The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize`
+The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize`
 or `data-wp-on-window--languagechange`).
-
-_Example of `wp-on-window` directive_
 
 ```php
 <div data-wp-on-window--resize="callbacks.logWidth"></div>
@@ -417,22 +350,18 @@ store( "myPlugin", {
 	},
 } );
 ```
-
 </details>
-<br/>
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-#### `wp-on-document`
+### `wp-on-document`
 
-It allows to attach global document events like `scroll`, `mousemove`, `keydown` and then execute a defined callback when those happen.
+This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
 
 [List of supported document events.](https://developer.mozilla.org/en-US/docs/Web/API/Document#events)
 
-> The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown`
+The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown`
 or `data-wp-on-document--selectionchange`).
-
-_Example of `wp-on-document` directive_
 
 ```php
 <div data-wp-on-document--keydown="callbacks.logKeydown"></div>
@@ -450,19 +379,17 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-#### `wp-watch`
+### `wp-watch`
 
 It runs a callback **when the node is created and runs it again when the state or context changes**.
 
-You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-watch` directives of that DOM element._
+You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`. 
 
-_Example of `wp-watch` directive_
+The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-watch` directives of that DOM element.
 
 ```html
 <div
@@ -498,31 +425,29 @@ store( "myPlugin", {
   },
 } );
 ```
-
 </details>
-<br/>
 
 The `wp-watch` directive is executed:
 
-- When the element is created.
-- Each time that any of the properties of the `state` or `context` used inside the callback changes.
+- When the element is created
+- Each time that any of the properties of the `state` or `context` used inside the callback changes
 
 The `wp-watch` directive can return a function. If it does, the returned function is used as cleanup logic, i.e., it will run just before the callback runs again, and it will run again when the element is removed from the DOM.
 
 As a reference, some use cases for this directive may be:
 
-- Logging.
-- Changing the title of the page.
+- Logging
+- Changing the title of the page
 - Setting the focus on an element with `.focus()`.
-- Changing the state or context when certain conditions are met.
+- Changing the state or context when certain conditions are met
 
-#### `wp-init`
+### `wp-init`
 
-It runs a callback **only when the node is created**.
+This directive runs a callback **only when the node is created**.
 
-You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-init` directives of that DOM element._
+You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init--[unique-id]`.
 
-_Example of `data-wp-init` directive_
+The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-init` directives of that DOM element.
 
 ```html
 <div data-wp-init="callbacks.logTimeInit">
@@ -530,7 +455,7 @@ _Example of `data-wp-init` directive_
 </div>
 ```
 
-_Example of several `wp-init` directives on the same DOM element_
+Here's another example with several `wp-init` directives on the same DOM element.
 
 ```html
 <form
@@ -557,19 +482,18 @@ store( "myPlugin", {
 ```
 
 </details>
-<br/>
 
 The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
 
-#### `wp-run`
+### `wp-run`
 
-It runs the passed callback **during node's render execution**.
+This directive runs the passed callback **during the node's render execution**.
 
-You can use and compose hooks like `useState`, `useWatch` or `useEffect` inside inside the passed callback and create your own logic, providing more flexibility than previous directives.
+You can use and compose hooks like `useState`, `useWatch`, or `useEffect` inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
-You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-run` directives of that DOM element._
+You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. 
 
-_Example of `data-wp-run` directive_
+The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-run` directives of that DOM element.
 
 ```html
 <div data-wp-run="callbacks.logInView">
@@ -613,11 +537,9 @@ store( 'myPlugin', {
   },
 } );
 ```
-
 </details>
-<br/>
 
-#### `wp-key`
+### `wp-key`
 
 The `wp-key` directive assigns a unique key to an element to help the Interactivity API identify it when iterating through arrays of elements. This becomes important if your array elements can move (e.g., due to sorting), get inserted, or get deleted. A well-chosen key value helps the Interactivity API infer what exactly has changed in the array, allowing it to make the correct updates to the DOM.
 
@@ -641,8 +563,7 @@ But it can also be used on other elements:
 
 When the list is re-rendered, the Interactivity API will match elements by their keys to determine if an item was added/removed/reordered. Elements without keys might be recreated unnecessarily.
 
-
-#### `wp-each`
+### `wp-each`
 
 The `wp-each` directive is intended to render a list of elements. The directive can be used in `<template>` tags, being the value a path to an array stored in the global state or the context. The content inside the `<template>` tag is the template used to render each of the items.
 
@@ -680,8 +601,7 @@ The prop that holds the item in the context can be changed by passing a suffix t
 
 By default, it uses each element as the key for the rendered nodes, but you can also specify a path to retrieve the key if necessary, e.g., when the list contains objects.
 
-For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-wp-key` inside the template content. This is because `data-wp-each` creates
-a context provider wrapper around each rendered item, and those wrappers are the ones that need the `key` property.
+For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-wp-key` inside the template content. This is because `data-wp-each` creates a context provider wrapper around each rendered item, and those wrappers are the ones that need the `key` property.
 
 ```html
 <ul data-wp-context='{
@@ -713,7 +633,7 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 </ul>
 ```
 
-### Values of directives are references to store properties
+## Values of directives are references to store properties
 
 The value assigned to a directive is a string pointing to a specific state, action, or side effect.
 
@@ -754,7 +674,7 @@ The example below is getting `state.isPlaying` from `otherPlugin` instead of `my
 
 ## The store
 
-The store is used to create the logic (actions, side effects…) linked to the directives and the data used inside that logic (state, derived state…).
+The store is used to create the logic (actions, side effects, etc.) linked to the directives and the data used inside that logic (state, derived state, etc.).
 
 **The store is usually created in the `view.js` file of each block**, although the state can be initialized from the `render.php` of the block.
 
@@ -955,7 +875,7 @@ wp_interactivity_state( 'favoriteMovies', array(
 
 ### Private stores
 
-A given store namespace can be marked as private, thus preventing its content to be accessed from other namespaces. The mechanism to do so is by adding a `lock` option to the `store()` call, like shown in the example below. This way, further executions of `store()` with the same locked namespace will throw an error, meaning that the namespace can only be accessed where its reference was returned from the first `store()` call. This is specially useful for developers that want to hide part of their plugin stores so it doesn't become accessible for extenders.
+A given store namespace can be marked as private, thus preventing its content to be accessed from other namespaces. The mechanism to do so is by adding a `lock` option to the `store()` call, as shown in the example below. This way, further executions of `store()` with the same locked namespace will throw an error, meaning that the namespace can only be accessed where its reference was returned from the first `store()` call. This is especially useful for developers who want to hide part of their plugin stores so it doesn't become accessible for extenders.
 
 ```js
 const { state } = store(
