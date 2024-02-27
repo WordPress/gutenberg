@@ -23,6 +23,8 @@ Decodes the HTML entities from a given string.
 _Usage_
 
 ```js
+import { decodeEntities } from '@wordpress/html-entities';
+
 const result = decodeEntities( '&aacute;' );
 console.log( result ); // result will be "á"
 ```
