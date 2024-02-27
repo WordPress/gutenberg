@@ -177,6 +177,23 @@ describe( 'BlockOutline', () => {
 
 				expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
 			} );
+
+			describe( 'when cover block', () => {
+				it( 'should not render an outline', async () => {
+					render(
+						<BlockOutline
+							isSelected
+							blockCategory="media"
+							name="core/cover"
+							hasInnerBlocks
+						/>
+					);
+
+					expect(
+						screen.queryByTestId( 'block-outline' )
+					).toBeNull();
+				} );
+			} );
 		} );
 
 		describe( 'when a file block', () => {

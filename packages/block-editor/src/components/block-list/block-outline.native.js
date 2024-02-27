@@ -52,6 +52,8 @@ function BlockOutline( { blockCategory, hasInnerBlocks, isSelected, name } ) {
 		! MEDIA_BLOCKS_WITH_OUTLINE.includes( name )
 	) {
 		shouldShowOutline = false;
+	} else if ( blockCategory === 'media' && name === 'core/cover' ) {
+		shouldShowOutline = false;
 	} else if (
 		blockCategory === 'design' &&
 		DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name )
