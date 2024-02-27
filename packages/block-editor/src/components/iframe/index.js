@@ -245,7 +245,19 @@ function Iframe( {
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
-		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		<style>
+			html{
+				height: auto !important;
+				min-height: 100%;
+			}
+
+			body {
+				margin: 0;
+				/* Default background color in case zoom out mode background
+				colors the html element */
+				background: white;
+			}
+		</style>
 		${ styles }
 		${ scripts }
 	</head>

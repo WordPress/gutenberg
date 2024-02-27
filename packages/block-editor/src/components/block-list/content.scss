@@ -455,6 +455,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 .block-editor-iframe__html {
 	transition: all 0.3s;
-	background-color: $gray-300;
 	transform-origin: top center;
+}
+
+.block-editor-iframe__html[style*="scale"] {
+	background-color: $gray-300;
 }
