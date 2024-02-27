@@ -14,6 +14,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './block.scss';
 
 const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing', 'core/freeform' ];
+const DESIGN_BLOCKS_WITHOUT_OUTLINE = [ 'core/button', 'core/spacer' ];
 
 function BlockOutline( {
 	blockCategory,
@@ -32,7 +33,8 @@ function BlockOutline( {
 		blockCategory === 'embed' ||
 		! blockCategory;
 	const isNonRichTextDesignBlock =
-		blockCategory === 'design' && name !== 'core/button';
+		blockCategory === 'design' &&
+		! DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name );
 	const shouldShowCompactOutline =
 		( hasBlockMediaCategory && ! hasInnerBlocks ) || textBlockWithOutline;
 

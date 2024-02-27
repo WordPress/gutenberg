@@ -218,4 +218,34 @@ describe( 'BlockOutline', () => {
 			} );
 		} );
 	} );
+
+	describe( 'when the block is a spacer block', () => {
+		describe( 'when selected', () => {
+			it( 'should not render an outline', async () => {
+				render(
+					<BlockOutline
+						isSelected
+						blockCategory="design"
+						name="core/spacer"
+					/>
+				);
+
+				expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
+			} );
+		} );
+
+		describe( 'when not selected', () => {
+			it( 'should not render an outline', async () => {
+				render(
+					<BlockOutline
+						isSelected={ false }
+						blockCategory="design"
+						name="core/spacer"
+					/>
+				);
+
+				expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
+			} );
+		} );
+	} );
 } );
