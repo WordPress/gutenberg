@@ -11,10 +11,10 @@ import { __ } from '@wordpress/i18n';
 import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import InspectorControls from '../inspector-controls';
-import { getBorderPanelLabel } from '../../hooks/border';
+import { useBorderPanelLabel } from '../../hooks/border';
 
 const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
-	const borderPanelLabel = getBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 
 	return (
 		<>

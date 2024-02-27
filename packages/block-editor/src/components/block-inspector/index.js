@@ -30,7 +30,7 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
-import { getBorderPanelLabel } from '../../hooks/border';
+import { useBorderPanelLabel } from '../../hooks/border';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
@@ -116,6 +116,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId
 	);
 
+	const borderPanelLabel = useBorderPanelLabel( {
+		blockName: selectedBlockName,
+	} );
+
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
@@ -140,9 +144,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 						/>
 						<InspectorControls.Slot
 							group="border"
-							label={ getBorderPanelLabel( {
-								blockName: selectedBlockName,
-							} ) }
+							label={ borderPanelLabel }
 						/>
 						<InspectorControls.Slot group="styles" />
 					</>
@@ -251,7 +253,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const borderPanelLabel = getBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 
 	return (
 		<div className="block-editor-block-inspector">
