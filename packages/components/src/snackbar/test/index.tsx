@@ -75,8 +75,8 @@ describe( 'Snackbar', () => {
 
 		await click( snackbar );
 
-		expect( onRemove ).toHaveBeenCalled();
-		expect( onDismiss ).toHaveBeenCalled();
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should not be dismissible by clicking the snackbar when the `explicitDismiss` prop is set to `true`', async () => {
@@ -131,8 +131,8 @@ describe( 'Snackbar', () => {
 
 		await click( closeButton );
 
-		expect( onRemove ).toHaveBeenCalled();
-		expect( onDismiss ).toHaveBeenCalled();
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	describe( 'actions', () => {
@@ -195,7 +195,7 @@ describe( 'Snackbar', () => {
 
 			await click( button );
 
-			expect( onClick ).toHaveBeenCalled();
+			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'should be rendered as a link when the `url` prop and the `onClick` are set', () => {
