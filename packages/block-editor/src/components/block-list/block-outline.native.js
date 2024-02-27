@@ -44,7 +44,7 @@ function BlockOutline( {
 		hasBlockTextCategory && styles.solidBorderTextContent,
 	];
 
-	const shoudlShowOutline =
+	const shouldShowOutline =
 		isSelected &&
 		( ( hasBlockTextCategory && hasInnerBlocks ) ||
 			( ! hasBlockTextCategory && hasInnerBlocks ) ||
@@ -53,7 +53,7 @@ function BlockOutline( {
 			textBlockWithOutline );
 
 	return (
-		shoudlShowOutline && (
+		shouldShowOutline && (
 			<View pointerEvents="box-none" style={ styleSolidBorder } />
 		)
 	);
