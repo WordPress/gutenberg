@@ -157,7 +157,20 @@ const BindingConnector = ( {
 	return null;
 };
 
-function BlockBindingBridge( { bindings, props, blockName, attributes } ) {
+/**
+ * BlockBindingBridge acts like a component wrapper
+ * that connects the bound attributes of a block
+ * to the source handlers.
+ * For this, it creates a BindingConnector for each bound attribute.
+ *
+ * @param {Object} props            - The component props.
+ * @param {string} props.blockName  - The block name.
+ * @param {Object} props.blockProps - The BlockEdit props object.
+ * @param {Object} props.bindings   - The block bindings settings.
+ * @param {Object} props.attributes - The block attributes.
+ * @return {null}                     This is a data-handling component. Render nothing.
+ */
+function BlockBindingBridge( { blockName, blockProps, bindings, attributes } ) {
 	const blockBindingsSources = unlock(
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
@@ -180,7 +193,7 @@ function BlockBindingBridge( { bindings, props, blockName, attributes } ) {
 							attrName={ attrName }
 							attrValue={ attributes[ attrName ] }
 							source={ source }
-							blockProps={ props }
+							blockProps={ blockProps }
 							args={ boundAttribute.args }
 						/>
 					);
@@ -214,7 +227,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		return (
 			<>
 				<BlockBindingBridge
-					props={ props }
+					blockProps={ props }
 					blockName={ blockName }
 					bindings={ bindings }
 					attributes={ attributes }
