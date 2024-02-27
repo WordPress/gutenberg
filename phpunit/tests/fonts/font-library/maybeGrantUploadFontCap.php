@@ -8,7 +8,7 @@
  * @group fonts
  * @group font-library
  *
- * @covers gutenberg_maybe_grant_upload_font_cap
+ * @covers ::gutenberg_maybe_grant_upload_font_cap
  */
 class Tests_Fonts_MaybeGrantUploadFontCap extends WP_UnitTestCase {
 	public function set_up() {
