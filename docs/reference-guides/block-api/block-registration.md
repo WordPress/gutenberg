@@ -304,7 +304,7 @@ The key is the name of the block (`string`) to hook into, and the value is the p
 ```js
 {
 	blockHooks: {
-		'core/verse': 'before'
+		'core/verse': 'before',
 		'core/spacer': 'after',
 		'core/column': 'firstChild',
 		'core/group': 'lastChild',

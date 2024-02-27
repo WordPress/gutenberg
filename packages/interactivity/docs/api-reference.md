@@ -1,5 +1,8 @@
 # API Reference
 
+> **Note**
+> Interactivity API is only available for WordPress 6.5 and above.
+
 To add interactivity to blocks using the Interactivity API, developers can use:
 
 - **Directives** - added to the markup to add specific behavior to the DOM elements of the block.
@@ -7,7 +10,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 
 DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=T4meh6lltJh6TCX51NTIu,DmIhxYSGFTL_ywZFbsmuSw)).
 
-![State & Directives](assets/state-directives.png)
+![State & Directives](https://make.wordpress.org/core/files/2024/02/interactivity-state-directives.png)
 
 ## Table of Contents
 
@@ -36,6 +39,12 @@ DOM elements are connected to data stored in the state and context through direc
   - [Setting the store](#setting-the-store)
     - [On the client side](#on-the-client-side)
     - [On the server side](#on-the-server-side)
+	- [Store client methods](#store-client-methods)
+	  - [getContext()](#getcontext)
+		- [getElement()](#getelement)
+- [Server Functions](#server-functions)
+  - [wp_interactivity_config](#wp_interactivity_config)
+	- [wp_interactivity_process_directives](#wp_interactivity_process_directives)
 
 ## The directives
 
@@ -69,7 +78,7 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 ### List of Directives
 
-With directives, we can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
+With directives, you can directly manage interactions related to things such as side effects, state, event handlers, attributes or content.
 
 #### `wp-interactive`
 
@@ -659,7 +668,7 @@ It would generate the following output:
 </ul>
 ```
 
-The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, we change the default prop `item` to `greeting`.
+The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, the default prop changes from `item` to `greeting`.
 
 ```html
 <ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
@@ -708,7 +717,7 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 
 The value assigned to a directive is a string pointing to a specific state, action, or side effect.
 
-In the following example, we use a getter to define the `state.isPlaying` derived value.
+In the following example, a getter is used to define the `state.isPlaying` derived value.
 
 ```js
 const { state } = store( "myPlugin", {
@@ -721,7 +730,7 @@ const { state } = store( "myPlugin", {
 } );
 ```
 
-And then, we use the string value `"state.isPlaying"` to assign the result of this selector to `data-bind--hidden`.
+And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-bind--hidden`.
 
 ```html
 <div data-bind--hidden="!state.isPlaying" ... >
@@ -731,9 +740,9 @@ And then, we use the string value `"state.isPlaying"` to assign the result of th
 
 These values assigned to directives are **references** to a particular property in the store. They are wired to the directives automatically so that each directive “knows” what store element refers to, without any additional configuration.
 
-Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property we want to access is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
+Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property accessed is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
 
-In the example below, we get `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
+The example below is getting `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
 
 ```html
 <div data-wp-interactive="myPlugin">
@@ -890,7 +899,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 #### On the client side
 
-*In the `view.js` file of each block* we can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
+*In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
 The `store` method used to set the store in javascript can be imported from `@wordpress/interactivity`.
 
@@ -917,40 +926,31 @@ store( "myPlugin", {
 
 #### On the server side
 
-> **Note**
-> We will rename `wp_store` to `wp_initial_state` in a future version.
+The state can also be initialized on the server using the `wp_interactivity_state()` function. You would typically do this in the `render.php` file of your block (the `render.php` templates were [introduced](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/) in WordPress 6.1).
 
-The state can also be initialized on the server using the `wp_store()` function. You would typically do this in the `render.php` file of your block (the `render.php` templates were [introduced](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/) in WordPress 6.1).
+The state defined on the server with `wp_interactivity_state()` gets merged with the stores defined in the view.js files.
 
-The state defined on the server with `wp_store()` gets merged with the stores defined in the view.js files.
-
-The `wp_store` function receives an [associative array](https://www.php.net/manual/en/language.types.array.php) as a parameter.
+The `wp_interactivity_state` function receives two arguments, a `string` with the namespace that will be used as a reference and an [associative array](https://www.php.net/manual/en/language.types.array.php) containing the values.
 
 _Example of store initialized from the server with a `state` = `{ someValue: 123 }`_
 
 ```php
 // render.php
-wp_store( array(
-  'myPlugin' => array(
-    'someValue' = 123
-  )
-);
+wp_interactivity_state( 'myPlugin', array (
+	'someValue' => get_some_value()
+));
 ```
 
 Initializing the state in the server also allows you to use any WordPress API. For example, you could use the Core Translation API to translate part of your state:
 
 ```php
 // render.php
-wp_store(
-  array(
-    "favoriteMovies" => array(
+wp_interactivity_state( 'favoriteMovies', array(
       "1" => array(
         "id" => "123-abc",
         "movieName" => __("someMovieName", "textdomain")
       ),
-    ),
-  )
-);
+) );
 ```
 
 ### Private stores
@@ -979,4 +979,126 @@ const { state } = store(
 
 // The following call works as expected.
 store( "myPlugin/private", { /* store part */ }, { lock: PRIVATE_LOCK } );
+```
+
+### Store client methods
+
+Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
+
+  - getContext()
+  - getElement()
+
+#### getContext()
+
+Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists.
+
+```php
+// render.php
+<div data-wp-interactive="myPlugin" data-wp-context='{ "isOpen": false }'>
+	<button data-wp-on--click="actions.log">Log</button>
+</div>
+```
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      const context = getContext();
+			 // Logs "false"
+      console.log('context => ', context.isOpen)
+    },
+  },
+});
+```
+
+#### getElement()
+
+Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
+It returns an object with two keys:
+
+##### ref
+
+`ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
+
+##### attributes
+
+`attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
+
+Those attributes will contain the directives of that element. In the button example:
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      const element = getElement();
+			 // Logs "false"
+      console.log('element attributes => ', element.attributes)
+    },
+  },
+});
+```
+
+The code will log:
+
+```json
+{
+	"data-wp-on--click": 'actions.increaseCounter',
+	"children": ['Log'],
+	"onclick": event => { evaluate(entry, event); }
+}
+## Server functions
+
+The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
+
+### wp_interactivity_config
+
+`wp_interactivity_config` allows to set or get a configuration array, referenced to a store namespace.
+The configuration is also available on the client, but it is static information.
+
+Consider it a global setting for interactions of a site, that won't be updated on user interactions.
+
+An example of setting:
+
+```php
+	wp_interactivity_config( 'myPlugin', array( 'showLikeButton' => is_user_logged_in() ) );
+```
+
+An example of getting:
+
+```php
+  wp_interactivity_config( 'myPlugin' );
+```
+
+This config can be retrieved on the client:
+
+```js
+// view.js
+
+const { showLikeButton } = getConfig();
+```
+
+### wp_interactivity_process_directives
+
+`wp_interactivity_process_directives` returns the updated HTML after the directives have been processed.
+
+It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether is a block or not.
+
+This code
+
+```php
+wp_interactivity_state( 'myPlugin', array( 'greeting' => 'Hello, World!' ) );
+$html = '<div data-wp-text="myPlugin::state.greeting"></div>';
+$processed_html = wp_interactivity_process_directives( $html_content );
+echo $processed_html;
+```
+
+will output:
+```html
+<div data-wp-text="create-block::state.greeting">Hello, World!</div>
 ```

@@ -29,13 +29,14 @@ const mediaTab = {
 };
 
 function InserterTabs( {
+	showBlocks = true,
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
 	tabsContents,
 } ) {
 	const tabs = [
-		blocksTab,
+		showBlocks && blocksTab,
 		showPatterns && patternsTab,
 		showMedia && mediaTab,
 	].filter( Boolean );

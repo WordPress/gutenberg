@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -40,10 +40,6 @@ export default function ResizableCoverPopover( {
 	...props
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
-	const dimensions = useMemo(
-		() => ( { height, minHeight, width } ),
-		[ minHeight, height, width ]
-	);
 
 	const resizableBoxProps = {
 		className: classnames( className, { 'is-resizing': isResizing } ),
@@ -75,7 +71,6 @@ export default function ResizableCoverPopover( {
 	return (
 		<ResizableBoxPopover
 			className="block-library-cover__resizable-box-popover"
-			__unstableRefreshSize={ dimensions }
 			resizableBoxProps={ resizableBoxProps }
 			{ ...props }
 		/>

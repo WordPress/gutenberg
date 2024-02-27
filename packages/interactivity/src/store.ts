@@ -16,8 +16,8 @@ import {
 	resetNamespace,
 } from './hooks';
 
-const isObject = ( item: unknown ): boolean =>
-	!! item && typeof item === 'object' && ! Array.isArray( item );
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	item && typeof item === 'object' && item.constructor === Object;
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
@@ -26,27 +26,18 @@ const deepMerge = ( target: any, source: any ) => {
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
 			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				if ( ! target[ key ] ) target[ key ] = {};
 				deepMerge( target[ key ], source[ key ] );
 			} else {
-				Object.assign( target, { [ key ]: source[ key ] } );
+				try {
+					target[ key ] = source[ key ];
+				} catch ( e ) {
+					// Assignemnts fail for properties that are only getters.
+					// When that's the case, the assignment is simply ignored.
+				}
 			}
 		}
 	}
-};
-
-const parseInitialData = () => {
-	const storeTag = document.querySelector(
-		`script[type="application/json"]#wp-interactivity-data`
-	);
-	if ( storeTag?.textContent ) {
-		try {
-			return JSON.parse( storeTag.textContent );
-		} catch ( e ) {
-			// Do nothing.
-		}
-	}
-	return {};
 };
 
 export const stores = new Map();
@@ -100,13 +91,13 @@ const handlers = {
 			}
 		}
 
-		const result = Reflect.get( target, key, receiver );
+		const result = Reflect.get( target, key );
 
 		// Check if the proxy is the store root and no key with that name exist. In
 		// that case, return an empty object for the requested key.
 		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
 			const obj = {};
-			Reflect.set( target, key, obj, receiver );
+			Reflect.set( target, key, obj );
 			return proxify( obj, ns );
 		}
 
@@ -162,6 +153,10 @@ const handlers = {
 		if ( isObject( result ) ) return proxify( result, ns );
 
 		return result;
+	},
+	// Prevents passing the current proxy as the receiver to the deepSignal.
+	set( target: any, key: string, value: any ) {
+		return Reflect.set( target, key, value );
 	},
 };
 
@@ -310,15 +305,36 @@ export function store(
 	return stores.get( namespace );
 }
 
+export const parseInitialData = ( dom = document ) => {
+	const storeTag = dom.querySelector(
+		`script[type="application/json"]#wp-interactivity-data`
+	);
+	if ( storeTag?.textContent ) {
+		try {
+			return JSON.parse( storeTag.textContent );
+		} catch ( e ) {
+			// Do nothing.
+		}
+	}
+	return {};
+};
+
+export const populateInitialData = ( data?: {
+	state?: Record< string, unknown >;
+	config?: Record< string, unknown >;
+} ) => {
+	if ( isObject( data?.state ) ) {
+		Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+			store( namespace, { state }, { lock: universalUnlock } );
+		} );
+	}
+	if ( isObject( data?.config ) ) {
+		Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+			storeConfigs.set( namespace, config );
+		} );
+	}
+};
+
 // Parse and populate the initial state and config.
 const data = parseInitialData();
-if ( isObject( data?.state ) ) {
-	Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
-		store( namespace, { state }, { lock: universalUnlock } );
-	} );
-}
-if ( isObject( data?.config ) ) {
-	Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
-		storeConfigs.set( namespace, config );
-	} );
-}
+populateInitialData( data );

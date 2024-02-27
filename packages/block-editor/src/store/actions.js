@@ -924,10 +924,8 @@ export const __unstableExpandSelection =
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
 	( { registry, select, dispatch } ) => {
-		const blocks = [ firstBlockClientId, secondBlockClientId ];
-		dispatch( { type: 'MERGE_BLOCKS', blocks } );
-
-		const [ clientIdA, clientIdB ] = blocks;
+		const clientIdA = firstBlockClientId;
+		const clientIdB = secondBlockClientId;
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
@@ -1539,7 +1537,7 @@ export const duplicateBlocks =
 	};
 
 /**
- * Action that inserts an empty block before a given block.
+ * Action that inserts a default block before a given block.
  *
  * @param {string} clientId
  */
@@ -1555,16 +1553,34 @@ export const insertBeforeBlock =
 			return;
 		}
 
-		const firstSelectedIndex = select.getBlockIndex( clientId );
-		return dispatch.insertDefaultBlock(
-			{},
-			rootClientId,
-			firstSelectedIndex
-		);
+		const blockIndex = select.getBlockIndex( clientId );
+		const directInsertBlock = rootClientId
+			? select.getDirectInsertBlock( rootClientId )
+			: null;
+
+		if ( ! directInsertBlock ) {
+			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
+		}
+
+		const copiedAttributes = {};
+		if ( directInsertBlock.attributesToCopy ) {
+			const attributes = select.getBlockAttributes( clientId );
+			directInsertBlock.attributesToCopy.forEach( ( key ) => {
+				if ( attributes[ key ] ) {
+					copiedAttributes[ key ] = attributes[ key ];
+				}
+			} );
+		}
+
+		const block = createBlock( directInsertBlock.name, {
+			...directInsertBlock.attributes,
+			...copiedAttributes,
+		} );
+		return dispatch.insertBlock( block, blockIndex, rootClientId );
 	};
 
 /**
- * Action that inserts an empty block after a given block.
+ * Action that inserts a default block after a given block.
  *
  * @param {string} clientId
  */
@@ -1580,12 +1596,34 @@ export const insertAfterBlock =
 			return;
 		}
 
-		const firstSelectedIndex = select.getBlockIndex( clientId );
-		return dispatch.insertDefaultBlock(
-			{},
-			rootClientId,
-			firstSelectedIndex + 1
-		);
+		const blockIndex = select.getBlockIndex( clientId );
+		const directInsertBlock = rootClientId
+			? select.getDirectInsertBlock( rootClientId )
+			: null;
+
+		if ( ! directInsertBlock ) {
+			return dispatch.insertDefaultBlock(
+				{},
+				rootClientId,
+				blockIndex + 1
+			);
+		}
+
+		const copiedAttributes = {};
+		if ( directInsertBlock.attributesToCopy ) {
+			const attributes = select.getBlockAttributes( clientId );
+			directInsertBlock.attributesToCopy.forEach( ( key ) => {
+				if ( attributes[ key ] ) {
+					copiedAttributes[ key ] = attributes[ key ];
+				}
+			} );
+		}
+
+		const block = createBlock( directInsertBlock.name, {
+			...directInsertBlock.attributes,
+			...copiedAttributes,
+		} );
+		return dispatch.insertBlock( block, blockIndex + 1, rootClientId );
 	};
 
 /**

@@ -18,6 +18,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 		>
 			<!-- rendered during hydration -->
 		</pre>
+		<button data-testid="parent replace" data-wp-on--click="actions.replaceObj">Replace obj</button>
 		<button
 			data-testid="parent prop1"
 			name="prop1"
@@ -50,6 +51,14 @@ wp_enqueue_script_module( 'directive-context-view' );
 		>
 			obj.prop5
 		</button>
+		<button
+			data-testid="parent new"
+			name="new"
+			value="modifiedFromParent"
+			data-wp-on--click="actions.updateContext"
+		>
+			new
+		</button>
 		<div
 			data-wp-context='{ "prop2":"child","prop3":"child","obj":{"prop5":"child","prop6":"child"},"array":[4,5,6] }'
 		>
@@ -59,6 +68,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 			>
 				<!-- rendered during hydration -->
 			</pre>
+			<button data-testid="child replace" data-wp-on--click="actions.replaceObj">Replace obj</button>
 			<button
 				data-testid="child prop1"
 				name="prop1"
@@ -127,10 +137,15 @@ wp_enqueue_script_module( 'directive-context-view' );
 	data-wp-router-region="navigation"
 	data-wp-context='{ "text": "first page" }'
 >
+	<div data-wp-context='{}'>
+		<div data-testid="navigation inherited text" data-wp-text="context.text"></div>
+		<div data-testid="navigation inherited text2" data-wp-text="context.text2"></div>
+	</div>
 	<div data-testid="navigation text" data-wp-text="context.text"></div>
 	<div data-testid="navigation new text" data-wp-text="context.newText"></div>
 	<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
+	<button data-testid="add text2" data-wp-on--click="actions.addText2">Add Text 2</button>
 	<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 </div>
@@ -142,4 +157,42 @@ wp_enqueue_script_module( 'directive-context-view' );
 >
 	<span data-testid="non-default suffix context" data-wp-text="context.text"></span>
 	<span data-testid="default suffix context" data-wp-text="context.defaultText"></span>
+</div>
+
+<div
+	data-wp-interactive='directive-context'
+	data-wp-context='{ "list": [
+		{ "id": 1, "text": "Text 1" },
+		{ "id": 2, "text": "Text 2" }
+	] }'
+>
+	<button data-testid="select 1" data-wp-on--click="actions.selectItem" value=1>Select 1</button>
+	<button data-testid="select 2" data-wp-on--click="actions.selectItem" value=2>Select 2</button>
+	<div data-testid="selected" data-wp-text="state.selected"></div>
+</div>
+
+<div
+	data-wp-interactive="directive-context-watch"
+	data-wp-context='{"counter":0}'
+>
+	<button
+		data-testid="counter parent"
+		data-wp-on--click="actions.increment"
+		data-wp-text="context.counter"
+	></button>
+	<div
+		data-wp-context='{"counter":0, "changes":0}'
+		data-wp-watch="callbacks.countChanges"
+	>
+		<button
+			data-testid="counter child"
+			data-wp-on--click="actions.increment"
+			data-wp-text="context.counter"
+		>
+		</button>
+		<span
+			data-testid="counter changes"
+			data-wp-text="context.changes"
+		></span>
+	</div>
 </div>

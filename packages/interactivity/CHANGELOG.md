@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent passing state proxies as receivers to deepSignal proxy handlers. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
+
+## 5.1.0 (2024-02-21)
+
+### Bug Fixes
+
+-   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
+-   Improve context merges using proxies. ([59187](https://github.com/WordPress/gutenberg/pull/59187))
+
 ## 5.0.0 (2024-02-09)
 
 ### New Features

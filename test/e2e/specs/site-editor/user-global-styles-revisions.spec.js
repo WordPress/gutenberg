@@ -56,8 +56,11 @@ test.describe( 'Style Revisions', () => {
 
 		// Shows changes made in the revision.
 		await expect(
-			page.getByTestId( 'global-styles-revision-changes' )
-		).toHaveText( 'Colors.' );
+			page
+				.getByTestId( 'global-styles-revision-changes' )
+				.getByRole( 'listitem' )
+				.first()
+		).toHaveText( 'Colors styles.' );
 
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
@@ -187,6 +190,38 @@ test.describe( 'Style Revisions', () => {
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeHidden();
+	} );
+
+	test( 'should close revisions panel and leave style book open if activated', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+		} );
+		await revisionsButton.click();
+		await styleBookButton.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		await page.click( 'role=button[name="Navigate to the previous view"]' );
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+
+		// The site editor canvas has been restored.
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
 	} );
 
 	test( 'should paginate', async ( {

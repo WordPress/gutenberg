@@ -13,8 +13,6 @@
 .dataviews-filters__view-actions {
 	padding: $grid-unit-15 $grid-unit-40 0;
 	.components-search-control {
-		flex-grow: 1;
-
 		.components-base-control__field {
 			max-width: 240px;
 		}
@@ -22,11 +20,7 @@
 }
 
 .dataviews-filters__container {
-	padding: 0 $grid-unit-40;
-}
-
-.dataviews-filters__view-actions.components-h-stack {
-	align-items: center;
+	padding-right: $grid-unit-40;
 }
 
 .dataviews-filters-button {
@@ -42,6 +36,13 @@
 	padding: $grid-unit-15 $grid-unit-40;
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
+}
+
+.dataviews-pagination__page-selection {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
 }
 
 .dataviews-filters-options {
@@ -118,7 +119,7 @@
 			background-color: #f8f8f8;
 		}
 
-		.components-checkbox-control__input {
+		.components-checkbox-control__input.components-checkbox-control__input {
 			opacity: 0;
 
 			&:checked,
@@ -201,6 +202,12 @@
 
 	.dataviews-view-table__actions-column {
 		width: 1%;
+	}
+
+	&:has(tr.is-selected) {
+		.components-checkbox-control__input {
+			opacity: 1;
+		}
 	}
 }
 
@@ -648,7 +655,8 @@
 		}
 
 		&:hover,
-		&:focus-visible {
+		&:focus-visible,
+		&[aria-expanded="true"] {
 			background: $gray-200;
 			color: $gray-900;
 		}
@@ -657,8 +665,9 @@
 			color: var(--wp-admin-theme-color);
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			&:hover,
+			&[aria-expanded="true"] {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
 			}
 		}
 

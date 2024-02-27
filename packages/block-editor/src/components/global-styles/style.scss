@@ -2,8 +2,22 @@
 	fill: currentColor;
 }
 
+// @todo: Ideally, popover, swatch size, and gap values should be CSS variables
+// to apply precise grid layouts.
+// https://github.com/WordPress/gutenberg/blob/954ecae571abbddc113d3a4bd8e1a72230180554/packages/block-editor/src/components/duotone-control/style.scss#L3-L9
 .block-editor-global-styles__shadow-popover-container {
 	width: 230px;
+}
+
+.block-editor-global-styles__shadow__list {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding-bottom: $grid-unit-10;
+}
+
+.block-editor-global-styles__clear-shadow {
+	text-align: right;
 }
 
 .block-editor-global-styles-filters-panel__dropdown,
@@ -21,14 +35,6 @@
 	}
 }
 
-// wrapper to clip the shadow beyond 6px
-.block-editor-global-styles__shadow-indicator-wrapper {
-	padding: $grid-unit-15 * 0.5;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
 // These styles are similar to the color palette.
 .block-editor-global-styles__shadow-indicator {
 	color: $gray-800;
@@ -37,8 +43,25 @@
 	cursor: pointer;
 	padding: 0;
 
-	height: $button-size-small;
-	width: $button-size-small;
+	height: $button-size-small + 2 * $border-width;
+	width: $button-size-small + 2 * $border-width;
+	box-sizing: border-box;
+
+	transform: scale(1);
+	transition: transform 0.1s ease;
+	will-change: transform;
+
+	&:focus {
+		border: #{ $border-width * 2 } solid $gray-700;
+	}
+
+	&:hover {
+		transform: scale(1.2);
+	}
+
+	&.unset {
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	}
 }
 
 .block-editor-global-styles-advanced-panel__custom-css-input textarea {

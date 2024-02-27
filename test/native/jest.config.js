@@ -58,7 +58,7 @@ module.exports = {
 		'node_modules',
 	],
 	moduleNameMapper: {
-		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
+		// Mock the CSS modules. See https://jestjs.io/docs/webpack#handling-static-assets
 		'\\.(scss)$': '<rootDir>/test/native/__mocks__/styleMock.js',
 		'\\.(eot|otf|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
 			'<rootDir>/test/native/__mocks__/fileMock.js',
