@@ -163,6 +163,21 @@ describe( 'BlockOutline', () => {
 
 			expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
 		} );
+
+		describe( 'with inner blocks', () => {
+			it( 'should render an outline', async () => {
+				render(
+					<BlockOutline
+						isSelected
+						blockCategory="media"
+						name="core/gallery"
+						hasInnerBlocks
+					/>
+				);
+
+				expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
+			} );
+		} );
 	} );
 
 	describe( 'containing a freeform block', () => {
