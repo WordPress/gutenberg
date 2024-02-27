@@ -172,7 +172,9 @@ describe( 'Snackbar', () => {
 			);
 
 			const snackbar = screen.getByTestId( testId );
-			const link = within( snackbar ).getByRole( 'link' );
+			const link = within( snackbar ).getByRole( 'link', {
+				name: 'View post',
+			} );
 
 			expect( link ).toHaveAttribute( 'href', 'https://example.com' );
 		} );
@@ -212,7 +214,9 @@ describe( 'Snackbar', () => {
 			);
 
 			const snackbar = screen.getByTestId( testId );
-			const link = within( snackbar ).getByRole( 'link' );
+			const link = within( snackbar ).getByRole( 'link', {
+				name: 'View post',
+			} );
 			expect( link ).toBeVisible();
 		} );
 	} );
