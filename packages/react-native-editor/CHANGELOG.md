@@ -13,7 +13,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Prevent crash when autoscrolling to blocks [#59110]
 -   [*] Remove opacity change when images are being uploaded [#59264]
 -   [*] Media & Text blocks correctly show an error message when the attached video upload fails [#59288]
--   [*] Fix regression where "design" category blocks (Group, Columns, etc) were not outlined when selected [#59415]
+-   [*] Improve consistency of the block outline indicating the currently selected block [#59415]
 
 ## 1.112.0
 -   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]
