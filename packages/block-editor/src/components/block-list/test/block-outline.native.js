@@ -81,12 +81,11 @@ describe( 'BlockOutline', () => {
 		} );
 	} );
 
-	describe( 'containing a non-text category block in the root list', () => {
+	describe( 'containing a widget category block', () => {
 		it( 'should render an outline', async () => {
 			render(
 				<BlockOutline
 					isSelected
-					isRootList
 					blockCategory="widgets"
 					name="core/latest-posts"
 				/>
@@ -108,21 +107,6 @@ describe( 'BlockOutline', () => {
 
 			expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
 		} );
-
-		describe( 'when in the root list', () => {
-			it( 'should not render an outline', async () => {
-				render(
-					<BlockOutline
-						isSelected
-						isRootList
-						blockCategory="design"
-						name="core/spacer"
-					/>
-				);
-
-				expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
-			} );
-		} );
 	} );
 
 	describe( 'containing a button block', () => {
@@ -136,21 +120,6 @@ describe( 'BlockOutline', () => {
 			);
 
 			expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
-		} );
-
-		describe( 'when in the root list', () => {
-			it( 'should not render an outline', async () => {
-				render(
-					<BlockOutline
-						isSelected
-						isRootList
-						blockCategory="design"
-						name="core/button"
-					/>
-				);
-
-				expect( screen.queryByTestId( 'block-outline' ) ).toBeNull();
-			} );
 		} );
 	} );
 

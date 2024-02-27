@@ -16,13 +16,7 @@ import styles from './block.scss';
 const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing', 'core/freeform' ];
 const DESIGN_BLOCKS_WITHOUT_OUTLINE = [ 'core/button', 'core/spacer' ];
 
-function BlockOutline( {
-	blockCategory,
-	hasInnerBlocks,
-	isRootList,
-	isSelected,
-	name,
-} ) {
+function BlockOutline( { blockCategory, hasInnerBlocks, isSelected, name } ) {
 	const textBlockWithOutline = TEXT_BLOCKS_WITH_OUTLINE.includes( name );
 
 	const hasBlockTextCategory =
@@ -48,33 +42,29 @@ function BlockOutline( {
 		return null;
 	}
 
-	let shouldShowOutline = false;
-
-	if ( hasBlockTextCategory && hasInnerBlocks ) {
-		shouldShowOutline = true;
-	} else if ( ! hasBlockTextCategory && hasInnerBlocks ) {
-		shouldShowOutline = true;
-	} else if ( blockCategory === 'design' ) {
-		if ( ! DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name ) ) {
-			shouldShowOutline = true;
-		}
-	} else if ( ! hasBlockTextCategory && isRootList ) {
-		shouldShowOutline = true;
-	} else if ( name.includes( 'core/social-link' ) ) {
-		shouldShowOutline = true;
-	} else if ( textBlockWithOutline ) {
-		shouldShowOutline = true;
+	let shouldShowOutline = true;
+	if ( hasBlockTextCategory && ! hasInnerBlocks ) {
+		shouldShowOutline = false;
+	} else if ( blockCategory === 'media' && ! hasInnerBlocks ) {
+		shouldShowOutline = false;
+	} else if (
+		blockCategory === 'design' &&
+		DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name )
+	) {
+		shouldShowOutline = false;
 	}
 
-	return (
-		shouldShowOutline && (
+	if ( shouldShowOutline ) {
+		return (
 			<View
 				pointerEvents="box-none"
 				style={ styleSolidBorder }
 				testID="block-outline"
 			/>
-		)
-	);
+		);
+	}
+
+	return null;
 }
 
 export default BlockOutline;
