@@ -19,18 +19,28 @@ import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
 
-function BlockHooksControlPure( { name, clientId } ) {
+function BlockHooksControlPure( {
+	name,
+	clientId,
+	metadata: { ignoredHookedBlocks = [] } = {},
+} ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
 	);
 
+	// A hooked block added via a filter will not be exposed through a block
+	// type's `blockHooks` property; however, if the containing layout has been
+	// modified, it will be present in the anchor block's `ignoredHookedBlocks`
+	// metadata.
 	const hookedBlocksForCurrentBlock = useMemo(
 		() =>
 			blockTypes?.filter(
-				( { blockHooks } ) => blockHooks && name in blockHooks
+				( { name: blockName, blockHooks } ) =>
+					( blockHooks && name in blockHooks ) ||
+					ignoredHookedBlocks.includes( blockName )
 			),
-		[ blockTypes, name ]
+		[ blockTypes, name, ignoredHookedBlocks ]
 	);
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
@@ -219,6 +229,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 export default {
 	edit: BlockHooksControlPure,
+	attributeKeys: [ 'metadata' ],
 	hasSupport() {
 		return true;
 	},
