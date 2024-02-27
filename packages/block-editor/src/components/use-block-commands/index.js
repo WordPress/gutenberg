@@ -40,7 +40,8 @@ export const useTransformCommands = () => {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
-			);
+			).filter( Boolean );
+
 			const rootClientId = getBlockRootClientId(
 				selectedBlockClientIds[ 0 ]
 			);
