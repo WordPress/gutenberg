@@ -77,7 +77,7 @@
 						"defaultPresets": {
 							"description": "Allow users to choose shadows from the default shadow presets.",
 							"type": "boolean",
-							"default": true
+							"default": false
 						},
 						"presets": {
 							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",

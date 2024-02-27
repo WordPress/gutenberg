@@ -16,6 +16,10 @@
 	padding-bottom: $grid-unit-10;
 }
 
+.block-editor-global-styles__clear-shadow {
+	text-align: right;
+}
+
 .block-editor-global-styles-filters-panel__dropdown,
 .block-editor-global-styles__shadow-dropdown {
 	display: block;
@@ -53,6 +57,10 @@
 
 	&:hover {
 		transform: scale(1.2);
+	}
+
+	&.unset {
+		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 	}
 }
 
