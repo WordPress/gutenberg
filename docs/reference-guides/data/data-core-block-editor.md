@@ -515,7 +515,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPDirectInsertBlock`: The block type to be directly inserted.
+-   `WPDirectInsertBlock|undefined`: The block type to be directly inserted.
 
 _Type Definition_
 
