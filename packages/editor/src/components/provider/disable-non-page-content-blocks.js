@@ -2,39 +2,46 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useBlockEditingMode,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
+const PAGE_CONTENT_BLOCKS = [
+	'core/post-title',
+	'core/post-featured-image',
+	'core/post-content',
+];
 
-function DisableBlock( { clientId } ) {
-	const isDescendentOfQueryLoop = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/query' ).length !==
-				0
-			);
-		},
-		[ clientId ]
-	);
-	const mode = isDescendentOfQueryLoop ? undefined : 'contentOnly';
+function useDisableNonPageContentBlocks() {
+	const contentIds = useSelect( ( select ) => {
+		const { getBlocksByName, getBlockParents, getBlockName } =
+			select( blockEditorStore );
+		return getBlocksByName( PAGE_CONTENT_BLOCKS ).filter( ( clientId ) =>
+			getBlockParents( clientId ).every( ( parentClientId ) => {
+				const parentBlockName = getBlockName( parentClientId );
+				return (
+					parentBlockName !== 'core/query' &&
+					! PAGE_CONTENT_BLOCKS.includes( parentBlockName )
+				);
+			} )
+		);
+	}, [] );
+
 	const { setBlockEditingMode, unsetBlockEditingMode } =
 		useDispatch( blockEditorStore );
+
 	useEffect( () => {
-		if ( mode ) {
-			setBlockEditingMode( clientId, mode );
-			return () => {
-				unsetBlockEditingMode( clientId );
-			};
+		setBlockEditingMode( '', 'disabled' ); // Disable editing at the root level.
+
+		for ( const contentId of contentIds ) {
+			setBlockEditingMode( contentId, 'contentOnly' ); // Re-enable each content block.
 		}
-	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
+		return () => {
+			unsetBlockEditingMode( '' );
+			for ( const contentId of contentIds ) {
+				unsetBlockEditingMode( contentId );
+			}
+		};
+	}, [ contentIds, setBlockEditingMode, unsetBlockEditingMode ] );
 }
 
 /**
@@ -42,14 +49,5 @@ function DisableBlock( { clientId } ) {
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	useBlockEditingMode( 'disabled' );
-	const clientIds = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlocksByName(
-			PAGE_CONTENT_BLOCK_TYPES
-		);
-	}, [] );
-
-	return clientIds.map( ( clientId ) => {
-		return <DisableBlock key={ clientId } clientId={ clientId } />;
-	} );
+	useDisableNonPageContentBlocks();
 }
