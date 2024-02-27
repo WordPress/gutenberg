@@ -171,6 +171,18 @@ function BlockHooksControlPure( {
 					false
 				);
 				break;
+
+			default:
+				// If we do not know the relative position, it is because the block was
+				// added via a filter. In this case, we default to inserting it after the
+				// current block.
+				insertBlock(
+					block,
+					blockIndex + 1,
+					rootClientId, // Insert as a child of the current block's parent
+					false
+				);
+				break;
 		}
 	};
 
