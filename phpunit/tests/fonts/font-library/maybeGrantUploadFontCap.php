@@ -10,7 +10,7 @@
  *
  * @covers gutenberg_maybe_grant_upload_font_cap
  */
-class Tests_Fonts_GutenbergMaybeGrantUploadFontCap extends WP_UnitTestCase {
+class Tests_Fonts_MaybeGrantUploadFontCap extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		add_filter( 'font_dir', array( $this, 'mock_wp_get_font_dir' ) );
