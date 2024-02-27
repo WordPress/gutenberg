@@ -34,7 +34,7 @@ export default function SingleSelectionCheckbox( {
 			__nextHasNoMarginBottom
 			label={ selectionLabel }
 			aria-disabled={ disabled }
-			checked={ disabled ? false : isSelected }
+			checked={ isSelected }
 			onChange={ () => {
 				if ( disabled ) {
 					return;
