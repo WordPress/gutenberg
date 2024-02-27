@@ -7,6 +7,7 @@ import readline from 'readline';
 import { spawnSync } from 'node:child_process';
 
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
@@ -334,6 +335,11 @@ function reportSummaryNextSteps( successes, failures ) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
 		nextSteps.push( `Remove the ${ LABEL } label` );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			nextSteps.push( `Add the "${ BACKPORT_COMPLETED_LABEL }" label` );
+		}
+
 		nextSteps.push( 'Request a backport to wordpress-develop if required' );
 		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
 	}
@@ -363,6 +369,17 @@ function GHcommentAndRemoveLabel( pr ) {
 	try {
 		cli( 'gh', [ 'pr', 'comment', number, '--body', comment ] );
 		cli( 'gh', [ 'pr', 'edit', number, '--remove-label', LABEL ] );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			cli( 'gh', [
+				'pr',
+				'edit',
+				number,
+				'--add-label',
+				BACKPORT_COMPLETED_LABEL,
+			] );
+		}
+
 		console.log( `✅ ${ number }: ${ comment }` );
 	} catch ( e ) {
 		console.log( `❌ ${ number }. ${ comment } ` );
