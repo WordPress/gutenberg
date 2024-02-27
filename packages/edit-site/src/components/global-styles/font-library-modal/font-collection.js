@@ -18,6 +18,8 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalHeading as Heading,
+	Card,
+	CardBody,
 	Notice,
 	SelectControl,
 	Spinner,
@@ -47,7 +49,6 @@ import {
 	getFontsOutline,
 	isFontFontFaceInOutline,
 } from './utils/fonts-outline';
-import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
@@ -57,23 +58,14 @@ const DEFAULT_CATEGORY = {
 	name: _x( 'All', 'font categories' ),
 };
 
-const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
+const LOCAL_STORAGE_KEY_PREFIX = `wp-font-library-collection-permission-`;
 const MIN_WINDOW_HEIGHT = 500;
 
 function FontCollection( { slug } ) {
-	const requiresPermission = slug === 'google-fonts';
-
-	const getGoogleFontsPermissionFromStorage = () => {
-		return window.localStorage.getItem( LOCAL_STORAGE_ITEM ) === 'true';
-	};
-
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ page, setPage ] = useState( 1 );
 	const [ filters, setFilters ] = useState( {} );
-	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
-		requiresPermission && ! getGoogleFontsPermissionFromStorage()
-	);
 	const {
 		collections,
 		getFontCollection,
@@ -86,20 +78,29 @@ function FontCollection( { slug } ) {
 		( collection ) => collection.slug === slug
 	);
 
-	useEffect( () => {
-		const handleStorage = () => {
-			setRenderConfirmDialog(
-				requiresPermission && ! getGoogleFontsPermissionFromStorage()
-			);
-		};
-		handleStorage();
-		window.addEventListener( 'storage', handleStorage );
-		return () => window.removeEventListener( 'storage', handleStorage );
-	}, [ slug, requiresPermission ] );
+	const getFontCollectionPermissionFromStorage = ( collectionSlug ) => {
+		return (
+			window.localStorage.getItem(
+				LOCAL_STORAGE_KEY_PREFIX + collectionSlug
+			) === 'true'
+		);
+	};
+
+	const [ hasPermission, setHasPermission ] = useState(
+		getFontCollectionPermissionFromStorage( slug )
+	);
+
+	const handleConfirmPermission = () => {
+		// eslint-disable-next-line no-undef
+		window.localStorage.setItem( LOCAL_STORAGE_KEY_PREFIX + slug, 'true' );
+		window.dispatchEvent( new Event( 'storage' ) );
+		setHasPermission( true );
+	};
 
 	const revokeAccess = () => {
-		window.localStorage.setItem( LOCAL_STORAGE_ITEM, 'false' );
+		window.localStorage.setItem( LOCAL_STORAGE_KEY_PREFIX + slug, 'false' );
 		window.dispatchEvent( new Event( 'storage' ) );
+		setHasPermission( false );
 	};
 
 	useEffect( () => {
@@ -244,30 +245,36 @@ function FontCollection( { slug } ) {
 		return sortFontFaces( fontFamily.fontFace );
 	};
 
-	if ( renderConfirmDialog ) {
-		return <GoogleFontsConfirmDialog />;
-	}
-
-	const ActionsComponent = () => {
-		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
-			return null;
-		}
+	if ( selectedCollection?.permission && ! hasPermission ) {
 		return (
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Actions' ) }
-				popoverProps={ {
-					position: 'bottom left',
-				} }
-				controls={ [
-					{
-						title: __( 'Revoke access to Google Fonts' ),
-						onClick: revokeAccess,
-					},
-				] }
-			/>
+			<div className="font-library__google-fonts-confirm">
+				<Card>
+					<CardBody>
+						<Text as="h3">
+							{ sprintf(
+								// translators: %s: Name of the Font Collection.
+								_x( 'Connect to %s' ),
+								selectedCollection.name
+							) }
+						</Text>
+						<Spacer margin={ 6 } />
+						<Text as="p">{ selectedCollection.permission }</Text>
+						<Spacer margin={ 6 } />
+						<Button
+							variant="primary"
+							onClick={ handleConfirmPermission }
+						>
+							{ sprintf(
+								// translators: %s: Name of the Font Collection.
+								_x( 'Allow access to %s' ),
+								selectedCollection.name
+							) }
+						</Button>
+					</CardBody>
+				</Card>
+			</div>
 		);
-	};
+	}
 
 	return (
 		<div className="font-library-modal__tabpanel-layout">
@@ -280,7 +287,25 @@ function FontCollection( { slug } ) {
 						<Heading level={ 2 } size={ 13 }>
 							{ selectedCollection.name }
 						</Heading>
-						<ActionsComponent />
+						{ selectedCollection?.permission && (
+							<DropdownMenu
+								icon={ moreVertical }
+								label={ __( 'Actions' ) }
+								popoverProps={ {
+									position: 'bottom left',
+								} }
+								controls={ [
+									{
+										title: sprintf(
+											// translators: %s: Name of the Font Collection.
+											_x( 'Revoke access from %s' ),
+											selectedCollection.name
+										),
+										onClick: revokeAccess,
+									},
+								] }
+							/>
+						) }
 					</HStack>
 					<Text>{ selectedCollection.description }</Text>
 					<Spacer margin={ 4 } />

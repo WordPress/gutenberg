@@ -170,7 +170,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			}
 
 			// If any data fields are requested, get the collection data.
-			$data_fields = array( 'name', 'description', 'font_families', 'categories' );
+			$data_fields = array( 'name', 'description', 'permission', 'font_families', 'categories' );
 			if ( ! empty( array_intersect( $fields, $data_fields ) ) ) {
 				$collection_data = $item->get_data();
 				if ( is_wp_error( $collection_data ) ) {
@@ -238,6 +238,11 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 					),
 					'description'   => array(
 						'description' => __( 'The description for the font collection.', 'gutenberg' ),
+						'type'        => 'string',
+						'context'     => array( 'view', 'edit', 'embed' ),
+					),
+					'permission'   => array(
+						'description' => __( 'The message to prompt a user for permission (if required).', 'gutenberg' ),
 						'type'        => 'string',
 						'context'     => array( 'view', 'edit', 'embed' ),
 					),

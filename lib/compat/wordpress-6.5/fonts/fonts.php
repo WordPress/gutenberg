@@ -164,6 +164,7 @@ function gutenberg_register_font_collections() {
 		array(
 			'name'          => _x( 'Google Fonts', 'font collection name', 'gutenberg' ),
 			'description'   => __( 'Install from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
+			'permission'    => __( 'To install fonts from Google you must give permission to connect directly to Google servers. The fonts you install will be downloaded from Google and stored on your site. Your site will then use these locally-hosted fonts. You can alternatively upload files directly on the Upload tab.', 'gutenberg' ),
 			'font_families' => 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json',
 			'categories'    => array(
 				array(
