@@ -20,7 +20,7 @@ test.describe( 'Editing Navigation Menus', () => {
 		editor,
 	} ) => {
 		await test.step( 'Check Navigation block is present and locked', async () => {
-			// create a Navigation Menu called "Test Menu" using the REST API helpers
+			// Create a Navigation Menu called "Primary Menu" using the REST API helpers.
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Primary Menu',
 				content:
@@ -61,12 +61,13 @@ test.describe( 'Editing Navigation Menus', () => {
 			// The Navigation block should be present and locked.
 			await expect( navBlockNode ).toBeVisible();
 
-			// The block should have no options menu.
+			// The block should have no actions menu.
 			await expect(
-				listView.getByRole( 'button', {
-					name: 'Options for Navigation',
-					exact: true,
-				} )
+				navBlockNode
+					.locator( '..' ) // parent selector.
+					.getByRole( 'button', {
+						name: 'Actions',
+					} )
 			).toBeHidden();
 
 			// Select the Navigation block.
