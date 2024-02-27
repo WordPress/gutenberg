@@ -32,7 +32,7 @@ function BlockOutline( {
 		blockCategory === 'media' ||
 		blockCategory === 'embed' ||
 		! blockCategory;
-	const isNonRichTextDesignBlock =
+	const isOutlinedDesignBlock =
 		blockCategory === 'design' &&
 		! DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name );
 	const shouldShowCompactOutline =
@@ -53,7 +53,7 @@ function BlockOutline( {
 		( ( hasBlockTextCategory && hasInnerBlocks ) ||
 			( ! hasBlockTextCategory && hasInnerBlocks ) ||
 			( ! hasBlockTextCategory && isRootList ) ||
-			isNonRichTextDesignBlock ||
+			isOutlinedDesignBlock ||
 			socialBlockWithOutline ||
 			textBlockWithOutline );
 
