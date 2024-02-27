@@ -166,6 +166,20 @@ describe( 'BlockOutline', () => {
 
 			expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
 		} );
+
+		describe( 'when platform specific', () => {
+			it( 'should render an outline', async () => {
+				render(
+					<BlockOutline
+						isSelected
+						blockCategory="embed"
+						name="core/social-link-amazon"
+					/>
+				);
+
+				expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
+			} );
+		} );
 	} );
 
 	describe( 'containing a media block', () => {
