@@ -1122,9 +1122,6 @@
 									"type": "string"
 								},
 								{
-									"$ref": "#/definitions/refComplete"
-								},
-								{
 									"type": "object",
 									"properties": {
 										"source": {
@@ -1137,6 +1134,9 @@
 										}
 									},
 									"additionalProperties": false
+								},
+								{
+									"$ref": "#/definitions/refComplete"
 								}
 							]
 						},

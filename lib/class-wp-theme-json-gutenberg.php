@@ -211,7 +211,7 @@ class WP_Theme_JSON_Gutenberg {
 		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
-		'background-image'                  => array( 'background', 'backgroundImage' ),
+		'background-image'                  => array( 'background', 'backgroundImage', 'url' ),
 		'background-position'               => array( 'background', 'backgroundPosition' ),
 		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
 		'background-size'                   => array( 'background', 'backgroundSize' ),
@@ -355,7 +355,10 @@ class WP_Theme_JSON_Gutenberg {
 		'appearanceTools'               => null,
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
-			'backgroundImage' => null,
+			'backgroundImage' => array(
+				'url'    => null,
+				'source' => null,
+			),
 			'backgroundSize'  => null,
 		),
 		'border'                        => array(
@@ -2153,9 +2156,7 @@ class WP_Theme_JSON_Gutenberg {
 			// Processes background styles.
 			if ( $value_path[0] === 'background' ) {
 				$value = gutenberg_get_background_support_styles(
-					array(
-						$value_path[1] => $value,
-					)
+					$styles['background'],
 				)['declarations'][ $css_property ];
 			}
 

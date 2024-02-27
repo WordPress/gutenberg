@@ -30,26 +30,23 @@ function gutenberg_register_background_support( $block_type ) {
 	}
 }
 
+// @TODO tests.
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
+	$background_image_source = $background_styles['backgroundImage']['source'] ?? null;
+
 	if ( is_string( $background_styles['backgroundImage'] ) ) {
 		$url = $background_styles['backgroundImage'];
 		$background_styles['backgroundImage'] = array(
 			'url'    => $url,
 		);
 	}
+
+	if ( 'theme' === $background_image_source ) {
+		$background_styles['backgroundImage']['url'] = esc_url( get_theme_file_uri( $background_styles['backgroundImage']['url'] ) );
+	}
+
 	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 }
-
-gutenberg_get_background_support_styles(
-	array(
-		'backgroundImage'  => array(
-			'source' => 'file',
-			'url'    => 'https://example.com/image.jpg',
-		),
-		'backgroundSize'   => 'cover',
-		'backgroundRepeat' => 'no-repeat',
-	)
-);
 
 /**
  * Renders the background styles to the block wrapper.
@@ -73,7 +70,6 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$styles					 = array();
 	$style_background        = $block_attributes['style']['background'];
 	$background_image_source = $style_background['backgroundImage']['source'] ?? null;
 
@@ -83,9 +79,9 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		if ( 'contain' === $style_background['backgroundSize'] && ! isset( $style_background['backgroundPosition'] ) ) {
 			$style_background['backgroundPosition'] = 'center';
 		}
-		$styles = gutenberg_get_background_support_styles( $style_background );
 	}
 
+	$styles = gutenberg_get_background_support_styles( $style_background );
 
 	if ( ! empty( $styles['css'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
