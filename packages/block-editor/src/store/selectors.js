@@ -2279,7 +2279,7 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 				return null;
 			}
 			const blocks = parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
+				__unstableSkipMigrationLogs: true,
 			} );
 			if ( blocks.length === 1 ) {
 				blocks[ 0 ].attributes = {

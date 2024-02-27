@@ -80,7 +80,10 @@ test.describe( 'Unsynced pattern', () => {
 			...before,
 			{
 				...before[ 0 ],
-				metadata: { categories: [ 'contact-details' ] },
+				attributes: {
+					...before[ 0 ].attributes,
+					metadata: { categories: [ 'contact-details' ] },
+				},
 			},
 		] );
 	} );
