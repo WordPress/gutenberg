@@ -39,6 +39,10 @@ function gutenberg_register_background_support( $block_type ) {
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
 	$background_image_source = $background_styles['backgroundImage']['source'] ?? null;
 
+	/*
+	 * If the background image is a string, it's a URL.
+	 * Assume "file" source.
+	 */
 	if ( is_string( $background_styles['backgroundImage'] ) ) {
 		$url                                 = $background_styles['backgroundImage'];
 		$background_image_source             = 'file';
@@ -47,6 +51,9 @@ function gutenberg_get_background_support_styles( $background_styles = array() )
 		);
 	}
 
+	/*
+	 * "theme" source implies relative path to the theme directory
+	 */
 	if ( 'theme' === $background_image_source ) {
 		$background_styles['backgroundImage']['url'] = esc_url( get_theme_file_uri( $background_styles['backgroundImage']['url'] ) );
 	}

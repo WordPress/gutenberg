@@ -2155,9 +2155,11 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Processes background styles.
 			if ( $value_path[0] === 'background' ) {
-				$value = gutenberg_get_background_support_styles(
+				$background_styles = gutenberg_get_background_support_styles(
 					$styles['background'],
-				)['declarations'][ $css_property ];
+				);
+
+				$value = $background_styles['declarations'][$css_property] ?? $value;
 			}
 
 			if ( 'aspect-ratio' === $css_property ) {
