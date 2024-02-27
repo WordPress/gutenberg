@@ -329,7 +329,7 @@ export function RichTextWrapper(
 		onChange,
 	} );
 
-	useMarkPersistent( value );
+	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );

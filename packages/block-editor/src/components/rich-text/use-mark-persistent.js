@@ -9,7 +9,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useMarkPersistent( value ) {
+export function useMarkPersistent( { html, value } ) {
 	const previousText = useRef();
 	const hasActiveFormats = !! value.activeFormats?.length;
 	const { __unstableMarkLastChangeAsPersistent } =
@@ -36,5 +36,5 @@ export function useMarkPersistent( value ) {
 		}
 
 		__unstableMarkLastChangeAsPersistent();
-	}, [ value.text, hasActiveFormats ] );
+	}, [ html, hasActiveFormats ] );
 }
