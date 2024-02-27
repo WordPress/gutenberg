@@ -24,7 +24,6 @@ function BlockOutline( {
 	name,
 } ) {
 	const textBlockWithOutline = TEXT_BLOCKS_WITH_OUTLINE.includes( name );
-	const socialBlockWithOutline = name.includes( 'core/social-link' );
 
 	const hasBlockTextCategory =
 		blockCategory === 'text' && ! textBlockWithOutline;
@@ -32,9 +31,6 @@ function BlockOutline( {
 		blockCategory === 'media' ||
 		blockCategory === 'embed' ||
 		! blockCategory;
-	const isOutlinedDesignBlock =
-		blockCategory === 'design' &&
-		! DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name );
 	const shouldShowCompactOutline =
 		( hasBlockMediaCategory && ! hasInnerBlocks ) || textBlockWithOutline;
 
@@ -48,14 +44,27 @@ function BlockOutline( {
 		hasBlockTextCategory && styles.solidBorderTextContent,
 	];
 
-	const shouldShowOutline =
-		isSelected &&
-		( ( hasBlockTextCategory && hasInnerBlocks ) ||
-			( ! hasBlockTextCategory && hasInnerBlocks ) ||
-			( ! hasBlockTextCategory && isRootList ) ||
-			isOutlinedDesignBlock ||
-			socialBlockWithOutline ||
-			textBlockWithOutline );
+	if ( ! isSelected ) {
+		return null;
+	}
+
+	let shouldShowOutline = false;
+
+	if ( hasBlockTextCategory && hasInnerBlocks ) {
+		shouldShowOutline = true;
+	} else if ( ! hasBlockTextCategory && hasInnerBlocks ) {
+		shouldShowOutline = true;
+	} else if ( blockCategory === 'design' ) {
+		if ( ! DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name ) ) {
+			shouldShowOutline = true;
+		}
+	} else if ( ! hasBlockTextCategory && isRootList ) {
+		shouldShowOutline = true;
+	} else if ( name.includes( 'core/social-link' ) ) {
+		shouldShowOutline = true;
+	} else if ( textBlockWithOutline ) {
+		shouldShowOutline = true;
+	}
 
 	return (
 		shouldShowOutline && (
