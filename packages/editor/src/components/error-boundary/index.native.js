@@ -48,8 +48,9 @@ class ErrorBoundary extends Component {
 		logException( error, {
 			context: {
 				component_stack: error.componentStack,
-				error_boundary_level: 'editor',
 			},
+			isHandled: true,
+			handledBy: 'Editor-level Error Boundary',
 		} );
 	}
 

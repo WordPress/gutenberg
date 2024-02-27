@@ -23,9 +23,10 @@ class BlockCrashBoundary extends Component {
 		logException( error, {
 			context: {
 				component_stack: error.componentStack,
-				error_boundary_level: 'block',
 				block_name: blockName,
 			},
+			isHandled: true,
+			handledBy: 'Block-level Error Boundary',
 		} );
 	}
 
