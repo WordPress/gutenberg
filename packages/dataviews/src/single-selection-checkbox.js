@@ -36,6 +36,10 @@ export default function SingleSelectionCheckbox( {
 			aria-disabled={ disabled }
 			checked={ disabled ? false : isSelected }
 			onChange={ () => {
+				if ( disabled ) {
+					return;
+				}
+
 				if ( ! isSelected ) {
 					onSelectionChange(
 						data.filter( ( _item ) => {
