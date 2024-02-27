@@ -7,7 +7,7 @@ import {
 	__experimentalVStack as VStack,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -90,8 +90,12 @@ const TypePreview = ( { variation } ) => {
 				type: 'tween',
 			} }
 		>
-			<span style={ headingPreviewStyle }>A</span>
-			<span style={ bodyPreviewStyle }>a</span>
+			<span style={ headingPreviewStyle }>
+				{ _x( 'A', 'Uppercase letter A' ) }
+			</span>
+			<span style={ bodyPreviewStyle }>
+				{ _x( 'a', 'Lowercase letter A' ) }
+			</span>
 		</motion.div>
 	);
 };
