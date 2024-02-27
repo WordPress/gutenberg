@@ -57,7 +57,11 @@ function BlockOutline( {
 
 	return (
 		shouldShowOutline && (
-			<View pointerEvents="box-none" style={ styleSolidBorder } />
+			<View
+				pointerEvents="box-none"
+				style={ styleSolidBorder }
+				testID="block-outline"
+			/>
 		)
 	);
 }
