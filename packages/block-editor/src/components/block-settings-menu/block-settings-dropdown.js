@@ -224,7 +224,8 @@ export function BlockSettingsDropdown( {
 								canRemove
 							) {
 								event.preventDefault();
-								updateSelectionAfterRemove( onRemove() );
+								onRemove();
+								updateSelectionAfterRemove();
 							} else if (
 								isMatch(
 									'core/block-editor/duplicate',
