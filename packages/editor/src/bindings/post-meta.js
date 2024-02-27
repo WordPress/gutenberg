@@ -35,7 +35,8 @@ export default {
 		};
 		return {
 			placeholder: metaKey,
-			useValue: [ metaValue, updateMetaValue ],
+			value: metaValue,
+			updateValue: updateMetaValue,
 		};
 	},
 };

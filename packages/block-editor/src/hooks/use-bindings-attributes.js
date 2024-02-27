@@ -4,12 +4,11 @@
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
-import { useBlockEditContext } from '../components/block-edit/context';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -29,60 +28,97 @@ export const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/button': [ 'url', 'text', 'linkTarget' ],
 };
 
+function UseSourceComponent( {
+	blockBindingsSources,
+	binding,
+	blockProps,
+	onLoad,
+	htmlAttribute,
+} ) {
+	const { source: sourceName, args } = binding;
+	const { placeholder, value: sourceValue } =
+		blockBindingsSources[ sourceName ]?.useSource( blockProps, args ) ?? {};
+
+	useEffect( () => {
+		// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
+		// Adding this workaround until attributes and metadata fields types are improved and include `url`.
+		const placeholderValue =
+			htmlAttribute === 'src' || htmlAttribute === 'href'
+				? null
+				: placeholder;
+		onLoad( sourceValue ? sourceValue : placeholderValue );
+	}, [] );
+
+	return null;
+}
+
 const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
-			const { clientId, name: blockName } = useBlockEditContext();
+			const { name: blockName, attributes } = props;
 			const blockBindingsSources = unlock(
 				useSelect( blocksStore )
 			).getAllBlockBindingsSources();
-			const { getBlockAttributes } = useSelect( blockEditorStore );
+			const blockType = getBlockType( blockName );
+			const [ attributesWithBindings, setAttributesWithBindings ] =
+				useState( attributes );
 
-			const updatedAttributes = getBlockAttributes( clientId );
-			if ( updatedAttributes?.metadata?.bindings ) {
-				Object.entries( updatedAttributes.metadata.bindings ).forEach(
-					( [ attributeName, settings ] ) => {
-						const source = blockBindingsSources[ settings.source ];
-
-						if ( source && source.useSource ) {
-							// Second argument (`updateMetaValue`) will be used to update the value in the future.
-							const {
-								placeholder,
-								useValue: [ metaValue = null ] = [],
-							} = source.useSource( props, settings.args );
-
-							if ( placeholder && ! metaValue ) {
-								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
-								// Adding this workaround until attributes and metadata fields types are improved and include `url`.
-								const htmlAttribute =
-									getBlockType( blockName ).attributes[
-										attributeName
-									].attribute;
-								if (
-									htmlAttribute === 'src' ||
-									htmlAttribute === 'href'
-								) {
-									updatedAttributes[ attributeName ] = null;
-								} else {
-									updatedAttributes[ attributeName ] =
-										placeholder;
-								}
-							}
-
-							if ( metaValue ) {
-								updatedAttributes[ attributeName ] = metaValue;
-							}
-						}
-					}
-				);
-			}
+			const updateAttributesWithBindings = useCallback(
+				( attributeName, newValue ) => {
+					if ( newValue )
+						setAttributesWithBindings( ( prev ) => ( {
+							...prev,
+							[ attributeName ]: newValue,
+						} ) );
+				},
+				[]
+			);
 
 			return (
-				<BlockEdit
-					key="edit"
-					{ ...props }
-					attributes={ updatedAttributes }
-				/>
+				<>
+					{ attributes?.metadata?.bindings ? (
+						<>
+							{ Object.entries(
+								attributes.metadata.bindings
+							).map( ( [ attributeName, binding ] ) => {
+								if (
+									! BLOCK_BINDINGS_ALLOWED_BLOCKS[
+										blockName
+									].includes( attributeName )
+								) {
+									return null;
+								}
+								const htmlAttribute =
+									blockType.attributes[ attributeName ]
+										.attribute;
+								return (
+									<UseSourceComponent
+										key={ attributeName }
+										blockBindingsSources={
+											blockBindingsSources
+										}
+										binding={ binding }
+										blockProps={ props }
+										htmlAttribute={ htmlAttribute }
+										onLoad={ ( newAttributeValue ) => {
+											updateAttributesWithBindings(
+												attributeName,
+												newAttributeValue
+											);
+										} }
+									/>
+								);
+							} ) }
+							<BlockEdit
+								key="edit"
+								{ ...props }
+								attributes={ attributesWithBindings }
+							/>
+						</>
+					) : (
+						<BlockEdit key="edit" { ...props } />
+					) }
+				</>
 			);
 		},
 		'useBoundAttributes'
