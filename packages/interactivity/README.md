@@ -17,7 +17,7 @@ These Core blocks are already powered by the API:
 > **Note**
 > This step is only required if you are using this API outside of WordPress.
 >
-> Within WordPress, the package is already bundled in Core, so all you need to do to ensure it is loaded, by adding `wp-interactivity` to the dependency array of the module script.
+> Within WordPress, the package is already bundled in Core, so all you need to do to ensure it is loaded, by adding `@wordpress/interactivity` to the dependency array of the script module.
 >
 >This happens automatically when you use the dependency extraction Webpack plugin that is used in tools like wp-scripts.
 
