@@ -178,6 +178,34 @@ describe( 'BlockOutline', () => {
 				expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
 			} );
 		} );
+
+		describe( 'when a file block', () => {
+			it( 'should render an outline', async () => {
+				render(
+					<BlockOutline
+						isSelected
+						blockCategory="media"
+						name="core/file"
+					/>
+				);
+
+				expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
+			} );
+		} );
+
+		describe( 'when an audio block', () => {
+			it( 'should render an outline', async () => {
+				render(
+					<BlockOutline
+						isSelected
+						blockCategory="media"
+						name="core/audio"
+					/>
+				);
+
+				expect( screen.getByTestId( 'block-outline' ) ).toBeVisible();
+			} );
+		} );
 	} );
 
 	describe( 'containing a freeform block', () => {
