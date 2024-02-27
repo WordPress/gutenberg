@@ -429,7 +429,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     @objc
     func logException(_ rawException: [AnyHashable: Any], callback: @escaping RCTResponseSenderBlock) {
-        guard let exception = JSException(from: rawException) else {
+        guard let exception = GutenbergJSException(from: rawException) else {
             callback([false])
             return
         }

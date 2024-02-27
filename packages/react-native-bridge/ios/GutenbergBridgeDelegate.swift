@@ -143,7 +143,7 @@ extension RCTLogLevel {
 
 // Definition of JavaScript exception, which will be used to
 // log exception to the Crash Logging service.
-public struct JSException {
+public struct GutenbergJSException {
     public let type: String
     public let value: String
     public let stacktrace: [StacktraceLine]
@@ -332,7 +332,7 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     func gutenbergDidRequestConnectionStatus() -> Bool
     
-    func gutenbergDidRequestLogException(_ exception: JSException, with callback: @escaping () -> Void)
+    func gutenbergDidRequestLogException(_ exception: GutenbergJSException, with callback: @escaping () -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
