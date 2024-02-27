@@ -76,9 +76,13 @@ test.describe( 'Unsynced pattern', () => {
 			.click();
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
-		await expect
-			.poll( editor.getBlocks )
-			.toEqual( [ ...before, ...before ] );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			...before,
+			{
+				...before[ 0 ],
+				metadata: { categories: [ 'contact-details' ] },
+			},
+		] );
 	} );
 } );
 
