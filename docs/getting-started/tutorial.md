@@ -36,9 +36,9 @@ The first step in creating the Copyright Date Block is to scaffold the initial b
 	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/">Get started with create-block</a> documentation for an introduction to using this package.
 </div>
 
-You can use `create-block` from just about any directory on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.
+You can use `create-block` from just about any directory (folder) on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.
 
-Therefore, create a new directory (folder) on your computer called "Block Tutorial". Open your terminal and `cd` to this directory. Then run the following command.
+Therefore, choose a directory to place the block plugin or optionally create a new folder called "Block Tutorial". Open your terminal and `cd` to this directory. Then run the following command.
 
 <div class="callout callout-info">
 	If you are not using <code>wp-env</code>, instead, navigate to the <code>plugins/</code> folder in your local WordPress installation using the terminal and run the following command.
@@ -203,7 +203,7 @@ Before you start building the functionality of the block itself, let's do a bit 
 
 Open the [`index.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#index-js) file. This is the main JavaScript file of the block and is used to register it on the client. You can learn more about client-side and server-side registration in the [Registration of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) documentation.
 
-Start by looking at the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/) function. This function accepts the name of the block, which we are getting from the imported `block.js` file, and the block configuration object.
+Start by looking at the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/) function. This function accepts the name of the block, which we are getting from the imported `block.json` file, and the block configuration object.
 
 ```js
 import Edit from './edit';
@@ -327,7 +327,7 @@ Save the file and confirm that the block appears correctly in the Editor and on 
 
 ### Cleaning up
 
-When you use the `create-block` package to scaffold a block, it might include files that you don't need. In the case of this tutorial, the block doesn't use stylesheets or font end JavaScipt. Clean up the plugin's `src/` folder with the following actions.
+When you use the `create-block` package to scaffold a block, it might include files that you don't need. In the case of this tutorial, the block doesn't use stylesheets or front end JavaScript. Clean up the plugin's `src/` folder with the following actions.
 
 1. In the `edit.js` file, remove the lines that import `editor.scss`
 2. In the `index.js` file, remove the lines that import `style.scss`
@@ -351,9 +351,10 @@ To enable this starting year functionality, you will need one attribute to store
 
 ### Updating block.json
 
-Block attributes are generally specified in the [`block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#data-storage-in-the-block-with-attributes) file. So open up the file and add the following section after the `example` in line 9.
+Block attributes are generally specified in the [`block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#data-storage-in-the-block-with-attributes) file. So open up the file and add the following section after the `example` property.
 
 ```json
+"example": {},
 "attributes": {
 	"showStartingYear": {
 		"type": "boolean"
@@ -391,7 +392,7 @@ Next, update the Edit function to return the current block content and an `Inspe
 
 ```js
 export default function Edit() {
-const currentYear = new Date().getFullYear().toString();
+	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<>
@@ -421,7 +422,7 @@ Then wrap the "Testing" message in the `PanelBody` component and set the `title`
 
 ```js
 export default function Edit() {
-const currentYear = new Date().getFullYear().toString();
+	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<>
@@ -483,7 +484,7 @@ export default function Edit( { attributes, setAttributes } ) {
 							'Starting year',
 							'copyright-date-block'
 						) }
-						value={ startingYear }
+						value={ startingYear || '' }
 						onChange={ ( value ) =>
 							setAttributes( { startingYear: value } )
 						}
@@ -495,6 +496,10 @@ export default function Edit( { attributes, setAttributes } ) {
 	);
 }
 ```
+
+<div class="callout callout-tip">
+	You may have noticed that the <code>value</code> property has a value of <code>startingYear || ''</code>. The symbol <code>||</code> is called the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR</a> (logical disjunction) operator. This prevents warnings in React when the <code>startingYear</code> is empty. See <a href="https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components">Controlled and uncontrolled components</a> for details.
+</div>
 
 Save the file and refresh the Editor. Confirm that a text field now exists in the Settings panel. Add a starting year and confirm that when you update the page, the value is saved.
 
@@ -522,7 +527,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<ToggleControl
-						checked={ showStartingYear }
+						checked={ !! showStartingYear }
 						label={ __(
 							'Show starting year',
 							'copyright-date-block'
@@ -539,7 +544,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								'Starting year',
 								'copyright-date-block'
 							) }
-							value={ startingYear }
+							value={ startingYear || '' }
 							onChange={ ( value ) =>
 								setAttributes( { startingYear: value } )
 							}
@@ -601,7 +606,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<ToggleControl
-						checked={ showStartingYear }
+						checked={ !! showStartingYear }
 						label={ __(
 							'Show starting year',
 							'copyright-date-block'
@@ -618,7 +623,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								'Starting year',
 								'copyright-date-block'
 							) }
-							value={ startingYear }
+							value={ startingYear || '' }
 							onChange={ ( value ) =>
 								setAttributes( { startingYear: value } )
 							}
@@ -690,7 +695,9 @@ In the next section, however, you will add static rendering to the block. This e
 
 ## Adding static rendering
 
-A block can be dynamically rendered, statically rendered, or both. The block you have built so far is dynamically rendered. The HTML output of the block is not actually stored in the database, only the block markup and the associated attributes.
+A block can utilize dynamic rendering, static rendering, or both. The block you have built so far is dynamically rendered. Its block markup and associated attributes are stored in the database, but its HTML output is not.
+
+Statically rendered blocks will always store the block markup, attributes, and output in the database. Blocks can also store static output in the database while being further enhanced dynamically on the front end, a combination of both methods.
 
 You will see the following if you switch to the Code editor from within the Editor.
 
@@ -708,7 +715,7 @@ Compare this to a statically rendered block like the Paragraph block.
 
 The HTML of the paragraph is stored in post content and saved in the database.
 
-You can learn more about dynamic and static rendering in the [Fundamentals documentation](https://developer.wordpress.org/block-editor/getting-started/fundamentals/). While most blocks are either dynamically or statically rendered, you can build a block that utilizes both methods.
+You can learn more about dynamic and static rendering in the [Fundamentals documentation](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). While most blocks are either dynamically or statically rendered, you can build a block that utilizes both methods.
 
 ### Why add static rendering?
 
@@ -958,9 +965,9 @@ You will not get any block validation errors, but the Editor will detect that ch
 
 #### Optimizing render.php
 
-The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the  `render.php` file via the `$block_content` variable.
+The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the  `render.php` file via the `$content` variable.
 
-Therefore, update the file to render the `$block_content` if `currentYear` and `fallbackCurrentYear` match.
+Therefore, update the file to render the generated content if `currentYear` and `fallbackCurrentYear` do not match.
 
 ```php
 $current_year = date( "Y" );

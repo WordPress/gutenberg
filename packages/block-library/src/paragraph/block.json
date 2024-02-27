@@ -41,7 +41,6 @@
 				"text": true
 			}
 		},
-		"__experimentalConnections": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -65,7 +64,10 @@
 			}
 		},
 		"__experimentalSelector": "p",
-		"__unstablePasteTextInline": true
+		"__unstablePasteTextInline": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"

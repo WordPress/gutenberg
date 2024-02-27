@@ -135,7 +135,12 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	return css;
 }
 
-function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
+function LayoutPanelPure( {
+	layout,
+	setAttributes,
+	name: blockName,
+	clientId,
+} ) {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
@@ -266,6 +271,8 @@ function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ blockSupportAndThemeSettings }
+							name={ blockName }
+							clientId={ clientId }
 						/>
 					) }
 					{ constrainedType && displayControlsForLegacyLayouts && (
@@ -273,6 +280,8 @@ function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ blockSupportAndThemeSettings }
+							name={ blockName }
+							clientId={ clientId }
 						/>
 					) }
 				</PanelBody>
@@ -282,6 +291,8 @@ function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
+					name={ blockName }
+					clientId={ clientId }
 				/>
 			) }
 		</>
@@ -351,7 +362,7 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	const layoutClasses = useLayoutClasses( attributes, name );
 
 	const { kebabCase } = unlock( componentsPrivateApis );
-	const selectorPrefix = `wp-container-${ kebabCase( name ) }-layout-`;
+	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );

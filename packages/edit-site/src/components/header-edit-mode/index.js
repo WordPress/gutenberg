@@ -42,9 +42,9 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { PreviewDropdown } = unlock( editorPrivateApis );
+const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
 
-export default function HeaderEditMode( { setListViewToggleElement } ) {
+export default function HeaderEditMode() {
 	const {
 		templateType,
 		isDistractionFree,
@@ -66,21 +66,12 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			blockSelectionStart: getBlockSelectionStart(),
-			showIconLabels: getPreference(
-				editSiteStore.name,
-				'showIconLabels'
-			),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			hasFixedToolbar: getPreference(
-				editSiteStore.name,
-				'fixedToolbar'
-			),
-			isDistractionFree: getPreference(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			isDistractionFree: getPreference( 'core', 'distractionFree' ),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
@@ -136,8 +127,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					<DocumentTools
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
-						showIconLabels={ showIconLabels }
-						setListViewToggleElement={ setListViewToggleElement }
 					/>
 					{ isTopToolbar && (
 						<>
@@ -145,7 +134,9 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 								className={ classnames(
 									'selected-block-tools-wrapper',
 									{
-										'is-collapsed': isBlockToolsCollapsed,
+										'is-collapsed':
+											isBlockToolsCollapsed ||
+											! hasBlockSelected,
 									}
 								) }
 							>
@@ -210,14 +201,14 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 							) }
 						>
 							<PreviewDropdown
-								showIconLabels={ showIconLabels }
 								disabled={
 									isFocusMode || ! hasDefaultEditorCanvasView
 								}
 							/>
 						</div>
 					) }
-					<SaveButton />
+					<PostViewLink />
+					<SaveButton size="compact" />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }

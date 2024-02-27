@@ -24,6 +24,7 @@ export default function Gallery( props ) {
 		blockProps,
 		__unstableLayoutClassNames: layoutClassNames,
 		isContentLocked,
+		multiGallerySelection,
 	} = props;
 
 	const { align, columns, imageCrop } = attributes;
@@ -54,7 +55,9 @@ export default function Gallery( props ) {
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }
 				insertBlocksAfter={ insertBlocksAfter }
-				showToolbarButton={ ! isContentLocked }
+				showToolbarButton={
+					! multiGallerySelection && ! isContentLocked
+				}
 				className="blocks-gallery-caption"
 				label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Add gallery caption' ) }

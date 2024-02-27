@@ -373,6 +373,12 @@ export const getAutosaveAttribute = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
@@ -592,6 +598,12 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
 			postType,
@@ -1152,7 +1164,7 @@ export const isEditorPanelEnabled = createRegistrySelector(
 		// For backward compatibility, we check edit-post
 		// even though now this is in "editor" package.
 		const inactivePanels = select( preferencesStore ).get(
-			'core/edit-post',
+			'core',
 			'inactivePanels'
 		);
 		return (
@@ -1176,7 +1188,7 @@ export const isEditorPanelOpened = createRegistrySelector(
 		// For backward compatibility, we check edit-post
 		// even though now this is in "editor" package.
 		const openPanels = select( preferencesStore ).get(
-			'core/edit-post',
+			'core',
 			'openPanels'
 		);
 		return !! openPanels?.includes( panelName );
@@ -1278,6 +1290,40 @@ export function getRenderingMode( state ) {
 export function getDeviceType( state ) {
 	return state.deviceType;
 }
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+);
 
 /*
  * Backward compatibility

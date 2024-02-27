@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
@@ -10,30 +10,14 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import { store as postEditorStore } from '../../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 function WritingMenu() {
-	const registry = useRegistry();
-
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( postEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const toggleDistractionFree = () => {
-		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', true );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-		} );
-	};
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-post', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -44,7 +28,7 @@ function WritingMenu() {
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="fixedToolbar"
 				onToggle={ turnOffDistractionFree }
 				label={ __( 'Top toolbar' ) }
@@ -55,8 +39,9 @@ function WritingMenu() {
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="distractionFree"
+				handleToggling={ false }
 				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }
 				info={ __( 'Write with calmness' ) }
@@ -65,7 +50,7 @@ function WritingMenu() {
 				shortcut={ displayShortcut.primaryShift( '\\' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
@@ -76,7 +61,7 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Show and hide admin UI' ) }
+				info={ __( 'Show and hide the admin user interface' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }

@@ -353,6 +353,18 @@ _Returns_
 
 -   `Array`: Block list.
 
+### getEditorMode
+
+Returns the current editing mode.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Editing mode.
+
 ### getEditorSelection
 
 Returns the current selection.
@@ -924,6 +936,30 @@ _Related_
 
 -   isFirstMultiSelectedBlock in core/block-editor store.
 
+### isInserterOpened
+
+Returns true if the inserter is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
+
+### isListViewOpened
+
+Returns true if the list view is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the list view is opened.
+
 ### isMultiSelecting
 
 _Related_
@@ -1349,18 +1385,43 @@ _Returns_
 
 -   `Object`: Action object.
 
+### setIsInserterOpened
+
+Returns an action object used to open/close the inserter.
+
+_Parameters_
+
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
+-   _value.rootClientId_ `string`: The root client ID to insert at.
+-   _value.insertionIndex_ `number`: The index to insert at.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsListViewOpened
+
+Returns an action object used to open/close the list view.
+
+_Parameters_
+
+-   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setRenderingMode
 
 Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
 
 -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
--   `template-only`: This mode renders the editor with only the template blocks visible.
 -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
 -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
 
 _Parameters_
 
--   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+-   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
 
 ### setTemplateValidity
 
@@ -1418,6 +1479,14 @@ _Related_
 
 -   stopTyping in core/block-editor store.
 
+### switchEditorMode
+
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
+
 ### synchronizeTemplate
 
 _Related_
@@ -1429,6 +1498,10 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleEditorPanelEnabled
 

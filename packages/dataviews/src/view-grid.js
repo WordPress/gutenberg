@@ -1,26 +1,143 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
-	FlexBlock,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Tooltip,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ItemActions from './item-actions';
+import SingleSelectionCheckbox from './single-selection-checkbox';
+
+import { useHasAPossibleBulkAction } from './bulk-actions';
+
+function GridItem( {
+	selection,
+	data,
+	onSelectionChange,
+	getItemId,
+	item,
+	actions,
+	mediaField,
+	primaryField,
+	visibleFields,
+} ) {
+	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
+	const id = getItemId( item );
+	const isSelected = selection.includes( id );
+	return (
+		<VStack
+			spacing={ 0 }
+			key={ id }
+			className={ classnames( 'dataviews-view-grid__card', {
+				'is-selected': hasBulkAction && isSelected,
+				'has-no-pointer-events': hasNoPointerEvents,
+			} ) }
+			onMouseDown={ ( event ) => {
+				if ( hasBulkAction && ( event.ctrlKey || event.metaKey ) ) {
+					setHasNoPointerEvents( true );
+					if ( ! isSelected ) {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId === id ||
+									selection.includes( itemId )
+								);
+							} )
+						);
+					} else {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId !== id &&
+									selection.includes( itemId )
+								);
+							} )
+						);
+					}
+				}
+			} }
+			onClick={ () => {
+				if ( hasNoPointerEvents ) {
+					setHasNoPointerEvents( false );
+				}
+			} }
+		>
+			<div className="dataviews-view-grid__media">
+				{ mediaField?.render( { item } ) }
+			</div>
+			<HStack
+				justify="space-between"
+				className="dataviews-view-grid__title-actions"
+			>
+				<SingleSelectionCheckbox
+					id={ id }
+					item={ item }
+					selection={ selection }
+					onSelectionChange={ onSelectionChange }
+					getItemId={ getItemId }
+					data={ data }
+					primaryField={ primaryField }
+					disabled={ ! hasBulkAction }
+				/>
+				<HStack className="dataviews-view-grid__primary-field">
+					{ primaryField?.render( { item } ) }
+				</HStack>
+				<ItemActions item={ item } actions={ actions } isCompact />
+			</HStack>
+			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+				{ visibleFields.map( ( field ) => {
+					const renderedValue = field.render( {
+						item,
+					} );
+					if ( ! renderedValue ) {
+						return null;
+					}
+					return (
+						<VStack
+							className="dataviews-view-grid__field"
+							key={ field.id }
+							spacing={ 1 }
+						>
+							<Tooltip text={ field.header } placement="left">
+								<div className="dataviews-view-grid__field-value">
+									{ renderedValue }
+								</div>
+							</Tooltip>
+						</VStack>
+					);
+				} ) }
+			</VStack>
+		</VStack>
+	);
+}
 
 export default function ViewGrid( {
 	data,
 	fields,
 	view,
 	actions,
+	isLoading,
 	getItemId,
 	deferredRendering,
+	selection,
+	onSelectionChange,
 } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
@@ -37,64 +154,45 @@ export default function ViewGrid( {
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
 	const usedData = deferredRendering ? shownData : data;
+	const hasData = !! usedData?.length;
 	return (
-		<Grid
-			gap={ 8 }
-			columns={ 2 }
-			alignment="top"
-			className="dataviews-grid-view"
-		>
-			{ usedData.map( ( item, index ) => (
-				<VStack
-					spacing={ 3 }
-					key={ getItemId?.( item ) || index }
-					className="dataviews-view-grid__card"
+		<>
+			{ hasData && (
+				<Grid
+					gap={ 6 }
+					columns={ 2 }
+					alignment="top"
+					className="dataviews-view-grid"
+					aria-busy={ isLoading }
 				>
-					<div className="dataviews-view-grid__media">
-						{ mediaField?.render( { item } ) }
-					</div>
-					<HStack
-						className="dataviews-view-grid__primary-field"
-						justify="space-between"
-					>
-						<FlexBlock>
-							{ primaryField?.render( { item } ) }
-						</FlexBlock>
-						<ItemActions
-							item={ item }
-							actions={ actions }
-							isCompact
-						/>
-					</HStack>
-					<VStack
-						className="dataviews-view-grid__fields"
-						spacing={ 3 }
-					>
-						{ visibleFields.map( ( field ) => {
-							const renderedValue = field.render( {
-								item,
-							} );
-							if ( ! renderedValue ) {
-								return null;
-							}
-							return (
-								<VStack
-									className="dataviews-view-grid__field"
-									key={ field.id }
-									spacing={ 1 }
-								>
-									<div className="dataviews-view-grid__field-header">
-										{ field.header }
-									</div>
-									<div className="dataviews-view-grid__field-value">
-										{ field.render( { item } ) }
-									</div>
-								</VStack>
-							);
-						} ) }
-					</VStack>
-				</VStack>
-			) ) }
-		</Grid>
+					{ usedData.map( ( item ) => {
+						return (
+							<GridItem
+								key={ getItemId( item ) }
+								selection={ selection }
+								data={ data }
+								onSelectionChange={ onSelectionChange }
+								getItemId={ getItemId }
+								item={ item }
+								actions={ actions }
+								mediaField={ mediaField }
+								primaryField={ primaryField }
+								visibleFields={ visibleFields }
+							/>
+						);
+					} ) }
+				</Grid>
+			) }
+			{ ! hasData && (
+				<div
+					className={ classnames( {
+						'dataviews-loading': isLoading,
+						'dataviews-no-results': ! isLoading,
+					} ) }
+				>
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				</div>
+			) }
+		</>
 	);
 }

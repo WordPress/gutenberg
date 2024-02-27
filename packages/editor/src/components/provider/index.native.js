@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { BackHandler } from 'react-native';
 import memize from 'memize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -58,8 +59,6 @@ const postTypeEntities = [
 import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line no-restricted-imports
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -78,6 +77,8 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+
+		this.onHardwareBackPress = this.onHardwareBackPress.bind( this );
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -191,6 +192,11 @@ class NativeEditorProvider extends Component {
 			this.setState( { isHelpVisible: true } );
 		} );
 
+		this.hardwareBackPressListener = BackHandler.addEventListener(
+			'hardwareBackPress',
+			this.onHardwareBackPress
+		);
+
 		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
@@ -250,6 +256,10 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowEditorHelp ) {
 			this.subscriptionParentShowEditorHelp.remove();
 		}
+
+		if ( this.hardwareBackPressListener ) {
+			this.hardwareBackPressListener.remove();
+		}
 	}
 
 	getThemeColors( { rawStyles, rawFeatures } ) {
@@ -278,6 +288,16 @@ class NativeEditorProvider extends Component {
 				unsupportedBlockNames
 			);
 		}
+	}
+
+	onHardwareBackPress() {
+		const { clearSelectedBlock, selectedBlockIndex } = this.props;
+
+		if ( selectedBlockIndex !== -1 ) {
+			clearSelectedBlock();
+			return true;
+		}
+		return false;
 	}
 
 	serializeToNativeAction() {
@@ -370,8 +390,8 @@ const ComposedNativeProvider = compose( [
 			getEditedPostAttribute,
 			getEditedPostContent,
 			getEditorSettings,
+			getEditorMode,
 		} = select( editorStore );
-		const { getEditorMode } = select( editPostStore );
 
 		const { getBlockIndex, getSelectedBlockClientId, getGlobalBlockCount } =
 			select( blockEditorStore );
@@ -395,11 +415,18 @@ const ComposedNativeProvider = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks, updateEditorSettings } =
-			dispatch( editorStore );
-		const { updateSettings, insertBlock, replaceBlock } =
-			dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( editPostStore );
+		const {
+			editPost,
+			resetEditorBlocks,
+			updateEditorSettings,
+			switchEditorMode,
+		} = dispatch( editorStore );
+		const {
+			clearSelectedBlock,
+			updateSettings,
+			insertBlock,
+			replaceBlock,
+		} = dispatch( blockEditorStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			dispatch( noticesStore );
@@ -411,6 +438,7 @@ const ComposedNativeProvider = compose( [
 			insertBlock,
 			createSuccessNotice,
 			createErrorNotice,
+			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},

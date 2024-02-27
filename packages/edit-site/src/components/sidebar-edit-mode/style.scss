@@ -34,6 +34,10 @@
 	}
 }
 
+.edit-site-global-styles-sidebar .edit-site-global-styles-sidebar__header-title {
+	margin: 0;
+}
+
 .edit-site-global-styles-sidebar .interface-complementary-area-header .components-button.has-icon {
 	margin-left: 0;
 }
@@ -100,12 +104,6 @@
 	}
 }
 
-.edit-site-sidebar-fixed-bottom-slot {
-	position: sticky;
-	bottom: 0;
-	background: $white;
-	display: flex;
-	padding: $grid-unit-20;
-	border-top: $border-width solid $gray-300;
-	box-sizing: content-box;
+.edit-site-sidebar__panel {
+	margin-top: -1px;
 }

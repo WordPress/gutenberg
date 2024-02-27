@@ -42,6 +42,14 @@
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-global-styles-screen-typography__font-variants-count {
+	color: $gray-700;
+}
+
+.edit-site-global-styles-font-families__add-fonts {
+	justify-content: center;
+}
+
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
@@ -165,7 +173,7 @@
 }
 
 .edit-site-global-styles-screen-css-help-link {
-	display: block;
+	display: inline-block;
 	margin-top: $grid-unit-10;
 }
 .edit-site-global-styles-screen-variations {

@@ -35,12 +35,12 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
-			const { getBlock, getBlockIndex, getBlockRootClientId } =
+			const { getBlocks, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
 
 			return {
 				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength: getBlock( clientId )?.innerBlocks?.length,
+				innerBlocksLength: getBlocks( clientId )?.length,
 				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
@@ -49,14 +49,13 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const hookedBlockClientIds = useSelect(
 		( select ) => {
-			const { getBlock, getGlobalBlockCount } =
+			const { getBlocks, getGlobalBlockCount } =
 				select( blockEditorStore );
 
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
 				( clientIds, block ) => {
 					// If the block doesn't exist anywhere in the block tree,
-					// we know that we have to display the toggle for it, and set
-					// it to disabled.
+					// we know that we have to set the toggle to disabled.
 					if ( getGlobalBlockCount( block.name ) === 0 ) {
 						return clientIds;
 					}
@@ -70,7 +69,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's siblings (with the right block type) qualifies
 							// as a hooked block (inserted `before` or `after` the current one), as the block
 							// might've been automatically inserted and then moved around a bit by the user.
-							candidates = getBlock( rootClientId )?.innerBlocks;
+							candidates = getBlocks( rootClientId );
 							break;
 
 						case 'first_child':
@@ -78,12 +77,12 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's child blocks (with the right block type) qualifies
 							// as a hooked first or last child block, as the block might've been automatically
 							// inserted and then moved around a bit by the user.
-							candidates = getBlock( clientId ).innerBlocks;
+							candidates = getBlocks( clientId );
 							break;
 					}
 
 					const hookedBlock = candidates?.find(
-						( candidate ) => name === candidate.name
+						( candidate ) => candidate.name === block.name
 					);
 
 					// If the block exists in the designated location, we consider it hooked
@@ -96,13 +95,8 @@ function BlockHooksControlPure( { name, clientId } ) {
 					}
 
 					// If no hooked block was found in any of its designated locations,
-					// but it exists elsewhere in the block tree, we consider it manually inserted.
-					// In this case, we take note and will remove the corresponding toggle from the
-					// block inspector panel.
-					return {
-						...clientIds,
-						[ block.name ]: false,
-					};
+					// we set the toggle to disabled.
+					return clientIds;
 				},
 				{}
 			);
@@ -118,13 +112,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
-	// Remove toggle if block isn't present in the designated location but elsewhere in the block tree.
-	const hookedBlocksForCurrentBlockIfNotPresentElsewhere =
-		hookedBlocksForCurrentBlock?.filter(
-			( block ) => hookedBlockClientIds?.[ block.name ] !== false
-		);
-
-	if ( ! hookedBlocksForCurrentBlockIfNotPresentElsewhere.length ) {
+	if ( ! hookedBlocksForCurrentBlock.length ) {
 		return null;
 	}
 
@@ -173,6 +161,11 @@ function BlockHooksControlPure( { name, clientId } ) {
 				title={ __( 'Plugins' ) }
 				initialOpen={ true }
 			>
+				<p className="block-editor-hooks__block-hooks-helptext">
+					{ __(
+						'Manage the inclusion of blocks added automatically by plugins.'
+					) }
+				</p>
 				{ Object.keys( groupedHookedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>

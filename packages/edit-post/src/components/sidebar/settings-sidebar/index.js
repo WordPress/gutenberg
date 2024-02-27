@@ -6,13 +6,20 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Platform, useCallback, useContext } from '@wordpress/element';
+import {
+	Platform,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	store as editorStore,
+	PageAttributesPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
 	PostFeaturedImagePanel,
@@ -25,7 +32,6 @@ import {
  */
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
-import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
@@ -48,19 +54,47 @@ export const sidebars = {
 const SidebarContent = ( {
 	sidebarName,
 	keyboardShortcut,
-	isTemplateMode,
+	isEditingTemplate,
 } ) => {
+	const tabListRef = useRef( null );
 	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
+
+	// This effect addresses a race condition caused by tabbing from the last
+	// block in the editor into the settings sidebar. Without this effect, the
+	// selected tab and browser focus can become separated in an unexpected way
+	// (e.g the "block" tab is focused, but the "post" tab is selected).
+	useEffect( () => {
+		const tabsElements = Array.from(
+			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
+		);
+		const selectedTabElement = tabsElements.find(
+			// We are purposefully using a custom `data-tab-id` attribute here
+			// because we don't want rely on any assumptions about `Tabs`
+			// component internals.
+			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
+		);
+		const activeElement = selectedTabElement?.ownerDocument.activeElement;
+		const tabsHasFocus = tabsElements.some( ( element ) => {
+			return activeElement && activeElement.id === element.id;
+		} );
+		if (
+			tabsHasFocus &&
+			selectedTabElement &&
+			selectedTabElement.id !== activeElement?.id
+		) {
+			selectedTabElement?.focus();
+		}
+	}, [ sidebarName ] );
 
 	return (
 		<PluginSidebarEditPost
 			identifier={ sidebarName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SettingsHeader />
+					<SettingsHeader ref={ tabListRef } />
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -77,7 +111,7 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ ! isTemplateMode && (
+					{ ! isEditingTemplate && (
 						<>
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
@@ -86,11 +120,11 @@ const SidebarContent = ( {
 							<PostFeaturedImagePanel />
 							<PostExcerptPanel />
 							<PostDiscussionPanel />
-							<PageAttributes />
+							<PageAttributesPanel />
 							<MetaBoxes location="side" />
 						</>
 					) }
-					{ isTemplateMode && <TemplateSummary /> }
+					{ isEditingTemplate && <TemplateSummary /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
@@ -105,7 +139,7 @@ const SettingsSidebar = () => {
 		sidebarName,
 		isSettingsSidebarActive,
 		keyboardShortcut,
-		isTemplateMode,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
@@ -132,8 +166,8 @@ const SettingsSidebar = () => {
 			sidebarName: sidebar,
 			isSettingsSidebarActive: isSettingsSidebar,
 			keyboardShortcut: shortcut,
-			isTemplateMode:
-				select( editorStore ).getRenderingMode() === 'template-only',
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 
@@ -157,11 +191,12 @@ const SettingsSidebar = () => {
 			// the selected tab to `null` avoids that.
 			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
 			onSelect={ onTabSelect }
+			selectOnMove={ false }
 		>
 			<SidebarContent
 				sidebarName={ sidebarName }
 				keyboardShortcut={ keyboardShortcut }
-				isTemplateMode={ isTemplateMode }
+				isEditingTemplate={ isEditingTemplate }
 			/>
 		</Tabs>
 	);

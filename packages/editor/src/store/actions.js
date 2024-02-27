@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -13,6 +14,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { applyFilters } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -313,8 +315,14 @@ export const trashPost =
 export const autosave =
 	( { local = false, ...options } = {} ) =>
 	async ( { select, dispatch } ) => {
+		const post = select.getCurrentPost();
+
+		// Currently template autosaving is not supported.
+		if ( post.type === 'wp_template' ) {
+			return;
+		}
+
 		if ( local ) {
-			const post = select.getCurrentPost();
 			const isPostNew = select.isEditedPostNew();
 			const title = select.getEditedPostAttribute( 'title' );
 			const content = select.getEditedPostAttribute( 'content' );
@@ -576,11 +584,10 @@ export function updateEditorSettings( settings ) {
  * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
  *
  * -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
- * -   `template-only`: This mode renders the editor with only the template blocks visible.
  * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
  * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
  *
- * @param {string} mode Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+ * @param {string} mode Mode (one of 'post-only' or 'template-locked').
  */
 export const setRenderingMode =
 	( mode ) =>
@@ -624,7 +631,7 @@ export const toggleEditorPanelEnabled =
 		const inactivePanels =
 			registry
 				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
+				.get( 'core', 'inactivePanels' ) ?? [];
 
 		const isPanelInactive = !! inactivePanels?.includes( panelName );
 
@@ -641,7 +648,7 @@ export const toggleEditorPanelEnabled =
 
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+			.set( 'core', 'inactivePanels', updatedInactivePanels );
 	};
 
 /**
@@ -653,9 +660,8 @@ export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
 		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
+			registry.select( preferencesStore ).get( 'core', 'openPanels' ) ??
+			[];
 
 		const isPanelOpen = !! openPanels?.includes( panelName );
 
@@ -672,7 +678,7 @@ export const toggleEditorPanelOpened =
 
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+			.set( 'core', 'openPanels', updatedOpenPanels );
 	};
 
 /**
@@ -688,6 +694,131 @@ export function removeEditorPanel( panelName ) {
 		panelName,
 	};
 }
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', false );
+		}
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core', 'fixedToolbar', true );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', ! isDistractionFree );
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/editor/distraction-free-mode/notice',
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry.batch( () => {
+										registry
+											.dispatch( preferencesStore )
+											.set(
+												'core',
+												'fixedToolbar',
+												isDistractionFree ? true : false
+											);
+										registry
+											.dispatch( preferencesStore )
+											.toggle(
+												'core',
+												'distractionFree'
+											);
+									} );
+								},
+							},
+						],
+					}
+				);
+		} );
+	};
+
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
+export const switchEditorMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
+
+		// Unselect blocks when we switch to a non visual mode.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if ( mode === 'visual' ) {
+			speak( __( 'Visual editor selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
+			speak( __( 'Code editor selected' ), 'assertive' );
+		}
+	};
 
 /**
  * Backward compatibility

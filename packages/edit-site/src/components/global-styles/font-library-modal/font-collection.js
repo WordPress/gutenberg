@@ -1,63 +1,89 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useState,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalInputControl as InputControl,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalHeading as Heading,
+	Notice,
 	SelectControl,
 	Spinner,
 	Icon,
 	FlexItem,
 	Flex,
 	Button,
-	Notice,
+	DropdownMenu,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
-import { search, closeSmall } from '@wordpress/icons';
+import { sprintf, __, _x } from '@wordpress/i18n';
+import {
+	search,
+	closeSmall,
+	moreVertical,
+	chevronLeft,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
 import { FontLibraryContext } from './context';
-import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
-import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
-import { getFontsOutline } from './utils/fonts-outline';
+import {
+	getFontsOutline,
+	isFontFontFaceInOutline,
+} from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
+import { downloadFontFaceAssets } from './utils';
+import { sortFontFaces } from './utils/sort-font-faces';
+import CollectionFontVariant from './collection-font-variant';
 
 const DEFAULT_CATEGORY = {
-	id: 'all',
-	name: __( 'All' ),
+	slug: 'all',
+	name: _x( 'All', 'font categories' ),
 };
-function FontCollection( { id } ) {
-	const requiresPermission = id === 'default-font-collection';
+
+const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
+const MIN_WINDOW_HEIGHT = 500;
+
+function FontCollection( { slug } ) {
+	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
-		return (
-			window.localStorage.getItem(
-				'wp-font-library-default-font-collection-permission'
-			) === 'true'
-		);
+		return window.localStorage.getItem( LOCAL_STORAGE_ITEM ) === 'true';
 	};
 
-	const [ notice, setNotice ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
+	const [ page, setPage ] = useState( 1 );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFonts } =
-		useContext( FontLibraryContext );
+	const {
+		collections,
+		getFontCollection,
+		installFont,
+		isInstalling,
+		notice,
+		setNotice,
+	} = useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
-		( collection ) => collection.id === id
+		( collection ) => collection.slug === slug
 	);
 
 	useEffect( () => {
@@ -69,44 +95,45 @@ function FontCollection( { id } ) {
 		handleStorage();
 		window.addEventListener( 'storage', handleStorage );
 		return () => window.removeEventListener( 'storage', handleStorage );
-	}, [ id, requiresPermission ] );
+	}, [ slug, requiresPermission ] );
+
+	const revokeAccess = () => {
+		window.localStorage.setItem( LOCAL_STORAGE_ITEM, 'false' );
+		window.dispatchEvent( new Event( 'storage' ) );
+	};
 
 	useEffect( () => {
 		const fetchFontCollection = async () => {
 			try {
-				await getFontCollection( id );
+				await getFontCollection( slug );
 				resetFilters();
 			} catch ( e ) {
-				setNotice( {
-					type: 'error',
-					message: e?.message,
-					duration: 0, // Don't auto-hide.
-				} );
+				if ( ! notice ) {
+					setNotice( {
+						type: 'error',
+						message: e?.message,
+					} );
+				}
 			}
 		};
 		fetchFontCollection();
-	}, [ id, getFontCollection ] );
+	}, [ slug, getFontCollection, setNotice, notice ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
 		setNotice( null );
-	}, [ id ] );
+	}, [ slug, setNotice ] );
 
-	// Reset notice after 5 seconds
 	useEffect( () => {
-		if ( notice && notice?.duration !== 0 ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, notice.duration ?? 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
+		// If the selected fonts change, reset the selected fonts to install
+		setFontsToInstall( [] );
+	}, [ selectedFont ] );
 
 	const collectionFonts = useMemo(
-		() => selectedCollection?.data?.fontFamilies ?? [],
+		() => selectedCollection?.font_families ?? [],
 		[ selectedCollection ]
 	);
-	const collectionCategories = selectedCollection?.data?.categories ?? [];
+	const collectionCategories = selectedCollection?.categories ?? [];
 
 	const categories = [ DEFAULT_CATEGORY, ...collectionCategories ];
 
@@ -115,26 +142,35 @@ function FontCollection( { id } ) {
 		[ collectionFonts, filters ]
 	);
 
+	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
+	// The height of each font family item is 61px.
+	const windowHeight = Math.max( window.innerHeight, MIN_WINDOW_HEIGHT );
+	const pageSize = Math.floor( ( windowHeight - 417 ) / 61 );
+	const totalPages = Math.ceil( fonts.length / pageSize );
+	const itemsStart = ( page - 1 ) * pageSize;
+	const itemsLimit = page * pageSize;
+	const items = fonts.slice( itemsStart, itemsLimit );
+
 	const handleCategoryFilter = ( category ) => {
 		setFilters( { ...filters, category } );
+		setPage( 1 );
 	};
 
 	const handleUpdateSearchInput = ( value ) => {
 		setFilters( { ...filters, search: value } );
+		setPage( 1 );
 	};
 
 	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
 
 	const resetFilters = () => {
 		setFilters( {} );
+		setPage( 1 );
 	};
 
 	const resetSearch = () => {
 		setFilters( { ...filters, search: '' } );
-	};
-
-	const handleUnselectFont = () => {
-		setSelectedFont( null );
+		setPage( 1 );
 	};
 
 	const handleToggleVariant = ( font, face ) => {
@@ -149,145 +185,326 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFonts( fontsToInstall );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
+		setNotice( null );
+
+		const fontFamily = fontsToInstall[ 0 ];
+
+		try {
+			if ( fontFamily?.fontFace ) {
+				await Promise.all(
+					fontFamily.fontFace.map( async ( fontFace ) => {
+						if ( fontFace.src ) {
+							fontFace.file = await downloadFontFaceAssets(
+								fontFace.src
+							);
+						}
+					} )
+				);
+			}
+		} catch ( error ) {
+			// If any of the fonts fail to download,
+			// show an error notice and stop the request from being sent.
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Error installing the fonts, could not be downloaded.'
+				),
+			} );
+			return;
+		}
+
+		try {
+			await installFont( fontFamily );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error.message,
+			} );
+		}
 		resetFontsToInstall();
 	};
 
+	const getSortedFontFaces = ( fontFamily ) => {
+		if ( ! fontFamily ) {
+			return [];
+		}
+		if ( ! fontFamily.fontFace || ! fontFamily.fontFace.length ) {
+			return [
+				{
+					fontFamily: fontFamily.fontFamily,
+					fontStyle: 'normal',
+					fontWeight: '400',
+				},
+			];
+		}
+		return sortFontFaces( fontFamily.fontFace );
+	};
+
+	if ( renderConfirmDialog ) {
+		return <GoogleFontsConfirmDialog />;
+	}
+
+	const ActionsComponent = () => {
+		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
+			return null;
+		}
+		return (
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Actions' ) }
+				popoverProps={ {
+					position: 'bottom left',
+				} }
+				controls={ [
+					{
+						title: __( 'Revoke access to Google Fonts' ),
+						onClick: revokeAccess,
+					},
+				] }
+			/>
+		);
+	};
+
 	return (
-		<TabLayout
-			title={
-				! selectedFont ? selectedCollection.name : selectedFont.name
-			}
-			description={
-				! selectedFont
-					? selectedCollection.description
-					: __( 'Select font variants to install.' )
-			}
-			handleBack={ !! selectedFont && handleUnselectFont }
-			footer={
-				fontsToInstall.length > 0 && (
-					<Footer handleInstall={ handleInstall } />
-				)
-			}
-		>
-			{ renderConfirmDialog && (
-				<>
-					<Spacer margin={ 8 } />
-					<GoogleFontsConfirmDialog />
-				</>
-			) }
+		<div className="font-library-modal__tabpanel-layout">
+			<NavigatorProvider
+				initialPath="/"
+				className="font-library-modal__tabpanel-layout"
+			>
+				<NavigatorScreen path="/">
+					<HStack justify="space-between">
+						<Heading level={ 2 } size={ 13 }>
+							{ selectedCollection.name }
+						</Heading>
+						<ActionsComponent />
+					</HStack>
+					<Text>{ selectedCollection.description }</Text>
+					<Spacer margin={ 4 } />
+					<Flex>
+						<FlexItem>
+							<InputControl
+								value={ filters.search }
+								placeholder={ __( 'Font name…' ) }
+								label={ __( 'Search' ) }
+								onChange={ debouncedUpdateSearchInput }
+								prefix={ <Icon icon={ search } /> }
+								suffix={
+									filters?.search ? (
+										<Icon
+											icon={ closeSmall }
+											onClick={ resetSearch }
+										/>
+									) : null
+								}
+							/>
+						</FlexItem>
+						<FlexItem>
+							<SelectControl
+								label={ __( 'Category' ) }
+								value={ filters.category }
+								onChange={ handleCategoryFilter }
+							>
+								{ categories &&
+									categories.map( ( category ) => (
+										<option
+											value={ category.slug }
+											key={ category.slug }
+										>
+											{ category.name }
+										</option>
+									) ) }
+							</SelectControl>
+						</FlexItem>
+					</Flex>
 
-			{ notice && (
-				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 2 } />
-				</>
-			) }
+					<Spacer margin={ 4 } />
 
-			{ ! renderConfirmDialog && ! selectedFont && (
-				<Flex>
-					<FlexItem>
-						<InputControl
-							value={ filters.search }
-							placeholder={ __( 'Font name…' ) }
-							label={ __( 'Search' ) }
-							onChange={ debouncedUpdateSearchInput }
-							prefix={ <Icon icon={ search } /> }
-							suffix={
-								filters?.search ? (
-									<Icon
-										icon={ closeSmall }
-										onClick={ resetSearch }
-									/>
-								) : null
-							}
+					{ ! selectedCollection?.font_families && ! notice && (
+						<Spinner />
+					) }
+
+					{ !! selectedCollection?.font_families?.length &&
+						! fonts.length && (
+							<Text>
+								{ __(
+									'No fonts found. Try with a different search term'
+								) }
+							</Text>
+						) }
+
+					<div className="font-library-modal__fonts-grid__main">
+						{ items.map( ( font ) => (
+							<FontCard
+								key={ font.font_family_settings.slug }
+								font={ font.font_family_settings }
+								navigatorPath={ '/fontFamily' }
+								onClick={ () => {
+									setSelectedFont(
+										font.font_family_settings
+									);
+								} }
+							/>
+						) ) }
+					</div>
+				</NavigatorScreen>
+
+				<NavigatorScreen path="/fontFamily">
+					<Flex justify="flex-start">
+						<NavigatorToParentButton
+							icon={ chevronLeft }
+							isSmall
+							onClick={ () => {
+								setSelectedFont( null );
+							} }
+							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
-					</FlexItem>
-					<FlexItem>
-						<SelectControl
-							label={ __( 'Category' ) }
-							value={ filters.category }
-							onChange={ handleCategoryFilter }
+						<Heading
+							level={ 2 }
+							size={ 13 }
+							className="edit-site-global-styles-header"
 						>
-							{ categories &&
-								categories.map( ( category ) => (
-									<option
-										value={ category.id }
-										key={ category.id }
-									>
-										{ category.name }
-									</option>
-								) ) }
-						</SelectControl>
-					</FlexItem>
+							{ selectedFont?.name }
+						</Heading>
+					</Flex>
+					{ notice && (
+						<>
+							<Spacer margin={ 1 } />
+							<Notice
+								status={ notice.type }
+								onRemove={ () => setNotice( null ) }
+							>
+								{ notice.message }
+							</Notice>
+							<Spacer margin={ 1 } />
+						</>
+					) }
+					<Spacer margin={ 4 } />
+					<Text> { __( 'Select font variants to install.' ) } </Text>
+					<Spacer margin={ 4 } />
+					<VStack spacing={ 0 }>
+						<Spacer margin={ 8 } />
+						{ getSortedFontFaces( selectedFont ).map(
+							( face, i ) => (
+								<CollectionFontVariant
+									font={ selectedFont }
+									face={ face }
+									key={ `face${ i }` }
+									handleToggleVariant={ handleToggleVariant }
+									selected={ isFontFontFaceInOutline(
+										selectedFont.slug,
+										selectedFont.fontFace ? face : null, // If the font has no fontFace, we want to check if the font is in the outline
+										fontToInstallOutline
+									) }
+								/>
+							)
+						) }
+					</VStack>
+					<Spacer margin={ 16 } />
+				</NavigatorScreen>
+			</NavigatorProvider>
+
+			{ selectedFont && (
+				<Flex
+					justify="flex-end"
+					className="font-library-modal__tabpanel-layout__footer"
+				>
+					<Button
+						variant="primary"
+						onClick={ handleInstall }
+						isBusy={ isInstalling }
+						disabled={ fontsToInstall.length === 0 || isInstalling }
+						__experimentalIsFocusable
+					>
+						{ __( 'Install' ) }
+					</Button>
 				</Flex>
 			) }
 
-			<Spacer margin={ 4 } />
-			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies &&
-				! notice && <Spinner /> }
-
-			{ ! renderConfirmDialog &&
-				!! selectedCollection?.data?.fontFamilies?.length &&
-				! fonts.length && (
-					<Text>
-						{ __(
-							'No fonts found. Try with a different search term'
+			{ ! selectedFont && (
+				<Flex
+					justify="center"
+					className="font-library-modal__tabpanel-layout__footer"
+				>
+					<Button
+						label={ __( 'First page' ) }
+						size="compact"
+						onClick={ () => setPage( 1 ) }
+						disabled={ page === 1 }
+						__experimentalIsFocusable
+					>
+						<span>«</span>
+					</Button>
+					<Button
+						label={ __( 'Previous page' ) }
+						size="compact"
+						onClick={ () => setPage( page - 1 ) }
+						disabled={ page === 1 }
+						__experimentalIsFocusable
+					>
+						<span>‹</span>
+					</Button>
+					<HStack
+						justify="flex-start"
+						expanded={ false }
+						spacing={ 2 }
+					>
+						{ createInterpolateElement(
+							sprintf(
+								// translators: %s: Total number of pages.
+								_x(
+									'Page <CurrenPageControl /> of %s',
+									'paging'
+								),
+								totalPages
+							),
+							{
+								CurrenPageControl: (
+									<SelectControl
+										aria-label={ __( 'Current page' ) }
+										value={ page }
+										options={ [
+											...Array( totalPages ),
+										].map( ( e, i ) => {
+											return {
+												label: i + 1,
+												value: i + 1,
+											};
+										} ) }
+										onChange={ ( newPage ) =>
+											setPage( parseInt( newPage ) )
+										}
+										size={ 'compact' }
+										__nextHasNoMarginBottom
+									/>
+								),
+							}
 						) }
-					</Text>
-				) }
-
-			{ ! renderConfirmDialog && selectedFont && (
-				<CollectionFontDetails
-					font={ selectedFont }
-					handleToggleVariant={ handleToggleVariant }
-					fontToInstallOutline={ fontToInstallOutline }
-				/>
+					</HStack>
+					<Button
+						label={ __( 'Next page' ) }
+						size="compact"
+						onClick={ () => setPage( page + 1 ) }
+						disabled={ page === totalPages }
+						__experimentalIsFocusable
+					>
+						<span>›</span>
+					</Button>
+					<Button
+						label={ __( 'Last page' ) }
+						size="compact"
+						onClick={ () => setPage( totalPages ) }
+						disabled={ page === totalPages }
+						__experimentalIsFocusable
+					>
+						<span>»</span>
+					</Button>
+				</Flex>
 			) }
-
-			{ ! renderConfirmDialog && ! selectedFont && (
-				<FontsGrid>
-					{ fonts.map( ( font ) => (
-						<FontCard
-							key={ font.slug }
-							font={ font }
-							onClick={ () => {
-								setSelectedFont( font );
-							} }
-						/>
-					) ) }
-				</FontsGrid>
-			) }
-		</TabLayout>
-	);
-}
-
-function Footer( { handleInstall } ) {
-	const { isInstalling } = useContext( FontLibraryContext );
-
-	return (
-		<Flex justify="flex-end">
-			<Button
-				variant="primary"
-				onClick={ handleInstall }
-				isBusy={ isInstalling }
-				disabled={ isInstalling }
-			>
-				{ __( 'Install' ) }
-			</Button>
-		</Flex>
+		</div>
 	);
 }
 

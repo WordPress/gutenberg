@@ -453,14 +453,25 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let markNextChangeAsNotPersistent = false;
+	let explicitPersistent;
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
-		if ( action.type === 'SYNC_DERIVED_BLOCK_ATTRIBUTES' ) {
-			return nextState.isPersistentChange
-				? { ...nextState, isPersistentChange: false }
-				: nextState;
+		let nextIsPersistentChange;
+		if ( action.type === 'SET_EXPLICIT_PERSISTENT' ) {
+			explicitPersistent = action.isPersistentChange;
+			nextIsPersistentChange = state.isPersistentChange ?? true;
+		}
+
+		if ( explicitPersistent !== undefined ) {
+			nextIsPersistentChange = explicitPersistent;
+			return nextIsPersistentChange === nextState.isPersistentChange
+				? nextState
+				: {
+						...nextState,
+						isPersistentChange: nextIsPersistentChange,
+				  };
 		}
 
 		const isExplicitPersistentChange =
@@ -473,7 +484,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = state?.isPersistentChange ?? true;
+			nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -1236,6 +1247,27 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer returning dragging state. It is possible for a user to be dragging
+ * data from outside of the editor, so this state is separate from `draggedBlocks`.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isDragging( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_DRAGGING':
+			return true;
+
+		case 'STOP_DRAGGING':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning dragged block client id.
  *
  * @param {string[]} state  Current state.
@@ -1489,11 +1521,11 @@ export function isSelectionEnabled( state = true, action ) {
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
-			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			const { clientIds, selectPrevious, message } = action;
 			return {
 				clientIds,
 				selectPrevious,
-				blockNamesForPrompt,
+				message,
 			};
 		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
 			return false;
@@ -1588,13 +1620,19 @@ export function blocksMode( state = {}, action ) {
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index, __unstableWithInserter, operation } =
-				action;
+			const {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+				nearestSide,
+			} = action;
 			const nextState = {
 				rootClientId,
 				index,
 				__unstableWithInserter,
 				operation,
+				nearestSide,
 			};
 
 			// Bail out updates if the states are the same.
@@ -1896,6 +1934,21 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 }
 
 /**
+ * Reducer returning the focus mode that should be used when temporarily edit as blocks finishes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function temporarilyEditingFocusModeRevert( state = '', action ) {
+	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
+		return action.focusModeToRevert;
+	}
+	return state;
+}
+
+/**
  * Reducer returning a map of block client IDs to block editing modes.
  *
  * @param {Map}    state  Current state.
@@ -1993,6 +2046,7 @@ export function lastFocus( state = false, action ) {
 
 const combinedReducers = combineReducers( {
 	blocks,
+	isDragging,
 	isTyping,
 	isBlockInterfaceHidden,
 	draggedBlocks,
@@ -2013,6 +2067,7 @@ const combinedReducers = combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
+	temporarilyEditingFocusModeRevert,
 	blockVisibility,
 	blockEditingModes,
 	styleOverrides,

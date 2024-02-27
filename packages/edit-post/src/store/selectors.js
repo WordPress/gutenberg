@@ -13,13 +13,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
-const EMPTY_INSERTION_POINT = {
-	rootClientId: undefined,
-	insertionIndex: undefined,
-	filterValue: undefined,
-};
 
 /**
  * Returns the current editing mode.
@@ -30,8 +30,7 @@ const EMPTY_INSERTION_POINT = {
  */
 export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
-		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
-		'visual'
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
 );
 
 /**
@@ -162,41 +161,34 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 		alternative: `select( 'core/preferences' ).get`,
 	} );
 
-	// These preferences now exist in the preferences store.
-	// Fetch them so that they can be merged into the post
-	// editor preferences.
-	const preferences = [
-		'hiddenBlockTypes',
-		'editorMode',
-		'preferredStyleVariations',
-	].reduce( ( accumulatedPrefs, preferenceKey ) => {
-		const value = select( preferencesStore ).get(
-			'core/edit-post',
-			preferenceKey
-		);
+	const corePreferences = [ 'editorMode', 'hiddenBlockTypes' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core',
+				preferenceKey
+			);
 
-		return {
-			...accumulatedPrefs,
-			[ preferenceKey ]: value,
-		};
-	}, {} );
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
 
 	// Panels were a preference, but the data structure changed when the state
 	// was migrated to the preferences store. They need to be converted from
 	// the new preferences store format to old format to ensure no breaking
 	// changes for plugins.
 	const inactivePanels = select( preferencesStore ).get(
-		'core/edit-post',
+		'core',
 		'inactivePanels'
 	);
-	const openPanels = select( preferencesStore ).get(
-		'core/edit-post',
-		'openPanels'
-	);
+	const openPanels = select( preferencesStore ).get( 'core', 'openPanels' );
 	const panels = convertPanelsToOldFormat( inactivePanels, openPanels );
 
 	return {
-		...preferences,
+		...corePreferences,
 		panels,
 	};
 } );
@@ -228,10 +220,8 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  */
 export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
 	return (
-		select( preferencesStore ).get(
-			'core/edit-post',
-			'hiddenBlockTypes'
-		) ?? EMPTY_ARRAY
+		select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ??
+		EMPTY_ARRAY
 	);
 } );
 
@@ -487,28 +477,41 @@ export const __experimentalGetPreviewDeviceType = createRegistrySelector(
 /**
  * Returns true if the inserter is opened.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state ) {
-	return !! state.blockInserterPanel;
-}
+export const isInserterOpened = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isInserterOpened`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).isInserterOpened`,
+	} );
+	return select( editorStore ).isInserterOpened();
+} );
 
 /**
  * Get the insertion point for the inserter.
+ *
+ * @deprecated
  *
  * @param {Object} state Global application state.
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export function __experimentalGetInsertionPoint( state ) {
-	if ( typeof state.blockInserterPanel === 'boolean' ) {
-		return EMPTY_INSERTION_POINT;
+export const __experimentalGetInsertionPoint = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-post' ).__experimentalGetInsertionPoint`,
+			{
+				since: '6.5',
+				version: '6.7',
+			}
+		);
+		return unlock( select( editorStore ) ).getInsertionPoint();
 	}
-
-	return state.blockInserterPanel;
-}
+);
 
 /**
  * Returns true if the list view is opened.
@@ -517,9 +520,13 @@ export function __experimentalGetInsertionPoint( state ) {
  *
  * @return {boolean} Whether the list view is opened.
  */
-export function isListViewOpened( state ) {
-	return state.listViewPanel;
-}
+export const isListViewOpened = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isListViewOpened`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).isListViewOpened`,
+	} );
+	return select( editorStore ).isListViewOpened();
+} );
 
 /**
  * Returns true if the template editing mode is enabled.
@@ -531,7 +538,7 @@ export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
 		since: '6.5',
 		alternative: `select( 'core/editor' ).getRenderingMode`,
 	} );
-	return select( editorStore ).getRenderingMode() !== 'post-only';
+	return select( editorStore ).getCurrentPostType() === 'wp_template';
 } );
 
 /**
@@ -569,12 +576,27 @@ export const getEditedPostTemplate = createRegistrySelector(
 		}
 
 		const post = select( editorStore ).getCurrentPost();
-		if ( post.link ) {
-			return select( coreStore ).__experimentalGetTemplateForLink(
-				post.link
-			);
+		let slugToCheck;
+		// In `draft` status we might not have a slug available, so we use the `single`
+		// post type templates slug(ex page, single-post, single-product etc..).
+		// Pages do not need the `single` prefix in the slug to be prioritized
+		// through template hierarchy.
+		if ( post.slug ) {
+			slugToCheck =
+				post.type === 'page'
+					? `${ post.type }-${ post.slug }`
+					: `single-${ post.type }-${ post.slug }`;
+		} else {
+			slugToCheck =
+				post.type === 'page' ? 'page' : `single-${ post.type }`;
 		}
-
-		return null;
+		const defaultTemplateId = select( coreStore ).getDefaultTemplateId( {
+			slug: slugToCheck,
+		} );
+		return select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			defaultTemplateId
+		);
 	}
 );

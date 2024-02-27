@@ -45,7 +45,6 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		prioritizePatterns,
 	},
 	ref
 ) {
@@ -67,10 +66,13 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns } = useSelect(
+	const { isZoomOutMode, showPatterns } = useSelect(
 		( select ) => {
-			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
+			const { hasAllowedPatterns, __unstableGetEditorMode } = unlock(
+				select( blockEditorStore )
+			);
 			return {
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 				showPatterns: hasAllowedPatterns( destinationRootClientId ),
 			};
 		},
@@ -78,7 +80,8 @@ function InserterMenu(
 	);
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
-	const showMedia = mediaCategories.length > 0;
+	const showMedia = mediaCategories.length > 0 && ! isZoomOutMode;
+	const showBlocks = ! isZoomOutMode;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
@@ -250,20 +253,21 @@ function InserterMenu(
 								__experimentalInsertionIndex
 							}
 							showBlockDirectory
+							showBlocks={ showBlocks }
 							shouldFocusBlock={ shouldFocusBlock }
 						/>
 					</div>
 				) }
 				{ showAsTabs && (
 					<InserterTabs
+						showBlocks={ showBlocks }
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
-						prioritizePatterns={ prioritizePatterns }
 						onSelect={ handleSetSelectedTab }
 						tabsContents={ inserterTabsContents }
 					/>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
+				{ ! delayedFilterValue && ! showAsTabs && showBlocks && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>

@@ -7,8 +7,10 @@ This is a template for [`@wordpress/create-block`](https://github.com/WordPress/
 This block template can be used by running the following command:
 
 ```bash
-npx  @wordpress/create-block --template @wordpress/create-block-interactive-template
+npx @wordpress/create-block --template @wordpress/create-block-interactive-template
 ```
+
+It requires Gutenberg 17.5 or higher.
 
 ## Contributing to this package
 

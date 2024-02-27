@@ -21,25 +21,14 @@
 		}
 	}
 
-	.components-search-control {
-		input[type="search"].components-search-control__input {
-			background: $white;
-			border: 1px solid $gray-300;
-
-			&:focus {
-				border-color: var(--wp-admin-theme-color);
-				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-			}
-		}
-	}
-
 	@include break-medium() {
 		width: 456px;
 	}
 
 	.edit-site-custom-template-modal__suggestions_list {
 		@include break-small() {
-			overflow: scroll;
+			max-height: $grid-unit-70 * 4; // Height of four buttons
+			overflow-y: auto;
 		}
 
 		&__list-item {

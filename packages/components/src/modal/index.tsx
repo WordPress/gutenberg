@@ -41,14 +41,15 @@ import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
-const level0Dismissers: MutableRefObject<
-	ModalProps[ 'onRequestClose' ] | undefined
->[] = [];
-const ModalContext = createContext( level0Dismissers );
+const ModalContext = createContext<
+	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
+>( [] );
 
-let isBodyOpenClassActive = false;
+// Used to track body class names applied while modals are open.
+const bodyOpenClasses = new Map< string, number >();
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -146,7 +147,7 @@ function UnforwardedModal(
 	// one should remain open at a time and the list enables closing prior ones.
 	const dismissers = useContext( ModalContext );
 	// Used for the tracking and dismissing any nested modals.
-	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
+	const nestedDismissers = useRef< typeof dismissers >( [] );
 
 	// Updates the stack tracking open modals at this level and calls
 	// onRequestClose for any prior and/or nested modals as applicable.
@@ -162,20 +163,22 @@ function UnforwardedModal(
 		};
 	}, [ dismissers ] );
 
-	const isLevel0 = dismissers === level0Dismissers;
 	// Adds/removes the value of bodyOpenClassName to body element.
 	useEffect( () => {
-		if ( ! isBodyOpenClassActive ) {
-			isBodyOpenClassActive = true;
-			document.body.classList.add( bodyOpenClassName );
-		}
+		const theClass = bodyOpenClassName;
+		const oneMore = 1 + ( bodyOpenClasses.get( theClass ) ?? 0 );
+		bodyOpenClasses.set( theClass, oneMore );
+		document.body.classList.add( bodyOpenClassName );
 		return () => {
-			if ( isLevel0 && dismissers.length === 0 ) {
-				document.body.classList.remove( bodyOpenClassName );
-				isBodyOpenClassActive = false;
+			const oneLess = bodyOpenClasses.get( theClass )! - 1;
+			if ( oneLess === 0 ) {
+				document.body.classList.remove( theClass );
+				bodyOpenClasses.delete( theClass );
+			} else {
+				bodyOpenClasses.set( theClass, oneLess );
 			}
 		};
-	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
+	}, [ bodyOpenClassName ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -195,19 +198,8 @@ function UnforwardedModal(
 
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			return;
-		}
-
-		if (
 			shouldCloseOnEsc &&
-			event.code === 'Escape' &&
+			( event.code === 'Escape' || event.key === 'Escape' ) &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
@@ -263,7 +255,7 @@ function UnforwardedModal(
 				'components-modal__screen-overlay',
 				overlayClassName
 			) }
-			onKeyDown={ handleEscapeKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>

@@ -159,6 +159,13 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
+export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
+	popoverProps: {
+		placement: 'left-start',
+		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+	},
+};
+
 function findInPresetsBy(
 	features,
 	blockName,
@@ -438,4 +445,40 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 		fastDeepEqual( original?.styles, variation?.styles ) &&
 		fastDeepEqual( original?.settings, variation?.settings )
 	);
+}
+
+/**
+ * Generates the selector for a block style variation by creating the
+ * appropriate CSS class and adding it to the ancestor portion of the block's
+ * selector.
+ *
+ * For example, take the Button block which has a compound selector:
+ * `.wp-block-button .wp-block-button__link`. With a variation named 'custom',
+ * the class `.is-style-custom` should be added to the `.wp-block-button`
+ * ancestor only.
+ *
+ * This function will take into account comma separated and complex selectors.
+ *
+ * @param {string} variation     Name for the variation.
+ * @param {string} blockSelector CSS selector for the block.
+ *
+ * @return {string} CSS selector for the block style variation.
+ */
+export function getBlockStyleVariationSelector( variation, blockSelector ) {
+	const variationClass = `.is-style-${ variation }`;
+
+	if ( ! blockSelector ) {
+		return variationClass;
+	}
+
+	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
+	const addVariationClass = ( _match, group1, group2 ) => {
+		return group1 + group2 + variationClass;
+	};
+
+	const result = blockSelector
+		.split( ',' )
+		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+
+	return result.join( ',' );
 }

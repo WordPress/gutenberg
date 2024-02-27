@@ -33,19 +33,14 @@ test.describe( 'Patterns', () => {
 		admin,
 		patterns,
 	} ) => {
-		await admin.visitSiteEditor();
-
-		await patterns.navigation
-			.getByRole( 'button', { name: 'Patterns' } )
-			.click();
-
+		await admin.visitSiteEditor( { path: '/patterns' } );
 		await expect(
 			patterns.navigation.getByRole( 'heading', {
 				name: 'Patterns',
 				level: 1,
 			} )
 		).toBeVisible();
-		await expect( patterns.content ).toContainText( 'No patterns found.' );
+		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.navigation
 			.getByRole( 'button', { name: 'Create pattern' } )
@@ -70,9 +65,6 @@ test.describe( 'Patterns', () => {
 			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My pattern' );
 		await page.keyboard.press( 'Enter' );
-		await expect(
-			createPatternDialog.getByRole( 'button', { name: 'Create' } )
-		).toBeDisabled();
 
 		await expect( page ).toHaveTitle( /^My pattern/ );
 		await expect(
@@ -102,7 +94,6 @@ test.describe( 'Patterns', () => {
 		await patterns.navigation
 			.getByRole( 'button', { name: 'Back' } )
 			.click();
-		// TODO: await expect( page ).toHaveTitle( /^Patterns/ );
 
 		await expect(
 			patterns.navigation.getByRole( 'button', {
@@ -126,11 +117,11 @@ test.describe( 'Patterns', () => {
 				level: 2,
 			} )
 		).toBeVisible();
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 1 );
+		await expect( patterns.item ).toHaveCount( 1 );
 		await expect(
-			patterns.list
-				.getByRole( 'heading', { name: 'My pattern' } )
-				.getByRole( 'button', { name: 'My pattern', exact: true } )
+			patterns.itemsList.getByText( 'My pattern', {
+				exact: true,
+			} )
 		).toBeVisible();
 	} );
 
@@ -138,6 +129,7 @@ test.describe( 'Patterns', () => {
 		admin,
 		requestUtils,
 		patterns,
+		page,
 	} ) => {
 		await Promise.all( [
 			requestUtils.createBlock( {
@@ -164,76 +156,46 @@ test.describe( 'Patterns', () => {
 
 		await admin.visitSiteEditor( { path: '/patterns' } );
 
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 3 );
-
-		await patterns.content
-			.getByRole( 'searchbox', { name: 'Search patterns' } )
-			.fill( 'footer' );
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 2 );
+		await expect( patterns.item ).toHaveCount( 3 );
+		const searchBox = patterns.content.getByRole( 'searchbox', {
+			name: 'Search',
+		} );
+		await searchBox.fill( 'footer' );
+		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.list
-				.getByRole( 'listitem' )
-				.getByRole( 'heading' )
-				.allInnerTexts()
+			await patterns.item.getByRole( 'button' ).allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced footer', 'Synced footer' ] )
 		);
 
-		const searchBox = patterns.content.getByRole( 'searchbox', {
-			name: 'Search patterns',
-		} );
-
 		await searchBox.fill( 'no match' );
-		await expect( patterns.content ).toContainText( 'No patterns found.' );
+		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
-			.getByRole( 'button', { name: 'Reset search' } )
+			.getByRole( 'button', { name: 'Reset filters' } )
 			.click();
 		await expect( searchBox ).toHaveValue( '' );
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 3 );
+		await expect( patterns.item ).toHaveCount( 3 );
 
-		const syncFilter = patterns.content.getByRole( 'radiogroup', {
-			name: 'Filter by sync status',
-		} );
-		await expect(
-			syncFilter.getByRole( 'radio', { name: 'All' } )
-		).toBeChecked();
-
-		await syncFilter
-			.getByRole( 'radio', { name: 'Synced', exact: true } )
+		await patterns.content
+			.getByRole( 'button', { name: 'Sync Status' } )
 			.click();
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 1 );
-		await expect( patterns.list.getByRole( 'listitem' ) ).toContainText(
-			'Synced footer'
-		);
+		await page.getByRole( 'option', { name: /^Synced/ } ).click();
 
-		await syncFilter.getByRole( 'radio', { name: 'Not synced' } ).click();
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 2 );
+		await expect( patterns.item ).toHaveCount( 1 );
+		await expect( patterns.item ).toContainText( 'Synced footer' );
+
+		await page.getByRole( 'option', { name: /^Not synced/ } ).click();
+		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.list
-				.getByRole( 'listitem' )
-				.getByRole( 'heading' )
-				.allInnerTexts()
+			await patterns.item.getByRole( 'button' ).allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced header', 'Unsynced footer' ] )
 		);
 
 		await searchBox.fill( 'footer' );
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 1 );
-		await expect( patterns.list.getByRole( 'listitem' ) ).toContainText(
-			'Unsynced footer'
-		);
-
-		await syncFilter.getByRole( 'radio', { name: 'All' } ).click();
-		await expect( patterns.list.getByRole( 'listitem' ) ).toHaveCount( 2 );
-		expect(
-			await patterns.list
-				.getByRole( 'listitem' )
-				.getByRole( 'heading' )
-				.allInnerTexts()
-		).toEqual(
-			expect.arrayContaining( [ 'Unsynced footer', 'Synced footer' ] )
-		);
+		await expect( patterns.item ).toHaveCount( 1 );
+		await expect( patterns.item ).toContainText( 'Unsynced footer' );
 	} );
 } );
 
@@ -250,6 +212,7 @@ class Patterns {
 		this.navigation = this.#page.getByRole( 'region', {
 			name: 'Navigation',
 		} );
-		this.list = this.content.getByRole( 'list' );
+		this.itemsList = this.content.locator( '.dataviews-view-grid' );
+		this.item = this.itemsList.locator( '.dataviews-view-grid__card' );
 	}
 }

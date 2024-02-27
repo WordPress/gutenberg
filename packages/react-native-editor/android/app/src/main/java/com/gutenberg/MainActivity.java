@@ -113,6 +113,8 @@ public class MainActivity extends ReactActivity {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        linearLayout.setFocusable(false);
+        linearLayout.setFocusableInTouchMode(true);
 
         // Create a Toolbar instance
         Toolbar toolbar = new Toolbar(this);
@@ -166,6 +168,7 @@ public class MainActivity extends ReactActivity {
         Bundle bundle = new Bundle();
 
         // Parse initial props from launch arguments
+        String initialTitle = null;
         String initialData = null;
         String rawStyles = null;
         String rawFeatures = null;
@@ -175,6 +178,9 @@ public class MainActivity extends ReactActivity {
             String initialProps = extrasBundle.getString(EXTRAS_INITIAL_PROPS, "{}");
             try {
                 JSONObject jsonObject = new JSONObject(initialProps);
+                if (jsonObject.has(GutenbergProps.PROP_INITIAL_TITLE)) {
+                    initialTitle = jsonObject.getString(GutenbergProps.PROP_INITIAL_TITLE);
+                }
                 if (jsonObject.has(GutenbergProps.PROP_INITIAL_DATA)) {
                     initialData = jsonObject.getString(GutenbergProps.PROP_INITIAL_DATA);
                 }
@@ -203,12 +209,16 @@ public class MainActivity extends ReactActivity {
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_TILED_GALLERY_BLOCK, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_VIDEOPRESS_BLOCK, true);
+        capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_VIDEOPRESS_V5_SUPPORT, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_LOOM_EMBED_BLOCK, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, true);
         bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
 
+        if(initialTitle != null) {
+            bundle.putString(GutenbergProps.PROP_INITIAL_TITLE, initialTitle);
+        }
         if(initialData != null) {
             bundle.putString(GutenbergProps.PROP_INITIAL_DATA, initialData);
         }
