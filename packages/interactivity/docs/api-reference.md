@@ -1052,6 +1052,8 @@ The code will log:
 	"children": ['Log'],
 	"onclick": event => { evaluate(entry, event); }
 }
+```
+
 ## Server functions
 
 The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
