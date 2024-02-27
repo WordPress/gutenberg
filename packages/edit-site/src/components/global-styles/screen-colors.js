@@ -47,6 +47,10 @@ function ScreenColors() {
 			/>
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 3 }>
+					{ !! colorVariations.length && (
+						<ColorVariations variations={ colorVariations } />
+					) }
+
 					<Palette />
 
 					<StylesColorPanel
@@ -55,10 +59,6 @@ function ScreenColors() {
 						onChange={ setStyle }
 						settings={ settings }
 					/>
-
-					{ !! colorVariations.length && (
-						<ColorVariations variations={ colorVariations } />
-					) }
 				</VStack>
 			</div>
 		</>
