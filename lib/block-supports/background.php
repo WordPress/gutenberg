@@ -33,6 +33,8 @@ function gutenberg_register_background_support( $block_type ) {
 /**
  * Given a theme.json or block background styles, returns the background styles for a block.
  *
+ * @since 6.6.0
+ *
  * @param  array  $background_styles Background style properties.
  * @return array                     Style engine array of CSS string and style declarations.
  */
@@ -40,22 +42,11 @@ function gutenberg_get_background_support_styles( $background_styles = array() )
 	$background_image_source             = isset( $background_styles['backgroundImage']['source'] ) ? $background_styles['backgroundImage']['source'] : null;
 	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'cover';
 
-	/*
-	 * @TODO document
-	 * $background_styles['backgroundImage']['url'] and file source implies an image URL path.
-	 */
-	if ( ( 'file' === $background_image_source || 'theme' === $background_image_source ) && ! empty( $background_styles['backgroundImage']['url'] ) ) {
+	if ( 'file' === $background_image_source && ! empty( $background_styles['backgroundImage']['url'] ) ) {
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
 		if ( 'contain' === $background_styles['backgroundSize'] && ! isset( $background_styles['backgroundPosition'] ) ) {
 			$background_styles['backgroundPosition'] = 'center';
 		}
-	}
-
-	/*
-	 * "theme" source implies relative path to the theme directory
-	 */
-	if ( 'theme' === $background_image_source ) {
-		$background_styles['backgroundImage']['url'] = esc_url( get_theme_file_uri( $background_styles['backgroundImage']['url'] ) );
 	}
 
 	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );

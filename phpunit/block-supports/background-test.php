@@ -279,16 +279,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-position:center;background-size:contain;",
 			),
-			'css generated with theme source'        => array(
-				'background_style' => array(
-					'backgroundImage' => array(
-						'url'    => 'assets/image/1024x768_e2e_test_image_size.jpeg',
-						'source' => 'theme',
-					),
-					'backgroundSize'  => 'contain',
-				),
-				'expected_css'     => "background-image:url('http://localhost:8889/wp-content/plugins/gutenberg/phpunit/data/themedir1/block-theme/assets/image/1024x768_e2e_test_image_size.jpeg');background-position:center;background-size:contain;",
-			),
 		);
 	}
 }
