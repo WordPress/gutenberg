@@ -110,7 +110,7 @@ const BindingConnector = ( {
 				return;
 			}
 
-			onPropValueChange?.( { [ attrName ]: newAttrValue } );
+			onPropValueChange( { [ attrName ]: newAttrValue } );
 		},
 		[ attrName, onPropValueChange ]
 	);
