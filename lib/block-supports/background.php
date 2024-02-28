@@ -40,7 +40,6 @@ function gutenberg_get_background_support_styles( $background_styles = array() )
 	$background_image_source             = isset( $background_styles['backgroundImage']['source'] ) ? $background_styles['backgroundImage']['source'] : null;
 	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'cover';
 
-
 	/*
 	 * @TODO document
 	 * $background_styles['backgroundImage']['url'] and file source implies an image URL path.

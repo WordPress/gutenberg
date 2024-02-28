@@ -7,7 +7,7 @@ import { generateRule, safeDecodeURI } from '../utils';
 const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
-		let _backgroundImage = style?.background?.backgroundImage;
+		const _backgroundImage = style?.background?.backgroundImage;
 		const _backgroundSize = style?.background?.backgroundSize;
 
 		const styleRules: GeneratedCSSRule[] = [];
@@ -28,7 +28,11 @@ const backgroundImage = {
 			} );
 		}
 
-		if ( _backgroundImage?.source === 'file' && _backgroundImage?.url ) {
+		if (
+			typeof _backgroundImage === 'object' &&
+			_backgroundImage?.source === 'file' &&
+			_backgroundImage?.url
+		) {
 			styleRules.push( {
 				selector: options.selector,
 				key: 'backgroundImage',

@@ -464,7 +464,8 @@ describe( 'getCSSRules', () => {
 			getCSSRules(
 				{
 					background: {
-						backgroundImage: "linear-gradient(to bottom,rgb(255 255 0 / 50%),rgb(0 0 255 / 50%), url('https://example.com/image.jpg')",
+						backgroundImage:
+							"linear-gradient(to bottom,rgb(255 255 0 / 50%),rgb(0 0 255 / 50%), url('https://example.com/image.jpg')",
 					},
 				},
 				{
