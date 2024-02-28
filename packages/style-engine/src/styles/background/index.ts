@@ -7,13 +7,21 @@ import { generateRule, safeDecodeURI } from '../utils';
 const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
-		const _backgroundImage = style?.background?.backgroundImage;
+		let _backgroundImage = style?.background?.backgroundImage;
 		const _backgroundSize = style?.background?.backgroundSize;
 
 		const styleRules: GeneratedCSSRule[] = [];
 
 		if ( ! _backgroundImage ) {
 			return styleRules;
+		}
+
+		if ( typeof _backgroundImage === 'string' ) {
+			const imageUrl = _backgroundImage;
+			_backgroundImage = {
+				source: 'file',
+				url: imageUrl,
+			};
 		}
 
 		if ( _backgroundImage?.source === 'file' && _backgroundImage?.url ) {
