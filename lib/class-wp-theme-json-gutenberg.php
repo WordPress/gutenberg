@@ -355,10 +355,7 @@ class WP_Theme_JSON_Gutenberg {
 		'appearanceTools'               => null,
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
-			'backgroundImage' => array(
-				'url'    => null,
-				'source' => null,
-			),
+			'backgroundImage' => null,
 			'backgroundSize'  => null,
 		),
 		'border'                        => array(
