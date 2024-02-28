@@ -410,7 +410,9 @@ export default function Image( {
 		lockUrlControls = false,
 		lockHrefControls = false,
 		lockAltControls = false,
+		lockAltControlsMessage,
 		lockTitleControls = false,
+		lockTitleControlsMessage,
 		lockCaption = false,
 	} = useSelect(
 		( select ) => {
@@ -454,10 +456,24 @@ export default function Image( {
 					!! altBinding &&
 					( ! altBindingSource ||
 						altBindingSource?.lockAttributesEditing ),
+				lockAltControlsMessage: sprintf(
+					/* translators: %s: Label of the bindings source if exists */
+					__( 'Connected to %s' ),
+					altBindingSource?.label
+						? altBindingSource.label
+						: 'dynamic data'
+				),
 				lockTitleControls:
 					!! titleBinding &&
 					( ! titleBindingSource ||
 						titleBindingSource?.lockAttributesEditing ),
+				lockTitleControlsMessage: sprintf(
+					/* translators: %s: Label of the bindings source if exists */
+					__( 'Connected to %s' ),
+					titleBindingSource?.label
+						? titleBindingSource.label
+						: 'dynamic data'
+				),
 			};
 		},
 		[ clientId, isSingleSelected, metadata?.bindings ]
@@ -557,11 +573,7 @@ export default function Image( {
 								disabled={ lockAltControls }
 								help={
 									lockAltControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
@@ -607,11 +619,7 @@ export default function Image( {
 								disabled={ lockTitleControls }
 								help={
 									lockTitleControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockTitleControlsMessage }</>
 									) : (
 										<>
 											{ __(
@@ -652,11 +660,7 @@ export default function Image( {
 								readOnly={ lockAltControls }
 								help={
 									lockAltControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
@@ -694,7 +698,7 @@ export default function Image( {
 					readOnly={ lockTitleControls }
 					help={
 						lockTitleControls ? (
-							<>{ __( 'Connected to a custom field' ) }</>
+							<>{ lockTitleControlsMessage }</>
 						) : (
 							<>
 								{ __(
