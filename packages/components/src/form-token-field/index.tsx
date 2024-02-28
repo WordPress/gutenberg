@@ -28,6 +28,7 @@ import {
 } from '../base-control/styles/base-control-styles';
 import { Spacer } from '../spacer';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const identity = ( value: string ) => value;
 
@@ -194,15 +195,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function onKeyDown( event: KeyboardEvent ) {
 		let preventDefault = false;
 
-		if (
-			event.defaultPrevented ||
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 		switch ( event.key ) {
@@ -689,7 +682,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	if ( ! disabled ) {
 		tokenFieldProps = Object.assign( {}, tokenFieldProps, {
-			onKeyDown,
+			onKeyDown: withIgnoreIMEEvents( onKeyDown ),
 			onKeyPress,
 			onFocus: onFocusHandler,
 		} );

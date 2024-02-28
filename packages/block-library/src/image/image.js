@@ -33,7 +33,7 @@ import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -411,14 +411,16 @@ export default function Image( {
 		lockHrefControls = false,
 		lockAltControls = false,
 		lockTitleControls = false,
+		lockCaption = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-
-			const { getBlockBindingsSource, getBlockParentsByBlockName } =
-				unlock( select( blockEditorStore ) );
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const { getBlockParentsByBlockName } = unlock(
+				select( blockEditorStore )
+			);
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -443,6 +445,10 @@ export default function Image( {
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
+				lockCaption:
+					// Disable editing the caption if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the caption on the frontend.
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
@@ -907,6 +913,7 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
+
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -914,6 +921,7 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
+				disableEditing={ lockCaption }
 			/>
 		</>
 	);

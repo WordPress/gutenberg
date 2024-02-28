@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { create, getTextContent } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -98,15 +97,26 @@ const computeOutlineHeadings = ( blocks = [] ) => {
 const isEmptyHeading = ( heading ) =>
 	! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( {
-	blocks = [],
-	title,
+export default function DocumentOutline( {
 	onSelect,
 	isTitleSupported,
 	hasOutlineItemsDisabled,
-} ) => {
-	const headings = computeOutlineHeadings( blocks );
+} ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const { blocks, title } = useSelect( ( select ) => {
+		const { getBlocks } = select( blockEditorStore );
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
+		return {
+			title: getEditedPostAttribute( 'title' ),
+			blocks: getBlocks(),
+			isTitleSupported: postType?.supports?.title ?? false,
+		};
+	} );
+
+	const headings = computeOutlineHeadings( blocks );
 	if ( headings.length < 1 ) {
 		return (
 			<div className="editor-document-outline has-no-headings">
@@ -194,19 +204,4 @@ export const DocumentOutline = ( {
 			</ul>
 		</div>
 	);
-};
-
-export default compose(
-	withSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-
-		return {
-			title: getEditedPostAttribute( 'title' ),
-			blocks: getBlocks(),
-			isTitleSupported: postType?.supports?.title ?? false,
-		};
-	} )
-)( DocumentOutline );
+}

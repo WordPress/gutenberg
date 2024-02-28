@@ -57,7 +57,7 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  */
 function gutenberg_block_bindings_replace_html( $block_content, $block_name, string $attribute_name, $source_value ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-	if ( ! isset( $block_type->attributes[ $attribute_name ] ) ) {
+	if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
 		return $block_content;
 	}
 
@@ -160,7 +160,7 @@ function gutenberg_process_block_bindings( $block_content, $parsed_block, $block
 	$supported_block_attrs = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 

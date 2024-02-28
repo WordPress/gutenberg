@@ -598,7 +598,7 @@ describe( 'Tabs', () => {
 		} );
 	} );
 	describe( 'Uncontrolled mode', () => {
-		describe( 'Without `initialTabId` prop', () => {
+		describe( 'Without `defaultTabId` prop', () => {
 			it( 'should render first tab', async () => {
 				render( <UncontrolledTabs tabs={ TABS } /> );
 
@@ -655,20 +655,20 @@ describe( 'Tabs', () => {
 			} );
 		} );
 
-		describe( 'With `initialTabId`', () => {
-			it( 'should render the tab set by `initialTabId` prop', async () => {
+		describe( 'With `defaultTabId`', () => {
+			it( 'should render the tab set by `defaultTabId` prop', async () => {
 				render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should not select a tab when `initialTabId` does not match any known tab', () => {
+			it( 'should not select a tab when `defaultTabId` does not match any known tab', () => {
 				render(
 					<UncontrolledTabs
 						tabs={ TABS }
-						initialTabId="does-not-exist"
+						defaultTabId="does-not-exist"
 					/>
 				);
 
@@ -682,25 +682,25 @@ describe( 'Tabs', () => {
 					screen.queryByRole( 'tabpanel' )
 				).not.toBeInTheDocument();
 			} );
-			it( 'should not change tabs when initialTabId is changed', async () => {
+			it( 'should not change tabs when defaultTabId is changed', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
 				rerender(
-					<UncontrolledTabs tabs={ TABS } initialTabId="alpha" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="alpha" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab is removed', async () => {
+			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -714,7 +714,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS.slice( 1 ) }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -722,13 +722,13 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
-			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab becomes disabled', async () => {
+			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -754,7 +754,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_ALPHA_DISABLED }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -762,9 +762,9 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
-			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
+			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="gamma" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="gamma" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
@@ -773,7 +773,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS.slice( 0, 2 ) }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -788,9 +788,9 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 			} );
 
-			it( 'waits for the tab with the `initialTabId` to be present in the `tabs` array before selecting it', async () => {
+			it( 'waits for the tab with the `defaultTabId` to be present in the `tabs` array before selecting it', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="delta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="delta" />
 				);
 
 				// There should be no selected tab yet.
@@ -801,7 +801,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_DELTA }
-						initialTabId="delta"
+						defaultTabId="delta"
 					/>
 				);
 
@@ -891,7 +891,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should select first enabled tab when the tab associated to `initialTabId` is disabled', async () => {
+			it( 'should select first enabled tab when the tab associated to `defaultTabId` is disabled', async () => {
 				const TABS_ONLY_GAMMA_ENABLED = TABS.map( ( tabObj ) =>
 					tabObj.tabId !== 'gamma'
 						? {
@@ -906,7 +906,7 @@ describe( 'Tabs', () => {
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS_ONLY_GAMMA_ENABLED }
-						initialTabId="beta"
+						defaultTabId="beta"
 					/>
 				);
 
@@ -916,7 +916,7 @@ describe( 'Tabs', () => {
 
 				// Re-enable all tabs
 				rerender(
-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
 				// Even if the initial tab becomes enabled again, the selected tab doesn't
@@ -968,14 +968,14 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 			} );
 
-			it( 'should select the first enabled tab when the tab associated to `initialTabId` becomes disabled while being the active tab', async () => {
+			it( 'should select the first enabled tab when the tab associated to `defaultTabId` becomes disabled while being the active tab', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS }
 						onSelect={ mockOnSelect }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -998,7 +998,7 @@ describe( 'Tabs', () => {
 					<UncontrolledTabs
 						tabs={ TABS_WITH_GAMMA_DISABLED }
 						onSelect={ mockOnSelect }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -1011,7 +1011,7 @@ describe( 'Tabs', () => {
 					<UncontrolledTabs
 						tabs={ TABS }
 						onSelect={ mockOnSelect }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -1032,12 +1032,12 @@ describe( 'Tabs', () => {
 				await screen.findByRole( 'tabpanel', { name: 'Beta' } )
 			).toBeInTheDocument();
 		} );
-		it( 'should render the specified `selectedTabId`, and ignore the `initialTabId` prop', async () => {
+		it( 'should render the specified `selectedTabId`, and ignore the `defaultTabId` prop', async () => {
 			render(
 				<ControlledTabs
 					tabs={ TABS }
 					selectedTabId="gamma"
-					initialTabId="beta"
+					defaultTabId="beta"
 				/>
 			);
 

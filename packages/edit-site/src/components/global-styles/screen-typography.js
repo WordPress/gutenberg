@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import TypographyElements from './typogrphy-elements';
+import TypographyElements from './typography-elements';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 

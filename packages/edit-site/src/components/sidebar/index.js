@@ -74,8 +74,9 @@ function SidebarScreens() {
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/pages">
 				<SidebarNavigationScreen
-					title={ __( 'Pages' ) }
+					title={ __( 'Manage pages' ) }
 					content={ <DataViewsSidebarContent /> }
+					backPath="/page"
 				/>
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
