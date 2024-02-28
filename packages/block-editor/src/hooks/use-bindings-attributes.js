@@ -85,10 +85,6 @@ const BindingConnector = ( {
 
 	const updateBoundAttibute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
-			// Bail early if the attribute value is the same.
-			if ( prevAttrValue === newAttrValue ) {
-				return;
-			}
 			/*
 			 * If the attribute is a RichTextData instance,
 			 * (core/paragraph, core/heading, core/button, etc.)
@@ -113,6 +109,11 @@ const BindingConnector = ( {
 				 * convert the new value to a RichTextData instance.
 				 */
 				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
+			}
+
+			// Bail early if the attribute value is the same.
+			if ( prevAttrValue === newAttrValue ) {
+				return;
 			}
 
 			onPropValueChange( { [ attrName ]: newAttrValue } );
