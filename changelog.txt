@@ -1,64 +1,6 @@
 == Changelog ==
 
-= 17.8.0-rc.4 =
-
-## Changelog
-
-### Tools
-
-#### Testing
-Fix failing Dropdown Menu e2e tests. ([59356](https://github.com/WordPress/gutenberg/pull/59356))
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@Mamaduka
-
-
-= 17.8.0-rc.3 =
-
-## Changelog
-
-### Enhancements
-
-- Block Hooks: Add help text to Plugins panel. ([59371](https://github.com/WordPress/gutenberg/pull/59371))
-
-
-### Bug Fixes
-
-- Block Hooks: Take controlled blocks into account for toggle state. ([59367](https://github.com/WordPress/gutenberg/pull/59367))
-- Font Library: Create post types on init hook. ([59333](https://github.com/WordPress/gutenberg/pull/59333))
-- Cover Block: Restore overflow: Clip rule to allow border radius again. ([59388](https://github.com/WordPress/gutenberg/pull/59388))
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@andrewserong @creativecoder @ockham
-
-
-= 17.8.0-rc.2 =
-
-## Changelog
-
-### Tools
-
-#### Testing
-- Performance tests: Make site editor performance test backwards compatible. ([59266](https://github.com/WordPress/gutenberg/pull/59266))
-- Performance tests: Update selectors in site editor pattern loading tests. ([59259](https://github.com/WordPress/gutenberg/pull/59259))
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@Mamaduka @ramonjd @youknowriad
-
-
-= 17.8.0-rc.1 =
+= 17.8.0 =
 
 ## Changelog
 
@@ -81,6 +23,7 @@ The following contributors merged PRs in this release:
 - CSS & Styling: Tweak link focus outline styles in HTML anchor and custom CSS. ([59048](https://github.com/WordPress/gutenberg/pull/59048))
 - Data Views: Make 'All pages' view label consistent with template and patterns. ([59009](https://github.com/WordPress/gutenberg/pull/59009))
 - Script Modules API: Script Modules add deregister option. ([58830](https://github.com/WordPress/gutenberg/pull/58830))
+- Block Hooks: Add help text to Plugins panel. ([59371](https://github.com/WordPress/gutenberg/pull/59371))
 
 #### Custom Fields
 - Block Bindings: Lock editing of blocks by default. ([58787](https://github.com/WordPress/gutenberg/pull/58787))
@@ -110,7 +53,7 @@ The following contributors merged PRs in this release:
 - Distraction Free Mode: fix ui toggling bugs. ([59061](https://github.com/WordPress/gutenberg/pull/59061))
 - Layout: Refactor responsive logic for grid column spans. ([59057](https://github.com/WordPress/gutenberg/pull/59057))
 - Interactivity API: Only add proxies to plain objects inside the store. ([59039](https://github.com/WordPress/gutenberg/pull/59039))
-- Block Hooks: Fix in Navigation block. ([59021](https://github.com/WordPress/gutenberg/pull/59021))
+- Cover Block: Restore overflow: Clip rule to allow border radius again. ([59388](https://github.com/WordPress/gutenberg/pull/59388))
 
 #### List View
 - Editor: Do not open list view by default on mobile. ([59016](https://github.com/WordPress/gutenberg/pull/59016))
@@ -136,6 +79,10 @@ The following contributors merged PRs in this release:
 - DataViews: Fix storybook. ([58842](https://github.com/WordPress/gutenberg/pull/58842))
 - DataViews: Remove second `reset filter` button in filter dialog. ([58960](https://github.com/WordPress/gutenberg/pull/58960))
 - Revert footer in pages list with DataViews. ([59151](https://github.com/WordPress/gutenberg/pull/59151))
+
+#### Block Hooks
+- Fix in Navigation block. ([59021](https://github.com/WordPress/gutenberg/pull/59021))
+- Take controlled blocks into account for toggle state. ([59367](https://github.com/WordPress/gutenberg/pull/59367))
 
 #### Block Editor
 - After Enter transform, skip other onEnter actions like splitting. ([59064](https://github.com/WordPress/gutenberg/pull/59064))
@@ -166,8 +113,9 @@ The following contributors merged PRs in this release:
 
 #### Font Library
 - Fixes installed font families not rendering in the editor or frontend. ([59019](https://github.com/WordPress/gutenberg/pull/59019))
-- Font Libary: Add missing translation functions. ([58104](https://github.com/WordPress/gutenberg/pull/58104))
+- Font Library: Add missing translation functions. ([58104](https://github.com/WordPress/gutenberg/pull/58104))
 - Show error message when no fonts found to install. ([58914](https://github.com/WordPress/gutenberg/pull/58914))
+- Font Library: Create post types on init hook. ([59333](https://github.com/WordPress/gutenberg/pull/59333))
 
 #### Synced Patterns
 - Fix missing source for binding attributes. ([59194](https://github.com/WordPress/gutenberg/pull/59194))
@@ -295,6 +243,9 @@ The following contributors merged PRs in this release:
 - Migrate `change-detection` to Playwright. ([58767](https://github.com/WordPress/gutenberg/pull/58767))
 - Tabs: Fix flaky unit tests. ([58629](https://github.com/WordPress/gutenberg/pull/58629))
 - Update test environment default theme versions to latest. ([58955](https://github.com/WordPress/gutenberg/pull/58955))
+- Performance tests: Make site editor performance test backwards compatible. ([59266](https://github.com/WordPress/gutenberg/pull/59266))
+- Performance tests: Update selectors in site editor pattern loading tests. ([59259](https://github.com/WordPress/gutenberg/pull/59259))
+- Fix failing Dropdown Menu e2e tests. ([59356](https://github.com/WordPress/gutenberg/pull/59356))
 
 #### Build Tooling
 - Add test:e2e:playwright:debug command to debug Playwright tests. ([58808](https://github.com/WordPress/gutenberg/pull/58808))
@@ -307,7 +258,9 @@ The following contributors merged PRs in this release:
 
 The following contributors merged PRs in this release:
 
-@aaronrobertshaw @afercia @ajlende @alexstine @andrewhayward @andrewserong @brookewp @c4rl0sbr4v0 @chad1008 @ciampo @DAreRodz @derekblank @desrosj @draganescu @ellatrix @fabiankaegy @gaambo @glendaviesnz @jameskoster @janboddez @jasmussen @jeryj @jorgefilipecosta @jsnajdr @juanfra @kevin940726 @Mamaduka @MarieComet @matiasbenedetto @mirka @noisysocks @ntsekouras @oandregal @ockham @pbking @ramonjd @SantosGuillamot @scruffian @shreyash3087 @t-hamano @talldan @tellthemachines @tyxla @youknowriad
+@aaronrobertshaw @afercia @ajlende @alexstine @andrewhayward @andrewserong @brookewp @c4rl0sbr4v0 @chad1008 @ciampo @creativecoder @DAreRodz @derekblank @desrosj @draganescu @ellatrix @fabiankaegy @gaambo @glendaviesnz @jameskoster @janboddez @jasmussen @jeryj @jorgefilipecosta @jsnajdr @juanfra @kevin940726 @Mamaduka @MarieComet @matiasbenedetto @mirka @noisysocks @ntsekouras @oandregal @ockham @pbking @ramonjd @SantosGuillamot @scruffian @shreyash3087 @t-hamano @talldan @tellthemachines @tyxla @youknowriad
+
+
 
 
 = 17.7.0 =
