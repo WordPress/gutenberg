@@ -2,27 +2,11 @@
  * WordPress dependencies
  */
 import { ToolbarItem, ToolbarGroup, Icon } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { connection } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
-
-export default function BlockBindingsIndicator( { clientId } ) {
-	const isConnected = useSelect(
-		( select ) => {
-			const attributes =
-				select( blockEditorStore ).getBlockAttributes( clientId );
-
-			return !! attributes?.metadata?.bindings;
-		},
-		[ clientId ]
-	);
-
-	return isConnected ? (
+export default function BlockBindingsIndicator() {
+	return (
 		<ToolbarGroup>
 			<ToolbarItem
 				as={ 'div' }
@@ -32,5 +16,5 @@ export default function BlockBindingsIndicator( { clientId } ) {
 				<Icon icon={ connection } size={ 24 } />
 			</ToolbarItem>
 		</ToolbarGroup>
-	) : null;
+	);
 }

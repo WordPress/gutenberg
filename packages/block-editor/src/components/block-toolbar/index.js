@@ -64,6 +64,7 @@ export function PrivateBlockToolbar( {
 		blockType,
 		shouldShowVisualToolbar,
 		showParentSelector,
+		isUsingBindings,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -73,6 +74,7 @@ export function PrivateBlockToolbar( {
 			isBlockValid,
 			getBlockRootClientId,
 			getBlockEditingMode,
+			getBlockAttributes,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -89,6 +91,8 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
+		const _isUsingBindings = !! getBlockAttributes( selectedBlockClientId )
+			?.metadata?.bindings;
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -109,6 +113,7 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
+			isUsingBindings: _isUsingBindings,
 		};
 	}, [] );
 
@@ -167,7 +172,7 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
-				<BlockBindingsIndicator clientId={ blockClientId } />
+				{ isUsingBindings && <BlockBindingsIndicator /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					isDefaultEditingMode && (
 						<div
