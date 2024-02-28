@@ -29,6 +29,7 @@ import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
+import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -127,9 +128,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	const blockEditContext = useBlockEditContext();
 	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
-	const bindingsStyle = hasBlockBindings
-		? { '--wp-admin-theme-color': '#9747FF' }
-		: {};
+	const bindingsStyle =
+		hasBlockBindings && canBindBlock( name )
+			? { '--wp-admin-theme-color': '#9747FF' }
+			: {};
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {

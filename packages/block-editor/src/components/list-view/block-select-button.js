@@ -37,11 +37,12 @@ import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import useListViewImages from './use-list-view-images';
 import { useListViewContext } from './context';
+import { canBindBlock } from '../../hooks/use-bindings-attributes';
 
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block: { clientId, name: blockName },
 		onClick,
 		onContextMenu,
 		onMouseDown,
@@ -286,7 +287,7 @@ function ListViewBlockSelectButton(
 							</Truncate>
 						</span>
 					) }
-					{ isConnected && (
+					{ isConnected && canBindBlock( blockName ) && (
 						<span className="block-editor-block-bindings-indicator">
 							<Icon icon={ connection } />
 						</span>
