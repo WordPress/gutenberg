@@ -10,13 +10,13 @@ const connection = (
 		viewBox="0 0 24 24"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<Path d="M5 19L8 16L5 19Z" fill="#9747FF" />
-		<Path d="M16 8L19 5L16 8Z" fill="#9747FF" />
+		<Path d="M5 19L8 16L5 19Z" />
+		<Path d="M16 8L19 5L16 8Z" />
 		<G
 			strokeWidth="1.5"
 			strokeLinecap="round"
 			strokeLinejoin="round"
-			stroke="#9747FF"
+			stroke="#000000"
 		>
 			<Path d="M5 19L8 16" />
 			<Path

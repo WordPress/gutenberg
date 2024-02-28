@@ -286,7 +286,11 @@ function ListViewBlockSelectButton(
 							</Truncate>
 						</span>
 					) }
-					{ isConnected && <Icon icon={ connection } /> }
+					{ isConnected && (
+						<span className="block-editor-block-bindings-indicator">
+							<Icon icon={ connection } />
+						</span>
+					) }
 					{ positionLabel && isSticky && (
 						<Tooltip text={ positionLabel }>
 							<Icon icon={ pinSmall } />
