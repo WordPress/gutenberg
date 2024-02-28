@@ -86,18 +86,21 @@ function gutenberg_create_initial_post_types() {
 
 /**
  * Initializes REST routes.
- *
- * @since 6.5
  */
 function gutenberg_create_initial_rest_routes() {
-	$font_collections_controller = new WP_REST_Font_Collections_Controller();
-	$font_collections_controller->register_routes();
+	global $wp_version;
+
+	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
+	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
+		$font_collections_controller = new WP_REST_Font_Collections_Controller();
+		$font_collections_controller->register_routes();
+	}
 }
+
+add_action( 'rest_api_init', 'gutenberg_create_initial_rest_routes' );
 
 /**
  * Initializes REST routes and post types.
- *
- * @since 6.5
  */
 function gutenberg_init_font_library() {
 	global $wp_version;
@@ -105,11 +108,10 @@ function gutenberg_init_font_library() {
 	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
 	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
 		gutenberg_create_initial_post_types();
-		gutenberg_create_initial_rest_routes();
 	}
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_font_library' );
+add_action( 'init', 'gutenberg_init_font_library' );
 
 
 if ( ! function_exists( 'wp_register_font_collection' ) ) {

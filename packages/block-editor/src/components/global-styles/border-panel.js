@@ -21,19 +21,24 @@ import { useColorsPerOrigin } from './hooks';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { overrideOrigins } from '../../store/get-block-settings';
 import { setImmutably } from '../../utils/object';
-import { getBorderPanelLabel } from '../../hooks/border';
+import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 
 export function useHasBorderPanel( settings ) {
-	const controls = [
-		useHasBorderColorControl( settings ),
-		useHasBorderRadiusControl( settings ),
-		useHasBorderStyleControl( settings ),
-		useHasBorderWidthControl( settings ),
-		useHasShadowControl( settings ),
-	];
-
+	const controls = Object.values( useHasBorderPanelControls( settings ) );
 	return controls.some( Boolean );
+}
+
+export function useHasBorderPanelControls( settings ) {
+	const controls = {
+		hasBorderColor: useHasBorderColorControl( settings ),
+		hasBorderRadius: useHasBorderRadiusControl( settings ),
+		hasBorderStyle: useHasBorderStyleControl( settings ),
+		hasBorderWidth: useHasBorderWidthControl( settings ),
+		hasShadow: useHasShadowControl( settings ),
+	};
+
+	return controls;
 }
 
 function useHasBorderColorControl( settings ) {
@@ -216,14 +221,16 @@ export default function BorderPanel( {
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
 
-	const label = getBorderPanelLabel( {
+	const hasBorderControl =
+		showBorderColor ||
+		showBorderStyle ||
+		showBorderWidth ||
+		showBorderRadius;
+
+	const label = useBorderPanelLabel( {
 		blockName: name,
 		hasShadowControl,
-		hasBorderControl:
-			showBorderColor ||
-			showBorderStyle ||
-			showBorderWidth ||
-			showBorderRadius,
+		hasBorderControl,
 	} );
 
 	return (
@@ -281,9 +288,12 @@ export default function BorderPanel( {
 					isShownByDefault={ defaultControls.shadow }
 					panelId={ panelId }
 				>
-					<BaseControl.VisualLabel as="legend">
-						{ __( 'Shadow' ) }
-					</BaseControl.VisualLabel>
+					{ hasBorderControl ? (
+						<BaseControl.VisualLabel as="legend">
+							{ __( 'Shadow' ) }
+						</BaseControl.VisualLabel>
+					) : null }
+
 					<ItemGroup isBordered isSeparated>
 						<ShadowPopover
 							shadow={ shadow }

@@ -161,6 +161,11 @@ function BlockHooksControlPure( { name, clientId } ) {
 				title={ __( 'Plugins' ) }
 				initialOpen={ true }
 			>
+				<p className="block-editor-hooks__block-hooks-helptext">
+					{ __(
+						'Manage the inclusion of blocks added automatically by plugins.'
+					) }
+				</p>
 				{ Object.keys( groupedHookedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
