@@ -111,29 +111,6 @@ wp.data
 	.isFeatureActive( 'namespace/editor-or-plugin-name', 'myFeatureName' ); // false
 ```
 
-The `MoreMenuDropdown` and `MoreMenuFeatureToggle` components help to implement an editor menu for changing preferences and feature values.
-
-```jsx
-function MyEditorMenu() {
-	return (
-		<MoreMenuDropdown>
-			{ () => (
-				<MenuGroup label={ __( 'Features' ) }>
-					<MoreMenuFeatureToggle
-						scope="namespace/editor-or-plugin-name"
-						feature="myFeatureName"
-						label={ __( 'My feature' ) }
-						info={ __( 'A really awesome feature' ) }
-						messageActivated={ __( 'My feature activated' ) }
-						messageDeactivated={ __( 'My feature deactivated' ) }
-					/>
-				</MenuGroup>
-			) }
-		</MoreMenuDropdown>
-	);
-}
-```
-
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
