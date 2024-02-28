@@ -138,7 +138,7 @@ export function getDisplaySrcFromFontFace( input ) {
 	} else {
 		src = input;
 	}
-	// If it is a theme we expect the font face be already loaded in the browser.
+	// It's expected theme fonts will already be loaded in the browser.
 	if ( src.startsWith( 'file:.' ) ) {
 		return;
 	}
