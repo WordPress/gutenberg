@@ -95,6 +95,7 @@ const BindingConnector = ( {
 			 * compare its HTML representation with the new value.
 			 */
 			if ( prevAttrValue instanceof RichTextData ) {
+				// If the new value is also a RichTextData instance and the value is the same, bail early.
 				if (
 					newAttrValue instanceof RichTextData &&
 					prevAttrValue.toHTMLString() === newAttrValue.toHTMLString()
