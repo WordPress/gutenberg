@@ -11,9 +11,7 @@ import { RichTextData } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { useBlockEditContext } from '../components/block-edit/context';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -64,8 +62,6 @@ export function canBindAttribute( blockName, attributeName ) {
  *
  * @param {Object}   props                   - The component props.
  * @param {string}   props.attrName          - The attribute name.
- * @param {any}      props.attrValue         - The attribute value.
- * @param {string}   props.blockName         - The block name.
  * @param {Object}   props.blockProps        - The block props with bound attribute.
  * @param {Object}   props.source            - Source handler.
  * @param {Object}   props.args              - The arguments to pass to the source.
@@ -75,8 +71,6 @@ export function canBindAttribute( blockName, attributeName ) {
 const BindingConnector = ( {
 	args,
 	attrName,
-	attrValue,
-	blockName,
 	blockProps,
 	source,
 	onPropValueChange,
@@ -85,6 +79,9 @@ const BindingConnector = ( {
 		blockProps,
 		args
 	);
+
+	const { name: blockName } = blockProps;
+	const attrValue = blockProps.attributes[ attrName ];
 
 	const updateBoundAttibute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
@@ -158,20 +155,12 @@ const BindingConnector = ( {
  * For this, it creates a BindingConnector for each bound attribute.
  *
  * @param {Object}   props                   - The component props.
- * @param {string}   props.blockName         - The block name.
  * @param {Object}   props.blockProps        - The BlockEdit props object.
  * @param {Object}   props.bindings          - The block bindings settings.
- * @param {Object}   props.attributes        - The block attributes.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
  * @return {null}                              Data-handling component. Render nothing.
  */
-function BlockBindingBridge( {
-	blockName,
-	blockProps,
-	bindings,
-	attributes,
-	onPropValueChange,
-} ) {
+function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 	const blockBindingsSources = unlock(
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
@@ -190,9 +179,7 @@ function BlockBindingBridge( {
 					return (
 						<BindingConnector
 							key={ attrName }
-							blockName={ blockName }
 							attrName={ attrName }
-							attrValue={ attributes[ attrName ] }
 							source={ source }
 							blockProps={ blockProps }
 							args={ boundAttribute.args }
@@ -207,9 +194,6 @@ function BlockBindingBridge( {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { clientId, name: blockName } = useBlockEditContext();
-		const { getBlockAttributes } = useSelect( blockEditorStore );
-
 		/*
 		 * Collect and update the bound attributes
 		 * in a separate state.
@@ -228,9 +212,8 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		 * Create binding object filtering
 		 * only the attributes that can be bound.
 		 */
-		const attributes = getBlockAttributes( clientId );
 		const bindings = Object.fromEntries(
-			Object.entries( attributes.metadata?.bindings || {} ).filter(
+			Object.entries( props.attributes.metadata?.bindings || {} ).filter(
 				( [ attrName ] ) => canBindAttribute( props.name, attrName )
 			)
 		);
@@ -240,16 +223,14 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				{ Object.keys( bindings ).length > 0 && (
 					<BlockBindingBridge
 						blockProps={ props }
-						blockName={ blockName }
 						bindings={ bindings }
-						attributes={ attributes }
 						onPropValueChange={ updateBoundAttributes }
 					/>
 				) }
 
 				<BlockEdit
 					{ ...props }
-					attributes={ { ...attributes, ...boundAttributes } }
+					attributes={ { ...props.attributes, ...boundAttributes } }
 				/>
 			</>
 		);
