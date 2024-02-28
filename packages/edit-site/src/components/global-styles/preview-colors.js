@@ -176,6 +176,8 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 										<motion.div
 											key={ slug }
 											style={ {
+												boxShadow:
+													'inset 0 0 0 1px #0003',
 												height:
 													normalizedColorSwatchSize *
 													ratio,
