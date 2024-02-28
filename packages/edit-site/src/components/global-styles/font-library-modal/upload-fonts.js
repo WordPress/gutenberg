@@ -143,19 +143,12 @@ function UploadFonts() {
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
 
-		if ( fontFamilies.length > 1 ) {
-			setNotice( {
-				type: 'error',
-				message: __(
-					'Variants from only one font family can be uploaded at a time.'
-				),
-			} );
-			setIsUploading( false );
-			return;
-		}
+		const installPromises = fontFamilies.map( ( fontFamily ) =>
+			installFont( fontFamily )
+		);
 
 		try {
-			await installFont( fontFamilies[ 0 ] );
+			await Promise.all( installPromises );
 			setNotice( {
 				type: 'success',
 				message: __( 'Fonts were installed successfully.' ),
