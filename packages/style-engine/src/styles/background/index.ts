@@ -16,12 +16,16 @@ const backgroundImage = {
 			return styleRules;
 		}
 
+		/*
+		 * If the background image is a string, it could already contain a url() function,
+		 * or have a linear-gradient value.
+		 */
 		if ( typeof _backgroundImage === 'string' ) {
-			const imageUrl = _backgroundImage;
-			_backgroundImage = {
-				source: 'file',
-				url: imageUrl,
-			};
+			styleRules.push( {
+				selector: options.selector,
+				key: 'backgroundImage',
+				value: _backgroundImage,
+			} );
 		}
 
 		if ( _backgroundImage?.source === 'file' && _backgroundImage?.url ) {

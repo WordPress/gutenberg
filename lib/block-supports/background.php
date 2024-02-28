@@ -37,22 +37,15 @@ function gutenberg_register_background_support( $block_type ) {
  * @return array                     Style engine array of CSS string and style declarations.
  */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
-	$background_image_source = $background_styles['backgroundImage']['source'] ?? null;
+	$background_image_source             = isset( $background_styles['backgroundImage']['source'] ) ? $background_styles['backgroundImage']['source'] : null;
+	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'cover';
+
 
 	/*
-	 * If the background image is a string, it's a URL.
-	 * Assume "file" source.
+	 * @TODO document
+	 * $background_styles['backgroundImage']['url'] and file source implies an image URL path.
 	 */
-	if ( is_string( $background_styles['backgroundImage'] ) ) {
-		$url                                  = esc_url( $background_styles['backgroundImage'] );
-		$background_image_source              = 'file';
-		$background_styles['backgroundImage'] = array(
-			'url' => $url,
-		);
-	}
-
-	if ( ! empty( $background_styles['backgroundImage']['url'] ) ) {
-		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+	if ( ( 'file' === $background_image_source || 'theme' === $background_image_source ) && ! empty( $background_styles['backgroundImage']['url'] ) ) {
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
 		if ( 'contain' === $background_styles['backgroundSize'] && ! isset( $background_styles['backgroundPosition'] ) ) {
 			$background_styles['backgroundPosition'] = 'center';

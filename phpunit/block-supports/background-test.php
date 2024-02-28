@@ -144,7 +144,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 					'backgroundImage' => true,
 				),
 				'background_style'    => array(
-					'backgroundImage' => 'https://example.com/image.jpg',
+					'backgroundImage' => "url('https://example.com/image.jpg')",
 				),
 				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
@@ -245,21 +245,24 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-size:cover;",
 			),
-			'css generated with implied file source' => array(
+			'css generated where backgroundImage is a string' => array(
 				'background_style' => array(
-					'backgroundImage' => 'https://example.com/image.jpg',
+					'backgroundImage' => "url('https://example.com/image.jpg')",
 				),
 				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-size:cover;",
 			),
 			'css generated with escaped URL'         => array(
 				'background_style' => array(
-					'backgroundImage' => 'https://example.com/image.jpg?q=pom-poms+%3Cscript%3Eevil_script()%3C/script%3E',
+					'backgroundImage' => array(
+						'url' => 'https://example.com/image.jpg?q=pom-poms+%3Cscript%3Eevil_script()%3C/script%3E',
+					),
+					'backgroundSize'  => 'cover',
 				),
 				'expected_css'     => 'background-size:cover;',
 			),
 			'css generated with expected properties' => array(
 				'background_style' => array(
-					'backgroundImage'    => 'https://example.com/image.jpg',
+					'backgroundImage'    => "url('https://example.com/image.jpg')",
 					'backgroundSize'     => '6px, auto, contain',
 					'backgroundPosition' => 'bottom 10px right 20px',
 					'backgroundRepeat'   => 'repeat space',
@@ -268,7 +271,10 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 			),
 			'css generated for file source with contain size should add center position' => array(
 				'background_style' => array(
-					'backgroundImage' => 'https://example.com/image.jpg',
+					'backgroundImage' => array(
+						'url'    => 'https://example.com/image.jpg',
+						'source' => 'file',
+					),
 					'backgroundSize'  => 'contain',
 				),
 				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-position:center;background-size:contain;",
