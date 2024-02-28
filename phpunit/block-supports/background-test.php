@@ -137,6 +137,18 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background image style is applied when backgroundImage is a string' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-rules-are-output',
+				'background_settings' => array(
+					'backgroundImage' => true,
+				),
+				'background_style'    => array(
+					'backgroundImage' => 'https://example.com/image.jpg',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
 			'background image style with contain, position, and repeat is applied' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',
@@ -198,6 +210,78 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'expected_wrapper'    => '<div>Content</div>',
 				'wrapper'             => '<div>Content</div>',
+			),
+		);
+	}
+
+	/**
+	 * Tests generating background styles.
+	 *
+	 * @covers ::gutenberg_get_background_support_styles
+	 *
+	 * @dataProvider data_get_background_support_styles
+	 *
+	 * @param mixed  $background_style The background styles within the block attributes.
+	 * @param string $expected_css     Expected markup for the block wrapper.
+	 */
+	public function test_get_background_support_styles( $background_style, $expected_css ) {
+		switch_theme( 'block-theme' );
+		$actual = gutenberg_get_background_support_styles( $background_style )['css'];
+
+		$this->assertEquals(
+			$expected_css,
+			$actual,
+			'Background CSS should be correct.'
+		);
+	}
+	public function data_get_background_support_styles() {
+		return array(
+			'css generated with file source'         => array(
+				'background_style' => array(
+					'backgroundImage' => array(
+						'url'    => 'https://example.com/image.jpg',
+						'source' => 'file',
+					),
+				),
+				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-size:cover;",
+			),
+			'css generated with implied file source' => array(
+				'background_style' => array(
+					'backgroundImage' => 'https://example.com/image.jpg',
+				),
+				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-size:cover;",
+			),
+			'css generated with escaped URL'         => array(
+				'background_style' => array(
+					'backgroundImage' => 'https://example.com/image.jpg?q=pom-poms+%3Cscript%3Eevil_script()%3C/script%3E',
+				),
+				'expected_css'     => 'background-size:cover;',
+			),
+			'css generated with expected properties' => array(
+				'background_style' => array(
+					'backgroundImage'    => 'https://example.com/image.jpg',
+					'backgroundSize'     => '6px, auto, contain',
+					'backgroundPosition' => 'bottom 10px right 20px',
+					'backgroundRepeat'   => 'repeat space',
+				),
+				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-position:bottom 10px right 20px;background-repeat:repeat space;background-size:6px, auto, contain;",
+			),
+			'css generated for file source with contain size should add center position' => array(
+				'background_style' => array(
+					'backgroundImage' => 'https://example.com/image.jpg',
+					'backgroundSize'  => 'contain',
+				),
+				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-position:center;background-size:contain;",
+			),
+			'css generated with theme source'        => array(
+				'background_style' => array(
+					'backgroundImage' => array(
+						'url'    => 'assets/image/1024x768_e2e_test_image_size.jpeg',
+						'source' => 'theme',
+					),
+					'backgroundSize'  => 'contain',
+				),
+				'expected_css'     => "background-image:url('http://localhost:8889/wp-content/plugins/gutenberg/phpunit/data/themedir1/block-theme/assets/image/1024x768_e2e_test_image_size.jpeg');background-position:center;background-size:contain;",
 			),
 		);
 	}

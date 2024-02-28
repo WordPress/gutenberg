@@ -44,11 +44,19 @@ function gutenberg_get_background_support_styles( $background_styles = array() )
 	 * Assume "file" source.
 	 */
 	if ( is_string( $background_styles['backgroundImage'] ) ) {
-		$url                                 = $background_styles['backgroundImage'];
-		$background_image_source             = 'file';
+		$url                                  = esc_url( $background_styles['backgroundImage'] );
+		$background_image_source              = 'file';
 		$background_styles['backgroundImage'] = array(
-			'url'    => $url,
+			'url' => $url,
 		);
+	}
+
+	if ( ! empty( $background_styles['backgroundImage']['url'] ) ) {
+		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+		// If the background size is set to `contain` and no position is set, set the position to `center`.
+		if ( 'contain' === $background_styles['backgroundSize'] && ! isset( $background_styles['backgroundPosition'] ) ) {
+			$background_styles['backgroundPosition'] = 'center';
+		}
 	}
 
 	/*
@@ -83,18 +91,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$style_background        = $block_attributes['style']['background'];
-	$background_image_source = $style_background['backgroundImage']['source'] ?? null;
-
-	if ( 'file' === $background_image_source && ! empty( $style_background['backgroundImage'] ) ) {
-		$style_background['backgroundSize'] = $style_background['backgroundSize'] ?? 'cover';
-		// If the background size is set to `contain` and no position is set, set the position to `center`.
-		if ( 'contain' === $style_background['backgroundSize'] && ! isset( $style_background['backgroundPosition'] ) ) {
-			$style_background['backgroundPosition'] = 'center';
-		}
-	}
-
-	$styles = gutenberg_get_background_support_styles( $style_background );
+	$styles = gutenberg_get_background_support_styles( $block_attributes['style']['background'] );
 
 	if ( ! empty( $styles['css'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
