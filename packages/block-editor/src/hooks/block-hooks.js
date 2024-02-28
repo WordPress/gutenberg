@@ -90,7 +90,7 @@ function BlockHooksControlPure( {
 							candidates = getBlocks( clientId );
 							break;
 
-						default:
+						case undefined:
 							// If we haven't found a blockHooks field with a relative position for the hooked
 							// block, it means that it was added by a filter. In this case, we look for the block
 							// both among the current block's siblings and its children.
@@ -172,7 +172,7 @@ function BlockHooksControlPure( {
 				);
 				break;
 
-			default:
+			case undefined:
 				// If we do not know the relative position, it is because the block was
 				// added via a filter. In this case, we default to inserting it after the
 				// current block.
