@@ -5,7 +5,7 @@ import { ToolbarItem, ToolbarGroup, Icon } from '@wordpress/components';
 import { connection } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
-export default function BlockBindingsIndicator() {
+export default function BlockBindingsToolbarIndicator() {
 	return (
 		<ToolbarGroup>
 			<ToolbarItem

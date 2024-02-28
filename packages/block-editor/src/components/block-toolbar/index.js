@@ -36,7 +36,7 @@ import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 import Shuffle from './shuffle';
-import BlockBindingsIndicator from '../block-bindings-indicator';
+import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
 
 /**
  * Renders the block toolbar.
