@@ -162,16 +162,6 @@ function FontLibraryProvider( { children } ) {
 	// Demo
 	const [ loadedFontUrls ] = useState( new Set() );
 
-	// Theme data
-	const { site, currentTheme } = useSelect( ( select ) => {
-		return {
-			site: select( coreStore ).getSite(),
-			currentTheme: select( coreStore ).getCurrentTheme(),
-		};
-	} );
-	const themeUrl =
-		site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
-
 	const getAvailableFontsOutline = ( availableFontFamilies ) => {
 		const outline = availableFontFamilies.reduce( ( acc, font ) => {
 			const availableFontFaces =
@@ -212,6 +202,7 @@ function FontLibraryProvider( { children } ) {
 
 	async function installFont( fontFamilyToInstall ) {
 		setIsInstalling( true );
+		let isANewFontFamily = false;
 		try {
 			// Get the font family if it already exists.
 			let installedFontFamily = await fetchGetFontFamilyBySlug(
@@ -220,6 +211,7 @@ function FontLibraryProvider( { children } ) {
 
 			// Otherwise create it.
 			if ( ! installedFontFamily ) {
+				isANewFontFamily = true;
 				// Prepare font family form data to install.
 				installedFontFamily = await fetchInstallFontFamily(
 					makeFontFamilyFormData( fontFamilyToInstall )
@@ -278,6 +270,11 @@ function FontLibraryProvider( { children } ) {
 				sucessfullyInstalledFontFaces.length === 0 &&
 				alreadyInstalledFontFaces.length === 0
 			) {
+				if ( isANewFontFamily ) {
+					// If the font family is new, delete it to avoid having font families without font faces.
+					await fetchUninstallFontFamily( installedFontFamily.id );
+				}
+
 				throw new Error(
 					sprintf(
 						/* translators: %s: Specific error message returned from server. */
@@ -416,7 +413,7 @@ function FontLibraryProvider( { children } ) {
 		// If the font doesn't have a src, don't load it.
 		if ( ! fontFace.src ) return;
 		// Get the src of the font.
-		const src = getDisplaySrcFromFontFace( fontFace.src, themeUrl );
+		const src = getDisplaySrcFromFontFace( fontFace.src );
 		// If the font is already loaded, don't load it again.
 		if ( ! src || loadedFontUrls.has( src ) ) return;
 		// Load the font in the browser.

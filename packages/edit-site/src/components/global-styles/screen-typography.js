@@ -10,8 +10,10 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import TypographyElements from './typography-elements';
+import TypographyVariations from './variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -19,6 +21,14 @@ function ScreenTypography() {
 			select( editorStore ).getEditorSettings().fontLibraryEnabled,
 		[]
 	);
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( {
+			property: 'typography',
+			filter: ( variation ) =>
+				variation?.settings?.typography?.fontFamilies &&
+				Object.keys( variation?.settings?.typography?.fontFamilies )
+					.length,
+		} );
 
 	return (
 		<>
@@ -30,7 +40,14 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
-					{ fontLibraryEnabled && <FontFamilies /> }
+					{ !! typographyVariations.length && (
+						<TypographyVariations />
+					) }
+					{ ! window.__experimentalDisableFontLibrary && (
+						<VStack spacing={ 3 }>
+							{ fontLibraryEnabled && <FontFamilies /> }
+						</VStack>
+					) }
 					<TypographyElements />
 				</VStack>
 			</div>

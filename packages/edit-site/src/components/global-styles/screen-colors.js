@@ -11,6 +11,8 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import ScreenHeader from './header';
 import Palette from './palette';
 import { unlock } from '../../lock-unlock';
+import ColorVariations from './variations-color';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const {
 	useGlobalStyle,
@@ -29,6 +31,12 @@ function ScreenColors() {
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
+		filter: ( variation ) =>
+			variation?.settings?.color &&
+			Object.keys( variation?.settings?.color ).length,
+	} );
 	return (
 		<>
 			<ScreenHeader
@@ -38,7 +46,11 @@ function ScreenColors() {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-colors">
-				<VStack spacing={ 10 }>
+				<VStack spacing={ 3 }>
+					{ !! colorVariations.length && (
+						<ColorVariations variations={ colorVariations } />
+					) }
+
 					<Palette />
 
 					<StylesColorPanel
