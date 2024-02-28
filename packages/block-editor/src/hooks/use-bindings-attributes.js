@@ -191,8 +191,8 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		function attributeReducer( state, action ) {
-			return { ...state, ...action };
+		function attributeReducer( state, newAttibutes ) {
+			return { ...state, ...newAttibutes };
 		}
 
 		/*
