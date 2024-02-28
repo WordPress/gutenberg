@@ -7,7 +7,7 @@ const v2 = {
 		ref: {
 			type: 'number',
 		},
-		overrides: {
+		content: {
 			type: 'object',
 		},
 	},
@@ -61,7 +61,7 @@ const v2 = {
 
 			return {
 				...retainedAttributes,
-				content,
+				content: updatedContent,
 			};
 		}
 

@@ -110,18 +110,41 @@ function applyInitialContentValuesToInnerBlocks(
 			defaultValues
 		);
 		const metadataName = block.attributes.metadata?.name;
-		if ( ! metadataName || ! hasOverridableAttributes( block ) )
+		const metadataId = block.attributes.metadata?.id;
+
+		if (
+			( ! metadataName && ! metadataId ) ||
+			! hasOverridableAttributes( block )
+		) {
 			return { ...block, innerBlocks };
+		}
+
 		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ metadataName ] ??= {};
-			defaultValues[ metadataName ][ attributeKey ] =
-				block.attributes[ attributeKey ];
+			// Back compat. Pattern overrides used to use a metadata `id`
+			// before using a `name`. Check for the name first, but if it
+			// doesn't exist use the id.
+			if ( Object.hasOwn( content, metadataName ) ) {
+				defaultValues[ metadataName ] ??= {};
+				defaultValues[ metadataName ][ attributeKey ] =
+					block.attributes[ attributeKey ];
 
-			const contentValues = content[ metadataName ];
-			if ( contentValues?.[ attributeKey ] !== undefined ) {
-				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
+				const contentValues = content[ metadataName ];
+				if ( contentValues?.[ attributeKey ] !== undefined ) {
+					newAttributes[ attributeKey ] =
+						contentValues[ attributeKey ];
+				}
+			} else if ( Object.hasOwn( content, metadataId ) ) {
+				defaultValues[ metadataId ] ??= {};
+				defaultValues[ metadataId ][ attributeKey ] =
+					block.attributes[ attributeKey ];
+
+				const contentValues = content[ metadataId ];
+				if ( contentValues?.[ attributeKey ] !== undefined ) {
+					newAttributes[ attributeKey ] =
+						contentValues[ attributeKey ];
+				}
 			}
 		}
 		return {
@@ -152,19 +175,39 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
 			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
 		);
 		const metadataName = block.attributes.metadata?.name;
-		if ( ! metadataName || ! hasOverridableAttributes( block ) ) continue;
+		const metadataId = block.attributes.metadata?.id;
+		if (
+			( ! metadataName && ! metadataId ) ||
+			! hasOverridableAttributes( block )
+		) {
+			continue;
+		}
+
 		const attributes = getOverridableAttributes( block );
+
+		// Back compat. Pattern overrides previously used an 'id' instead of a 'name'.
+		// Check first if the metadata name or id is in use in the existing content,
+		// and if so use the appropriate one. If not, prefer the name when defined.
+		let contentKey;
+		if ( Object.hasOwn( content, metadataName ) ) {
+			contentKey = metadataName;
+		} else if ( Object.hasOwn( content, metadataId ) ) {
+			contentKey = metadataId;
+		} else {
+			contentKey = metadataName ? metadataName : metadataId;
+		}
+
 		for ( const attributeKey of attributes ) {
 			if (
 				! isAttributeEqual(
 					block.attributes[ attributeKey ],
-					defaultValues[ metadataName ][ attributeKey ]
+					defaultValues?.[ contentKey ]?.[ attributeKey ]
 				)
 			) {
-				content[ metadataName ] ??= {};
+				content[ contentKey ] ??= {};
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				content[ metadataName ][ attributeKey ] =
+				content[ contentKey ][ attributeKey ] =
 					block.attributes[ attributeKey ] === undefined
 						? // TODO: We use an empty string to represent undefined for now until
 						  // we support a richer format for overrides and the block binding API.
