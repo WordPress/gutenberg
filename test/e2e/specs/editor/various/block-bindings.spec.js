@@ -1245,7 +1245,7 @@ test.describe( 'Block bindings', () => {
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'non_existing_custom_field'
+					'fallback value'
 				);
 			} );
 
@@ -1276,7 +1276,7 @@ test.describe( 'Block bindings', () => {
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'_protected_field'
+					'fallback value'
 				);
 			} );
 
@@ -1309,7 +1309,7 @@ test.describe( 'Block bindings', () => {
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
 				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'show_in_rest_false_field'
+					'fallback value'
 				);
 			} );
 		} );
