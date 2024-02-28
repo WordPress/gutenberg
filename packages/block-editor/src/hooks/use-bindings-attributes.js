@@ -4,7 +4,7 @@
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useCallback, useState } from '@wordpress/element';
+import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -115,7 +115,7 @@ const BindingConnector = ( {
 		[ attrName, onPropValueChange ]
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			updateBoundAttibute( propValue, attrValue );
 		} else if ( placeholder ) {
