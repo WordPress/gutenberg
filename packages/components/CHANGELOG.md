@@ -11,6 +11,10 @@
 
 -   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
 
+### Experimental
+
+-   `CustomSelectControlV2`: Remove legacy adapter layer ([#59420](https://github.com/WordPress/gutenberg/pull/59420)).
+
 ## 27.0.0 (2024-02-21)
 
 ### Breaking Changes
