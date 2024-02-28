@@ -867,7 +867,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			 *
 			 * To avoid an infinite loop, don't hook wp_get_font_dir() to 'upload_dir'.
 			 * Instead, just pass its return value to the 'upload_dir' callback.
-			*/
+			 */
 			$font_dir       = wp_get_font_dir();
 			$set_upload_dir = function () use ( $font_dir ) {
 				return $font_dir;
