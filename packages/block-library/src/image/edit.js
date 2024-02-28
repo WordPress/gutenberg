@@ -354,9 +354,7 @@ export function ImageEdit( {
 				lockUrlControlsMessage: sprintf(
 					/* translators: %s: Label of the bindings source if exists */
 					__( 'Connected to %s' ),
-					blockBindingsSource?.label
-						? blockBindingsSource.label
-						: 'dynamic data'
+					blockBindingsSource?.label || __( 'dynamic data' )
 				),
 			};
 		},

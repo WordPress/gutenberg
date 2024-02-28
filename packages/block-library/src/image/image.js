@@ -459,9 +459,7 @@ export default function Image( {
 				lockAltControlsMessage: sprintf(
 					/* translators: %s: Label of the bindings source if exists */
 					__( 'Connected to %s' ),
-					altBindingSource?.label
-						? altBindingSource.label
-						: 'dynamic data'
+					altBindingSource?.label || __( 'dynamic data' )
 				),
 				lockTitleControls:
 					!! titleBinding &&
@@ -470,9 +468,7 @@ export default function Image( {
 				lockTitleControlsMessage: sprintf(
 					/* translators: %s: Label of the bindings source if exists */
 					__( 'Connected to %s' ),
-					titleBindingSource?.label
-						? titleBindingSource.label
-						: 'dynamic data'
+					titleBindingSource?.label || __( 'dynamic data' )
 				),
 			};
 		},
