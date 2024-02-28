@@ -22,7 +22,7 @@ import type { FlexProps } from '../types';
 
 function useDeprecatedProps(
 	props: WordPressComponentProps< FlexProps, 'div' >
-): WordPressComponentProps< FlexProps, 'div' > {
+): Omit< typeof props, 'isReversed' > {
 	const { isReversed, ...otherProps } = props;
 
 	if ( typeof isReversed !== 'undefined' ) {
