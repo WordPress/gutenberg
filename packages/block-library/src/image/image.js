@@ -456,20 +456,24 @@ export default function Image( {
 					!! altBinding &&
 					( ! altBindingSource ||
 						altBindingSource?.lockAttributesEditing ),
-				lockAltControlsMessage: sprintf(
-					/* translators: %s: Label of the bindings source if exists */
-					__( 'Connected to %s' ),
-					altBindingSource?.label || __( 'dynamic data' )
-				),
+				lockAltControlsMessage: altBindingSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							altBindingSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
 					( ! titleBindingSource ||
 						titleBindingSource?.lockAttributesEditing ),
-				lockTitleControlsMessage: sprintf(
-					/* translators: %s: Label of the bindings source if exists */
-					__( 'Connected to %s' ),
-					titleBindingSource?.label || __( 'dynamic data' )
-				),
+				lockTitleControlsMessage: titleBindingSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							titleBindingSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 			};
 		},
 		[ clientId, isSingleSelected, metadata?.bindings ]

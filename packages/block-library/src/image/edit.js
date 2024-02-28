@@ -351,11 +351,13 @@ export function ImageEdit( {
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
 						blockBindingsSource?.lockAttributesEditing ),
-				lockUrlControlsMessage: sprintf(
-					/* translators: %s: Label of the bindings source if exists */
-					__( 'Connected to %s' ),
-					blockBindingsSource?.label || __( 'dynamic data' )
-				),
+				lockUrlControlsMessage: blockBindingsSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							blockBindingsSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 			};
 		},
 		[ isSingleSelected ]
