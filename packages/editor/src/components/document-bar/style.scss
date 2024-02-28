@@ -40,6 +40,10 @@
 	flex-grow: 1;
 	overflow: hidden;
 	color: $gray-800;
+	gap: $grid-unit-05;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
 	@include break-small() {
@@ -66,16 +70,6 @@
 		max-width: 50%;
 		color: currentColor;
 	}
-
-	.editor-document-bar.is-animated.has-back-button & {
-		animation: editor-document-bar__slide-in-left 0.3s;
-		@include reduce-motion("animation");
-	}
-
-	.editor-document-bar.is-animated & {
-		animation: editor-document-bar__slide-in-right 0.3s;
-		@include reduce-motion("animation");
-	}
 }
 
 .editor-document-bar__shortcut {
@@ -99,32 +93,5 @@
 	&:hover {
 		color: var(--wp-block-synced-color);
 		background-color: transparent;
-	}
-
-	.editor-document-bar.is-animated & {
-		animation: editor-document-bar__slide-in-left 0.3s;
-		@include reduce-motion("animation");
-	}
-}
-
-@keyframes editor-document-bar__slide-in-right {
-	from {
-		transform: translateX(-15%);
-		opacity: 0;
-	}
-	to {
-		transform: translateX(0);
-		opacity: 1;
-	}
-}
-
-@keyframes editor-document-bar__slide-in-left {
-	from {
-		transform: translateX(15%);
-		opacity: 0;
-	}
-	to {
-		transform: translateX(0);
-		opacity: 1;
 	}
 }

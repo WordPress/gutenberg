@@ -71,6 +71,7 @@ export default function BlockThemeControl( { id } ) {
 			popoverProps={ POPOVER_PROPS }
 			focusOnMount
 			toggleProps={ {
+				__next40pxDefaultSize: true,
 				variant: 'tertiary',
 			} }
 			label={ __( 'Template options' ) }

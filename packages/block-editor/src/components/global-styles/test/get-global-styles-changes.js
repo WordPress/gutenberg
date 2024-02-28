@@ -1,7 +1,9 @@
 /**
  * Internal dependencies
  */
-import getGlobalStylesChanges from '../get-global-styles-changes';
+import getGlobalStylesChanges, {
+	getGlobalStylesChangelist,
+} from '../get-global-styles-changes';
 
 /**
  * WordPress dependencies
@@ -12,24 +14,8 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 
-describe( 'getGlobalStylesChanges', () => {
-	beforeEach( () => {
-		registerBlockType( 'core/test-fiori-di-zucca', {
-			save: () => {},
-			category: 'text',
-			title: 'Test pumpkin flowers',
-			edit: () => {},
-		} );
-	} );
-
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
-
-	const revision = {
-		id: 10,
+describe( 'getGlobalStylesChanges and utils', () => {
+	const next = {
 		styles: {
 			typography: {
 				fontSize: 'var(--wp--preset--font-size--potato)',
@@ -85,11 +71,18 @@ describe( 'getGlobalStylesChanges', () => {
 						},
 					],
 				},
+				gradients: [
+					{
+						name: 'Something something',
+						gradient:
+							'linear-gradient(105deg,rgba(6,147,100,1) 0%,rgb(155,81,100) 100%)',
+						slug: 'something-something',
+					},
+				],
 			},
 		},
 	};
-	const previousRevision = {
-		id: 9,
+	const previous = {
 		styles: {
 			typography: {
 				fontSize: 'var(--wp--preset--font-size--fungus)',
@@ -161,74 +154,120 @@ describe( 'getGlobalStylesChanges', () => {
 							color: 'blue',
 						},
 					],
+					custom: [
+						{
+							slug: 'one',
+							color: 'tomato',
+						},
+					],
 				},
+				gradients: [
+					{
+						name: 'Vivid cyan blue to vivid purple',
+						gradient:
+							'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+						slug: 'vivid-cyan-blue-to-vivid-purple',
+					},
+				],
+			},
+			typography: {
+				fluid: true,
 			},
 		},
 	};
 
-	it( 'returns a list of changes and caches them', () => {
-		const resultA = getGlobalStylesChanges( revision, previousRevision );
-		expect( resultA ).toEqual( [
-			'Colors',
-			'Typography',
-			'Test pumpkin flowers',
-			'H3 element',
-			'Caption element',
-			'H6 element',
-			'Link element',
-			'Color settings',
-		] );
-
-		const resultB = getGlobalStylesChanges( revision, previousRevision );
-
-		expect( resultA ).toBe( resultB );
-	} );
-
-	it( 'returns a list of truncated changes', () => {
-		const resultA = getGlobalStylesChanges( revision, previousRevision, {
-			maxResults: 3,
+	beforeEach( () => {
+		registerBlockType( 'core/test-fiori-di-zucca', {
+			save: () => {},
+			category: 'text',
+			title: 'Test pumpkin flowers',
+			edit: () => {},
 		} );
-		expect( resultA ).toEqual( [
-			'Colors',
-			'Typography',
-			'Test pumpkin flowers',
-			'…and 5 more changes',
-		] );
 	} );
 
-	it( 'skips unknown and unchanged keys', () => {
-		const result = getGlobalStylesChanges(
-			{
-				styles: {
-					frogs: {
-						legs: 'green',
-					},
-					typography: {
-						fontSize: '1rem',
-					},
-					settings: {
-						'': {
-							'': 'foo',
+	afterEach( () => {
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'getGlobalStylesChanges()', () => {
+		it( 'returns a list of changes', () => {
+			const result = getGlobalStylesChanges( next, previous );
+			expect( result ).toEqual( [
+				'Colors, Typography styles.',
+				'Test pumpkin flowers block.',
+				'H3, Caption, H6, Link elements.',
+				'Color, Typography settings.',
+			] );
+		} );
+
+		it( 'returns a list of truncated changes', () => {
+			const resultA = getGlobalStylesChanges( next, previous, {
+				maxResults: 3,
+			} );
+			expect( resultA ).toEqual( [
+				'Colors, Typography styles.',
+				'Test pumpkin flowers block.',
+			] );
+		} );
+
+		it( 'skips unknown and unchanged keys', () => {
+			const result = getGlobalStylesChanges(
+				{
+					styles: {
+						frogs: {
+							legs: 'green',
+						},
+						typography: {
+							fontSize: '1rem',
+						},
+						settings: {
+							'': {
+								'': 'foo',
+							},
 						},
 					},
 				},
-			},
-			{
-				styles: {
-					frogs: {
-						legs: 'yellow',
-					},
-					typography: {
-						fontSize: '1rem',
-					},
-					settings: {
-						'': {
-							'': 'bar',
+				{
+					styles: {
+						frogs: {
+							legs: 'yellow',
+						},
+						typography: {
+							fontSize: '1rem',
+						},
+						settings: {
+							'': {
+								'': 'bar',
+							},
 						},
 					},
-				},
-			}
-		);
-		expect( result ).toEqual( [] );
+				}
+			);
+			expect( result ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'getGlobalStylesChangelist()', () => {
+		it( 'compares two objects and returns a cached list of changed keys', () => {
+			const resultA = getGlobalStylesChangelist( next, previous );
+
+			expect( resultA ).toEqual( [
+				[ 'styles', 'Colors' ],
+				[ 'styles', 'Typography' ],
+				[ 'blocks', 'Test pumpkin flowers' ],
+				[ 'elements', 'H3' ],
+				[ 'elements', 'Caption' ],
+				[ 'elements', 'H6' ],
+				[ 'elements', 'Link' ],
+				[ 'settings', 'Color' ],
+				[ 'settings', 'Typography' ],
+			] );
+
+			const resultB = getGlobalStylesChangelist( next, previous );
+
+			expect( resultB ).toEqual( resultA );
+		} );
 	} );
 } );

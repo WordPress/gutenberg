@@ -28,13 +28,8 @@ store(
 				const queryRef = ref.closest(
 					'.wp-block-query[data-wp-router-region]'
 				);
-				const isDisabled = queryRef?.dataset.wpNavigationDisabled;
 
-				if (
-					isValidLink( ref ) &&
-					isValidEvent( event ) &&
-					! isDisabled
-				) {
+				if ( isValidLink( ref ) && isValidEvent( event ) ) {
 					event.preventDefault();
 
 					const { actions } = yield import(
@@ -50,11 +45,7 @@ store(
 			},
 			*prefetch() {
 				const { ref } = getElement();
-				const queryRef = ref.closest(
-					'.wp-block-query[data-wp-router-region]'
-				);
-				const isDisabled = queryRef?.dataset.wpNavigationDisabled;
-				if ( isValidLink( ref ) && ! isDisabled ) {
+				if ( isValidLink( ref ) ) {
 					const { actions } = yield import(
 						'@wordpress/interactivity-router'
 					);

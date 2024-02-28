@@ -157,7 +157,7 @@ store( 'directive-each', {
 
 const html = `
 <div
-	data-wp-interactive='{ "namespace": "directive-each" }'
+	data-wp-interactive="directive-each"
 	data-wp-router-region="navigation-updated list"
 	data-wp-context='{ "list": [ "alpha", "beta", "gamma", "delta" ] }'
 	data-testid="navigation-updated list"

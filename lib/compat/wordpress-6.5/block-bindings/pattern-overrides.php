@@ -35,6 +35,7 @@ function gutenberg_register_block_bindings_pattern_overrides_source() {
 		array(
 			'label'              => _x( 'Pattern Overrides', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_pattern_overrides_callback',
+			'uses_context'       => array( 'pattern/overrides' ),
 		)
 	);
 }

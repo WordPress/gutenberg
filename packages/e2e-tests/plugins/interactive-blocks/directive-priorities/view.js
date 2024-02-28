@@ -4,11 +4,13 @@
 import {
 	store,
 	getContext,
-	directive,
-	deepSignal,
 	useEffect,
-	createElement as h,
+	privateApis
 } from '@wordpress/interactivity';
+
+const { directive, deepSignal, h } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 /**
  * Namespace used in custom directives and store.

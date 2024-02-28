@@ -46,6 +46,7 @@ function DocumentTools( {
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
+		isDistractionFree,
 		isInserterOpened,
 		isListViewOpen,
 		listViewShortcut,
@@ -69,6 +70,7 @@ function DocumentTools( {
 			listViewToggleRef: getListViewToggleRef(),
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 
@@ -158,22 +160,26 @@ function DocumentTools( {
 							variant={ showIconLabels ? 'tertiary' : undefined }
 							size="compact"
 						/>
-						<ToolbarItem
-							as={ Button }
-							className="editor-document-tools__document-overview-toggle"
-							icon={ listView }
-							disabled={ disableBlockTools }
-							isPressed={ isListViewOpen }
-							/* translators: button label text should, if possible, be under 16 characters. */
-							label={ listViewLabel }
-							onClick={ toggleListView }
-							shortcut={ listViewShortcut }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							aria-expanded={ isListViewOpen }
-							ref={ listViewToggleRef }
-							size="compact"
-						/>
+						{ ! isDistractionFree && (
+							<ToolbarItem
+								as={ Button }
+								className="editor-document-tools__document-overview-toggle"
+								icon={ listView }
+								disabled={ disableBlockTools }
+								isPressed={ isListViewOpen }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ listViewLabel }
+								onClick={ toggleListView }
+								shortcut={ listViewShortcut }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								aria-expanded={ isListViewOpen }
+								ref={ listViewToggleRef }
+								size="compact"
+							/>
+						) }
 					</>
 				) }
 				{ children }

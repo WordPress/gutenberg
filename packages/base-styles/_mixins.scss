@@ -64,7 +64,7 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-background, $white), 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	box-shadow: inset 0 0 0 $border-width $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -296,6 +296,16 @@
 				font-size: 21px;
 			}
 		}
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: $gray-100;
+		border-color: $gray-300;
+		cursor: default;
+
+		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
+		opacity: 1;
 	}
 }
 

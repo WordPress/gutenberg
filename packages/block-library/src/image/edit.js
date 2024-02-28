@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -341,15 +342,15 @@ export function ImageEdit( {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const blockBindingsSource = unlock(
+				select( blocksStore )
+			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource( metadata?.bindings?.url?.source )
-						?.lockAttributesEditing === true,
+					( ! blockBindingsSource ||
+						blockBindingsSource?.lockAttributesEditing ),
 			};
 		},
 		[ isSingleSelected ]

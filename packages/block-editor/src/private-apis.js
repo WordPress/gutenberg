@@ -26,6 +26,8 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
+import { selectBlockPatternsKey } from './store/private-keys';
+import { PrivateRichText } from './components/rich-text/';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -56,4 +58,6 @@ lock( privateApis, {
 	useReusableBlocksRenameHint,
 	usesContextKey,
 	useFlashEditableBlocks,
+	selectBlockPatternsKey,
+	PrivateRichText,
 } );

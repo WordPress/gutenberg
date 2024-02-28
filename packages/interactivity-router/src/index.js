@@ -1,12 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { render, store, privateApis } from '@wordpress/interactivity';
+import { store, privateApis, getConfig } from '@wordpress/interactivity';
 
-const { directivePrefix, getRegionRootFragment, initialVdom, toVdom } =
-	privateApis(
-		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-	);
+const {
+	directivePrefix,
+	getRegionRootFragment,
+	initialVdom,
+	toVdom,
+	render,
+	parseInitialData,
+	populateInitialData,
+	batch,
+} = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 // The cache of visited and prefetched pages.
 const pages = new Map();
@@ -45,20 +53,39 @@ const regionsToVdom = ( dom, { vdom } = {} ) => {
 			: toVdom( region );
 	} );
 	const title = dom.querySelector( 'title' )?.innerText;
-	return { regions, title };
+	const initialData = parseInitialData( dom );
+	return { regions, title, initialData };
 };
 
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
-	const attrName = `data-${ directivePrefix }-router-region`;
-	document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
-		const id = region.getAttribute( attrName );
-		const fragment = getRegionRootFragment( region );
-		render( page.regions[ id ], fragment );
+	batch( () => {
+		populateInitialData( page.initialData );
+		const attrName = `data-${ directivePrefix }-router-region`;
+		document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
+			const id = region.getAttribute( attrName );
+			const fragment = getRegionRootFragment( region );
+			render( page.regions[ id ], fragment );
+		} );
+		if ( page.title ) {
+			document.title = page.title;
+		}
 	} );
-	if ( page.title ) {
-		document.title = page.title;
-	}
+};
+
+/**
+ * Load the given page forcing a full page reload.
+ *
+ * The function returns a promise that won't resolve, useful to prevent any
+ * potential feedback indicating that the navigation has finished while the new
+ * page is being loaded.
+ *
+ * @param {string} href The page href.
+ * @return {Promise} Promise that never resolves.
+ */
+const forcePageReload = ( href ) => {
+	window.location.assign( href );
+	return new Promise( () => {} );
 };
 
 // Listen to the back and forward buttons and restore the page if it's in the
@@ -113,6 +140,11 @@ export const { state, actions } = store( 'core/router', {
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href, options = {} ) {
+			const { clientNavigationDisabled } = getConfig();
+			if ( clientNavigationDisabled ) {
+				yield forcePageReload( href );
+			}
+
 			const pagePath = getPagePath( href );
 			const { navigation } = state;
 			const {
@@ -156,7 +188,11 @@ export const { state, actions } = store( 'core/router', {
 			// out, and let the newer execution to update the HTML.
 			if ( navigatingTo !== href ) return;
 
-			if ( page ) {
+			if (
+				page &&
+				! page.initialData?.config?.[ 'core/router' ]
+					?.clientNavigationDisabled
+			) {
 				renderRegions( page );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
@@ -183,11 +219,7 @@ export const { state, actions } = store( 'core/router', {
 							: '' );
 				}
 			} else {
-				window.location.assign( href );
-				// Await a promise that won't resolve to prevent any potential
-				// feedback indicating that the navigation has finished while
-				// the new page is being loaded.
-				yield new Promise( () => {} );
+				yield forcePageReload( href );
 			}
 		},
 
@@ -204,6 +236,9 @@ export const { state, actions } = store( 'core/router', {
 		 *                                  fetching the requested URL.
 		 */
 		prefetch( url, options = {} ) {
+			const { clientNavigationDisabled } = getConfig();
+			if ( clientNavigationDisabled ) return;
+
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
 				pages.set( pagePath, fetchPage( pagePath, options ) );

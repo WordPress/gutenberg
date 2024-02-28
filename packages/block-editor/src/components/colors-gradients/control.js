@@ -133,7 +133,7 @@ function ColorGradientControlInner( {
 					{ canChooseAColor && canChooseAGradient && (
 						<div>
 							<Tabs
-								initialTabId={
+								defaultTabId={
 									gradientValue
 										? TAB_IDS.gradient
 										: !! canChooseAColor && TAB_IDS.color

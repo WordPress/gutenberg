@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -22,7 +22,7 @@ import { unlock } from '../lock-unlock';
  * @return {WPHigherOrderComponent} Higher-order component.
  */
 
-const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+export const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title', 'alt' ],
@@ -33,20 +33,18 @@ const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
 			const { clientId, name: blockName } = useBlockEditContext();
-			const { getBlockBindingsSource } = unlock(
-				useSelect( blockEditorStore )
-			);
+			const blockBindingsSources = unlock(
+				useSelect( blocksStore )
+			).getAllBlockBindingsSources();
 			const { getBlockAttributes } = useSelect( blockEditorStore );
 
 			const updatedAttributes = getBlockAttributes( clientId );
 			if ( updatedAttributes?.metadata?.bindings ) {
 				Object.entries( updatedAttributes.metadata.bindings ).forEach(
 					( [ attributeName, settings ] ) => {
-						const source = getBlockBindingsSource(
-							settings.source
-						);
+						const source = blockBindingsSources[ settings.source ];
 
-						if ( source ) {
+						if ( source && source.useSource ) {
 							// Second argument (`updateMetaValue`) will be used to update the value in the future.
 							const {
 								placeholder,
@@ -82,8 +80,8 @@ const createEditFunctionWithBindingsAttribute = () =>
 			return (
 				<BlockEdit
 					key="edit"
-					attributes={ updatedAttributes }
 					{ ...props }
+					attributes={ updatedAttributes }
 				/>
 			);
 		},
@@ -111,25 +109,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
 	shimAttributeSource
-);
-
-// Add the context to all blocks.
-addFilter(
-	'blocks.registerBlockType',
-	'core/block-bindings-ui',
-	( settings, name ) => {
-		if ( ! ( name in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
-			return settings;
-		}
-		const contextItems = [ 'postId', 'postType', 'queryId' ];
-		const usesContextArray = settings.usesContext;
-		const oldUsesContextArray = new Set( usesContextArray );
-		contextItems.forEach( ( item ) => {
-			if ( ! oldUsesContextArray.has( item ) ) {
-				usesContextArray.push( item );
-			}
-		} );
-		settings.usesContext = usesContextArray;
-		return settings;
-	}
 );

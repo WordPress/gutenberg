@@ -153,6 +153,18 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 		}
 
 		/**
+		 * Removes a registered script module.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param string $id The identifier of the script module.
+		 */
+		public function deregister( string $id ) {
+			unset( $this->registered[ $id ] );
+			unset( $this->enqueued_before_registered[ $id ] );
+		}
+
+		/**
 		 * Adds the hooks to print the import map, enqueued script modules and script
 		 * module preloads.
 		 *
@@ -231,7 +243,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 						'1.8.2',
 						true
 					);
-					wp_print_inline_script_tag(
+					gutenberg_print_inline_script_tag(
 						wp_get_script_polyfill(
 							$wp_scripts,
 							array(
@@ -243,7 +255,7 @@ if ( ! class_exists( 'WP_Script_Modules' ) ) {
 						)
 					);
 				}
-				wp_print_inline_script_tag(
+				gutenberg_print_inline_script_tag(
 					wp_json_encode( $import_map, JSON_HEX_TAG | JSON_HEX_AMP ),
 					array(
 						'type' => 'importmap',

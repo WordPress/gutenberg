@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -77,7 +77,7 @@
 						"defaultPresets": {
 							"description": "Allow users to choose shadows from the default shadow presets.",
 							"type": "boolean",
-							"default": true
+							"default": false
 						},
 						"presets": {
 							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
@@ -256,6 +256,11 @@
 					"properties": {
 						"backgroundImage": {
 							"description": "Allow users to set a background image.",
+							"type": "boolean",
+							"default": false
+						},
+						"backgroundSize": {
+							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
 							"type": "boolean",
 							"default": false
 						}

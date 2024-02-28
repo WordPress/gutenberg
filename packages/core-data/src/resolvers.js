@@ -679,7 +679,7 @@ export const getNavigationFallbackId =
 			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
-				fallback?.id
+				fallback.id
 			);
 			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
@@ -694,7 +694,7 @@ export const getNavigationFallbackId =
 			dispatch.finishResolution( 'getEntityRecord', [
 				'postType',
 				'wp_navigation',
-				fallback?.id,
+				fallback.id,
 			] );
 		}
 	};

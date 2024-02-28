@@ -17,7 +17,7 @@ import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 
 function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
-	const attributeSources = Object.keys( syncedAttributes ).map(
+	const attributeSources = syncedAttributes.map(
 		( attributeName ) =>
 			attributes.metadata?.bindings?.[ attributeName ]?.source
 	);
@@ -36,7 +36,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		};
 
 		if ( ! isChecked ) {
-			for ( const attributeName of Object.keys( syncedAttributes ) ) {
+			for ( const attributeName of syncedAttributes ) {
 				if (
 					updatedBindings[ attributeName ]?.source ===
 					'core/pattern-overrides'
@@ -56,7 +56,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 			return;
 		}
 
-		for ( const attributeName of Object.keys( syncedAttributes ) ) {
+		for ( const attributeName of syncedAttributes ) {
 			if ( ! updatedBindings[ attributeName ] ) {
 				updatedBindings[ attributeName ] = {
 					source: 'core/pattern-overrides',

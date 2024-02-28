@@ -60,6 +60,9 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
+		// Check if the numbers in the editor content updated.
+		await expect( editor.canvas.locator( '.fn' ) ).toHaveText( '1' );
+
 		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		await editor.showBlockToolbar();

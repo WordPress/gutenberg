@@ -58,13 +58,35 @@ export function usePasteHandler( props ) {
 			const isInternal =
 				event.clipboardData.getData( 'rich-text' ) === 'true';
 
+			function pasteInline( content ) {
+				const transformed = formatTypes.reduce(
+					( accumulator, { __unstablePasteRule } ) => {
+						// Only allow one transform.
+						if ( __unstablePasteRule && accumulator === value ) {
+							accumulator = __unstablePasteRule( value, {
+								html,
+								plainText,
+							} );
+						}
+
+						return accumulator;
+					},
+					value
+				);
+				if ( transformed !== value ) {
+					onChange( transformed );
+				} else {
+					const valueToInsert = create( { html: content } );
+					addActiveFormats( valueToInsert, value.activeFormats );
+					onChange( insert( value, valueToInsert ) );
+				}
+			}
+
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
 			if ( isInternal ) {
-				const pastedValue = create( { html } );
-				addActiveFormats( pastedValue, value.activeFormats );
-				onChange( insert( value, pastedValue ) );
+				pasteInline( html );
 				return;
 			}
 
@@ -135,28 +157,7 @@ export function usePasteHandler( props ) {
 			} );
 
 			if ( typeof content === 'string' ) {
-				const transformed = formatTypes.reduce(
-					( accumlator, { __unstablePasteRule } ) => {
-						// Only allow one transform.
-						if ( __unstablePasteRule && accumlator === value ) {
-							accumlator = __unstablePasteRule( value, {
-								html,
-								plainText,
-							} );
-						}
-
-						return accumlator;
-					},
-					value
-				);
-
-				if ( transformed !== value ) {
-					onChange( transformed );
-				} else {
-					const valueToInsert = create( { html: content } );
-					addActiveFormats( valueToInsert, value.activeFormats );
-					onChange( insert( value, valueToInsert ) );
-				}
+				pasteInline( content );
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );

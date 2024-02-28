@@ -8,6 +8,8 @@
 /**
  * Renders the `core/block` block on server.
  *
+ * @global WP_Embed $wp_embed
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Rendered HTML of the referenced block.

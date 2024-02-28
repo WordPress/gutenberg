@@ -26,6 +26,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
+import cloneDeep from '../../utils/clone-deep';
 
 const { cleanEmptyObject, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
@@ -273,10 +274,6 @@ function setNestedValue( object, path, value ) {
 	}, object );
 
 	return object;
-}
-
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
 }
 
 function PushChangesToGlobalStylesControl( {
