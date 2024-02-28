@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 17.8.0-rc.4 =
+
+## Changelog
+
+### Tools
+
+#### Testing
+Fix failing Dropdown Menu e2e tests. ([59356](https://github.com/WordPress/gutenberg/pull/59356))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@Mamaduka
+
+
 = 17.8.0-rc.3 =
 
 ## Changelog
