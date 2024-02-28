@@ -27,7 +27,12 @@ const Pagination = memo( function Pagination( {
 				justify="end"
 				className="dataviews-pagination"
 			>
-				<HStack justify="flex-start" expanded={ false } spacing={ 2 }>
+				<HStack
+					justify="flex-start"
+					expanded={ false }
+					spacing={ 2 }
+					className="dataviews-pagination__page-selection"
+				>
 					{ createInterpolateElement(
 						sprintf(
 							// translators: %s: Total number of pages.

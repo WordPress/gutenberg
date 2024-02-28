@@ -297,6 +297,16 @@
 			}
 		}
 	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: $gray-100;
+		border-color: $gray-300;
+		cursor: default;
+
+		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
+		opacity: 1;
+	}
 }
 
 @mixin radio-control {

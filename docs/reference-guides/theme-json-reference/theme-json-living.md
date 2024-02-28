@@ -72,7 +72,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
+| defaultPresets | boolean | false |  |
 | presets | array |  | name, shadow, slug |
 
 ---

@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -342,7 +343,7 @@ export function ImageEdit( {
 			}
 
 			const blockBindingsSource = unlock(
-				select( blockEditorStore )
+				select( blocksStore )
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {

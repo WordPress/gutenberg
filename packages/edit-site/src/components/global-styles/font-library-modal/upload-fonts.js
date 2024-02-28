@@ -3,11 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Button,
-	DropZone,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Button,
+	DropZone,
+	Notice,
 	FormFileUpload,
 	FlexItem,
 	privateApis as componentsPrivateApis,
@@ -22,7 +23,6 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import TabPanelLayout from './tab-panel-layout';
 import { unlock } from '../../../lock-unlock';
 
 const { ProgressBar } = unlock( componentsPrivateApis );
@@ -171,9 +171,17 @@ function UploadFonts() {
 	};
 
 	return (
-		<TabPanelLayout notice={ notice }>
+		<div className="font-library-modal__tabpanel-layout">
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library-modal__local-fonts">
+				{ notice && (
+					<Notice
+						status={ notice.type }
+						onRemove={ () => setNotice( null ) }
+					>
+						{ notice.message }
+					</Notice>
+				) }
 				{ isUploading && (
 					<FlexItem>
 						<div className="font-library-modal__upload-area">
@@ -205,7 +213,7 @@ function UploadFonts() {
 					) }
 				</Text>
 			</VStack>
-		</TabPanelLayout>
+		</div>
 	);
 }
 

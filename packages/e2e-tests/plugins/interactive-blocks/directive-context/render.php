@@ -170,3 +170,29 @@ wp_enqueue_script_module( 'directive-context-view' );
 	<button data-testid="select 2" data-wp-on--click="actions.selectItem" value=2>Select 2</button>
 	<div data-testid="selected" data-wp-text="state.selected"></div>
 </div>
+
+<div
+	data-wp-interactive="directive-context-watch"
+	data-wp-context='{"counter":0}'
+>
+	<button
+		data-testid="counter parent"
+		data-wp-on--click="actions.increment"
+		data-wp-text="context.counter"
+	></button>
+	<div
+		data-wp-context='{"counter":0, "changes":0}'
+		data-wp-watch="callbacks.countChanges"
+	>
+		<button
+			data-testid="counter child"
+			data-wp-on--click="actions.increment"
+			data-wp-text="context.counter"
+		>
+		</button>
+		<span
+			data-testid="counter changes"
+			data-wp-text="context.changes"
+		></span>
+	</div>
+</div>

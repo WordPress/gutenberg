@@ -8,6 +8,9 @@
 /**
  * Renders the `core/calendar` block on server.
  *
+ * @global int $monthnum.
+ * @global int $year.
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the block content.
@@ -116,6 +119,8 @@ function block_core_calendar_has_published_posts() {
 /**
  * Queries the database for any published post and saves
  * a flag whether any published post exists or not.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
  *
  * @return bool Has any published posts or not.
  */
