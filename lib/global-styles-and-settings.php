@@ -378,3 +378,21 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }
+
+/**
+ * Adds the `uses-style-variation` and `is-style-variation-name` classes to the body if a theme style variation is used.
+ *
+ * @since 6.4.0
+ *
+ * @param array $classes Classes for the body element.
+ * @return array Filtered classes for the body element.
+ */
+function gutenberg_add_variation_class_to_body( $classes ) {
+	$custom = wp_get_global_settings( array( 'custom' ) );
+	if ( isset( $custom['variation'] ) && 'Default' !== $custom['variation'] ) {
+		$classes[] = 'uses-style-variation';
+		$classes[] = _wp_to_kebab_case( 'is style variation ' . $custom['variation'] );
+	}
+	return $classes;
+}
+add_filter( 'body_class', 'gutenberg_add_variation_class_to_body' );
