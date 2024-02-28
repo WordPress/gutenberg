@@ -34,18 +34,15 @@ export function useShowBlockTools() {
 				getSelectedBlockClientId() ||
 				getFirstMultiSelectedBlockClientId();
 
-			const { name = '', attributes = {} } = getBlock( clientId ) || {};
+			const block = getBlock( clientId ) || { name: '', attributes: {} };
 			const editorMode = __unstableGetEditorMode();
-			const hasSelectedBlock = clientId && name;
-			const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( {
-				name,
-				attributes,
-			} );
+			const hasSelectedBlock = clientId && block?.name;
+			const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
 			const _showEmptyBlockSideInserter =
 				clientId &&
 				! isTyping() &&
 				editorMode === 'edit' &&
-				isUnmodifiedDefaultBlock( { name, attributes } );
+				isUnmodifiedDefaultBlock( block );
 			const maybeShowBreadcrumb =
 				hasSelectedBlock &&
 				! hasMultiSelection() &&
