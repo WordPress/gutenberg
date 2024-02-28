@@ -70,6 +70,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			return;
 		}
 
+		const currentRef = ref.current;
 		const scrollContainer = getScrollContainer( ref.current );
 		const isSelected = isBlockSelected( clientId );
 		const adjustScrolling =
@@ -141,6 +142,10 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		controller.start( { x: 0, y: 0, from: { x, y } } );
 
 		return () => {
+			// Ensure that transform is removed when the animation is stopped.
+			if ( currentRef ) {
+				currentRef.style.transform = null;
+			}
 			controller.stop();
 		};
 	}, [
