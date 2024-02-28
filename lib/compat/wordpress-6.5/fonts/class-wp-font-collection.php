@@ -145,6 +145,10 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 				$data['categories'] = $this->data['categories'];
 			}
 
+			if ( isset( $this->data['permission'] ) ) {
+				$data['permission'] = $this->data['permission'];
+			}
+
 			return $data;
 		}
 
@@ -249,6 +253,7 @@ if ( ! class_exists( 'WP_Font_Collection' ) ) {
 		private static function get_sanitization_schema() {
 			return array(
 				'name'          => 'sanitize_text_field',
+				'permission'    => 'sanitize_text_field',
 				'description'   => 'sanitize_text_field',
 				'font_families' => array(
 					array(
