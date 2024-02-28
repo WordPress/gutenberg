@@ -7,6 +7,10 @@
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
 
+### Internal
+
+-   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
+
 ## 27.0.0 (2024-02-21)
 
 ### Breaking Changes
