@@ -120,7 +120,9 @@ function InstalledFonts() {
 				</HStack>
 			) }
 
-			<NavigatorProvider initialPath="/">
+			<NavigatorProvider
+				initialPath={ libraryFontSelected ? '/fontFamily' : '/' }
+			>
 				<NavigatorScreen path="/">
 					{ notice && (
 						<>
