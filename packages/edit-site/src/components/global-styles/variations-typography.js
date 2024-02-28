@@ -7,7 +7,7 @@ import {
 	__experimentalVStack as VStack,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -17,7 +17,6 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import Subtitle from './subtitle';
 import Variation from './variation';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -137,7 +136,6 @@ export default function TypographyVariations() {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
 				columns={ 3 }
 				className="edit-site-global-styles-style-variations-container"
