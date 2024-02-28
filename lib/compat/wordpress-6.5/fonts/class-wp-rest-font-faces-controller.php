@@ -861,7 +861,7 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 
 			// Set the upload directory to the fonts directory.
 			$font_dir       = wp_get_font_dir();
-			$set_upload_dir = function ( $defaults ) use ( $font_dir ) {
+			$set_upload_dir = function () use ( $font_dir ) {
 				return $font_dir;
 			};
 			add_filter( 'upload_dir', $set_upload_dir );
