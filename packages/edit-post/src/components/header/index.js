@@ -21,7 +21,7 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { next, previous, box } from '@wordpress/icons';
+import { next, previous, metabox } from '@wordpress/icons';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -194,7 +194,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				/>
 				{ hasActiveMetaboxes && (
 					<Button
-						icon={ box }
+						icon={ metabox }
 						onClick={ () => {
 							toggleMetaBoxes();
 						} }
