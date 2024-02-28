@@ -25,6 +25,16 @@ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
 			onChange={ ( nextColor ) => {
 				onChange( colord( nextColor ) );
 			} }
+			// Pointer capture fortifies drag gestures so that they continue to
+			// work while dragging outside the component over objects like
+			// iframes. If a newer version of react-colorful begins to employ
+			// pointer capture this will be redundant and should be removed.
+			onPointerDown={ ( { currentTarget, pointerId } ) => {
+				currentTarget.setPointerCapture( pointerId );
+			} }
+			onPointerUp={ ( { currentTarget, pointerId } ) => {
+				currentTarget.releasePointerCapture( pointerId );
+			} }
 		/>
 	);
 };
