@@ -21,11 +21,10 @@ export function useHasBlockToolbar() {
 			const {
 				getBlockEditingMode,
 				getBlockName,
-				getSelectedBlockClientIds,
+				getBlockSelectionStart,
 			} = select( blockEditorStore );
 
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const selectedBlockClientId = getBlockSelectionStart();
 			const isDefaultEditingMode =
 				getBlockEditingMode( selectedBlockClientId ) === 'default';
 			const blockType =
