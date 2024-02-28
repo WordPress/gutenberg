@@ -156,6 +156,7 @@ function readBlockJSON( filename ) {
 		parent,
 		ancestor,
 		__experimental,
+		allowedBlocks,
 	} = blockjson;
 	const sourcefile = getSourceFromFile( filename );
 	const blockInfoList = [ `-	**Name:** ${ name }` ];
@@ -171,6 +172,11 @@ function readBlockJSON( filename ) {
 	}
 	if ( ancestor?.length > 0 ) {
 		blockInfoList.push( `-	**Ancestor:** ${ ancestor.join( ', ' ) }` );
+	}
+	if ( allowedBlocks?.length > 0 ) {
+		blockInfoList.push(
+			`-	**Allowed Blocks:** ${ allowedBlocks.join( ', ' ) }`
+		);
 	}
 	if ( supports ) {
 		blockInfoList.push(

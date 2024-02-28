@@ -3,7 +3,8 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
-			"citation": "...with a caption",
+			"value": "",
+			"citation": "",
 			"textAlign": "right"
 		},
 		"innerBlocks": [
@@ -11,7 +12,7 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"content": "Testing deprecated quote block...",
+					"content": "Quote with the align attribute. Example: {\"align\":\"right\"}",
 					"dropCap": false
 				},
 				"innerBlocks": []

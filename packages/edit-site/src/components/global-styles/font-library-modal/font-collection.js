@@ -277,12 +277,14 @@ function FontCollection( { slug } ) {
 			>
 				<NavigatorScreen path="/">
 					<HStack justify="space-between">
-						<Heading level={ 2 } size={ 13 }>
-							{ selectedCollection.name }
-						</Heading>
+						<VStack>
+							<Heading level={ 2 } size={ 13 }>
+								{ selectedCollection.name }
+							</Heading>
+							<Text>{ selectedCollection.description }</Text>
+						</VStack>
 						<ActionsComponent />
 					</HStack>
-					<Text>{ selectedCollection.description }</Text>
 					<Spacer margin={ 4 } />
 					<Flex>
 						<FlexItem>
