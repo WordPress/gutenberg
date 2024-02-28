@@ -724,3 +724,16 @@
 		}
 	}
 }
+
+.dataviews-filters__reset-button-container {
+	.dataviews-filters__reset-button[aria-disabled="true"],
+	.dataviews-filters__reset-button[aria-disabled="true"]:hover {
+		opacity: 0;
+	}
+
+	&:focus-within {
+		.dataviews-filters__reset-button[aria-disabled="true"] {
+			opacity: 1;
+		}
+	}
+}

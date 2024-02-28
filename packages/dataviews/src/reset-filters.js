@@ -16,21 +16,24 @@ export default function ResetFilter( { filters, view, onChangeView } ) {
 				_filter.value !== undefined || ! isPrimary( _filter.field )
 		);
 	return (
-		<Button
-			disabled={ isDisabled }
-			__experimentalIsFocusable
-			size="compact"
-			variant="tertiary"
-			onClick={ () => {
-				onChangeView( {
-					...view,
-					page: 1,
-					search: '',
-					filters: [],
-				} );
-			} }
-		>
-			{ __( 'Reset filters' ) }
-		</Button>
+		<div className="dataviews-filters__reset-button-container">
+			<Button
+				disabled={ isDisabled }
+				__experimentalIsFocusable
+				size="compact"
+				variant="tertiary"
+				className="dataviews-filters__reset-button"
+				onClick={ () => {
+					onChangeView( {
+						...view,
+						page: 1,
+						search: '',
+						filters: [],
+					} );
+				} }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+		</div>
 	);
 }
