@@ -6,6 +6,7 @@ import {
 	MenuItem,
 	MenuItemsChoice,
 	DropdownMenu,
+	FlexItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
@@ -107,16 +108,18 @@ function NavigationMenuSelector( {
 	const menuUnavailable =
 		hasResolvedNavigationMenus && currentMenuId === null;
 
-	let selectorLabel = '';
+	let currentMenuTitleOrMenuState = '';
 
 	if ( isResolvingNavigationMenus ) {
-		selectorLabel = __( 'Loading…' );
+		currentMenuTitleOrMenuState = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
-		selectorLabel = __( 'Choose or create a Navigation Menu' );
+		currentMenuTitleOrMenuState = __(
+			'Choose or create a Navigation Menu'
+		);
 	} else {
 		// Current Menu's title.
-		selectorLabel = currentTitle;
+		currentMenuTitleOrMenuState = currentTitle;
 	}
 
 	useEffect( () => {
@@ -138,77 +141,88 @@ function NavigationMenuSelector( {
 	] );
 
 	const NavigationMenuSelectorDropdown = (
-		<DropdownMenu
-			label={ selectorLabel }
-			icon={ moreVertical }
-			toggleProps={ { size: 'small' } }
-		>
-			{ ( { onClose } ) => (
-				<>
-					{ showNavigationMenus && hasNavigationMenus && (
-						<MenuGroup label={ __( 'Menus' ) }>
-							<MenuItemsChoice
-								value={ currentMenuId }
-								onSelect={ ( menuId ) => {
-									onSelectNavigationMenu( menuId );
-									onClose();
-								} }
-								choices={ menuChoices }
-							/>
-						</MenuGroup>
-					) }
-					{ showClassicMenus && hasClassicMenus && (
-						<MenuGroup label={ __( 'Import Classic Menus' ) }>
-							{ classicMenus?.map( ( menu ) => {
-								const label = decodeEntities( menu.name );
-								return (
-									<MenuItem
-										onClick={ async () => {
-											setIsUpdatingMenuRef( true );
-											await onSelectClassicMenu( menu );
-											setIsUpdatingMenuRef( false );
-											onClose();
-										} }
-										key={ menu.id }
-										aria-label={ sprintf(
-											createActionLabel,
-											label
-										) }
-										disabled={
-											isUpdatingMenuRef ||
-											isResolvingNavigationMenus ||
-											! hasResolvedNavigationMenus
-										}
-									>
-										{ label }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-
-					{ canUserCreateNavigationMenus && (
-						<MenuGroup label={ __( 'Tools' ) }>
-							<MenuItem
-								onClick={ async () => {
-									setIsUpdatingMenuRef( true );
-									await onCreateNew();
-									setIsUpdatingMenuRef( false );
-									onClose();
-								} }
-								disabled={
-									isUpdatingMenuRef ||
-									isResolvingNavigationMenus ||
-									! hasResolvedNavigationMenus
-								}
-							>
-								{ __( 'Create new menu' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</>
-			) }
-		</DropdownMenu>
+		<>
+			<DropdownMenu
+				label={ __( 'Actions' ) }
+				icon={ moreVertical }
+				toggleProps={ { size: 'small' } }
+			>
+				{ ( { onClose } ) => (
+					<>
+						{ showNavigationMenus && hasNavigationMenus && (
+							<MenuGroup label={ __( 'Available Menus' ) }>
+								<MenuItemsChoice
+									value={ currentMenuId }
+									onSelect={ ( menuId ) => {
+										onSelectNavigationMenu( menuId );
+										onClose();
+									} }
+									choices={ menuChoices }
+								/>
+							</MenuGroup>
+						) }
+						{ showClassicMenus && hasClassicMenus && (
+							<MenuGroup label={ __( 'Import Classic Menus' ) }>
+								{ classicMenus?.map( ( menu ) => {
+									const label = decodeEntities( menu.name );
+									return (
+										<MenuItem
+											onClick={ async () => {
+												setIsUpdatingMenuRef( true );
+												await onSelectClassicMenu(
+													menu
+												);
+												setIsUpdatingMenuRef( false );
+												onClose();
+											} }
+											key={ menu.id }
+											aria-label={ sprintf(
+												createActionLabel,
+												label
+											) }
+											disabled={
+												isUpdatingMenuRef ||
+												isResolvingNavigationMenus ||
+												! hasResolvedNavigationMenus
+											}
+										>
+											{ label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+						{ canUserCreateNavigationMenu && (
+							<MenuGroup label={ __( 'Tools' ) }>
+								<MenuItem
+									onClick={ async () => {
+										setIsUpdatingMenuRef( true );
+										await onCreateNew();
+										setIsUpdatingMenuRef( false );
+										onClose();
+									} }
+									disabled={
+										isUpdatingMenuRef ||
+										isResolvingNavigationMenus ||
+										! hasResolvedNavigationMenus
+									}
+								>
+									{ __( 'Create new menu' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
+			<FlexItem
+				style={ {
+					minWidth: '100%',
+				} }
+				as="p"
+			>
+				{ currentMenuTitleOrMenuState }
+			</FlexItem>
+		</>
 	);
 
 	return NavigationMenuSelectorDropdown;
