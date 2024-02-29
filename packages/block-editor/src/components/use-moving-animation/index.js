@@ -139,10 +139,6 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		const y = Math.round( previous.top - destination.top );
 
 		controller.start( { x: 0, y: 0, from: { x, y } } );
-
-		return () => {
-			controller.stop();
-		};
 	}, [
 		previous,
 		prevRect,
