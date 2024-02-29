@@ -450,7 +450,7 @@ test.describe( 'Copy/cut/paste', () => {
 		// back to default browser behaviour, allowing the browser to insert
 		// unfiltered HTML. When we swap out the post title in the post editor
 		// with the proper block, this test can be removed.
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			html: '<span style="border: 1px solid black">Hello World</span>',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
@@ -469,7 +469,7 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			html: '<span style="border: 1px solid black">x</span>',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
@@ -487,7 +487,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			html: '<pre>x</pre>',
 		} );
 		await editor.insertBlock( { name: 'core/list' } );
@@ -503,7 +503,7 @@ test.describe( 'Copy/cut/paste', () => {
 			attributes: { content: 'a' },
 		} );
 		await pageUtils.pressKeys( 'primary+a' );
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			plainText: 'https://wordpress.org/gutenberg',
 			html: '<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
 		} );
@@ -547,7 +547,7 @@ test.describe( 'Copy/cut/paste', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'a' },
 		} );
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			plainText: 'https://wordpress.org/gutenberg',
 			html: 'https://wordpress.org/gutenberg',
 		} );
@@ -565,7 +565,7 @@ test.describe( 'Copy/cut/paste', () => {
 
 	test( 'should embed on paste', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
 			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
 		} );
@@ -586,7 +586,7 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		} );
 		await pageUtils.pressKeys( 'primary+a' );
-		pageUtils.setClipboardData( {
+		await pageUtils.setClipboardData( {
 			plainText: 'movie: b',
 			html: 'movie: b',
 		} );

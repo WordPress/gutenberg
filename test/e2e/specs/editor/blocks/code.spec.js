@@ -40,11 +40,18 @@ test.describe( 'Code', () => {
 		await editor.insertBlock( { name: 'core/code' } );
 
 		// Test to see if HTML and white space is kept.
-		pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
+		await pageUtils.setClipboardData( {
+			plainText: '<img />\n\t<br>',
+		} );
 
 		await pageUtils.pressKeys( 'primary+v' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/code',
+				attributes: { content: '&lt;img /><br>\t&lt;br>' },
+			},
+		] );
 	} );
 
 	test.describe( 'Block transforms', () => {
