@@ -51,6 +51,9 @@
 
 .dataviews-view-table-wrapper {
 	overflow-x: auto;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 }
 
 .dataviews-view-table {
@@ -473,6 +476,10 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dataviews-view-table-selection-checkbox label {
