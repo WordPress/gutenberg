@@ -576,7 +576,7 @@ export default function NavigationLinkEdit( {
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
 									onReplace( [] );
-									// Focus the parent navigation block.
+									// Focus the parent block.
 									selectBlock( firstParentClientId );
 								}
 							} }
