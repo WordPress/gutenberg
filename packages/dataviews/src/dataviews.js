@@ -92,7 +92,7 @@ export default function DataViews( {
 	);
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 3 } justify="flex-start">
+			<VStack spacing={ 0 } justify="flex-start">
 				<HStack
 					alignment="top"
 					justify="start"
