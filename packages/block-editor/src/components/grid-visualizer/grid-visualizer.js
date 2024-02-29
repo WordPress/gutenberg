@@ -65,7 +65,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( blockElement )
 	);
-	const [ isDisabled, setIsDisabled ] = useState( true );
+	const [ hasCellPointerEvents, setHasCellPointerEvents ] = useState( false );
 
 	useEffect( () => {
 		const observers = [];
@@ -85,11 +85,11 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 
 	useEffect( () => {
 		function onGlobalDrag() {
-			setIsDisabled( false );
+			setHasCellPointerEvents( true );
 		}
 
 		function onGlobalDragEnd() {
-			setIsDisabled( true );
+			setHasCellPointerEvents( false );
 		}
 		document.addEventListener( 'drag', onGlobalDrag );
 		document.addEventListener( 'dragend', onGlobalDragEnd );
@@ -102,7 +102,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 	return (
 		<BlockPopoverCover
 			className={ classnames( 'block-editor-grid-visualizer', {
-				'is-disabled': isDisabled,
+				'has-cell-pointer-events': hasCellPointerEvents,
 			} ) }
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"

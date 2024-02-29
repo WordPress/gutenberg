@@ -1,9 +1,16 @@
 .block-editor-grid-visualizer {
-	&.block-editor-grid-visualizer { // These rules need extra specificity.
+	// Override the z-index and pointer-events set by .components-popover using lots of specificity.
+	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
 		z-index: z-index(".block-editor-grid-visualizer");
 
-		&.is-disabled .components-popover__content * {
+		.components-popover__content * {
 			pointer-events: none;
+		}
+
+		&.has-cell-pointer-events {
+			.block-editor-grid-visualizer__cell {
+				pointer-events: all;
+			}
 		}
 	}
 }
