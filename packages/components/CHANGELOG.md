@@ -11,6 +11,7 @@
 ### Internal
 
 -   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
+-   Remove unused `useLatestRef()` hook ([#59471](https://github.com/WordPress/gutenberg/pull/59471)).
 
 ### Experimental
 
