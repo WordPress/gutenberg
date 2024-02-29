@@ -969,3 +969,150 @@ const { state } = store(
 // The following call works as expected.
 store( "myPlugin/private", { /* store part */ }, { lock: PRIVATE_LOCK } );
 ```
+
+### Store client methods
+
+Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
+
+  - getContext()
+  - getElement()
+
+#### getContext()
+
+Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists.
+
+```php
+// render.php
+<div data-wp-interactive="myPlugin" data-wp-context='{ "isOpen": false }'>
+	<button data-wp-on--click="actions.log">Log</button>
+</div>
+```
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      const context = getContext();
+			 // Logs "false"
+      console.log('context => ', context.isOpen)
+    },
+  },
+});
+```
+
+#### getElement()
+
+Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
+It returns an object with two keys:
+
+##### ref
+
+`ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
+
+##### attributes
+
+`attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
+
+Those attributes will contain the directives of that element. In the button example:
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      const element = getElement();
+			 // Logs "false"
+      console.log('element attributes => ', element.attributes)
+    },
+  },
+});
+```
+
+The code will log:
+
+```json
+{
+	"data-wp-on--click": 'actions.increaseCounter',
+	"children": ['Log'],
+	"onclick": event => { evaluate(entry, event); }
+}
+```
+
+## Server functions
+
+The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
+
+### wp_interactivity_config
+
+`wp_interactivity_config` allows to set or get a configuration array, referenced to a store namespace.
+The configuration is also available on the client, but it is static information.
+
+Consider it a global setting for interactions of a site, that won't be updated on user interactions.
+
+An example of setting:
+
+```php
+	wp_interactivity_config( 'myPlugin', array( 'showLikeButton' => is_user_logged_in() ) );
+```
+
+An example of getting:
+
+```php
+  wp_interactivity_config( 'myPlugin' );
+```
+
+This config can be retrieved on the client:
+
+```js
+// view.js
+
+const { showLikeButton } = getConfig();
+```
+
+### wp_interactivity_process_directives
+
+`wp_interactivity_process_directives` returns the updated HTML after the directives have been processed.
+
+It is the Core function of the Interactivity API server side rendering part, and is public so any HTML can be processed, whether is a block or not.
+
+This code
+
+```php
+wp_interactivity_state( 'myPlugin', array( 'greeting' => 'Hello, World!' ) );
+$html = '<div data-wp-text="myPlugin::state.greeting"></div>';
+$processed_html = wp_interactivity_process_directives( $html_content );
+echo $processed_html;
+```
+
+will output:
+```html
+<div data-wp-text="create-block::state.greeting">Hello, World!</div>
+```
+
+### wp_interactivity_data_wp_context
+
+`wp_interactivity_data_wp_context` returns a stringified JSON of a context directive.
+This function is the recommended way to print the `data-wp-context` attribute in the server side rendedered markup.
+
+```php
+
+$my_context = array(
+	'counter' => 0,
+	'isOpen'  => true,
+);
+<div
+ echo wp_interactivity_data_wp_context($my_context)
+>
+</div>
+```
+
+will output:
+
+```html
+<div data-wp-context='{"counter":0,"isOpen":true}'>
+```
