@@ -151,7 +151,7 @@ const extractMessage = ( exception ) => {
 const parseException = ( originalException ) => {
 	const exception = {
 		type: originalException?.name,
-		value: extractMessage( originalException ),
+		message: extractMessage( originalException ),
 	};
 
 	const stacktrace = parseStacktrace( originalException );
@@ -159,8 +159,8 @@ const parseException = ( originalException ) => {
 		exception.stacktrace = stacktrace;
 	}
 
-	if ( exception.type === undefined && exception.value === '' ) {
-		exception.value = 'Unknown error';
+	if ( exception.type === undefined && exception.message === '' ) {
+		exception.message = 'Unknown error';
 	}
 
 	return exception;
