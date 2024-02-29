@@ -40,7 +40,14 @@ export default function ChildLayoutControl( {
 	onChange,
 	parentLayout,
 } ) {
-	const { selfStretch, flexSize, columnSpan, rowSpan } = childLayout;
+	const {
+		selfStretch,
+		flexSize,
+		columnStart,
+		rowStart,
+		columnSpan,
+		rowSpan,
+	} = childLayout;
 	const {
 		type: parentType,
 		default: { type: defaultParentType = 'default' } = {},
@@ -107,34 +114,72 @@ export default function ChildLayoutControl( {
 				</>
 			) }
 			{ parentLayoutType === 'grid' && (
-				<HStack>
-					<InputControl
-						size={ '__unstable-large' }
-						label={ __( 'Column Span' ) }
-						type="number"
-						onChange={ ( value ) => {
-							onChange( {
-								rowSpan,
-								columnSpan: value,
-							} );
-						} }
-						value={ columnSpan }
-						min={ 1 }
-					/>
-					<InputControl
-						size={ '__unstable-large' }
-						label={ __( 'Row Span' ) }
-						type="number"
-						onChange={ ( value ) => {
-							onChange( {
-								columnSpan,
-								rowSpan: value,
-							} );
-						} }
-						value={ rowSpan }
-						min={ 1 }
-					/>
-				</HStack>
+				<>
+					<HStack>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Column Start' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart: value,
+									rowStart,
+									columnSpan,
+									rowSpan,
+								} );
+							} }
+							value={ columnStart }
+							min={ 1 }
+						/>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Row Start' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart: value,
+									columnSpan,
+									rowSpan,
+								} );
+							} }
+							value={ rowStart }
+							min={ 1 }
+						/>
+					</HStack>
+					<HStack>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Column Span' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart,
+									columnSpan: value,
+									rowSpan,
+								} );
+							} }
+							value={ columnSpan }
+							min={ 1 }
+						/>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Row Span' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart,
+									columnSpan,
+									rowSpan: value,
+								} );
+							} }
+							value={ rowSpan }
+							min={ 1 }
+						/>
+					</HStack>
+				</>
 			) }
 		</>
 	);

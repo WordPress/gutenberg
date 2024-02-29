@@ -418,6 +418,8 @@ export default function DimensionsPanel( {
 		setChildLayout( {
 			selfStretch: undefined,
 			flexSize: undefined,
+			columnStart: undefined,
+			rowStart: undefined,
 			columnSpan: undefined,
 			rowSpan: undefined,
 		} );
@@ -433,6 +435,8 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				columnStart: undefined,
+				rowStart: undefined,
 				columnSpan: undefined,
 				rowSpan: undefined,
 			} ),
