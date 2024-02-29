@@ -540,7 +540,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 		accumulateSelection( accumulator, node, range, value );
 
 		// Ignore any placeholders, but keep their content since the browser
-		// might insert text inside them.
+		// might insert text inside them when the editable element is flex.
 		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
