@@ -207,7 +207,6 @@ function FontLibraryProvider( { children } ) {
 			let installationErrors = [];
 
 			await fontFamiliesToInstall.map( async ( fontFamilyToInstall ) => {
-
 				let isANewFontFamily = false;
 
 				// Get the font family if it already exists.
@@ -274,8 +273,7 @@ function FontLibraryProvider( { children } ) {
 						...alreadyInstalledFontFaces,
 					];
 					fontFamiliesToActivate.push( fontFamilyToInstall );
-				}
-				else if ( isANewFontFamily ) {
+				} else if ( isANewFontFamily ) {
 					// If the font family is new, delete it to avoid having font families without font faces.
 					await fetchUninstallFontFamily( installedFontFamily.id );
 				}
