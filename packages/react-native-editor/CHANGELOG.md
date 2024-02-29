@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.114.0
 -   [*] Prevent crash when autoscrolling to blocks [#59110]
 -   [*] Remove opacity change when images are being uploaded [#59264]
 -   [*] Media & Text blocks correctly show an error message when the attached video upload fails [#59288]
