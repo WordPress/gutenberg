@@ -155,13 +155,16 @@ public struct GutenbergJSException {
 
     public struct StacktraceLine {
         public let filename: String?
-        public let function: String?
+        public let function: String
         public let lineno: NSNumber?
         public let colno: NSNumber?
         
-        init(from dict: [AnyHashable: Any]) {
+        init?(from dict: [AnyHashable: Any]) {
+            guard let function = dict["function"] as? String else {
+                return nil
+            }
             self.filename = dict["filename"] as? String
-            self.function = dict["function"] as? String
+            self.function = function
             self.lineno = dict["lineno"] as? NSNumber
             self.colno = dict["colno"] as? NSNumber
         }
@@ -181,7 +184,7 @@ public struct GutenbergJSException {
         
         self.type = type
         self.value = value
-        self.stacktrace = rawStacktrace.map { StacktraceLine(from: $0) }
+        self.stacktrace = rawStacktrace.compactMap { StacktraceLine(from: $0) }
         self.context = context
         self.tags = tags
         self.isHandled = isHandled
