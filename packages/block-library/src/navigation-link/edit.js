@@ -30,6 +30,7 @@ import {
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
+	focus,
 	placeCaretAtHorizontalEdge,
 	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
@@ -568,7 +569,29 @@ export default function NavigationLinkEdit( {
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
 									// Need to handle refocusing the Nav block or the inserter?
+									const previousElement =
+										focus.tabbable.findNext(
+											listItemRef.current
+										);
+									const previousPreviousElement =
+										focus.tabbable.findPrevious(
+											previousElement
+										);
+									const previousPreviousPreviousElement =
+										focus.tabbable.findPrevious(
+											previousPreviousElement
+										);
+									const previousPreviousPreviousPreviousElement =
+										focus.tabbable.findPrevious(
+											previousPreviousPreviousElement
+										);
+
+									previousPreviousPreviousPreviousElement?.focus();
 									onReplace( [] );
+									const nextElement = focus.tabbable.findNext(
+										previousPreviousPreviousPreviousElement
+									);
+									nextElement?.focus();
 								}
 							} }
 							anchor={ popoverAnchor }
