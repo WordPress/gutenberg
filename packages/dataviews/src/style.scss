@@ -222,7 +222,6 @@
 	color: $gray-900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden;
 	display: block;
 	width: 100%;
 
@@ -238,6 +237,7 @@
 		&:hover {
 			color: $gray-900;
 		}
+		@include link-reset();
 	}
 
 	button.components-button.is-link {
