@@ -48,7 +48,7 @@ export default function useSetPatternBindings(
 
 	useEffect( () => {
 		// Bindings should only be created when editing a wp_block post type,
-		// and also when there's a change to the user given name for the block.
+		// and also when there's a change to the user-given name for the block.
 		if (
 			currentPostType !== 'wp_block' ||
 			metadataName === prevMetadataName
@@ -70,7 +70,7 @@ export default function useSetPatternBindings(
 			return;
 		}
 
-		// The user given name for the block was deleted, remove the bindings.
+		// The user-given name for the block was deleted, remove the bindings.
 		if ( ! metadataName?.length && prevMetadataName?.length ) {
 			const updatedBindings = removeBindings(
 				bindings,
@@ -84,7 +84,7 @@ export default function useSetPatternBindings(
 			} );
 		}
 
-		// The user given name for the block was set, set the bindings.
+		// The user-given name for the block was set, set the bindings.
 		if ( ! prevMetadataName?.length && metadataName.length ) {
 			const updatedBindings = addBindings( bindings, syncedAttributes );
 			setAttributes( {
