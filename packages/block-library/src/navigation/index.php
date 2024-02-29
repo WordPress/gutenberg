@@ -1373,6 +1373,8 @@ function block_core_navigation_remove_serialized_parent_block( $serialized_block
  * Mock a parsed block for the Navigation block given its inner blocks and the `wp_navigation` post object.
  * The `wp_navigation` post's `_wp_ignored_hooked_blocks` meta is queried to add the `metadata.ignoredHookedBlocks` attribute.
  *
+ * @since 6.5.0
+ *
  * @param array   $inner_blocks Parsed inner blocks of a Navigation block.
  * @param WP_Post $post         `wp_navigation` post object corresponding to the block.
  *
@@ -1458,6 +1460,8 @@ function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks
 /**
  * Updates the post meta with the list of ignored hooked blocks when the navigation is created or updated via the REST API.
  *
+ * @since 6.5.0
+ *
  * @param WP_Post $post Post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
@@ -1503,6 +1507,8 @@ if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'r
 
 /**
  * Hooks into the REST API response for the core/navigation block and adds the first and last inner blocks.
+ *
+ * @since 6.5.0
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Post          $post     Post object.
