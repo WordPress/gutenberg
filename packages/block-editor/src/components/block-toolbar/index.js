@@ -34,9 +34,8 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
-import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 import Shuffle from './shuffle';
-
+import { useHasBlockToolbar } from './use-has-block-toolbar';
 /**
  * Renders the block toolbar.
  *
@@ -122,15 +121,8 @@ export function PrivateBlockToolbar( {
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
-	const isToolbarEnabled =
-		blockType &&
-		hasBlockSupport( blockType, '__experimentalToolbar', true );
-	const hasAnyBlockControls = useHasAnyBlockControls();
-
-	if (
-		! isToolbarEnabled ||
-		( ! isDefaultEditingMode && ! hasAnyBlockControls )
-	) {
+	const hasBlockToolbar = useHasBlockToolbar();
+	if ( ! hasBlockToolbar ) {
 		return null;
 	}
 

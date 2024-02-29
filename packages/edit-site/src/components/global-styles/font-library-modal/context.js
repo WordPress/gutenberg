@@ -202,6 +202,7 @@ function FontLibraryProvider( { children } ) {
 
 	async function installFont( fontFamilyToInstall ) {
 		setIsInstalling( true );
+		let isANewFontFamily = false;
 		try {
 			// Get the font family if it already exists.
 			let installedFontFamily = await fetchGetFontFamilyBySlug(
@@ -210,6 +211,7 @@ function FontLibraryProvider( { children } ) {
 
 			// Otherwise create it.
 			if ( ! installedFontFamily ) {
+				isANewFontFamily = true;
 				// Prepare font family form data to install.
 				installedFontFamily = await fetchInstallFontFamily(
 					makeFontFamilyFormData( fontFamilyToInstall )
@@ -268,6 +270,11 @@ function FontLibraryProvider( { children } ) {
 				sucessfullyInstalledFontFaces.length === 0 &&
 				alreadyInstalledFontFaces.length === 0
 			) {
+				if ( isANewFontFamily ) {
+					// If the font family is new, delete it to avoid having font families without font faces.
+					await fetchUninstallFontFamily( installedFontFamily.id );
+				}
+
 				throw new Error(
 					sprintf(
 						/* translators: %s: Specific error message returned from server. */

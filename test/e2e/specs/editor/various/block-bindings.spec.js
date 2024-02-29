@@ -1218,7 +1218,7 @@ test.describe( 'Block bindings', () => {
 					name: 'core/paragraph',
 					attributes: {
 						anchor: 'paragraph-binding',
-						content: 'p',
+						content: 'fallback value',
 						metadata: {
 							bindings: {
 								content: {
@@ -1244,9 +1244,73 @@ test.describe( 'Block bindings', () => {
 				// Check the frontend doesn't show the content.
 				const postId = await editor.publishPost();
 				await page.goto( `/?p=${ postId }` );
-				await expect(
-					page.locator( '#paragraph-binding' )
-				).toBeHidden();
+				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
+					'fallback value'
+				);
+			} );
+
+			test( 'should not show the value of a protected meta field', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'paragraph-binding',
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: '_protected_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText( '_protected_field' );
+				// Check the frontend doesn't show the content.
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
+					'fallback value'
+				);
+			} );
+
+			test( 'should not show the value of a meta field with `show_in_rest` false', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'paragraph-binding',
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'show_in_rest_false_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'show_in_rest_false_field'
+				);
+				// Check the frontend doesn't show the content.
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
+					'fallback value'
+				);
 			} );
 		} );
 
