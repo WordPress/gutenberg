@@ -26,7 +26,7 @@ function removeBindings( bindings, syncedAttributes ) {
 	return updatedBindings;
 }
 
-function setBindings( bindings, syncedAttributes ) {
+function addBindings( bindings, syncedAttributes ) {
 	const updatedBindings = { ...bindings };
 	for ( const attributeName of syncedAttributes ) {
 		if ( ! bindings?.[ attributeName ] ) {
@@ -86,7 +86,7 @@ export default function useSetPatternBindings(
 
 		// The user given name for the block was set, set the bindings.
 		if ( ! prevMetadataName?.length && metadataName.length ) {
-			const updatedBindings = setBindings( bindings, syncedAttributes );
+			const updatedBindings = addBindings( bindings, syncedAttributes );
 			setAttributes( {
 				metadata: {
 					...attributes.metadata,
