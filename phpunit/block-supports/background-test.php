@@ -225,7 +225,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 * @param string $expected_css     Expected markup for the block wrapper.
 	 */
 	public function test_get_background_support_styles( $background_style, $expected_css ) {
-		switch_theme( 'block-theme' );
 		$actual = gutenberg_get_background_support_styles( $background_style )['css'];
 
 		$this->assertEquals(
