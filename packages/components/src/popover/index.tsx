@@ -53,6 +53,11 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceElement,
 } from './utils';
+import {
+	contextConnect,
+	ContextSystemProvider,
+	useContextSystem,
+} from '../context';
 import type { WordPressComponentProps } from '../context';
 import type {
 	PopoverProps,
@@ -108,6 +113,8 @@ const getPopoverFallbackContainer = () => {
 	return container;
 };
 
+const defaultContextValue = {};
+
 const UnforwardedPopover = (
 	props: Omit<
 		WordPressComponentProps< PopoverProps, 'div', false >,
@@ -149,7 +156,7 @@ const UnforwardedPopover = (
 
 		// Rest
 		...contentProps
-	} = props;
+	} = useContextSystem( props, 'Popover' );
 
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
@@ -387,7 +394,7 @@ const UnforwardedPopover = (
 
 	let content = (
 		<motion.div
-			className={ classnames( 'components-popover', className, {
+			className={ classnames( className, {
 				'is-expanded': isExpanded,
 				'is-positioned': isPositioned,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
@@ -417,7 +424,11 @@ const UnforwardedPopover = (
 					/>
 				</div>
 			) }
-			<div className="components-popover__content">{ children }</div>
+			<div className="components-popover__content">
+				<ContextSystemProvider value={ defaultContextValue }>
+					{ children }
+				</ContextSystemProvider>
+			</div>
 			{ hasArrow && (
 				<div
 					ref={ arrowCallbackRef }
@@ -491,7 +502,7 @@ const UnforwardedPopover = (
  * ```
  *
  */
-export const Popover = forwardRef( UnforwardedPopover );
+export const Popover = contextConnect( UnforwardedPopover, 'Popover' );
 
 function PopoverSlot(
 	{ name = SLOT_NAME }: { name?: string },
