@@ -69,11 +69,7 @@ function moreCommentConverter( node, doc ) {
 	// If our `<!--more-->` comment is in the middle of a paragraph, we should
 	// split the paragraph in two and insert the more block in between. If not,
 	// the more block will eventually end up being inserted after the paragraph.
-	if (
-		! node.parentNode ||
-		node.parentNode.nodeName !== 'P' ||
-		node.parentNode.childNodes.length === 1
-	) {
+	if ( ! node.parentNode || node.parentNode.nodeName !== 'P' ) {
 		replace( node, moreBlock );
 	} else {
 		const childNodes = Array.from( node.parentNode.childNodes );
