@@ -610,7 +610,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 	} );
 
 	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
-	test( 'should preserve internal formatting (-webkit)', async ( {
+	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,
 		editor,
 		pageUtils,
