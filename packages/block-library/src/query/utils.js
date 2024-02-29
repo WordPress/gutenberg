@@ -138,9 +138,11 @@ export const useTaxonomies = ( postType ) => {
 		},
 		[ postType ]
 	);
-	return taxonomies?.filter(
-		( { visibility } ) => !! visibility?.publicly_queryable
-	);
+	return useMemo( () => {
+		return taxonomies?.filter(
+			( { visibility } ) => !! visibility?.publicly_queryable
+		);
+	}, [ taxonomies ] );
 };
 
 /**
