@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
 /**
@@ -127,6 +127,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 
 function GridVisualizerCell( { column, row } ) {
 	const [ isDraggingOver, setIsDraggingOver ] = useState( false );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const ref = useDropZone( {
@@ -138,19 +139,23 @@ function GridVisualizerCell( { column, row } ) {
 		},
 		onDrop( event ) {
 			setIsDraggingOver( false );
-			const { srcClientIds } = parseDropEvent( event );
-			if ( ! srcClientIds?.length ) {
+			const {
+				srcClientIds: [ srcClientId ],
+			} = parseDropEvent( event );
+			if ( ! srcClientId ) {
 				return;
 			}
-			updateBlockAttributes( srcClientIds, {
+			const attributes = getBlockAttributes( srcClientId );
+			updateBlockAttributes( srcClientId, {
 				style: {
+					...attributes.style,
 					layout: {
+						...attributes.style?.layout,
 						columnStart: column,
 						rowStart: row,
 					},
 				},
 			} );
-			console.log( srcClientIds, column, row );
 		},
 	} );
 

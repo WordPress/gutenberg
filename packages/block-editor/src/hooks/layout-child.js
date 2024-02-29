@@ -17,7 +17,14 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
 	} );
 	const layout = style?.layout ?? {};
-	const { selfStretch, flexSize, columnSpan, rowSpan } = layout;
+	const {
+		selfStretch,
+		flexSize,
+		columnStart,
+		rowStart,
+		columnSpan,
+		rowSpan,
+	} = layout;
 	const parentLayout = useLayout() || {};
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
@@ -33,6 +40,14 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		} else if ( selfStretch === 'fill' ) {
 			css = `${ selector } {
 				flex-grow: 1;
+			}`;
+		} else if ( columnStart && columnSpan ) {
+			css = `${ selector } {
+				grid-column: ${ columnStart } / span ${ columnSpan };
+			}`;
+		} else if ( columnStart ) {
+			css = `${ selector } {
+				grid-column: ${ columnStart };
 			}`;
 		} else if ( columnSpan ) {
 			css = `${ selector } {
@@ -79,7 +94,15 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				}
 			}`;
 		}
-		if ( rowSpan ) {
+		if ( rowStart && rowSpan ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart } / span ${ rowSpan };
+			}`;
+		} else if ( rowStart ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart };
+			}`;
+		} else if ( rowSpan ) {
 			css += `${ selector } {
 				grid-row: span ${ rowSpan };
 			}`;
