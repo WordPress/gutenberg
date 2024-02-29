@@ -1,19 +1,20 @@
-// TODO: Specificity hacks to get rid of all these darn !importants.
-
 .block-editor-grid-visualizer {
-	z-index: z-index(".block-editor-grid-visualizer") !important;
-}
+	&.block-editor-grid-visualizer { // These rules need extra specificity.
+		z-index: z-index(".block-editor-grid-visualizer");
 
-.block-editor-grid-visualizer .components-popover__content * {
-	pointer-events: none !important;
+		&.is-disabled .components-popover__content * {
+			pointer-events: none;
+		}
+	}
 }
 
 .block-editor-grid-visualizer__grid {
 	display: grid;
 }
 
-.block-editor-grid-visualizer__item {
+.block-editor-grid-visualizer__cell {
 	border: $border-width dashed $gray-300;
+	position: relative;
 }
 
 .block-editor-grid-item-resizer {
