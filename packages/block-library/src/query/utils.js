@@ -131,16 +131,16 @@ export const useTaxonomies = ( postType ) => {
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );
-			const filteredTaxonomies = getTaxonomies( {
+			return getTaxonomies( {
 				type: postType,
 				per_page: -1,
-				context: 'view',
 			} );
-			return filteredTaxonomies;
 		},
 		[ postType ]
 	);
-	return taxonomies;
+	return taxonomies?.filter(
+		( { visibility } ) => !! visibility?.publicly_queryable
+	);
 };
 
 /**
