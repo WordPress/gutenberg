@@ -16,7 +16,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -24,20 +23,39 @@ import { check } from '@wordpress/icons';
 const checkIcon = <Icon icon={ check } size={ 24 } />;
 const noop = () => undefined;
 
-function BlockStyleColorIndicator( { blockStyle } ) {
-	const { background, gradient, text } = blockStyle?.styles?.color || {};
+function BlockStyleColorCard( { blockStyle } ) {
+	const { background, gradient, text } = blockStyle.styles?.color || {};
+	const linkColor = blockStyle?.styles?.elements?.link?.color?.text;
+	const styles = {
+		background: gradient,
+		backgroundColor: gradient ? undefined : background,
+	};
+
+	return (
+		<HStack
+			className={ classnames( 'block-editor-block-styles__color-card', {
+				'no-background': ! background && ! gradient,
+			} ) }
+			justify="space-around"
+			style={ styles }
+			spacing={ 2 }
+		>
+			<Flex expanded={ false }>
+				<ColorIndicator colorValue={ text } />
+			</Flex>
+			<Flex expanded={ false }>
+				<ColorIndicator colorValue={ linkColor } />
+			</Flex>
+		</HStack>
+	);
+}
+
+function BlockStyleItem( { blockStyle } ) {
 	const label = blockStyle?.label || blockStyle?.name;
 
 	return (
 		<HStack justify="flex-start">
-			<ZStack isLayered={ false } offset={ -8 }>
-				<Flex expanded={ false }>
-					<ColorIndicator colorValue={ gradient ?? background } />
-				</Flex>
-				<Flex expanded={ false }>
-					<ColorIndicator colorValue={ text } />
-				</Flex>
-			</ZStack>
+			<BlockStyleColorCard blockStyle={ blockStyle } />
 			<FlexItem title={ label }>{ label }</FlexItem>
 		</HStack>
 	);
@@ -55,7 +73,7 @@ function BlockStylesDropdownToggle( { onToggle, isOpen, blockStyle } ) {
 
 	return (
 		<Button __next40pxDefaultSize { ...toggleProps }>
-			<BlockStyleColorIndicator blockStyle={ blockStyle } />
+			<BlockStyleItem blockStyle={ blockStyle } />
 		</Button>
 	);
 }
@@ -85,8 +103,9 @@ function BlockStylesDropdownContent( {
 						onMouseLeave={ () => handlePreview( null ) }
 						role="menuitemradio"
 						suffix={ isSelected ? checkIcon : undefined }
+						__next40pxDefaultSize
 					>
-						<BlockStyleColorIndicator blockStyle={ style } />
+						<BlockStyleItem blockStyle={ style } />
 					</MenuItem>
 				);
 			} ) }
