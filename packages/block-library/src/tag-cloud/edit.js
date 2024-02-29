@@ -11,6 +11,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalGetValidParsedQuantityAndUnit as getValidParsedQuantityAndUnit,
 	Disabled,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -78,9 +79,9 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 
 	// If default unit isn't available, convert default value to first available unit.
 	const [ smallestFontSizeValue, smallestFontSizeUnit ] =
-		parseQuantityAndUnitFromRawValue( smallestFontSize, availableUnits );
+		getValidParsedQuantityAndUnit( smallestFontSize, units );
 	const [ largestFontSizeValue, largestFontSizeUnit ] =
-		parseQuantityAndUnitFromRawValue( smallestFontSize, availableUnits );
+		getValidParsedQuantityAndUnit( largestFontSize, units );
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
