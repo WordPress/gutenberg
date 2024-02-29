@@ -42,8 +42,8 @@ export default function useSetPatternBindings(
 	{ name, attributes, setAttributes },
 	currentPostType
 ) {
-	const metadataName = attributes?.metadata?.name;
-	const prevMetadataName = usePrevious( metadataName ) ?? metadataName;
+	const metadataName = attributes?.metadata?.name ?? '';
+	const prevMetadataName = usePrevious( metadataName ) ?? '';
 	const bindings = attributes?.metadata?.bindings;
 
 	useEffect( () => {
