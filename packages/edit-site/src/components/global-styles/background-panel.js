@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,16 +15,6 @@ const {
 	BackgroundPanel: StylesBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
-const DEFAULT_CONTROLS = {
-	contentSize: true,
-	wideSize: true,
-	padding: true,
-	margin: true,
-	blockGap: true,
-	minHeight: true,
-	childLayout: false,
-};
-
 export default function BackgroundPanel() {
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
@@ -36,15 +25,13 @@ export default function BackgroundPanel() {
 
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
-
+console.log( 'inheritedStyle', inheritedStyle );
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
-			includeLayoutControls
-			defaultControls={ DEFAULT_CONTROLS }
 		/>
 	);
 }

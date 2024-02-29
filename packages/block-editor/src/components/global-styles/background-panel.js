@@ -7,8 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	FontSizePicker,
-	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
@@ -28,7 +26,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { Platform, useCallback, useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -76,6 +74,11 @@ export function hasBackgroundImageValue( style ) {
 
 	return hasValue;
 }
+
+export const hasNumericalBackgroundPosition = ( value ) =>
+	typeof value === 'string' &&
+	value.split( ' ' ).every( ( v ) => ! isNaN( parseFloat( v ) ) );
+
 
 export const coordsToBackgroundPosition = ( value ) => {
 	if ( ! value || ( isNaN( value.x ) && isNaN( value.y ) ) ) {
@@ -160,6 +163,7 @@ function BackgroundImageToolsPanelItem( {
 	isShownByDefault,
 	onChange,
 	style,
+	inheritedValue,
 } ) {
 	const { mediaUpload } = useSelect(
 		( select ) => {
@@ -172,7 +176,9 @@ function BackgroundImageToolsPanelItem( {
 		[ panelId ]
 	);
 
-	const { id, title, url } = style?.background?.backgroundImage || {};
+	const { id, title, url } = style?.background?.backgroundImage || {
+		...inheritedValue?.background.backgroundImage,
+	};
 
 	const replaceContainerRef = useRef();
 
@@ -248,7 +254,9 @@ function BackgroundImageToolsPanelItem( {
 		};
 	}, [] );
 
-	const hasValue = hasBackgroundImageValue( style );
+	const hasValue =
+		hasBackgroundImageValue( style ) ||
+		hasBackgroundImageValue( inheritedValue );
 
 	return (
 		<ToolsPanelItem
@@ -273,7 +281,7 @@ function BackgroundImageToolsPanelItem( {
 					name={
 						<InspectorImagePreview
 							label={ __( 'Background image' ) }
-							filename={ title }
+							filename={ title || __( 'Untitled' ) }
 							url={ url }
 						/>
 					}
@@ -311,9 +319,20 @@ function BackgroundSizeToolsPanelItem( {
 	isShownByDefault,
 	onChange,
 	style,
+	inheritedValue,
 } ) {
-	const sizeValue = style?.background?.backgroundSize;
-	const repeatValue = style?.background?.backgroundRepeat;
+	const sizeValue =
+		style?.background?.backgroundSize ||
+		inheritedValue?.background?.backgroundSize;
+	const repeatValue =
+		style?.background?.backgroundRepeat ||
+		inheritedValue?.background?.backgroundRepeat;
+	const imageValue =
+		style?.background?.backgroundImage?.url ||
+		inheritedValue?.background?.backgroundImage?.url;
+	const positionValue =
+		style?.background?.backgroundPosition ||
+		inheritedValue?.background?.backgroundPosition;
 
 	// An `undefined` value is treated as `cover` by the toggle group control.
 	// An empty string is treated as `auto` by the toggle group control. This
@@ -420,10 +439,8 @@ function BackgroundSizeToolsPanelItem( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
-				url={ style?.background?.backgroundImage?.url }
-				value={ backgroundPositionToCoords(
-					style?.background?.backgroundPosition
-				) }
+				url={ imageValue }
+				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
@@ -483,20 +500,22 @@ function BackgroundToolsPanel( {
 	};
 
 	return (
-		<ToolsPanel
+		<VStack
+			as={ ToolsPanel }
+			spacing={ 6 }
 			label={ __( 'Background' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
-		</ToolsPanel>
+		</VStack>
 	);
 }
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	backgroundSize: true,
+	backgroundSize: false,
 };
 
 export default function BackgroundPanel( {
@@ -508,7 +527,9 @@ export default function BackgroundPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
-	const hasBackGroundSizeControl = !! settings?.background?.backgroundSize;
+	const hasBackGroundSizeControl =
+		hasNumericalBackgroundPosition( settings?.background?.backgroundSize ) ||
+		hasNumericalBackgroundPosition( inheritedValue?.background?.backgroundSize );
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -528,15 +549,17 @@ export default function BackgroundPanel( {
 				panelId={ panelId }
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
+				inheritedValue={ inheritedValue }
 			/>
-			{ hasBackGroundSizeControl && (
-				<BackgroundSizeToolsPanelItem
-					onChange={ onChange }
-					panelId={ panelId }
-					isShownByDefault={ defaultControls.backgroundSize }
-					style={ value }
-				/>
-			) }
+			<BackgroundSizeToolsPanelItem
+				onChange={ onChange }
+				panelId={ panelId }
+				isShownByDefault={
+					hasBackGroundSizeControl || defaultControls.backgroundSize
+				}
+				style={ value }
+				inheritedValue={ inheritedValue }
+			/>
 		</Wrapper>
 	);
 }
