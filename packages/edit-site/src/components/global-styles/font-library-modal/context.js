@@ -206,7 +206,7 @@ function FontLibraryProvider( { children } ) {
 			const fontFamiliesToActivate = [];
 			let installationErrors = [];
 
-			await fontFamiliesToInstall.map( async ( fontFamilyToInstall ) => {
+			for ( const fontFamilyToInstall of fontFamiliesToInstall ) {
 				let isANewFontFamily = false;
 
 				// Get the font family if it already exists.
@@ -281,9 +281,9 @@ function FontLibraryProvider( { children } ) {
 				installationErrors = installationErrors.concat(
 					unsucessfullyInstalledFontFaces
 				);
-			} );
+			}
 
-			if ( fontFamiliesToActivate.length === 0 ) {
+			if ( fontFamiliesToActivate.length > 0 ) {
 				// Activate the font family (add the font family to the global styles).
 				activateCustomFontFamilies( fontFamiliesToActivate );
 
