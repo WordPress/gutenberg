@@ -38,6 +38,7 @@
 	position: relative;
 	margin-right: $grid-unit-20;
 	align-self: flex-start;
+	max-width: 60px;
 
 	.block-directory-downloadable-block-list-item__spinner {
 		position: absolute;
