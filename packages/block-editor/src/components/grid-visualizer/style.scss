@@ -15,6 +15,10 @@
 .block-editor-grid-visualizer__cell {
 	border: $border-width dashed $gray-300;
 	position: relative;
+
+	&.is-dragging-over {
+		background: var(--wp-admin-theme-color);
+	}
 }
 
 .block-editor-grid-item-resizer {

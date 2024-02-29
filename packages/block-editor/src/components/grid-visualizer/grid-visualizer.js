@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { DropZone } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
+import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -126,26 +126,40 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 }
 
 function GridVisualizerCell( { column, row } ) {
+	const [ isDraggingOver, setIsDraggingOver ] = useState( false );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	function onDrop( event ) {
-		const { srcClientIds } = parseDropEvent( event );
-		if ( ! srcClientIds?.length ) {
-			return;
-		}
-		updateBlockAttributes( srcClientIds, {
-			style: {
-				layout: {
-					columnStart: column,
-					rowStart: row,
+	const ref = useDropZone( {
+		onDragEnter() {
+			setIsDraggingOver( true );
+		},
+		onDragLeave() {
+			setIsDraggingOver( false );
+		},
+		onDrop( event ) {
+			setIsDraggingOver( false );
+			const { srcClientIds } = parseDropEvent( event );
+			if ( ! srcClientIds?.length ) {
+				return;
+			}
+			updateBlockAttributes( srcClientIds, {
+				style: {
+					layout: {
+						columnStart: column,
+						rowStart: row,
+					},
 				},
-			},
-		} );
-	}
+			} );
+			console.log( srcClientIds, column, row );
+		},
+	} );
 
 	return (
-		<div className="block-editor-grid-visualizer__cell">
-			<DropZone label={ 'Drop to pin block' } onDrop={ onDrop } />
-		</div>
+		<div
+			ref={ ref }
+			className={ classnames( 'block-editor-grid-visualizer__cell', {
+				'is-dragging-over': isDraggingOver,
+			} ) }
+		/>
 	);
 }
