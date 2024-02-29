@@ -43,9 +43,7 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			const wrapperBlockClientId = getBlockRootClientId(
 				firstBlock.clientId
 			);
-			const wrapperBlockName = getBlockName(
-				getBlockRootClientId( firstBlock.clientId )
-			);
+			const wrapperBlockName = getBlockName( wrapperBlockClientId );
 
 			if ( wrapperBlockName ) {
 				_blocks = createBlock(
