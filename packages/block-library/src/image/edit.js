@@ -20,7 +20,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -336,7 +336,7 @@ export function ImageEdit( {
 	} );
 
 	// Much of this description is duplicated from MediaPlaceholder.
-	const { lockUrlControls = false } = useSelect(
+	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
@@ -351,6 +351,13 @@ export function ImageEdit( {
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
 						blockBindingsSource?.lockAttributesEditing ),
+				lockUrlControlsMessage: blockBindingsSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							blockBindingsSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 			};
 		},
 		[ isSingleSelected ]
@@ -387,7 +394,7 @@ export function ImageEdit( {
 					<span
 						className={ 'block-bindings-media-placeholder-message' }
 					>
-						{ __( 'Connected to a custom field' ) }
+						{ lockUrlControlsMessage }
 					</span>
 				) : (
 					content
