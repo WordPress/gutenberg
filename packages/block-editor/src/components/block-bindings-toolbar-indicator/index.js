@@ -11,7 +11,7 @@ export default function BlockBindingsToolbarIndicator() {
 			<ToolbarItem
 				as={ 'div' }
 				aria-label={ _x( 'Connected', 'block toolbar button label' ) }
-				className="block-editor__block-bindings-indicator block-toolbar__block-bindings-indicator"
+				className="block-editor-block-bindings-toolbar-indicator"
 			>
 				<Icon icon={ connection } size={ 24 } />
 			</ToolbarItem>

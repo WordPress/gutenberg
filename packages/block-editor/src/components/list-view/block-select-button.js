@@ -288,7 +288,7 @@ function ListViewBlockSelectButton(
 						</span>
 					) }
 					{ isConnected && canBindBlock( blockName ) && (
-						<span className="block-editor__block-bindings-indicator">
+						<span className="block-editor-list-view-block-select-button__bindings">
 							<Icon icon={ connection } />
 						</span>
 					) }

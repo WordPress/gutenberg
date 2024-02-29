@@ -1,14 +1,14 @@
-.block-toolbar__block-bindings-indicator {
+.block-editor-block-bindings-toolbar-indicator {
 	display: inline-flex;
 	align-items: center;
 	height: 48px;
 	padding: 6px;
-}
 
-.block-editor__block-bindings-indicator svg g {
-	stroke: #9747ff;
-	fill: transparent;
-	stroke-width: 1.5;
-	stroke-linecap: round;
-	stroke-linejoin: round;
+	svg g {
+		stroke: var(--wp-bound-block-color);
+		fill: transparent;
+		stroke-width: 1.5;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
 }
