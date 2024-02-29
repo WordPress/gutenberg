@@ -12,73 +12,34 @@ import {
 	Dropdown,
 	Flex,
 	FlexItem,
+	Icon,
+	MenuGroup,
+	MenuItem,
 	__experimentalHStack as HStack,
-	__experimentalTruncate as Truncate,
 	__experimentalZStack as ZStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { check } from '@wordpress/icons';
 
+const checkIcon = <Icon icon={ check } size={ 24 } />;
 const noop = () => undefined;
 
-function BlockStyleColorCard( { blockStyle } ) {
-	const textColor = blockStyle?.styles?.color?.text;
-	const linkColor = blockStyle?.styles?.elements?.link?.color?.text;
+function BlockStyleColorIndicator( { blockStyle } ) {
+	const { background, gradient, text } = blockStyle?.styles?.color || {};
+	const label = blockStyle?.label || blockStyle?.name;
 
 	return (
-		<HStack justify="space-around">
-			<Flex expanded={ false }>
-				<ColorIndicator colorValue={ textColor } />
-			</Flex>
-			<Flex expanded={ false }>
-				<ColorIndicator colorValue={ linkColor } />
-			</Flex>
+		<HStack justify="flex-start">
+			<ZStack isLayered={ false } offset={ -8 }>
+				<Flex expanded={ false }>
+					<ColorIndicator colorValue={ gradient ?? background } />
+				</Flex>
+				<Flex expanded={ false }>
+					<ColorIndicator colorValue={ text } />
+				</Flex>
+			</ZStack>
+			<FlexItem title={ label }>{ label }</FlexItem>
 		</HStack>
-	);
-}
-
-function BlockStyleButton( {
-	handlePreview,
-	isSelected,
-	onClick,
-	blockStyle,
-} ) {
-	// If the block style variation does not contain color values,
-	// render a textual label to cover styles such as the Button's
-	// Outline, or Image's Rounded, block styles.
-	const { label, name } = blockStyle;
-	const { background, gradient, text } = blockStyle.styles?.color || {};
-	const hasColors = background || gradient || text;
-	const styles = {
-		background: gradient,
-		backgroundColor: gradient ? undefined : background,
-	};
-
-	return (
-		<Button
-			aria-current={ isSelected }
-			className={ classnames( 'block-editor-block-styles__item', {
-				'is-active': isSelected,
-			} ) }
-			label={ blockStyle.label || blockStyle.name }
-			onBlur={ () => handlePreview( null ) }
-			onClick={ () => onClick( blockStyle ) }
-			onFocus={ () => handlePreview( blockStyle ) }
-			onMouseEnter={ () => handlePreview( blockStyle ) }
-			onMouseLeave={ () => handlePreview( null ) }
-			style={ styles }
-			variant="secondary"
-			__next40pxDefaultSize
-		>
-			{ hasColors && <BlockStyleColorCard blockStyle={ blockStyle } /> }
-			{ ! hasColors && (
-				<Truncate
-					numberOfLines={ 1 }
-					classsName="block-editor-block-styles__item-text"
-				>
-					{ label || name }
-				</Truncate>
-			) }
-		</Button>
 	);
 }
 
@@ -92,58 +53,44 @@ function BlockStylesDropdownToggle( { onToggle, isOpen, blockStyle } ) {
 		'aria-label': __( 'Block style options' ),
 	};
 
-	const { background, gradient, text } = blockStyle?.styles?.color || {};
-	const linkColor = blockStyle?.styles?.elements?.link?.color?.text;
-	const label = blockStyle?.label || blockStyle?.name;
-	const hasColors = gradient || background || text || linkColor;
-
 	return (
 		<Button __next40pxDefaultSize { ...toggleProps }>
-			<HStack justify="flex-start">
-				{ hasColors && (
-					<ZStack isLayered={ false } offset={ -8 }>
-						<Flex expanded={ false }>
-							<ColorIndicator
-								colorValue={ gradient ?? background }
-							/>
-						</Flex>
-						<Flex expanded={ false }>
-							<ColorIndicator colorValue={ text } />
-						</Flex>
-						{ !! linkColor && (
-							<Flex expanded={ false }>
-								<ColorIndicator colorValue={ linkColor } />
-							</Flex>
-						) }
-					</ZStack>
-				) }
-				<FlexItem title={ label }>{ label }</FlexItem>
-			</HStack>
+			<BlockStyleColorIndicator blockStyle={ blockStyle } />
 		</Button>
 	);
 }
 
 function BlockStylesDropdownContent( {
 	activeStyle,
-	blockStyles,
 	handlePreview,
 	onSelect,
-	...props
+	styles,
 } ) {
 	return (
-		<div className="block-editor-block-styles__variants" { ...props }>
-			{ blockStyles.map( ( style ) => {
+		<MenuGroup
+			className="block-editor-block-styles__dropdown-group"
+			label={ __( 'Block styles' ) }
+		>
+			{ styles.map( ( style ) => {
+				const isSelected = activeStyle?.name === style.name;
+
 				return (
-					<BlockStyleButton
-						blockStyle={ style }
-						handlePreview={ handlePreview }
-						isSelected={ activeStyle?.name === style.name }
-						onClick={ onSelect }
+					<MenuItem
+						isSelected={ isSelected }
 						key={ style.name }
-					/>
+						onBlur={ () => handlePreview( null ) }
+						onClick={ () => onSelect( style ) }
+						onFocus={ () => handlePreview( style ) }
+						onMouseEnter={ () => handlePreview( style ) }
+						onMouseLeave={ () => handlePreview( null ) }
+						role="menuitemradio"
+						suffix={ isSelected ? checkIcon : undefined }
+					>
+						<BlockStyleColorIndicator blockStyle={ style } />
+					</MenuItem>
 				);
 			} ) }
-		</div>
+		</MenuGroup>
 	);
 }
 
@@ -151,11 +98,11 @@ export default function BlockStylesDropdown( {
 	className,
 	handlePreview = noop,
 	onSelect = noop,
-	blockStyles,
+	styles,
 	value,
 	...props
 } ) {
-	if ( ! blockStyles?.length ) {
+	if ( ! styles?.length ) {
 		return null;
 	}
 
@@ -179,9 +126,9 @@ export default function BlockStylesDropdown( {
 				<BlockStylesDropdownContent
 					{ ...contentProps }
 					activeStyle={ value }
-					blockStyles={ blockStyles }
 					handlePreview={ handlePreview }
 					onSelect={ onSelect }
+					styles={ styles }
 				/>
 			) }
 		/>

@@ -54,9 +54,9 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	return (
 		<div className="block-editor-block-styles">
 			<BlockStylesDropdown
-				blockStyles={ stylesToRender }
 				handlePreview={ styleItemHandler }
 				onSelect={ onSelectStylePreview }
+				styles={ stylesToRender }
 				value={ activeStyle }
 			/>
 			{ hoveredStyle && ! isMobileViewport && (
