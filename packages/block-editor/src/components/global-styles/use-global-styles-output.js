@@ -600,6 +600,7 @@ const STYLE_KEYS = [
 	'filter',
 	'outline',
 	'shadow',
+	'background',
 ];
 
 function pickStyleKeys( treeToPickFrom ) {
