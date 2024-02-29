@@ -146,7 +146,7 @@ extension RCTLogLevel {
 // log exception to the Crash Logging service.
 public struct GutenbergJSException {
     public let type: String
-    public let value: String
+    public let message: String
     public let stacktrace: [StacktraceLine]
     public let context: [String: Any]
     public let tags: [String: String]
@@ -172,7 +172,7 @@ public struct GutenbergJSException {
     
     init?(from dict: [AnyHashable: Any]) {
         guard let type = dict["type"] as? String,
-              let value = dict["value"] as? String,
+              let message = dict["message"] as? String,
               let rawStacktrace = dict["stacktrace"] as? [[AnyHashable: Any]],
               let context = dict["context"] as? [String: Any],
               let tags = dict["tags"] as? [String: String],
@@ -183,7 +183,7 @@ public struct GutenbergJSException {
         }
         
         self.type = type
-        self.value = value
+        self.message = message
         self.stacktrace = rawStacktrace.compactMap { StacktraceLine(from: $0) }
         self.context = context
         self.tags = tags
