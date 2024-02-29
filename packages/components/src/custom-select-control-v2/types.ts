@@ -57,10 +57,6 @@ export type _CustomSelectProps = {
 	 * Accessible label for the control.
 	 */
 	label: string;
-	/**
-	 * Optional props passed to the Ariakit Select Popover.
-	 */
-	popoverProps?: Ariakit.SelectPopoverProps;
 };
 
 export type CustomSelectProps = _CustomSelectProps &
