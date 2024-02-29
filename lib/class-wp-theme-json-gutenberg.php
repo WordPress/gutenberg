@@ -1334,7 +1334,6 @@ class WP_Theme_JSON_Gutenberg {
 		return $block_nodes;
 	}
 
-
 	/**
 	 * Returns the global styles custom CSS for a single block.
 	 *

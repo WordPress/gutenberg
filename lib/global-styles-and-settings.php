@@ -224,7 +224,7 @@ function gutenberg_add_global_styles_block_custom_css() {
 
 		$stylesheet_handle = 'global-styles';
 
-		/**
+		/*
 		 * When `wp_should_load_separate_core_block_assets()` is true, follow a similar
 		 * logic to the one in `gutenberg_add_global_styles_for_blocks` to add the custom
 		 * css only when the block is rendered.
