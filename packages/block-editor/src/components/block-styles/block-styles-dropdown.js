@@ -38,13 +38,19 @@ function BlockStyleColorCard( { blockStyle } ) {
 			} ) }
 			justify="space-around"
 			style={ styles }
-			spacing={ 2 }
+			spacing={ 1 }
 		>
 			<Flex expanded={ false }>
-				<ColorIndicator colorValue={ text } />
+				<ColorIndicator
+					className="block-editor-block-styles__color-indicator"
+					colorValue={ text }
+				/>
 			</Flex>
 			<Flex expanded={ false }>
-				<ColorIndicator colorValue={ linkColor } />
+				<ColorIndicator
+					className="block-editor-block-styles__color-indicator"
+					colorValue={ linkColor }
+				/>
 			</Flex>
 		</HStack>
 	);
@@ -85,10 +91,7 @@ function BlockStylesDropdownContent( {
 	styles,
 } ) {
 	return (
-		<MenuGroup
-			className="block-editor-block-styles__dropdown-group"
-			label={ __( 'Block styles' ) }
-		>
+		<MenuGroup className="block-editor-block-styles__dropdown-group">
 			{ styles.map( ( style ) => {
 				const isSelected = activeStyle?.name === style.name;
 

@@ -20,12 +20,18 @@
 	box-shadow: inset 0 0 0 $border-width $gray-300;
 	width: 100%;
 }
+.block-editor-block-styles__color-indicator {
+	width: $grid-unit-10;
+	height: $grid-unit-10;
+}
 .block-editor-block-styles__dropdown-group,
 .block-editor-block-styles__dropdown-toggle {
 	.block-editor-block-styles__color-card {
-		width: $grid-unit-80;
-		padding: $grid-unit-05 $grid-unit-10;
+		// Width is 2 x 8px indicators, 2 x 8px padding, 4px gap.
+		width: $grid-unit-40 + $grid-unit-05;
+		padding: $grid-unit-10;
 		box-sizing: border-box;
+		border-radius: $radius-block-ui;
 
 		&.no-background {
 			box-shadow: inset 0 0 0 $border-width $gray-300;
