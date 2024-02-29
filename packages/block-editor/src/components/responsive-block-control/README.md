@@ -25,7 +25,7 @@ import { useState } from 'react';
 import { registerBlockType } from '@wordpress/blocks';
 import {
 	InspectorControls,
-	ResponsiveBlockControl,
+	__experimentalResponsiveBlockControl as ResponsiveBlockControl,
 } from '@wordpress/block-editor';
 import {
 	DimensionControl,
