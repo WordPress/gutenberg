@@ -2138,7 +2138,7 @@ class WP_Theme_JSON_Gutenberg {
 					$styles['background'],
 				);
 
-				$value = $background_styles['declarations'][$css_property] ?? $value;
+				$value = $background_styles['declarations'][ $css_property ] ?? $value;
 			}
 
 			// Skip if empty and not "0" or value represents array of longhand values.
