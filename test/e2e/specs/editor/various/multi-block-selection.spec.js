@@ -614,7 +614,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should keep correct selection when dragging outside block', async ( {
+	test( 'should keep correct selection when dragging outside block (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -730,7 +730,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should clear selection when clicking next to blocks', async ( {
+	test( 'should clear selection when clicking next to blocks (-firefox)', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
