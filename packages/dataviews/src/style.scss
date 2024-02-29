@@ -21,6 +21,17 @@
 
 .dataviews-filters__container {
 	padding-right: $grid-unit-40;
+
+	.dataviews-filters__reset-button[aria-disabled="true"] {
+		&,
+		&:hover {
+			opacity: 0;
+		}
+
+		&:focus {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-filters-button {
@@ -721,19 +732,6 @@
 		&:focus-visible {
 			outline: none;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-	}
-}
-
-.dataviews-filters__reset-button-container {
-	.dataviews-filters__reset-button[aria-disabled="true"],
-	.dataviews-filters__reset-button[aria-disabled="true"]:hover {
-		opacity: 0;
-	}
-
-	&:focus-within {
-		.dataviews-filters__reset-button[aria-disabled="true"] {
-			opacity: 1;
 		}
 	}
 }
