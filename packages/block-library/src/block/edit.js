@@ -314,17 +314,15 @@ export default function ReusableBlockEdit( {
 		[ editedRecord.blocks, editedRecord.content ]
 	);
 
-	// A map of clientIds to the old nano id system to provide back compat.
 	const legacyIdMap = useRef( {} );
+
+	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
+		// Build a map of clientIds to the old nano id system to provide back compat.
 		legacyIdMap.current = getLegacyIdMap(
 			initialBlocks,
 			initialContent.current
 		);
-	}, [ initialBlocks ] );
-
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
 		defaultContent.current = {};
 		const originalEditingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
