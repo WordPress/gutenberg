@@ -1332,8 +1332,8 @@ test.describe( 'Block bindings', () => {
 					},
 				} );
 				await page.keyboard.press( 'Enter' );
-				const initialParagraph = ( await editor.getBlocks() )[ 0 ];
-				const newEmptyParagraph = ( await editor.getBlocks() )[ 1 ];
+				const [ initialParagraph, newEmptyParagraph ] =
+					await editor.getBlocks();
 				// First block should be the original block.
 				expect( initialParagraph.name ).toBe( 'core/paragraph' );
 				expect( initialParagraph.attributes.content ).toBe(
@@ -1408,8 +1408,8 @@ test.describe( 'Block bindings', () => {
 					},
 				} );
 				await page.keyboard.press( 'Enter' );
-				const initialHeading = ( await editor.getBlocks() )[ 0 ];
-				const newEmptyParagraph = ( await editor.getBlocks() )[ 1 ];
+				const [ initialHeading, newEmptyParagraph ] =
+					await editor.getBlocks();
 				// First block should be the original block.
 				expect( initialHeading.name ).toBe( 'core/heading' );
 				expect( initialHeading.attributes.content ).toBe(
