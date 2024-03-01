@@ -75,7 +75,7 @@ function ControlsWithStoreSubscription( props ) {
 
 	const shouldShowResetOverridesControl =
 		! isEditingPattern &&
-		!! props.attributes.metadata?.id &&
+		!! props.attributes.metadata?.name &&
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;
 
