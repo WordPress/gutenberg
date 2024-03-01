@@ -581,28 +581,26 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$child_layout_declarations['flex-grow'] = '1';
 	}
 
-	if ( isset( $block['attrs']['style']['layout']['columnStart'] ) && isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
-		$column_start                             = $block['attrs']['style']['layout']['columnStart'];
-		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
+	$column_start = isset( $block['attrs']['style']['layout']['columnStart'] ) ? $block['attrs']['style']['layout']['columnStart'] : null;
+	$column_span  = isset( $block['attrs']['style']['layout']['columnSpan'] ) ? $block['attrs']['style']['layout']['columnSpan'] : null;
+	if ( $column_start && $column_span ) {
 		$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
-	} elseif ( isset( $block['attrs']['style']['layout']['columnStart'] ) ) {
-		$column_start                             = $block['attrs']['style']['layout']['columnStart'];
+	} elseif ( $column_start ) {
 		$child_layout_declarations['grid-column'] = "$column_start";
-	} elseif ( isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
-		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
+	} elseif ( $column_span ) {
 		$child_layout_declarations['grid-column'] = "span $column_span";
 	}
-	if ( isset( $block['attrs']['style']['layout']['rowStart'] ) && isset( $block['attrs']['style']['layout']['rowSpan'] ) ) {
-		$row_start                             = $block['attrs']['style']['layout']['rowStart'];
-		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
+
+	$row_start = isset( $block['attrs']['style']['layout']['rowStart'] ) ? $block['attrs']['style']['layout']['rowStart'] : null;
+	$row_span  = isset( $block['attrs']['style']['layout']['rowSpan'] ) ? $block['attrs']['style']['layout']['rowSpan'] : null;
+	if ( $row_start && $row_span ) {
 		$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
-	} elseif ( isset( $block['attrs']['style']['layout']['rowStart'] ) ) {
-		$row_start                             = $block['attrs']['style']['layout']['rowStart'];
+	} elseif ( $row_start ) {
 		$child_layout_declarations['grid-row'] = "$row_start";
-	} elseif ( isset( $block['attrs']['style']['layout']['rowSpan'] ) ) {
-		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
+	} elseif ( $row_span ) {
 		$child_layout_declarations['grid-row'] = "span $row_span";
 	}
+
 	$child_layout_styles[] = array(
 		'selector'     => ".$container_content_class",
 		'declarations' => $child_layout_declarations,
