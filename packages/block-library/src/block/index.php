@@ -55,7 +55,7 @@ function render_block_core_block( $attributes ) {
 	// This matches the `v2` deprecation. Removes the inner `values` property
 	// from every item.
 	if ( isset( $attributes['content'] ) ) {
-		foreach ( $attributes['content'] as $content_key => &$content_data ) {
+		foreach ( $attributes['content'] as &$content_data ) {
 			if ( isset( $content_data['values'] ) ) {
 				$is_assoc_array = is_array( $content_data['values'] ) && ! wp_is_numeric_array( $content_data['values'] );
 
