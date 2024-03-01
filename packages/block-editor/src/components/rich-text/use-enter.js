@@ -9,6 +9,7 @@ import {
 	createBlock,
 	getBlockTransforms,
 	findTransform,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 
@@ -20,14 +21,16 @@ import { splitValue } from './split-value';
 
 export function useEnter( props ) {
 	const registry = useRegistry();
-	const { insertBlock, __unstableMarkAutomaticChange } =
+	const { insertBlock, insertDefaultBlock, __unstableMarkAutomaticChange } =
 		useDispatch( blockEditorStore );
 	const {
+		canInsertBlockType,
 		getBlockIndex,
 		getBlockName,
 		getBlockRootClientId,
 		getSelectedBlockClientId,
 	} = useSelect( blockEditorStore );
+	const { getDefaultBlockName } = useSelect( blocksStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
@@ -42,11 +45,23 @@ export function useEnter( props ) {
 
 			if ( event.target.contentEditable !== 'true' ) {
 				const clientId = getSelectedBlockClientId();
-				insertBlock(
-					createBlock( getBlockName( clientId ), {} ),
-					getBlockIndex( clientId ) + 1,
+				const canInsertDefaultBlock = canInsertBlockType(
+					getDefaultBlockName(),
 					getBlockRootClientId( clientId )
 				);
+				if ( canInsertDefaultBlock ) {
+					insertDefaultBlock(
+						{},
+						getBlockRootClientId( clientId ),
+						getBlockIndex( clientId ) + 1
+					);
+				} else {
+					insertBlock(
+						createBlock( getBlockName( clientId ), {} ),
+						getBlockIndex( clientId ) + 1,
+						getBlockRootClientId( clientId )
+					);
+				}
 				return;
 			}
 
