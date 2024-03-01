@@ -1331,10 +1331,6 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-				await paragraphBlock.click();
 				await page.keyboard.press( 'Enter' );
 				const initialParagraph = ( await editor.getBlocks() )[ 0 ];
 				const newEmptyParagraph = ( await editor.getBlocks() )[ 1 ];
@@ -1411,10 +1407,6 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
-				const headingBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Heading',
-				} );
-				await headingBlock.click();
 				await page.keyboard.press( 'Enter' );
 				const initialHeading = ( await editor.getBlocks() )[ 0 ];
 				const newEmptyParagraph = ( await editor.getBlocks() )[ 1 ];
@@ -1593,13 +1585,13 @@ test.describe( 'Block bindings', () => {
 						},
 					],
 				} );
-				const buttonBlock = editor.canvas
+				await editor.canvas
 					.getByRole( 'document', {
 						name: 'Block: Button',
 						exact: true,
 					} )
-					.getByRole( 'textbox' );
-				await buttonBlock.click();
+					.getByRole( 'textbox' )
+					.click();
 				await page.keyboard.press( 'Enter' );
 				const [ initialButton, newEmptyButton ] = (
 					await editor.getBlocks()
