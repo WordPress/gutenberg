@@ -72,8 +72,7 @@ export default function VisualEditor( { styles } ) {
 
 	const isToBeIframed =
 		hasV3BlocksOnly ||
-		isGutenbergPlugin ||
-		isBlockBasedTheme ||
+		( isGutenbergPlugin && isBlockBasedTheme ) ||
 		isEditingTemplate;
 
 	return (
