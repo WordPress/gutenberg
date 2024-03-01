@@ -268,6 +268,14 @@ const SiteLogo = ( {
 			</ResizableBox>
 		);
 
+	// Support the previous location for the Site Icon settings. To be removed
+	// when the required WP core version for Gutenberg is >= 6.5.0.
+	const shouldUseNewUrl = ! window?.__experimentalUseCustomizerSiteLogoUrl;
+
+	const siteIconSettingsUrl = shouldUseNewUrl
+		? siteUrl + '/wp-admin/options-general.php'
+		: siteUrl + '/wp-admin/customize.php?autofocus[section]=title_tagline';
+
 	const syncSiteIconHelpText = createInterpolateElement(
 		__(
 			'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. To use a custom icon that is different from your site logo, use the <a>Site Icon settings</a>.'
@@ -276,10 +284,7 @@ const SiteLogo = ( {
 			a: (
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				<a
-					href={
-						siteUrl +
-						'/wp-admin/customize.php?autofocus[section]=title_tagline'
-					}
+					href={ siteIconSettingsUrl }
 					target="_blank"
 					rel="noopener noreferrer"
 				/>
