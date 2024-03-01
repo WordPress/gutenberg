@@ -10,6 +10,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -26,6 +27,7 @@ const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 export default function VisualEditor( { styles } ) {
 	const {
 		isWelcomeGuideVisible,
+		renderingMode,
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 		isEditingTemplate,
@@ -46,6 +48,27 @@ export default function VisualEditor( { styles } ) {
 				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
+
+	let paddingBottom;
+
+	// Add a constant padding for the typewritter effect. When typing at the
+	// bottom, there needs to be room to scroll up.
+	if ( renderingMode === 'post-only' ) {
+		paddingBottom = '40vh';
+	}
+
+	styles = useMemo(
+		() => [
+			...styles,
+			{
+				// We should move this in to future to the body.
+				css: paddingBottom
+					? `body{padding-bottom:${ paddingBottom }}`
+					: '',
+			},
+		],
+		[ styles, paddingBottom ]
+	);
 
 	const isToBeIframed =
 		hasV3BlocksOnly ||
