@@ -26,7 +26,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, Platform, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -39,10 +39,18 @@ import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
 
-export const IMAGE_BACKGROUND_TYPE = 'image';
+const IMAGE_BACKGROUND_TYPE = 'image';
 
+/**
+ * Checks site settings to see if the background panel may be used.
+ * `settings.background.backgroundSize` exists also,
+ * but can only be used if settings?.background?.backgroundImage is `true`.
+ *
+ * @param {Object} settings Site settings
+ * @return {boolean}        Whether site settings has activated background panel.
+ */
 export function useHasBackgroundPanel( settings ) {
-	return !! settings?.background?.backgroundImage;
+	return Platform.OS === 'web' && settings?.background?.backgroundImage;
 }
 
 /**
@@ -51,7 +59,7 @@ export function useHasBackgroundPanel( settings ) {
  * as background position.
  *
  * @param {Object} style Style attribute.
- * @return {boolean}     Whether or not the block has a background size value set.
+ * @return {boolean}     Whether the block has a background size value set.
  */
 export function hasBackgroundSizeValue( style ) {
 	return (
@@ -65,21 +73,38 @@ export function hasBackgroundSizeValue( style ) {
  * attributes.
  *
  * @param {Object} style Style attribute.
- * @return {boolean}     Whether or not the block has a background image value set.
+ * @return {boolean}     Whether the block has a background image value set.
  */
 export function hasBackgroundImageValue( style ) {
-	const hasValue =
+	return (
 		!! style?.background?.backgroundImage?.id ||
-		!! style?.background?.backgroundImage?.url;
-
-	return hasValue;
+		!! style?.background?.backgroundImage?.url
+	);
 }
 
-export const hasNumericalBackgroundPosition = ( value ) =>
-	typeof value === 'string' &&
-	value.split( ' ' ).every( ( v ) => ! isNaN( parseFloat( v ) ) );
+/**
+ * Get the help text for the background size control.
+ *
+ * @param {string} value backgroundSize value.
+ * @return {string}      Translated help text.
+ */
+function backgroundSizeHelpText( value ) {
+	if ( value === 'cover' || value === undefined ) {
+		return __( 'Image covers the space evenly.' );
+	}
+	if ( value === 'contain' ) {
+		return __( 'Image is contained without distortion.' );
+	}
+	return __( 'Specify a fixed width.' );
+}
 
-
+/**
+ * Coverts decimal x and y coords from FocalPointPicker to percentage-based values
+ * to use as backgroundPosition value.
+ *
+ * @param {{x?:number, y?:number}} value FocalPointPicker coords.
+ * @return {string}      				 backgroundPosition value.
+ */
 export const coordsToBackgroundPosition = ( value ) => {
 	if ( ! value || ( isNaN( value.x ) && isNaN( value.y ) ) ) {
 		return undefined;
@@ -91,6 +116,12 @@ export const coordsToBackgroundPosition = ( value ) => {
 	return `${ x * 100 }% ${ y * 100 }%`;
 };
 
+/**
+ * Coverts backgroundPosition value to x and y coords for FocalPointPicker.
+ *
+ * @param {string} value backgroundPosition value.
+ * @return {{x?:number, y?:number}}       FocalPointPicker coords.
+ */
 export const backgroundPositionToCoords = ( value ) => {
 	if ( ! value ) {
 		return { x: undefined, y: undefined };
@@ -103,16 +134,6 @@ export const backgroundPositionToCoords = ( value ) => {
 	return { x, y };
 };
 
-function backgroundSizeHelpText( value ) {
-	if ( value === 'cover' || value === undefined ) {
-		return __( 'Image covers the space evenly.' );
-	}
-	if ( value === 'contain' ) {
-		return __( 'Image is contained without distortion.' );
-	}
-	return __( 'Specify a fixed width.' );
-}
-
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	const imgLabel = label || getFilename( imgUrl );
 	return (
@@ -120,7 +141,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 			<HStack justify="flex-start" as="span">
 				<span
 					className={ classnames(
-						'block-editor-hooks__background__inspector-image-indicator-wrapper',
+						'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
 						{
 							'has-image': imgUrl,
 						}
@@ -129,7 +150,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 				>
 					{ imgUrl && (
 						<span
-							className="block-editor-hooks__background__inspector-image-indicator"
+							className="block-editor-global-styles-background-panel__inspector-image-indicator"
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
@@ -139,7 +160,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
-						className="block-editor-hooks__background__inspector-media-replace-title"
+						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
 					>
 						{ imgLabel }
 					</Truncate>
@@ -165,19 +186,13 @@ function BackgroundImageToolsPanelItem( {
 	style,
 	inheritedValue,
 } ) {
-	const { mediaUpload } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-
-			return {
-				mediaUpload: getSettings().mediaUpload,
-			};
-		},
-		[ panelId ]
+	const mediaUpload = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
 	);
 
 	const { id, title, url } = style?.background?.backgroundImage || {
-		...inheritedValue?.background.backgroundImage,
+		...inheritedValue?.background?.backgroundImage,
 	};
 
 	const replaceContainerRef = useRef();
@@ -269,7 +284,7 @@ function BackgroundImageToolsPanelItem( {
 			panelId={ panelId }
 		>
 			<div
-				className="block-editor-hooks__background__inspector-media-replace-container"
+				className="block-editor-global-styles-background-panel__inspector-media-replace-container"
 				ref={ replaceContainerRef }
 			>
 				<MediaReplaceFlow
@@ -396,7 +411,7 @@ function BackgroundSizeToolsPanelItem( {
 		);
 	};
 
-	const updateBackgroundPosition = ( next ) =>
+	const updateBackgroundPosition = ( next ) => {
 		onChange(
 			setImmutably(
 				style,
@@ -404,6 +419,7 @@ function BackgroundSizeToolsPanelItem( {
 				coordsToBackgroundPosition( next )
 			)
 		);
+	};
 
 	const toggleIsRepeated = () =>
 		onChange(
@@ -527,15 +543,14 @@ export default function BackgroundPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
-	const hasBackGroundSizeControl =
-		hasNumericalBackgroundPosition( settings?.background?.backgroundSize ) ||
-		hasNumericalBackgroundPosition( inheritedValue?.background?.backgroundSize );
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
 			background: {},
 		};
 	}, [] );
+	const shouldShowBackgroundSizeControls =
+		settings?.background?.backgroundSize;
 
 	return (
 		<Wrapper
@@ -551,15 +566,15 @@ export default function BackgroundPanel( {
 				style={ value }
 				inheritedValue={ inheritedValue }
 			/>
-			<BackgroundSizeToolsPanelItem
-				onChange={ onChange }
-				panelId={ panelId }
-				isShownByDefault={
-					hasBackGroundSizeControl || defaultControls.backgroundSize
-				}
-				style={ value }
-				inheritedValue={ inheritedValue }
-			/>
+			{ shouldShowBackgroundSizeControls && (
+				<BackgroundSizeToolsPanelItem
+					onChange={ onChange }
+					panelId={ panelId }
+					isShownByDefault={ defaultControls.backgroundSize }
+					style={ value }
+					inheritedValue={ inheritedValue }
+				/>
+			) }
 		</Wrapper>
 	);
 }

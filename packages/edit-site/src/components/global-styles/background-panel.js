@@ -25,7 +25,7 @@ export default function BackgroundPanel() {
 
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
-console.log( 'inheritedStyle', inheritedStyle );
+
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
