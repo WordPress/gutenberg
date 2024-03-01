@@ -472,11 +472,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if (
 			isEditableTree &&
-			// Ignore any placeholders.
-			( node.getAttribute( 'data-rich-text-placeholder' ) ||
-				// Ignore any line breaks that are not inserted by us.
-				( tagName === 'br' &&
-					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+			// Ignore any line breaks that are not inserted by us.
+			tagName === 'br' &&
+			! node.getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -541,7 +539,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		accumulateSelection( accumulator, node, range, value );
 
-		if ( ! format ) {
+		// Ignore any placeholders, but keep their content since the browser
+		// might insert text inside them when the editable element is flex.
+		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {
