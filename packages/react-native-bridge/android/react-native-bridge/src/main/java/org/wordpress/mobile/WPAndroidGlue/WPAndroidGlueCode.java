@@ -57,8 +57,10 @@ import org.wordpress.android.util.AppLog.T;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.LogExceptionCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergJsException;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
@@ -114,6 +116,8 @@ public class WPAndroidGlueCode {
     private OnToggleRedoButtonListener mOnToggleRedoButtonListener;
     private OnConnectionStatusEventListener mOnConnectionStatusEventListener;
     private OnBackHandlerEventListener mOnBackHandlerEventListener;
+
+    private OnDidLogExceptionListener mOnDidLogExceptionListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -225,6 +229,10 @@ public class WPAndroidGlueCode {
         void gutenbergDidRequestEmbedFullscreenPreview(String html, String title);
     }
 
+    public interface OnDidLogExceptionListener {
+        void didLogException(GutenbergJsException exception, LogExceptionCallback onLogExceptionCallback);
+    }
+
     public interface OnGutenbergDidSendButtonPressedActionListener {
         void gutenbergDidSendButtonPressedAction(String buttonType);
     }
@@ -272,6 +280,10 @@ public class WPAndroidGlueCode {
 
     public interface OnBackHandlerEventListener {
         void onBackHandler();
+    }
+
+    public interface OnLogExceptionListener {
+        void onLogException(GutenbergJsException exception);
     }
 
     public void mediaSelectionCancelled() {
@@ -617,8 +629,9 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void logException(final ReadableMap exception, LogExceptionCallback logExceptionCallback) {
-                logExceptionCallback.onLogException();
+            public void logException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback) {
+                mOnDidLogExceptionListener.didLogException(exception, logExceptionCallback);
+                logExceptionCallback.onLogException(true);
             }
         }, mIsDarkMode);
 
@@ -720,6 +733,7 @@ public class WPAndroidGlueCode {
                                   OnToggleRedoButtonListener onToggleRedoButtonListener,
                                   OnConnectionStatusEventListener onConnectionStatusEventListener,
                                   OnBackHandlerEventListener onBackHandlerEventListener,
+                                  OnDidLogExceptionListener onDidLogExceptionListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -747,6 +761,7 @@ public class WPAndroidGlueCode {
         mOnToggleRedoButtonListener = onToggleRedoButtonListener;
         mOnConnectionStatusEventListener = onConnectionStatusEventListener;
         mOnBackHandlerEventListener = onBackHandlerEventListener;
+        mOnDidLogExceptionListener = onDidLogExceptionListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
