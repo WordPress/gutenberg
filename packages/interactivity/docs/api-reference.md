@@ -620,6 +620,8 @@ For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-
 </ul>
 ```
 
+### `wp-each-child`
+
 For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
 
 ```html
