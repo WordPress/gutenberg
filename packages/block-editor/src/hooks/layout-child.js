@@ -10,7 +10,10 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
-import { GridVisualizer, GridItemResizer } from '../components/grid-visualizer';
+import {
+	GridVisualizer,
+	GridItemResizer,
+} from '../components/grid-interactivity';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
