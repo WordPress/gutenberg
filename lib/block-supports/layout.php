@@ -610,13 +610,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$column_count         = isset( $block['attrs']['style']['layout']['columnCount'] ) ? $block['attrs']['style']['layout']['columnCount'] : null;
 
 	/*
-	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
-	 * the columnSpan should be removed on small grids. If there's a minimumColumnWidth, the grid is responsive.
-	 * But if the minimumColumnWidth value wasn't changed, it won't be set. In that case, if columnCount doesn't
-	 * exist, we can assume that the grid is responsive.
+	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+	 * the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
+	 * once the grid has less columns than the start.
+	 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
+	 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
 	 */
-	if ( $column_span && ( $minimum_column_width || ! $column_count ) ) {
+	if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
 		$column_span_number  = floatval( $column_span );
+		$column_start_number = floatval( $column_start );
+		$highest_number      = max( $column_span_number, $column_start_number );
 		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 		$parent_column_value = floatval( $parent_column_width );
 		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
@@ -642,14 +645,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * viable to use in the computation of the container query value.
 		 */
 		$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
-		$container_query_value = $column_span_number * $parent_column_value + ( $column_span_number - 1 ) * $default_gap_value;
+		$container_query_value = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
 		$container_query_value = $container_query_value . $parent_column_unit;
+		// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
+		$grid_column_value = $column_span ? '1/-1' : 'auto';
 
 		$child_layout_styles[] = array(
 			'rules_group'  => "@container (max-width: $container_query_value )",
 			'selector'     => ".$container_content_class",
 			'declarations' => array(
-				'grid-column' => '1/-1',
+				'grid-column' => $grid_column_value,
 			),
 		);
 	}
