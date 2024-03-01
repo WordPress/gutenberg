@@ -125,7 +125,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@6d7209f44a25a59e904b1ee9f3b0c33ab2cd888d # v2.29.0
+              uses: shivammathur/setup-php@a4e22b60bbb9c1021113f2860347b0759f66fe5d # v2.30.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -144,7 +144,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
@@ -225,7 +225,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@6d7209f44a25a59e904b1ee9f3b0c33ab2cd888d # v2.29.0
+              uses: shivammathur/setup-php@a4e22b60bbb9c1021113f2860347b0759f66fe5d # v2.30.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -238,7 +238,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
+              uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -246,7 +246,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
