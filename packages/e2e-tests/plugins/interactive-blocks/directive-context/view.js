@@ -12,6 +12,11 @@ store( 'directive-context', {
 		get selected() {
 			const { list, selected } = getContext();
 			return list.find( ( obj ) => obj === selected )?.text;
+		},
+		get isProxyPreserved() {
+			const ctx = getContext();
+			const pointer = ctx.obj;
+			return pointer === ctx.obj;
 		}
 	},
 	actions: {

@@ -336,4 +336,11 @@ test.describe( 'data-wp-context', () => {
 		await expect( counterChild ).toHaveText( '1' );
 		await expect( changes ).toHaveText( '2' );
 	} );
+
+	test( 'references to the same context object should be preserved', async ( {
+		page,
+	} ) => {
+		const isProxyPreserved = page.getByTestId( 'is proxy preserved' );
+		await expect( isProxyPreserved ).toHaveText( 'true' );
+	} );
 } );

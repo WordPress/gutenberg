@@ -129,6 +129,13 @@ wp_enqueue_script_module( 'directive-context-view' );
 		>
 			Toggle Context Text
 		</button>
+
+		<div>
+			Is proxy preserved? <span
+				data-testid="is proxy preserved"
+				data-wp-text="state.isProxyPreserved"
+			></span>
+		</div>
 	</div>
 </div>
 
