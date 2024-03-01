@@ -152,8 +152,8 @@ require __DIR__ . '/compat/wordpress-6.5/fonts/fonts.php';
 
 // Load the Font Face and Font Face Resolver, if not already loaded by WordPress Core.
 if ( ! class_exists( 'WP_Font_Face' ) ) {
-	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
-	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
+	require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/class-wp-font-face.php';
+	require __DIR__ . '/compat/wordpress-6.5/fonts/font-face/class-wp-font-face-resolver.php';
 }
 
 /*
