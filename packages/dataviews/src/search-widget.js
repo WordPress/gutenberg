@@ -41,12 +41,12 @@ function normalizeSearchInput( input = '' ) {
 
 function ListBox( { view, filter, onChangeView } ) {
 	const compositeStore = useCompositeStore( {
+		virtualFocus: true,
 		focusLoop: true,
 		// When we have no or just one operators, we can set the first item as active.
 		// We do that by passing `undefined` to `defaultActiveId`. Otherwise, we set it to `null`,
 		// so the first item is not selected, since the focus is on the operators control.
 		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
-		includesBaseElement: false,
 	} );
 	const selectedFilter = view.filters.find(
 		( _filter ) => _filter.field === filter.field
@@ -67,50 +67,63 @@ function ListBox( { view, filter, onChangeView } ) {
 					compositeStore.move( compositeStore.first() );
 				}
 			} }
+			render={ <Ariakit.CompositeTypeahead store={ compositeStore } /> }
 		>
 			{ filter.elements.map( ( element ) => (
-				<CompositeItem
+				<Ariakit.CompositeHover
+					store={ compositeStore }
 					key={ element.value }
 					render={
-						<div
-							aria-label={ element.label }
-							role="option"
-							className="dataviews-search-widget-listitem"
+						<CompositeItem
+							render={
+								<div
+									aria-label={ element.label }
+									role="option"
+									className="dataviews-search-widget-listitem"
+								/>
+							}
+							onClick={ () => {
+								const currentFilter = view.filters.find(
+									( _filter ) =>
+										_filter.field === filter.field
+								);
+								const newFilters = currentFilter
+									? [
+											...view.filters.map(
+												( _filter ) => {
+													if (
+														_filter.field ===
+														filter.field
+													) {
+														return {
+															..._filter,
+															operator:
+																currentFilter.operator ||
+																filter
+																	.operators[ 0 ],
+															value: element.value,
+														};
+													}
+													return _filter;
+												}
+											),
+									  ]
+									: [
+											...view.filters,
+											{
+												field: filter.field,
+												operator: filter.operators[ 0 ],
+												value: element.value,
+											},
+									  ];
+								onChangeView( {
+									...view,
+									page: 1,
+									filters: newFilters,
+								} );
+							} }
 						/>
 					}
-					onClick={ () => {
-						const currentFilter = view.filters.find(
-							( _filter ) => _filter.field === filter.field
-						);
-						const newFilters = currentFilter
-							? [
-									...view.filters.map( ( _filter ) => {
-										if ( _filter.field === filter.field ) {
-											return {
-												..._filter,
-												operator:
-													currentFilter.operator ||
-													filter.operators[ 0 ],
-												value: element.value,
-											};
-										}
-										return _filter;
-									} ),
-							  ]
-							: [
-									...view.filters,
-									{
-										field: filter.field,
-										operator: filter.operators[ 0 ],
-										value: element.value,
-									},
-							  ];
-						onChangeView( {
-							...view,
-							page: 1,
-							filters: newFilters,
-						} );
-					} }
 				>
 					<span className="dataviews-search-widget-listitem-check">
 						{ selectedValues === element.value && (
@@ -125,7 +138,7 @@ function ListBox( { view, filter, onChangeView } ) {
 							</span>
 						) }
 					</span>
-				</CompositeItem>
+				</Ariakit.CompositeHover>
 			) ) }
 		</Composite>
 	);
