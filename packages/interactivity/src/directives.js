@@ -17,6 +17,10 @@ import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 // Assigned objects should be ignore during proxification.
 const contextAssignedObjects = new WeakMap();
 
+// Store the context proxy and fallback for each object in the context.
+const contextObjectToProxy = new WeakMap();
+const contextObjectToFallback = new WeakMap();
+
 const isPlainObject = ( item ) =>
 	item && typeof item === 'object' && item.constructor === Object;
 
@@ -36,58 +40,71 @@ const descriptor = Reflect.getOwnPropertyDescriptor;
  *
  * @return {Object} The wrapped context object.
  */
-const proxifyContext = ( current, inherited = {} ) =>
-	new Proxy( current, {
-		get: ( target, k ) => {
-			// Always subscribe to prop changes in the current context.
-			const currentProp = target[ k ];
+const proxifyContext = ( current, inherited = {} ) => {
+	// Update the fallback object reference when it changes.
+	contextObjectToFallback.set( current, inherited );
+	if ( ! contextObjectToProxy.has( current ) ) {
+		const proxy = new Proxy( current, {
+			get: ( target, k ) => {
+				const fallback = contextObjectToFallback.get( current );
+				// Always subscribe to prop changes in the current context.
+				const currentProp = target[ k ];
 
-			// Return the inherited prop when missing in target.
-			if ( ! ( k in target ) && k in inherited ) {
-				return inherited[ k ];
-			}
-
-			// Proxify plain objects that are not listed in `ignore`.
-			if (
-				k in target &&
-				! contextAssignedObjects.get( target )?.has( k ) &&
-				isPlainObject( peek( target, k ) )
-			) {
-				return proxifyContext( currentProp, inherited[ k ] );
-			}
-
-			/*
-			 * For other cases, return the value from target, also subscribing
-			 * to changes in the parent context when the current prop is
-			 * not defined.
-			 */
-			return k in target ? currentProp : inherited[ k ];
-		},
-		set: ( target, k, value ) => {
-			const obj =
-				k in target || ! ( k in inherited ) ? target : inherited;
-
-			// Values that are objects should not be proxified so they point to
-			// the original object and don't inherit unexpected properties.
-			if ( value && typeof value === 'object' ) {
-				if ( ! contextAssignedObjects.has( obj ) ) {
-					contextAssignedObjects.set( obj, new Set() );
+				// Return the inherited prop when missing in target.
+				if ( ! ( k in target ) && k in fallback ) {
+					return fallback[ k ];
 				}
-				contextAssignedObjects.get( obj ).add( k );
-			}
 
-			obj[ k ] = value;
-			return true;
-		},
-		ownKeys: ( target ) => [
-			...new Set( [
-				...Object.keys( inherited ),
-				...Object.keys( target ),
-			] ),
-		],
-		getOwnPropertyDescriptor: ( target, k ) =>
-			descriptor( target, k ) || descriptor( inherited, k ),
-	} );
+				// Proxify plain objects that are not listed in `ignore`.
+				if (
+					k in target &&
+					! contextAssignedObjects.get( target )?.has( k ) &&
+					isPlainObject( peek( target, k ) )
+				) {
+					return proxifyContext( currentProp, fallback[ k ] );
+				}
+
+				/*
+				 * For other cases, return the value from target, also
+				 * subscribing to changes in the parent context when the current
+				 * prop is not defined.
+				 */
+				return k in target ? currentProp : fallback[ k ];
+			},
+			set: ( target, k, value ) => {
+				const fallback = contextObjectToFallback.get( current );
+				const obj =
+					k in target || ! ( k in fallback ) ? target : fallback;
+
+				/*
+				 * Assigned object values should not be proxified so they point
+				 * to the original object and don't inherit unexpected
+				 * properties.
+				 */
+				if ( value && typeof value === 'object' ) {
+					if ( ! contextAssignedObjects.has( obj ) ) {
+						contextAssignedObjects.set( obj, new Set() );
+					}
+					contextAssignedObjects.get( obj ).add( k );
+				}
+
+				obj[ k ] = value;
+				return true;
+			},
+			ownKeys: ( target ) => [
+				...new Set( [
+					...Object.keys( contextObjectToFallback.get( current ) ),
+					...Object.keys( target ),
+				] ),
+			],
+			getOwnPropertyDescriptor: ( target, k ) =>
+				descriptor( target, k ) ||
+				descriptor( contextObjectToFallback.get( current ), k ),
+		} );
+		contextObjectToProxy.set( current, proxy );
+	}
+	return contextObjectToProxy.get( current );
+};
 
 /**
  * Recursively update values within a deepSignal object.
