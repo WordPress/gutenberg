@@ -47,6 +47,7 @@ export default function StyleVariationsContainer() {
 							label={ variation?.title }
 							withHoverView
 							isFocused={ isFocused }
+							variation={ variation }
 						/>
 					) }
 				</Variation>
