@@ -10,6 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { PATTERN_SYNC_TYPES } from '../constants';
+import { hasOverridableAttributes } from '../utils';
 
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
@@ -137,3 +138,38 @@ export function setEditingPattern( clientId, isEditing ) {
 		isEditing,
 	};
 }
+
+/**
+ * Returns a generator converting a synced pattern block into a static block.
+ *
+ * @param {string} clientId The client ID of the pattern block.
+ * @param {string} [mode]   The explicit editing mode to set if defined.
+ */
+export const syncPatternEditingMode =
+	( clientId, mode ) =>
+	( { registry } ) => {
+		const patternBlocks = registry
+			.select( blockEditorStore )
+			.getBlocks( clientId );
+		const { setBlockEditingMode } = registry.dispatch( blockEditorStore );
+
+		function recursivelySetEditMode( blocks ) {
+			blocks.forEach( ( block ) => {
+				const editMode =
+					mode ||
+					( hasOverridableAttributes( block )
+						? 'contentOnly'
+						: 'disabled' );
+				setBlockEditingMode( block.clientId, editMode );
+				recursivelySetEditMode(
+					block.innerBlocks,
+					// Disable editing for nested patterns.
+					block.name === 'core/block' ? 'disabled' : mode
+				);
+			} );
+		}
+
+		registry.batch( () => {
+			recursivelySetEditMode( patternBlocks );
+		} );
+	};
