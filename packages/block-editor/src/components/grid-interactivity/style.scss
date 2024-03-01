@@ -1,5 +1,5 @@
 .block-editor-grid-visualizer {
-	// Override the z-index and pointer-events set by .components-popover using lots of specificity.
+	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
 		z-index: z-index(".block-editor-grid-visualizer");
 
@@ -29,17 +29,23 @@
 }
 
 .block-editor-grid-item-resizer {
-	z-index: z-index(".block-editor-grid-visualizer") !important;
-}
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
+		z-index: z-index(".block-editor-grid-visualizer");
 
-.block-editor-grid-item-resizer .components-popover__content * {
-	pointer-events: none !important;
+		.components-popover__content * {
+			pointer-events: none;
+		}
+	}
 }
 
 .block-editor-grid-item-resizer__box {
 	border: $border-width solid var(--wp-admin-theme-color);
 
 	.components-resizable-box__handle {
-		pointer-events: all !important;
+		// Specificity to override the pointer-events set by .components-popover.
+		&.components-resizable-box__handle.components-resizable-box__handle {
+			pointer-events: all;
+		}
 	}
 }
