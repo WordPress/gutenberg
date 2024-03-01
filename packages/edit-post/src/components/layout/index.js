@@ -139,7 +139,7 @@ function Layout( { initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar } =
+	const { openGeneralSidebar, closeGeneralSidebar, initializeMetaBoxes } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setIsInserterOpened } = useDispatch( editorStore );
@@ -158,6 +158,8 @@ function Layout( { initialPost } ) {
 		isDistractionFree,
 		showBlockBreadcrumbs,
 		showMetaBoxes,
+		areMetaBoxesInitialized,
+		isEditorReady,
 		documentLabel,
 		hasHistory,
 	} = useSelect( ( select ) => {
@@ -169,7 +171,11 @@ function Layout( { initialPost } ) {
 		return {
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only' &&
+				select( editPostStore ).areMetaBoxesInitialized() &&
 				select( editPostStore ).showMetaBoxes(),
+			areMetaBoxesInitialized:
+				select( editPostStore ).areMetaBoxesInitialized(),
+			isEditorReady: select( editorStore ).__unstableIsEditorReady(),
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
@@ -223,6 +229,22 @@ function Layout( { initialPost } ) {
 			closeGeneralSidebar();
 		}
 	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
+	// When editor is ready, initialize postboxes (wp core script) and metabox
+	// saving.
+	useEffect( () => {
+		if (
+			isEditorReady &&
+			hasActiveMetaboxes &&
+			! areMetaBoxesInitialized
+		) {
+			initializeMetaBoxes();
+		}
+	}, [
+		isEditorReady,
+		hasActiveMetaboxes,
+		areMetaBoxesInitialized,
+		initializeMetaBoxes,
+	] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -341,7 +363,7 @@ function Layout( { initialPost } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						{ ! isDistractionFree && showMetaBoxes && (
+						{ showMetaBoxes && (
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
