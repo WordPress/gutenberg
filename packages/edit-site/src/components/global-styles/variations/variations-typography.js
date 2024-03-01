@@ -13,11 +13,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import { unlock } from '../../lock-unlock';
-import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import Subtitle from './subtitle';
+import { mergeBaseAndUserConfigs } from '../global-styles-provider';
+import { unlock } from '../../../lock-unlock';
+import { getFamilyPreviewStyle } from '../font-library-modal/utils/preview-styles';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import Subtitle from '../subtitle';
 import Variation from './variation';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -72,7 +72,7 @@ const TypePreview = ( { variation } ) => {
 		: {};
 	return (
 		<motion.div
-			className="edit-site-global-styles-type-preview"
+			className="edit-site-global-styles-variations__type-preview"
 			animate={ {
 				scale: 1,
 				opacity: 1,

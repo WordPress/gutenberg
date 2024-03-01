@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import StylesPreview from './preview';
-import Variation from './variation';
+import Variation from './variations/variation';
 
 export default function StyleVariationsContainer() {
 	const variations = useSelect( ( select ) => {
