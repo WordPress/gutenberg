@@ -47,7 +47,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Paragraph', () => {
-			test( 'Should show the value of the custom field', async ( {
+			test( 'should show the value of the custom field', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -72,7 +72,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should lock the appropriate controls with a registered source', async ( {
+			test( 'should lock the appropriate controls with a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -118,7 +118,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should lock the appropriate controls when source is not defined', async ( {
+			test( 'should lock the appropriate controls when source is not defined', async ( {
 				editor,
 				page,
 			} ) => {
@@ -166,7 +166,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Heading', () => {
-			test( 'Should show the key of the custom field', async ( {
+			test( 'should show the key of the custom field', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -189,7 +189,7 @@ test.describe( 'Block bindings', () => {
 				await expect( headingBlock ).toHaveText( 'text_custom_field' );
 			} );
 
-			test( 'Should lock the appropriate controls with a registered source', async ( {
+			test( 'should lock the appropriate controls with a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -235,7 +235,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should lock the appropriate controls when source is not defined', async ( {
+			test( 'should lock the appropriate controls when source is not defined', async ( {
 				editor,
 				page,
 			} ) => {
@@ -283,7 +283,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Button', () => {
-			test( 'Should show the key of the custom field when text is bound', async ( {
+			test( 'should show the key of the custom field when text is bound', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -313,7 +313,7 @@ test.describe( 'Block bindings', () => {
 				await expect( buttonBlock ).toHaveText( 'text_custom_field' );
 			} );
 
-			test( 'Should lock text controls when text is bound to a registered source', async ( {
+			test( 'should lock text controls when text is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -375,7 +375,7 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 			} );
 
-			test( 'Should lock text controls when text is bound to an undefined source', async ( {
+			test( 'should lock text controls when text is bound to an undefined source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -437,7 +437,7 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 			} );
 
-			test( 'Should lock url controls when url is bound to a registered source', async ( {
+			test( 'should lock url controls when url is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -497,7 +497,7 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 			} );
 
-			test( 'Should lock url controls when url is bound to an undefined source', async ( {
+			test( 'should lock url controls when url is bound to an undefined source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -557,7 +557,7 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 			} );
 
-			test( 'Should lock url and text controls when both are bound', async ( {
+			test( 'should lock url and text controls when both are bound', async ( {
 				editor,
 				page,
 			} ) => {
@@ -630,7 +630,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Image', () => {
-			test( 'Should show the upload form when url is not bound', async ( {
+			test( 'should show the upload form when url is not bound', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( { name: 'core/image' } );
@@ -643,7 +643,7 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 			} );
 
-			test( 'Should NOT show the upload form when url is bound to a registered source', async ( {
+			test( 'should NOT show the upload form when url is bound to a registered source', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -671,7 +671,7 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 			} );
 
-			test( 'Should NOT show the upload form when url is bound to an undefined source', async ( {
+			test( 'should NOT show the upload form when url is bound to an undefined source', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -699,7 +699,7 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 			} );
 
-			test( 'Should lock url controls when url is bound to a registered source', async ( {
+			test( 'should lock url controls when url is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -768,7 +768,7 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'Should lock url controls when url is bound to an undefined source', async ( {
+			test( 'should lock url controls when url is bound to an undefined source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -837,7 +837,7 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'Should disable alt textarea when alt is bound to a registered source', async ( {
+			test( 'should disable alt textarea when alt is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -900,7 +900,7 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'Should disable alt textarea when alt is bound to an undefined source', async ( {
+			test( 'should disable alt textarea when alt is bound to an undefined source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -963,7 +963,7 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'Should disable title input when title is bound to a registered source', async ( {
+			test( 'should disable title input when title is bound to a registered source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1026,7 +1026,7 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'text_custom_field' );
 			} );
 
-			test( 'Should disable title input when title is bound to an undefined source', async ( {
+			test( 'should disable title input when title is bound to an undefined source', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1168,7 +1168,7 @@ test.describe( 'Block bindings', () => {
 			await admin.createNewPost( { title: 'Test bindings' } );
 		} );
 		test.describe( 'Paragraph', () => {
-			test( 'Should show the value of the custom field when exists', async ( {
+			test( 'should show the value of the custom field when exists', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1210,7 +1210,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( "Should show the value of the key when custom field doesn't exists", async ( {
+			test( "should show the value of the key when custom field doesn't exist", async ( {
 				editor,
 				page,
 			} ) => {
@@ -1312,50 +1312,125 @@ test.describe( 'Block bindings', () => {
 					'fallback value'
 				);
 			} );
-		} );
 
-		test( 'Heading - should show the value of the custom field', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					anchor: 'heading-binding',
-					content: 'heading default content',
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/post-meta',
-								args: { key: 'text_custom_field' },
+			test( 'should add empty paragraph block when pressing enter', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
 							},
 						},
 					},
-				},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await paragraphBlock.click();
+				await page.keyboard.press( 'Enter' );
+				const initialParagraph = ( await editor.getBlocks() )[ 0 ];
+				const newEmptyParagraph = ( await editor.getBlocks() )[ 1 ];
+				// First block should be the original block.
+				expect( initialParagraph.name ).toBe( 'core/paragraph' );
+				expect( initialParagraph.attributes.content ).toBe(
+					'Value of the text_custom_field'
+				);
+				// Second block should be an empty paragraph block.
+				expect( newEmptyParagraph.name ).toBe( 'core/paragraph' );
+				expect( newEmptyParagraph.attributes.content ).toBe( '' );
 			} );
-			const headingBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Heading',
-			} );
-			await expect( headingBlock ).toHaveText(
-				'Value of the text_custom_field'
-			);
-			// Heading is not editable.
-			await expect( headingBlock ).toHaveAttribute(
-				'contenteditable',
-				'false'
-			);
+		} );
 
-			// Check the frontend shows the value of the custom field.
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
-			await expect( page.locator( '#heading-binding' ) ).toBeVisible();
-			await expect( page.locator( '#heading-binding' ) ).toHaveText(
-				'Value of the text_custom_field'
-			);
+		test.describe( 'Heading', () => {
+			test( 'should show the value of the custom field', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						anchor: 'heading-binding',
+						content: 'heading default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const headingBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} );
+				await expect( headingBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
+				// Heading is not editable.
+				await expect( headingBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+
+				// Check the frontend shows the value of the custom field.
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+				await expect(
+					page.locator( '#heading-binding' )
+				).toBeVisible();
+				await expect( page.locator( '#heading-binding' ) ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
+
+			test( 'should add empty paragraph block when pressing enter', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						anchor: 'heading-binding',
+						content: 'heading default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const headingBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} );
+				await headingBlock.click();
+				await page.keyboard.press( 'Enter' );
+				const initialHeading = ( await editor.getBlocks() )[ 0 ];
+				const newEmptyParagraph = ( await editor.getBlocks() )[ 1 ];
+				// First block should be the original block.
+				expect( initialHeading.name ).toBe( 'core/heading' );
+				expect( initialHeading.attributes.content ).toBe(
+					'Value of the text_custom_field'
+				);
+				// Second block should be an empty paragraph block.
+				expect( newEmptyParagraph.name ).toBe( 'core/paragraph' );
+				expect( newEmptyParagraph.attributes.content ).toBe( '' );
+			} );
 		} );
 
 		test.describe( 'Button', () => {
-			test( 'Should show the value of the custom field when text is bound', async ( {
+			test( 'should show the value of the custom field when text is bound', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1411,7 +1486,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should use the value of the custom field when url is bound', async ( {
+			test( 'should use the value of the custom field when url is bound', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1449,7 +1524,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should use the values of the custom fields when text and url are bound', async ( {
+			test( 'should use the values of the custom fields when text and url are bound', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1492,6 +1567,53 @@ test.describe( 'Block bindings', () => {
 					'#url-custom-field'
 				);
 			} );
+
+			test( 'should add empty button block when pressing enter', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								anchor: 'button-text-binding',
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'core/post-meta',
+											args: { key: 'text_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' );
+				await buttonBlock.click();
+				await page.keyboard.press( 'Enter' );
+				const initialButton = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				const newEmptyButton = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 1 ];
+				// First block should be the original block.
+				expect( initialButton.name ).toBe( 'core/button' );
+				expect( initialButton.attributes.text ).toBe(
+					'Value of the text_custom_field'
+				);
+				// Second block should be an empty paragraph block.
+				expect( newEmptyButton.name ).toBe( 'core/button' );
+				expect( newEmptyButton.attributes.text ).toBe( '' );
+			} );
 		} );
 
 		test.describe( 'Image', () => {
@@ -1518,7 +1640,7 @@ test.describe( 'Block bindings', () => {
 				} );
 				await page.reload();
 			} );
-			test( 'Should show the value of the custom field when url is bound', async ( {
+			test( 'should show the value of the custom field when url is bound', async ( {
 				editor,
 				page,
 				BlockBindingsUtils,
@@ -1569,7 +1691,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should show value of the custom field in the alt textarea when alt is bound', async ( {
+			test( 'should show value of the custom field in the alt textarea when alt is bound', async ( {
 				editor,
 				page,
 				BlockBindingsUtils,
@@ -1635,7 +1757,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'Should show value of the custom field in the title input when title is bound', async ( {
+			test( 'should show value of the custom field in the title input when title is bound', async ( {
 				editor,
 				page,
 				BlockBindingsUtils,
