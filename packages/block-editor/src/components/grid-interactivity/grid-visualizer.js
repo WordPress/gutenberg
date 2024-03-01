@@ -87,7 +87,6 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 		function onGlobalDrag() {
 			setHasCellPointerEvents( true );
 		}
-
 		function onGlobalDragEnd() {
 			setHasCellPointerEvents( false );
 		}
