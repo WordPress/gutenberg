@@ -626,15 +626,17 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void logException(final ReadableMap exception, final Callback jsCallback) {
+    public void logException(final ReadableMap rawException, final Callback jsCallback) {
+        GutenbergJsException exception = GutenbergJsException.fromReadableMap(rawException);
         LogExceptionCallback logExceptionCallback = onLogExceptionCallback(jsCallback);
+
         mGutenbergBridgeJS2Parent.logException(exception, logExceptionCallback);
     }
 
    private LogExceptionCallback onLogExceptionCallback(final Callback jsCallback) {
        return new GutenbergBridgeJS2Parent.LogExceptionCallback() {
-           @Override public void onLogException() {
-               jsCallback.invoke();
+           @Override public void onLogException(boolean success) {
+               jsCallback.invoke(success);
            }
        };
    }

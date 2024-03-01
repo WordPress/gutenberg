@@ -65,7 +65,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     }
 
     interface LogExceptionCallback {
-        void onLogException();
+        void onLogException(boolean success);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -194,5 +194,5 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
 
-    void logException(ReadableMap exception, LogExceptionCallback jsCallback);
+    void logException(GutenbergJsException exception, LogExceptionCallback jsCallback);
 }
