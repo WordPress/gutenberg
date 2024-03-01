@@ -1601,10 +1601,8 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'textbox' );
 				await buttonBlock.click();
 				await page.keyboard.press( 'Enter' );
-				const initialButton = ( await editor.getBlocks() )[ 0 ]
-					.innerBlocks[ 0 ];
-				const newEmptyButton = ( await editor.getBlocks() )[ 0 ]
-					.innerBlocks[ 1 ];
+				const [ initialButton, newEmptyButton ] = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks;
 				// First block should be the original block.
 				expect( initialButton.name ).toBe( 'core/button' );
 				expect( initialButton.attributes.text ).toBe(
