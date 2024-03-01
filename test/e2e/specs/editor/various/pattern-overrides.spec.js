@@ -86,8 +86,7 @@ test.describe( 'Pattern Overrides', () => {
 			}
 			await editorSettings
 				.getByRole( 'textbox', { name: 'Block Name' } )
-				.click();
-			await page.keyboard.type( editableParagraphName );
+				.fill( editableParagraphName );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
