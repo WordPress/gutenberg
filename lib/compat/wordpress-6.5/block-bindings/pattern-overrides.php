@@ -15,11 +15,11 @@
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_pattern_overrides_callback( $source_attrs, $block_instance, $attribute_name ) {
-	if ( ! isset( $block_instance->context[ 'pattern/overrides'] ) )  {
+	if ( ! isset( $block_instance->context['pattern/overrides'] ) ) {
 		return null;
 	}
 
-	$override_content = $block_instance->context[ 'pattern/overrides'];
+	$override_content = $block_instance->context['pattern/overrides'];
 
 	// Back compat. Pattern overrides previously used a metadata `id` instead of `name`.
 	// We check first for the name, and if it exists, use that value.
