@@ -54,13 +54,13 @@ function render_block_core_block( $attributes ) {
 
 	// This matches the `v2` deprecation. Removes the inner `values` property
 	// from every item.
-	if ( isset( $attributes['content' ] ) ) {
+	if ( isset( $attributes['content'] ) ) {
 		foreach ( $attributes['content'] as $content_key => &$content_data ) {
-			if ( isset( $content_data[ 'values' ] ) ) {
-				$is_assoc_array = is_array( $content_data[ 'values' ] ) && ! wp_is_numeric_array( $content_data[ 'values' ] );
+			if ( isset( $content_data['values'] ) ) {
+				$is_assoc_array = is_array( $content_data['values'] ) && ! wp_is_numeric_array( $content_data['values'] );
 
 				if ( $is_assoc_array ) {
-					$content_data = $content_data[ 'values' ];
+					$content_data = $content_data['values'];
 				}
 			}
 		}
@@ -70,7 +70,6 @@ function render_block_core_block( $attributes ) {
 	if ( isset( $attributes['overrides'] ) && ! isset( $attributes['content'] ) ) {
 		$attributes['content'] = $attributes['overrides'];
 	}
-
 
 	/**
 	 * We set the `pattern/overrides` context through the `render_block_context`
