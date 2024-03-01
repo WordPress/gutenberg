@@ -28,12 +28,6 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
 	}
-
-	// Support the previous location for the Site Icon settings. To be removed
-	// when the required WP core version for Gutenberg is >= 6.5.0.
-	if ( ! is_wp_version_compatible( '6.5' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalUseCustomizerSiteLogoUrl = true', 'before' );
-	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
