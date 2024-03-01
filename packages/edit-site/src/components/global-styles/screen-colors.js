@@ -11,7 +11,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import ScreenHeader from './header';
 import Palette from './palette';
 import { unlock } from '../../lock-unlock';
-import ColorVariations from './variations-color';
+import ColorVariations from './variations/variations-color';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const {
