@@ -125,7 +125,7 @@ Different contexts can be defined at different levels, and deeper levels will me
 
 ### `wp-bind`
 
-This directive allows setting HTML attributes on elements based on a boolean or string value. It follows the syntax `data-wp-bind--attribute`. 
+This directive allows setting HTML attributes on elements based on a boolean or string value. It follows the syntax `data-wp-bind--attribute`.
 
 ```html
 <li data-wp-context='{ "isMenuOpen": false }'>
@@ -225,7 +225,7 @@ The boolean value received by the directive is used to toggle (add when `true` o
 
 ### `wp-style`
 
-This directive adds or removes inline style to an HTML element, depending on its value. It follows the syntax `data-wp-style--css-property`. 
+This directive adds or removes inline style to an HTML element, depending on its value. It follows the syntax `data-wp-style--css-property`.
 
 ```html
 <div data-wp-context='{ "color": "red" }' >
@@ -299,7 +299,7 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-on`
 
-This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`). 
+This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
 ```php
 <button data-wp-on--click="actions.logTime" >
@@ -387,7 +387,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 It runs a callback **when the node is created and runs it again when the state or context changes**.
 
-You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`. 
+You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-watch` directives of that DOM element.
 
@@ -491,7 +491,7 @@ This directive runs the passed callback **during the node's render execution**.
 
 You can use and compose hooks like `useState`, `useWatch`, or `useEffect` inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
-You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. 
+You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-run` directives of that DOM element.
 
@@ -619,6 +619,8 @@ For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-
   </template>
 </ul>
 ```
+
+### `wp-each-child`
 
 For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
 
