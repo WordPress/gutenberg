@@ -13,6 +13,7 @@ import { useLayout } from '../components/block-list/layout';
 import {
 	GridVisualizer,
 	GridItemResizer,
+	GridItemPinToolbarItem,
 } from '../components/grid-interactivity';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
@@ -131,29 +132,34 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		},
 		[ clientId ]
 	);
+
 	if ( parentLayout.type !== 'grid' ) {
 		return null;
 	}
 	if ( ! window.__experimentalEnableGridInteractivity ) {
 		return null;
 	}
+
+	function updateLayout( layout ) {
+		setAttributes( {
+			style: {
+				...style,
+				layout: {
+					...style?.layout,
+					...layout,
+				},
+			},
+		} );
+	}
+
 	return (
 		<>
 			<GridVisualizer clientId={ rootClientId } />
-			<GridItemResizer
+			<GridItemResizer clientId={ clientId } onChange={ updateLayout } />
+			<GridItemPinToolbarItem
 				clientId={ clientId }
-				onChange={ ( { columnSpan, rowSpan } ) => {
-					setAttributes( {
-						style: {
-							...style,
-							layout: {
-								...style?.layout,
-								columnSpan,
-								rowSpan,
-							},
-						},
-					} );
-				} }
+				layout={ style?.layout }
+				onChange={ updateLayout }
 			/>
 		</>
 	);

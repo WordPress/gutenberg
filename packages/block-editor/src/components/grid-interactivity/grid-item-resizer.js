@@ -8,7 +8,7 @@ import { ResizableBox } from '@wordpress/components';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS } from './utils';
+import { getComputedCSS, getGridLines, getClosestLine } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
@@ -76,25 +76,5 @@ export function GridItemResizer( { clientId, onChange } ) {
 				} }
 			/>
 		</BlockPopoverCover>
-	);
-}
-
-function getGridLines( template, gap ) {
-	const lines = [ 0 ];
-	for ( const size of template.split( ' ' ) ) {
-		const line = parseFloat( size );
-		lines.push( lines[ lines.length - 1 ] + line + gap );
-	}
-	return lines;
-}
-
-function getClosestLine( lines, position ) {
-	return lines.reduce(
-		( closest, line, index ) =>
-			Math.abs( line - position ) <
-			Math.abs( lines[ closest ] - position )
-				? index
-				: closest,
-		0
 	);
 }
