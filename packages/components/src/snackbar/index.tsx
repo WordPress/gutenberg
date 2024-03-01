@@ -150,21 +150,24 @@ function UnforwardedSnackbar(
 					<div className="components-snackbar__icon">{ icon }</div>
 				) }
 				{ children }
-				{ actions.map( ( { label, onClick, url }, index ) => {
-					return (
-						<Button
-							key={ index }
-							href={ url }
-							variant="tertiary"
-							onClick={ (
-								event: MouseEvent< HTMLButtonElement >
-							) => onActionClick( event, onClick ) }
-							className="components-snackbar__action"
-						>
-							{ label }
-						</Button>
-					);
-				} ) }
+				{ actions.map(
+					( { label, onClick, url, ...otherProps }, index ) => {
+						return (
+							<Button
+								key={ index }
+								href={ url }
+								variant="tertiary"
+								onClick={ (
+									event: MouseEvent< HTMLButtonElement >
+								) => onActionClick( event, onClick ) }
+								className="components-snackbar__action"
+								{ ...otherProps }
+							>
+								{ label }
+							</Button>
+						);
+					}
+				) }
 				{ explicitDismiss && (
 					<span
 						role="button"

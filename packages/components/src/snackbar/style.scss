@@ -52,6 +52,7 @@
 	flex-shrink: 0;
 	line-height: $default-line-height;
 	padding: 0;
+	gap: $grid-unit-05;
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
 		text-decoration: underline;
@@ -72,7 +73,7 @@
 
 .components-snackbar__content {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	justify-content: space-between;
 	line-height: $default-line-height;
 }

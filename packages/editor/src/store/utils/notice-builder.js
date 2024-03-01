@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
+import { Icon, external } from '@wordpress/icons';
 
 /**
  * Builds the arguments for a success notification dispatch.
@@ -60,9 +61,16 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 
 	const actions = [];
 	if ( shouldShowLink ) {
+		const label = isDraft ? __( 'View Draft' ) : postType.labels.view_item;
 		actions.push( {
-			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
+			label: (
+				<>
+					{ label }
+					<Icon icon={ external } />
+				</>
+			),
 			url: post.link,
+			target: '_blank',
 		} );
 	}
 	return [
