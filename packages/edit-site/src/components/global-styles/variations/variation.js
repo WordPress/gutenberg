@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useContext, useState } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { Button, Icon } from '@wordpress/components';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,7 +17,11 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation, children } ) {
+export default function Variation( {
+	variation,
+	children,
+	shouldShowTooltip = true,
+} ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
@@ -44,13 +44,6 @@ export default function Variation( { variation, children } ) {
 		} ) );
 	};
 
-	const selectOnEnter = ( event ) => {
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			selectVariation();
-		}
-	};
-
 	const isActive = useMemo(
 		() => areGlobalStyleConfigsEqual( user, variation ),
 		[ user, variation ]
@@ -68,26 +61,26 @@ export default function Variation( { variation, children } ) {
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
-			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
-				role="button"
+			<Button
+				className="edit-site-global-styles-variations_item"
 				onClick={ selectVariation }
-				onKeyDown={ selectOnEnter }
-				tabIndex="0"
-				aria-label={ label }
+				label={ label }
 				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
+				showTooltip={ shouldShowTooltip }
 			>
-				<div className="edit-site-global-styles-variations_item-preview">
+				<span className="edit-site-global-styles-variations_item-preview">
 					{ children( isFocused ) }
-				</div>
-			</div>
+				</span>
+				{ isActive && (
+					<Icon
+						icon={ check }
+						size={ 16 }
+						className="edit-site-global-styles-variations_active-icon"
+					/>
+				) }
+			</Button>
 		</GlobalStylesContext.Provider>
 	);
 }

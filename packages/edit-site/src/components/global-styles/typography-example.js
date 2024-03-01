@@ -36,7 +36,8 @@ export default function PreviewTypography( { fontSize, variation } ) {
 	}
 
 	return (
-		<motion.div
+		<motion.span
+			className="edit-site-global-styles_preview-typography"
 			animate={ {
 				scale: 1,
 				opacity: 1,
@@ -50,6 +51,7 @@ export default function PreviewTypography( { fontSize, variation } ) {
 				type: 'tween',
 			} }
 			style={ {
+				display: 'block',
 				fontSize: '22px',
 				lineHeight: '44px',
 				textAlign: 'center',
@@ -61,6 +63,6 @@ export default function PreviewTypography( { fontSize, variation } ) {
 			<span style={ bodyPreviewStyle }>
 				{ _x( 'a', 'Lowercase letter A' ) }
 			</span>
-		</motion.div>
+		</motion.span>
 	);
 }

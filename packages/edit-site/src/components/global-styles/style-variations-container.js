@@ -41,7 +41,11 @@ export default function StyleVariationsContainer() {
 			className="edit-site-global-styles-style-variations-container"
 		>
 			{ withEmptyVariation.map( ( variation, index ) => (
-				<Variation key={ index } variation={ variation }>
+				<Variation
+					key={ index }
+					variation={ variation }
+					shouldShowTooltip={ false }
+				>
 					{ ( isFocused ) => (
 						<PreviewStyles
 							label={ variation?.title }
