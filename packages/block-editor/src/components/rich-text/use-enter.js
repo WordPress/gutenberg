@@ -5,13 +5,8 @@ import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { insert, remove } from '@wordpress/rich-text';
-import {
-	createBlock,
-	getBlockTransforms,
-	findTransform,
-	store as blocksStore,
-} from '@wordpress/blocks';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,47 +16,20 @@ import { splitValue } from './split-value';
 
 export function useEnter( props ) {
 	const registry = useRegistry();
-	const { insertBlock, insertDefaultBlock, __unstableMarkAutomaticChange } =
-		useDispatch( blockEditorStore );
-	const {
-		canInsertBlockType,
-		getBlockIndex,
-		getBlockName,
-		getBlockRootClientId,
-		getSelectedBlockClientId,
-	} = useSelect( blockEditorStore );
-	const { getDefaultBlockName } = useSelect( blocksStore );
+	const { __unstableMarkAutomaticChange } = useDispatch( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
+			if ( event.target.contentEditable !== 'true' ) {
+				return;
+			}
+
 			if ( event.defaultPrevented ) {
 				return;
 			}
 
 			if ( event.keyCode !== ENTER ) {
-				return;
-			}
-
-			if ( event.target.contentEditable !== 'true' ) {
-				const clientId = getSelectedBlockClientId();
-				const canInsertDefaultBlock = canInsertBlockType(
-					getDefaultBlockName(),
-					getBlockRootClientId( clientId )
-				);
-				if ( canInsertDefaultBlock ) {
-					insertDefaultBlock(
-						{},
-						getBlockRootClientId( clientId ),
-						getBlockIndex( clientId ) + 1
-					);
-				} else {
-					insertBlock(
-						createBlock( getBlockName( clientId ), {} ),
-						getBlockIndex( clientId ) + 1,
-						getBlockRootClientId( clientId )
-					);
-				}
 				return;
 			}
 
