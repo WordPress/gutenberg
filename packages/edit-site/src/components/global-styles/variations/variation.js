@@ -2,10 +2,10 @@
  * WordPress dependencies
  */
 import { useMemo, useContext, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Button, Icon } from '@wordpress/components';
 import { check } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,6 +22,11 @@ export default function Variation( {
 	children,
 	shouldShowTooltip = true,
 } ) {
+	const instanceId = useInstanceId(
+		Variation,
+		'edit-site-global-styles-variations_item'
+	);
+	const descriptionId = variation?.description ? instanceId : undefined;
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
@@ -49,26 +54,17 @@ export default function Variation( {
 		[ user, variation ]
 	);
 
-	let label = variation?.title;
-	if ( variation?.description ) {
-		label = sprintf(
-			/* translators: %1$s: variation title. %2$s variation description. */
-			__( '%1$s (%2$s)' ),
-			variation?.title,
-			variation?.description
-		);
-	}
-
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<Button
 				className="edit-site-global-styles-variations_item"
 				onClick={ selectVariation }
-				label={ label }
+				label={ variation?.title }
 				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 				showTooltip={ shouldShowTooltip }
+				aria-describedby={ descriptionId }
 			>
 				<span className="edit-site-global-styles-variations_item-preview">
 					{ children( isFocused ) }
@@ -81,6 +77,11 @@ export default function Variation( {
 					/>
 				) }
 			</Button>
+			{ descriptionId && (
+				<div hidden id={ descriptionId }>
+					{ variation?.description }
+				</div>
+			) }
 		</GlobalStylesContext.Provider>
 	);
 }
