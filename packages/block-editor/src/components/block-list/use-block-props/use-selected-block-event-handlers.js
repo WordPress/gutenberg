@@ -22,7 +22,8 @@ import { store as blockEditorStore } from '../../../store';
 export function useEventHandlers( { clientId, isSelected } ) {
 	const { getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
+	const { insertAfterBlock, insertDefaultBlock, removeBlock } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -57,11 +58,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
-					insertDefaultBlock(
-						{},
-						getBlockRootClientId( clientId ),
-						getBlockIndex( clientId ) + 1
-					);
+					insertAfterBlock( clientId );
 				} else {
 					removeBlock( clientId );
 				}
