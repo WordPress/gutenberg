@@ -606,15 +606,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'declarations' => $child_layout_declarations,
 	);
 
+	$minimum_column_width = isset( $block['attrs']['style']['layout']['minimumColumnWidth'] ) ? $block['attrs']['style']['layout']['minimumColumnWidth'] : null;
+	$column_count         = isset( $block['attrs']['style']['layout']['columnCount'] ) ? $block['attrs']['style']['layout']['columnCount'] : null;
+
 	/*
 	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
 	 * the columnSpan should be removed on small grids. If there's a minimumColumnWidth, the grid is responsive.
 	 * But if the minimumColumnWidth value wasn't changed, it won't be set. In that case, if columnCount doesn't
 	 * exist, we can assume that the grid is responsive.
 	 */
-	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && ( isset( $block['parentLayout']['minimumColumnWidth'] ) || ! isset( $block['parentLayout']['columnCount'] ) ) ) {
-		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
-		$parent_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : '12rem';
+	if ( $column_span && ( $minimum_column_width || ! $column_count ) ) {
+		$column_span_number  = floatval( $column_span );
+		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 		$parent_column_value = floatval( $parent_column_width );
 		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
 
