@@ -438,7 +438,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should keep internal selection after blur', async ( {
+	test( 'should keep internal selection after blur (-webkit)', async ( {
 		page,
 		editor,
 		pageUtils,
