@@ -45,6 +45,11 @@ const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
  * transforms e.g. settings found in `block.json`.
  */
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+/**
+ * Key within block settings' supports array indicating support for text
+ * indent e.g. settings found in `block.json`.
+ */
+const TEXT_INDENT_SUPPORT_KEY = 'typography.__experimentalTextIndent';
 
 /**
  * Key within block settings' supports array indicating support for letter-spacing
@@ -61,6 +66,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
+	TEXT_INDENT_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
