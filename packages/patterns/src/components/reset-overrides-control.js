@@ -11,13 +11,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
-function recursivelyFindBlockWithId( blocks, id ) {
+function recursivelyFindBlockWithName( blocks, name ) {
 	for ( const block of blocks ) {
-		if ( block.attributes.metadata?.id === id ) {
+		if ( block.attributes.metadata?.name === name ) {
 			return block;
 		}
 
-		const found = recursivelyFindBlockWithId( block.innerBlocks, id );
+		const found = recursivelyFindBlockWithName( block.innerBlocks, name );
 		if ( found ) {
 			return found;
 		}
@@ -26,10 +26,10 @@ function recursivelyFindBlockWithId( blocks, id ) {
 
 export default function ResetOverridesControl( props ) {
 	const registry = useRegistry();
-	const id = props.attributes.metadata?.id;
+	const name = props.attributes.metadata?.name;
 	const patternWithOverrides = useSelect(
 		( select ) => {
-			if ( ! id ) {
+			if ( ! name ) {
 				return undefined;
 			}
 
@@ -39,13 +39,13 @@ export default function ResetOverridesControl( props ) {
 				getBlockParentsByBlockName( props.clientId, 'core/block' )
 			)[ 0 ];
 
-			if ( ! patternBlock?.attributes.content?.[ id ] ) {
+			if ( ! patternBlock?.attributes.content?.[ name ] ) {
 				return undefined;
 			}
 
 			return patternBlock;
 		},
-		[ props.clientId, id ]
+		[ props.clientId, name ]
 	);
 
 	const resetOverrides = async () => {
@@ -57,7 +57,7 @@ export default function ResetOverridesControl( props ) {
 				patternWithOverrides.attributes.ref
 			);
 		const blocks = editedRecord.blocks ?? parse( editedRecord.content );
-		const block = recursivelyFindBlockWithId( blocks, id );
+		const block = recursivelyFindBlockWithName( blocks, name );
 
 		const newAttributes = Object.assign(
 			// Reset every existing attribute to undefined.
