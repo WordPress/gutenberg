@@ -1333,15 +1333,14 @@ test.describe( 'Block bindings', () => {
 				} );
 				await page.keyboard.press( 'Enter' );
 				const [ initialParagraph, newEmptyParagraph ] =
-					await editor.getBlocks();
-				// First block should be the original block.
-				expect( initialParagraph.name ).toBe( 'core/paragraph' );
-				expect( initialParagraph.attributes.content ).toBe(
+					await editor.canvas
+						.locator( '[data-type="core/paragraph"]' )
+						.all();
+				await expect( initialParagraph ).toHaveText(
 					'Value of the text_custom_field'
 				);
-				// Second block should be an empty paragraph block.
-				expect( newEmptyParagraph.name ).toBe( 'core/paragraph' );
-				expect( newEmptyParagraph.attributes.content ).toBe( '' );
+				await expect( newEmptyParagraph ).toHaveText( '' );
+				await expect( newEmptyParagraph ).toBeEditable();
 			} );
 		} );
 
@@ -1408,16 +1407,24 @@ test.describe( 'Block bindings', () => {
 					},
 				} );
 				await page.keyboard.press( 'Enter' );
+				// Can't use `editor.getBlocks` because it doesn't return the meta value shown in the editor.
 				const [ initialHeading, newEmptyParagraph ] =
-					await editor.getBlocks();
+					await editor.canvas.locator( '[data-block]' ).all();
 				// First block should be the original block.
-				expect( initialHeading.name ).toBe( 'core/heading' );
-				expect( initialHeading.attributes.content ).toBe(
+				await expect( initialHeading ).toHaveAttribute(
+					'data-type',
+					'core/heading'
+				);
+				await expect( initialHeading ).toHaveText(
 					'Value of the text_custom_field'
 				);
 				// Second block should be an empty paragraph block.
-				expect( newEmptyParagraph.name ).toBe( 'core/paragraph' );
-				expect( newEmptyParagraph.attributes.content ).toBe( '' );
+				await expect( newEmptyParagraph ).toHaveAttribute(
+					'data-type',
+					'core/paragraph'
+				);
+				await expect( newEmptyParagraph ).toHaveText( '' );
+				await expect( newEmptyParagraph ).toBeEditable();
 			} );
 		} );
 
@@ -1593,17 +1600,16 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'textbox' )
 					.click();
 				await page.keyboard.press( 'Enter' );
-				const [ initialButton, newEmptyButton ] = (
-					await editor.getBlocks()
-				)[ 0 ].innerBlocks;
+				const [ initialButton, newEmptyButton ] = await editor.canvas
+					.locator( '[data-type="core/button"]' )
+					.all();
 				// First block should be the original block.
-				expect( initialButton.name ).toBe( 'core/button' );
-				expect( initialButton.attributes.text ).toBe(
+				await expect( initialButton ).toHaveText(
 					'Value of the text_custom_field'
 				);
 				// Second block should be an empty paragraph block.
-				expect( newEmptyButton.name ).toBe( 'core/button' );
-				expect( newEmptyButton.attributes.text ).toBe( '' );
+				await expect( newEmptyButton ).toHaveText( '' );
+				await expect( newEmptyButton ).toBeEditable();
 			} );
 		} );
 
