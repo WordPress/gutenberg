@@ -5,8 +5,12 @@ import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { insert, remove } from '@wordpress/rich-text';
-import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import {
+	createBlock,
+	getBlockTransforms,
+	findTransform,
+} from '@wordpress/blocks';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,20 +20,33 @@ import { splitValue } from './split-value';
 
 export function useEnter( props ) {
 	const registry = useRegistry();
-	const { __unstableMarkAutomaticChange } = useDispatch( blockEditorStore );
+	const { insertBlock, __unstableMarkAutomaticChange } =
+		useDispatch( blockEditorStore );
+	const {
+		getBlockIndex,
+		getBlockName,
+		getBlockRootClientId,
+		getSelectedBlockClientId,
+	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
-			if ( event.target.contentEditable !== 'true' ) {
-				return;
-			}
-
 			if ( event.defaultPrevented ) {
 				return;
 			}
 
 			if ( event.keyCode !== ENTER ) {
+				return;
+			}
+
+			if ( event.target.contentEditable !== 'true' ) {
+				const clientId = getSelectedBlockClientId();
+				insertBlock(
+					createBlock( getBlockName( clientId ), {} ),
+					getBlockIndex( clientId ) + 1,
+					getBlockRootClientId( clientId )
+				);
 				return;
 			}
 
