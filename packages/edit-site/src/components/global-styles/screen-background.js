@@ -11,12 +11,12 @@ import BackgroundPanel from './background-panel';
 import ScreenHeader from './header';
 import { unlock } from '../../lock-unlock';
 
-const { useHasBackgroundPanel, useGlobalSetting, useSettingsForBlockElement } =
-	unlock( blockEditorPrivateApis );
+const { useHasBackgroundPanel, useGlobalSetting } = unlock(
+	blockEditorPrivateApis
+);
 
 function ScreenBackground() {
-	const [ rawSettings ] = useGlobalSetting( '' );
-	const settings = useSettingsForBlockElement( rawSettings );
+	const [ settings ] = useGlobalSetting( '' );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	return (
 		<>

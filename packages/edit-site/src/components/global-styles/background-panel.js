@@ -11,7 +11,6 @@ import { unlock } from '../../lock-unlock';
 const {
 	useGlobalStyle,
 	useGlobalSetting,
-	useSettingsForBlockElement,
 	BackgroundPanel: StylesBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -22,9 +21,7 @@ export default function BackgroundPanel() {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
 		shouldDecodeEncode: false,
 	} );
-
-	const [ rawSettings ] = useGlobalSetting( '' );
-	const settings = useSettingsForBlockElement( rawSettings );
+	const [ settings ] = useGlobalSetting( '' );
 
 	return (
 		<StylesBackgroundPanel
