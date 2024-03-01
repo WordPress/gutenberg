@@ -172,6 +172,11 @@ module.exports = {
 					'Do not use string literals for IDs; use withInstanceId instead.',
 			},
 			{
+				selector: 'JSXAttribute[name.name="disabled"]',
+				message:
+					'Do not use the disabled attribute; use aria-disabled instead.',
+			},
+			{
 				// Discourage the usage of `Math.random()` as it's a code smell
 				// for UUID generation, for which we already have a higher-order
 				// component: `withInstanceId`.
