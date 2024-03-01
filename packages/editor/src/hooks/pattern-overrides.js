@@ -14,7 +14,7 @@ import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 const {
-	PartialSyncingControls,
+	useSetPatternBindings,
 	ResetOverridesControl,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
@@ -29,7 +29,7 @@ const {
  *
  * @return {Component} Wrapped component.
  */
-const withPartialSyncingControls = createHigherOrderComponent(
+const withPatternOverrideControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const isSupportedBlock = Object.keys(
 			PARTIAL_SYNCING_SUPPORTED_BLOCKS
@@ -38,6 +38,7 @@ const withPartialSyncingControls = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } />
+				{ isSupportedBlock && <BindingUpdater { ...props } /> }
 				{ props.isSelected && isSupportedBlock && (
 					<ControlsWithStoreSubscription { ...props } />
 				) }
@@ -45,6 +46,15 @@ const withPartialSyncingControls = createHigherOrderComponent(
 		);
 	}
 );
+
+function BindingUpdater( props ) {
+	const postType = useSelect(
+		( select ) => select( editorStore ).getCurrentPostType(),
+		[]
+	);
+	useSetPatternBindings( props, postType );
+	return null;
+}
 
 // Split into a separate component to avoid a store subscription
 // on every block.
@@ -55,6 +65,7 @@ function ControlsWithStoreSubscription( props ) {
 			select( editorStore ).getCurrentPostType() === PATTERN_TYPES.user,
 		[]
 	);
+
 	const bindings = props.attributes.metadata?.bindings;
 	const hasPatternBindings =
 		!! bindings &&
@@ -62,19 +73,14 @@ function ControlsWithStoreSubscription( props ) {
 			( binding ) => binding.source === 'core/pattern-overrides'
 		);
 
-	const shouldShowPartialSyncingControls =
-		isEditingPattern && blockEditingMode === 'default';
 	const shouldShowResetOverridesControl =
 		! isEditingPattern &&
-		!! props.attributes.metadata?.id &&
+		!! props.attributes.metadata?.name &&
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;
 
 	return (
 		<>
-			{ shouldShowPartialSyncingControls && (
-				<PartialSyncingControls { ...props } />
-			) }
 			{ shouldShowResetOverridesControl && (
 				<ResetOverridesControl { ...props } />
 			) }
@@ -84,6 +90,6 @@ function ControlsWithStoreSubscription( props ) {
 
 addFilter(
 	'editor.BlockEdit',
-	'core/editor/with-partial-syncing-controls',
-	withPartialSyncingControls
+	'core/editor/with-pattern-override-controls',
+	withPatternOverrideControls
 );

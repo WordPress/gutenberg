@@ -51,6 +51,9 @@
 
 .dataviews-view-table-wrapper {
 	overflow-x: auto;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 }
 
 .dataviews-view-table {
@@ -219,7 +222,6 @@
 	color: $gray-900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden;
 	display: block;
 	width: 100%;
 
@@ -235,6 +237,7 @@
 		&:hover {
 			color: $gray-900;
 		}
+		@include link-reset();
 	}
 
 	button.components-button.is-link {
@@ -473,6 +476,10 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dataviews-view-table-selection-checkbox label {

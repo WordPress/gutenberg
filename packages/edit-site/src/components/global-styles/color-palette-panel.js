@@ -13,6 +13,8 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import ColorVariations from './variations-color';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
@@ -45,7 +47,12 @@ export default function ColorPalettePanel( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
+		filter: ( variation ) =>
+			variation?.settings?.color &&
+			Object.keys( variation?.settings?.color ).length,
+	} );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 
@@ -78,6 +85,9 @@ export default function ColorPalettePanel( { name } ) {
 						popoverProps={ popoverProps }
 					/>
 				) }
+			{ !! colorVariations.length && (
+				<ColorVariations variations={ colorVariations } />
+			) }
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }

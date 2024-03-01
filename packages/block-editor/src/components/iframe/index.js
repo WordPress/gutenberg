@@ -107,6 +107,7 @@ function Iframe( {
 	shouldZoom = false,
 	readonly,
 	forwardedRef: ref,
+	title = __( 'Editor canvas' ),
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode, isZoomOutMode } = useSelect(
@@ -245,7 +246,19 @@ function Iframe( {
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
-		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		<style>
+			html{
+				height: auto !important;
+				min-height: 100%;
+			}
+
+			body {
+				margin: 0;
+				/* Default background color in case zoom out mode background
+				colors the html element */
+				background: white;
+			}
+		</style>
 		${ styles }
 		${ scripts }
 	</head>
@@ -283,9 +296,13 @@ function Iframe( {
 		}
 	}, [ scale, frameSize, marginFromScaling, iframeDocument ] );
 
+	// Make sure to not render the before and after focusable div elements in view
+	// mode. They're only needed to capture focus in edit mode.
+	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+
 	return (
 		<>
-			{ tabIndex >= 0 && before }
+			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
@@ -301,7 +318,7 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
-				title={ __( 'Editor canvas' ) }
+				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
 						props.onKeyDown( event );
@@ -346,7 +363,7 @@ function Iframe( {
 						iframeDocument.documentElement
 					) }
 			</iframe>
-			{ tabIndex >= 0 && after }
+			{ shouldRenderFocusCaptureElements && after }
 		</>
 	);
 }
