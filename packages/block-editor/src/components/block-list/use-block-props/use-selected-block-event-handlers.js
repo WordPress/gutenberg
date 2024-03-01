@@ -22,8 +22,7 @@ import { store as blockEditorStore } from '../../../store';
 export function useEventHandlers( { clientId, isSelected } ) {
 	const { getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const { insertAfterBlock, insertDefaultBlock, removeBlock } =
-		useDispatch( blockEditorStore );
+	const { insertAfterBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -87,7 +86,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			isSelected,
 			getBlockRootClientId,
 			getBlockIndex,
-			insertDefaultBlock,
+			insertAfterBlock,
 			removeBlock,
 		]
 	);
