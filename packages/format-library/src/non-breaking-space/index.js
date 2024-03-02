@@ -11,8 +11,8 @@ const title = __( 'Non breaking space' );
 export const nonBreakingSpace = {
 	name,
 	title,
-	tagName: 'span',
-	className: 'nbsp',
+	tagName: 'nbsp',
+	className: null,
 	edit( { value, onChange } ) {
 		function addNonBreakingSpace() {
 			onChange( insert( value, '\u00a0' ) );

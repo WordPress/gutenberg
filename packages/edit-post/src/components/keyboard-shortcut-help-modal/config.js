@@ -47,7 +47,7 @@ export const textFormattingShortcuts = [
 		),
 	},
 	{
-		keyCombination: { modifier: 'primaryShift', character: 'SPACE' },
+		keyCombination: { modifier: 'primaryShift', character: '\u00a0' },
 		description: __( 'Add non breaking space.' ),
 	},
 ];
