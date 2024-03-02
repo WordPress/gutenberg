@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistrySelector } from '@wordpress/data';
-import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,7 +30,7 @@ export const getInsertionPoint = createRegistrySelector(
 
 		if ( getRenderingMode( state ) === 'template-locked' ) {
 			const [ postContentClientId ] =
-				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+				select( blockEditorStore ).getBlocksByName(
 					'core/post-content'
 				);
 			if ( postContentClientId ) {
@@ -52,9 +46,6 @@ export const getInsertionPoint = createRegistrySelector(
 	}
 );
 
-export const getListViewToggleRef = createSelector(
-	() => {
-		return createRef();
-	},
-	() => []
-);
+export function getListViewToggleRef( state ) {
+	return state.listViewToggleRef;
+}

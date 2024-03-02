@@ -40,3 +40,18 @@ export function addUnprocessedBlockType( name, blockType ) {
 		dispatch.addBlockTypes( processedBlockType );
 	};
 }
+
+/**
+ * Register new block bindings source.
+ *
+ * @param {string} source Name of the source to register.
+ */
+export function registerBlockBindingsSource( source ) {
+	return {
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		useSource: source.useSource,
+		lockAttributesEditing: source.lockAttributesEditing,
+	};
+}

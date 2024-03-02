@@ -92,6 +92,20 @@ function bootstrappedBlockTypes( state = {}, action ) {
 						blockHooks: blockType.blockHooks,
 					};
 				}
+
+				// The `allowedBlocks` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.5.
+				if (
+					serverDefinition.allowedBlocks === undefined &&
+					blockType.allowedBlocks
+				) {
+					newDefinition = {
+						...serverDefinition,
+						...newDefinition,
+						allowedBlocks: blockType.allowedBlocks,
+					};
+				}
 			} else {
 				newDefinition = Object.fromEntries(
 					Object.entries( blockType )
@@ -369,6 +383,20 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
+export function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				useSource: action.useSource,
+				lockAttributesEditing: action.lockAttributesEditing ?? true,
+			},
+		};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	bootstrappedBlockTypes,
 	unprocessedBlockTypes,
@@ -381,4 +409,5 @@ export default combineReducers( {
 	groupingBlockName,
 	categories,
 	collections,
+	blockBindingsSources,
 } );

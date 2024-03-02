@@ -43,6 +43,9 @@
 						"docs/getting-started/fundamentals/markup-representation-block.md": []
 					},
 					{
+						"docs/getting-started/fundamentals/static-dynamic-rendering.md": []
+					},
+					{
 						"docs/getting-started/fundamentals/javascript-in-the-block-editor.md": []
 					}
 				]
@@ -56,9 +59,6 @@
 			{ "docs/how-to-guides/accessibility.md": [] },
 			{
 				"docs/how-to-guides/block-tutorial/README.md": [
-					{
-						"docs/how-to-guides/block-tutorial/writing-your-first-block-type.md": []
-					},
 					{
 						"docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md": []
 					},

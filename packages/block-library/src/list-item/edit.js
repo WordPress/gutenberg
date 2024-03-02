@@ -29,7 +29,6 @@ import {
 	useOutdentListItem,
 	useSplit,
 	useMerge,
-	useCopy,
 } from './hooks';
 import { convertToListItems } from './utils';
 
@@ -79,9 +78,8 @@ export default function ListItemEdit( {
 	mergeBlocks,
 } ) {
 	const { placeholder, content } = attributes;
-	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
+	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list' ],
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );

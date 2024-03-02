@@ -39,10 +39,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 			<CheckboxControl
 				__nextHasNoMarginBottom
 				label={
-					<strong>
-						{ decodeEntities( entityRecordTitle ) ||
-							__( 'Untitled' ) }
-					</strong>
+					decodeEntities( entityRecordTitle ) || __( 'Untitled' )
 				}
 				checked={ checked }
 				onChange={ onChange }

@@ -2,6 +2,75 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent passing state proxies as receivers to deepSignal proxy handlers. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
+
+## 5.1.0 (2024-02-21)
+
+### Bug Fixes
+
+-   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
+-   Improve context merges using proxies. ([59187](https://github.com/WordPress/gutenberg/pull/59187))
+
+## 5.0.0 (2024-02-09)
+
+### New Features
+
+-   Export `getConfig()` to retrieve the server-defined configuration for the passed namespace. ([58749](https://github.com/WordPress/gutenberg/pull/58749))
+
+### Breaking changes
+
+-   Remove the style prop (`key`) and class name arguments the `data-wp-style` and `data-wp-class` directives. ([#58835](https://github.com/WordPress/gutenberg/pull/58835)).
+-   Remove the `data-wp-body` directive. ([#58835](https://github.com/WordPress/gutenberg/pull/58835))
+
+### Enhancements
+
+-   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))
+-   Support setting the namespace using a string in `data-wp-interactive`, like `data-wp-interactive="myPlugin"`. ([#58743](https://github.com/WordPress/gutenberg/pull/58743))
+
+### Bug Fixes
+
+-   Avoid initializing private stores as public when they have initial state. ([#58754](https://github.com/WordPress/gutenberg/pull/58754))
+
+### Bug fixes
+
+-   Interactivity API: Remove non default suffix data wp context processing. ([#58664](https://github.com/WordPress/gutenberg/pull/58664))
+
+## 4.0.1 (2024-01-31)
+
+### Bug Fixes
+
+-   Ensure Preact is used in published packages ([58258](https://github.com/WordPress/gutenberg/pull/58258).
+
+## 4.0.0 (2024-01-24)
+
+### Enhancements
+
+-   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
+-   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([#57891](https://github.com/WordPress/gutenberg/pull/57891))
+-   Export `withScope()` and allow to use it with asynchronous operations. ([#58013](https://github.com/WordPress/gutenberg/pull/58013))
+-   Add `block supports` for `clientNavigation` and `interactive` properties on `block.json` schema.([#58132](https://github.com/WordPress/gutenberg/pull/58132))
+
+### New Features
+
+-   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([#57805](https://github.com/WordPress/gutenberg/pull/57805))
+-   Add `wp-data-on-window` and `wp-data-on-document` directives. ([#57931](https://github.com/WordPress/gutenberg/pull/57931))
+-   Add the `data-wp-each` directive to render lists of items using a template. ([57859](https://github.com/WordPress/gutenberg/pull/57859))
+
+### Breaking Changes
+
+-   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
+-   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
+-   Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
+-   Convert `navigate` and `prefetch` function to actions of the new `core/router` store, available when importing the `@wordpress/interactivity-router` module. ([#57924](https://github.com/WordPress/gutenberg/pull/57924))
+
+### Bug Fix
+
+-   Prevent `wp-data-on=""` from creating `onDefault` handlers. ([#57925](https://github.com/WordPress/gutenberg/pull/57925))
+
+## 3.2.0 (2024-01-10)
+
 ### Bug Fix
 
 -   Fix namespaces when there are nested interactive regions. ([#57029](https://github.com/WordPress/gutenberg/pull/57029))

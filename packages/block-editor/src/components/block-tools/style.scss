@@ -235,6 +235,11 @@
 			padding-right: 6px;
 			padding-left: 6px;
 			background-color: $white;
+
+			.show-icon-labels & {
+				padding-right: $grid-unit-15;
+				padding-left: $grid-unit-15;
+			}
 		}
 	}
 
@@ -242,15 +247,11 @@
 	.show-icon-labels & {
 
 		.block-editor-block-parent-selector {
-			position: static;
-			margin-top: -$border-width;
+			position: relative;
+			left: auto;
 			margin-left: -$border-width;
-			margin-bottom: -$border-width;
-
-			.block-editor-block-parent-selector__button {
-				position: static;
-			}
 		}
+
 		.block-editor-block-mover__move-button-container,
 		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
 			border-left: 1px solid $gray-900;

@@ -54,11 +54,7 @@ function UnforwardedSelectControl(
 		__next40pxDefaultSize = false,
 		__nextHasNoMarginBottom = false,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.SelectControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;

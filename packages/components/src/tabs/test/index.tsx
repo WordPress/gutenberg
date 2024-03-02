@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import { press, click } from '@ariakit/test';
+import { press, click, sleep } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -194,12 +194,14 @@ describe( 'Tabs', () => {
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 
 			// By default the tabpanel should receive focus
+			await sleep();
 			await press.Tab();
 			expect( selectedTabPanel ).toHaveFocus();
 		} );
@@ -229,12 +231,14 @@ describe( 'Tabs', () => {
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 			// Because the alpha tabpanel is set to `focusable: false`, pressing
 			// the Tab key should focus the button, not the tabpanel
+			await sleep();
 			await press.Tab();
 			expect( alphaButton ).toHaveFocus();
 		} );
@@ -305,6 +309,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -338,6 +343,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -373,6 +379,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -472,6 +479,7 @@ describe( 'Tabs', () => {
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
+			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 			// Confirm onSelect has not been re-called
@@ -514,6 +522,7 @@ describe( 'Tabs', () => {
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
@@ -522,6 +531,7 @@ describe( 'Tabs', () => {
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
 			// Instead, focus should go to the currently selected tabpanel (alpha).
+			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tabpanel', {
@@ -588,7 +598,7 @@ describe( 'Tabs', () => {
 		} );
 	} );
 	describe( 'Uncontrolled mode', () => {
-		describe( 'Without `initialTabId` prop', () => {
+		describe( 'Without `defaultTabId` prop', () => {
 			it( 'should render first tab', async () => {
 				render( <UncontrolledTabs tabs={ TABS } /> );
 
@@ -645,20 +655,20 @@ describe( 'Tabs', () => {
 			} );
 		} );
 
-		describe( 'With `initialTabId`', () => {
-			it( 'should render the tab set by `initialTabId` prop', async () => {
+		describe( 'With `defaultTabId`', () => {
+			it( 'should render the tab set by `defaultTabId` prop', async () => {
 				render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should not select a tab when `initialTabId` does not match any known tab', () => {
+			it( 'should not select a tab when `defaultTabId` does not match any known tab', () => {
 				render(
 					<UncontrolledTabs
 						tabs={ TABS }
-						initialTabId="does-not-exist"
+						defaultTabId="does-not-exist"
 					/>
 				);
 
@@ -672,25 +682,25 @@ describe( 'Tabs', () => {
 					screen.queryByRole( 'tabpanel' )
 				).not.toBeInTheDocument();
 			} );
-			it( 'should not change tabs when initialTabId is changed', async () => {
+			it( 'should not change tabs when defaultTabId is changed', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
 				rerender(
-					<UncontrolledTabs tabs={ TABS } initialTabId="alpha" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="alpha" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab is removed', async () => {
+			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -704,7 +714,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS.slice( 1 ) }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -712,13 +722,13 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
-			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab becomes disabled', async () => {
+			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -744,7 +754,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_ALPHA_DISABLED }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 						onSelect={ mockOnSelect }
 					/>
 				);
@@ -752,9 +762,9 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
-			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
+			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="gamma" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="gamma" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
@@ -763,7 +773,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS.slice( 0, 2 ) }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -778,9 +788,9 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 			} );
 
-			it( 'waits for the tab with the `initialTabId` to be present in the `tabs` array before selecting it', async () => {
+			it( 'waits for the tab with the `defaultTabId` to be present in the `tabs` array before selecting it', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs tabs={ TABS } initialTabId="delta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="delta" />
 				);
 
 				// There should be no selected tab yet.
@@ -791,7 +801,7 @@ describe( 'Tabs', () => {
 				rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_DELTA }
-						initialTabId="delta"
+						defaultTabId="delta"
 					/>
 				);
 
@@ -832,6 +842,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 				// Move focus to the tablist, make sure alpha is focused.
+				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'tab', { name: 'Alpha' } )
@@ -880,7 +891,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should select first enabled tab when the tab associated to `initialTabId` is disabled', async () => {
+			it( 'should select first enabled tab when the tab associated to `defaultTabId` is disabled', async () => {
 				const TABS_ONLY_GAMMA_ENABLED = TABS.map( ( tabObj ) =>
 					tabObj.tabId !== 'gamma'
 						? {
@@ -895,7 +906,7 @@ describe( 'Tabs', () => {
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS_ONLY_GAMMA_ENABLED }
-						initialTabId="beta"
+						defaultTabId="beta"
 					/>
 				);
 
@@ -905,7 +916,7 @@ describe( 'Tabs', () => {
 
 				// Re-enable all tabs
 				rerender(
-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
 				// Even if the initial tab becomes enabled again, the selected tab doesn't
@@ -957,14 +968,14 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 			} );
 
-			it( 'should select the first enabled tab when the tab associated to `initialTabId` becomes disabled while being the active tab', async () => {
+			it( 'should select the first enabled tab when the tab associated to `defaultTabId` becomes disabled while being the active tab', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
 					<UncontrolledTabs
 						tabs={ TABS }
 						onSelect={ mockOnSelect }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -987,7 +998,7 @@ describe( 'Tabs', () => {
 					<UncontrolledTabs
 						tabs={ TABS_WITH_GAMMA_DISABLED }
 						onSelect={ mockOnSelect }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -1000,7 +1011,7 @@ describe( 'Tabs', () => {
 					<UncontrolledTabs
 						tabs={ TABS }
 						onSelect={ mockOnSelect }
-						initialTabId="gamma"
+						defaultTabId="gamma"
 					/>
 				);
 
@@ -1021,12 +1032,12 @@ describe( 'Tabs', () => {
 				await screen.findByRole( 'tabpanel', { name: 'Beta' } )
 			).toBeInTheDocument();
 		} );
-		it( 'should render the specified `selectedTabId`, and ignore the `initialTabId` prop', async () => {
+		it( 'should render the specified `selectedTabId`, and ignore the `defaultTabId` prop', async () => {
 			render(
 				<ControlledTabs
 					tabs={ TABS }
 					selectedTabId="gamma"
-					initialTabId="beta"
+					defaultTabId="beta"
 				/>
 			);
 
@@ -1172,11 +1183,132 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 			} );
 		} );
+		describe( 'When `selectedId` is changed by the controlling component', () => {
+			describe.each( [ true, false ] )(
+				'and `selectOnMove` is %s',
+				( selectOnMove ) => {
+					it( 'should continue to handle arrow key navigation properly', async () => {
+						const { rerender } = render(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="beta"
+								selectOnMove={ selectOnMove }
+							/>
+						);
+
+						// Due to the timing of the component re-rendering, we
+						// need to force a delay to ensure the test doesn't run
+						// the upcoming assertions too early.
+						// see https://github.com/WordPress/gutenberg/pull/58629#issuecomment-1924875249
+						await sleep();
+
+						// Tab key should focus the currently selected tab, which is Beta.
+						await press.Tab();
+						await waitFor( async () =>
+							expect( await getSelectedTab() ).toHaveTextContent(
+								'Beta'
+							)
+						);
+						expect( await getSelectedTab() ).toHaveFocus();
+
+						rerender(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="gamma"
+								selectOnMove={ selectOnMove }
+							/>
+						);
+
+						// When the selected tab is changed, it should not automatically receive focus.
+
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Gamma'
+						);
+
+						expect(
+							screen.getByRole( 'tab', { name: 'Beta' } )
+						).toHaveFocus();
+
+						// Arrow keys should move focus to the next tab, which is Gamma
+						await press.ArrowRight();
+						expect(
+							screen.getByRole( 'tab', { name: 'Gamma' } )
+						).toHaveFocus();
+					} );
+
+					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
+						const { rerender } = render(
+							<>
+								<button>Focus me</button>
+								<ControlledTabs
+									tabs={ TABS }
+									selectedTabId="beta"
+									selectOnMove={ selectOnMove }
+								/>
+							</>
+						);
+
+						// Tab key should focus the currently selected tab, which is Beta.
+						await sleep();
+						await press.Tab();
+						await sleep();
+						await press.Tab();
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Beta'
+						);
+						expect( await getSelectedTab() ).toHaveFocus();
+
+						rerender(
+							<>
+								<button>Focus me</button>
+								<ControlledTabs
+									tabs={ TABS }
+									selectedTabId="gamma"
+									selectOnMove={ selectOnMove }
+								/>
+							</>
+						);
+
+						// When the selected tab is changed, it should not automatically receive focus.
+
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Gamma'
+						);
+
+						expect(
+							screen.getByRole( 'tab', { name: 'Beta' } )
+						).toHaveFocus();
+
+						// Press shift+tab, move focus to the button before Tabs
+						await press.ShiftTab();
+						expect(
+							screen.getByRole( 'button', { name: 'Focus me' } )
+						).toHaveFocus();
+
+						// Press tab, move focus back to the tablist
+						await sleep();
+						await press.Tab();
+
+						const betaTab = screen.getByRole( 'tab', {
+							name: 'Beta',
+						} );
+						const gammaTab = screen.getByRole( 'tab', {
+							name: 'Gamma',
+						} );
+
+						expect(
+							selectOnMove ? gammaTab : betaTab
+						).toHaveFocus();
+					} );
+				}
+			);
+		} );
 
 		describe( 'When `selectOnMove` is `true`', () => {
 			it( 'should automatically select a newly focused tab', async () => {
 				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
 
+				await sleep();
 				await press.Tab();
 
 				// Tab key should focus the currently selected tab, which is Beta.
@@ -1185,24 +1317,6 @@ describe( 'Tabs', () => {
 
 				// Arrow keys should select and move focus to the next tab.
 				await press.ArrowRight();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-				expect( await getSelectedTab() ).toHaveFocus();
-			} );
-			it( 'should automatically update focus when the selected tab is changed by the controlling component', async () => {
-				const { rerender } = render(
-					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
-				);
-
-				// Tab key should focus the currently selected tab, which is Beta.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect( await getSelectedTab() ).toHaveFocus();
-
-				rerender(
-					<ControlledTabs tabs={ TABS } selectedTabId="gamma" />
-				);
-
-				// When the selected tab is changed, it should automatically receive focus.
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 				expect( await getSelectedTab() ).toHaveFocus();
 			} );
@@ -1220,10 +1334,13 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
+				await sleep();
 				await press.Tab();
-				expect(
-					await screen.findByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
+				await waitFor( async () =>
+					expect(
+						await screen.findByRole( 'tab', { name: 'Beta' } )
+					).toHaveFocus()
+				);
 
 				// Arrow key should move focus but not automatically change the selected tab.
 				await press.ArrowRight();
@@ -1246,35 +1363,6 @@ describe( 'Tabs', () => {
 				// Pressing the enter/return should select the focused tab.
 				await press.Enter();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			} );
-			it( 'should not automatically update focus when the selected tab is changed by the controlling component', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="beta"
-						selectOnMove={ false }
-					/>
-				);
-
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-
-				// Tab key should focus the currently selected tab, which is Beta.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveFocus();
-
-				rerender(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						selectOnMove={ false }
-					/>
-				);
-
-				// When the selected tab is changed, it should not automatically receive focus.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-				expect(
-					screen.getByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
 			} );
 		} );
 	} );

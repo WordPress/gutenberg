@@ -90,7 +90,6 @@ export default function ListItemEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list' ],
 		renderAppender: false,
 	} );
 

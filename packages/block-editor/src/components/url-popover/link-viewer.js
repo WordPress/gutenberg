@@ -41,6 +41,7 @@ export default function LinkViewer( {
 					icon={ edit }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
+					size="compact"
 				/>
 			) }
 		</div>

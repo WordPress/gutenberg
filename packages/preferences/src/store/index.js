@@ -12,7 +12,7 @@ import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
 /**
- * Store definition for the interface namespace.
+ * Store definition for the preferences namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *

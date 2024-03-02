@@ -250,9 +250,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 		);
 
 		const clientIds =
-			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
-				'core/template-part'
-			);
+			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
 		const blocks =
 			select( blockEditorStore ).getBlocksByClientId( clientIds );
 
@@ -268,7 +266,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector( ( select ) => () => {
-	return select( preferencesStore ).get( 'core/edit-site', 'editorMode' );
+	return select( preferencesStore ).get( 'core', 'editorMode' );
 } );
 
 /**
