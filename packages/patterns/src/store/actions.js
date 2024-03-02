@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { parse } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -90,25 +90,37 @@ export const createPatternFromFile =
 export const convertSyncedPatternToStatic =
 	( clientId ) =>
 	( { registry } ) => {
-		const oldBlock = registry
+		const patternBlock = registry
 			.select( blockEditorStore )
 			.getBlock( clientId );
-		const pattern = registry
-			.select( 'core' )
-			.getEditedEntityRecord(
-				'postType',
-				'wp_block',
-				oldBlock.attributes.ref
-			);
 
-		const newBlocks = parse(
-			typeof pattern.content === 'function'
-				? pattern.content( pattern )
-				: pattern.content
-		);
+		function cloneBlocksAndRemoveBindings( blocks ) {
+			return blocks.map( ( block ) => {
+				let metadata = block.attributes.metadata;
+				if ( metadata ) {
+					metadata = { ...metadata };
+					delete metadata.id;
+					delete metadata.bindings;
+				}
+				return cloneBlock(
+					block,
+					{
+						metadata:
+							metadata && Object.keys( metadata ).length > 0
+								? metadata
+								: undefined,
+					},
+					cloneBlocksAndRemoveBindings( block.innerBlocks )
+				);
+			} );
+		}
+
 		registry
 			.dispatch( blockEditorStore )
-			.replaceBlocks( oldBlock.clientId, newBlocks );
+			.replaceBlocks(
+				patternBlock.clientId,
+				cloneBlocksAndRemoveBindings( patternBlock.innerBlocks )
+			);
 	};
 
 /**

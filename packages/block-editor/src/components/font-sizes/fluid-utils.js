@@ -181,6 +181,13 @@ export function getComputedFluidTypographyValue( {
 		return null;
 	}
 
+	// Calculates the linear factor denominator. If it's 0, we cannot calculate a fluid value.
+	const linearDenominator =
+		maximumViewportWidthParsed.value - minimumViewportWidthParsed.value;
+	if ( ! linearDenominator ) {
+		return null;
+	}
+
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
 	const minViewportWidthOffsetValue = roundToPrecision(
@@ -193,8 +200,7 @@ export function getComputedFluidTypographyValue( {
 	const linearFactor =
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
-			( maximumViewportWidthParsed.value -
-				minimumViewportWidthParsed.value ) );
+			linearDenominator );
 	const linearFactorScaled = roundToPrecision(
 		( linearFactor || 1 ) * scaleFactor,
 		3

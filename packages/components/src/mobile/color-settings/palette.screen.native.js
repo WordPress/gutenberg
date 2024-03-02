@@ -29,7 +29,6 @@ import { colorsUtils } from './utils';
 import styles from './style.scss';
 
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
-const THEME_PALETTE_NAME = 'Theme';
 
 const PaletteScreen = () => {
 	const route = useRoute();
@@ -48,7 +47,6 @@ const PaletteScreen = () => {
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const isGradientColor = isGradient( currentValue );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
-	const allAvailableColors = useMobileGlobalStylesColors();
 
 	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
@@ -57,6 +55,10 @@ const PaletteScreen = () => {
 	const currentSegmentColors = ! isGradientSegment
 		? defaultSettings.colors
 		: defaultSettings.gradients;
+	const allAvailableColors = useMobileGlobalStylesColors();
+	const allAvailableGradients = currentSegmentColors
+		.flatMap( ( { gradients } ) => gradients )
+		.filter( Boolean );
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
@@ -184,10 +186,10 @@ const PaletteScreen = () => {
 						colors: palette.colors,
 						gradients: palette.gradients,
 						allColors: allAvailableColors,
+						allGradients: allAvailableGradients,
 					};
-					const enableCustomColor =
-						! isGradientSegment &&
-						palette.name === THEME_PALETTE_NAME;
+					// Limit to show the custom indicator to the first available palette
+					const enableCustomColor = paletteKey === 0;
 
 					return (
 						<ColorPalette

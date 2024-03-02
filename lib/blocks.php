@@ -439,55 +439,7 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
 
-/**
- * Complements the lightbox implementation for the 'core/image' block.
- *
- * This function is INTENTIONALLY left out of core as it only provides
- * backwards compatibility for the legacy lightbox syntax that was only
- * introduced in Gutenberg. The legacy syntax was using the `behaviors` key in
- * the block attrbutes and the `theme.json` file.
- *
- * @since 16.7.0
- *
- * @param array $block The block to check.
- * @return array The block with the legacyLightboxSettings set if available.
- */
-function gutenberg_should_render_lightbox( $block ) {
 
-	if ( 'core/image' !== $block['blockName'] ) {
-		return $block;
-	}
-
-	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$block['legacyLightboxSettings'] = $block['attrs']['behaviors']['lightbox'];
-	}
-
-	return $block;
-}
-
-add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
-
-/**
- * Registers the metadata block attribute for all block types.
- *
- * @param array $args Array of arguments for registering a block type.
- * @return array $args
- */
-function gutenberg_register_metadata_attribute( $args ) {
-	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
-		$args['attributes'] = array();
-	}
-
-	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
-		$args['attributes']['metadata'] = array(
-			'type' => 'object',
-		);
-	}
-
-	return $args;
-}
-add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 /**
  * Strips all HTML from the content of footnotes, and sanitizes the ID.

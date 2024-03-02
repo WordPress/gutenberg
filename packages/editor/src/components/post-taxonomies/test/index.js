@@ -13,7 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { PostTaxonomies } from '../';
+import PostTaxonomies from '../';
 
 describe( 'PostTaxonomies', () => {
 	const genresTaxonomy = {
@@ -87,20 +87,30 @@ describe( 'PostTaxonomies', () => {
 	it( 'should render no children if taxonomy data not available', () => {
 		const taxonomies = null;
 
-		const { container } = render(
-			<PostTaxonomies postType="page" taxonomies={ taxonomies } />
+		jest.spyOn(
+			select( editorStore ),
+			'getCurrentPostType'
+		).mockReturnValue( 'page' );
+		jest.spyOn( select( coreStore ), 'getTaxonomies' ).mockReturnValue(
+			taxonomies
 		);
+
+		const { container } = render( <PostTaxonomies /> );
 
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should render taxonomy components for taxonomies assigned to post type', () => {
-		const { rerender } = render(
-			<PostTaxonomies
-				postType="book"
-				taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] }
-			/>
-		);
+		jest.spyOn(
+			select( editorStore ),
+			'getCurrentPostType'
+		).mockReturnValue( 'book' );
+		jest.spyOn( select( coreStore ), 'getTaxonomies' ).mockReturnValue( [
+			genresTaxonomy,
+			categoriesTaxonomy,
+		] );
+
+		render( <PostTaxonomies /> );
 
 		expect( screen.getByRole( 'group', { name: 'Genres' } ) ).toBeVisible();
 		expect(
@@ -112,59 +122,35 @@ describe( 'PostTaxonomies', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Add new category' } )
 		).not.toBeInTheDocument();
-
-		rerender(
-			<PostTaxonomies
-				postType="book"
-				taxonomies={ [
-					genresTaxonomy,
-					{
-						...categoriesTaxonomy,
-						types: [ 'post', 'page', 'book' ],
-					},
-				] }
-			/>
-		);
-
-		expect( screen.getByRole( 'group', { name: 'Genres' } ) ).toBeVisible();
-		expect(
-			screen.getByRole( 'group', { name: 'Categories' } )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'button', { name: 'Add new genre' } )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'button', { name: 'Add new category' } )
-		).toBeVisible();
 	} );
 
 	it( 'should not render taxonomy components that hide their ui', () => {
-		const { rerender } = render(
-			<PostTaxonomies postType="book" taxonomies={ [ genresTaxonomy ] } />
-		);
+		jest.spyOn(
+			select( editorStore ),
+			'getCurrentPostType'
+		).mockReturnValue( 'book' );
+		jest.spyOn( select( coreStore ), 'getTaxonomies' ).mockReturnValue( [
+			genresTaxonomy,
+			{
+				...categoriesTaxonomy,
+				types: [ 'post', 'page', 'book' ],
+				visibility: {
+					show_ui: false,
+				},
+			},
+		] );
+
+		render( <PostTaxonomies /> );
 
 		expect( screen.getByRole( 'group', { name: 'Genres' } ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'button', { name: 'Add new genre' } )
 		).toBeVisible();
-
-		rerender(
-			<PostTaxonomies
-				postType="book"
-				taxonomies={ [
-					{
-						...genresTaxonomy,
-						visibility: { show_ui: false },
-					},
-				] }
-			/>
-		);
-
 		expect(
-			screen.queryByRole( 'group', { name: 'Genres' } )
+			screen.queryByRole( 'group', { name: 'Categories' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add new genre' } )
+			screen.queryByRole( 'button', { name: 'Add new category' } )
 		).not.toBeInTheDocument();
 	} );
 } );

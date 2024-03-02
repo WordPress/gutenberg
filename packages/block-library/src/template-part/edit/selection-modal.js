@@ -5,7 +5,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
-import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import {
@@ -21,7 +20,7 @@ import {
 	useAlternativeTemplateParts,
 	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
-import { createTemplatePartId } from './utils/create-template-part-id';
+import { mapTemplatePartToBlockPattern } from './utils/map-template-part-to-block-pattern';
 import { searchPatterns } from '../../utils/search-patterns';
 
 export default function TemplatePartSelectionModal( {
@@ -39,12 +38,9 @@ export default function TemplatePartSelectionModal( {
 	);
 	// We can map template parts to block patters to reuse the BlockPatternsList UI
 	const filteredTemplateParts = useMemo( () => {
-		const partsAsPatterns = templateParts.map( ( templatePart ) => ( {
-			name: createTemplatePartId( templatePart.theme, templatePart.slug ),
-			title: templatePart.title.rendered,
-			blocks: parse( templatePart.content.raw ),
-			templatePart,
-		} ) );
+		const partsAsPatterns = templateParts.map( ( templatePart ) =>
+			mapTemplatePartToBlockPattern( templatePart )
+		);
 
 		return searchPatterns( partsAsPatterns, searchValue );
 	}, [ templateParts, searchValue ] );

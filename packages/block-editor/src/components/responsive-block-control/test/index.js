@@ -81,7 +81,7 @@ describe( 'Basic rendering', () => {
 		} );
 
 		const toggleState = screen.getByRole( 'checkbox', {
-			name: 'Use the same padding on all screensizes.',
+			name: 'Use the same padding on all screen sizes.',
 			checked: true,
 		} );
 
@@ -268,7 +268,7 @@ describe( 'Default and Responsive modes', () => {
 
 		// Select elements based on what the user can see.
 		const toggleInput = screen.getByRole( 'checkbox', {
-			name: 'Use the same padding on all screensizes.',
+			name: 'Use the same padding on all screen sizes.',
 			checked: true,
 		} );
 

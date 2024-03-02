@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { useHover } from '@use-gesture/react';
-
-/**
  * Internal dependencies
  */
 import type { UnitControlProps } from '../unit-control/types';
@@ -14,6 +9,10 @@ export type BoxControlValue = {
 	right?: string;
 	bottom?: string;
 	left?: string;
+};
+
+export type CustomValueUnits = {
+	[ key: string ]: { max: number; step: number };
 };
 
 type UnitControlPassthroughProps = Omit<
@@ -72,6 +71,12 @@ export type BoxControlProps = Pick<
 	 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
 	 */
 	values?: BoxControlValue;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };
 
 export type BoxControlInputControlProps = UnitControlPassthroughProps & {
@@ -91,22 +96,6 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 	sides: BoxControlProps[ 'sides' ];
 	values: BoxControlValue;
 };
-
-export type BoxUnitControlProps = UnitControlPassthroughProps &
-	Pick< UnitControlProps, 'onChange' | 'onFocus' > & {
-		isFirst?: boolean;
-		isLast?: boolean;
-		isOnly?: boolean;
-		label?: string;
-		onHoverOff?: (
-			event: ReturnType< typeof useHover >[ 'event' ],
-			state: Omit< ReturnType< typeof useHover >, 'event' >
-		) => void;
-		onHoverOn?: (
-			event: ReturnType< typeof useHover >[ 'event' ],
-			state: Omit< ReturnType< typeof useHover >, 'event' >
-		) => void;
-	};
 
 export type BoxControlIconProps = {
 	/**

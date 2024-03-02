@@ -148,7 +148,6 @@ test.describe( 'Block Toolbar', () => {
 			exact: true,
 		} );
 
-		// Yes, this is the way to get the block toolbar, and yes, it is annoying.
 		const blockToolbar = page.getByRole( 'toolbar', {
 			name: 'Block tools',
 		} );
@@ -239,6 +238,62 @@ test.describe( 'Block Toolbar', () => {
 		// Test cleanup
 		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
+	} );
+
+	test( 'Focus should remain on mover when moving blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// On default floating toolbar
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph 1' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph 2' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph 3' },
+		} );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		// check focus is within the block toolbar
+		const blockToolbarParagraphButton = page.getByRole( 'button', {
+			name: 'Paragraph',
+			exact: true,
+		} );
+		await expect( blockToolbarParagraphButton ).toBeFocused();
+		// Go to Move Up Button
+		await pageUtils.pressKeys( 'ArrowRight' );
+		const blockToolbarMoveUpButton = page.getByRole( 'button', {
+			name: 'Move up',
+			exact: true,
+		} );
+
+		// Make sure it's in an acvite state for now
+		await expect( blockToolbarMoveUpButton ).toBeEnabled();
+
+		await expect( blockToolbarMoveUpButton ).toBeFocused();
+		await pageUtils.pressKeys( 'Enter' );
+		await expect( blockToolbarMoveUpButton ).toBeFocused();
+		await pageUtils.pressKeys( 'Enter' );
+		await expect( blockToolbarMoveUpButton ).toBeFocused();
+		await expect( blockToolbarMoveUpButton ).toBeDisabled();
+
+		// Check to make sure focus returns to the Move Up button roving index after all of this
+		await pageUtils.pressKeys( 'Tab' );
+		// Hide the block toolbar
+		await pageUtils.pressKeys( 'ArrowRight' );
+		// Check the block toolbar is hidden
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		await expect( blockToolbar ).toBeHidden();
+		await pageUtils.pressKeys( 'shift+Tab' );
+		// We should be on the Move Up button again
+		await expect( blockToolbarMoveUpButton ).toBeFocused();
 	} );
 } );
 

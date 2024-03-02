@@ -11,6 +11,7 @@ import {
 	screen,
 	setupCoreBlocks,
 } from 'test/helpers';
+import { BackHandler } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -102,8 +103,10 @@ describe( 'Editor', () => {
 		await initializeEditor();
 
 		// Act
-		await act( () => mediaAppendCallback( MEDIA[ 0 ] ) );
-		await act( () => mediaAppendCallback( MEDIA[ 2 ] ) );
+		act( () => mediaAppendCallback( MEDIA[ 0 ] ) );
+		act( () => mediaAppendCallback( MEDIA[ 2 ] ) );
+		await screen.findByTestId( `network-image-${ MEDIA[ 0 ].serverUrl }` );
+		await screen.findByTestId( `network-image-${ MEDIA[ 2 ].serverUrl }` );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -121,12 +124,29 @@ describe( 'Editor', () => {
 		await initializeEditor();
 
 		// Act
-		await act( () => mediaAppendCallback( MEDIA[ 0 ] ) );
+		act( () => mediaAppendCallback( MEDIA[ 0 ] ) );
 		// Unsupported type (PDF file)
-		await act( () => mediaAppendCallback( MEDIA[ 1 ] ) );
-		await act( () => mediaAppendCallback( MEDIA[ 3 ] ) );
+		act( () => mediaAppendCallback( MEDIA[ 1 ] ) );
+		act( () => mediaAppendCallback( MEDIA[ 3 ] ) );
+		await screen.findByTestId( `network-image-${ MEDIA[ 0 ].serverUrl }` );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'unselects current block when tapping on the hardware back button', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Spacer' );
+
+		// Act
+		act( () => {
+			BackHandler.mockPressBack();
+		} );
+
+		// Assert
+		const openBlockSettingsButton =
+			screen.queryAllByLabelText( 'Open Settings' );
+		expect( openBlockSettingsButton.length ).toBe( 0 );
 	} );
 } );

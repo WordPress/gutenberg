@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 6.29.0 (2024-02-21)
+
+## 6.28.0 (2024-02-09)
+
+## 6.27.0 (2024-01-24)
+
+### Deprecations
+
+-   The `pure` HoC has been deprecated. Use `memo` or `PureComponent` instead ([#57173](https://github.com/WordPress/gutenberg/pull/57173)).
+
+## 6.26.0 (2024-01-10)
+
 ## 6.25.0 (2023-12-13)
 
 ## 6.24.0 (2023-11-29)

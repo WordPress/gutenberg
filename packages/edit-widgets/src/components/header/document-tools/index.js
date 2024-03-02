@@ -22,7 +22,7 @@ import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-a
 import { store as editWidgetsStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
+const { useShowBlockTools } = unlock( blockEditorPrivateApis );
 
 function DocumentTools() {
 	const isMediumViewport = useViewportMatch( 'medium' );
@@ -76,13 +76,14 @@ function DocumentTools() {
 	);
 
 	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
+	const { showFixedToolbar } = useShowBlockTools();
 
 	return (
 		<NavigableToolbar
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
-			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			shouldUseKeyboardFocusShortcut={ ! showFixedToolbar }
+			variant="unstyled"
 		>
 			<ToolbarItem
 				ref={ inserterButton }
@@ -104,8 +105,8 @@ function DocumentTools() {
 			/>
 			{ isMediumViewport && (
 				<>
-					<UndoButton />
-					<RedoButton />
+					<ToolbarItem as={ UndoButton } />
+					<ToolbarItem as={ RedoButton } />
 					<ToolbarItem
 						as={ Button }
 						className="edit-widgets-header-toolbar__list-view-toggle"

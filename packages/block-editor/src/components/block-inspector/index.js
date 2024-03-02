@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
@@ -21,7 +20,6 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
-import DefaultStylePicker from '../default-style-picker';
 import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
@@ -30,6 +28,7 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
+import { useBorderPanelLabel } from '../../hooks/border';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
@@ -56,9 +55,11 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<BlockInfo.Slot />
-			<PanelBody title={ __( 'Content' ) }>
-				<BlockQuickNavigation clientIds={ contentClientIds } />
-			</PanelBody>
+			{ contentClientIds.length > 0 && (
+				<PanelBody title={ __( 'Content' ) }>
+					<BlockQuickNavigation clientIds={ contentClientIds } />
+				</PanelBody>
+			) }
 		</div>
 	);
 }
@@ -92,7 +93,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			blockType: _blockType,
 			topLevelLockedBlock:
 				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
-				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
+				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
+				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
 					: undefined ),
 		};
@@ -111,6 +113,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		blockType,
 		selectedBlockClientId
 	);
+
+	const borderPanelLabel = useBorderPanelLabel( {
+		blockName: selectedBlockName,
+	} );
 
 	if ( count > 1 ) {
 		return (
@@ -136,7 +142,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 						/>
 						<InspectorControls.Slot
 							group="border"
-							label={ __( 'Border' ) }
+							label={ borderPanelLabel }
 						/>
 						<InspectorControls.Slot group="styles" />
 					</>
@@ -245,6 +251,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -268,15 +275,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						<div>
 							<PanelBody title={ __( 'Styles' ) }>
 								<BlockStyles clientId={ clientId } />
-								{ hasBlockSupport(
-									blockName,
-									'defaultStylePicker',
-									true
-								) && (
-									<DefaultStylePicker
-										blockName={ blockName }
-									/>
-								) }
 							</PanelBody>
 						</div>
 					) }
@@ -297,7 +295,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					/>
 					<InspectorControls.Slot
 						group="border"
-						label={ __( 'Border' ) }
+						label={ borderPanelLabel }
 					/>
 					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot

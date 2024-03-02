@@ -5,8 +5,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	Warning,
 } from '@wordpress/block-editor';
 import {

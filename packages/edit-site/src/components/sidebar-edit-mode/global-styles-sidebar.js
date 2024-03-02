@@ -41,10 +41,10 @@ export default function GlobalStylesSidebar() {
 		);
 		const canvasContainerView = getEditorCanvasContainerView();
 		const _isVisualEditorMode =
-			'visual' === select( editSiteStore ).getEditorMode();
+			'visual' === select( editorStore ).getEditorMode();
 		const _isEditCanvasMode = 'edit' === getCanvasMode();
 		const _showListViewByDefault = select( preferencesStore ).get(
-			'core/edit-site',
+			'core',
 			'showListViewByDefault'
 		);
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -132,13 +132,11 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex
-					className="edit-site-global-styles-sidebar__header"
-					role="menubar"
-					aria-label={ __( 'Styles actions' ) }
-				>
+				<Flex className="edit-site-global-styles-sidebar__header">
 					<FlexBlock style={ { minWidth: 'min-content' } }>
-						<strong>{ __( 'Styles' ) }</strong>
+						<h2 className="edit-site-global-styles-sidebar__header-title">
+							{ __( 'Styles' ) }
+						</h2>
 					</FlexBlock>
 					<FlexItem>
 						<Button

@@ -159,7 +159,7 @@ Continuing the examples with duotone, this means you could allow full access to 
 }
 ```
 
-You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/theme-json.md). 
+You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/global-settings-and-styles.md). 
 
 ### Disable inherit default layout
 

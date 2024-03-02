@@ -89,7 +89,6 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
-
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel

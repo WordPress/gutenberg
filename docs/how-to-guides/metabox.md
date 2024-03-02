@@ -18,7 +18,7 @@ This guide shows how to create a block that prompts a user for a single value, a
 
 This guide assumes you are already familiar with WordPress plugins, post meta, and basic JavaScript. Review the [Getting started with JavaScript tutorial](/docs/how-to-guides/javascript/README.md) for an introduction.
 
-The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/create-block/README.md) for a deeper understanding of creating custom blocks.
+The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) for a deeper understanding of creating custom blocks.
 
 You will need:
 
