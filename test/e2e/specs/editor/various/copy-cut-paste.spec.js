@@ -518,6 +518,30 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should link selection on internal paste', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'https://w.org' },
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+x' );
+		await page.keyboard.type( 'a' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="https://w.org">a</a>',
+				},
+			},
+		] );
+	} );
+
 	test( 'should auto-link', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',

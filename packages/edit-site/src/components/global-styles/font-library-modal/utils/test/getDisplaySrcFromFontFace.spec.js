@@ -21,33 +21,22 @@ describe( 'getDisplaySrcFromFontFace', () => {
 		);
 	} );
 
-	it( 'makes URL absolute when it starts with file:. and urlPrefix is given', () => {
-		const input = 'file:./font1';
-		const urlPrefix = 'http://example.com';
-		expect( getDisplaySrcFromFontFace( input, urlPrefix ) ).toBe(
-			'http://example.com/font1'
-		);
-	} );
-
-	it( 'does not modify URL if it does not start with file:.', () => {
-		const input = [ 'http://some-other-place.com/font1' ];
-		const urlPrefix = 'http://example.com';
-		expect( getDisplaySrcFromFontFace( input, urlPrefix ) ).toBe(
-			'http://some-other-place.com/font1'
-		);
+	it( 'return undefined when the url starts with file:', () => {
+		const input = 'file:./theme/assets/font1.ttf';
+		expect( getDisplaySrcFromFontFace( input ) ).toBe( undefined );
 	} );
 
 	it( 'encodes the URL if it is not encoded', () => {
-		const input = 'file:./assets/font one with spaces.ttf';
+		const input = 'https://example.org/font one with spaces.ttf';
 		expect( getDisplaySrcFromFontFace( input ) ).toBe(
-			'file:./assets/font%20one%20with%20spaces.ttf'
+			'https://example.org/font%20one%20with%20spaces.ttf'
 		);
 	} );
 
 	it( 'does not encode the URL if it is already encoded', () => {
-		const input = 'file:./font%20one';
+		const input = 'https://example.org/fonts/font%20one.ttf';
 		expect( getDisplaySrcFromFontFace( input ) ).toBe(
-			'file:./font%20one'
+			'https://example.org/fonts/font%20one.ttf'
 		);
 	} );
 } );

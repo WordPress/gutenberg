@@ -132,7 +132,7 @@ android {
 dependencies {
     def packageJson = '../../package.json'
 
-    implementation "org.wordpress-mobile.gutenberg-mobile:react-native-bridge"
+    implementation "org.wordpress.gutenberg-mobile:react-native-bridge"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation "com.google.android.material:material:1.9.0"
     // The version of react-native is set by the React Native Gradle Plugin
@@ -145,8 +145,8 @@ dependencies {
 
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
-    def reactNativeLibrariesPublisherVersion = "v3"
-    def reactNativeLibrariesGroupId = "org.wordpress-mobile.react-native-libraries.$reactNativeLibrariesPublisherVersion"
+    def reactNativeLibrariesPublisherVersion = "v4"
+    def reactNativeLibrariesGroupId = "org.wordpress.react-native-libraries.$reactNativeLibrariesPublisherVersion"
     implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"

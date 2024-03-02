@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate, getContext } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'router-regions', {
 	state: {
@@ -19,7 +19,10 @@ const { state } = store( 'router-regions', {
 		router: {
 			*navigate( e ) {
 				e.preventDefault();
-				yield navigate( e.target.href );
+				const { actions } = yield import(
+					"@wordpress/interactivity-router"
+				);
+				yield actions.navigate( e.target.href );
 			},
 			back() {
 				history.back();

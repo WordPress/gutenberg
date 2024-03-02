@@ -19,6 +19,6 @@ export default function useSlotFills( name: SlotKey ) {
 	const fills = useSnapshot( registry.fills, { sync: true } );
 	// The important bit here is that this call ensures that the hook
 	// only causes a re-render if the "fills" of a given slot name
-	// change change, not any fills.
+	// change, not any fills.
 	return fills.get( name );
 }

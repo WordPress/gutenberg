@@ -4,10 +4,7 @@
 import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
-import {
-	__experimentalBlockPatternsList as BlockPatternsList,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -42,14 +39,13 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 function useStartPatterns( fallbackContent ) {
 	const { slug, patterns } = useSelect( ( select ) => {
 		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEntityRecord } = select( coreStore );
+		const { getEntityRecord, getBlockPatterns } = select( coreStore );
 		const postId = getEditedPostId();
 		const postType = getEditedPostType();
 		const record = getEntityRecord( 'postType', postType, postId );
-		const { getSettings } = select( blockEditorStore );
 		return {
 			slug: record.slug,
-			patterns: getSettings().__experimentalBlockPatterns,
+			patterns: getBlockPatterns(),
 		};
 	}, [] );
 

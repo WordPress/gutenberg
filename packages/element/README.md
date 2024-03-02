@@ -247,7 +247,7 @@ This is the same concept as the React Native implementation.
 
 _Related_
 
--   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
+-   <https://reactnative.dev/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
 
 _Usage_
 
@@ -261,6 +261,12 @@ const placeholderLabel = Platform.select( {
 	),
 } );
 ```
+
+### PureComponent
+
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#reactpurecomponent>
 
 ### RawHTML
 

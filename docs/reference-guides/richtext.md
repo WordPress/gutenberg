@@ -81,7 +81,7 @@ If you'd still like to use RichText, you can eliminate all of the formatting opt
 
 If you want to limit the formats allowed, you can specify using `allowedFormats` property in your code, see the example above or [the component documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md#allowedformats-array) for details.
 
-### Disable specific fromat types in Editor
+### Disable specific format types in Editor
 
 The RichText component uses formats to display inline elements, for example images within the paragraph block. If you just want to disable a format from the editor, you can use the `unregisterFormatType` function. For example to disable inline images, use:
 

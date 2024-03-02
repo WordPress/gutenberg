@@ -23,7 +23,7 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
-export type Size = 'default' | 'small' | '__unstable-large';
+export type Size = 'default' | 'small' | 'compact' | '__unstable-large';
 
 interface BaseProps {
 	/**
@@ -176,10 +176,19 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
 	label?: ReactNode;
+	/**
+	 * Whether to hide the border when not focused.
+	 *
+	 * @default false
+	 */
+	isBorderless?: boolean;
 }
 
 export interface InputControlProps
-	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
+	extends Omit<
+			InputBaseProps,
+			'children' | 'isBorderless' | 'isFocused' | keyof FlexProps
+		>,
 		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the

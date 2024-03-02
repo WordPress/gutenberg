@@ -11,7 +11,7 @@ import {
  * Internal dependencies
  */
 import { getFontFaceVariantName } from './utils';
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
 
 function CollectionFontVariant( {
@@ -35,21 +35,23 @@ function CollectionFontVariant( {
 	);
 
 	return (
-		<label
-			className="font-library-modal__library-font-variant"
-			htmlFor={ checkboxId }
-		>
-			<Flex justify="space-between" align="center" gap="1rem">
-				<FontFaceDemo fontFace={ face } text={ displayName } />
+		<div className="font-library-modal__font-card">
+			<Flex justify="flex-start" align="center" gap="1rem">
 				<CheckboxControl
 					checked={ selected }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
 					id={ checkboxId }
-					label={ false }
 				/>
+				<label htmlFor={ checkboxId }>
+					<FontDemo
+						font={ face }
+						text={ displayName }
+						onClick={ handleToggleActivation }
+					/>
+				</label>
 			</Flex>
-		</label>
+		</div>
 	);
 }
 

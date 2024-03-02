@@ -44,10 +44,10 @@ const entityResolvers = rootEntitiesConfig.reduce( ( result, entity ) => {
 
 const entityActions = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name, 'save' ) ] = ( key ) =>
-		actions.saveEntityRecord( kind, name, key );
-	result[ getMethodName( kind, name, 'delete' ) ] = ( key, query ) =>
-		actions.deleteEntityRecord( kind, name, key, query );
+	result[ getMethodName( kind, name, 'save' ) ] = ( record, options ) =>
+		actions.saveEntityRecord( kind, name, record, options );
+	result[ getMethodName( kind, name, 'delete' ) ] = ( key, query, options ) =>
+		actions.deleteEntityRecord( kind, name, key, query, options );
 	return result;
 }, {} );
 

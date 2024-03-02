@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
 	PanelBody,
@@ -21,11 +21,9 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -33,6 +31,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -42,40 +41,18 @@ function AudioEdit( {
 	className,
 	setAttributes,
 	onReplace,
-	isSelected,
+	isSelected: isSingleSelected,
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
 	const isTemporaryAudio = ! id && isBlobURL( src );
-	const { mediaUpload, multiAudioSelection } = useSelect( ( select ) => {
-		const { getSettings, getMultiSelectedBlockClientIds, getBlockName } =
-			select( blockEditorStore );
-		const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
-		return {
-			mediaUpload: getSettings().mediaUpload,
-			multiAudioSelection:
-				multiSelectedClientIds.length &&
-				multiSelectedClientIds.every(
-					( _clientId ) => getBlockName( _clientId ) === 'core/audio'
-				),
-		};
-	}, [] );
-
-	useEffect( () => {
-		if ( ! id && isBlobURL( src ) ) {
-			const file = getBlobByURL( src );
-
-			if ( file ) {
-				mediaUpload( {
-					filesList: [ file ],
-					onFileChange: ( [ media ] ) => onSelectAudio( media ),
-					onError: ( e ) => onUploadError( e ),
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-				} );
-			}
-		}
-	}, [] );
+	useUploadMediaFromBlobURL( {
+		url: src,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectAudio,
+		onError: onUploadError,
+	} );
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
@@ -156,7 +133,7 @@ function AudioEdit( {
 
 	return (
 		<>
-			{ ! multiAudioSelection && (
+			{ isSingleSelected && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -212,17 +189,17 @@ function AudioEdit( {
 					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Audio caption text' ) }
-					showToolbarButton={ ! multiAudioSelection }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>

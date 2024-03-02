@@ -273,8 +273,8 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_styles' => '/^.wp-elements-[a-f0-9]{32} a' . $color_css_rules .
-					'.wp-elements-[a-f0-9]{32} a:hover' . $color_css_rules . '$/',
+				'expected_styles' => '/^.wp-elements-[a-f0-9]{32} a:where\(:not\(.wp-element-button\)\)' . $color_css_rules .
+					'.wp-elements-[a-f0-9]{32} a:where\(:not\(.wp-element-button\)\):hover' . $color_css_rules . '$/',
 			),
 			'generic heading element styles are applied' => array(
 				'color_settings'  => array( 'heading' => true ),

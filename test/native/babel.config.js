@@ -13,6 +13,7 @@ module.exports = ( api ) => {
 			],
 			'react-native-reanimated/plugin',
 			'@babel/plugin-proposal-export-namespace-from',
+			'@babel/plugin-transform-dynamic-import',
 		],
 		overrides: [
 			{

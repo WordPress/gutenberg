@@ -6,6 +6,7 @@ The Mobile Gutenberg (MG) project maintains a suite of automated end-to-end (E2E
 
 1. Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide for both iOS and Android, which covers setting up Xcode, Android Studio, the Android SDK.
 1. Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
+1. Install [`jq`](https://jqlang.github.io/jq/download/) via [Homebrew](https://brew.sh/) or your preferred package manager.
 1. `npm run native test:e2e:setup`
 
 ## Running Tests

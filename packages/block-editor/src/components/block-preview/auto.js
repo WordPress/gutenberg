@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
+import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { memo, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 
 /**
@@ -18,12 +18,13 @@ import { store } from '../../store';
 let MemoizedBlockList;
 
 const MAX_HEIGHT = 2000;
+const EMPTY_ADDITIONAL_STYLES = [];
 
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
 	minHeight,
-	additionalStyles = [],
+	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 } ) {
 	if ( ! viewportWidth ) {
 		viewportWidth = containerWidth;
@@ -55,7 +56,7 @@ function ScaledBlockPreview( {
 	}, [ styles, additionalStyles ] );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
-	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
+	MemoizedBlockList = MemoizedBlockList || memo( BlockList );
 
 	const scale = containerWidth / viewportWidth;
 	const aspectRatio = contentHeight

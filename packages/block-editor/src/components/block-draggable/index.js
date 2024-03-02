@@ -17,12 +17,15 @@ import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-pr
 import { isDropTargetValid } from '../use-block-drop-zone';
 
 const BlockDraggable = ( {
+	appendToOwnerDocument,
 	children,
 	clientIds,
 	cloneClassname,
+	elementId,
 	onDragStart,
 	onDragEnd,
 	fadeWhenDisabled = false,
+	dragComponent,
 } ) => {
 	const {
 		srcRootClientId,
@@ -181,6 +184,7 @@ const BlockDraggable = ( {
 
 	return (
 		<Draggable
+			appendToOwnerDocument={ appendToOwnerDocument }
 			cloneClassname={ cloneClassname }
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
@@ -210,12 +214,19 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip
-					count={ clientIds.length }
-					icon={ icon }
-					fadeWhenDisabled
-				/>
+				// Check against `undefined` so that `null` can be used to disable
+				// the default drag component.
+				dragComponent !== undefined ? (
+					dragComponent
+				) : (
+					<BlockDraggableChip
+						count={ clientIds.length }
+						icon={ icon }
+						fadeWhenDisabled
+					/>
+				)
 			}
+			elementId={ elementId }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {

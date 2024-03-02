@@ -694,7 +694,7 @@ describe( 'Gallery block', () => {
 		await openBlockSettings( screen );
 
 		// Disable crop images setting
-		fireEvent.press( getByText( 'Crop images' ) );
+		fireEvent.press( getByText( 'Crop images to fit' ) );
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
