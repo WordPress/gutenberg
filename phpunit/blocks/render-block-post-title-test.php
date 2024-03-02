@@ -5,11 +5,6 @@
  * @package WordPress
  * @subpackage Blocks
  * @covers ::gutenberg_render_block_core_post_title
- */
-
-/**
- * Tests for the  Post Title block.
- *
  * @group blocks
  */
 class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
@@ -66,8 +61,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 
 	/**
 	 * Test gutenberg_render_block_core_post_title() method.
-	 *
-	 * @covers ::gutenberg_render_block_core_post_title
 	 */
 	public function test_gutenberg_render_block_core_post_title_without_post() {
 		$block = new stdClass();
@@ -83,8 +76,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
 
 	/**
 	 * Test gutenberg_render_block_core_post_title() method.
-	 *
-	 * @covers ::gutenberg_render_block_core_post_title
 	 */
 	public function test_gutenberg_render_block_core_post_title() {
 
