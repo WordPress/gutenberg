@@ -214,6 +214,15 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 * }
 	 */
 	function wp_get_font_dir( $upload_dir ) {
+		if ( doing_filter( 'font_dir' ) ) {
+			/*
+			 * The font_dir filter is being run, avoid an infinite loop.
+			 *
+			 * This indicates that a plugin is calling wp_upload_dir() while filtering
+			 * the font directory and avoids an infinite loop.
+			 */
+			return $upload_dir;
+		}
 		return apply_filters( 'font_dir', $upload_dir );
 	}
 }
