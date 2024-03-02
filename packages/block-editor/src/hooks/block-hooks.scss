@@ -13,4 +13,10 @@
 	.components-toggle-control .components-h-stack .components-h-stack {
 		flex-direction: row;
 	}
+
+	.block-editor-hooks__block-hooks-helptext {
+		color: $gray-700;
+		font-size: $helptext-font-size;
+		margin-bottom: $grid-unit-20;
+	}
 }

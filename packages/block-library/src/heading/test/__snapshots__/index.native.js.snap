@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Heading block changes heading level 1`] = `
+"<!-- wp:heading {"level":6} -->
+<h6 class="wp-block-heading"></h6>
+<!-- /wp:heading -->"
+`;
+
 exports[`Heading block inserts block 1`] = `
 "<!-- wp:heading -->
 <h2 class="wp-block-heading"></h2>

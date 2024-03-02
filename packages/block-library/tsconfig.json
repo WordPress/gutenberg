@@ -27,6 +27,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../interactivity" },
+		{ "path": "../interactivity-router" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },

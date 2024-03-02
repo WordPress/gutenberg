@@ -217,8 +217,8 @@ export function FocalPointPicker( {
 	};
 
 	const focalPointPosition = {
-		left: x * bounds.width,
-		top: y * bounds.height,
+		left: x !== undefined ? x * bounds.width : 0.5 * bounds.width,
+		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
 	const classes = classnames(

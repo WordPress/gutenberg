@@ -4,6 +4,7 @@
 import {
 	BaseControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -114,7 +115,7 @@ export default function SpacingSizesControl( {
 					/>
 				) }
 			</HStack>
-			{ renderControls() }
+			<VStack spacing={ 0.5 }>{ renderControls() }</VStack>
 		</fieldset>
 	);
 }

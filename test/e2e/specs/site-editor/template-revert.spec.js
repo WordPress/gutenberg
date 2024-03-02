@@ -294,12 +294,12 @@ class TemplateRevertUtils {
 		await this.editor.openDocumentSettingsSidebar();
 		const isTemplateTabVisible = await this.page
 			.locator(
-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
 			)
 			.isVisible();
 		if ( isTemplateTabVisible ) {
 			await this.page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
 			);
 		}
 		await this.page.click(

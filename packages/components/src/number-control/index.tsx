@@ -54,11 +54,7 @@ function UnforwardedNumberControl(
 		suffix,
 		onChange = noop,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >(
-		props,
-		'wp.components.NumberControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
 
 	if ( hideHTMLArrows ) {
 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
@@ -247,9 +243,7 @@ function UnforwardedNumberControl(
 									className={ spinButtonClasses }
 									icon={ plusIcon }
 									size="small"
-									aria-hidden="true"
-									aria-label={ __( 'Increment' ) }
-									tabIndex={ -1 }
+									label={ __( 'Increment' ) }
 									onClick={ buildSpinButtonClickHandler(
 										'up'
 									) }
@@ -258,9 +252,7 @@ function UnforwardedNumberControl(
 									className={ spinButtonClasses }
 									icon={ resetIcon }
 									size="small"
-									aria-hidden="true"
-									aria-label={ __( 'Decrement' ) }
-									tabIndex={ -1 }
+									label={ __( 'Decrement' ) }
 									onClick={ buildSpinButtonClickHandler(
 										'down'
 									) }

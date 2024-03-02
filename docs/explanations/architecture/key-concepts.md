@@ -39,7 +39,7 @@ Given a block type, a block variation is a predefined set of its initial attribu
 **More on blocks**
 
 -   **[Block API](/docs/reference-guides/block-api/README.md)**
--   **[Tutorial: Building A Custom Block](/docs/getting-started/create-block/README.md)**
+-   **[Tutorial: Building A Custom Block](/docs/getting-started/devenv/get-started-with-create-block.md)**
 
 ## Reusable blocks
 
@@ -65,6 +65,6 @@ More on [Site editing templates](/docs/explanations/architecture/full-site-editi
 
 ## Styles
 
-Styles, formerly known as Global Styles and as such referenced in the code, is both an interface that users access through the editor and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what specific tools a theme offers (like a custom color palette), the available design tools present, and an infrastructure that allows to coordinate the styles coming from WordPress, the active theme, and the user.
+Styles, formerly known as Global Styles and as such referenced in the code, is both an interface that users access through the editor and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/global-settings-and-styles.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what specific tools a theme offers (like a custom color palette), the available design tools present, and an infrastructure that allows to coordinate the styles coming from WordPress, the active theme, and the user.
 
 Learn more about [Global Styles](/docs/explanations/architecture/styles.md#global-styles).

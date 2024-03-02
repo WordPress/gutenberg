@@ -1,5 +1,6 @@
 // This needs specificity to override individual block styles.
 .components-placeholder.components-placeholder {
+	font-size: $default-font-size;
 	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
@@ -33,6 +34,11 @@
 .components-placeholder__fieldset {
 	font-family: $default-font;
 	font-size: $default-font-size;
+	// Global Styles can affect this so we are resetting.
+	letter-spacing: initial;
+	line-height: initial;
+	text-transform: none;
+	font-weight: normal;
 }
 
 .components-placeholder__label {
@@ -146,11 +152,6 @@
 	&.is-small {
 		.components-button {
 			padding: 0 $grid-unit-10 2px;
-		}
-	}
-	.components-placeholder__learn-more {
-		.components-external-link {
-			color: var(--wp-admin-theme-color);
 		}
 	}
 }

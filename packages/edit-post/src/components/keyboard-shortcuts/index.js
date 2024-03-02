@@ -8,7 +8,6 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
@@ -18,19 +17,9 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
-	const isModeToggleDisabled = useSelect( ( select ) => {
-		const { richEditingEnabled, codeEditingEnabled } =
-			select( editorStore ).getEditorSettings();
-		return ! richEditingEnabled || ! codeEditingEnabled;
-	}, [] );
-	const {
-		switchEditorMode,
-		openGeneralSidebar,
-		closeGeneralSidebar,
-		toggleFeature,
-		toggleDistractionFree,
-	} = useDispatch( editPostStore );
+	const { isEditorSidebarOpened } = useSelect( editPostStore );
+	const { openGeneralSidebar, closeGeneralSidebar, toggleFeature } =
+		useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const {
@@ -69,26 +58,6 @@ function KeyboardShortcuts() {
 	};
 
 	useEffect( () => {
-		registerShortcut( {
-			name: 'core/edit-post/toggle-mode',
-			category: 'global',
-			description: __( 'Switch between visual editor and code editor.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'm',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-post/toggle-distraction-free',
-			category: 'global',
-			description: __( 'Toggle distraction free mode.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: '\\',
-			},
-		} );
-
 		registerShortcut( {
 			name: 'core/edit-post/toggle-fullscreen',
 			category: 'global',
@@ -178,24 +147,8 @@ function KeyboardShortcuts() {
 		} );
 	}, [] );
 
-	useShortcut(
-		'core/edit-post/toggle-mode',
-		() => {
-			switchEditorMode(
-				getEditorMode() === 'visual' ? 'text' : 'visual'
-			);
-		},
-		{
-			isDisabled: isModeToggleDisabled,
-		}
-	);
-
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
 		toggleFeature( 'fullscreenMode' );
-	} );
-
-	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
-		toggleDistractionFree();
 	} );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {

@@ -192,22 +192,12 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 			/>
-			<div>
-				{ attributes.isLink ? (
-					<a
-						href="#avatar-pseudo-link"
-						className="wp-block-avatar__link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						<ResizableAvatar
-							attributes={ attributes }
-							avatar={ avatar }
-							blockProps={ blockProps }
-							isSelected={ isSelected }
-							setAttributes={ setAttributes }
-						/>
-					</a>
-				) : (
+			{ attributes.isLink ? (
+				<a
+					href="#avatar-pseudo-link"
+					className="wp-block-avatar__link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
 					<ResizableAvatar
 						attributes={ attributes }
 						avatar={ avatar }
@@ -215,8 +205,16 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 						isSelected={ isSelected }
 						setAttributes={ setAttributes }
 					/>
-				) }
-			</div>
+				</a>
+			) : (
+				<ResizableAvatar
+					attributes={ attributes }
+					avatar={ avatar }
+					blockProps={ blockProps }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</>
 	);
 };

@@ -27,14 +27,20 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const renderingMode = useSelect(
-		( select ) => select( editorStore ).getRenderingMode(),
-		[]
-	);
+	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
+		const { getEditorSettings, getCurrentTemplateId } =
+			select( editorStore );
+
+		return {
+			onNavigateToEntityRecord:
+				getEditorSettings().onNavigateToEntityRecord,
+			templateId: getCurrentTemplateId(),
+		};
+	}, [] );
+
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
-	const { setRenderingMode } = useDispatch( editorStore );
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
@@ -42,18 +48,17 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
-			if ( renderingMode !== 'template-locked' ) {
-				return;
-			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
+
 			const isNoticeAlreadyShowing = getNotices().some(
 				( notice ) => notice.id === lastNoticeId.current
 			);
 			if ( isNoticeAlreadyShowing ) {
 				return;
 			}
+
 			const { notice } = await createInfoNotice(
 				__( 'Edit your template to edit this block.' ),
 				{
@@ -62,7 +67,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => setRenderingMode( 'template-only' ),
+							onClick: () =>
+								onNavigateToEntityRecord( {
+									postId: templateId,
+									postType: 'wp_template',
+								} ),
 						},
 					],
 				}
@@ -71,9 +80,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		};
 
 		const handleDblClick = ( event ) => {
-			if ( renderingMode !== 'template-locked' ) {
-				return;
-			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
@@ -90,7 +96,15 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, renderingMode, contentRef.current ] );
+	}, [
+		lastNoticeId,
+		contentRef,
+		getNotices,
+		createInfoNotice,
+		onNavigateToEntityRecord,
+		templateId,
+		removeNotice,
+	] );
 
 	return (
 		<ConfirmDialog
@@ -98,7 +112,10 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				setRenderingMode( 'template-only' );
+				onNavigateToEntityRecord( {
+					postId: templateId,
+					postType: 'wp_template',
+				} );
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

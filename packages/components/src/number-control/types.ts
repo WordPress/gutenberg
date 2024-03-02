@@ -15,7 +15,7 @@ export type NumberControlProps = Omit<
 	 */
 	hideHTMLArrows?: boolean;
 	/**
-	 * The type of spin controls to display. These are butons that allow the
+	 * The type of spin controls to display. These are buttons that allow the
 	 * user to quickly increment and decrement the number.
 	 *
 	 * - 'none' - Do not show spin controls.

@@ -142,8 +142,9 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 			'skip'     => $skip_button_color_serialization,
 		),
 		'link'    => array(
-			'selector'       => ".$class_name a",
-			'hover_selector' => ".$class_name a:hover",
+			// :where(:not) matches theme.json selector.
+			'selector'       => ".$class_name a:where(:not(.wp-element-button))",
+			'hover_selector' => ".$class_name a:where(:not(.wp-element-button)):hover",
 			'skip'           => $skip_link_color_serialization,
 		),
 		'heading' => array(
