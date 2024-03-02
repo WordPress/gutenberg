@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -62,9 +63,13 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-
+	const {
+		getBlocksByClientId,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		isGroupable,
+	} = useSelect( blockEditorStore );
+	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		showEmptyBlockSideInserter,
 		showBreadcrumb,
@@ -74,6 +79,7 @@ export default function BlockTools( {
 	const {
 		duplicateBlocks,
 		removeBlocks,
+		replaceBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
 		selectBlock,
@@ -139,6 +145,18 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
+			}
+		} else if ( isMatch( 'core/block-editor/group', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 && isGroupable( clientIds ) ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const groupingBlockName = getGroupingBlockName();
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
+				replaceBlocks( clientIds, newBlocks );
 			}
 		}
 	}

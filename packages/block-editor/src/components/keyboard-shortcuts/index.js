@@ -132,6 +132,18 @@ function KeyboardShortcutsRegister() {
 				character: 'y',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/group',
+			category: 'block',
+			description: __(
+				'Create a group block from the selected block(s).'
+			),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'g',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;
