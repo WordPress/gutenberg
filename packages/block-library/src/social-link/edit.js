@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 import {
 	InspectorControls,
@@ -22,14 +22,16 @@ import {
 	PanelBody,
 	PanelRow,
 	TextControl,
+	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import { getSocialService } from './social-list';
 
 const SocialLinkURLPopover = ( {
 	url,
@@ -111,8 +113,18 @@ const SocialLinkEdit = ( {
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
-	const IconComponent = getIconBySite( service );
-	const socialLinkName = getNameBySite( service );
+	const activeVariation = useSelect(
+		( select ) => {
+			return select( blocksStore ).getActiveBlockVariation(
+				'core/social-link',
+				attributes
+			);
+		},
+		[ attributes ]
+	);
+
+	const { icon, label: socialLinkName } = getSocialService( activeVariation );
+
 	const socialLinkLabel = label ?? socialLinkName;
 	const blockProps = useBlockProps( {
 		className: classes,
@@ -162,7 +174,7 @@ const SocialLinkEdit = ( {
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
 				>
-					<IconComponent />
+					<Icon icon={ icon } />
 					<span
 						className={ classNames( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,

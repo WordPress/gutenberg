@@ -6,29 +6,38 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import variations from './variations';
 import { ChainIcon } from './icons';
 
 /**
- * Retrieves the social service's icon component.
+ * Retrieves the display label for the social service.
  *
- * @param {string} name key for a social service (lowercase slug)
+ * @param {Object} activeVariation The object of the active social service variation
  *
- * @return {Component} Icon component for social service.
+ * @return {string} Display label for social service
  */
-export const getIconBySite = ( name ) => {
-	const variation = variations.find( ( v ) => v.name === name );
-	return variation ? variation.icon : ChainIcon;
+const getSocialServiceLabel = ( activeVariation ) => {
+	const title = activeVariation?.title ?? activeVariation.name;
+	return title;
 };
 
 /**
- * Retrieves the display name for the social service.
+ * Retrieves the social service's icon component and label.
  *
- * @param {string} name key for a social service (lowercase slug)
+ * @param {Object} activeVariation The object of the active social service variation
  *
- * @return {string} Display name for social service
+ * @return {Object} An opject containing the Icon component for social service and label.
  */
-export const getNameBySite = ( name ) => {
-	const variation = variations.find( ( v ) => v.name === name );
-	return variation ? variation.title : __( 'Social Icon' );
+export const getSocialService = ( activeVariation ) => {
+	if ( activeVariation?.name ) {
+		return {
+			icon: activeVariation?.icon ?? ChainIcon,
+			label: getSocialServiceLabel( activeVariation ),
+		};
+	}
+
+	// Default to Mail if no active variation is found.
+	return {
+		icon: ChainIcon,
+		label: __( 'Social Icon' ),
+	};
 };
