@@ -3,7 +3,12 @@
 class Tests_Font_Library_FontDirCanBeFiltered extends WP_UnitTestCase {
 
 	public function test_font_directory_can_be_filtered() {
-		// Filters uploads directory to return font directory.
+		/*
+		 * Naive filtering of uploads directory to return font directory.
+		 *
+		 * This emulates the approach a plugin developer may take to
+		 * add the filter when extending the font library functionality.
+		 */
 		add_filter( 'upload_dir', 'wp_get_font_dir' );
 
 		add_filter(
