@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { isBlobURL } from '@wordpress/blob';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -14,6 +15,7 @@ import {
 	PanelBody,
 	Placeholder,
 	Button,
+	Spinner,
 	TextControl,
 } from '@wordpress/components';
 import {
@@ -26,7 +28,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -68,6 +70,7 @@ export default function PostFeaturedImageEdit( {
 		linkTarget,
 		useFirstImageFromPost,
 	} = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -142,6 +145,9 @@ export default function PostFeaturedImageEdit( {
 
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
+		className: classnames( {
+			'is-transient': temporaryURL,
+		} ),
 	} );
 	const borderProps = useBorderProps( attributes );
 	const blockEditingMode = useBlockEditingMode();
@@ -169,11 +175,21 @@ export default function PostFeaturedImageEdit( {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
 		}
+
+		if ( value?.url && isBlobURL( value.url ) ) {
+			setTemporaryURL( value.url );
+		}
 	};
+
+	// Reset temporary url when media is available.
+	if ( media && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 	};
 
 	const controls = blockEditingMode === 'default' && (
@@ -237,7 +253,7 @@ export default function PostFeaturedImageEdit( {
 	/**
 	 * A Post Featured Image block should not have image replacement
 	 * or upload options in the following cases:
-	 * - Is placed in a Query Loop. This is a consious decision to
+	 * - Is placed in a Query Loop. This is a conscious decision to
 	 * prevent content editing of different posts in Query Loop, and
 	 * this could change in the future.
 	 * - Is in a context where it does not have a postId (for example
@@ -279,7 +295,7 @@ export default function PostFeaturedImageEdit( {
 	 * - It has no image assigned yet
 	 * Then display the placeholder with the image upload option.
 	 */
-	if ( ! featuredImage ) {
+	if ( ! featuredImage && ! temporaryURL ) {
 		image = (
 			<MediaPlaceholder
 				onSelect={ onSelectImage }
@@ -305,24 +321,28 @@ export default function PostFeaturedImageEdit( {
 		);
 	} else {
 		// We have a Featured image so show a Placeholder if is loading.
-		image = ! media ? (
-			placeholder()
-		) : (
-			<img
-				className={ borderProps.className }
-				src={ mediaUrl }
-				alt={
-					media.alt_text
-						? sprintf(
-								// translators: %s: The image's alt text.
-								__( 'Featured image: %s' ),
-								media.alt_text
-						  )
-						: __( 'Featured image' )
-				}
-				style={ imageStyles }
-			/>
-		);
+		image =
+			! media && ! temporaryURL ? (
+				placeholder()
+			) : (
+				<>
+					<img
+						className={ borderProps.className }
+						src={ temporaryURL || mediaUrl }
+						alt={
+							media && media?.alt_text
+								? sprintf(
+										// translators: %s: The image's alt text.
+										__( 'Featured image: %s' ),
+										media.alt_text
+								  )
+								: __( 'Featured image' )
+						}
+						style={ imageStyles }
+					/>
+					{ temporaryURL && <Spinner /> }
+				</>
+			);
 	}
 
 	/**
@@ -333,7 +353,7 @@ export default function PostFeaturedImageEdit( {
 	 */
 	return (
 		<>
-			{ controls }
+			{ ! temporaryURL && controls }
 			{ !! media && ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
