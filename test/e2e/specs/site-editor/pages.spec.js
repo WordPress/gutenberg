@@ -150,7 +150,7 @@ test.describe( 'Pages', () => {
 
 		// Go back to page editing focus.
 		await page
-			.getByRole( 'region', { name: 'Editor content' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Back' } )
 			.click();
 

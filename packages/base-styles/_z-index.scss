@@ -108,6 +108,9 @@ $z-layers: (
 	// Above the block list and the header.
 	".block-editor-block-popover": 31,
 
+	// Below the block toolbar.
+	".block-editor-grid-visualizer": 30,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 
@@ -190,7 +193,8 @@ $z-layers: (
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
 	".edit-site-patterns__header": 2,
-	".edit-site-patterns__grid-pagination": 2,
+	".edit-site-patterns__dataviews-list-pagination": 2,
+	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
 	".edit-site-layout__canvas-container.is-resizing::after": 100,

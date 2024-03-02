@@ -8,9 +8,10 @@
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
  */
-function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
+function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(
-		'viewModule' => 'view_module_ids',
+		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
+		'viewModule' => 'view_script_module_ids',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
 		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
@@ -40,28 +41,7 @@ function gutenberg_filter_block_type_metadata_settings_register_modules( $settin
 	return $settings;
 }
 
-add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 10, 2 );
-
-/**
- * Enqueue modules associated with the block.
- *
- * @param string   $block_content  The block content.
- * @param array    $parsed_block   The full block, including name and attributes.
- * @param WP_Block $block_instance The block instance.
- */
-function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
-	$block_type = $block_instance->block_type;
-
-	if ( ! empty( $block_type->view_module_ids ) ) {
-		foreach ( $block_type->view_module_ids as $module_id ) {
-			wp_enqueue_script_module( $module_id );
-		}
-	}
-
-	return $block_content;
-}
-
-add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_modules', 10, 3 );
+add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_view_module', 20, 2 );
 
 /**
  * Finds a module ID for the selected block metadata field. It detects
@@ -100,25 +80,9 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$module_id             = gutenberg_generate_block_asset_module_id( $metadata['name'], $field_name, $index );
 	$module_asset_path     = wp_normalize_path( realpath( $module_asset_raw_path ) );
 
-	if ( empty( $module_asset_path ) ) {
-		_doing_it_wrong(
-			__FUNCTION__,
-			sprintf(
-				// This string is from WordPress Core. See `register_block_script_handle`.
-				// Translators: This is a translation from WordPress Core (default). No need to translate.
-				__( 'The asset file (%1$s) for the "%2$s" defined in "%3$s" block definition is missing.', 'default' ),
-				$module_asset_raw_path,
-				$field_name,
-				$metadata['name']
-			),
-			'6.5.0'
-		);
-		return false;
-	}
-
 	$module_path_norm    = wp_normalize_path( realpath( $path . '/' . $module_path ) );
 	$module_uri          = get_block_asset_url( $module_path_norm );
-	$module_asset        = require $module_asset_path;
+	$module_asset        = ! empty( $module_asset_path ) ? require $module_asset_path : array();
 	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();
 
 	wp_register_script_module(
@@ -159,7 +123,9 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 	}
 
 	$field_mappings = array(
-		'viewModule' => 'view-module',
+		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
+		'viewModule'       => 'view-script-module',
+		'viewScriptModule' => 'view-script-module',
 	);
 	$asset_handle   = str_replace( '/', '-', $block_name ) .
 		'-' . $field_mappings[ $field_name ];
@@ -172,21 +138,20 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 /**
  * Registers a REST field for block types to provide view module IDs.
  *
- * Adds the `view_module_ids` field to block type objects in the REST API, which
+ * Adds the `view_script_module_ids` and `view_module_ids` (deprecated) field to block type objects in the REST API, which
  * lists the script module IDs for any script modules associated with the
- * block's viewModule(s) key.
- *
- * @since 6.5.0
+ * block's viewScriptModule key.
  */
 function gutenberg_register_view_module_ids_rest_field() {
+	// @todo remove view_module_ids support in Gutenberg >= 17.8 (replaced by view_script_module_ids).
 	register_rest_field(
 		'block-type',
 		'view_module_ids',
 		array(
 			'get_callback' => function ( $item ) {
 				$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
-				if ( isset( $block_type->view_module_ids ) ) {
-					return $block_type->view_module_ids;
+				if ( isset( $block_type->view_script_module_ids ) ) {
+					return $block_type->view_script_module_ids;
 				}
 				return array();
 			},

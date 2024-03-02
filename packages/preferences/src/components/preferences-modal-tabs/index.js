@@ -66,7 +66,7 @@ export default function PreferencesModalTabs( { sections } ) {
 		modalContent = (
 			<div className="preferences__tabs">
 				<Tabs
-					initialTabId={
+					defaultTabId={
 						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
 					}
 					onSelect={ setActiveMenu }

@@ -78,6 +78,9 @@
 				"margin": true,
 				"padding": false
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

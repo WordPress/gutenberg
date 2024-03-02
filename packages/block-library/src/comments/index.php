@@ -16,6 +16,8 @@
  * the block is in legacy mode. If not, the HTML generated in the editor is
  * returned instead.
  *
+ * @global WP_Post  $post     Global post object.
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.

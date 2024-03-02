@@ -11,6 +11,7 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -34,6 +35,7 @@ export default function save( { attributes } ) {
 
 	const newRel = ! rel ? undefined : rel;
 	const borderProps = getBorderClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = classnames( {
 		// All other align classes are handled by block supports.
@@ -58,6 +60,7 @@ export default function save( { attributes } ) {
 			className={ imageClasses || undefined }
 			style={ {
 				...borderProps.style,
+				...shadowProps.style,
 				aspectRatio,
 				objectFit: scale,
 				width,

@@ -188,9 +188,9 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
           class="components-flex-item emotion-7 emotion-8 emotion-6"
@@ -459,9 +459,9 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
           class="components-flex-item emotion-7 emotion-8 emotion-6"
@@ -740,9 +740,9 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
           class="components-flex-item emotion-7 emotion-8 emotion-6"
@@ -1033,9 +1033,9 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
           class="components-flex-item emotion-7 emotion-8 emotion-6"

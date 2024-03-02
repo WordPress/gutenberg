@@ -20,6 +20,7 @@
 	// Icons are 36px, as set by a 24px icon and 12px padding.
 	.components-button.components-button, // This needs specificity to override padding values inherited from the button component.
 	.components-button.has-icon.has-icon {
+		justify-content: center;
 		min-width: $block-toolbar-height - $grid-unit-15;
 		padding-left: $grid-unit-15 * 0.5; // 6px.
 		padding-right: $grid-unit-15 * 0.5;

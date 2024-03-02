@@ -62,6 +62,16 @@ export const format = {
 					return false;
 				}
 
+				const allowedBlocks =
+					select( blockEditorStore ).getSettings().allowedBlockTypes;
+				if (
+					allowedBlocks === false ||
+					( Array.isArray( allowedBlocks ) &&
+						! allowedBlocks.includes( 'core/footnotes' ) )
+				) {
+					return false;
+				}
+
 				const entityRecord = select( coreDataStore ).getEntityRecord(
 					'postType',
 					postType,

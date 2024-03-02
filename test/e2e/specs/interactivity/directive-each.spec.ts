@@ -36,6 +36,15 @@ test.describe( 'data-wp-each', () => {
 		] );
 	} );
 
+	test( 'should convert from kebab-case to camelCase the specified item name in the context', async ( {
+		page,
+	} ) => {
+		const elements = page
+			.getByTestId( 'letters-kebab-case' )
+			.getByTestId( 'item' );
+		await expect( elements ).toHaveText( [ 'A', 'B', 'C' ] );
+	} );
+
 	test.describe( 'without `wp-each-key`', () => {
 		test.beforeEach( async ( { page } ) => {
 			const elements = page.getByTestId( 'fruits' ).getByTestId( 'item' );

@@ -23,13 +23,14 @@ import { store as editorStore } from '../../store';
 const DEFAULT_TITLE = __( 'Custom Template' );
 
 export default function CreateNewTemplateModal( { onClose } ) {
-	const { defaultBlockTemplate, getPostLinkProps } = useSelect(
+	const { defaultBlockTemplate, onNavigateToEntityRecord } = useSelect(
 		( select ) => {
 			const { getEditorSettings, getCurrentTemplateId } =
 				select( editorStore );
 			return {
 				defaultBlockTemplate: getEditorSettings().defaultBlockTemplate,
-				getPostLinkProps: getEditorSettings().getPostLinkProps,
+				onNavigateToEntityRecord:
+					getEditorSettings().onNavigateToEntityRecord,
 				getTemplateId: getCurrentTemplateId,
 			};
 		}
@@ -97,13 +98,10 @@ export default function CreateNewTemplateModal( { onClose } ) {
 		} );
 
 		setIsBusy( false );
-		const editTemplate = getPostLinkProps
-			? getPostLinkProps( {
-					postId: newTemplate.id,
-					postType: 'wp_template',
-			  } )
-			: {};
-		editTemplate.onClick();
+		onNavigateToEntityRecord( {
+			postId: newTemplate.id,
+			postType: 'wp_template',
+		} );
 		cancel();
 	};
 

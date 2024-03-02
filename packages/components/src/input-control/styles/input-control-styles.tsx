@@ -213,7 +213,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -263,20 +263,23 @@ export const LabelWrapper = styled( FlexItem )`
 
 type BackdropProps = {
 	disabled?: boolean;
+	isBorderless?: boolean;
 	isFocused?: boolean;
 };
 
 const backdropFocusedStyles = ( {
 	disabled,
+	isBorderless,
 	isFocused,
 }: BackdropProps ): SerializedStyles => {
-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
 
 	let boxShadow;
 	let outline;
 	let outlineOffset;
 
 	if ( isFocused ) {
+		borderColor = COLORS.ui.borderFocus;
 		boxShadow = CONFIG.controlBoxShadowFocus;
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline = `2px solid transparent`;
@@ -284,7 +287,7 @@ const backdropFocusedStyles = ( {
 	}
 
 	if ( disabled ) {
-		borderColor = COLORS.ui.borderDisabled;
+		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
 	}
 
 	return css( {

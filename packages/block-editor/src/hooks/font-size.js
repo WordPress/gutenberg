@@ -131,7 +131,6 @@ export function FontSizeEdit( props ) {
 			withReset={ false }
 			withSlider
 			size="__unstable-large"
-			__nextHasNoMarginBottom
 		/>
 	);
 }

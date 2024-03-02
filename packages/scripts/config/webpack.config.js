@@ -11,6 +11,7 @@ const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
+const { sync: glob } = require( 'fast-glob' );
 
 /**
  * WordPress dependencies
@@ -33,6 +34,7 @@ const {
 	getAsBooleanFromENV,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
+	fromProjectRoot,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -390,6 +392,37 @@ const scriptConfig = {
 };
 
 if ( hasExperimentalModulesFlag ) {
+	/**
+	 * Add block.json files to compilation to ensure changes trigger rebuilds when watching
+	 */
+	class BlockJsonDependenciesPlugin {
+		constructor() {
+			/** @type {ReadonlyArray<string>} */
+			this.blockJsonFiles = glob( '**/block.json', {
+				absolute: true,
+				cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+			} );
+		}
+
+		/**
+		 * Apply the plugin
+		 * @param {webpack.Compiler} compiler the compiler instance
+		 * @return {void}
+		 */
+		apply( compiler ) {
+			if ( this.blockJsonFiles.length ) {
+				compiler.hooks.compilation.tap(
+					'BlockJsonDependenciesPlugin',
+					( compilation ) => {
+						compilation.fileDependencies.addAll(
+							this.blockJsonFiles
+						);
+					}
+				);
+			}
+		}
+	}
+
 	/** @type {webpack.Configuration} */
 	const moduleConfig = {
 		...baseConfig,
@@ -429,6 +462,7 @@ if ( hasExperimentalModulesFlag ) {
 			// generated, and the default externals set.
 			! process.env.WP_NO_EXTERNALS &&
 				new DependencyExtractionWebpackPlugin(),
+			new BlockJsonDependenciesPlugin(),
 		].filter( Boolean ),
 	};
 

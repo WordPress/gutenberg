@@ -1,4 +1,4 @@
-const moduleFields = new Set( [ 'viewModule' ] );
+const moduleFields = new Set( [ 'viewScriptModule', 'viewModule' ] );
 const scriptFields = new Set( [ 'viewScript', 'script', 'editorScript' ] );
 
 /**

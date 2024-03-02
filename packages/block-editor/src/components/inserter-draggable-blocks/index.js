@@ -7,12 +7,15 @@ import {
 	serialize,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const InserterDraggableBlocks = ( {
 	isEnabled,
@@ -36,11 +39,16 @@ const InserterDraggableBlocks = ( {
 		[ blocks ]
 	);
 
+	const { startDragging, stopDragging } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
 	return (
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
+				startDragging();
 				const parsedBlocks =
 					pattern?.type === INSERTER_PATTERN_TYPES.user &&
 					pattern?.syncStatus !== 'unsynced'
@@ -50,6 +58,9 @@ const InserterDraggableBlocks = ( {
 					'text/html',
 					serialize( parsedBlocks )
 				);
+			} }
+			onDragEnd={ () => {
+				stopDragging();
 			} }
 			__experimentalDragComponent={
 				<BlockDraggableChip

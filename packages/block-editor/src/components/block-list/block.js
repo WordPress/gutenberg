@@ -524,7 +524,7 @@ function BlockListBlockProvider( props ) {
 				__unstableIsFullySelected,
 				__unstableSelectionHasUnmergeableBlock,
 				isBlockBeingDragged,
-				isDraggingBlocks,
+				isDragging,
 				hasBlockMovingClientId,
 				canInsertBlockType,
 				__unstableHasActiveBlockOverlayActive,
@@ -602,7 +602,7 @@ function BlockListBlockProvider( props ) {
 				isOutlineEnabled: outlineMode,
 				hasOverlay:
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
-					! isDraggingBlocks(),
+					! isDragging(),
 				initialPosition:
 					_isSelected && __unstableGetEditorMode() === 'edit'
 						? getSelectedBlocksInitialCaretPosition()

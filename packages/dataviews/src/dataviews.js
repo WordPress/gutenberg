@@ -20,6 +20,16 @@ import BulkActions from './bulk-actions';
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
 
+function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
+
 export default function DataViews( {
 	view,
 	onChangeView,
@@ -37,30 +47,33 @@ export default function DataViews( {
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+	const [ openedFilter, setOpenedFilter ] = useState( null );
 
 	useEffect( () => {
 		if (
 			selection.length > 0 &&
 			selection.some(
-				( id ) => ! data.some( ( item ) => item.id === id )
+				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
 			)
 		) {
 			const newSelection = selection.filter( ( id ) =>
-				data.some( ( item ) => item.id === id )
+				data.some( ( item ) => getItemId( item ) === id )
 			);
 			setSelection( newSelection );
 			onSelectionChange(
-				data.filter( ( item ) => newSelection.includes( item.id ) )
+				data.filter( ( item ) =>
+					newSelection.includes( getItemId( item ) )
+				)
 			);
 		}
-	}, [ selection, data, onSelectionChange ] );
+	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
-			setSelection( items.map( ( item ) => item.id ) );
+			setSelection( items.map( ( item ) => getItemId( item ) ) );
 			onSelectionChange( items );
 		},
-		[ setSelection, onSelectionChange ]
+		[ setSelection, getItemId, onSelectionChange ]
 	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
@@ -72,14 +85,24 @@ export default function DataViews( {
 			render: field.render || field.getValue,
 		} ) );
 	}, [ fields ] );
+
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 0 } justify="flex-start">
+			<VStack spacing={ 3 } justify="flex-start">
 				<HStack
-					alignment="flex-start"
+					alignment="top"
+					justify="start"
 					className="dataviews-filters__view-actions"
 				>
-					<HStack justify="start" wrap>
+					<HStack
+						justify="start"
+						className="dataviews-filters__container"
+						wrap
+					>
 						{ search && (
 							<Search
 								label={ searchLabel }
@@ -91,18 +114,20 @@ export default function DataViews( {
 							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
+							openedFilter={ openedFilter }
+							setOpenedFilter={ setOpenedFilter }
 						/>
 					</HStack>
-					{ ( view.type === LAYOUT_TABLE ||
-						view.type === LAYOUT_GRID ) && (
-						<BulkActions
-							actions={ actions }
-							data={ data }
-							onSelectionChange={ onSetSelection }
-							selection={ selection }
-							getItemId={ getItemId }
-						/>
-					) }
+					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+						hasPossibleBulkAction && (
+							<BulkActions
+								actions={ actions }
+								data={ data }
+								onSelectionChange={ onSetSelection }
+								selection={ selection }
+								getItemId={ getItemId }
+							/>
+						) }
 					<ViewActions
 						fields={ _fields }
 						view={ view }
@@ -122,6 +147,7 @@ export default function DataViews( {
 					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
+					setOpenedFilter={ setOpenedFilter }
 				/>
 				<Pagination
 					view={ view }

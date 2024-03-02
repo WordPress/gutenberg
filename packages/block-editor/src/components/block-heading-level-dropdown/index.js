@@ -46,31 +46,23 @@ export default function HeadingLevelDropdown( {
 			icon={ <HeadingLevelIcon level={ value } /> }
 			label={ __( 'Change level' ) }
 			controls={ options.map( ( targetLevel ) => {
-				{
-					const isActive = targetLevel === value;
-
-					return {
-						icon: (
-							<HeadingLevelIcon
-								level={ targetLevel }
-								isPressed={ isActive }
-							/>
-						),
-						title:
-							targetLevel === 0
-								? __( 'Paragraph' )
-								: sprintf(
-										// translators: %s: heading level e.g: "1", "2", "3"
-										__( 'Heading %d' ),
-										targetLevel
-								  ),
-						isActive,
-						onClick() {
-							onChange( targetLevel );
-						},
-						role: 'menuitemradio',
-					};
-				}
+				const isActive = targetLevel === value;
+				return {
+					icon: <HeadingLevelIcon level={ targetLevel } />,
+					title:
+						targetLevel === 0
+							? __( 'Paragraph' )
+							: sprintf(
+									// translators: %s: heading level e.g: "1", "2", "3"
+									__( 'Heading %d' ),
+									targetLevel
+							  ),
+					isActive,
+					onClick() {
+						onChange( targetLevel );
+					},
+					role: 'menuitemradio',
+				};
 			} ) }
 		/>
 	);

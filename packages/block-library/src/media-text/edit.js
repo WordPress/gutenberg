@@ -230,6 +230,15 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	const mediaTextGeneralSettings = (
 		<PanelBody title={ __( 'Settings' ) }>
+			<RangeControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				label={ __( 'Media width' ) }
+				value={ temporaryMediaWidth || mediaWidth }
+				onChange={ commitWidthChange }
+				min={ WIDTH_CONSTRAINT_PERCENTAGE }
+				max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
+			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
 				label={ __( 'Stack on mobile' ) }
@@ -243,7 +252,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ mediaType === 'image' && (
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={ __( 'Crop image to fill entire column' ) }
+					label={ __( 'Crop image to fill' ) }
 					checked={ !! imageFill }
 					onChange={ () =>
 						setAttributes( {
@@ -292,16 +301,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					imageSizeHelp={ __(
 						'Select the size of the source image.'
 					) }
-				/>
-			) }
-			{ mediaUrl && (
-				<RangeControl
-					__nextHasNoMarginBottom
-					label={ __( 'Media width' ) }
-					value={ temporaryMediaWidth || mediaWidth }
-					onChange={ commitWidthChange }
-					min={ WIDTH_CONSTRAINT_PERCENTAGE }
-					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
 				/>
 			) }
 		</PanelBody>

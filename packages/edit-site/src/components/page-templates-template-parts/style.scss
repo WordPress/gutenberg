@@ -37,8 +37,30 @@
 			border-radius: 3px 3px 0 0;
 		}
 	}
+
+	&.is-viewtype-table {
+		border-radius: $radius-block-ui;
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+			border-radius: $radius-block-ui;
+		}
+	}
 }
 
 .page-templates-description {
 	white-space: normal;
+}
+
+.edit-site-page-template-template-parts-dataviews {
+	.dataviews-pagination {
+		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
+	}
 }

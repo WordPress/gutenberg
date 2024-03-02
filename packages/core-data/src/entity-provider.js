@@ -155,7 +155,7 @@ const parsedBlocksCache = new WeakMap();
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { getEntityRecord } = useSelect( STORE_NAME );
+	const { getEntityRecord, getEntityRecordEdits } = useSelect( STORE_NAME );
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
@@ -183,20 +183,32 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return editedBlocks;
 		}
 
-		if ( ! content || typeof content === 'function' ) {
+		if ( ! content || typeof content !== 'string' ) {
 			return EMPTY_ARRAY;
 		}
 
-		const entityRecord = getEntityRecord( kind, name, id );
-		let _blocks = parsedBlocksCache.get( entityRecord );
+		// If there's an edit, cache the parsed blocks by the edit.
+		// If not, cache by the original enity record.
+		const edits = getEntityRecordEdits( kind, name, id );
+		const isUnedited = ! edits || ! Object.keys( edits ).length;
+		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
+		let _blocks = parsedBlocksCache.get( cackeKey );
 
 		if ( ! _blocks ) {
 			_blocks = parse( content );
-			parsedBlocksCache.set( entityRecord, _blocks );
+			parsedBlocksCache.set( cackeKey, _blocks );
 		}
 
 		return _blocks;
-	}, [ kind, name, id, editedBlocks, content, getEntityRecord ] );
+	}, [
+		kind,
+		name,
+		id,
+		editedBlocks,
+		content,
+		getEntityRecord,
+		getEntityRecordEdits,
+	] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),

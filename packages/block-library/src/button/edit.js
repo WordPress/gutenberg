@@ -45,6 +45,7 @@ import {
 	createBlock,
 	cloneBlock,
 	getDefaultBlockName,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -123,7 +124,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	}
 
 	return (
-		<PanelBody title={ __( 'Width settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ButtonGroup aria-label={ __( 'Button width' ) }>
 				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 					return (
@@ -238,15 +239,15 @@ function ButtonEdit( props ) {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const blockBindingsSource = unlock(
+				select( blocksStore )
+			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource( metadata?.bindings?.url?.source )
-						?.lockAttributesEditing === true,
+					( ! blockBindingsSource ||
+						blockBindingsSource?.lockAttributesEditing ),
 			};
 		},
 		[ isSelected ]

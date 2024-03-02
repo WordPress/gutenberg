@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
+	NavigableMenu,
 	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	MenuGroup,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
+	Icon,
 	link as linkIcon,
 	image,
 	page,
@@ -57,6 +59,17 @@ const ImageURLInputUI = ( {
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
+	const wrapperRef = useRef();
+
+	useEffect( () => {
+		if ( ! wrapperRef.current ) {
+			return;
+		}
+		const nextFocusTarget =
+			focus.focusable.find( wrapperRef.current )[ 0 ] ||
+			wrapperRef.current;
+		nextFocusTarget.focus();
+	}, [ isEditingLink, url, lightboxEnabled ] );
 
 	const startEditLink = () => {
 		if (
@@ -249,6 +262,7 @@ const ImageURLInputUI = ( {
 			/>
 			{ isOpen && (
 				<URLPopover
+					ref={ wrapperRef }
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
@@ -257,7 +271,7 @@ const ImageURLInputUI = ( {
 					}
 					additionalControls={
 						showLinkEditor && (
-							<MenuGroup>
+							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
@@ -295,9 +309,10 @@ const ImageURLInputUI = ( {
 										{ __( 'Expand on click' ) }
 									</MenuItem>
 								) }
-							</MenuGroup>
+							</NavigableMenu>
 						)
 					}
+					offset={ 13 }
 				>
 					{ ( ! url || isEditingLink ) && ! lightboxEnabled && (
 						<>
@@ -328,9 +343,7 @@ const ImageURLInputUI = ( {
 					) }
 					{ ! url && ! isEditingLink && lightboxEnabled && (
 						<div className="block-editor-url-popover__expand-on-click">
-							<div className="fullscreen-icon">
-								{ fullscreen }
-							</div>
+							<Icon icon={ fullscreen } />
 							<div className="text">
 								<p>{ __( 'Expand on click' ) }</p>
 								<p className="description">
@@ -341,7 +354,6 @@ const ImageURLInputUI = ( {
 							</div>
 							<Button
 								icon={ linkOff }
-								className="remove-link"
 								label={ __( 'Disable expand on click' ) }
 								onClick={ () => {
 									onSetLightbox( false );

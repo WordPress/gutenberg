@@ -117,7 +117,6 @@ function NonDefaultControls( { format, onChange } ) {
 	return (
 		<VStack>
 			<CustomSelectControl
-				__nextUnconstrainedWidth
 				label={ __( 'Choose a format' ) }
 				options={ [ ...suggestedOptions, customOption ] }
 				value={

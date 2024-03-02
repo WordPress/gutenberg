@@ -47,11 +47,6 @@ const restrictedImports = [
 		message: 'Please use native functionality instead.',
 	},
 	{
-		name: 'reakit',
-		message:
-			'Please use Reakit API through `@wordpress/components` instead.',
-	},
-	{
 		name: '@ariakit/react',
 		message:
 			'Please use Ariakit API through `@wordpress/components` instead.',
@@ -359,20 +354,25 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/components/src/**' ],
-			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
 			rules: {
 				'no-restricted-syntax': [
 					'error',
 					{
-						selector: 'Literal[value=/--wp-admin-theme-/]',
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 						message:
 							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
 					{
 						selector:
-							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 						message:
-							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
 				],
 			},

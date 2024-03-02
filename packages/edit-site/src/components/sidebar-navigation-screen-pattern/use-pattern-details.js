@@ -6,7 +6,7 @@ import { sentenceCase } from 'change-case';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
@@ -94,8 +94,14 @@ export default function usePatternDetails( postType, postId ) {
 			label: __( 'Syncing' ),
 			value:
 				record.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced
-					? __( 'Not synced' )
-					: __( 'Fully synced' ),
+					? _x(
+							'Not synced',
+							'Text that indicates that the pattern is not synchronized'
+					  )
+					: _x(
+							'Synced',
+							'Text that indicates that the pattern is synchronized'
+					  ),
 		} );
 
 		if ( record.wp_pattern_category?.length === 0 ) {

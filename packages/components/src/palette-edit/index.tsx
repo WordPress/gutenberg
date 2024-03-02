@@ -152,7 +152,6 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 			{ isGradient && (
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
-						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar
 						value={ element.gradient }
 						onChange={ ( newGradient ) => {
@@ -590,7 +589,6 @@ export function PaletteEdit( {
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
-								__nextHasNoMargin
 								gradients={ gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }

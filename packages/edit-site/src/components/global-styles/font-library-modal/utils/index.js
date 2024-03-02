@@ -9,7 +9,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
 import { fetchInstallFontFace } from '../resolvers';
-import { formatFontFamily } from './preview-styles';
+import { formatFontFaceName } from './preview-styles';
 
 /**
  * Browser dependencies
@@ -99,7 +99,7 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	const newFont = new window.FontFace(
-		formatFontFamily( fontFace.fontFamily ),
+		formatFontFaceName( fontFace.fontFamily ),
 		dataSource,
 		{
 			style: fontFace.fontStyle,
@@ -121,7 +121,13 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 }
 
-export function getDisplaySrcFromFontFace( input, urlPrefix ) {
+/**
+ * Retrieves the display source from a font face src.
+ *
+ * @param {string|string[]} input - The font face src.
+ * @return {string|undefined} The display source or undefined if the input is invalid.
+ */
+export function getDisplaySrcFromFontFace( input ) {
 	if ( ! input ) {
 		return;
 	}
@@ -132,9 +138,9 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	} else {
 		src = input;
 	}
-	// If it is a theme font, we need to make the url absolute
-	if ( src.startsWith( 'file:.' ) && urlPrefix ) {
-		src = src.replace( 'file:.', urlPrefix );
+	// It's expected theme fonts will already be loaded in the browser.
+	if ( src.startsWith( 'file:.' ) ) {
+		return;
 	}
 	if ( ! isUrlEncoded( src ) ) {
 		src = encodeURI( src );
