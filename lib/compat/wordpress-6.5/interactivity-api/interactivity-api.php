@@ -77,9 +77,9 @@ if ( ! function_exists( 'wp_interactivity' ) ) {
 	 * It provides access to the WP_Interactivity_API instance, creating one if it
 	 * doesn't exist yet.
 	 *
-	 * @global WP_Interactivity_API $wp_interactivity
-	 *
 	 * @since 6.5.0
+	 *
+	 * @global WP_Interactivity_API $wp_interactivity
 	 *
 	 * @return WP_Interactivity_API The main WP_Interactivity_API instance.
 	 */
