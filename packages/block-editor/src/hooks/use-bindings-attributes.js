@@ -126,6 +126,12 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			useSelect( blocksStore )
 		).getAllBlockBindingsSources();
 
+		/*
+		 * A trigger to refresh
+		 * the bound attributesvalues
+		 * when the source data changes.
+		 * It is used to force the re-render of the BlockEdit component.
+		 */
 		const [ refreshTrigger, setTrigger ] = useState( 1 );
 		const refreshExternalSourceData = setTrigger.bind(
 			null,
@@ -223,15 +229,17 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			[ bindings, props ]
 		);
 
+		if ( Object.keys( bindings ).length <= 0 ) {
+			return <BlockEdit { ...props } />;
+		}
+
 		return (
 			<>
-				{ Object.keys( bindings ).length > 0 && (
-					<BlockBindingBridge
-						blockProps={ props }
-						bindings={ bindings }
-						onPropValueChange={ refreshExternalSourceData }
-					/>
-				) }
+				<BlockBindingBridge
+					blockProps={ props }
+					bindings={ bindings }
+					onPropValueChange={ refreshExternalSourceData }
+				/>
 
 				<BlockEdit
 					{ ...props }
