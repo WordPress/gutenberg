@@ -4,7 +4,13 @@
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useCallback,
+	useState,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -80,70 +86,14 @@ const BindingConnector = ( {
 		args
 	);
 
-	const { name: blockName } = blockProps;
-	const attrValue = blockProps.attributes[ attrName ];
-
-	const updateBoundAttibute = useCallback(
-		( newAttrValue, prevAttrValue ) => {
-			/*
-			 * If the attribute is a RichTextData instance,
-			 * (core/paragraph, core/heading, core/button, etc.)
-			 * compare its HTML representation with the new value.
-			 *
-			 * To do: it looks like a workaround.
-			 * Consider improving the attribute and metadata fields types.
-			 */
-			if ( prevAttrValue instanceof RichTextData ) {
-				// Bail early if the Rich Text value is the same.
-				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
-					return;
-				}
-
-				/*
-				 * To preserve the value type,
-				 * convert the new value to a RichTextData instance.
-				 */
-				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
-			}
-
-			if ( prevAttrValue === newAttrValue ) {
-				return;
-			}
-
-			onPropValueChange( { [ attrName ]: newAttrValue } );
-		},
-		[ attrName, onPropValueChange ]
-	);
+	const prevPropValue = useRef( propValue );
 
 	useLayoutEffect( () => {
-		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttibute( propValue, attrValue );
-		} else if ( placeholder ) {
-			/*
-			 * Placeholder fallback.
-			 * If the attribute is `src` or `href`,
-			 * a placeholder can't be used because it is not a valid url.
-			 * Adding this workaround until
-			 * attributes and metadata fields types are improved and include `url`.
-			 */
-			const htmlAttribute =
-				getBlockType( blockName ).attributes[ attrName ].attribute;
-
-			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
-				return;
-			}
-
-			updateBoundAttibute( placeholder );
+		if ( prevPropValue.current !== propValue ) {
+			onPropValueChange( { [ attrName ]: propValue } );
+			prevPropValue.current = propValue;
 		}
-	}, [
-		updateBoundAttibute,
-		propValue,
-		attrValue,
-		placeholder,
-		blockName,
-		attrName,
-	] );
+	}, [ propValue, attrName, onPropValueChange ] );
 
 	return null;
 };
@@ -151,7 +101,7 @@ const BindingConnector = ( {
 /**
  * BlockBindingBridge acts like a component wrapper
  * that connects the bound attributes of a block
- * to the source handlers.
+ * to the source helper.
  * For this, it creates a BindingConnector for each bound attribute.
  *
  * @param {Object}   props                   - The component props.
@@ -194,19 +144,12 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		/*
-		 * Collect and update the bound attributes
-		 * in a separate state.
-		 */
-		const [ boundAttributes, setBoundAttributes ] = useState( {} );
-		const updateBoundAttributes = useCallback(
-			( newAttributes ) =>
-				setBoundAttributes( ( prev ) => ( {
-					...prev,
-					...newAttributes,
-				} ) ),
-			[]
-		);
+		const blockBindingsSources = unlock(
+			useSelect( blocksStore )
+		).getAllBlockBindingsSources();
+
+		const [ trigger, setTrigger ] = useState( 1 );
+		const retrigger = setTrigger.bind( null, trigger + 1 );
 
 		/*
 		 * Create binding object filtering
@@ -218,19 +161,94 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			)
 		);
 
+		/**
+		 * Helper function to update the block attributes,
+		 * handling both bound and unbound attributes.
+		 * For unboud attributes, it uses the BlockEdit `setAttributes` prop.
+		 * For bound attributes, it uses the source handler `updateValue` function.
+		 *
+		 * @param {Object} nextAttributes - The next attributes to update.
+		 * @return {void}
+		 */
+		const updateAttributes = useCallback(
+			( nextAttributes ) => {
+				const unboundAttributes = {};
+				Object.entries( nextAttributes ).forEach(
+					( [ boundAttributeName, value ] ) => {
+						if ( ! ( boundAttributeName in bindings ) ) {
+							/*
+							 * Collect unbound attributes.
+							 * They will be updated using the BlockEdit `setAttributes` prop.
+							 */
+							unboundAttributes[ boundAttributeName ] = value;
+						} else {
+							/*
+							 * Update bound attributes.
+							 * They will be updated using the source handler `updateValue` function.
+							 */
+							const boundAttributeSourceHandlerName =
+								bindings[ boundAttributeName ]?.source;
+							const sourceHandler =
+								blockBindingsSources[
+									boundAttributeSourceHandlerName
+								];
+							const { helper } = sourceHandler;
+							const { update } = helper(
+								props,
+								bindings[ boundAttributeName ].args
+							);
+							update( value );
+						}
+					}
+				);
+
+				// Update unbound attributes.
+				if ( Object.keys( unboundAttributes ).length ) {
+					props.setAttributes( unboundAttributes );
+				}
+			},
+			[ bindings, blockBindingsSources, props ]
+		);
+
+		/**
+		 * Collect the current values of the bound attributes,
+		 */
+		const boundAttributes = useMemo( () => {
+			if ( ! trigger ) {
+				return {};
+			}
+
+			const attributesStack = {};
+			Object.entries( bindings ).forEach(
+				( [ attrName, boundAttribute ] ) => {
+					const source =
+						blockBindingsSources[ boundAttribute.source ];
+					if ( ! source?.useSource ) {
+						return;
+					}
+
+					const { helper } = source;
+					const { get } = helper( props, boundAttribute.args );
+					attributesStack[ attrName ] = get();
+				}
+			);
+			return attributesStack;
+		}, [ bindings, blockBindingsSources, props, trigger ] );
+
 		return (
 			<>
 				{ Object.keys( bindings ).length > 0 && (
 					<BlockBindingBridge
 						blockProps={ props }
 						bindings={ bindings }
-						onPropValueChange={ updateBoundAttributes }
+						onPropValueChange={ retrigger }
 					/>
 				) }
 
 				<BlockEdit
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
+					setAttributes={ updateAttributes }
 				/>
 			</>
 		);

@@ -116,6 +116,9 @@ export function failResolutions( selectorName, args, errors ) {
  * @return {{ type: 'INVALIDATE_RESOLUTION', selectorName: string, args: any[] }} Action object.
  */
 export function invalidateResolution( selectorName, args ) {
+	console.log( 'selectorName', selectorName );
+	console.log( 'args', args );
+
 	return {
 		type: 'INVALIDATE_RESOLUTION',
 		selectorName,
