@@ -184,8 +184,8 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		// Pick bound attributes from the (memoized) bindings object.
 		const boundAttributes = Object.fromEntries(
 			Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
-				const { get } = settings;
-				return [ attrName, get() ];
+				const { value } = settings;
+				return [ attrName, value ];
 			} )
 		);
 

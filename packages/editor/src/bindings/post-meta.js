@@ -27,13 +27,9 @@ export default {
 		const editedRecord = getEditedEntityRecord( kind, postType, id );
 
 		return {
-			get() {
-				return editedRecord.meta?.[ metaKey ];
-			},
+			value: editedRecord.meta?.[ metaKey ],
 
-			getPlaceholder() {
-				return metaKey;
-			},
+			placeholder: metaKey,
 
 			update( newValue ) {
 				const { editEntityRecord } = dispatch( coreStore );
