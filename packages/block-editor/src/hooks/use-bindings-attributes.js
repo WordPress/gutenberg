@@ -69,30 +69,24 @@ export function canBindAttribute( blockName, attributeName ) {
  * @param {Object}   props                   - The component props.
  * @param {string}   props.attrName          - The attribute name.
  * @param {Object}   props.blockProps        - The block props with bound attribute.
- * @param {Object}   props.source            - Source handler.
- * @param {Object}   props.args              - The arguments to pass to the source.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
+ * @param            props.settings
  * @return {null}                              Data-handling component. Render nothing.
  */
-const BindingConnector = ( {
-	args,
-	attrName,
-	blockProps,
-	source,
-	onPropValueChange,
-} ) => {
-	const { placeholder, value: propValue } = source.useSource(
-		blockProps,
-		args
-	);
+const BindingConnector = ( { attrName, settings, onPropValueChange } ) => {
+	const { useSource } = settings;
+	const { placeholder, value: propValue } = useSource();
 
 	const prevPropValue = useRef( propValue );
 
 	useLayoutEffect( () => {
-		if ( prevPropValue.current !== propValue ) {
-			onPropValueChange( { [ attrName ]: propValue } );
-			prevPropValue.current = propValue;
+		if ( prevPropValue.current === propValue ) {
+			return;
 		}
+
+		// Propagate the source value to the block attribute.
+		onPropValueChange( { [ attrName ]: propValue } );
+		prevPropValue.current = propValue;
 	}, [ propValue, attrName, onPropValueChange ] );
 
 	return null;
@@ -111,33 +105,24 @@ const BindingConnector = ( {
  * @return {null}                              Data-handling component. Render nothing.
  */
 function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
-	const blockBindingsSources = unlock(
-		useSelect( blocksStore )
-	).getAllBlockBindingsSources();
-
 	return (
 		<>
-			{ Object.entries( bindings ).map(
-				( [ attrName, boundAttribute ] ) => {
-					// Bail early if the block doesn't have a valid source handler.
-					const source =
-						blockBindingsSources[ boundAttribute.source ];
-					if ( ! source?.useSource ) {
-						return null;
-					}
-
-					return (
-						<BindingConnector
-							key={ attrName }
-							attrName={ attrName }
-							source={ source }
-							blockProps={ blockProps }
-							args={ boundAttribute.args }
-							onPropValueChange={ onPropValueChange }
-						/>
-					);
+			{ Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
+				// Bail early if the block doesn't have a valid source handler.
+				if ( ! settings?.useSource ) {
+					return null;
 				}
-			) }
+
+				return (
+					<BindingConnector
+						key={ attrName }
+						attrName={ attrName }
+						blockProps={ blockProps }
+						onPropValueChange={ onPropValueChange }
+						settings={ settings }
+					/>
+				);
+			} ) }
 		</>
 	);
 }
@@ -152,13 +137,30 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		const retrigger = setTrigger.bind( null, trigger + 1 );
 
 		/*
-		 * Create binding object filtering
-		 * only the attributes that can be bound.
+		 * Binding object:
+		 * - filter out the bindings that are not allowed for the current block.
+		 * - Map the bindings to the source handler.
 		 */
 		const bindings = Object.fromEntries(
-			Object.entries( props.attributes.metadata?.bindings || {} ).filter(
-				( [ attrName ] ) => canBindAttribute( props.name, attrName )
-			)
+			Object.entries( props.attributes.metadata?.bindings || {} )
+				.filter( ( [ attrName ] ) =>
+					canBindAttribute( props.name, attrName )
+				)
+				.map( ( [ attrName, binding ] ) => {
+					const source = blockBindingsSources[ binding.source ];
+					if ( ! source?.handler ) {
+						return null;
+					}
+
+					return [
+						attrName,
+						{
+							source: binding.source,
+							args: binding.args,
+							...source.handler( props, binding.args ),
+						},
+					];
+				} )
 		);
 
 		/**
@@ -182,21 +184,9 @@ const withBlockBindingSupport = createHigherOrderComponent(
 							 */
 							unboundAttributes[ boundAttributeName ] = value;
 						} else {
-							/*
-							 * Update bound attributes.
-							 * They will be updated using the source handler `updateValue` function.
-							 */
-							const boundAttributeSourceHandlerName =
-								bindings[ boundAttributeName ]?.source;
-							const sourceHandler =
-								blockBindingsSources[
-									boundAttributeSourceHandlerName
-								];
-							const { helper } = sourceHandler;
-							const { update } = helper(
-								props,
-								bindings[ boundAttributeName ].args
-							);
+							const update =
+								bindings[ boundAttributeName ]?.update;
+
 							update( value );
 						}
 					}
@@ -207,7 +197,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 					props.setAttributes( unboundAttributes );
 				}
 			},
-			[ bindings, blockBindingsSources, props ]
+			[ bindings, props ]
 		);
 
 		/**
@@ -219,21 +209,11 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			const attributesStack = {};
-			Object.entries( bindings ).forEach(
-				( [ attrName, boundAttribute ] ) => {
-					const source =
-						blockBindingsSources[ boundAttribute.source ];
-					if ( ! source?.useSource ) {
-						return;
-					}
-
-					const { helper } = source;
-					const { get } = helper( props, boundAttribute.args );
-					attributesStack[ attrName ] = get();
-				}
-			);
+			Object.entries( bindings ).forEach( ( [ attrName, settings ] ) => {
+				attributesStack[ attrName ] = settings.get();
+			} );
 			return attributesStack;
-		}, [ bindings, blockBindingsSources, props, trigger ] );
+		}, [ bindings, trigger ] );
 
 		return (
 			<>

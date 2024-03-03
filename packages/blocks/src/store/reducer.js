@@ -390,7 +390,7 @@ export function blockBindingsSources( state = {}, action ) {
 			[ action.sourceName ]: {
 				label: action.sourceLabel,
 				useSource: action.useSource,
-				helper: action.helper,
+				handler: action.handler,
 				lockAttributesEditing: action.lockAttributesEditing ?? true,
 			},
 		};
