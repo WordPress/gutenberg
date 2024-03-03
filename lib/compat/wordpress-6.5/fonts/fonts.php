@@ -213,7 +213,7 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *     @type string|false $error   False or error message.
 	 * }
 	 */
-	function wp_get_font_dir( $upload_dir ) {
+	function wp_get_font_dir( $upload_dir = array() ) {
 		if ( doing_filter( 'font_dir' ) ) {
 			/*
 			 * The font_dir filter is being run, avoid an infinite loop.
