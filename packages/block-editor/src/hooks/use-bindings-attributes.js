@@ -68,26 +68,24 @@ export function canBindAttribute( blockName, attributeName ) {
  *
  * @param {Object}   props                   - The component props.
  * @param {string}   props.attrName          - The attribute name.
- * @param {Object}   props.blockProps        - The block props with bound attribute.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
- * @param            props.settings
+ * @param {Object}   props.settings          - The block bindings settings.
  * @return {null}                              Data-handling component. Render nothing.
  */
 const BindingConnector = ( { attrName, settings, onPropValueChange } ) => {
 	const { useSource } = settings;
-	const { placeholder, value: propValue } = useSource();
-
-	const prevPropValue = useRef( propValue );
+	const newPropValue = useSource();
+	const prevPropValue = useRef( newPropValue );
 
 	useLayoutEffect( () => {
-		if ( prevPropValue.current === propValue ) {
+		if ( prevPropValue.current === newPropValue ) {
 			return;
 		}
 
 		// Propagate the source value to the block attribute.
-		onPropValueChange( { [ attrName ]: propValue } );
-		prevPropValue.current = propValue;
-	}, [ propValue, attrName, onPropValueChange ] );
+		onPropValueChange( { [ attrName ]: newPropValue } );
+		prevPropValue.current = newPropValue;
+	}, [ newPropValue, attrName, onPropValueChange ] );
 
 	return null;
 };
@@ -108,11 +106,6 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
-				// Bail early if the block doesn't have a valid source handler.
-				if ( ! settings?.useSource ) {
-					return null;
-				}
-
 				return (
 					<BindingConnector
 						key={ attrName }
@@ -133,41 +126,75 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			useSelect( blocksStore )
 		).getAllBlockBindingsSources();
 
-		const [ trigger, setTrigger ] = useState( 1 );
-		const retrigger = setTrigger.bind( null, trigger + 1 );
+		const [ refreshTrigger, setTrigger ] = useState( 1 );
+		const refreshExternalSourceData = setTrigger.bind(
+			null,
+			refreshTrigger + 1
+		);
 
 		/*
 		 * Binding object:
 		 * - filter out the bindings that are not allowed for the current block.
 		 * - Map the bindings to the source handler.
+		 *
+		 * Object shape:
+		 * {
+		 *  [attrName]: {
+		 *    args: Object,
+		 *    source: string,
+		 *    get: Function,
+		 *    update: Function,
+		 *    useSource: Function,
+		 * },
 		 */
-		const bindings = Object.fromEntries(
-			Object.entries( props.attributes.metadata?.bindings || {} )
-				.filter( ( [ attrName ] ) =>
-					canBindAttribute( props.name, attrName )
-				)
-				.map( ( [ attrName, binding ] ) => {
-					const source = blockBindingsSources[ binding.source ];
-					if ( ! source?.handler ) {
-						return null;
-					}
+		const bindings = useMemo(
+			() =>
+				refreshTrigger
+					? Object.fromEntries(
+							Object.entries(
+								props.attributes.metadata?.bindings || {}
+							)
+								.filter(
+									( [ attrName, binding ] ) =>
+										canBindAttribute(
+											props.name,
+											attrName
+										) &&
+										!! blockBindingsSources[
+											binding.source
+										]?.handler
+								)
+								.map( ( [ attrName, binding ] ) => {
+									return [
+										attrName,
+										{
+											source: binding.source,
+											args: binding.args,
+											...blockBindingsSources[
+												binding.source
+											].handler( props, binding.args ),
+										},
+									];
+								} )
+					  )
+					: {},
+			[ blockBindingsSources, props, refreshTrigger ]
+		);
 
-					return [
-						attrName,
-						{
-							source: binding.source,
-							args: binding.args,
-							...source.handler( props, binding.args ),
-						},
-					];
-				} )
+		// Pick bound attributes from the (memoized) bindings object.
+		const boundAttributes = Object.fromEntries(
+			Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
+				const { get } = settings;
+				return [ attrName, get() ];
+			} )
 		);
 
 		/**
 		 * Helper function to update the block attributes,
 		 * handling both bound and unbound attributes.
-		 * For unboud attributes, it uses the BlockEdit `setAttributes` prop.
-		 * For bound attributes, it uses the source handler `updateValue` function.
+		 *
+		 * For unbound attributes, it calls the BlockEdit `setAttributes` callback.
+		 * For bound attributes, it calls the source `update` handler function.
 		 *
 		 * @param {Object} nextAttributes - The next attributes to update.
 		 * @return {void}
@@ -178,16 +205,12 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				Object.entries( nextAttributes ).forEach(
 					( [ boundAttributeName, value ] ) => {
 						if ( ! ( boundAttributeName in bindings ) ) {
-							/*
-							 * Collect unbound attributes.
-							 * They will be updated using the BlockEdit `setAttributes` prop.
-							 */
+							//Collect unbound attributes.
 							unboundAttributes[ boundAttributeName ] = value;
 						} else {
-							const update =
-								bindings[ boundAttributeName ]?.update;
-
-							update( value );
+							// Update bound attribute, one by one.
+							const settings = bindings[ boundAttributeName ];
+							settings.update( value );
 						}
 					}
 				);
@@ -200,28 +223,13 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			[ bindings, props ]
 		);
 
-		/**
-		 * Collect the current values of the bound attributes,
-		 */
-		const boundAttributes = useMemo( () => {
-			if ( ! trigger ) {
-				return {};
-			}
-
-			const attributesStack = {};
-			Object.entries( bindings ).forEach( ( [ attrName, settings ] ) => {
-				attributesStack[ attrName ] = settings.get();
-			} );
-			return attributesStack;
-		}, [ bindings, trigger ] );
-
 		return (
 			<>
 				{ Object.keys( bindings ).length > 0 && (
 					<BlockBindingBridge
 						blockProps={ props }
 						bindings={ bindings }
-						onPropValueChange={ retrigger }
+						onPropValueChange={ refreshExternalSourceData }
 					/>
 				) }
 

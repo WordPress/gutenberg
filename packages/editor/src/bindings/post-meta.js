@@ -19,60 +19,41 @@ export default {
 
 		const kind = 'postType';
 		const postType = context.postType ?? getCurrentPostType();
-		const postId = context.postId ?? getCurrentPostId();
-		const prop = 'meta';
+		const id = context.postId ?? getCurrentPostId();
 
 		const { getEntityRecord, getEditedEntityRecord } = select( coreStore );
 
-		const record = getEntityRecord( kind, postType, postId );
-		const editedRecord = getEditedEntityRecord( kind, postType, postId );
+		const record = getEntityRecord( kind, postType, id );
+		const editedRecord = getEditedEntityRecord( kind, postType, id );
 
 		return {
 			get() {
-				const propValue =
-					record && editedRecord
-						? {
-								value: editedRecord[ prop ]?.[ metaKey ],
-								fullValue: record[ prop ]?.[ metaKey ],
-						  }
-						: {};
+				return editedRecord.meta?.[ metaKey ];
+			},
 
-				return propValue.value;
+			getPlaceholder() {
+				return metaKey;
 			},
 
 			update( newValue ) {
 				const { editEntityRecord } = dispatch( coreStore );
 
-				editEntityRecord( kind, postType, postId, {
+				editEntityRecord( kind, postType, id, {
 					meta: {
-						...record[ prop ],
+						...record.meta,
 						[ metaKey ]: newValue,
 					},
 				} );
 			},
 
 			useSource() {
-				const [ meta, setMeta ] = useEntityProp(
-					'postType',
-					context.postType,
-					'meta',
-					context.postId
-				);
+				const [ meta ] = useEntityProp( kind, postType, 'meta', id );
 
 				if ( postType === 'wp_template' ) {
 					return { placeholder: metaKey };
 				}
 
-				const metaValue = meta[ metaKey ];
-				const updateMetaValue = ( newValue ) => {
-					setMeta( { ...meta, [ metaKey ]: newValue } );
-				};
-
-				return {
-					placeholder: metaKey,
-					value: metaValue,
-					updateValue: updateMetaValue,
-				};
+				return meta[ metaKey ];
 			},
 		};
 	},
