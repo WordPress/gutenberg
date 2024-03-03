@@ -8,6 +8,7 @@ import {
 } from './utils';
 import './compat';
 import align from './align';
+import textAlign from './text-align';
 import './lock';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
@@ -33,6 +34,7 @@ import './use-bindings-attributes';
 createBlockEditFilter(
 	[
 		align,
+		textAlign,
 		anchor,
 		customClassName,
 		style,
@@ -47,6 +49,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	textAlign,
 	style,
 	color,
 	dimensions,
@@ -59,6 +62,7 @@ createBlockListBlockFilter( [
 ] );
 createBlockSaveFilter( [
 	align,
+	textAlign,
 	anchor,
 	ariaLabel,
 	customClassName,
