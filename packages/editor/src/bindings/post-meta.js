@@ -12,7 +12,7 @@ import { store as editorStore } from '../store';
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
-	handler( props, sourceAttributes ) {
+	init( props, sourceAttributes ) {
 		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
 		const { context } = props;
 		const { key: metaKey } = sourceAttributes;

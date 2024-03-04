@@ -97,12 +97,11 @@ const BindingConnector = ( { attrName, settings, onPropValueChange } ) => {
  * For this, it creates a BindingConnector for each bound attribute.
  *
  * @param {Object}   props                   - The component props.
- * @param {Object}   props.blockProps        - The BlockEdit props object.
  * @param {Object}   props.bindings          - The block bindings settings.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
  * @return {null}                              Data-handling component. Render nothing.
  */
-function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
+function BlockBindingBridge( { bindings, onPropValueChange } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
@@ -110,9 +109,8 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 					<BindingConnector
 						key={ attrName }
 						attrName={ attrName }
-						blockProps={ blockProps }
-						onPropValueChange={ onPropValueChange }
 						settings={ settings }
+						onPropValueChange={ onPropValueChange }
 					/>
 				);
 			} ) }
@@ -148,8 +146,8 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		 *  [attrName]: {
 		 *    args: Object,
 		 *    source: string,
-		 *    get: Function,
-		 *    update: Function,
+		 *    value: any,
+		 *    placeholder: any,
 		 *    useSource: Function,
 		 * },
 		 */
@@ -168,17 +166,36 @@ const withBlockBindingSupport = createHigherOrderComponent(
 										) &&
 										!! blockBindingsSources[
 											binding.source
-										]?.handler
+										]?.init
 								)
 								.map( ( [ attrName, binding ] ) => {
+									const settings = blockBindingsSources[
+										binding.source
+									].init( props, binding.args );
+
+									/*
+									 * If the original attribute value is a RichTextData,
+									 * the bound value should be a RichTextData as well.
+									 * To do: Probably we should have a better way to handle this.
+									 */
+									const originalAttrValue =
+										props.attributes[ attrName ];
+
+									const value =
+										originalAttrValue instanceof
+										RichTextData
+											? RichTextData.fromHTMLString(
+													settings.value
+											  )
+											: settings.value;
+
 									return [
 										attrName,
 										{
 											source: binding.source,
 											args: binding.args,
-											...blockBindingsSources[
-												binding.source
-											].handler( props, binding.args ),
+											...settings,
+											value,
 										},
 									];
 								} )
