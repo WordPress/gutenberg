@@ -75,10 +75,8 @@ const BindingConnector = ( {
 	source,
 	onPropValueChange,
 } ) => {
-	const { placeholder, value: propValue } = source.useSource(
-		blockProps,
-		args
-	);
+	const { useSource } = source;
+	const { placeholder, value: propValue } = useSource( blockProps, args );
 
 	const { name: blockName } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
