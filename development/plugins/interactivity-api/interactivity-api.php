@@ -18,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function interactivity_api_interactivity_api_block_init() {
-	register_block_type( __DIR__ . '/build/accordions' );
 	register_block_type( __DIR__ . '/build/accordion' );
 }
 add_action( 'init', 'interactivity_api_interactivity_api_block_init' );
