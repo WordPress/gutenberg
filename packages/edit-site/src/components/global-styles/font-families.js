@@ -33,7 +33,7 @@ function FontFamilies() {
 			{ !! modalTabOpen && (
 				<FontLibraryModal
 					onRequestClose={ () => toggleModal() }
-					initialTabId={ modalTabOpen }
+					defaultTabId={ modalTabOpen }
 				/>
 			) }
 

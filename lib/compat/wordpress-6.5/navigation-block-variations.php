@@ -11,7 +11,7 @@ function gutenberg_navigation_link_variations_compat( $args ) {
 	if ( 'core/navigation-link' !== $args['name'] || ! empty( $args['variation_callback'] ) ) {
 		return $args;
 	}
-	$args['variation_callback'] = 'build_navigation_link_block_variations';
+	$args['variation_callback'] = 'gutenberg_block_core_navigation_link_build_variations';
 	return $args;
 }
 

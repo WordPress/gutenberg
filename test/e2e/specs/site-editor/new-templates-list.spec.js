@@ -7,15 +7,14 @@ test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.setGutenbergExperiments( [ 'gutenberg-dataviews' ] ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
 		] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.setGutenbergExperiments( [] ),
-		] );
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );

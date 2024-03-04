@@ -33,7 +33,7 @@ import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -410,15 +410,19 @@ export default function Image( {
 		lockUrlControls = false,
 		lockHrefControls = false,
 		lockAltControls = false,
+		lockAltControlsMessage,
 		lockTitleControls = false,
+		lockTitleControlsMessage,
+		lockCaption = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-
-			const { getBlockBindingsSource, getBlockParentsByBlockName } =
-				unlock( select( blockEditorStore ) );
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const { getBlockParentsByBlockName } = unlock(
+				select( blockEditorStore )
+			);
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -444,14 +448,32 @@ export default function Image( {
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
 					hasParentPattern,
+				lockCaption:
+					// Disable editing the caption if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the caption on the frontend.
+					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
 					( ! altBindingSource ||
 						altBindingSource?.lockAttributesEditing ),
+				lockAltControlsMessage: altBindingSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							altBindingSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
 					( ! titleBindingSource ||
 						titleBindingSource?.lockAttributesEditing ),
+				lockTitleControlsMessage: titleBindingSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							titleBindingSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 			};
 		},
 		[ clientId, isSingleSelected, metadata?.bindings ]
@@ -551,11 +573,7 @@ export default function Image( {
 								disabled={ lockAltControls }
 								help={
 									lockAltControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
@@ -601,11 +619,7 @@ export default function Image( {
 								disabled={ lockTitleControls }
 								help={
 									lockTitleControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockTitleControlsMessage }</>
 									) : (
 										<>
 											{ __(
@@ -646,11 +660,7 @@ export default function Image( {
 								readOnly={ lockAltControls }
 								help={
 									lockAltControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
@@ -688,7 +698,7 @@ export default function Image( {
 					readOnly={ lockTitleControls }
 					help={
 						lockTitleControls ? (
-							<>{ __( 'Connected to a custom field' ) }</>
+							<>{ lockTitleControlsMessage }</>
 						) : (
 							<>
 								{ __(
@@ -907,6 +917,7 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
+
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -914,6 +925,7 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
+				disableEditing={ lockCaption }
 			/>
 		</>
 	);

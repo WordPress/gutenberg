@@ -36,3 +36,18 @@ if ( ! function_exists( 'array_is_list' ) ) {
 		return true;
 	}
 }
+
+/**
+ * Sets a global JS variable used to flag whether to direct the Site Logo block's admin urls
+ * to the Customizer. This allows Gutenberg running on versions of WordPress < 6.5.0 to
+ * support the previous location for the Site Icon settings. This function should not be
+ * backported to core, and should be removed when the required WP core version for Gutenberg
+ * is >= 6.5.0.
+ */
+function gutenberg_add_use_customizer_site_logo_url_flag() {
+	if ( ! is_wp_version_compatible( '6.5' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalUseCustomizerSiteLogoUrl = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_add_use_customizer_site_logo_url_flag' );

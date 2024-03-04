@@ -13,8 +13,6 @@
 .dataviews-filters__view-actions {
 	padding: $grid-unit-15 $grid-unit-40 0;
 	.components-search-control {
-		flex-grow: 1;
-
 		.components-base-control__field {
 			max-width: 240px;
 		}
@@ -22,11 +20,7 @@
 }
 
 .dataviews-filters__container {
-	padding: 0 $grid-unit-40;
-}
-
-.dataviews-filters__view-actions.components-h-stack {
-	align-items: center;
+	padding-right: $grid-unit-40;
 }
 
 .dataviews-filters-button {
@@ -44,12 +38,22 @@
 	color: $gray-700;
 }
 
+.dataviews-pagination__page-selection {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
+}
+
 .dataviews-filters-options {
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
 .dataviews-view-table-wrapper {
 	overflow-x: auto;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 }
 
 .dataviews-view-table {
@@ -118,7 +122,7 @@
 			background-color: #f8f8f8;
 		}
 
-		.components-checkbox-control__input {
+		.components-checkbox-control__input.components-checkbox-control__input {
 			opacity: 0;
 
 			&:checked,
@@ -207,6 +211,12 @@
 	.dataviews-view-table__actions-column {
 		width: 1%;
 	}
+
+	&:has(tr.is-selected) {
+		.components-checkbox-control__input {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-view-list__primary-field,
@@ -217,7 +227,6 @@
 	color: $gray-900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden;
 	display: block;
 	width: 100%;
 
@@ -233,6 +242,7 @@
 		&:hover {
 			color: $gray-900;
 		}
+		@include link-reset();
 	}
 
 	button.components-button.is-link {
@@ -471,6 +481,10 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dataviews-view-table-selection-checkbox label {
@@ -653,7 +667,8 @@
 		}
 
 		&:hover,
-		&:focus-visible {
+		&:focus-visible,
+		&[aria-expanded="true"] {
 			background: $gray-200;
 			color: $gray-900;
 		}
@@ -662,8 +677,9 @@
 			color: var(--wp-admin-theme-color);
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			&:hover,
+			&[aria-expanded="true"] {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
 			}
 		}
 

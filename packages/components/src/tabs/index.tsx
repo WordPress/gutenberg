@@ -26,7 +26,7 @@ import { TabPanel } from './tabpanel';
 
 function Tabs( {
 	selectOnMove = true,
-	initialTabId,
+	defaultTabId,
 	orientation = 'horizontal',
 	onSelect,
 	children,
@@ -36,7 +36,7 @@ function Tabs( {
 	const store = Ariakit.useTabStore( {
 		selectOnMove,
 		orientation,
-		defaultSelectedId: initialTabId && `${ instanceId }-${ initialTabId }`,
+		defaultSelectedId: defaultTabId && `${ instanceId }-${ defaultTabId }`,
 		setSelectedId: ( selectedId ) => {
 			const strippedDownId =
 				typeof selectedId === 'string'
@@ -66,7 +66,7 @@ function Tabs( {
 		return ! item.dimmed;
 	} );
 	const initialTab = items.find(
-		( item ) => item.id === `${ instanceId }-${ initialTabId }`
+		( item ) => item.id === `${ instanceId }-${ defaultTabId }`
 	);
 
 	// Handle selecting the initial tab.
@@ -78,8 +78,8 @@ function Tabs( {
 		// Wait for the denoted initial tab to be declared before making a
 		// selection. This ensures that if a tab is declared lazily it can
 		// still receive initial selection, as well as ensuring no tab is
-		// selected if an invalid `initialTabId` is provided.
-		if ( initialTabId && ! initialTab ) {
+		// selected if an invalid `defaultTabId` is provided.
+		if ( defaultTabId && ! initialTab ) {
 			return;
 		}
 
@@ -101,7 +101,7 @@ function Tabs( {
 	}, [
 		firstEnabledTab,
 		initialTab,
-		initialTabId,
+		defaultTabId,
 		isControlled,
 		items,
 		selectedId,
@@ -122,7 +122,7 @@ function Tabs( {
 		}
 
 		// If the currently selected tab becomes disabled, fall back to the
-		// `initialTabId` if possible. Otherwise select the first
+		// `defaultTabId` if possible. Otherwise select the first
 		// enabled tab (if there is one).
 		if ( initialTab && ! initialTab.dimmed ) {
 			setSelectedId( initialTab.id );

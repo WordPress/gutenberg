@@ -341,7 +341,9 @@ class MediaContainer extends Component {
 								{ getMediaOptions() }
 
 								<MediaUploadProgress
-									enablePausedUploads
+									enablePausedUploads={
+										mediaType === MEDIA_TYPE_IMAGE
+									}
 									coverUrl={ coverUrl }
 									mediaId={ mediaId }
 									onUpdateMediaProgress={

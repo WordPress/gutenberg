@@ -25,9 +25,12 @@ function useEditorCommandLoader() {
 		isFocusMode,
 		isPreviewMode,
 		isViewable,
+		isCodeEditingEnabled,
+		isRichEditingEnabled,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { isListViewOpened, getCurrentPostType } = select( editorStore );
+		const { isListViewOpened, getCurrentPostType, getEditorSettings } =
+			select( editorStore );
 		const { getSettings } = select( blockEditorStore );
 		const { getPostType } = select( coreStore );
 
@@ -40,6 +43,8 @@ function useEditorCommandLoader() {
 			isTopToolbar: get( 'core', 'fixedToolbar' ),
 			isPreviewMode: getSettings().__unstableIsPreviewMode,
 			isViewable: getPostType( getCurrentPostType() )?.viewable ?? false,
+			isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
+			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
@@ -51,6 +56,7 @@ function useEditorCommandLoader() {
 		toggleDistractionFree,
 	} = useDispatch( editorStore );
 	const { getCurrentPostId } = useSelect( editorStore );
+	const allowSwitchEditorMode = isCodeEditingEnabled && isRichEditingEnabled;
 
 	if ( isPreviewMode ) {
 		return { commands: [], isLoading: false };
@@ -141,18 +147,20 @@ function useEditorCommandLoader() {
 		},
 	} );
 
-	commands.push( {
-		name: 'core/toggle-code-editor',
-		label:
-			editorMode === 'visual'
-				? __( 'Open code editor' )
-				: __( 'Exit code editor' ),
-		icon: code,
-		callback: ( { close } ) => {
-			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
-			close();
-		},
-	} );
+	if ( allowSwitchEditorMode ) {
+		commands.push( {
+			name: 'core/toggle-code-editor',
+			label:
+				editorMode === 'visual'
+					? __( 'Open code editor' )
+					: __( 'Exit code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
+				close();
+			},
+		} );
+	}
 
 	commands.push( {
 		name: 'core/toggle-breadcrumbs',

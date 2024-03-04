@@ -97,6 +97,20 @@ const PatternEdit = ( { attributes, clientId } ) => {
 						injectThemeAttributeInBlockTemplateContent( block )
 					)
 				);
+				// If the pattern has a single block and categories, we should add the
+				// categories of the pattern to the block's metadata.
+				if (
+					clonedBlocks.length === 1 &&
+					selectedPattern.categories?.length > 0
+				) {
+					clonedBlocks[ 0 ].attributes = {
+						...clonedBlocks[ 0 ].attributes,
+						metadata: {
+							...clonedBlocks[ 0 ].attributes.metadata,
+							categories: selectedPattern.categories,
+						},
+					};
+				}
 				const rootEditingMode = getBlockEditingMode( rootClientId );
 				registry.batch( () => {
 					// Temporarily set the root block to default mode to allow replacing the pattern.

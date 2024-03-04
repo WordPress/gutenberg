@@ -210,6 +210,26 @@ function Title( { item, categoryId } ) {
 	}
 	return (
 		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
+			<Flex
+				as="div"
+				gap={ 0 }
+				justify="left"
+				className="edit-site-patterns__pattern-title"
+			>
+				{ item.type === PATTERN_TYPES.theme ? (
+					item.title
+				) : (
+					<Button
+						variant="link"
+						onClick={ onClick }
+						// Required for the grid's roving tab index system.
+						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+						tabIndex="-1"
+					>
+						{ item.title || item.name }
+					</Button>
+				) }
+			</Flex>
 			{ itemIcon && ! isNonUserPattern && (
 				<Tooltip
 					placement="top"
@@ -235,26 +255,6 @@ function Title( { item, categoryId } ) {
 					/>
 				</Tooltip>
 			) }
-			<Flex
-				as="div"
-				gap={ 0 }
-				justify="left"
-				className="edit-site-patterns__pattern-title"
-			>
-				{ item.type === PATTERN_TYPES.theme ? (
-					item.title
-				) : (
-					<Button
-						variant="link"
-						onClick={ onClick }
-						// Required for the grid's roving tab index system.
-						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
-						tabIndex="-1"
-					>
-						{ item.title || item.name }
-					</Button>
-				) }
-			</Flex>
 		</HStack>
 	);
 }
