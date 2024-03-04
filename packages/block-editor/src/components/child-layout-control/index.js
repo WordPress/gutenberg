@@ -64,18 +64,10 @@ export default function ChildLayoutControl( {
 		} );
 	};
 
-	const hasColumnSpanValue = () => !! columnSpan;
-	const resetColumnSpan = () => {
+	const hasSpanValue = () => !! columnSpan || !! rowSpan;
+	const resetGridSpans = () => {
 		onChange( {
-			rowSpan,
 			columnSpan: undefined,
-		} );
-	};
-
-	const hasRowSpanValue = () => !! rowSpan;
-	const resetRowSpan = () => {
-		onChange( {
-			columnSpan,
 			rowSpan: undefined,
 		} );
 	};
@@ -148,49 +140,41 @@ export default function ChildLayoutControl( {
 				</VStack>
 			) }
 			{ parentLayoutType === 'grid' && (
-				<HStack style={ { gridColumn: '1 / -1' } }>
-					<ToolsPanelItem
-						hasValue={ hasColumnSpanValue }
+				<HStack
+					as={ ToolsPanelItem }
+					hasValue={ hasSpanValue }
+					label={ __( 'Grid spans' ) }
+					onDeselect={ resetGridSpans }
+					isShownByDefault={ isShownByDefault }
+					panelId={ panelId }
+				>
+					<InputControl
+						size={ '__unstable-large' }
 						label={ __( 'Column Span' ) }
-						onDeselect={ resetColumnSpan }
-						isShownByDefault={ isShownByDefault }
-						panelId={ panelId }
-					>
-						<InputControl
-							size={ '__unstable-large' }
-							label={ __( 'Column Span' ) }
-							type="number"
-							onChange={ ( value ) => {
-								onChange( {
-									rowSpan,
-									columnSpan: value,
-								} );
-							} }
-							value={ columnSpan }
-							min={ 1 }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ hasRowSpanValue }
+						type="number"
+						onChange={ ( value ) => {
+							onChange( {
+								rowSpan,
+								columnSpan: value,
+							} );
+						} }
+						value={ columnSpan }
+						min={ 1 }
+					/>
+
+					<InputControl
+						size={ '__unstable-large' }
 						label={ __( 'Row Span' ) }
-						onDeselect={ resetRowSpan }
-						isShownByDefault={ isShownByDefault }
-						panelId={ panelId }
-					>
-						<InputControl
-							size={ '__unstable-large' }
-							label={ __( 'Row Span' ) }
-							type="number"
-							onChange={ ( value ) => {
-								onChange( {
-									columnSpan,
-									rowSpan: value,
-								} );
-							} }
-							value={ rowSpan }
-							min={ 1 }
-						/>
-					</ToolsPanelItem>
+						type="number"
+						onChange={ ( value ) => {
+							onChange( {
+								columnSpan,
+								rowSpan: value,
+							} );
+						} }
+						value={ rowSpan }
+						min={ 1 }
+					/>
 				</HStack>
 			) }
 		</>
