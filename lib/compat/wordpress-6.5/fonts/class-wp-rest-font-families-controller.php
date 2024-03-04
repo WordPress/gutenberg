@@ -341,15 +341,6 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 									'sanitize_callback' => array( 'WP_Font_Utils', 'sanitize_font_family' ),
 								),
 							),
-							'preview'    => array(
-								'description' => __( 'URL to a preview image of the font family.', 'gutenberg' ),
-								'type'        => 'string',
-								'format'      => 'uri',
-								'default'     => '',
-								'arg_options' => array(
-									'sanitize_callback' => 'sanitize_url',
-								),
-							),
 						),
 						'required'             => array( 'name', 'slug', 'fontFamily' ),
 						'additionalProperties' => false,
@@ -429,7 +420,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 				return array(
 					'theme_json_version'   => $properties['theme_json_version'],
 					// When creating or updating, font_family_settings is stringified JSON, to work with multipart/form-data.
-					// Font families don't currently support file uploads, but may accept preview files in the future.
+					// Font families don't currently support file uploads
 					'font_family_settings' => array(
 						'description'       => __( 'font-family declaration in theme.json format, encoded as a string.', 'gutenberg' ),
 						'type'              => 'string',
@@ -560,7 +551,6 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 				'name'       => isset( $post->post_title ) && $post->post_title ? $post->post_title : '',
 				'slug'       => isset( $post->post_name ) && $post->post_name ? $post->post_name : '',
 				'fontFamily' => isset( $settings_json['fontFamily'] ) && $settings_json['fontFamily'] ? $settings_json['fontFamily'] : '',
-				'preview'    => isset( $settings_json['preview'] ) && $settings_json['preview'] ? $settings_json['preview'] : '',
 			);
 		}
 	}
