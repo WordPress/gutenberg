@@ -193,8 +193,8 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 }
 
 /**
- * Ensure the elements block support class name generated and added to
- * block attributes in the `render_block_data` filter gets applied to the
+ * Ensure the elements block support class name generated, and added to
+ * block attributes, in the `render_block_data` filter gets applied to the
  * block's markup.
  *
  * @see gutenberg_render_elements_support_styles
@@ -215,8 +215,6 @@ function gutenberg_render_elements_class_name( $block_content, $block ) {
 	$tags = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $tags->next_tag() ) {
-		// Ensure the elements class name set in render_block_data filter is applied in markup.
-		// See `gutenberg_render_elements_support_styles`.
 		$tags->add_class( $matches[0] );
 	}
 
