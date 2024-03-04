@@ -392,12 +392,8 @@ function processCommits( commits ) {
 	return result;
 }
 
-function formatPRLine( { pullRequest: pr, isBeforeLastRCDate } ) {
-	return `- [ ] ${ pr.url } - @${
-		pr.creator
-	} | Trac ticket | Core backport PR ${
-		isBeforeLastRCDate ? '(⚠️ Check for existing WP Core backport)' : ''
-	}\n`;
+function formatPRLine( { pullRequest: pr } ) {
+	return `- [ ] ${ pr.url } - @${ pr.creator } | Trac ticket | Core backport PR \n`;
 }
 
 function formatHeading( level, key ) {
