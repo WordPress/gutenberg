@@ -190,8 +190,31 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		// Pick bound attributes from the (memoized) bindings object.
 		const boundAttributes = Object.fromEntries(
 			Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
-				const { value } = settings;
-				return [ attrName, value ];
+				const { value, placeholder } = settings;
+				if ( typeof value !== 'undefined' ) {
+					return [ attrName, value ];
+				}
+
+				if ( ! placeholder ) {
+					return [ attrName, undefined ];
+				}
+
+				/*
+				 * Placeholder fallback.
+				 * If the attribute is `src` or `href`,
+				 * a placeholder can't be used because it is not a valid url.
+				 * Adding this workaround until
+				 * attributes and metadata fields types are improved and include `url`.
+				 */
+				const htmlAttribute = getBlockType( props.name ).attributes[
+					attrName
+				].attribute;
+
+				if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
+					return [ attrName, null ];
+				}
+
+				return [ attrName, placeholder ];
 			} )
 		);
 
