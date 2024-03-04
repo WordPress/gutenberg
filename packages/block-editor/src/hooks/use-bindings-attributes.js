@@ -151,87 +151,78 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		 *    useSource: Function,
 		 * },
 		 */
-		const bindings = useMemo(
-			() =>
-				refreshTrigger
-					? Object.fromEntries(
-							Object.entries(
-								props.attributes.metadata?.bindings || {}
-							)
-								.filter(
-									( [ attrName, binding ] ) =>
-										canBindAttribute(
-											props.name,
-											attrName
-										) &&
-										!! blockBindingsSources[
-											binding.source
-										]?.init
-								)
-								.map( ( [ attrName, binding ] ) => {
-									const settings = blockBindingsSources[
-										binding.source
-									].init( props, binding.args );
+		const bindings = useMemo( () => {
+			if ( ! refreshTrigger ) {
+				return {};
+			}
 
-									/*
-									 * If the original attribute value is a RichTextData,
-									 * the bound value should be a RichTextData as well.
-									 * To do: Probably we should have a better way to handle this.
-									 */
-									const originalAttrValue =
-										props.attributes[ attrName ];
+			return Object.fromEntries(
+				Object.entries( props.attributes.metadata?.bindings || {} )
+					.filter(
+						( [ attrName, binding ] ) =>
+							canBindAttribute( props.name, attrName ) &&
+							!! blockBindingsSources[ binding.source ]?.init
+					)
+					.map( ( [ attrName, binding ] ) => {
+						const settings = blockBindingsSources[
+							binding.source
+						].init( props, binding.args );
 
-									const value =
-										originalAttrValue instanceof
-										RichTextData
-											? RichTextData.fromHTMLString(
-													settings.value
-											  )
-											: settings.value;
+						let value = settings.value;
 
-									return [
-										attrName,
-										{
-											source: binding.source,
-											args: binding.args,
-											...settings,
-											value,
-										},
-									];
-								} )
-					  )
-					: {},
-			[ blockBindingsSources, props, refreshTrigger ]
-		);
+						/*
+						 * If the original attribute value is a RichTextData,
+						 * the bound value should be a RichTextData as well.
+						 * To do: Probably we should have a better way to handle this.
+						 */
+						const originalAttrValue = props.attributes[ attrName ];
+
+						if ( typeof value !== 'undefined' ) {
+							value =
+								originalAttrValue instanceof RichTextData
+									? RichTextData.fromHTMLString(
+											settings.value
+									  )
+									: settings.value;
+						} else if ( settings.placeholder ) {
+							/*
+							 * Placeholder fallback.
+							 * If the attribute is `src` or `href`,
+							 * a placeholder can't be used because it is not a valid url.
+							 * ToDo: Adding this workaround until
+							 * attributes and metadata fields types are improved and include `url`.
+							 */
+							const htmlAttribute = getBlockType( props.name )
+								.attributes[ attrName ].attribute;
+
+							if (
+								htmlAttribute === 'src' ||
+								htmlAttribute === 'href'
+							) {
+								value = null;
+							} else {
+								value = settings.placeholder;
+							}
+						}
+
+						return [
+							attrName,
+							{
+								source: binding.source,
+								args: binding.args,
+								...settings,
+								value,
+							},
+						];
+					} )
+			);
+		}, [ blockBindingsSources, props, refreshTrigger ] );
 
 		// Pick bound attributes from the (memoized) bindings object.
 		const boundAttributes = Object.fromEntries(
 			Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
-				const { value, placeholder } = settings;
-				if ( typeof value !== 'undefined' ) {
-					return [ attrName, value ];
-				}
-
-				if ( ! placeholder ) {
-					return [ attrName, undefined ];
-				}
-
-				/*
-				 * Placeholder fallback.
-				 * If the attribute is `src` or `href`,
-				 * a placeholder can't be used because it is not a valid url.
-				 * Adding this workaround until
-				 * attributes and metadata fields types are improved and include `url`.
-				 */
-				const htmlAttribute = getBlockType( props.name ).attributes[
-					attrName
-				].attribute;
-
-				if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-					return [ attrName, null ];
-				}
-
-				return [ attrName, placeholder ];
+				const { value } = settings;
+				return [ attrName, value ];
 			} )
 		);
 
