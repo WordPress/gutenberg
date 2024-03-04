@@ -507,9 +507,6 @@
 	margin-left: $grid-unit-10;
 }
 
-.dataviews-view-grid__card.has-no-pointer-events * {
-	pointer-events: none;
-}
 .dataviews-filter-summary__popover {
 	.components-popover__content {
 		width: 230px;
