@@ -197,7 +197,6 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { setAttributes } = props;
 		/*
 		 * Collect and update the bound attributes
 		 * in a separate state.
@@ -227,11 +226,10 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				Object.entries( nextAttributes ?? {} )
 					.filter( ( [ attribute ] ) => attribute in updateFunctions )
 					.forEach( ( [ attribute, value ] ) => {
-						updateFunctions[ attribute ]( value );
+						updateFunctions[ attribute ]( value, nextAttributes );
 					} );
-				setAttributes( nextAttributes );
 			},
-			[ setAttributes, updateFunctions ]
+			[ updateFunctions ]
 		);
 
 		const registry = useRegistry();

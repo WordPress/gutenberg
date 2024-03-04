@@ -14,7 +14,7 @@ export default {
 	label: _x( 'Post Meta', 'block bindings source' ),
 	useSource( props, sourceAttributes ) {
 		const { getCurrentPostType } = useSelect( editorStore );
-		const { context } = props;
+		const { context, setAttributes } = props;
 		const { key: metaKey } = sourceAttributes;
 		const postType = context.postType
 			? context.postType
@@ -31,8 +31,9 @@ export default {
 			return { placeholder: metaKey };
 		}
 		const metaValue = meta[ metaKey ];
-		const updateMetaValue = ( newValue ) => {
+		const updateMetaValue = ( newValue, nextAttributes ) => {
 			setMeta( { ...meta, [ metaKey ]: newValue } );
+			setAttributes( nextAttributes );
 		};
 
 		return {

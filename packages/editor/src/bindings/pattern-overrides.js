@@ -9,7 +9,7 @@ import { useCallback } from '@wordpress/element';
 export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
-	useSource( { clientId }, _, attributeName ) {
+	useSource( { clientId, setAttributes }, _, attributeName ) {
 		const { patternClientId, blockName, placeholder, value } = useSelect(
 			( select ) => {
 				const {
@@ -35,7 +35,7 @@ export default {
 		const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 		const updateValue = useCallback(
-			( newValue ) => {
+			( newValue, nextAttributes ) => {
 				if ( patternClientId ) {
 					const currentBindingValue =
 						getBlockAttributes( patternClientId )?.content;
@@ -48,6 +48,8 @@ export default {
 							},
 						},
 					} );
+				} else {
+					setAttributes( nextAttributes );
 				}
 			},
 			[
