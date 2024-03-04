@@ -395,6 +395,7 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							hideLabelFromVision={ ! showTextControl }
+							isDisabled={ value?.id }
 						/>
 						{ ! showActions && (
 							<div className="block-editor-link-control__search-enter">

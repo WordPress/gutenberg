@@ -426,6 +426,7 @@ class URLInput extends Component {
 			__experimentalRenderControl: renderControl,
 			value = '',
 			hideLabelFromVision = false,
+			isDisabled,
 		} = this.props;
 
 		const {
@@ -467,6 +468,7 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			disabled: isDisabled,
 		};
 
 		if ( renderControl ) {

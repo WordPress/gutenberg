@@ -43,6 +43,7 @@ const LinkControlSearchInput = forwardRef(
 			withURLSuggestion = true,
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
+			isDisabled = false,
 		},
 		ref
 	) => {
@@ -148,6 +149,7 @@ const LinkControlSearchInput = forwardRef(
 						}
 					} }
 					ref={ ref }
+					isDisabled={ isDisabled }
 				/>
 				{ children }
 			</div>
