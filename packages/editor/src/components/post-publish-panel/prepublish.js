@@ -20,6 +20,7 @@ import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
 import { store as editorStore } from '../../store';
 import MaybeCategoryPanel from './maybe-category-panel';
+import MaybeUploadMedia from './maybe-upload-media';
 
 function PostPublishPanelPrepublish( { children } ) {
 	const {
@@ -103,6 +104,7 @@ function PostPublishPanelPrepublish( { children } ) {
 					<span className="components-site-home">{ siteHome }</span>
 				</div>
 			</div>
+			<MaybeUploadMedia />
 			{ hasPublishAction && (
 				<>
 					<PanelBody

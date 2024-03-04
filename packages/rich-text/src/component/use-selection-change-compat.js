@@ -4,6 +4,11 @@
 import { useRefEffect } from '@wordpress/compose';
 
 /**
+ * Internal dependencies
+ */
+import { isRangeEqual } from '../is-range-equal';
+
+/**
  * Sometimes some browsers are not firing a `selectionchange` event when
  * changing the selection by mouse or keyboard. This hook makes sure that, if we
  * detect no `selectionchange` or `input` event between the up and down events,
@@ -16,7 +21,7 @@ export function useSelectionChangeCompat() {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
+		const selection = defaultView?.getSelection();
 
 		let range;
 
@@ -38,7 +43,7 @@ export function useSelectionChangeCompat() {
 
 			function onUp() {
 				onCancel();
-				if ( range === getRange() ) return;
+				if ( isRangeEqual( range, getRange() ) ) return;
 				ownerDocument.dispatchEvent( new Event( 'selectionchange' ) );
 			}
 

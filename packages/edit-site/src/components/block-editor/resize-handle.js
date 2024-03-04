@@ -35,6 +35,7 @@ export default function ResizeHandle( {
 				aria-label={ __( 'Drag to resize' ) }
 				aria-describedby={ `resizable-editor__resize-help-${ direction }` }
 				onKeyDown={ handleKeyDown }
+				type="button"
 			/>
 			<VisuallyHidden
 				id={ `resizable-editor__resize-help-${ direction }` }

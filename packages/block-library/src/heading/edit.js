@@ -16,12 +16,13 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from './heading-level-dropdown';
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
@@ -40,6 +41,7 @@ function HeadingEdit( {
 		} ),
 		style,
 	} );
+	const blockEditingMode = useBlockEditingMode();
 
 	const { canGenerateAnchors } = useSelect( ( select ) => {
 		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
@@ -90,20 +92,22 @@ function HeadingEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						value={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName={ tagName }
@@ -132,7 +136,6 @@ function HeadingEdit( {
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side

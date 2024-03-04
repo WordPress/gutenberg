@@ -11,9 +11,8 @@ export {
 	useCustomSides as __experimentalUseCustomSides,
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
 	getGapCSSValue as __experimentalGetGapCSSValue,
+	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
 	useCachedTruthy,
-	useLayoutClasses as __experimentaluseLayoutClasses,
-	useLayoutStyles as __experimentaluseLayoutStyles,
 } from './hooks';
 export * from './components';
 export * from './elements';

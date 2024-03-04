@@ -1,6 +1,6 @@
 # CardMedia
 
-`CardMedia` provides a container for media elements within a [`Card`](/packages/components/src/card/card/README.md).
+`CardMedia` provides a container for full-bleed content within a [`Card`](/packages/components/src/card/card/README.md), such as images, video, or even just a background color.
 
 ## Usage
 

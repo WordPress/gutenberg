@@ -1,10 +1,6 @@
 .editor-post-featured-image {
 	padding: 0;
 
-	&__container {
-		margin-bottom: 1em;
-		position: relative;
-	}
 
 	.components-spinner {
 		position: absolute;
@@ -12,12 +8,6 @@
 		left: 50%;
 		margin-top: -9px;
 		margin-left: -9px;
-	}
-
-	// Stack consecutive buttons.
-	.components-button + .components-button {
-		display: block;
-		margin-top: 1em;
 	}
 
 	// This keeps images at their intrinsic size (eg. a 50px
@@ -28,22 +18,40 @@
 	}
 }
 
+.editor-post-featured-image__container {
+	position: relative;
+
+	&:hover,
+	&:focus,
+	&:focus-within {
+		.editor-post-featured-image__actions {
+			opacity: 1;
+		}
+	}
+}
+
 .editor-post-featured-image__toggle,
 .editor-post-featured-image__preview {
-	display: block;
 	width: 100%;
 	padding: 0;
 	transition: all 0.1s ease-out;
 	@include reduce-motion("transition");
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+	overflow: hidden; // Ensure the focus style properly encapsulates the image.
+
+	// Apply a max-height.
+	display: flex;
+	justify-content: center;
+	max-height: 150px;
 }
 
 .editor-post-featured-image__preview {
 	height: auto;
-}
 
-.editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
-	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
+	.components-responsive-wrapper {
+		width: 100%;
+		background: $gray-100;
+	}
 }
 
 .editor-post-featured-image__toggle {
@@ -58,4 +66,20 @@
 		background: $gray-300;
 		color: $gray-900;
 	}
+}
+
+.editor-post-featured-image__actions {
+	@include reduce-motion("transition");
+	bottom: 0;
+	opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
+	padding: $grid-unit-10;
+	position: absolute;
+	transition: opacity 50ms ease-out;
+}
+
+.editor-post-featured-image__action {
+	backdrop-filter: blur(16px) saturate(180%);
+	background: rgba(255, 255, 255, 0.75);
+	flex-grow: 1;
+	justify-content: center;
 }

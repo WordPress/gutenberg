@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	ResizableBox,
@@ -35,6 +35,8 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -62,7 +64,6 @@ function ClipboardToolbarButton( { text, disabled } ) {
 function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		id,
-		fileId,
 		fileName,
 		href,
 		textLinkHref,
@@ -72,60 +73,48 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const { media, mediaUpload } = useSelect(
+	const { media } = useSelect(
 		( select ) => ( {
 			media:
 				id === undefined
 					? undefined
 					: select( coreStore ).getMedia( id ),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[ id ]
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const { toggleSelection } = useDispatch( blockEditorStore );
+
+	useUploadMediaFromBlobURL( {
+		url: href,
+		onChange: onSelectFile,
+		onError: onUploadError,
+	} );
 
 	useEffect( () => {
-		// Upload a file drag-and-dropped into the editor.
-		if ( isBlobURL( href ) ) {
-			const file = getBlobByURL( href );
-
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: onUploadError,
+		if ( RichText.isEmpty( downloadButtonText ) ) {
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
-
-			revokeBlobURL( href );
-		}
-
-		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
 
-	useEffect( () => {
-		if ( ! fileId && href ) {
-			// Add a unique fileId to each file block.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
-		}
-	}, [ href, fileId, clientId ] );
-
 	function onSelectFile( newMedia ) {
-		if ( newMedia && newMedia.url ) {
-			const isPdf = newMedia.url.endsWith( '.pdf' );
-			setAttributes( {
-				href: newMedia.url,
-				fileName: newMedia.title,
-				textLinkHref: newMedia.url,
-				id: newMedia.id,
-				displayPreview: isPdf ? true : undefined,
-				previewHeight: isPdf ? 600 : undefined,
-			} );
+		if ( ! newMedia || ! newMedia.url ) {
+			return;
 		}
+
+		const isPdf = newMedia.url.endsWith( '.pdf' );
+		setAttributes( {
+			href: newMedia.url,
+			fileName: newMedia.title,
+			textLinkHref: newMedia.url,
+			id: newMedia.id,
+			displayPreview: isPdf ? true : undefined,
+			previewHeight: isPdf ? 600 : undefined,
+			fileId: `wp-block-file--media-${ clientId }`,
+		} );
 	}
 
 	function onUploadError( message ) {
@@ -146,13 +135,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
-	}
-
-	function changeDownloadButtonText( newValue ) {
-		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -277,7 +259,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting
 						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
 						}
 						href={ textLinkHref }
 					/>
@@ -301,7 +285,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+									setAttributes( {
+										downloadButtonText:
+											removeAnchorTag( text ),
+									} )
 								}
 							/>
 						</div>

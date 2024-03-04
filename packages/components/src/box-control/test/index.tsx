@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -33,7 +33,10 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ () => {} } /> );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Box Control' } )
+				screen.getByRole( 'group', { name: 'Box Control' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
 			).toBeVisible();
 		} );
 
@@ -42,19 +45,40 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ () => {} } /> );
 
-			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
-			} );
+			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
 
-			await user.type( input, '100%' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
+		} );
+
+		it( 'should update input values when interacting with slider', () => {
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const slider = screen.getByRole( 'slider' );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
 			expect(
-				screen.getByRole( 'combobox', {
-					name: 'Select unit',
-				} )
-			).toHaveValue( '%' );
+				screen.getByRole( 'textbox', { name: 'All sides' } )
+			).toHaveValue( '50' );
+		} );
+
+		it( 'should update slider values when interacting with input', async () => {
+			const user = userEvent.setup();
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const input = screen.getByRole( 'textbox', {
+				name: 'All sides',
+			} );
+
+			await user.type( input, '50' );
+			await user.keyboard( '{Enter}' );
+
+			expect( input ).toHaveValue( '50' );
+			expect( screen.getByRole( 'slider' ) ).toHaveValue( '50' );
 		} );
 	} );
 
@@ -65,22 +89,17 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ () => {} } /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
-			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
+				name: 'All sides',
 			} );
 
-			await user.type( input, '100px' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled', async () => {
@@ -89,22 +108,17 @@ describe( 'BoxControl', () => {
 			render( <Example /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
-			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
+				name: 'All sides',
 			} );
 
-			await user.type( input, '100px' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
@@ -113,22 +127,17 @@ describe( 'BoxControl', () => {
 			render( <Example /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
-			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
+				name: 'All sides',
 			} );
 
-			await user.type( input, '100px' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
@@ -138,18 +147,13 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 
 			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
+				name: 'All sides',
 			} );
 
-			await user.type( input, '100%' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect(
-				screen.getByRole( 'combobox', {
-					name: 'Select unit',
-				} )
-			).toHaveValue( '%' );
 
 			await user.clear( input );
 			expect( input ).toHaveValue( '' );
@@ -177,29 +181,50 @@ describe( 'BoxControl', () => {
 			);
 
 			await user.type(
-				screen.getByRole( 'textbox', { name: 'Top' } ),
-				'100px'
+				screen.getByRole( 'textbox', { name: 'Top side' } ),
+				'100'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Top' } )
+				screen.getByRole( 'textbox', { name: 'Top side' } )
 			).toHaveValue( '100' );
 			expect(
-				screen.getByRole( 'textbox', { name: 'Right' } )
+				screen.getByRole( 'textbox', { name: 'Right side' } )
 			).not.toHaveValue();
 			expect(
-				screen.getByRole( 'textbox', { name: 'Bottom' } )
+				screen.getByRole( 'textbox', { name: 'Bottom side' } )
 			).not.toHaveValue();
 			expect(
-				screen.getByRole( 'textbox', { name: 'Left' } )
+				screen.getByRole( 'textbox', { name: 'Left side' } )
 			).not.toHaveValue();
+		} );
 
-			screen
-				.getAllByRole( 'combobox', { name: 'Select unit' } )
-				.forEach( ( combobox ) => {
-					expect( combobox ).toHaveValue( 'px' );
-				} );
+		it( 'should update a single side value when using slider unlinked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const slider = screen.getByRole( 'slider', { name: 'Right side' } );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top side' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right side' } )
+			).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Bottom side' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left side' } )
+			).not.toHaveValue();
 		} );
 
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
@@ -213,24 +238,68 @@ describe( 'BoxControl', () => {
 
 			await user.type(
 				screen.getByRole( 'textbox', {
-					name: 'Vertical',
+					name: 'Top and bottom sides',
 				} ),
-				'100px'
+				'100'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect(
-				screen.getByRole( 'textbox', { name: 'Vertical' } )
+				screen.getByRole( 'textbox', { name: 'Top and bottom sides' } )
 			).toHaveValue( '100' );
 			expect(
-				screen.getByRole( 'textbox', { name: 'Horizontal' } )
+				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
 			).not.toHaveValue();
+		} );
 
-			screen
-				.getAllByRole( 'combobox', { name: 'Select unit' } )
-				.forEach( ( combobox ) => {
-					expect( combobox ).toHaveValue( 'px' );
-				} );
+		it( 'should update a whole axis using a slider when value is changed when unlinked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example splitOnAxis /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const slider = screen.getByRole( 'slider', {
+				name: 'Left and right sides',
+			} );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top and bottom sides' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
+			).toHaveValue( '50' );
+		} );
+
+		it( 'should show "Mixed" label when sides have different values but are linked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example /> );
+
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unlink sides',
+			} );
+
+			await user.click( unlinkButton );
+
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Right side',
+				} ),
+				'13'
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right side' } )
+			).toHaveValue( '13' );
+
+			await user.click( unlinkButton );
+
+			expect( screen.getByPlaceholderText( 'Mixed' ) ).toHaveValue( '' );
 		} );
 	} );
 
@@ -321,23 +390,30 @@ describe( 'BoxControl', () => {
 	describe( 'onChange updates', () => {
 		it( 'should call onChange when values contain more than just CSS units', async () => {
 			const user = userEvent.setup();
-			const setState = jest.fn();
+			const onChangeSpy = jest.fn();
 
-			render( <BoxControl onChange={ setState } /> );
+			render( <BoxControl onChange={ onChangeSpy } /> );
 
-			await user.type(
-				screen.getByRole( 'textbox', {
-					name: 'Box Control',
-				} ),
-				'7.5rem'
-			);
-			await user.keyboard( '{Enter}' );
+			const valueInput = screen.getByRole( 'textbox', {
+				name: 'All sides',
+			} );
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
-			expect( setState ).toHaveBeenCalledWith( {
-				top: '7.5rem',
-				right: '7.5rem',
-				bottom: '7.5rem',
-				left: '7.5rem',
+			// Typing the first letter of a unit blurs the input and focuses the combobox.
+			await user.type( valueInput, '7r' );
+
+			expect( unitSelect ).toHaveFocus();
+
+			// The correct expected behavior would be for the values to have "rem"
+			// as their unit, but the test environment doesn't seem to change
+			// values on `select` elements when using the keyboard.
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '7px',
+				right: '7px',
+				bottom: '7px',
+				left: '7px',
 			} );
 		} );
 

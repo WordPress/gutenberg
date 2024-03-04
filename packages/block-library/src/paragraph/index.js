@@ -28,7 +28,17 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
+			if ( customName ) {
+				return customName;
+			}
+
 			const { content } = attributes;
 			return ! content || content.length === 0 ? __( 'Empty' ) : content;
 		}

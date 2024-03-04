@@ -18,8 +18,10 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -32,7 +34,7 @@ test.describe( 'Classic', () => {
 		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
@@ -69,11 +71,11 @@ test.describe( 'Classic', () => {
 		const createGallery = page.getByRole( 'button', {
 			name: 'Create a new gallery',
 		} );
-		await expect( createGallery ).not.toBeDisabled();
+		await expect( createGallery ).toBeEnabled();
 		await createGallery.click();
 		await page.click( 'role=button[name="Insert gallery"i]' );
 
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
@@ -84,12 +86,8 @@ test.describe( 'Classic', () => {
 		);
 		await expect( galleryBlock ).toBeVisible();
 
-		// Focus on the editor so that keyboard shortcuts work.
-		// See: https://github.com/WordPress/gutenberg/issues/46844
-		await galleryBlock.focus();
-
 		// Check that you can undo back to a Classic block gallery in one step.
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
 			page.locator( 'role=document[name="Block: Classic"i]' )
 		).toBeVisible();
@@ -119,16 +117,14 @@ test.describe( 'Classic', () => {
 		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 
-		await page.click( 'role=button[name="Save draft"i]' );
-
-		await expect(
-			page.locator( 'role=button[name="Saved"i]' )
-		).toBeDisabled();
-
+		await editor.saveDraft();
 		await page.reload();
 		await page.unroute( '**' );
+
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
 
 		const errors = [];
 		page.on( 'pageerror', ( exception ) => {

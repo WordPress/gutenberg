@@ -14,16 +14,15 @@ test.describe( 'Site editor iframe rendering mode', () => {
 
 	test( 'Should render editor in standards mode.', async ( {
 		admin,
-		page,
+		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-
-		const compatMode = await page
-			.locator( 'iframe[name="editor-canvas"]' )
-			.evaluate( ( iframe ) => iframe.contentDocument.compatMode );
+		const compatMode = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => document.compatMode );
 
 		// CSS1Compat = expected standards mode.
 		// BackCompat = quirks mode.

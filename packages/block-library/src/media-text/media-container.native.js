@@ -26,12 +26,12 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import icon from './media-container-icon';
 import SvgIconRetry from './icon-retry';
 
 /**
@@ -170,7 +170,7 @@ class MediaContainer extends Component {
 			mediaWidth,
 			shouldStack,
 		} = this.props;
-		const { isUploadFailed, retryMessage } = params;
+		const { isUploadFailed, isUploadPaused, retryMessage } = params;
 		const focalPointValues = ! focalPoint
 			? IMAGE_DEFAULT_FOCAL_POINT
 			: focalPoint;
@@ -203,6 +203,7 @@ class MediaContainer extends Component {
 							focalPoint={ imageFill && focalPointValues }
 							isSelected={ isMediaSelected }
 							isUploadFailed={ isUploadFailed }
+							isUploadPaused={ isUploadPaused }
 							isUploadInProgress={ isUploadInProgress }
 							onSelectMediaUploadOption={
 								this.onSelectMediaUploadOption
@@ -316,6 +317,7 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
+				className={ 'no-block-outline' }
 			/>
 		);
 	}
@@ -339,6 +341,9 @@ class MediaContainer extends Component {
 								{ getMediaOptions() }
 
 								<MediaUploadProgress
+									enablePausedUploads={
+										mediaType === MEDIA_TYPE_IMAGE
+									}
 									coverUrl={ coverUrl }
 									mediaId={ mediaId }
 									onUpdateMediaProgress={

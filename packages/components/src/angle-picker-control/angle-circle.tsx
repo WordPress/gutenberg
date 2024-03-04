@@ -13,7 +13,7 @@ import {
 	CircleIndicator,
 } from './styles/angle-picker-control-styles';
 
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
 
 type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
@@ -91,7 +91,6 @@ function AngleCircle( {
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
 			className="components-angle-picker-control__angle-circle"
-			style={ isDragging ? { cursor: 'grabbing' } : undefined }
 			{ ...props }
 		>
 			<CircleIndicatorWrapper

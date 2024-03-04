@@ -19,16 +19,6 @@ describe( 'PostPublishButton', () => {
 			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should be true if forceIsSaving is true', () => {
-			render(
-				<PostPublishButton isPublishable isSaveable forceIsSaving />
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: 'Submit for Review' } )
-			).toHaveAttribute( 'aria-disabled', 'true' );
-		} );
-
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
 			render(
 				<PostPublishButton

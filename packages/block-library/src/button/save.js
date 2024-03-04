@@ -12,11 +12,14 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
 	const {
+		tagName,
+		type,
 		textAlign,
 		fontSize,
 		linkTarget,
@@ -28,13 +31,17 @@ export default function save( { attributes, className } ) {
 		width,
 	} = attributes;
 
-	if ( ! text ) {
+	if ( RichText.isEmpty( text ) ) {
 		return null;
 	}
 
+	const TagName = tagName || 'a';
+	const isButtonTag = 'button' === TagName;
+	const buttonType = type || 'button';
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
@@ -51,6 +58,7 @@ export default function save( { attributes, className } ) {
 		...borderProps.style,
 		...colorProps.style,
 		...spacingProps.style,
+		...shadowProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
@@ -65,14 +73,15 @@ export default function save( { attributes, className } ) {
 	return (
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
-				tagName="a"
+				tagName={ TagName }
+				type={ isButtonTag ? buttonType : null }
 				className={ buttonClasses }
-				href={ url }
+				href={ isButtonTag ? null : url }
 				title={ title }
 				style={ buttonStyle }
 				value={ text }
-				target={ linkTarget }
-				rel={ rel }
+				target={ isButtonTag ? null : linkTarget }
+				rel={ isButtonTag ? null : rel }
 			/>
 		</div>
 	);

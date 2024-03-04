@@ -4,12 +4,6 @@ FormToggle switches a single setting on or off.
 
 ![On and off FormToggles. The top toggle is on, while the bottom toggle is off.](https://wordpress.org/gutenberg/files/2019/01/Toggle.jpg)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -54,8 +48,8 @@ When a user switches a toggle, its corresponding action takes effect immediately
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { FormToggle } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyFormToggle = () => {
 	const [ isChecked, setChecked ] = useState( true );

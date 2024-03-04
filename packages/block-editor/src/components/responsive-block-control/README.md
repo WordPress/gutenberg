@@ -2,7 +2,7 @@
 
 `ResponsiveBlockControl` provides a standardised interface for the creation of Block controls that require **different settings per viewport** (ie: "responsive" settings).
 
-For example, imagine your Block provides a control which affords the ability to change a "padding" value used in the Block display. Consider that whilst this setting may work well on "large" screens, the same value may not work well on smaller screens (it may be too large for example). As a result, you now need to provide a padding control _per viewport/screensize_.
+For example, imagine your Block provides a control which affords the ability to change a "padding" value used in the Block display. Consider that whilst this setting may work well on "large" screens, the same value may not work well on smaller screens (it may be too large for example). As a result, you now need to provide a padding control _per viewport/screen size_.
 
 `ResponsiveBlockControl` provides a standardised component for the creation of such interfaces within Gutenberg.
 
@@ -21,14 +21,12 @@ In a block's `edit` implementation, render a `<ResponsiveBlockControl />` compon
 By default the default control will be used to render the default (ie: "All") setting _as well as_ the per-viewport responsive settings.
 
 ```jsx
+import { useState } from 'react';
 import { registerBlockType } from '@wordpress/blocks';
 import {
 	InspectorControls,
-	ResponsiveBlockControl,
+	__experimentalResponsiveBlockControl as ResponsiveBlockControl,
 } from '@wordpress/block-editor';
-
-import { useState } from '@wordpress/element';
-
 import {
 	DimensionControl,
 } from '@wordpress/components';
@@ -196,7 +194,7 @@ const renderResponsiveControls = ( viewports ) => {
 ### `toggleLabel`
 
 -   **Type:** `String`
--   **Default:** `Use the same %s on all screensizes.` (where "%s" is the `property` prop - see above )
+-   **Default:** `Use the same %s on all screen sizes.` (where "%s" is the `property` prop - see above )
 -   **Required:** `false`
 
 Optional label used for the toggle control which switches the interface between showing responsive controls or not.
@@ -215,7 +213,7 @@ Optional label used for the toggle control which switches the interface between 
 
 -   **Required:** `false`
 
-Optional object describing the attributes of the default value. By default this is `All` which indicates the control will affect "all viewports/screensizes".
+Optional object describing the attributes of the default value. By default this is `All` which indicates the control will affect "all viewports/screen sizes".
 
 ### `viewports`
 

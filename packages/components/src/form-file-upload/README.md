@@ -38,9 +38,9 @@ Children are passed as children of `Button`.
 
 ### icon
 
-The icon to render. Supported values are: Dashicons (specified as strings), functions, WPComponent instances and `null`.
+The icon to render. Supported values are: Dashicons (specified as strings), functions, Component instances and `null`.
 
--   Type: `String|Function|WPComponent|null`
+-   Type: `String|Function|Component|null`
 -   Required: No
 -   Default: `null`
 

@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
-import { css, SerializedStyles } from '@emotion/react';
+import type { SerializedStyles } from '@emotion/react';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';

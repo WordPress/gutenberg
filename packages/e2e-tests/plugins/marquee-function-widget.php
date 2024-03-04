@@ -14,7 +14,7 @@ function marquee_greeting_init() {
 	wp_register_sidebar_widget(
 		'marquee_greeting',
 		'Marquee Greeting',
-		function() {
+		static function () {
 			$greeting = get_option( 'marquee_greeting', 'Hello!' );
 			printf( '<marquee>%s</marquee>', esc_html( $greeting ) );
 		}
@@ -23,7 +23,7 @@ function marquee_greeting_init() {
 	wp_register_widget_control(
 		'marquee_greeting',
 		'Marquee Greeting',
-		function() {
+		static function () {
 			if ( isset( $_POST['marquee-greeting'] ) ) {
 				update_option(
 					'marquee_greeting',

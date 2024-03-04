@@ -2,28 +2,9 @@
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withPluginContext } from '@wordpress/plugins';
-const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
+import { usePluginContext } from '@wordpress/plugins';
 
-const PluginPrePublishPanelFill = ( {
-	children,
-	className,
-	title,
-	initialOpen = false,
-	icon,
-} ) => (
-	<Fill>
-		<PanelBody
-			className={ className }
-			initialOpen={ initialOpen || ! title }
-			title={ title }
-			icon={ icon }
-		>
-			{ children }
-		</PanelBody>
-	</Fill>
-);
+const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
 
 /**
  * Renders provided content to the pre-publish side panel in the publish flow
@@ -37,6 +18,7 @@ const PluginPrePublishPanelFill = ( {
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/)
  *                                                                      icon slug string, or an SVG WP element, to be rendered when
  *                                                                      the sidebar is pinned to toolbar.
+ * @param {Element}               props.children                        Children to be rendered
  *
  * @example
  * ```js
@@ -45,7 +27,7 @@ const PluginPrePublishPanelFill = ( {
  * var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
  *
  * function MyPluginPrePublishPanel() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginPrePublishPanel,
  * 		{
  * 			className: 'my-plugin-pre-publish-panel',
@@ -74,15 +56,30 @@ const PluginPrePublishPanelFill = ( {
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
-const PluginPrePublishPanel = compose(
-	withPluginContext( ( context, ownProps ) => {
-		return {
-			icon: ownProps.icon || context.icon,
-		};
-	} )
-)( PluginPrePublishPanelFill );
+const PluginPrePublishPanel = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => {
+	const { icon: pluginIcon } = usePluginContext();
+
+	return (
+		<Fill>
+			<PanelBody
+				className={ className }
+				initialOpen={ initialOpen || ! title }
+				title={ title }
+				icon={ icon ?? pluginIcon }
+			>
+				{ children }
+			</PanelBody>
+		</Fill>
+	);
+};
 
 PluginPrePublishPanel.Slot = Slot;
 

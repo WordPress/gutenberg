@@ -18,7 +18,7 @@ import type { Admin } from './';
 export async function visitAdminPage(
 	this: Admin,
 	adminPath: string,
-	query: string
+	query?: string
 ) {
 	await this.page.goto(
 		join( 'wp-admin', adminPath ) + ( query ? `?${ query }` : '' )

@@ -11,7 +11,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
 import { BorderControl } from '../../border-control';
 import { Grid } from '../../grid';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControlSplitControls } from './hook';
 
 import type { BorderControlProps } from '../../border-control/types';

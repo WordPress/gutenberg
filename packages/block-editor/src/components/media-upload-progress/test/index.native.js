@@ -14,13 +14,13 @@ import {
 /**
  * Internal dependencies
  */
+import { MediaUploadProgress } from '../';
 import {
-	MediaUploadProgress,
 	MEDIA_UPLOAD_STATE_UPLOADING,
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
 	MEDIA_UPLOAD_STATE_FAILED,
 	MEDIA_UPLOAD_STATE_RESET,
-} from '../';
+} from '../constants';
 
 let uploadCallBack;
 subscribeMediaUpload.mockImplementation( ( callback ) => {

@@ -6,11 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import {
-	WordPressComponentProps,
-	contextConnect,
-	useContextSystem,
-} from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { contextConnect, useContextSystem } from '../context';
 import { DropdownContentWrapperDiv } from './styles';
 import type { DropdownContentWrapperProps } from './types';
 

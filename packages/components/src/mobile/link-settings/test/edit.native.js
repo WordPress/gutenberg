@@ -4,13 +4,30 @@
  * External dependencies
  */
 import Clipboard from '@react-native-clipboard/clipboard';
-import { fireEvent, initializeEditor } from 'test/helpers';
+import {
+	fireEvent,
+	initializeEditor,
+	waitForElementToBeRemoved,
+} from 'test/helpers';
 /**
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+
+// Mock debounce to prevent potentially belated state updates.
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
+// Mock link suggestions that are fetched by the link picker
+// when typing a search query.
+jest.mock( '@wordpress/core-data/src/fetch', () => ( {
+	__experimentalFetchLinkSuggestions: jest.fn().mockResolvedValue( [ {} ] ),
+} ) );
 
 /**
  * Utility function to unregister all core block types previously registered
@@ -34,9 +51,7 @@ describe.each( [
 			type: 'core/button',
 			initialHtml: `
 				<!-- wp:button {"style":{"border":{"radius":"5px"}}} -->
-				<div class="wp-block-button">
-					<a class="wp-block-button__link" style="border-radius:5px">Link</a>
-				</div>
+				<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" style="border-radius:5px">Link</a></div>
 				<!-- /wp:button -->
 			`,
 			toJSON: () => 'core/button',
@@ -112,11 +127,9 @@ describe.each( [
 				);
 				fireEvent.press( block );
 				fireEvent.press( block );
+				fireEvent.press( subject.getByLabelText( 'Open Settings' ) );
 				fireEvent.press(
-					await subject.findByLabelText( 'Open Settings' )
-				);
-				fireEvent.press(
-					await subject.findByLabelText(
+					subject.getByLabelText(
 						`Link to, ${
 							type === 'core/image'
 								? 'None'
@@ -125,9 +138,7 @@ describe.each( [
 					)
 				);
 				if ( type === 'core/image' ) {
-					fireEvent.press(
-						await subject.findByLabelText( /Custom URL/ )
-					);
+					fireEvent.press( subject.getByLabelText( /Custom URL/ ) );
 				}
 				await subject.findByLabelText( 'Apply' );
 
@@ -157,11 +168,9 @@ describe.each( [
 				);
 				fireEvent.press( block );
 				fireEvent.press( block );
+				fireEvent.press( subject.getByLabelText( 'Open Settings' ) );
 				fireEvent.press(
-					await subject.findByLabelText( 'Open Settings' )
-				);
-				fireEvent.press(
-					await subject.findByLabelText(
+					subject.getByLabelText(
 						`Link to, ${
 							type === 'core/image'
 								? 'None'
@@ -171,7 +180,7 @@ describe.each( [
 				);
 				if ( type === 'core/image' ) {
 					fireEvent.press(
-						await subject.findByLabelText( 'Custom URL. Empty' )
+						subject.getByLabelText( 'Custom URL. Empty' )
 					);
 				}
 				fireEvent.press(
@@ -186,11 +195,15 @@ describe.each( [
 						}`
 					)
 				);
+
 				if ( type === 'core/image' ) {
 					fireEvent.press(
-						await subject.findByLabelText( `Custom URL, ${ url }` )
+						subject.getByLabelText( `Custom URL, ${ url }` )
 					);
 				}
+				await waitForElementToBeRemoved( () =>
+					subject.getByTestId( 'link-picker-loading' )
+				);
 				await subject.findByLabelText( 'Apply' );
 
 				// Assert.
@@ -223,10 +236,10 @@ describe.each( [
 					fireEvent.press( block );
 					fireEvent.press( block );
 					fireEvent.press(
-						await subject.findByLabelText( 'Open Settings' )
+						subject.getByLabelText( 'Open Settings' )
 					);
 					fireEvent.press(
-						await subject.findByLabelText(
+						subject.getByLabelText(
 							`Link to, ${
 								type === 'core/image'
 									? 'None'
@@ -236,7 +249,7 @@ describe.each( [
 					);
 					if ( type === 'core/image' ) {
 						fireEvent.press(
-							await subject.findByLabelText( /Custom URL/ )
+							subject.getByLabelText( /Custom URL/ )
 						);
 					}
 					await subject.findByLabelText(
@@ -276,10 +289,10 @@ describe.each( [
 					fireEvent.press( block );
 					fireEvent.press( block );
 					fireEvent.press(
-						await subject.findByLabelText( 'Open Settings' )
+						subject.getByLabelText( 'Open Settings' )
 					);
 					fireEvent.press(
-						await subject.findByLabelText(
+						subject.getByLabelText(
 							`Link to, ${
 								type === 'core/image'
 									? 'None'
@@ -289,7 +302,7 @@ describe.each( [
 					);
 					if ( type === 'core/image' ) {
 						fireEvent.press(
-							await subject.findByLabelText( /Custom URL/ )
+							subject.getByLabelText( /Custom URL/ )
 						);
 					}
 					fireEvent.press(

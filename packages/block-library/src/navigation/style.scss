@@ -31,6 +31,7 @@ $navigation-icon-size: 24px;
 
 	// Menu item container.
 	.wp-block-navigation-item {
+		background-color: inherit;
 		display: flex;
 		align-items: center;
 		position: relative;
@@ -316,7 +317,9 @@ button.wp-block-navigation-item__content {
 // When set to open on click, a button element is used.
 // We pad it to include the arrow icon in the clickable area.
 // The padding can be blanket for click, since you can't set click and hide the icon.
+// This is only applied to the submenu in the page list block.
 .wp-block-navigation-item.open-on-click .wp-block-navigation-submenu__toggle {
+	padding-left: 0; // Remove the browser default padding.
 	padding-right: 0.6em + 0.25em; // Same size as icon plus margin.
 
 	+ .wp-block-navigation__submenu-icon {
@@ -324,7 +327,10 @@ button.wp-block-navigation-item__content {
 		pointer-events: none; // Make the icon inert to allow click on the button.
 	}
 }
-
+// Remove the browser default padding on the button element used in the navigation link submenu.
+.wp-block-navigation-item.open-on-click button.wp-block-navigation-item__content:not(.wp-block-navigation-submenu__toggle) {
+	padding: 0;
+}
 
 /**
  * Margins
@@ -398,15 +404,26 @@ button.wp-block-navigation-item__content {
 }
 
 // Default background and font color.
-.wp-block-navigation:not(.has-background) {
+.wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container {
+	// Set a background color for submenus so that they're not transparent.
+	// NOTE TO DEVS - if refactoring this code, please double-check that
+	// submenus have a default background color, this feature has regressed
+	// several times, so care needs to be taken.
+	background-color: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+// If we do have a background color selected, inherit it from the navigation block
+.wp-block-navigation.has-background {
 	.wp-block-navigation__submenu-container {
-		// Set a background color for submenus so that they're not transparent.
-		// NOTE TO DEVS - if refactoring this code, please double-check that
-		// submenus have a default background color, this feature has regressed
-		// several times, so care needs to be taken.
-		background-color: #fff;
+		background-color: inherit;
+	}
+}
+
+.wp-block-navigation:not(.has-text-color) {
+	.wp-block-navigation__submenu-container {
+		// Set a default color for submenu text if none is selected
 		color: #000;
-		border: 1px solid rgba(0, 0, 0, 0.15);
 	}
 }
 
@@ -458,7 +475,8 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
-	.wp-block-navigation-link a {
+	// Low specificity so that themes can override.
+	& :where(.wp-block-navigation-item a) {
 		color: inherit;
 	}
 
@@ -493,10 +511,10 @@ button.wp-block-navigation-item__content {
 		@include reduce-motion("animation");
 
 		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
-		padding-top: var(--wp--style--root--padding-top, 2rem);
-		padding-right: var(--wp--style--root--padding-right, 2rem);
-		padding-bottom: var(--wp--style--root--padding-bottom, 2rem);
-		padding-left: var(--wp--style--root--padding-left, 2rem);
+		padding-top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
+		padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
+		padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
+		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20em);
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -579,6 +597,7 @@ button.wp-block-navigation-item__content {
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
 		.wp-block-navigation-item .wp-block-navigation__submenu-container,
+		.wp-block-navigation__container,
 		.wp-block-navigation-item,
 		.wp-block-page-list {
 			color: inherit !important;
@@ -620,8 +639,13 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation:not(.has-background)
 .wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
+}
+
+.wp-block-navigation:not(.has-text-color)
+.wp-block-navigation__responsive-container.is-menu-open {
 	color: #000;
 }
+
 
 // Overlay menu toggle button label
 .wp-block-navigation__toggle_button_label {
@@ -689,10 +713,12 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-close {
 	width: 100%;
 
-	// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
-	max-width: var(--wp--style--global--wide-size, 100%);
-	margin-left: auto;
-	margin-right: auto;
+	.has-modal-open & {
+		// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+		max-width: var(--wp--style--global--wide-size, 100%);
+		margin-left: auto;
+		margin-right: auto;
+	}
 
 	// This element is not keyboard accessible, and is focusable only using the mouse.
 	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,

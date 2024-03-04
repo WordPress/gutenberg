@@ -5,9 +5,42 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PageAttributesOrder } from '../order';
+import PageAttributesOrder from '../order';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: jest.fn(),
+} ) );
+
+function setupDataMock( order = 0 ) {
+	useSelect.mockImplementation( ( mapSelect ) =>
+		mapSelect( () => ( {
+			getPostType: () => null,
+			getEditedPostAttribute: ( attr ) => {
+				switch ( attr ) {
+					case 'menu_order':
+						return order;
+					default:
+						return null;
+				}
+			},
+		} ) )
+	);
+
+	const editPost = jest.fn();
+	useDispatch.mockImplementation( () => ( {
+		editPost,
+	} ) );
+
+	return editPost;
+}
 
 describe( 'PageAttributesOrder', () => {
 	/**
@@ -22,9 +55,9 @@ describe( 'PageAttributesOrder', () => {
 	it( 'should reject invalid input', async () => {
 		const user = userEvent.setup();
 
-		const onUpdateOrder = jest.fn();
+		const editPost = setupDataMock();
 
-		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
+		render( <PageAttributesOrder /> );
 
 		const input = screen.getByRole( 'spinbutton', { name: 'Order' } );
 		await user.type( input, 'bad', typeOptions );
@@ -33,31 +66,29 @@ describe( 'PageAttributesOrder', () => {
 		await user.type( input, '+', typeOptions );
 		await user.type( input, ' ', typeOptions );
 
-		expect( onUpdateOrder ).not.toHaveBeenCalled();
+		expect( editPost ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should update with zero input', async () => {
 		const user = userEvent.setup();
 
-		const onUpdateOrder = jest.fn();
+		const editPost = setupDataMock( 4 );
 
-		render(
-			<PageAttributesOrder order={ 4 } onUpdateOrder={ onUpdateOrder } />
-		);
+		render( <PageAttributesOrder /> );
 
 		const input = screen.getByRole( 'spinbutton', { name: 'Order' } );
 
 		await user.type( input, '0', typeOptions );
 
-		expect( onUpdateOrder ).toHaveBeenCalledWith( 0 );
+		expect( editPost ).toHaveBeenCalledWith( { menu_order: 0 } );
 	} );
 
 	it( 'should update with valid positive input', async () => {
 		const user = userEvent.setup();
 
-		const onUpdateOrder = jest.fn();
+		const editPost = setupDataMock();
 
-		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
+		render( <PageAttributesOrder /> );
 
 		await user.type(
 			screen.getByRole( 'spinbutton', { name: 'Order' } ),
@@ -65,15 +96,15 @@ describe( 'PageAttributesOrder', () => {
 			typeOptions
 		);
 
-		expect( onUpdateOrder ).toHaveBeenCalledWith( 4 );
+		expect( editPost ).toHaveBeenCalledWith( { menu_order: 4 } );
 	} );
 
 	it( 'should update with valid negative input', async () => {
 		const user = userEvent.setup();
 
-		const onUpdateOrder = jest.fn();
+		const editPost = setupDataMock();
 
-		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
+		render( <PageAttributesOrder /> );
 
 		await user.type(
 			screen.getByRole( 'spinbutton', { name: 'Order' } ),
@@ -81,6 +112,6 @@ describe( 'PageAttributesOrder', () => {
 			typeOptions
 		);
 
-		expect( onUpdateOrder ).toHaveBeenCalledWith( -1 );
+		expect( editPost ).toHaveBeenCalledWith( { menu_order: -1 } );
 	} );
 } );

@@ -10,7 +10,7 @@ import { toggleMoreMenu } from './toggle-more-menu';
 export async function enablePrePublishChecks() {
 	await togglePreferencesOption(
 		'General',
-		'Include pre-publish checklist',
+		'Enable pre-publish checks',
 		true
 	);
 	await toggleMoreMenu( 'close' );

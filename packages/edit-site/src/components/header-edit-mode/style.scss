@@ -15,6 +15,19 @@ $header-toolbar-min-width: 335px;
 	.edit-site-header-edit-mode__start {
 		display: flex;
 		border: none;
+		align-items: center;
+		flex-shrink: 2;
+		// We need this to be overflow hidden so the block toolbar can
+		// overflow scroll. If the overflow is visible, flexbox allows
+		// the toolbar to grow outside of the allowed container space.
+		overflow: hidden;
+		// Take up the full height of the header so the border focus
+		// is visible on toolbar buttons.
+		height: 100%;
+		// Allow focus ring to be fully visible on furthest right button.
+		@include break-medium() {
+			padding-right: 2px;
+		}
 	}
 
 	.edit-site-header-edit-mode__end {
@@ -27,6 +40,7 @@ $header-toolbar-min-width: 335px;
 		align-items: center;
 		height: 100%;
 		flex-grow: 1;
+		margin: 0 $grid-unit-20;
 		justify-content: center;
 		// Flex items will, by default, refuse to shrink below a minimum
 		// intrinsic width. In order to shrink this flexbox item, and
@@ -34,15 +48,17 @@ $header-toolbar-min-width: 335px;
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
 	}
+
 }
 
 .edit-site-header-edit-mode__toolbar {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	gap: $grid-unit-10;
 
-	@include break-small() {
-		padding-left: $grid-unit-30;
+	@include break-medium() {
+		padding-left: $grid-unit-50 * 0.5;
 	}
 
 	@include break-wide() {
@@ -50,12 +66,6 @@ $header-toolbar-min-width: 335px;
 	}
 
 	.edit-site-header-edit-mode__inserter-toggle {
-		margin-right: $grid-unit-10;
-		min-width: $grid-unit-40;
-		width: $grid-unit-40;
-		height: $grid-unit-40;
-		padding: 0;
-
 		svg {
 			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
 			@include reduce-motion("transition");
@@ -76,26 +86,14 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__actions {
 	display: inline-flex;
 	align-items: center;
+	flex-wrap: nowrap;
 	padding-right: $grid-unit-05;
 
 	@include break-small () {
-		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+		padding-right: $grid-unit-10;
 	}
 
-	gap: $grid-unit-05;
-
-	@include break-small() {
-		gap: $grid-unit-10;
-	}
-
-	// Pinned items.
-	.interface-pinned-items {
-		display: none;
-
-		@include break-medium() {
-			display: inline-flex;
-		}
-	}
+	gap: $grid-unit-10;
 }
 
 .edit-site-header-edit-mode__preview-options {
@@ -104,47 +102,6 @@ $header-toolbar-min-width: 335px;
 
 	&.is-zoomed-out {
 		opacity: 0;
-	}
-}
-
-.edit-site-header-edit-mode__start {
-	display: flex;
-	border: none;
-
-	// The Toolbar component adds different styles to buttons, so we reset them
-	// here to the original button styles
-	.edit-site-header-edit-mode__toolbar > .components-button.has-icon,
-	.edit-site-header-edit-mode__toolbar > .components-dropdown > .components-button.has-icon {
-		height: $button-size;
-		min-width: $button-size;
-		padding: 6px;
-
-		&.is-pressed {
-			background: $gray-900;
-		}
-
-		&:focus:not(:disabled) {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
-			outline: 1px solid transparent;
-		}
-
-		&::before {
-			display: none;
-		}
-	}
-
-	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-icon {
-		margin-right: $grid-unit-10;
-		// Special dimensions for this button.
-		min-width: 32px;
-		width: 32px;
-		height: 32px;
-		padding: 0;
-	}
-
-	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-text.has-icon {
-		width: auto;
-		padding: 0 $grid-unit-10;
 	}
 }
 
@@ -191,7 +148,111 @@ $header-toolbar-min-width: 335px;
 		padding: 0 $grid-unit-10;
 	}
 
-	.edit-site-header-edit-mode__start .edit-site-header-edit-mode__toolbar > * + * {
-		margin-left: $grid-unit-10;
+	.block-editor-block-mover {
+		// Modified group borders.
+		border-left: none;
+
+		&::before {
+			content: "";
+			width: $border-width;
+			height: $grid-unit-30;
+			background-color: $gray-300;
+			margin-top: $grid-unit-05;
+			margin-left: $grid-unit;
+		}
+
+		// Modified block movers horizontal separator.
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
+		}
 	}
+}
+
+.has-fixed-toolbar {
+	.selected-block-tools-wrapper {
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		height: $header-height;
+
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+			height: 100%;
+		}
+
+		// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
+		.block-editor-block-toolbar {
+			height: 100%;
+			// Push down so that buttons are centered vertically.
+			// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+			// but there is a -1px top-margin down the stack that affects this.
+			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
+
+			// Match the height of other buttons in the header toolbar.
+			.components-button:not(.block-editor-block-mover-button) {
+				height: $button-size-compact;
+			}
+		}
+
+		&::after {
+			content: "";
+			width: $border-width;
+			height: $grid-unit-30;
+			background-color: $gray-300;
+			margin-left: $grid-unit;
+		}
+
+		// Modified group borders.
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				height: $grid-unit-30;
+				background-color: $gray-300;
+				margin-top: $grid-unit-05;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
+
+		.block-editor-block-mover {
+			// Match the height of other buttons in the header toolbar.
+			&.is-horizontal .block-editor-block-mover-button {
+				height: $button-size-compact;
+				overflow: visible;
+			}
+
+			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+			@include break-small() {
+				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+					position: relative;
+					top: -10px;
+				}
+			}
+		}
+
+		&.is-collapsed {
+			display: none;
+		}
+	}
+
+	.edit-site-header-edit-mode__center.is-collapsed {
+		display: none;
+	}
+}
+
+.edit-site-header-edit-mode__block-tools-toggle {
+	margin-left: 2px; // Allow focus ring to be fully visible
 }

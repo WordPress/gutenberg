@@ -8,7 +8,7 @@
  * Description:       {{description}}
 {{/description}}
  * Version:           {{version}}
- * Requires at least: 6.1
+ * Requires at least: 6.2
  * Requires PHP:      7.0
 {{#author}}
  * Author:            {{author}}
@@ -30,6 +30,10 @@
  * @package           {{namespace}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /**
  * Registers the block using the metadata loaded from the `block.json` file.
  * Behind the scenes, it registers also all assets so they can be enqueued
@@ -37,7 +41,7 @@
  *
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
-function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_init() {
 	register_block_type( __DIR__ . '/build' );
 }
-add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
+add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_init' );

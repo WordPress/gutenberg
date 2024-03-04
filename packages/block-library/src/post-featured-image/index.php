@@ -19,12 +19,6 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
-	// Check is needed for backward compatibility with third-party plugins
-	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
-	if ( ! in_the_loop() && have_posts() ) {
-		the_post();
-	}
-
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
@@ -60,9 +54,40 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
+
+	// Get the first image from the post.
+	if ( $attributes['useFirstImageFromPost'] && ! $featured_image ) {
+		$content_post = get_post( $post_ID );
+		$content      = $content_post->post_content;
+		$processor    = new WP_HTML_Tag_Processor( $content );
+
+		/*
+		 * Transfer the image tag from the post into a new text snippet.
+		 * Because the HTML API doesn't currently expose a way to extract
+		 * HTML substrings this is necessary as a workaround. Of note, this
+		 * is different than directly extracting the IMG tag:
+		 * - If there are duplicate attributes in the source there will only be one in the output.
+		 * - If there are single-quoted or unquoted attributes they will be double-quoted in the output.
+		 * - If there are named character references in the attribute values they may be replaced with their direct code points. E.g. `&hellip;` becomes `…`.
+		 * In the future there will likely be a mechanism to copy snippets of HTML from
+		 * one document into another, via the HTML Processor's `get_outer_html()` or
+		 * equivalent. When that happens it would be appropriate to replace this custom
+		 * code with that canonical code.
+		 */
+		if ( $processor->next_tag( 'img' ) ) {
+			$tag_html = new WP_HTML_Tag_Processor( '<img>' );
+			$tag_html->next_tag();
+			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+				$tag_html->set_attribute( $name, $processor->get_attribute( $name ) );
+			}
+			$featured_image = $tag_html->get_updated_html();
+		}
+	}
+
 	if ( ! $featured_image ) {
 		return '';
 	}
+
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
@@ -190,12 +215,12 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 
 	// Border color.
 	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = _wp_array_get( $attributes, array( 'style', 'border', 'color' ), null );
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
 	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
 
 	// Individual border styles e.g. top, left etc.
 	foreach ( $sides as $side ) {
-		$border                 = _wp_array_get( $attributes, array( 'style', 'border', $side ), null );
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
 			'color' => isset( $border['color'] ) ? $border['color'] : null,
 			'style' => isset( $border['style'] ) ? $border['style'] : null,

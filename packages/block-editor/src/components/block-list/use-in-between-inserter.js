@@ -4,6 +4,7 @@
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,13 +22,13 @@ export function useInBetweenInserter() {
 	);
 	const {
 		getBlockListSettings,
-		getBlockRootClientId,
 		getBlockIndex,
-		isBlockInsertionPointVisible,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getTemplateLock,
 		__unstableIsWithinBlockOverlay,
+		getBlockEditingMode,
+		getBlockName,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
@@ -73,8 +74,11 @@ export function useInBetweenInserter() {
 					rootClientId = blockElement.getAttribute( 'data-block' );
 				}
 
-				// Don't set the insertion point if the template is locked.
-				if ( getTemplateLock( rootClientId ) ) {
+				if (
+					getTemplateLock( rootClientId ) ||
+					getBlockEditingMode( rootClientId ) === 'disabled' ||
+					getBlockName( rootClientId ) === 'core/block'
+				) {
 					return;
 				}
 
@@ -93,7 +97,9 @@ export function useInBetweenInserter() {
 							blockElRect.top > offsetTop ) ||
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'horizontal' &&
-							blockElRect.left > offsetLeft )
+							( isRTL()
+								? blockElRect.right < offsetLeft
+								: blockElRect.left > offsetLeft ) )
 					);
 				} );
 
@@ -165,9 +171,7 @@ export function useInBetweenInserter() {
 		[
 			openRef,
 			getBlockListSettings,
-			getBlockRootClientId,
 			getBlockIndex,
-			isBlockInsertionPointVisible,
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,

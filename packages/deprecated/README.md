@@ -69,8 +69,7 @@ _Parameters_
 
 ### logged
 
-Object map tracking messages which have been logged, for use in ensuring a
-message is only logged once.
+Object map tracking messages which have been logged, for use in ensuring a message is only logged once.
 
 _Type_
 

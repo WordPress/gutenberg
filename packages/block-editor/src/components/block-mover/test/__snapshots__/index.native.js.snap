@@ -42,8 +42,20 @@ exports[`Block Mover Picker moving blocks moves blocks up and down 1`] = `
 <!-- /wp:spacer -->"
 `;
 
-exports[`Block Mover Picker should match snapshot 1`] = `
-[
+exports[`Block Mover Picker should render without crashing and match snapshot 1`] = `
+<View
+  style={
+    [
+      {
+        "height": 44,
+      },
+      {
+        "borderLeftWidth": 0.5,
+      },
+      undefined,
+    ]
+  }
+>
   <View>
     <View
       accessibilityHint="Double tap to move the block to the left"
@@ -51,7 +63,19 @@ exports[`Block Mover Picker should match snapshot 1`] = `
       accessibilityRole="button"
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
         }
       }
       accessible={true}
@@ -76,7 +100,7 @@ exports[`Block Mover Picker should match snapshot 1`] = `
     >
       <View
         collapsable={false}
-        handlerTag={3}
+        handlerTag={1}
         handlerType="LongPressGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
@@ -98,11 +122,19 @@ exports[`Block Mover Picker should match snapshot 1`] = `
             }
           }
         >
-          Svg
+          <Svg
+            height={24}
+            style={{}}
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
         </View>
       </View>
     </View>
-  </View>,
+  </View>
   <View>
     <View
       accessibilityHint="Double tap to move the block to the right"
@@ -110,7 +142,19 @@ exports[`Block Mover Picker should match snapshot 1`] = `
       accessibilityRole="button"
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
         }
       }
       accessible={true}
@@ -135,7 +179,7 @@ exports[`Block Mover Picker should match snapshot 1`] = `
     >
       <View
         collapsable={false}
-        handlerTag={4}
+        handlerTag={2}
         handlerType="LongPressGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
@@ -157,10 +201,18 @@ exports[`Block Mover Picker should match snapshot 1`] = `
             }
           }
         >
-          Svg
+          <Svg
+            height={24}
+            style={{}}
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
         </View>
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;

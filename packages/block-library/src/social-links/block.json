@@ -1,9 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/social-links",
 	"title": "Social Icons",
 	"category": "widgets",
+	"allowedBlocks": [ "core/social-link" ],
 	"description": "Display icons linking to your social media profiles or sites.",
 	"keywords": [ "links" ],
 	"textdomain": "default",
@@ -41,14 +42,16 @@
 	"providesContext": {
 		"openInNewTab": "openInNewTab",
 		"showLabels": "showLabels",
+		"iconColor": "iconColor",
 		"iconColorValue": "iconColorValue",
+		"iconBackgroundColor": "iconBackgroundColor",
 		"iconBackgroundColorValue": "iconBackgroundColorValue"
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"anchor": true,
 		"__experimentalExposeControlsToChildren": true,
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
@@ -71,8 +74,13 @@
 			"padding": true,
 			"units": [ "px", "em", "rem", "vh", "vw" ],
 			"__experimentalDefaultControls": {
-				"blockGap": true
+				"blockGap": true,
+				"margin": true,
+				"padding": false
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

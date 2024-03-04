@@ -4,11 +4,10 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	__experimentalUseNavigator as useNavigator,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -19,26 +18,8 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
-import { store as editSiteStore } from '../../store';
-
-const config = {
-	wp_template: {
-		labels: {
-			title: __( 'Templates' ),
-			loading: __( 'Loading templates' ),
-			notFound: __( 'No templates found' ),
-			manage: __( 'Manage all templates' ),
-		},
-	},
-	wp_template_part: {
-		labels: {
-			title: __( 'Template parts' ),
-			loading: __( 'Loading template parts' ),
-			notFound: __( 'No template parts found' ),
-			manage: __( 'Manage all template parts' ),
-		},
-	},
-};
+import SidebarButton from '../sidebar-button';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -49,82 +30,127 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 };
 
 export default function SidebarNavigationScreenTemplates() {
-	const {
-		params: { postType },
-	} = useNavigator();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
-
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		postType,
-		{
-			per_page: -1,
-		}
+		TEMPLATE_POST_TYPE,
+		{ per_page: -1 }
 	);
-	const sortedTemplates = templates ? [ ...templates ] : [];
-	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
-
-	const browseAllLink = useLink( {
-		path: '/' + postType + '/all',
-	} );
-
-	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
-
+	const browseAllLink = useLink( { path: '/wp_template/all' } );
+	const canCreate = ! isMobileViewport;
 	return (
 		<SidebarNavigationScreen
-			isRoot={ isTemplatePartsMode }
-			title={ config[ postType ].labels.title }
+			title={ __( 'Templates' ) }
+			description={ __(
+				'Express the layout of your site with templates.'
+			) }
 			actions={
 				canCreate && (
 					<AddNewTemplate
-						templateType={ postType }
+						templateType={ TEMPLATE_POST_TYPE }
 						toggleProps={ {
-							className:
-								'edit-site-sidebar-navigation-screen-templates__add-button',
+							as: SidebarButton,
 						} }
 					/>
 				)
 			}
 			content={
 				<>
-					{ isLoading && config[ postType ].labels.loading }
+					{ isLoading && __( 'Loading templates…' ) }
 					{ ! isLoading && (
-						<ItemGroup>
-							{ ! templates?.length && (
-								<Item>
-									{ config[ postType ].labels.notFound }
-								</Item>
-							) }
-							{ sortedTemplates.map( ( template ) => (
-								<TemplateItem
-									postType={ postType }
-									postId={ template.id }
-									key={ template.id }
-								>
-									{ decodeEntities(
-										template.title?.rendered ||
-											template.slug
-									) }
-								</TemplateItem>
-							) ) }
-							{ ! isMobileViewport && (
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
-									{ ...browseAllLink }
-									children={
-										config[ postType ].labels.manage
-									}
-								/>
-							) }
-						</ItemGroup>
+						<SidebarTemplatesList templates={ templates } />
 					) }
 				</>
 			}
+			footer={
+				! isMobileViewport && (
+					<SidebarNavigationItem withChevron { ...browseAllLink }>
+						{ __( 'Manage all templates' ) }
+					</SidebarNavigationItem>
+				)
+			}
 		/>
+	);
+}
+
+function TemplatesGroup( { title, templates } ) {
+	return (
+		<ItemGroup>
+			{ !! title && (
+				<Item className="edit-site-sidebar-navigation-screen-templates__templates-group-title">
+					{ title }
+				</Item>
+			) }
+			{ templates.map( ( template ) => (
+				<TemplateItem
+					postType={ TEMPLATE_POST_TYPE }
+					postId={ template.id }
+					key={ template.id }
+					withChevron
+				>
+					{ decodeEntities(
+						template.title?.rendered || template.slug
+					) }
+				</TemplateItem>
+			) ) }
+		</ItemGroup>
+	);
+}
+function SidebarTemplatesList( { templates } ) {
+	if ( ! templates?.length ) {
+		return (
+			<ItemGroup>
+				<Item>{ __( 'No templates found' ) }</Item>
+			</ItemGroup>
+		);
+	}
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
+	const { hierarchyTemplates, customTemplates, ...plugins } =
+		sortedTemplates.reduce(
+			( accumulator, template ) => {
+				const {
+					original_source: originalSource,
+					author_text: authorText,
+				} = template;
+				if ( originalSource === 'plugin' ) {
+					if ( ! accumulator[ authorText ] ) {
+						accumulator[ authorText ] = [];
+					}
+					accumulator[ authorText ].push( template );
+				} else if ( template.is_custom ) {
+					accumulator.customTemplates.push( template );
+				} else {
+					accumulator.hierarchyTemplates.push( template );
+				}
+				return accumulator;
+			},
+			{ hierarchyTemplates: [], customTemplates: [] }
+		);
+	return (
+		<VStack spacing={ 3 }>
+			{ !! hierarchyTemplates.length && (
+				<TemplatesGroup templates={ hierarchyTemplates } />
+			) }
+			{ !! customTemplates.length && (
+				<TemplatesGroup
+					title={ __( 'Custom' ) }
+					templates={ customTemplates }
+				/>
+			) }
+			{ Object.entries( plugins ).map(
+				( [ plugin, pluginTemplates ] ) => {
+					return (
+						<TemplatesGroup
+							key={ plugin }
+							title={ plugin }
+							templates={ pluginTemplates }
+						/>
+					);
+				}
+			) }
+		</VStack>
 	);
 }

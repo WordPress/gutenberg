@@ -191,7 +191,7 @@ fi
 # Define constants
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 GUTENBERG_SOURCE_CODE_DIR="$SCRIPT_DIR/../../.."
-WP_CLI="php -d memory_limit=4G $SCRIPT_DIR/wp-cli.phar"
+WP_CLI="php -d memory_limit=4G -d error_reporting=E_ALL&~E_DEPRECATED $SCRIPT_DIR/wp-cli.phar"
 BUNDLE_CLI="$GUTENBERG_SOURCE_CODE_DIR/node_modules/.bin/react-native bundle --config ${METRO_CONFIG:-metro.config.js}"
 
 # Set target path

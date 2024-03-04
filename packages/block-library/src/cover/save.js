@@ -138,7 +138,8 @@ export default function save( { attributes } ) {
 					/>
 				) : (
 					<div
-						role="img"
+						role={ alt ? 'img' : undefined }
+						aria-label={ alt ? alt : undefined }
 						className={ imgClasses }
 						style={ { backgroundPosition, backgroundImage } }
 					/>

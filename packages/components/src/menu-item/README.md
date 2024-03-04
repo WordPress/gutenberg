@@ -5,8 +5,8 @@ MenuItem is a component which renders a button intended to be used in combinatio
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { MenuItem } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyMenuItem = () => {
 	const [ isActive, setIsActive ] = useState( true );
@@ -29,10 +29,17 @@ MenuItem supports the following props. Any additional props are passed through t
 
 ### `children`
 
--   Type: `WPElement`
+-   Type: `Element`
 -   Required: No
 
 Element to render as child of button.
+
+### `disabled`
+
+-   Type: `boolean`
+-   Required: No
+
+Refer to documentation for [Button's `disabled` prop](/packages/components/src/button/README.md#disabled-boolean).
 
 ### `info`
 
@@ -63,7 +70,7 @@ Determines where to display the provided `icon`.
 -   Type: `boolean`
 -   Required: No
 
-Whether or not the menu item is currently selected.
+Whether or not the menu item is currently selected. `isSelected` is only taken into account when the `role` prop is either `"menuitemcheckbox"` or `"menuitemradio"`.
 
 ### `shortcut`
 
@@ -82,7 +89,7 @@ If shortcut is a string, it is expecting the display text. If shortcut is an obj
 
 ### `suffix`
 
--   Type: `WPElement`
+-   Type: `Element`
 -   Required: No
 
 Allows for markup other than icons or shortcuts to be added to the menu item.

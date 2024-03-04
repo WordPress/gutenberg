@@ -1,15 +1,17 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/buttons",
 	"title": "Buttons",
 	"category": "design",
+	"allowedBlocks": [ "core/button" ],
 	"description": "Prompt visitors to take action with a group of button-style links.",
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
+		"html": false,
 		"__experimentalExposeControlsToChildren": true,
 		"spacing": {
 			"blockGap": true,
@@ -31,12 +33,15 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-buttons-editor",

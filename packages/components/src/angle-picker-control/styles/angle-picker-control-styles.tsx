@@ -1,35 +1,18 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { Flex } from '../../flex';
 import { COLORS } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
+import { Text } from '../../text';
 import CONFIG from '../../utils/config-values';
 
-import type { AnglePickerControlProps } from '../types';
-
 const CIRCLE_SIZE = 32;
-const INNER_CIRCLE_SIZE = 3;
-
-const deprecatedBottomMargin = ( {
-	__nextHasNoMarginBottom,
-}: Pick< AnglePickerControlProps, '__nextHasNoMarginBottom' > ) => {
-	return ! __nextHasNoMarginBottom
-		? css`
-				margin-bottom: ${ space( 2 ) };
-		  `
-		: '';
-};
-
-export const Root = styled( Flex )`
-	${ deprecatedBottomMargin }
-`;
+const INNER_CIRCLE_SIZE = 6;
 
 export const CircleRoot = styled.div`
 	border-radius: 50%;
@@ -39,6 +22,10 @@ export const CircleRoot = styled.div`
 	height: ${ CIRCLE_SIZE }px;
 	overflow: hidden;
 	width: ${ CIRCLE_SIZE }px;
+
+	:active {
+		cursor: grabbing;
+	}
 `;
 
 export const CircleIndicatorWrapper = styled.div`
@@ -53,17 +40,19 @@ export const CircleIndicatorWrapper = styled.div`
 `;
 
 export const CircleIndicator = styled.div`
-	background: ${ COLORS.ui.theme };
+	background: ${ COLORS.theme.accent };
 	border-radius: 50%;
-	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.ui.theme };
-	bottom: 0;
 	box-sizing: border-box;
 	display: block;
-	height: 0px;
-	left: 0;
-	margin: auto;
+	left: 50%;
+	top: 4px;
+	transform: translateX( -50% );
 	position: absolute;
-	right: 0;
-	top: -${ CIRCLE_SIZE / 2 }px;
-	width: 0px;
+	width: ${ INNER_CIRCLE_SIZE }px;
+	height: ${ INNER_CIRCLE_SIZE }px;
+`;
+
+export const UnitText = styled( Text )`
+	color: ${ COLORS.theme.accent };
+	margin-right: ${ space( 3 ) };
 `;

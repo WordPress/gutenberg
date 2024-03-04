@@ -31,9 +31,10 @@ import deprecated from '@wordpress/deprecated';
 
 /**
  * @typedef TimezoneConfig
- * @property {string} offset Offset setting.
- * @property {string} string The timezone as a string (e.g., `'America/Los_Angeles'`).
- * @property {string} abbr   Abbreviation for the timezone.
+ * @property {string} offset          Offset setting.
+ * @property {string} offsetFormatted Offset setting with decimals formatted to minutes.
+ * @property {string} string          The timezone as a string (e.g., `'America/Los_Angeles'`).
+ * @property {string} abbr            Abbreviation for the timezone.
  */
 
 /* eslint-disable jsdoc/valid-types */
@@ -63,8 +64,8 @@ const WP_ZONE = 'WP';
 // See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
 const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
 
-// Changes made here will likely need to be made in `lib/client-assets.php` as
-// well because it uses the `setSettings()` function to change these settings.
+// Changes made here will likely need to be synced with Core in the file
+// src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
 /** @type {DateSettings} */
 let settings = {
 	l10n: {
@@ -132,7 +133,7 @@ let settings = {
 		datetime: 'F j, Y g: i a',
 		datetimeAbbreviated: 'M j, Y g: i a',
 	},
-	timezone: { offset: '0', string: '', abbr: '' },
+	timezone: { offset: '0', offsetFormatted: '0', string: '', abbr: '' },
 };
 
 /**
@@ -226,15 +227,33 @@ export function __experimentalGetSettings() {
 }
 
 function setupWPTimezone() {
-	// Create WP timezone based off dateSettings.
-	momentLib.tz.add(
-		momentLib.tz.pack( {
-			name: WP_ZONE,
-			abbrs: [ WP_ZONE ],
-			untils: [ null ],
-			offsets: [ -settings.timezone.offset * 60 || 0 ],
-		} )
-	);
+	// Get the current timezone settings from the WP timezone string.
+	const currentTimezone = momentLib.tz.zone( settings.timezone.string );
+
+	// Check to see if we have a valid TZ data, if so, use it for the custom WP_ZONE timezone, otherwise just use the offset.
+	if ( currentTimezone ) {
+		// Create WP timezone based off settings.timezone.string.  We need to include the additional data so that we
+		// don't lose information about daylight savings time and other items.
+		// See https://github.com/WordPress/gutenberg/pull/48083
+		momentLib.tz.add(
+			momentLib.tz.pack( {
+				name: WP_ZONE,
+				abbrs: currentTimezone.abbrs,
+				untils: currentTimezone.untils,
+				offsets: currentTimezone.offsets,
+			} )
+		);
+	} else {
+		// Create WP timezone based off dateSettings.
+		momentLib.tz.add(
+			momentLib.tz.pack( {
+				name: WP_ZONE,
+				abbrs: [ WP_ZONE ],
+				untils: [ null ],
+				offsets: [ -settings.timezone.offset * 60 || 0 ],
+			} )
+		);
+	}
 }
 
 // Date constants.
@@ -579,6 +598,20 @@ export function getDate( dateString ) {
 	}
 
 	return momentLib.tz( dateString, WP_ZONE ).toDate();
+}
+
+/**
+ * Returns a human-readable time difference between two dates, like human_time_diff() in PHP.
+ *
+ * @param {Moment | Date | string}             from From date, in the WP timezone.
+ * @param {Moment | Date | string | undefined} to   To date, formatted in the WP timezone.
+ *
+ * @return {string} Human-readable time difference.
+ */
+export function humanTimeDiff( from, to ) {
+	const fromMoment = momentLib.tz( from, WP_ZONE );
+	const toMoment = to ? momentLib.tz( to, WP_ZONE ) : momentLib.tz( WP_ZONE );
+	return fromMoment.from( toMoment );
 }
 
 /**

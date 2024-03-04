@@ -11,11 +11,11 @@ import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
-import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { default as getPxFromCssUnit } from '../mobile/utils/get-px-from-css-unit';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
 
@@ -62,6 +62,12 @@ function FontSizePicker( {
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
 
+	const accessibilityLabel = sprintf(
+		// translators: %1$s: Font size name e.g. Small
+		__( 'Font Size, %1$s' ),
+		selectedOption.name
+	);
+
 	return (
 		<BottomSheet.SubSheet
 			navigationButton={
@@ -80,7 +86,7 @@ function FontSizePicker( {
 					}
 					onPress={ openSubSheet }
 					accessibilityRole={ 'button' }
-					accessibilityLabel={ selectedOption.name }
+					accessibilityLabel={ accessibilityLabel }
 					accessibilityHint={ sprintf(
 						// translators: %s: Select control button label e.g. Small
 						__( 'Navigates to select %s' ),

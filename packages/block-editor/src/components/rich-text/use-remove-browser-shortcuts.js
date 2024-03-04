@@ -23,7 +23,7 @@ export function useRemoveBrowserShortcuts() {
 		}
 		node.addEventListener( 'keydown', onKeydown );
 		return () => {
-			node.addEventListener( 'keydown', onKeydown );
+			node.removeEventListener( 'keydown', onKeydown );
 		};
 	}, [] );
 }

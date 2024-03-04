@@ -1,7 +1,12 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { kebabCase } from 'lodash';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
 
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
@@ -64,5 +69,6 @@ export function getFontSizeClass( fontSizeSlug ) {
 		return;
 	}
 
+	const { kebabCase } = unlock( componentsPrivateApis );
 	return `has-${ kebabCase( fontSizeSlug ) }-font-size`;
 }

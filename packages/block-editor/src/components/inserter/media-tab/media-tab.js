@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -16,7 +16,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -89,7 +89,13 @@ function MediaTab( {
 										<FlexBlock>
 											{ mediaCategory.labels.name }
 										</FlexBlock>
-										<Icon icon={ chevronRight } />
+										<Icon
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
 									</HStack>
 								</Item>
 							) ) }

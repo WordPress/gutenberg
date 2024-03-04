@@ -43,7 +43,8 @@ export class BrowserURL extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { postId, postStatus, postType, isSavingPost } = this.props;
+		const { postId, postStatus, postType, isSavingPost, hasHistory } =
+			this.props;
 		const { historyId } = this.state;
 
 		// Posts are still dirty while saving so wait for saving to finish
@@ -56,7 +57,8 @@ export class BrowserURL extends Component {
 		if (
 			( postId !== prevProps.postId || postId !== historyId ) &&
 			postStatus !== 'auto-draft' &&
-			postId
+			postId &&
+			! hasHistory
 		) {
 			this.setBrowserURL( postId );
 		}

@@ -4,13 +4,9 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	insert,
-	__unstableIsEmptyLine as isEmptyLine,
-	__unstableInsertLineSeparator as insertLineSeparator,
-} from '@wordpress/rich-text';
+import { insert, remove } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,11 +15,16 @@ import { store as blockEditorStore } from '../../store';
 import { splitValue } from './split-value';
 
 export function useEnter( props ) {
+	const registry = useRegistry();
 	const { __unstableMarkAutomaticChange } = useDispatch( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
+			if ( event.target.contentEditable !== 'true' ) {
+				return;
+			}
+
 			if ( event.defaultPrevented ) {
 				return;
 			}
@@ -37,11 +38,10 @@ export function useEnter( props ) {
 				value,
 				onReplace,
 				onSplit,
-				onSplitMiddle,
-				multilineTag,
 				onChange,
 				disableLineBreaks,
 				onSplitAtEnd,
+				onSplitAtDoubleLineEnd,
 			} = propsRef.current;
 
 			event.preventDefault();
@@ -65,45 +65,40 @@ export function useEnter( props ) {
 						} ),
 					] );
 					__unstableMarkAutomaticChange();
+					return;
 				}
 			}
 
-			if ( multilineTag ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( {
-						value: _value,
-						onReplace,
-						onSplit,
-						onSplitMiddle,
-						multilineTag,
-					} );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
+			const { text, start, end } = _value;
 
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( {
-						value: _value,
-						onReplace,
-						onSplit,
-						onSplitMiddle,
-						multilineTag,
-					} );
+			if ( event.shiftKey ) {
+				if ( ! disableLineBreaks ) {
+					onChange( insert( _value, '\n' ) );
 				}
+			} else if ( canSplit ) {
+				splitValue( {
+					value: _value,
+					onReplace,
+					onSplit,
+				} );
+			} else if ( onSplitAtEnd && start === end && end === text.length ) {
+				onSplitAtEnd();
+			} else if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				start === end &&
+				end === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				registry.batch( () => {
+					_value.start = _value.end - 2;
+					onChange( remove( _value ) );
+					onSplitAtDoubleLineEnd();
+				} );
+			} else if ( ! disableLineBreaks ) {
+				onChange( insert( _value, '\n' ) );
 			}
 		}
 

@@ -1,9 +1,4 @@
 /**
- * Line separator character, used for multiline text.
- */
-export const LINE_SEPARATOR = '\u2028';
-
-/**
  * Object replacement character, used as a placeholder for objects.
  */
 export const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';

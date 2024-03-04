@@ -25,9 +25,9 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
+import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -53,7 +53,9 @@ function BlockContent( {
 	if ( ! hasResolvedPages ) {
 		return (
 			<div { ...blockProps }>
-				<Spinner />
+				<div className="wp-block-page-list__loading-indicator-container">
+					<Spinner className="wp-block-page-list__loading-indicator" />
+				</div>
 			</div>
 		);
 	}
@@ -111,29 +113,6 @@ function BlockContent( {
 	}
 }
 
-function ConvertToLinks( { onClick, disabled } ) {
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
-
-	return (
-		<>
-			<BlockControls group="other">
-				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-					{ __( 'Edit' ) }
-				</ToolbarButton>
-			</BlockControls>
-			{ isOpen && (
-				<ConvertToLinksModal
-					onClick={ onClick }
-					onClose={ closeModal }
-					disabled={ disabled }
-				/>
-			) }
-		</>
-	);
-}
-
 export default function PageListEdit( {
 	context,
 	clientId,
@@ -141,6 +120,9 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = useCallback( () => setOpen( true ), [] );
+	const closeModal = () => setOpen( false );
 
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
@@ -187,12 +169,6 @@ export default function PageListEdit( {
 		}, new Map() );
 	}, [ pages ] );
 
-	const convertToNavigationLinks = useConvertToNavigationLinks( {
-		clientId,
-		pages,
-		parentPageID,
-	} );
-
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
@@ -207,88 +183,135 @@ export default function PageListEdit( {
 		style: { ...context.style?.color },
 	} );
 
-	const getBlockList = ( parentId = parentPageID ) => {
-		const childPages = pagesByParentId.get( parentId );
+	const pagesTree = useMemo(
+		function makePagesTree( parentId = 0, level = 0 ) {
+			const childPages = pagesByParentId.get( parentId );
 
-		if ( ! childPages?.length ) {
-			return [];
-		}
-
-		return childPages.reduce( ( template, page ) => {
-			const hasChildren = pagesByParentId.has( page.id );
-			const pageProps = {
-				id: page.id,
-				label: page.title?.rendered,
-				title: page.title?.rendered,
-				link: page.url,
-				hasChildren,
-			};
-			let item = null;
-			const children = getBlockList( page.id );
-			item = createBlock( 'core/page-list-item', pageProps, children );
-			template.push( item );
-
-			return template;
-		}, [] );
-	};
-
-	const makePagesTree = ( parentId = 0, level = 0 ) => {
-		const childPages = pagesByParentId.get( parentId );
-
-		if ( ! childPages?.length ) {
-			return [];
-		}
-
-		return childPages.reduce( ( tree, page ) => {
-			const hasChildren = pagesByParentId.has( page.id );
-			const item = {
-				value: page.id,
-				label: '— '.repeat( level ) + page.title.rendered,
-				rawName: page.title.rendered,
-			};
-			tree.push( item );
-			if ( hasChildren ) {
-				tree.push( ...makePagesTree( page.id, level + 1 ) );
+			if ( ! childPages?.length ) {
+				return [];
 			}
-			return tree;
-		}, [] );
-	};
 
-	const pagesTree = useMemo( makePagesTree, [ pagesByParentId ] );
+			return childPages.reduce( ( tree, page ) => {
+				const hasChildren = pagesByParentId.has( page.id );
+				const item = {
+					value: page.id,
+					label: '— '.repeat( level ) + page.title.rendered,
+					rawName: page.title.rendered,
+				};
+				tree.push( item );
+				if ( hasChildren ) {
+					tree.push( ...makePagesTree( page.id, level + 1 ) );
+				}
+				return tree;
+			}, [] );
+		},
+		[ pagesByParentId ]
+	);
 
-	const blockList = useMemo( getBlockList, [
-		pagesByParentId,
-		parentPageID,
-	] );
+	const blockList = useMemo(
+		function getBlockList( parentId = parentPageID ) {
+			const childPages = pagesByParentId.get( parentId );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/page-list-item' ],
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
+			if ( ! childPages?.length ) {
+				return [];
+			}
 
-	const { isNested } = useSelect(
+			return childPages.reduce( ( template, page ) => {
+				const hasChildren = pagesByParentId.has( page.id );
+				const pageProps = {
+					id: page.id,
+					label:
+						// translators: displayed when a page has an empty title.
+						page.title?.rendered?.trim() !== ''
+							? page.title?.rendered
+							: __( '(no title)' ),
+					title: page.title?.rendered,
+					link: page.url,
+					hasChildren,
+				};
+				let item = null;
+				const children = getBlockList( page.id );
+				item = createBlock(
+					'core/page-list-item',
+					pageProps,
+					children
+				);
+				template.push( item );
+
+				return template;
+			}, [] );
+		},
+		[ pagesByParentId, parentPageID ]
+	);
+
+	const {
+		isNested,
+		hasSelectedChild,
+		parentClientId,
+		hasDraggedChild,
+		isChildOfNavigation,
+	} = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const {
+				getBlockParentsByBlockName,
+				hasSelectedInnerBlock,
+				hasDraggedInnerBlock,
+			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation-submenu',
 				true
 			);
+			const navigationBlockParents = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation',
+				true
+			);
 			return {
 				isNested: blockParents.length > 0,
+				isChildOfNavigation: navigationBlockParents.length > 0,
+				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
+				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
+				parentClientId: navigationBlockParents[ 0 ],
 			};
 		},
 		[ clientId ]
 	);
 
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+		parentClientId,
+		parentPageID,
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+		templateLock: isChildOfNavigation ? false : 'all',
+		onInput: NOOP,
+		onChange: NOOP,
+		value: blockList,
+	} );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( hasSelectedChild || hasDraggedChild ) {
+			openModal();
+			selectBlock( parentClientId );
+		}
+	}, [
+		hasSelectedChild,
+		hasDraggedChild,
+		parentClientId,
+		selectBlock,
+		openModal,
+	] );
+
 	useEffect( () => {
 		setAttributes( { isNested } );
-	}, [ isNested ] );
+	}, [ isNested, setAttributes ] );
 
 	return (
 		<>
@@ -296,8 +319,9 @@ export default function PageListEdit( {
 				{ pagesTree.length > 0 && (
 					<PanelBody>
 						<ComboboxControl
+							__next40pxDefaultSize
 							className="editor-page-attributes__parent"
-							label={ __( 'Parent page' ) }
+							label={ __( 'Parent' ) }
 							value={ parentPageID }
 							options={ pagesTree }
 							onChange={ ( value ) =>
@@ -323,10 +347,23 @@ export default function PageListEdit( {
 				) }
 			</InspectorControls>
 			{ allowConvertToLinks && (
-				<ConvertToLinks
-					disabled={ ! hasResolvedPages }
-					onClick={ convertToNavigationLinks }
-				/>
+				<>
+					<BlockControls group="other">
+						<ToolbarButton
+							title={ __( 'Edit' ) }
+							onClick={ openModal }
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</BlockControls>
+					{ isOpen && (
+						<ConvertToLinksModal
+							onClick={ convertToNavigationLinks }
+							onClose={ closeModal }
+							disabled={ ! hasResolvedPages }
+						/>
+					) }
+				</>
 			) }
 			<BlockContent
 				blockProps={ blockProps }

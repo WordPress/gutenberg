@@ -64,7 +64,8 @@ export async function toggleGlobalBlockInserter() {
 	// "Add block" selector is required to make sure performance comparison
 	// doesn't fail on older branches where we still had "Add block" as label.
 	await page.click(
-		'.edit-post-header [aria-label="Add block"],' +
+		'.editor-document-tools__inserter-toggle,' +
+			'.edit-post-header [aria-label="Add block"],' +
 			'.edit-site-header [aria-label="Add block"],' +
 			'.edit-post-header [aria-label="Toggle block inserter"],' +
 			'.edit-site-header [aria-label="Toggle block inserter"],' +
@@ -86,7 +87,10 @@ export async function selectGlobalInserterTab( label ) {
 	}
 
 	const activeTab = await page.waitForSelector(
-		'.block-editor-inserter__tabs button.is-active'
+		// Targeting a class name is necessary here, because there are likely
+		// two implementations of the `Tabs` component visible to this test, and
+		// we want to confirm that it's waiting for the correct one.
+		'.block-editor-inserter__tabs [role="tab"][aria-selected="true"]'
 	);
 
 	const activeTabLabel = await page.evaluate(
@@ -106,8 +110,8 @@ export async function selectGlobalInserterTab( label ) {
 		case 'Media':
 			labelSelector = `. = "${ label }"`;
 			break;
-		case 'Reusable':
-			// Reusable tab label is an icon, hence the different selector.
+		case 'Synced patterns':
+			// Synced patterns tab label is an icon, hence the different selector.
 			labelSelector = `@aria-label = "${ label }"`;
 			break;
 	}
@@ -180,7 +184,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
 	switch ( category ) {
 		case 'Blocks':
 		case 'Patterns':
-		case 'Reusable': {
+		case 'Synced patterns': {
 			waitForInsertElement = async () => {
 				return await page.waitForXPath(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
@@ -220,7 +224,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
  * If the entity is not instantly available in the open inserter, a search will
  * be performed. If the search returns no results, an error will be thrown.
  *
- * Available categories: Blocks, Patterns, Reusable and Block Directory.
+ * Available categories: Blocks, Patterns, Synced patterns and Block Directory.
  *
  * @param {string} category   The category to insert from.
  * @param {string} searchTerm The term by which to find the entity to insert.
@@ -231,14 +235,14 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 
 	let insertButton;
 
-	if ( [ 'Blocks', 'Reusable' ].includes( category ) ) {
-		// If it's a block, see it it's insertable without searching...
+	if ( [ 'Blocks', 'Synced patterns' ].includes( category ) ) {
+		// If it's a block, see if it's insertable without searching...
 		try {
 			insertButton = (
 				await page.$x(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
 				)
-			 )[ 0 ];
+			)[ 0 ];
 		} catch ( error ) {
 			// noop
 		}
@@ -260,8 +264,8 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 	await insertButton.click();
 
 	// Extra wait for the reusable block to be ready.
-	if ( category === 'Reusable' ) {
-		await page.waitForSelector(
+	if ( category === 'Synced patterns' ) {
+		await canvas().waitForSelector(
 			'.block-library-block__reusable-block-container'
 		);
 	}
@@ -337,17 +341,6 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await insertFromGlobalInserter( 'Patterns', searchTerm );
-}
-
-/**
- * Inserts a reusable block matching a given search term via the global
- * inserter.
- *
- * @param {string} searchTerm The term by which to find the reusable block to
- *                            insert.
- */
-export async function insertReusableBlock( searchTerm ) {
-	await insertFromGlobalInserter( 'Reusable', searchTerm );
 }
 
 /**

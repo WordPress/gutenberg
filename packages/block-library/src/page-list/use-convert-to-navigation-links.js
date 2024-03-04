@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -116,27 +116,10 @@ export function convertToNavigationLinks( pages = [], parentPageID = null ) {
 export function useConvertToNavigationLinks( {
 	clientId,
 	pages,
+	parentClientId,
 	parentPageID,
 } ) {
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
-
-	const { parentNavBlockClientId } = useSelect(
-		( select ) => {
-			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-				select( blockEditorStore );
-
-			const _selectedBlockClientId = getSelectedBlockClientId();
-
-			return {
-				parentNavBlockClientId: getBlockParentsByBlockName(
-					_selectedBlockClientId,
-					'core/navigation',
-					true
-				)[ 0 ],
-			};
-		},
-		[ clientId ]
-	);
 
 	return () => {
 		const navigationLinks = convertToNavigationLinks( pages, parentPageID );
@@ -145,6 +128,6 @@ export function useConvertToNavigationLinks( {
 		replaceBlock( clientId, navigationLinks );
 
 		// Select the Navigation block to reveal the changes.
-		selectBlock( parentNavBlockClientId );
+		selectBlock( parentClientId );
 	};
 }

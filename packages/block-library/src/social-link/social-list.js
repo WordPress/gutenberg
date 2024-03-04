@@ -14,7 +14,7 @@ import { ChainIcon } from './icons';
  *
  * @param {string} name key for a social service (lowercase slug)
  *
- * @return {WPComponent} Icon component for social service.
+ * @return {Component} Icon component for social service.
  */
 export const getIconBySite = ( name ) => {
 	const variation = variations.find( ( v ) => v.name === name );

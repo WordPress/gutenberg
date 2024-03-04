@@ -1,0 +1,6 @@
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="primary_dark">#FFFFFF</color>
+    <color name="colorPrimaryVariant">#000000</color>
+    <color name="toolbarBorder">#3C3C435C</color>
+</resources>

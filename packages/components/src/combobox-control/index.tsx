@@ -32,19 +32,23 @@ import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
+interface DetectOutsideComponentProps {
+	onFocusOutside: ( event: React.FocusEvent ) => void;
+	children?: React.ReactNode;
+}
+
 const DetectOutside = withFocusOutside(
-	class extends Component {
-		// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
-		handleFocusOutside( event ) {
-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+	class extends Component< DetectOutsideComponentProps > {
+		handleFocusOutside( event: React.FocusEvent ) {
 			this.props.onFocusOutside( event );
 		}
 
 		render() {
-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
 			return this.props.children;
 		}
 	}
@@ -104,23 +108,25 @@ const getIndexOfMatchingSuggestion = (
  * }
  * ```
  */
-function ComboboxControl( {
-	__nextHasNoMarginBottom = false,
-	__next36pxDefaultSize = false,
-	value: valueProp,
-	label,
-	options,
-	onChange: onChangeProp,
-	onFilterValueChange = noop,
-	hideLabelFromVision,
-	help,
-	allowReset = true,
-	className,
-	messages = {
-		selected: __( 'Item selected.' ),
-	},
-	__experimentalRenderItem,
-}: ComboboxControlProps ) {
+function ComboboxControl( props: ComboboxControlProps ) {
+	const {
+		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
+		value: valueProp,
+		label,
+		options,
+		onChange: onChangeProp,
+		onFilterValueChange = noop,
+		hideLabelFromVision,
+		help,
+		allowReset = true,
+		className,
+		messages = {
+			selected: __( 'Item selected.' ),
+		},
+		__experimentalRenderItem,
+	} = useDeprecated36pxDefaultSizeProp( props );
+
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
 		onChange: onChangeProp,
@@ -181,51 +187,42 @@ function ComboboxControl( {
 		setIsExpanded( true );
 	};
 
-	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > = (
-		event
-	) => {
-		let preventDefault = false;
+	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
+		withIgnoreIMEEvents( ( event ) => {
+			let preventDefault = false;
 
-		if (
-			event.defaultPrevented ||
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			return;
-		}
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
-		switch ( event.code ) {
-			case 'Enter':
-				if ( selectedSuggestion ) {
-					onSuggestionSelected( selectedSuggestion );
+			switch ( event.code ) {
+				case 'Enter':
+					if ( selectedSuggestion ) {
+						onSuggestionSelected( selectedSuggestion );
+						preventDefault = true;
+					}
+					break;
+				case 'ArrowUp':
+					handleArrowNavigation( -1 );
 					preventDefault = true;
-				}
-				break;
-			case 'ArrowUp':
-				handleArrowNavigation( -1 );
-				preventDefault = true;
-				break;
-			case 'ArrowDown':
-				handleArrowNavigation( 1 );
-				preventDefault = true;
-				break;
-			case 'Escape':
-				setIsExpanded( false );
-				setSelectedSuggestion( null );
-				preventDefault = true;
-				break;
-			default:
-				break;
-		}
+					break;
+				case 'ArrowDown':
+					handleArrowNavigation( 1 );
+					preventDefault = true;
+					break;
+				case 'Escape':
+					setIsExpanded( false );
+					setSelectedSuggestion( null );
+					preventDefault = true;
+					break;
+				default:
+					break;
+			}
 
-		if ( preventDefault ) {
-			event.preventDefault();
-		}
-	};
+			if ( preventDefault ) {
+				event.preventDefault();
+			}
+		} );
 
 	const onBlur = () => {
 		setInputHasFocus( false );
@@ -314,7 +311,7 @@ function ComboboxControl( {
 					onKeyDown={ onKeyDown }
 				>
 					<InputWrapperFlex
-						__next36pxDefaultSize={ __next36pxDefaultSize }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					>
 						<FlexBlock>
 							<TokenInput

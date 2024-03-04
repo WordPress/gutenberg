@@ -24,13 +24,14 @@ function ComplementaryAreaToggle( {
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
 			identifier,
-		[ identifier ]
+		[ identifier, scope ]
 	);
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
+			aria-controls={ identifier.replace( '/', ':' ) }
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );

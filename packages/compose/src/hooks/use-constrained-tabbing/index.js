@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -33,9 +32,9 @@ import useRefEffect from '../use-ref-effect';
 function useConstrainedTabbing() {
 	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
-			const { keyCode, shiftKey, target } = event;
+			const { key, shiftKey, target } = event;
 
-			if ( keyCode !== TAB ) {
+			if ( key !== 'Tab' ) {
 				return;
 			}
 

@@ -18,6 +18,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {number}        maxWidth                               Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes                      Allowed block types
  * @property {boolean}       hasFixedToolbar                        Whether or not the editor toolbar is fixed
+ * @property {boolean}       distractionFree                        Whether or not the editor UI is distraction free
  * @property {boolean}       focusMode                              Whether the focus mode is enabled or not
  * @property {Array}         styles                                 Editor Styles
  * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode

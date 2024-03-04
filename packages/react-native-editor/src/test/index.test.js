@@ -8,7 +8,9 @@ import { initializeEditor, render } from 'test/helpers';
  * WordPress dependencies
  */
 import * as wpHooks from '@wordpress/hooks';
-import '@wordpress/jest-console';
+import { registerCoreBlocks } from '@wordpress/block-library';
+// eslint-disable-next-line no-restricted-imports
+import * as wpEditPost from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -18,6 +20,11 @@ import setupLocale from '../setup-locale';
 
 jest.mock( 'react-native/Libraries/ReactNative/AppRegistry' );
 jest.mock( '../setup-locale' );
+jest.mock( '@wordpress/block-library', () => ( {
+	__esModule: true,
+	registerCoreBlocks: jest.fn(),
+	NEW_BLOCK_TYPES: {},
+} ) );
 
 const getEditorComponent = ( registerParams ) => {
 	let EditorComponent;
@@ -150,50 +157,55 @@ describe( 'Register Gutenberg', () => {
 		expect( hookCallOrder ).toBeLessThan( onRenderEditorCallOrder );
 	} );
 
-	it( 'dispatches "native.render" hook after the editor is rendered', () => {
-		const doAction = jest.spyOn( wpHooks, 'doAction' );
-
+	it( 'dispatches "native.post-register-core-blocks" hook after core blocks are registered', async () => {
 		// An empty component is provided in order to listen for render calls of the editor component.
 		const onRenderEditor = jest.fn();
 		const MockEditor = () => {
 			onRenderEditor();
 			return null;
 		};
-		jest.mock( '../setup', () => ( {
-			__esModule: true,
-			default: jest.fn().mockReturnValue( <MockEditor /> ),
-		} ) );
+
+		// Unmock setup module to render the above mocked editor component.
+		jest.unmock( '../setup' );
+
+		// The mocked editor component is provided via `initializeEditor` function of
+		// `@wordpress/edit-post` package, instead of via the setup as above test cases.
+		const initializeEditorMock = jest
+			.spyOn( wpEditPost, 'initializeEditor' )
+			.mockReturnValue( <MockEditor /> );
+
+		// Listen to WP hook
+		const callback = jest.fn();
+		wpHooks.addAction(
+			'native.post-register-core-blocks',
+			'test',
+			callback
+		);
 
 		const EditorComponent = getEditorComponent();
-		// Modules are isolated upon editor rendering in order to guarantee that the setup module is imported on every test.
-		jest.isolateModules( () => render( <EditorComponent /> ) );
+		render( <EditorComponent /> );
 
-		const hookCallIndex = 1;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
 		// Reference: https://github.com/facebook/jest/issues/4402#issuecomment-534516219
-		const hookCallOrder =
-			doAction.mock.invocationCallOrder[ hookCallIndex ];
+		const callbackCallOrder = callback.mock.invocationCallOrder[ 0 ];
+		const registerCoreBlocksCallOrder =
+			registerCoreBlocks.mock.invocationCallOrder[ 0 ];
 		const onRenderEditorCallOrder =
 			onRenderEditor.mock.invocationCallOrder[ 0 ];
-		const hookName = doAction.mock.calls[ hookCallIndex ][ 0 ];
 
-		expect( hookName ).toBe( 'native.render' );
-		expect( hookCallOrder ).toBeGreaterThan( onRenderEditorCallOrder );
+		expect( callbackCallOrder ).toBeGreaterThan(
+			registerCoreBlocksCallOrder
+		);
+		expect( callbackCallOrder ).toBeLessThan( onRenderEditorCallOrder );
+
+		initializeEditorMock.mockRestore();
 	} );
 
 	it( 'initializes the editor', async () => {
-		// Unmock setup module to render the actual editor component.
-		jest.unmock( '../setup' );
-
-		const EditorComponent = getEditorComponent();
-		const screen = await initializeEditor(
-			{},
-			{ component: EditorComponent }
-		);
+		const screen = await initializeEditor();
 		// Inner blocks create BlockLists so let's take into account selecting the main one
 		const blockList = screen.getAllByTestId( 'block-list-wrapper' )[ 0 ];
 
 		expect( blockList ).toBeVisible();
-		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
 	} );
 } );

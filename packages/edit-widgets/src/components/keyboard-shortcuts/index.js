@@ -70,7 +70,7 @@ function KeyboardShortcuts() {
 	} );
 
 	useShortcut(
-		'core/edit-widgets//transform-heading-to-paragraph',
+		'core/edit-widgets/transform-heading-to-paragraph',
 		( event ) => handleTextLevelShortcut( event, 0 )
 	);
 
@@ -79,7 +79,7 @@ function KeyboardShortcuts() {
 		//the hook will execute the same way every time
 		//eslint-disable-next-line react-hooks/rules-of-hooks
 		useShortcut(
-			`core/edit-widgets//transform-paragraph-to-heading-${ level }`,
+			`core/edit-widgets/transform-paragraph-to-heading-${ level }`,
 			( event ) => handleTextLevelShortcut( event, level )
 		);
 	} );
@@ -180,7 +180,7 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: `core/edit-widgets//transform-heading-to-paragraph`,
+			name: 'core/edit-widgets/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),
 			keyCombination: {
@@ -191,7 +191,7 @@ function KeyboardShortcutsRegister() {
 
 		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
 			registerShortcut( {
-				name: `core/edit-widgets//transform-paragraph-to-heading-${ level }`,
+				name: `core/edit-widgets/transform-paragraph-to-heading-${ level }`,
 				category: 'block-library',
 				description: __( 'Transform paragraph to heading.' ),
 				keyCombination: {

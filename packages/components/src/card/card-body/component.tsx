@@ -6,7 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { Scrollable } from '../../scrollable';
 import { View } from '../../view';
 import { useCardBody } from './hook';

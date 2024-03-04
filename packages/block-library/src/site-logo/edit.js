@@ -24,12 +24,19 @@ import {
 	ToolbarButton,
 	Placeholder,
 	Button,
+	DropZone,
+	FlexItem,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaUpload,
+	MediaUploadCheck,
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
@@ -261,6 +268,14 @@ const SiteLogo = ( {
 			</ResizableBox>
 		);
 
+	// Support the previous location for the Site Icon settings. To be removed
+	// when the required WP core version for Gutenberg is >= 6.5.0.
+	const shouldUseNewUrl = ! window?.__experimentalUseCustomizerSiteLogoUrl;
+
+	const siteIconSettingsUrl = shouldUseNewUrl
+		? siteUrl + '/wp-admin/options-general.php'
+		: siteUrl + '/wp-admin/customize.php?autofocus[section]=title_tagline';
+
 	const syncSiteIconHelpText = createInterpolateElement(
 		__(
 			'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. To use a custom icon that is different from your site logo, use the <a>Site Icon settings</a>.'
@@ -269,10 +284,7 @@ const SiteLogo = ( {
 			a: (
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				<a
-					href={
-						siteUrl +
-						'/wp-admin/customize.php?autofocus[section]=title_tagline'
-					}
+					href={ siteIconSettingsUrl }
 					target="_blank"
 					rel="noopener noreferrer"
 				/>
@@ -286,6 +298,7 @@ const SiteLogo = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
 							setAttributes( { width: newWidth } )
@@ -300,6 +313,7 @@ const SiteLogo = ( {
 						disabled={ ! isResizable }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link image to home' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -307,6 +321,7 @@ const SiteLogo = ( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -320,7 +335,8 @@ const SiteLogo = ( {
 					{ canUserEdit && (
 						<>
 							<ToggleControl
-								label={ __( 'Use as site icon' ) }
+								__nextHasNoMarginBottom
+								label={ __( 'Use as Site Icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
@@ -343,6 +359,45 @@ const SiteLogo = ( {
 			</BlockControls>
 			{ imgEdit }
 		</>
+	);
+};
+
+// This is a light wrapper around MediaReplaceFlow because the block has two
+// different MediaReplaceFlows, one for the inspector and one for the toolbar.
+function SiteLogoReplaceFlow( { onRemoveLogo, ...mediaReplaceProps } ) {
+	return (
+		<MediaReplaceFlow
+			{ ...mediaReplaceProps }
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			accept={ ACCEPT_MEDIA_STRING }
+		>
+			<MenuItem onClick={ onRemoveLogo }>{ __( 'Reset' ) }</MenuItem>
+		</MediaReplaceFlow>
+	);
+}
+
+const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
+	const {
+		alt_text: alt,
+		source_url: logoUrl,
+		slug: logoSlug,
+		media_details: logoMediaDetails,
+	} = mediaItemData;
+	const logoLabel = logoMediaDetails?.sizes?.full?.file || logoSlug;
+	return (
+		<ItemGroup { ...itemGroupProps } as="span">
+			<HStack justify="flex-start" as="span">
+				<img src={ logoUrl } alt={ alt } />
+				<FlexItem as="span">
+					<Truncate
+						numberOfLines={ 1 }
+						className="block-library-site-logo__inspector-media-replace-title"
+					>
+						{ logoLabel }
+					</Truncate>
+				</FlexItem>
+			</HStack>
+		</ItemGroup>
 	);
 };
 
@@ -395,6 +450,7 @@ export default function LogoEdit( {
 			siteIconId: _siteIconId,
 		};
 	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -458,17 +514,29 @@ export default function LogoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	const onFilesDrop = ( filesList ) => {
+		getSettings().mediaUpload( {
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+			filesList,
+			onFileChange( [ image ] ) {
+				if ( isBlobURL( image?.url ) ) {
+					return;
+				}
+				onInitialSelectLogo( image );
+			},
+			onError: onUploadError,
+		} );
+	};
+
+	const mediaReplaceFlowProps = {
+		mediaURL: logoUrl,
+		onSelect: onSelectLogo,
+		onError: onUploadError,
+		onRemoveLogo,
+	};
 	const controls = canUserEdit && logoUrl && (
 		<BlockControls group="other">
-			<MediaReplaceFlow
-				mediaURL={ logoUrl }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				accept={ ACCEPT_MEDIA_STRING }
-				onSelect={ onSelectLogo }
-				onError={ onUploadError }
-			>
-				<MenuItem onClick={ onRemoveLogo }>{ __( 'Reset' ) }</MenuItem>
-			</MediaReplaceFlow>
+			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
 	);
 
@@ -527,9 +595,63 @@ export default function LogoEdit( {
 
 	const label = __( 'Add a site logo' );
 
+	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
+		<InspectorControls>
+			<PanelBody title={ __( 'Media' ) }>
+				<div className="block-library-site-logo__inspector-media-replace-container">
+					{ ! canUserEdit && !! logoUrl && (
+						<InspectorLogoPreview
+							mediaItemData={ mediaItemData }
+							itemGroupProps={ {
+								isBordered: true,
+								className:
+									'block-library-site-logo__inspector-readonly-logo-preview',
+							} }
+						/>
+					) }
+					{ canUserEdit && !! logoUrl && (
+						<SiteLogoReplaceFlow
+							{ ...mediaReplaceFlowProps }
+							name={
+								<InspectorLogoPreview
+									mediaItemData={ mediaItemData }
+								/>
+							}
+							popoverProps={ {} }
+						/>
+					) }
+					{ canUserEdit && ! logoUrl && (
+						<MediaUploadCheck>
+							<MediaUpload
+								onSelect={ onInitialSelectLogo }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								render={ ( { open } ) => (
+									<div className="block-library-site-logo__inspector-upload-container">
+										<Button
+											onClick={ open }
+											variant="secondary"
+										>
+											{ isLoading ? (
+												<Spinner />
+											) : (
+												__( 'Add media' )
+											) }
+										</Button>
+										<DropZone onFilesDrop={ onFilesDrop } />
+									</div>
+								) }
+							/>
+						</MediaUploadCheck>
+					) }
+				</div>
+			</PanelBody>
+		</InspectorControls>
+	);
+
 	return (
 		<div { ...blockProps }>
 			{ controls }
+			{ mediaInspectorPanel }
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
 				<Placeholder className="site-logo_placeholder">

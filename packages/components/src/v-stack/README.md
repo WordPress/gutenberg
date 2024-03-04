@@ -42,8 +42,8 @@ Determines how the child elements are aligned.
 -   `bottom`: Aligns content to the bottom.
 -   `bottomLeft`: Aligns content to the bottom/left.
 -   `bottomRight`: Aligns content to the bottom/right.
--   `edge`: Aligns content to the edges of the container.
--   `stretch`: Stretches content to the edges of the container.
+-   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
+-   `stretch`: Stretches content to the cross axis edges of the container.
 
 ##### `direction`: `FlexDirection`
 

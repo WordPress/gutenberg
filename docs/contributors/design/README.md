@@ -8,7 +8,7 @@ The [Make WordPress Design blog](https://make.wordpress.org/design/) is the prim
 
 Real-time discussions for design take place in the `#design` channel in [Make WordPress Slack](https://make.wordpress.org/chat) (registration required). Weekly meetings for the Design team are on Wednesdays at 19:00UTC.
 
-## How Can Designers Contribute?
+## How can designers contribute?
 
 The Gutenberg project uses GitHub for managing code and tracking issues. The main repository is at: [https://github.com/WordPress/gutenberg](https://github.com/WordPress/gutenberg).
 
@@ -20,7 +20,9 @@ The [WordPress Design team](http://make.wordpress.org/design/) uses [Figma](http
 
 This section outlines the design principles and patterns of the editor interface—to explain the background of the design, inform future improvements, and help people design great blocks.
 
-![Gutenberg Logo](https://cldup.com/J2MgjuShPv-3000x3000.png)
+<img width="200" src="https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/assets/gutenberg-logo-black.svg" alt="Gutenberg Logo" />
+
+The Gutenberg logo was made by [Cristel Rossignol](https://twitter.com/cristelrossi), and is released under the GPL license. [Download the SVG logo](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/assets/gutenberg-logo-black.svg).
 
 ### Goal of Gutenberg
 
@@ -57,26 +59,3 @@ Gutenberg wants to make it easier to author rich content. This means ensuring go
 **Direct manipulation is intuitive.** The block interface allows users to manipulate content directly on the page. Plugin and theme authors will support and extend this experience by building their own custom blocks.
 
 **Code editing shouldn't be necessary for customization.** Customizing traditionally required complicated markup, and complicated markup is easy to break. With Gutenberg, customizing becomes more intuitive — and safer. A developer will be able to provide custom blocks that directly render portions of a layout (a three column grid of features, for instance) and clearly specify what can be directly edited by the user. That means the user can update text, swap images, reduce the number of columns, without having to ask a developer, or worrying about breaking things.
-
-### Future Opportunities
-
-The initial phase of Gutenberg as described in the kickoff goal is primarily limited to the content area (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content by appending blocks sequentially, then adding layout options to each block.
-
-That said, there isn’t any fixed limit to the kind of layouts Gutenberg will be able to create. It’s very possible for Gutenberg to grow beyond the confines of post and page content, to include the whole page — one could think of a theme template as a comma-separated list of blocks, like this:
-
-```js
-{
-	'theme/header',
-	'theme/sidebar',
-	'core/content' {
-		'core/cover-image',
-		'theme/author-card',
-		'core/text',
-	},
-	'theme/footer',
-}
-```
-
-Every block nested inside the content block would be _rearrangeable_. Every block would be _editable_. Every block would use the same API, and both the editor and the theme would load the same `style.css` file directly. In the end, both the editor/page builder and theme/front-end would appear near-identical, allowing for a true WYSIWYG experience.
-
-This concept is speculative, but it’s one direction Gutenberg could go in the future.

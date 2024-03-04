@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -177,6 +178,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				value={ value }
 				onInputChange={ debouncedSearch }
 				suggestions={ suggestions }
+				displayTransform={ decodeEntities }
 				onChange={ onTermsChange }
 				__experimentalShowHowTo={ false }
 			/>

@@ -3,7 +3,6 @@
 		"name": "core/cover",
 		"isValid": true,
 		"attributes": {
-			"useFeaturedImage": false,
 			"alt": "",
 			"hasParallax": false,
 			"isRepeated": false,
@@ -11,7 +10,9 @@
 			"overlayColor": "primary",
 			"backgroundType": "image",
 			"isDark": true,
-			"tagName": "div"
+			"useFeaturedImage": false,
+			"tagName": "div",
+			"isUserOverlayColor": true
 		},
 		"innerBlocks": [
 			{

@@ -1,0 +1,61 @@
+.wp-block-form-input__label {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+	margin-bottom: 0.5em;
+
+	&.is-label-inline {
+		flex-direction: row;
+		gap: 0.5em;
+		align-items: center;
+
+		.wp-block-form-input__label-content {
+			margin-bottom: 0.5em;
+		}
+	}
+
+	/*
+	Small tweak to left-align the checkbox.
+	Even though `:has` is not currently supported in Firefox, this is a small tweak
+	and does not affect the functionality of the block or the user's experience.
+	There will be a minor inconsistency between browsers. However, it's more important to provide
+	a better experience for 80+% of users, until Firefox catches up and supports `:has`.
+	*/
+	&:has(input[type="checkbox"]) {
+		width: fit-content;
+		flex-direction: row-reverse;
+	}
+}
+
+.wp-block-form-input__label-content {
+	width: fit-content;
+}
+
+.wp-block-form-input__input {
+	padding: 0 0.5em;
+	font-size: 1em;
+	margin-bottom: 0.5em;
+
+	&[type="text"],
+	&[type="password"],
+	&[type="date"],
+	&[type="datetime"],
+	&[type="datetime-local"],
+	&[type="email"],
+	&[type="month"],
+	&[type="number"],
+	&[type="search"],
+	&[type="tel"],
+	&[type="time"],
+	&[type="url"],
+	&[type="week"] {
+		min-height: 2em;
+		line-height: 2;
+		border: 1px solid;
+	}
+}
+
+textarea.wp-block-form-input__input {
+	min-height: 10em;
+}

@@ -17,6 +17,7 @@ import Tiles from './tiles';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockCaption,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
@@ -141,7 +142,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					! caption
+					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
 						  'Gallery caption. Empty'
 						: sprintf(

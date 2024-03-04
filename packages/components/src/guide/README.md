@@ -37,20 +37,6 @@ function MyTutorial() {
 
 The component accepts the following props:
 
-### onFinish
-
-A function which is called when the guide is finished. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
-
--   Type: `function`
--   Required: Yes
-
-### pages
-
-A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
-
--   Type: `array`
--   Required: Yes
-
 ### className
 
 A custom class to add to the modal.
@@ -62,7 +48,7 @@ A custom class to add to the modal.
 
 This property is used as the modal's accessibility label. It is required for accessibility reasons.
 
--   Type: `String`
+-   Type: `string`
 -   Required: Yes
 
 ### finishButtonText
@@ -71,3 +57,19 @@ Use this to customize the label of the _Finish_ button shown at the end of the g
 
 -   Type: `string`
 -   Required: No
+-	Default: `'Finish'`
+
+### onFinish
+
+A function which is called when the guide is finished. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
+
+-   Type: `( event?: KeyboardEvent< HTMLDivElement > | SyntheticEvent ) => void`
+-   Required: Yes
+
+### pages
+
+A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
+
+-   Type: `{ content: ReactNode; image?: ReactNode; }[]`
+-   Required: No
+-   Default: `[]`

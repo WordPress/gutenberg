@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
@@ -28,6 +29,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
+import { getAuthority } from '@wordpress/url';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -99,16 +101,14 @@ const EmbedEdit = ( props ) => {
 	/**
 	 * Returns the attributes derived from the preview, merged with the current attributes.
 	 *
-	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
 	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = ( ignorePreviousClassName = false ) =>
+	const getMergedAttributes = () =>
 		getMergedAttributesWithPreview(
 			attributes,
 			preview,
 			title,
-			responsive,
-			ignorePreviousClassName
+			responsive
 		);
 
 	const toggleResponsive = () => {
@@ -127,30 +127,44 @@ const EmbedEdit = ( props ) => {
 	};
 
 	useEffect( () => {
-		if ( ! preview?.html || ! cannotEmbed || fetching ) {
+		if ( preview?.html || ! cannotEmbed || fetching ) {
 			return;
 		}
+
 		// At this stage, we're not fetching the preview and know it can't be embedded,
 		// so try removing any trailing slash, and resubmit.
 		const newURL = attributesUrl.replace( /\/$/, '' );
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributesUrl ] );
+	}, [ preview?.html, attributesUrl, cannotEmbed, fetching, setAttributes ] );
+
+	// Try a different provider in case the embed url is not supported.
+	useEffect( () => {
+		if ( ! cannotEmbed || fetching || ! url ) {
+			return;
+		}
+
+		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
+		if ( getAuthority( url ) === 'x.com' ) {
+			const newURL = new URL( url );
+			newURL.host = 'twitter.com';
+			setAttributes( { url: newURL.toString() } );
+		}
+	}, [ url, cannotEmbed, fetching, setAttributes ] );
 
 	// Handle incoming preview.
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			// When obtaining an incoming preview, we set the attributes derived from
-			// the preview data. In this case when getting the merged attributes,
-			// we ignore the previous classname because it might not match the expected
-			// classes by the new preview.
-			setAttributes( getMergedAttributes( true ) );
+			// When obtaining an incoming preview,
+			// we set the attributes derived from the preview data.
+			const mergedAttributes = getMergedAttributes();
+			setAttributes( mergedAttributes );
 
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
 					props,
-					getMergedAttributes()
+					mergedAttributes
 				);
 
 				if ( upgradedBlock ) {
@@ -188,8 +202,14 @@ const EmbedEdit = ( props ) => {
 							event.preventDefault();
 						}
 
+						// If the embed URL was changed, we need to reset the aspect ratio class.
+						// To do this we have to remove the existing ratio class so it can be recalculated.
+						const blockClass = removeAspectRatioClasses(
+							attributes.className
+						);
+
 						setIsEditingURL( false );
-						setAttributes( { url } );
+						setAttributes( { url, className: blockClass } );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }

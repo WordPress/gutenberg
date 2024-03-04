@@ -7,14 +7,13 @@ import type { RefAttributes } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponent } from '../ui/context/wordpress-component';
+import type { WordPressComponent } from '../context/wordpress-component';
 import type { ViewProps } from './types';
 
 /**
  * `View` is a core component that renders everything in the library.
  * It is the principle component in the entire library.
  *
- * @example
  * ```jsx
  * import { View } from `@wordpress/components`;
  *
@@ -27,10 +26,10 @@ import type { ViewProps } from './types';
  * }
  * ```
  */
-// @ts-expect-error
 export const View: WordPressComponent<
 	'div',
-	ViewProps & RefAttributes< any >
+	ViewProps & RefAttributes< any >,
+	true
 > = styled.div``;
 
 View.selector = '.components-view';

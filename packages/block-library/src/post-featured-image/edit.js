@@ -24,7 +24,9 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -43,6 +45,11 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 	);
 }
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function PostFeaturedImageEdit( {
 	clientId,
 	attributes,
@@ -59,17 +66,48 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		useFirstImageFromPost,
 	} = attributes;
-	const [ featuredImage, setFeaturedImage ] = useEntityProp(
+
+	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
 		postId
 	);
 
-	const { media, postType } = useSelect(
+	// Fallback to post content if no featured image is set.
+	// This is needed for the "Use first image from post" option.
+	const [ postContent ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'content',
+		postId
+	);
+
+	const featuredImage = useMemo( () => {
+		if ( storedFeaturedImage ) {
+			return storedFeaturedImage;
+		}
+
+		if ( ! useFirstImageFromPost ) {
+			return;
+		}
+
+		const imageOpener =
+			/<!--\s+wp:(?:core\/)?image\s+(?<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+\/?-->).)*)?}\s+)?-->/.exec(
+				postContent
+			);
+		const imageId =
+			imageOpener?.groups?.attrs &&
+			JSON.parse( imageOpener.groups.attrs )?.id;
+		return imageId;
+	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
+
+	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType } = select( coreStore );
+			const { getMedia, getPostType, getEditedEntityRecord } =
+				select( coreStore );
 			return {
 				media:
 					featuredImage &&
@@ -77,10 +115,16 @@ export default function PostFeaturedImageEdit( {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
+				postPermalink: getEditedEntityRecord(
+					'postType',
+					postTypeSlug,
+					postId
+				)?.link,
 			};
 		},
-		[ featuredImage, postTypeSlug ]
+		[ featuredImage, postTypeSlug, postId ]
 	);
+
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
 	const imageSizes = useSelect(
@@ -100,6 +144,7 @@ export default function PostFeaturedImageEdit( {
 		style: { width, height, aspectRatio },
 	} );
 	const borderProps = useBorderProps( attributes );
+	const blockEditingMode = useBlockEditingMode();
 
 	const placeholder = ( content ) => {
 		return (
@@ -110,7 +155,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration={ true }
 				style={ {
-					...blockProps.style,
+					height: !! aspectRatio && '100%',
+					width: !! aspectRatio && '100%',
 					...borderProps.style,
 				} }
 			>
@@ -130,8 +176,13 @@ export default function PostFeaturedImageEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const controls = (
+	const controls = blockEditingMode === 'default' && (
 		<>
+			<Overlay
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+			/>
 			<DimensionControls
 				clientId={ clientId }
 				attributes={ attributes }
@@ -139,14 +190,15 @@ export default function PostFeaturedImageEdit( {
 				imageSizeOptions={ imageSizeOptions }
 			/>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={
 							postType?.labels.singular_name
 								? sprintf(
-										// translators: %s: Name of the post type e.g: "post".
+										// translators: %s: Name of the post type e.g: "Page".
 										__( 'Link to %s' ),
-										postType.labels.singular_name.toLowerCase()
+										postType.labels.singular_name
 								  )
 								: __( 'Link to post' )
 						}
@@ -156,6 +208,7 @@ export default function PostFeaturedImageEdit( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -178,49 +231,34 @@ export default function PostFeaturedImageEdit( {
 			</InspectorControls>
 		</>
 	);
+
 	let image;
 
 	/**
-	 * A post featured image block placed in a query loop
-	 * does not have image replacement or upload options.
+	 * A Post Featured Image block should not have image replacement
+	 * or upload options in the following cases:
+	 * - Is placed in a Query Loop. This is a consious decision to
+	 * prevent content editing of different posts in Query Loop, and
+	 * this could change in the future.
+	 * - Is in a context where it does not have a postId (for example
+	 * in a template or template part).
 	 */
-	if ( ! featuredImage && isDescendentOfQueryLoop ) {
+	if ( ! featuredImage && ( isDescendentOfQueryLoop || ! postId ) ) {
 		return (
 			<>
 				{ controls }
 				<div { ...blockProps }>
-					{ placeholder() }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
-				</div>
-			</>
-		);
-	}
-
-	/**
-	 * A post featured image placed in a block template, outside a query loop,
-	 * does not have a postId and will always be a placeholder image.
-	 * It does not have image replacement, upload, or link options.
-	 */
-	if ( ! featuredImage && ! postId ) {
-		return (
-			<>
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					imageSizeOptions={ imageSizeOptions }
-				/>
-				<div { ...blockProps }>
-					{ placeholder() }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
+					{ !! isLink ? (
+						<a
+							href={ postPermalink }
+							target={ linkTarget }
+							{ ...disabledClickProps }
+						>
+							{ placeholder() }
+						</a>
+					) : (
+						placeholder()
+					) }
 				</div>
 			</>
 		);
@@ -229,7 +267,7 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
-		height: ( !! aspectRatio && '100%' ) || height,
+		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};
@@ -313,12 +351,18 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ image }
-				<Overlay
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
+				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
+				{ !! isLink ? (
+					<a
+						href={ postPermalink }
+						target={ linkTarget }
+						{ ...disabledClickProps }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
 			</figure>
 		</>
 	);

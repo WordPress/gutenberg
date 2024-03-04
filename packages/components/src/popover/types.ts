@@ -14,11 +14,6 @@ type DomRectWithOwnerDocument = DOMRect & {
 
 type PopoverPlacement = Placement | 'overlay';
 
-export type AnimatedWrapperProps = {
-	placement: PopoverPlacement;
-	shouldAnimate?: boolean;
-};
-
 export type PopoverAnchorRefReference = MutableRefObject<
 	Element | null | undefined
 >;
@@ -70,6 +65,15 @@ export type PopoverProps = {
 	 * @default true
 	 */
 	flip?: boolean;
+	/**
+	 * Determines whether tabbing is constrained to within the popover,
+	 * preventing keyboard focus from leaving the popover content without
+	 * explicit focus elswhere, or whether the popover remains part of the wider
+	 * tab order. If no value is passed, it will be derived from `focusOnMount`.
+	 *
+	 * @default `focusOnMount` !== false
+	 */
+	constrainTabbing?: boolean;
 	/**
 	 * By default, the _first tabbable element_ in the popover will receive focus
 	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
@@ -150,6 +154,12 @@ export type PopoverProps = {
 	 * @default undefined
 	 */
 	variant?: 'unstyled' | 'toolbar';
+	/**
+	 * Whether to render the popover inline or within the slot.
+	 *
+	 * @default false
+	 */
+	inline?: boolean;
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport

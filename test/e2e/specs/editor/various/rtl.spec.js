@@ -150,10 +150,12 @@ test.describe( 'RTL', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( ARABIC_ONE );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( ARABIC_TWO );
 
 		// Insert a character at each boundary position.

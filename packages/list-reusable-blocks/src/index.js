@@ -31,9 +31,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const showNotice = () => {
 		const notice = document.createElement( 'div' );
 		notice.className = 'notice notice-success is-dismissible';
-		notice.innerHTML = `<p>${ __(
-			'Reusable block imported successfully!'
-		) }</p>`;
+		notice.innerHTML = `<p>${ __( 'Pattern imported successfully!' ) }</p>`;
 
 		const headerEnd = document.querySelector( '.wp-header-end' );
 		if ( ! headerEnd ) {

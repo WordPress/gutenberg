@@ -7,120 +7,19 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
-
-export function useColorsPerOrigin( name ) {
-	const [ customColors ] = useGlobalSetting( 'color.palette.custom', name );
-	const [ themeColors ] = useGlobalSetting( 'color.palette.theme', name );
-	const [ defaultColors ] = useGlobalSetting( 'color.palette.default', name );
-	const [ shouldDisplayDefaultColors ] = useGlobalSetting(
-		'color.defaultPalette'
-	);
-
-	return useMemo( () => {
-		const result = [];
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				colors: themeColors,
-			} );
-		}
-		if (
-			shouldDisplayDefaultColors &&
-			defaultColors &&
-			defaultColors.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				colors: defaultColors,
-			} );
-		}
-		if ( customColors && customColors.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette is created by the user.'
-				),
-				colors: customColors,
-			} );
-		}
-		return result;
-	}, [ customColors, themeColors, defaultColors ] );
-}
-
-export function useGradientsPerOrigin( name ) {
-	const [ customGradients ] = useGlobalSetting(
-		'color.gradients.custom',
-		name
-	);
-	const [ themeGradients ] = useGlobalSetting(
-		'color.gradients.theme',
-		name
-	);
-	const [ defaultGradients ] = useGlobalSetting(
-		'color.gradients.default',
-		name
-	);
-	const [ shouldDisplayDefaultGradients ] = useGlobalSetting(
-		'color.defaultGradients'
-	);
-
-	return useMemo( () => {
-		const result = [];
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				gradients: themeGradients,
-			} );
-		}
-		if (
-			shouldDisplayDefaultGradients &&
-			defaultGradients &&
-			defaultGradients.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				gradients: defaultGradients,
-			} );
-		}
-		if ( customGradients && customGradients.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette is created by the user.'
-				),
-				gradients: customGradients,
-			} );
-		}
-		return result;
-	}, [ customGradients, themeGradients, defaultGradients ] );
-}
 
 export function useColorRandomizer( name ) {
 	const [ themeColors, setThemeColors ] = useGlobalSetting(
@@ -151,6 +50,32 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useStylesPreviewColors() {
+	const [ textColor = 'black' ] = useGlobalStyle( 'color.text' );
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const [ headingColor = textColor ] = useGlobalStyle(
+		'elements.h1.color.text'
+	);
+	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
+	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
+	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
+
+	const paletteColors = ( themeColors ?? [] )
+		.concat( customColors ?? [] )
+		.concat( coreColors ?? [] );
+	const highlightedColors = paletteColors
+		.filter(
+			// we exclude these two colors because they are already visible in the preview.
+			( { color } ) => color !== backgroundColor && color !== headingColor
+		)
+		.slice( 0, 2 );
+
+	return {
+		paletteColors,
+		highlightedColors,
+	};
 }
 
 export function useSupportedStyles( name, element ) {

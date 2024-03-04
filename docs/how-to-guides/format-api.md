@@ -18,7 +18,7 @@ You will need:
 -   A minimal plugin activated and setup ready to edit
 -   JavaScript setup for building and enqueuing
 
-The [complete format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/format-api) is available that you can use as a reference for your setup.
+The [complete format-api example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/format-api-f14b86) is available that you can use as a reference for your setup.
 
 ## Step-by-step guide
 
@@ -173,7 +173,7 @@ registerFormatType( 'my-custom-format/sample-output', {
 } );
 ```
 
-### Step5: Add a button outside of the dropdown (Optional)
+### Step 5: Add a button outside of the dropdown (Optional)
 
 Using the `RichTextToolbarButton` component, the button is added to the default dropdown menu. You can add the button directly to the toolbar by using the `BlockControls` component.
 
@@ -220,7 +220,7 @@ If you run into errors:
 -   Confirm the JavaScript is loading in the editor.
 -   Check for any console error messages.
 
-## Additional Resources
+## Additional resources
 
 Reference documentation used in this guide:
 
@@ -234,4 +234,4 @@ Reference documentation used in this guide:
 
 The guide showed you how to add a button to the toolbar and have it apply a format to the selected text. Try it out and see what you can build with it in your next plugin.
 
-Download the [format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/format-api) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+Download the [format-api example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/format-api-f14b86) from the [block-development-examples](https://github.com/WordPress/block-development-examples) repository.

@@ -8,8 +8,7 @@ Namespace: `core/notices`.
 
 ### getNotices
 
-Returns all notices as an array, optionally for a given context. Defaults to
-the global context.
+Returns all notices as an array, optionally for a given context. Defaults to the global context.
 
 _Usage_
 
@@ -48,8 +47,7 @@ _Returns_
 
 ### createErrorNotice
 
-Returns an action object used in signalling that an error notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that an error notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -93,8 +91,7 @@ _Returns_
 
 ### createInfoNotice
 
-Returns an action object used in signalling that an info notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that an info notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -159,7 +156,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _status_ `[string]`: Notice status.
+-   _status_ `string|undefined`: Notice status ("info" if undefined is passed).
 -   _content_ `string`: Notice message.
 -   _options_ `[Object]`: Notice options.
 -   _options.context_ `[string]`: Context under which to group notice.
@@ -178,8 +175,7 @@ _Returns_
 
 ### createSuccessNotice
 
-Returns an action object used in signalling that a success notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that a success notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -221,8 +217,7 @@ _Returns_
 
 ### createWarningNotice
 
-Returns an action object used in signalling that a warning notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that a warning notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
@@ -261,6 +256,53 @@ _Parameters_
 
 -   _content_ `string`: Notice message.
 -   _options_ `[Object]`: Optional notice options.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### removeAllNotices
+
+Removes all notices from a given context. Defaults to the default context.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+export const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeAllNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button onClick={ () => removeAllNotices() }>
+				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+			</Button>
+			<Button onClick={ () => removeAllNotices( 'snackbar' ) }>
+				{ __(
+					'Clear all snackbar notices',
+					'woo-gutenberg-products-block'
+				) }
+			</Button>
+		</>
+	);
+};
+```
+
+_Parameters_
+
+-   _noticeType_ `string`: The context to remove all notices from.
+-   _context_ `string`: The context to remove all notices from.
 
 _Returns_
 
@@ -309,6 +351,51 @@ _Parameters_
 
 -   _id_ `string`: Notice unique identifier.
 -   _context_ `[string]`: Optional context (grouping) in which the notice is intended to appear. Defaults to default context.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### removeNotices
+
+Returns an action object used in signalling that several notices are to be removed.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button
+				onClick={ () =>
+					removeNotices( notices.map( ( { id } ) => id ) )
+				}
+			>
+				{ __( 'Clear all notices' ) }
+			</Button>
+		</>
+	);
+};
+```
+
+_Parameters_
+
+-   _ids_ `string[]`: List of unique notice identifiers.
+-   _context_ `[string]`: Optional context (grouping) in which the notices are intended to appear. Defaults to default context.
 
 _Returns_
 

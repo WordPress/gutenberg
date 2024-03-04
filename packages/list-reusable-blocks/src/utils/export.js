@@ -11,7 +11,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { download } from './file';
+import { downloadBlob } from '@wordpress/blob';
 
 /**
  * Export a reusable block as a JSON file.
@@ -25,18 +25,20 @@ async function exportReusableBlock( id ) {
 	} );
 	const title = post.title.raw;
 	const content = post.content.raw;
+	const syncStatus = post.wp_pattern_sync_status;
 	const fileContent = JSON.stringify(
 		{
 			__file: 'wp_block',
 			title,
 			content,
+			syncStatus,
 		},
 		null,
 		2
 	);
 	const fileName = kebabCase( title ) + '.json';
 
-	download( fileName, fileContent, 'application/json' );
+	downloadBlob( fileName, fileContent, 'application/json' );
 }
 
 export default exportReusableBlock;

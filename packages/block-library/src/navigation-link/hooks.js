@@ -4,7 +4,7 @@
 import {
 	category,
 	page,
-	postContent,
+	postList,
 	tag,
 	customPostType,
 } from '@wordpress/icons';
@@ -12,7 +12,7 @@ import {
 function getIcon( variationName ) {
 	switch ( variationName ) {
 		case 'post':
-			return postContent;
+			return postList;
 		case 'page':
 			return page;
 		case 'tag':

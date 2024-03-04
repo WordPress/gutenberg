@@ -1,0 +1,28 @@
+.edit-site-save-hub {
+	color: $gray-600;
+	border-top: 1px solid $gray-800;
+	flex-shrink: 0;
+	margin: 0;
+	padding: $grid-unit-20 $canvas-padding;
+}
+
+.edit-site-save-hub__button {
+	color: inherit;
+	width: 100%;
+	justify-content: center;
+
+	&[aria-disabled="true"] {
+		opacity: 1;
+	}
+
+	&[aria-disabled="true"]:hover {
+		color: inherit;
+	}
+
+	&:not(.is-primary) {
+		&.is-busy,
+		&.is-busy[aria-disabled="true"]:hover {
+			color: $gray-900;
+		}
+	}
+}

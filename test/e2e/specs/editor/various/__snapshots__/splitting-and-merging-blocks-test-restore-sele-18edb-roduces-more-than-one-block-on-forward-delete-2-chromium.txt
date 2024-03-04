@@ -1,9 +1,0 @@
-<!-- wp:paragraph -->
-<p>hi-item 1</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>item 2</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->

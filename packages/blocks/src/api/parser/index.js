@@ -101,6 +101,7 @@ export function normalizeRawBlock( rawBlock, options ) {
 	// meaning there are no negative consequences to repeated autop calls.
 	if (
 		rawBlockName === fallbackBlockName &&
+		rawBlockName === 'core/freeform' &&
 		! options?.__unstableSkipAutop
 	) {
 		rawInnerHTML = autop( rawInnerHTML ).trim();

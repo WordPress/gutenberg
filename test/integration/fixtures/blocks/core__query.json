@@ -19,9 +19,7 @@
 				"parents": []
 			},
 			"tagName": "div",
-			"displayLayout": {
-				"type": "list"
-			}
+			"enhancedPagination": false
 		},
 		"innerBlocks": []
 	}

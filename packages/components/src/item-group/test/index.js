@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -72,7 +73,8 @@ describe( 'ItemGroup', () => {
 	} );
 
 	describe( 'Item', () => {
-		it( 'should render as a `button` if the `onClick` handler is specified', () => {
+		it( 'should render as a `button` if the `onClick` handler is specified', async () => {
+			const user = userEvent.setup();
 			const spy = jest.fn();
 			render( <Item onClick={ spy }>Code is poetry</Item> );
 
@@ -80,7 +82,7 @@ describe( 'ItemGroup', () => {
 
 			expect( button ).toBeInTheDocument();
 
-			fireEvent.click( button );
+			await user.click( button );
 
 			expect( spy ).toHaveBeenCalled();
 		} );

@@ -46,7 +46,9 @@ $grid-unit-80: 8 * $grid-unit;		// 64px
 
 $icon-size: 24px;
 $button-size: 36px;
+$button-size-next-default-40px: 40px; // transitionary variable for next default button size
 $button-size-small: 24px;
+$button-size-compact: 32px;
 $header-height: 60px;
 $panel-header-height: $grid-unit-60;
 $nav-sidebar-width: 360px;
@@ -55,9 +57,12 @@ $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
 $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
-$modal-min-width: 360px;
+$modal-min-width: 350px;
+$modal-width-small: 384px;
+$modal-width-medium: 512px;
+$modal-width-large: 840px;
 $spinner-size: 16px;
-$canvas-padding: $grid-unit-30;
+$canvas-padding: $grid-unit-20;
 
 
 /**
@@ -83,7 +88,7 @@ $widget-area-width: 700px;
 
 $block-toolbar-height: $grid-unit-60;
 $border-width: 1px;
-$border-width-focus: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
+$border-width-focus-fallback: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
 $border-width-tab: 1.5px;
 $helptext-font-size: 12px;
 $radius-round: 50%;

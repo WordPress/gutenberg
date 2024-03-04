@@ -27,8 +27,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
-const ALLOWED_BLOCKS = [ 'core/social-link' ];
-
 const sizeOptions = [
 	{ name: __( 'Small' ), value: 'has-small-icon-size' },
 	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
@@ -106,9 +104,9 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
+		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
 	} );
 
@@ -194,8 +192,9 @@ export function SocialLinksEdit( props ) {
 				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open links in new tab' ) }
 						checked={ openInNewTab }
 						onChange={ () =>
@@ -203,6 +202,7 @@ export function SocialLinksEdit( props ) {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show labels' ) }
 						checked={ showLabels }
 						onChange={ () =>
@@ -211,37 +211,39 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls group="color">
-				{ colorSettings.map(
-					( { onChange, label, value, resetAllFilter } ) => (
-						<ColorGradientSettingsDropdown
-							key={ `social-links-color-${ label }` }
-							__experimentalIsRenderedInSidebar
-							settings={ [
-								{
-									colorValue: value,
-									label,
-									onColorChange: onChange,
-									isShownByDefault: true,
-									resetAllFilter,
-									enableAlpha: true,
-								},
-							] }
-							panelId={ clientId }
-							{ ...colorGradientSettings }
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="color">
+					{ colorSettings.map(
+						( { onChange, label, value, resetAllFilter } ) => (
+							<ColorGradientSettingsDropdown
+								key={ `social-links-color-${ label }` }
+								__experimentalIsRenderedInSidebar
+								settings={ [
+									{
+										colorValue: value,
+										label,
+										onColorChange: onChange,
+										isShownByDefault: true,
+										resetAllFilter,
+										enableAlpha: true,
+									},
+								] }
+								panelId={ clientId }
+								{ ...colorGradientSettings }
+							/>
+						)
+					) }
+					{ ! logosOnly && (
+						<ContrastChecker
+							{ ...{
+								textColor: iconColorValue,
+								backgroundColor: iconBackgroundColorValue,
+							} }
+							isLargeText={ false }
 						/>
-					)
-				) }
-				{ ! logosOnly && (
-					<ContrastChecker
-						{ ...{
-							textColor: iconColorValue,
-							backgroundColor: iconBackgroundColorValue,
-						} }
-						isLargeText={ false }
-					/>
-				) }
-			</InspectorControls>
+					) }
+				</InspectorControls>
+			) }
 			<ul { ...innerBlocksProps } />
 		</>
 	);

@@ -63,6 +63,38 @@ const transforms = {
 				},
 			},
 		},
+		{
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				node.children.length === 1 &&
+				node.firstChild.nodeName === 'VIDEO',
+			transform: ( node ) => {
+				const videoElement = node.firstChild;
+				const attributes = {
+					autoplay: videoElement.hasAttribute( 'autoplay' )
+						? true
+						: undefined,
+					controls: videoElement.hasAttribute( 'controls' )
+						? undefined
+						: false,
+					loop: videoElement.hasAttribute( 'loop' )
+						? true
+						: undefined,
+					muted: videoElement.hasAttribute( 'muted' )
+						? true
+						: undefined,
+					preload:
+						videoElement.getAttribute( 'preload' ) || undefined,
+					playsInline: videoElement.hasAttribute( 'playsinline' )
+						? true
+						: undefined,
+					poster: videoElement.getAttribute( 'poster' ) || undefined,
+					src: videoElement.getAttribute( 'src' ) || undefined,
+				};
+				return createBlock( 'core/video', attributes );
+			},
+		},
 	],
 };
 

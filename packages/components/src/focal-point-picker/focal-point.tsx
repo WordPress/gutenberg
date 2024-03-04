@@ -8,7 +8,7 @@ import { PointerCircle } from './styles/focal-point-style';
  */
 import classnames from 'classnames';
 import type { FocalPointProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export default function FocalPoint( {
 	left = '50%',

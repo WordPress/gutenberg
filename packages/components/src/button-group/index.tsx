@@ -13,7 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { ButtonGroupProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnforwardedButtonGroup(
 	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,

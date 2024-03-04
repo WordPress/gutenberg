@@ -2,6 +2,7 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
 
 /**
@@ -23,7 +24,17 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // Experimental or other packages that should be private are bundled when used.
 // That way, we can iterate on these package without making them part of the public API.
 // See: https://github.com/WordPress/gutenberg/pull/19809
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+//
+// !!
+// This list must be kept in sync with the matching list in packages/dependency-extraction-webpack-plugin/lib/util.js
+// !!
+const BUNDLED_PACKAGES = [
+	'@wordpress/dataviews',
+	'@wordpress/icons',
+	'@wordpress/interface',
+	'@wordpress/sync',
+	'@wordpress/undo-manager',
+];
 
 // PHP files in packages that have to be copied during build.
 const bundledPackagesPhpConfig = [
@@ -75,7 +86,8 @@ const gutenbergPackages = Object.keys( dependencies )
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
 			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'interactivity' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
@@ -121,10 +133,10 @@ const vendorsCopyConfig = Object.entries( vendors ).flatMap(
 module.exports = {
 	...baseConfig,
 	name: 'packages',
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		return {
-			...memo,
-			[ packageName ]: {
+	entry: Object.fromEntries(
+		gutenbergPackages.map( ( packageName ) => [
+			packageName,
+			{
 				import: `./packages/${ packageName }`,
 				library: {
 					name: [ 'wp', camelCaseDash( packageName ) ],
@@ -134,12 +146,23 @@ module.exports = {
 						: undefined,
 				},
 			},
-		};
-	}, {} ),
+		] )
+	),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
 		path: join( __dirname, '..', '..' ),
+		devtoolModuleFilenameTemplate: ( info ) => {
+			if ( info.resourcePath.includes( '/@wordpress/' ) ) {
+				const resourcePath =
+					info.resourcePath.split( '/@wordpress/' )[ 1 ];
+				return `../../packages/${ resourcePath }`;
+			}
+			return `webpack://${ info.namespace }/${ info.resourcePath }`;
+		},
+	},
+	performance: {
+		hints: false, // disable warnings about package sizes
 	},
 	plugins: [
 		...plugins,
@@ -155,6 +178,10 @@ module.exports = {
 				} ) )
 				.concat( bundledPackagesPhpConfig )
 				.concat( vendorsCopyConfig ),
+		} ),
+		new MomentTimezoneDataPlugin( {
+			startYear: 2000,
+			endYear: 2040,
 		} ),
 	].filter( Boolean ),
 };

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { safeDecodeURI } from '@wordpress/url';
 import { escapeHTML } from '@wordpress/escape-html';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
@@ -27,7 +27,6 @@ import { escapeHTML } from '@wordpress/escape-html';
  * @param {Object}                          updatedValue    New block attributes to update.
  * @param {Function}                        setAttributes   Block attribute update function.
  * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
- *
  */
 
 export const updateAttributes = (
@@ -89,7 +88,7 @@ export const updateAttributes = (
 
 	setAttributes( {
 		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...{ url: newUrl ? encodeURI( safeDecodeURI( newUrl ) ) : newUrl },
+		...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),

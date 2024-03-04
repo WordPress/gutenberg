@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import { mapValues, isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
-import { select as globalSelect, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -57,9 +51,13 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 				const mergedAttributes = useMemo(
 					() => ( {
 						...attributes,
-						...mapValues(
-							metaAttributes,
-							( metaKey ) => meta[ metaKey ]
+						...Object.fromEntries(
+							Object.entries( metaAttributes ).map(
+								( [ attributeKey, metaKey ] ) => [
+									attributeKey,
+									meta[ metaKey ],
+								]
+							)
 						),
 					} ),
 					[ attributes, meta ]
@@ -83,7 +81,7 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 									] )
 							);
 
-							if ( ! isEmpty( nextMeta ) ) {
+							if ( Object.entries( nextMeta ).length ) {
 								setMeta( nextMeta );
 							}
 
@@ -106,15 +104,12 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
  */
 function shimAttributeSource( settings ) {
 	/** @type {WPMetaAttributeMapping} */
-	const metaAttributes = mapValues(
-		Object.fromEntries(
-			Object.entries( settings.attributes ?? {} ).filter(
-				( [ , { source } ] ) => source === 'meta'
-			)
-		),
-		'meta'
+	const metaAttributes = Object.fromEntries(
+		Object.entries( settings.attributes ?? {} )
+			.filter( ( [ , { source } ] ) => source === 'meta' )
+			.map( ( [ attributeKey, { meta } ] ) => [ attributeKey, meta ] )
 	);
-	if ( ! isEmpty( metaAttributes ) ) {
+	if ( Object.entries( metaAttributes ).length ) {
 		settings.edit = createWithMetaAttributeSource( metaAttributes )(
 			settings.edit
 		);
@@ -128,26 +123,3 @@ addFilter(
 	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
 	shimAttributeSource
 );
-
-// The above filter will only capture blocks registered after the filter was
-// added. There may already be blocks registered by this point, and those must
-// be updated to apply the shim.
-//
-// The following implementation achieves this, albeit with a couple caveats:
-// - Only blocks registered on the global store will be modified.
-// - The block settings are directly mutated, since there is currently no
-//   mechanism to update an existing block registration. This is the reason for
-//   `getBlockType` separate from `getBlockTypes`, since the latter returns a
-//   _copy_ of the block registration (i.e. the mutation would not affect the
-//   actual registered block settings).
-//
-// `getBlockTypes` or `getBlockType` implementation could change in the future
-// in regards to creating settings clones, but the corresponding end-to-end
-// tests for meta blocks should cover against any potential regressions.
-//
-// In the future, we could support updating block settings, at which point this
-// implementation could use that mechanism instead.
-globalSelect( blocksStore )
-	.getBlockTypes()
-	.map( ( { name } ) => globalSelect( blocksStore ).getBlockType( name ) )
-	.forEach( shimAttributeSource );

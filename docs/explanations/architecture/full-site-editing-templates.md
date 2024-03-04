@@ -1,8 +1,8 @@
-# Full Site Editing Templates
+# Site Editing Templates
 
 ## Template and template part flows
 
-This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend. For an introduction about block themes and Full site editing templates, refer to the [block theme documentation](/docs/how-to-guides/themes/block-theme-overview.md).
+This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend.
 
 ## Storage
 

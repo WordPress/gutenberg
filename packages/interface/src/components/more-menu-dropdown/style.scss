@@ -17,7 +17,7 @@
 }
 
 .interface-more-menu-dropdown__content .components-popover__content {
-	min-width: 280px;
+	min-width: 300px;
 
 	// Let the menu scale to fit items.
 	@include break-mobile() {

@@ -4,6 +4,7 @@
 		"incremental": false,
 		"composite": false,
 		"module": "CommonJS",
+		"moduleResolution": "node16",
 		"types": [ "node" ],
 		"rootDir": "src",
 		"noEmit": false,

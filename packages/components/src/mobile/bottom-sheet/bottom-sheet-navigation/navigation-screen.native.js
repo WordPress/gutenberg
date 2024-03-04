@@ -6,13 +6,17 @@ import {
 	useNavigation,
 	useFocusEffect,
 } from '@react-navigation/native';
-import { View, ScrollView, TouchableHighlight } from 'react-native';
+import {
+	ScrollView,
+	TouchableHighlight,
+	useWindowDimensions,
+	View,
+} from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheetContext } from '@wordpress/components';
-import { debounce } from '@wordpress/compose';
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -29,7 +33,7 @@ const BottomSheetNavigationScreen = ( {
 	name,
 } ) => {
 	const navigation = useNavigation();
-	const heightRef = useRef( { maxHeight: 0 } );
+	const maxHeight = useRef( 0 );
 	const isFocused = useIsFocused();
 	const {
 		onHandleHardwareButtonPress,
@@ -38,15 +42,9 @@ const BottomSheetNavigationScreen = ( {
 		listProps,
 		safeAreaBottomInset,
 	} = useContext( BottomSheetContext );
+	const { height: windowHeight } = useWindowDimensions();
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
-
-	// Disable reason: deferring this refactor to the native team.
-	// see https://github.com/WordPress/gutenberg/pull/41166
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [
-		setHeight,
-	] );
 
 	useFocusEffect(
 		useCallback( () => {
@@ -81,17 +79,14 @@ const BottomSheetNavigationScreen = ( {
 	useFocusEffect(
 		useCallback( () => {
 			if ( fullScreen ) {
-				setHeight( '100%' );
+				setHeight( windowHeight );
 				setIsFullScreen( true );
-			} else if ( heightRef.current.maxHeight !== 0 ) {
+			} else if ( maxHeight.current !== 0 ) {
 				setIsFullScreen( false );
-				setHeight( heightRef.current.maxHeight );
+				setHeight( maxHeight.current );
 			}
 			return () => {};
-			// Disable reason: deferring this refactor to the native team.
-			// see https://github.com/WordPress/gutenberg/pull/41166
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [ setHeight ] )
+		}, [ fullScreen, setHeight, setIsFullScreen, windowHeight ] )
 	);
 
 	const onLayout = ( { nativeEvent } ) => {
@@ -99,10 +94,9 @@ const BottomSheetNavigationScreen = ( {
 			return;
 		}
 		const { height } = nativeEvent.layout;
-
-		if ( heightRef.current.maxHeight !== height && isFocused ) {
-			heightRef.current.maxHeight = height;
-			setHeightDebounce( height );
+		if ( maxHeight.current !== height && isFocused ) {
+			maxHeight.current = height;
+			setHeight( height );
 		}
 	};
 

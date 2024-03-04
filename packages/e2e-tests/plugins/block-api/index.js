@@ -1,13 +1,16 @@
 ( function () {
 	const { registerBlockType } = wp.blocks;
+	const { useBlockProps } = wp.blockEditor;
+	const { createElement: el } = wp.element;
 	const { addFilter } = wp.hooks;
 
 	registerBlockType( 'e2e-tests/hello-world', {
+		apiVersion: 3,
 		title: 'Hello World',
 		description: 'Hello World test block.',
 		category: 'widgets',
-		edit() {
-			return 'Hello Editor!';
+		edit: function Edit() {
+			return el( 'p', useBlockProps(), 'Hello Editor!' );
 		},
 		save() {
 			return 'Hello Frontend!';

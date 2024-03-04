@@ -3,7 +3,6 @@
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
@@ -16,11 +15,6 @@ import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcutsEditMode() {
-	const { getEditorMode } = useSelect( editSiteStore );
-	const isListViewOpen = useSelect(
-		( select ) => select( editSiteStore ).isListViewOpened(),
-		[]
-	);
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea(
@@ -28,12 +22,8 @@ function KeyboardShortcutsEditMode() {
 			) === SIDEBAR_BLOCK,
 		[]
 	);
-	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened, switchEditorMode } =
-		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
-
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
 		useSelect( blockEditorStore );
@@ -66,20 +56,6 @@ function KeyboardShortcutsEditMode() {
 		);
 	};
 
-	useShortcut( 'core/edit-site/undo', ( event ) => {
-		undo();
-		event.preventDefault();
-	} );
-
-	useShortcut( 'core/edit-site/redo', ( event ) => {
-		redo();
-		event.preventDefault();
-	} );
-
-	useShortcut( 'core/edit-site/toggle-list-view', () => {
-		setIsListViewOpened( ! isListViewOpen );
-	} );
-
 	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any
 		// obscure shortcuts from triggering.
@@ -90,10 +66,6 @@ function KeyboardShortcutsEditMode() {
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 		}
-	} );
-
-	useShortcut( 'core/edit-site/toggle-mode', () => {
-		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
 	} );
 
 	useShortcut( 'core/edit-site/transform-heading-to-paragraph', ( event ) =>

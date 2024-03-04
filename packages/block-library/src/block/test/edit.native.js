@@ -56,8 +56,8 @@ afterAll( () => {
 	} );
 } );
 
-describe( 'Reusable block', () => {
-	it( 'inserts a reusable block', async () => {
+describe( 'Synced patterns', () => {
+	it( 'inserts a synced pattern', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const reusableBlockMock1 = getMockedReusableBlock( 1 );
 		const reusableBlockMock2 = getMockedReusableBlock( 2 );
@@ -86,7 +86,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( await screen.findByLabelText( 'Add block' ) );
 
 		// Navigate to reusable tab.
-		const reusableSegment = await screen.findByText( 'Reusable' );
+		const reusableSegment = await screen.findByText( 'Synced patterns' );
 		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
@@ -98,7 +98,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( reusableSegment );
 
 		const reusableBlockList = screen.getByTestId(
-			'InserterUI-ReusableBlocks'
+			'InserterUI-SyncedPatterns'
 		);
 		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
@@ -114,7 +114,7 @@ describe( 'Reusable block', () => {
 
 		// Get the reusable block.
 		const [ reusableBlock ] = await screen.findAllByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -131,7 +131,7 @@ describe( 'Reusable block', () => {
 		} );
 
 		const [ reusableBlock ] = await screen.findAllByLabelText(
-			/Reusable block Block\. Row 1/
+			/Pattern Block\. Row 1/
 		);
 
 		const blockDeleted = within( reusableBlock ).getByText(
@@ -142,9 +142,7 @@ describe( 'Reusable block', () => {
 		expect( blockDeleted ).toBeDefined();
 	} );
 
-	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
-	// triggering `onLayout*` on the element: https://github.com/callstack/react-native-testing-library/issues/897.
-	it.skip( 'renders block content', async () => {
+	it( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
@@ -163,13 +161,12 @@ describe( 'Reusable block', () => {
 			initialHtml,
 		} );
 
-		const [ reusableBlock ] = await screen.findByLabelText(
-			/Reusable block Block\. Row 1/
+		const reusableBlock = await screen.findByLabelText(
+			/Pattern Block\. Row 1/
 		);
 
-		const innerBlockListWrapper = await within(
-			reusableBlock
-		).findByTestId( 'block-list-wrapper' );
+		const innerBlockListWrapper =
+			await within( reusableBlock ).findByTestId( 'block-list-wrapper' );
 
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.

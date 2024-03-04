@@ -24,7 +24,7 @@ export async function openDocumentSettingsSidebar( this: Editor ) {
 		await toggleButton.click();
 		await this.page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Close settings' } )
+			.getByRole( 'button', { name: 'Close Settings' } )
 			.waitFor();
 	}
 }

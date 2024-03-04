@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### ShortcutProvider
 
-Handles callbacks added to context by `useShortcut`.
+Handles callbacks added to context by `useShortcut`. Adding a provider allows to register contextual shortcuts that are only active when a certain part of the UI is focused.
 
 _Parameters_
 
@@ -26,7 +26,7 @@ _Parameters_
 
 _Returns_
 
--   `import('@wordpress/element').WPElement`: Component.
+-   `Element`: Component.
 
 ### store
 

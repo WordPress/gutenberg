@@ -38,6 +38,7 @@ export default function MoreMenuDropdown( {
 			toggleProps={ {
 				tooltipPosition: 'bottom',
 				...toggleProps,
+				size: 'compact',
 			} }
 		>
 			{ ( onClose ) => children( onClose ) }

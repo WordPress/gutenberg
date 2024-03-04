@@ -11,7 +11,8 @@
 		{ "path": "../element" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
-		{ "path": "../priority-queue" }
+		{ "path": "../priority-queue" },
+		{ "path": "../undo-manager" }
 	],
 	"include": [ "src/**/*" ]
 }

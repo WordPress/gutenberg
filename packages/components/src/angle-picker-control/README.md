@@ -6,7 +6,7 @@ Users can choose an angle in a visual UI with the mouse by dragging an angle ind
 ## Usage
 
 ```jsx
-import { useState } from '@wordpress/element';
+import { useState } from 'react';
 import { AnglePickerControl } from '@wordpress/components';
 
 function Example() {
@@ -15,7 +15,6 @@ function Example() {
 		<AnglePickerControl
 			value={ angle }
 			onChange={ setAngle }
-			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -43,10 +42,3 @@ The current value of the input. The value represents an angle in degrees and sho
 A function that receives the new value of the input.
 
 -   Required: Yes
-
-### `__nextHasNoMarginBottom`: `boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
-
--   Required: No
--   Default: `false`

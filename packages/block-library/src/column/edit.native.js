@@ -15,7 +15,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	store as blockEditorStore,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -42,7 +42,6 @@ function ColumnEdit( {
 	hasChildren,
 	isSelected,
 	getStylesFromColorScheme,
-	isParentSelected,
 	contentStyle,
 	columns,
 	selectedColumnIndex,
@@ -61,14 +60,9 @@ function ColumnEdit( {
 
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	const updateAlignment = ( alignment ) => {
@@ -112,10 +106,10 @@ function ColumnEdit( {
 	};
 
 	const renderAppender = useCallback( () => {
-		const { width: columnWidth } = contentStyle[ clientId ];
-		const isFullWidth = columnWidth === screenWidth;
-
 		if ( isSelected ) {
+			const { width: columnWidth } = contentStyle[ clientId ] || {};
+			const isFullWidth = columnWidth === screenWidth;
+
 			return (
 				<View
 					style={ [
@@ -134,18 +128,16 @@ function ColumnEdit( {
 			);
 		}
 		return null;
-	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
+	}, [ contentStyle, clientId, screenWidth, isSelected, hasChildren ] );
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
 			<View
 				style={ [
-					! isParentSelected &&
-						getStylesFromColorScheme(
-							styles.columnPlaceholder,
-							styles.columnPlaceholderDark
-						),
-					styles.columnPlaceholderNotSelected,
+					getStylesFromColorScheme(
+						styles.columnPlaceholder,
+						styles.columnPlaceholderDark
+					),
 					contentStyle[ clientId ],
 				] }
 			/>
@@ -168,7 +160,7 @@ function ColumnEdit( {
 						/>
 					</BlockControls>
 					<InspectorControls>
-						<PanelBody title={ __( 'Column settings' ) }>
+						<PanelBody title={ __( 'Settings' ) }>
 							<UnitControl
 								label={ __( 'Width' ) }
 								min={ 1 }
@@ -258,8 +250,6 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const hasChildren = !! getBlockCount( clientId );
-		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
 
 		const blockOrder = getBlockOrder( parentId );
 
@@ -271,7 +261,6 @@ export default compose( [
 
 		return {
 			hasChildren,
-			isParentSelected,
 			isSelected,
 			selectedColumnIndex,
 			columns,

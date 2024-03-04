@@ -1,13 +1,15 @@
+'use strict';
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 
 /**
  * Internal dependencies
  */
 const initConfig = require( '../init-config' );
 const { configureWordPress, resetDatabase } = require( '../wordpress' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 
 /**
  * @typedef {import('../wordpress').WPEnvironment} WPEnvironment
@@ -20,9 +22,15 @@ const { configureWordPress, resetDatabase } = require( '../wordpress' );
  * @param {Object}                 options
  * @param {WPEnvironmentSelection} options.environment The environment to clean. Either 'development', 'tests', or 'all'.
  * @param {Object}                 options.spinner     A CLI spinner which indicates progress.
+ * @param {boolean}                options.scripts     Indicates whether or not lifecycle scripts should be executed.
  * @param {boolean}                options.debug       True if debug mode is enabled.
  */
-module.exports = async function clean( { environment, spinner, debug } ) {
+module.exports = async function clean( {
+	environment,
+	spinner,
+	scripts,
+	debug,
+} ) {
 	const config = await initConfig( { spinner, debug } );
 
 	const description = `${ environment } environment${
@@ -56,6 +64,10 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 	}
 
 	await Promise.all( tasks );
+
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterClean', config, spinner );
+	}
 
 	spinner.text = `Cleaned ${ description }.`;
 };

@@ -5,7 +5,7 @@ import { SVG, Path } from '@wordpress/primitives';
 
 const stretchWide = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M5 9v6h14V9H5zm11-4.8H8v1.5h8V4.2zM8 19.8h8v-1.5H8v1.5z" />
+		<Path d="M16 5.5H8V4h8v1.5ZM16 20H8v-1.5h8V20ZM5 9h14v6H5V9Z" />
 	</SVG>
 );
 

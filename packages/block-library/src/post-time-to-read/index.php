@@ -32,8 +32,8 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	$minutes_to_read = max( 1, (int) round( wp_word_count( $content, $word_count_type ) / $average_reading_rate ) );
 
 	$minutes_to_read_string = sprintf(
-		/* translators: %d is the number of minutes the post will take to read. */
-		_n( '%d minute', '%d minutes', $minutes_to_read ),
+		/* translators: %s is the number of minutes the post will take to read. */
+		_n( '%s minute', '%s minutes', $minutes_to_read ),
 		$minutes_to_read
 	);
 
@@ -42,7 +42,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(
-		'<p %1$s>%2$s</p>',
+		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
 		$minutes_to_read_string
 	);

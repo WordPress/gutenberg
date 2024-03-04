@@ -12,7 +12,9 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '### 3' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -27,7 +29,9 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '4' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '#### ' );
@@ -44,7 +48,9 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '## 1. H' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -59,7 +65,9 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '## `code`' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -115,7 +123,9 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '### Heading' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -147,7 +157,9 @@ test.describe( 'Heading', () => {
 	} );
 
 	test( 'should correctly apply named colors', async ( { editor, page } ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -160,7 +172,7 @@ test.describe( 'Heading', () => {
 		await textColor.click();
 
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'option', {
 				name: 'Color: Luminous vivid orange',
 			} )
 			.click();
@@ -185,7 +197,9 @@ test.describe( 'Heading', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '## Heading' );
 
 		// Change text alignment
@@ -196,9 +210,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '4' );
+		await pageUtils.pressKeys( 'access+4' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
@@ -216,7 +230,9 @@ test.describe( 'Heading', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Paragraph' );
 
 		// Change text alignment
@@ -227,9 +243,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '2' );
+		await pageUtils.pressKeys( 'access+2' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
@@ -247,7 +263,9 @@ test.describe( 'Heading', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '## Heading' );
 
 		// Change text alignment
@@ -259,9 +277,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '0' );
+		await pageUtils.pressKeys( 'access+0' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -272,5 +290,185 @@ test.describe( 'Heading', () => {
 				},
 			},
 		] );
+	} );
+
+	test.describe( 'Block transforms', () => {
+		test.describe( 'FROM paragraph', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/heading' );
+				const headingBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( headingBlock.name ).toBe( 'core/heading' );
+				expect( headingBlock.attributes.content ).toBe(
+					'initial content'
+				);
+			} );
+
+			test( 'should preserve the text align attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						align: 'right',
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/heading' );
+				const headingBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( headingBlock.name ).toBe( 'core/heading' );
+				expect( headingBlock.attributes.textAlign ).toBe( 'right' );
+			} );
+
+			test( 'should preserve the metadata attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/heading' );
+				const headingBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( headingBlock.name ).toBe( 'core/heading' );
+				expect( headingBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+
+			test( 'should preserve the block bindings', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'custom_field',
+									},
+								},
+							},
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/heading' );
+				const headingBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( headingBlock.name ).toBe( 'core/heading' );
+				expect(
+					headingBlock.attributes.metadata.bindings
+				).toMatchObject( {
+					content: {
+						source: 'core/post-meta',
+						args: {
+							key: 'custom_field',
+						},
+					},
+				} );
+			} );
+		} );
+
+		test.describe( 'TO paragraph', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/paragraph' );
+				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
+				expect( paragraphBlock.attributes.content ).toBe(
+					'initial content'
+				);
+			} );
+
+			test( 'should preserve the text align attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						textAlign: 'right',
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/paragraph' );
+				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
+				expect( paragraphBlock.attributes.align ).toBe( 'right' );
+			} );
+
+			test( 'should preserve the metadata attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/paragraph' );
+				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
+				expect( paragraphBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+
+			test( 'should preserve the block bindings', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'custom_field',
+									},
+								},
+							},
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/paragraph' );
+				const paragraphBlock = ( await editor.getBlocks() )[ 0 ];
+				expect( paragraphBlock.name ).toBe( 'core/paragraph' );
+				expect(
+					paragraphBlock.attributes.metadata.bindings
+				).toMatchObject( {
+					content: {
+						source: 'core/post-meta',
+						args: {
+							key: 'custom_field',
+						},
+					},
+				} );
+			} );
+		} );
 	} );
 } );

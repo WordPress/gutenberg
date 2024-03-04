@@ -26,6 +26,17 @@
 		opacity: 0.62;
 	}
 
+	// In "constrained" layout containers, the first and last paragraphs have their margins zeroed out.
+	// In the case of this appender, it needs to apply those same rules to avoid layout shifts.
+	// Such shifts happen when the bottom margin of the Title block has been set to less than the default 1em margin of paragraphs.
+	:where(body .is-layout-constrained) & {
+		> :first-child:first-child {
+			margin-block-start: 0;
+		}
+
+		// Since this particular appender will only ever appear on an entirely empty document, we don't account for last-child.
+	}
+
 	// Dropzone.
 	.components-drop-zone__content-icon {
 		display: none;

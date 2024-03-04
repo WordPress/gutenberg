@@ -30,20 +30,18 @@ test.describe( 'Block deletion', () => {
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
-					name: 'Paragraph block',
+					name: 'Block: Paragraph',
 				} )
 				.last()
 		).toBeFocused();
 
 		// Remove the current paragraph via the Block Toolbar options menu.
 		await editor.showBlockToolbar();
-		await editor.canvas
+		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure the last block was removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -60,6 +58,51 @@ test.describe( 'Block deletion', () => {
 				attributes: { content: 'Second| ← caret was here' },
 			},
 		] );
+	} );
+
+	// this test should be moved to a new testing story about focus management.
+	test( 'deleting a block focuses the parent block', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add a group with a paragraph in it.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Paragraph child of group' },
+				},
+			],
+		} );
+
+		// Select the paragraph.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraph );
+
+		// Remove the current paragraph via the Block Toolbar options menu.
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+
+		// Ensure the paragraph was removed.
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/group', attributes: {} } ] );
+
+		// Ensure the group block is focused.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Group',
+				} )
+				.last()
+		).toBeFocused();
 	} );
 
 	test( 'deleting the last block via the keyboard shortcut', async ( {
@@ -85,13 +128,13 @@ test.describe( 'Block deletion', () => {
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
-					name: 'Paragraph block',
+					name: 'Block: Paragraph',
 				} )
 				.last()
 		).toBeFocused();
 
 		// Remove the current paragraph via dedicated keyboard shortcut.
-		await pageUtils.pressKeyWithModifier( 'access', 'z' );
+		await pageUtils.pressKeys( 'access+z' );
 
 		// Ensure the last block was removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -227,7 +270,7 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 
 		// Select the last two paragraphs.
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect
 			.poll( () =>
 				page.evaluate( () =>
@@ -264,19 +307,17 @@ test.describe( 'Block deletion', () => {
 		} );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 		).toBeFocused();
 
 		// Remove that paragraph via its options menu.
 		await editor.showBlockToolbar();
-		await editor.canvas
+		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure an empty block was created and focused.
 		await expect(
@@ -336,7 +377,7 @@ test.describe( 'Block deletion', () => {
 		await expect.poll( editor.getBlocks ).toHaveLength( 0 );
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Ensure that the block appender button is visible.
 		await expect(

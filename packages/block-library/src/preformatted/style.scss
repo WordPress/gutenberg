@@ -1,7 +1,10 @@
 .wp-block-preformatted {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	white-space: pre-wrap;
 }
 
-.wp-block-preformatted.has-background {
+// Add low specificity default padding when a background is used.
+:where(.wp-block-preformatted.has-background) {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }

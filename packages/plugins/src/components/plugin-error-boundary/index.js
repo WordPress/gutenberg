@@ -4,6 +4,9 @@
 import { Component } from '@wordpress/element';
 
 export class PluginErrorBoundary extends Component {
+	/**
+	 * @param {Object} props
+	 */
 	constructor( props ) {
 		super( props );
 		this.state = {
@@ -15,6 +18,9 @@ export class PluginErrorBoundary extends Component {
 		return { hasError: true };
 	}
 
+	/**
+	 * @param {Error} error Error object passed by React.
+	 */
 	componentDidCatch( error ) {
 		const { name, onError } = this.props;
 		if ( onError ) {

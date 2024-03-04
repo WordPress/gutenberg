@@ -4,6 +4,11 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { LAYOUT_DEFINITIONS } from './definitions';
+
+/**
  * Utility to generate the proper CSS selector for layout styles.
  *
  * @param {string} selectors CSS selector, also supports multiple comma-separated selectors.
@@ -35,14 +40,14 @@ export function appendSelectors( selectors, append = '' ) {
  * with the provided `blockGapValue`.
  *
  * @param {string} selector          The CSS selector to target for the generated rules.
- * @param {Object} layoutDefinitions Layout definitions object from theme.json.
+ * @param {Object} layoutDefinitions Layout definitions object.
  * @param {string} layoutType        The layout type (e.g. `default` or `flex`).
  * @param {string} blockGapValue     The current blockGap value to be applied.
  * @return {string} The generated CSS rules.
  */
 export function getBlockGapCSS(
 	selector,
-	layoutDefinitions,
+	layoutDefinitions = LAYOUT_DEFINITIONS,
 	layoutType,
 	blockGapValue
 ) {
@@ -83,10 +88,11 @@ export function getBlockGapCSS(
  * @return {Object} An object with contextual info per alignment.
  */
 export function getAlignmentsInfo( layout ) {
-	const { contentSize, wideSize } = layout;
+	const { contentSize, wideSize, type = 'default' } = layout;
 	const alignmentInfo = {};
-	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
-	if ( sizeRegex.test( contentSize ) ) {
+	const sizeRegex =
+		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
+	if ( sizeRegex.test( contentSize ) && type === 'constrained' ) {
 		// translators: %s: container size (i.e. 600px etc)
 		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
 	}

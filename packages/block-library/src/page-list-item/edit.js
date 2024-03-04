@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
@@ -36,7 +35,7 @@ function useFrontPageId() {
 }
 
 export default function PageListItemEdit( { context, attributes } ) {
-	const { id, label, link, hasChildren } = attributes;
+	const { id, label, link, hasChildren, title } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
@@ -65,6 +64,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 			{ hasChildren && context.openSubmenusOnClick ? (
 				<>
 					<button
+						type="button"
 						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"
 					>
@@ -81,7 +81,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 					} ) }
 					href={ link }
 				>
-					{ decodeEntities( label ) }
+					{ decodeEntities( title ) }
 				</a>
 			) }
 			{ hasChildren && (
@@ -91,6 +91,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 							<button
 								className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
 								aria-expanded="false"
+								type="button"
 							>
 								<ItemSubmenuIcon />
 							</button>
