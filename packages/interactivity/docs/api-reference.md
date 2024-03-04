@@ -1042,10 +1042,11 @@ The code will log:
 }
 ```
 
-### useScope()
+### withScope()
 
 Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
-When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like `setInterval()`, you need to ensure that callback sets the scope. The way of doing so is by wrapping the callback with `withScope()` function.
+
+When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
 
 An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
 
@@ -1053,15 +1054,12 @@ An example, where `actions.nextImage` would trigger an undefined error without t
 store('mySliderPlugin', {
 	callbacks: {
 		initSlideShow: () => {
-			const ctx = getContext();
-			if ( ctx.autoplay ) {
-				setInterval(
-					withScope( () => {
-						actions.nextImage();
-					} ),
-					state.transitionsSpeed
-				);
-			}
+			setInterval(
+				withScope( () => {
+					actions.nextImage();
+				} ),
+				3_000
+			);
 		},
 })
 ```
