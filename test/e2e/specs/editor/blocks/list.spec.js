@@ -680,7 +680,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should be immeadiately saved on indentation', async ( {
+	test( 'should be immediately saved on indentation', async ( {
 		editor,
 		page,
 	} ) => {
