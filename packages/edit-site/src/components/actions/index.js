@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external, trash, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,7 +27,7 @@ const { useHistory } = unlock( routerPrivateApis );
 export const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
-	isPrimary: true,
+	isPrimary: false,
 	icon: trash,
 	isEligible( { status } ) {
 		return status !== 'trash';
@@ -372,6 +372,8 @@ export function useEditPostAction() {
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
+			isPrimary: true,
+			icon: edit,
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
