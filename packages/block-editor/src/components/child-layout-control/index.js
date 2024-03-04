@@ -130,6 +130,7 @@ export default function ChildLayoutControl( {
 							} }
 							value={ columnStart }
 							min={ 1 }
+							max={ parentLayout?.columnCount }
 						/>
 						<InputControl
 							size={ '__unstable-large' }
@@ -145,6 +146,7 @@ export default function ChildLayoutControl( {
 							} }
 							value={ rowStart }
 							min={ 1 }
+							max={ parentLayout?.columnCount }
 						/>
 					</HStack>
 					<HStack>
@@ -162,6 +164,7 @@ export default function ChildLayoutControl( {
 							} }
 							value={ columnSpan }
 							min={ 1 }
+							max={ parentLayout?.columnCount }
 						/>
 						<InputControl
 							size={ '__unstable-large' }
@@ -177,6 +180,7 @@ export default function ChildLayoutControl( {
 							} }
 							value={ rowSpan }
 							min={ 1 }
+							max={ parentLayout?.columnCount }
 						/>
 					</HStack>
 				</>
