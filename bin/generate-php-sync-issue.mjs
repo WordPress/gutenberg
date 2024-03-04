@@ -17,7 +17,7 @@ function getArg( argName ) {
 
 const OWNER = 'wordpress';
 const REPO = 'gutenberg';
-const MAX_MONTHS_TO_QUERY = 6;
+const MAX_MONTHS_TO_QUERY = 4;
 
 // The following paths will be ignored when generating the issue content.
 const IGNORED_PATHS = [
