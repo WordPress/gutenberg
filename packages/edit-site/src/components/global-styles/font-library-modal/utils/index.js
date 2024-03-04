@@ -134,7 +134,7 @@ export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
 	const unloadFontFace = ( fonts ) => {
 		fonts.forEach( ( f ) => {
 			if (
-				f.family === fontFace.fontFamily &&
+				f.family === formatFontFaceName( fontFace.fontFamily ) &&
 				f.weight === fontFace.fontWeight &&
 				f.style === fontFace.fontStyle
 			) {
