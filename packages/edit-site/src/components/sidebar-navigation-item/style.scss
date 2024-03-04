@@ -17,6 +17,11 @@
 		}
 	}
 
+	&:focus-visible {
+		// Avoid hiding the focus outline when the next navigation item is hovered
+		position: relative;
+	}
+
 	&[aria-current] {
 		background: var(--wp-admin-theme-color);
 		color: $white;
