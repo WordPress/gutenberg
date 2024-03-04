@@ -1,9 +1,3 @@
-[data-type="core/shortcode"] {
-	&.components-placeholder {
-		min-height: 0;
-	}
-}
-
 // The editing view for the Shortcode block is equivalent to block UI.
 // Therefore we increase specificity to avoid theme styles bleeding in.
 .blocks-shortcode__textarea {
