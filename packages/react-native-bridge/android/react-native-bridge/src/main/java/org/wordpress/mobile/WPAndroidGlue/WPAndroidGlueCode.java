@@ -18,7 +18,9 @@ import androidx.core.util.Consumer;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.brentvatne.react.ReactVideoPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -40,18 +42,16 @@ import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
-import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
-import org.linusu.RNGetRandomValuesPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
-import org.reactnative.maskedview.RNCMaskedViewPackage;
-import com.dylanvann.fastimage.FastImageViewPackage;
 
+import org.linusu.RNGetRandomValuesPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.AppLog.T;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -117,7 +117,7 @@ public class WPAndroidGlueCode {
     private OnConnectionStatusEventListener mOnConnectionStatusEventListener;
     private OnBackHandlerEventListener mOnBackHandlerEventListener;
 
-    private OnDidLogExceptionListener mOnDidLogExceptionListener;
+    private OnLogExceptionListener mOnLogExceptionListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -229,10 +229,6 @@ public class WPAndroidGlueCode {
         void gutenbergDidRequestEmbedFullscreenPreview(String html, String title);
     }
 
-    public interface OnDidLogExceptionListener {
-        void didLogException(GutenbergJsException exception, LogExceptionCallback onLogExceptionCallback);
-    }
-
     public interface OnGutenbergDidSendButtonPressedActionListener {
         void gutenbergDidSendButtonPressedAction(String buttonType);
     }
@@ -283,7 +279,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnLogExceptionListener {
-        void onLogException(GutenbergJsException exception);
+        void onLogException(GutenbergJsException exception, LogExceptionCallback onLogExceptionCallback);
     }
 
     public void mediaSelectionCancelled() {
@@ -630,7 +626,7 @@ public class WPAndroidGlueCode {
 
             @Override
             public void logException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback) {
-                mOnDidLogExceptionListener.didLogException(exception, logExceptionCallback);
+                mOnLogExceptionListener.onLogException(exception, logExceptionCallback);
                 logExceptionCallback.onLogException(true);
             }
         }, mIsDarkMode);
@@ -733,7 +729,7 @@ public class WPAndroidGlueCode {
                                   OnToggleRedoButtonListener onToggleRedoButtonListener,
                                   OnConnectionStatusEventListener onConnectionStatusEventListener,
                                   OnBackHandlerEventListener onBackHandlerEventListener,
-                                  OnDidLogExceptionListener onDidLogExceptionListener,
+                                  OnLogExceptionListener onLogExceptionListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -761,7 +757,7 @@ public class WPAndroidGlueCode {
         mOnToggleRedoButtonListener = onToggleRedoButtonListener;
         mOnConnectionStatusEventListener = onConnectionStatusEventListener;
         mOnBackHandlerEventListener = onBackHandlerEventListener;
-        mOnDidLogExceptionListener = onDidLogExceptionListener;
+        mOnLogExceptionListener = onLogExceptionListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
