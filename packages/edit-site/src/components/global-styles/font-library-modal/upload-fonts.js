@@ -184,7 +184,7 @@ function UploadFonts() {
 						accept={ ALLOWED_FILE_EXTENSIONS.map(
 							( ext ) => `.${ ext }`
 						).join( ',' ) }
-						multiple={ true }
+						multiple
 						onChange={ onFilesUpload }
 						render={ ( { openFileDialog } ) => (
 							<Button
