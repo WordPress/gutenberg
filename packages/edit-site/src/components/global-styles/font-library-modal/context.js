@@ -423,7 +423,6 @@ function FontLibraryProvider( { children } ) {
 		);
 
 		if ( isFaceActivated ) {
-			// Load font faces just in the iframe because they already are in the document.
 			loadFontFaceInBrowser(
 				face,
 				getDisplaySrcFromFontFace( face.src ),
