@@ -1,14 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import HighlightedColors from './highlighted-colors';
 import PreviewIframe from './preview-iframe';
-import { FirstFrame } from './preview-animations';
+
+const firstFrameVariants = {
+	start: {
+		scale: 1,
+		opacity: 1,
+	},
+	hover: {
+		scale: 0,
+		opacity: 0,
+	},
+};
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 	return (
@@ -18,7 +31,14 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 			withHoverView={ withHoverView }
 		>
 			{ ( { ratio, key } ) => (
-				<FirstFrame key={ key }>
+				<motion.div
+					key={ key }
+					variants={ firstFrameVariants }
+					style={ {
+						height: '100%',
+						overflow: 'hidden',
+					} }
+				>
 					<HStack
 						spacing={ 10 * ratio }
 						justify="center"
@@ -32,7 +52,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 							ratio={ ratio }
 						/>
 					</HStack>
-				</FirstFrame>
+				</motion.div>
 			) }
 		</PreviewIframe>
 	);

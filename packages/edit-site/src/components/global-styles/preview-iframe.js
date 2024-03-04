@@ -142,9 +142,9 @@ export default function PreviewIframe( {
 								: 'start'
 						}
 					>
-						{ [ ...children ].map( ( child, key ) =>
-							child( { ratio, key } )
-						) }
+						{ []
+							.concat( children ) // This makes sure children is always an array.
+							.map( ( child, key ) => child( { ratio, key } ) ) }
 					</motion.div>
 				</Iframe>
 			) }

@@ -5,6 +5,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 
 /**
@@ -16,9 +17,38 @@ import PreviewTypography from './preview-typography';
 import HighlightedColors from './highlighted-colors';
 import PreviewIframe from './preview-iframe';
 
-import { FirstFrame, MidFrame, SecondFrame } from './preview-animations';
-
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+
+const firstFrameVariants = {
+	start: {
+		scale: 1,
+		opacity: 1,
+	},
+	hover: {
+		scale: 0,
+		opacity: 0,
+	},
+};
+
+const midFrameVariants = {
+	hover: {
+		opacity: 1,
+	},
+	start: {
+		opacity: 0.5,
+	},
+};
+
+const secondFrameVariants = {
+	hover: {
+		scale: 1,
+		opacity: 1,
+	},
+	start: {
+		scale: 0,
+		opacity: 0,
+	},
+};
 
 const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 	const [ fontWeight ] = useGlobalStyle( 'typography.fontWeight' );
@@ -43,7 +73,14 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 			withHoverView={ withHoverView }
 		>
 			{ ( { ratio, key } ) => (
-				<FirstFrame key={ key }>
+				<motion.div
+					key={ key }
+					variants={ firstFrameVariants }
+					style={ {
+						height: '100%',
+						overflow: 'hidden',
+					} }
+				>
 					<HStack
 						spacing={ 10 * ratio }
 						justify="center"
@@ -63,10 +100,22 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 							/>
 						</VStack>
 					</HStack>
-				</FirstFrame>
+				</motion.div>
 			) }
 			{ ( { key } ) => (
-				<MidFrame withHoverView={ withHoverView } key={ key }>
+				<motion.div
+					key={ key }
+					variants={ withHoverView && midFrameVariants }
+					style={ {
+						height: '100%',
+						width: '100%',
+						position: 'absolute',
+						top: 0,
+						overflow: 'hidden',
+						filter: 'blur(60px)',
+						opacity: 0.1,
+					} }
+				>
 					<HStack
 						spacing={ 0 }
 						justify="flex-start"
@@ -88,10 +137,20 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 								/>
 							) ) }
 					</HStack>
-				</MidFrame>
+				</motion.div>
 			) }
 			{ ( { ratio, key } ) => (
-				<SecondFrame key={ key }>
+				<motion.div
+					key={ key }
+					variants={ secondFrameVariants }
+					style={ {
+						height: '100%',
+						width: '100%',
+						overflow: 'hidden',
+						position: 'absolute',
+						top: 0,
+					} }
+				>
 					<VStack
 						spacing={ 3 * ratio }
 						justify="center"
@@ -117,7 +176,7 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 							</div>
 						) }
 					</VStack>
-				</SecondFrame>
+				</motion.div>
 			) }
 		</PreviewIframe>
 	);
