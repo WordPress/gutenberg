@@ -106,7 +106,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'Top Level Item 1',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 
@@ -116,7 +116,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'Top Level Item 2',
 				} )
 				.filter( {
-					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 
@@ -126,7 +126,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'Test Submenu Item',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+					hasText: 'Block 1 of 1, Level 2.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 	} );
@@ -241,7 +241,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: firstResultText,
 				} )
 				.filter( {
-					hasText: 'Block 3 of 3, Level 1', // proxy for filtering by description.
+					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 	} );
@@ -263,7 +263,7 @@ test.describe( 'Navigation block - List view editing', () => {
 				name: 'Top Level Item 2',
 			} )
 			.filter( {
-				hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+				hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
 			} );
 
 		// The actions menu button is a sibling of the menu item gridcell.
@@ -295,7 +295,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'Top Level Item 2',
 				} )
 				.filter( {
-					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeHidden();
 	} );
@@ -379,7 +379,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'Changed label', // new menu item text
 				} )
 				.filter( {
-					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 	} );
@@ -407,7 +407,7 @@ test.describe( 'Navigation block - List view editing', () => {
 				name: 'Top Level Item 1',
 			} )
 			.filter( {
-				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+				hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 			} );
 
 		// The actions menu button is a sibling of the menu item gridcell.
@@ -444,7 +444,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'wordpress.org',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+					hasText: 'Block 1 of 1, Level 2.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 
@@ -456,7 +456,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					name: 'Top Level Item 1',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
 	} );

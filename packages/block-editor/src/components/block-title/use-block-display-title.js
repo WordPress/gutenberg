@@ -6,6 +6,7 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,8 +65,8 @@ export default function useBlockDisplayTitle( {
 		[ clientId, context ]
 	);
 
-	if ( ! blockTitle ) {
-		return null;
+	if ( ! blockTitle || blockTitle.trim() === '' ) {
+		return __( 'Untitled' );
 	}
 
 	if (

@@ -21,7 +21,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
@@ -35,7 +35,11 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import { useListViewContext } from './context';
-import { getBlockPositionDescription, focusListItem } from './utils';
+import {
+	getBlockPositionDescription,
+	getBlockPropertiesDescription,
+	focusListItem,
+} from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
@@ -92,12 +96,6 @@ function ListViewBlock( {
 		[ clientId ]
 	);
 
-	const listViewItemLabel =
-		block.attributes?.label || // Visible label of a block item e.g. for Navigation link block.
-		blockInformation?.name || // Custom Block name for user-renamed blocks: attributes?.metadata?.name.
-		blockInformation?.title || // Synced pattern name or Block type name e.g. 'Paragraph': resusableTitle || blockType.title;
-		__( 'Untitled' ); // Fallback title.
-
 	const allowRightClickOverrides = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().allowRightClickOverrides,
@@ -112,7 +110,7 @@ function ListViewBlock( {
 		// Don't show the settings menu if block is disabled or content only.
 		blockEditingMode === 'default';
 	const instanceId = useInstanceId( ListViewBlock );
-	const descriptionId = `list-view-block-select-button__${ instanceId }`;
+	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 
 	const {
 		expand,
@@ -252,13 +250,8 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockAriaLabel = isLocked
-		? sprintf(
-				// translators: %s: The title of the block. This string indicates a link to select the locked block.
-				__( '%s (locked)' ),
-				listViewItemLabel
-		  )
-		: listViewItemLabel;
+	const blockPropertiesDescription =
+		getBlockPropertiesDescription( isLocked );
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -351,12 +344,11 @@ function ListViewBlock( {
 							onFocus={ onFocus }
 							isExpanded={ canEdit ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
-							ariaLabel={ blockAriaLabel }
 							ariaDescribedBy={ descriptionId }
 							updateFocusAndSelection={ updateFocusAndSelection }
 						/>
 						<AriaReferencedText id={ descriptionId }>
-							{ blockPositionDescription }
+							{ `${ blockPositionDescription } ${ blockPropertiesDescription }` }
 						</AriaReferencedText>
 					</div>
 				) }
