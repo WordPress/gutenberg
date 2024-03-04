@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { typography, color, layout } from '@wordpress/icons';
+import { typography, color, layout, alignLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -38,6 +38,15 @@ function RootMenu() {
 						aria-label={ __( 'Typography styles' ) }
 					>
 						{ __( 'Typography' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasTypographyPanel && (
+					<NavigationButtonAsItem
+						icon={ alignLeft }
+						path="/text-alignment"
+						aria-label={ __( 'Text alignment' ) }
+					>
+						{ __( 'Text alignment' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasColorPanel && (
