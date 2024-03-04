@@ -21,6 +21,7 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
@@ -178,6 +179,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 					actions={ primaryActions }
 					item={ item }
 				/>
+				<DropdownMenuSeparator />
 				<ActionsDropdownMenuGroup
 					actions={ secondaryActions }
 					item={ item }
