@@ -65,14 +65,14 @@ const THROTTLE_OPTIONS = {
 };
 const noop = () => {};
 
-const PreviewWrapper = ( {
+export default function PreviewIframe( {
 	firstFrame = noop,
 	midFrame = noop,
 	secondFrame = noop,
 	label,
 	isFocused,
 	withHoverView,
-} ) => {
+} ) {
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
@@ -222,6 +222,4 @@ const PreviewWrapper = ( {
 			) }
 		</>
 	);
-};
-
-export default PreviewWrapper;
+}

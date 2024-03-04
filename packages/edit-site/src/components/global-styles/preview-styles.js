@@ -14,11 +14,11 @@ import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from './hooks';
 import PreviewTypography from './preview-typography';
 import HighlightedColors from './highlighted-colors';
-import PreviewWrapper from './preview-wrapper';
+import PreviewIframe from './preview-iframe';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-const StylesPreview = ( { label, isFocused, withHoverView, variation } ) => {
+const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 	const [ fontWeight ] = useGlobalStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useGlobalStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useGlobalStyle(
@@ -106,7 +106,7 @@ const StylesPreview = ( { label, isFocused, withHoverView, variation } ) => {
 	);
 
 	return (
-		<PreviewWrapper
+		<PreviewIframe
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
@@ -117,4 +117,4 @@ const StylesPreview = ( { label, isFocused, withHoverView, variation } ) => {
 	);
 };
 
-export default StylesPreview;
+export default PreviewStyles;

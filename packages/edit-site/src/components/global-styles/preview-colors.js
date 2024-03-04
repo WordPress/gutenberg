@@ -7,7 +7,7 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
  * Internal dependencies
  */
 import HighlightedColors from './highlighted-colors';
-import PreviewWrapper from './preview-wrapper';
+import PreviewIframe from './preview-iframe';
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 	const FirstFrame = ( ratio ) => (
@@ -27,7 +27,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 	);
 
 	return (
-		<PreviewWrapper
+		<PreviewIframe
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
