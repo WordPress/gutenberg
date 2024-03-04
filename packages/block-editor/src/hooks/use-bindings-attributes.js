@@ -66,17 +66,23 @@ export function canBindAttribute( blockName, attributeName ) {
  * @param {Object}   props.source            - Source handler.
  * @param {Object}   props.args              - The arguments to pass to the source.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
+ * @param {string}   props.incomingAttrValue - The incoming attribute value.
  * @return {null}                              Data-handling component. Render nothing.
  */
 const BindingConnector = ( {
 	args,
 	attrName,
+	incomingAttrValue,
 	blockProps,
 	source,
 	onPropValueChange,
 } ) => {
 	const { useSource } = source;
-	const { placeholder, value: propValue } = useSource( blockProps, args );
+	const {
+		placeholder,
+		value: propValue,
+		updateValue: updatePropValue,
+	} = useSource( blockProps, args );
 
 	const { name: blockName } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
@@ -92,6 +98,11 @@ const BindingConnector = ( {
 		[ attrName, onPropValueChange ]
 	);
 
+	/*
+	 * Source prop => Block Attribute
+	 * Sync from source to the block attribute.
+	 * It also handles the placeholder fallback.
+	 */
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			updateBoundAttibute( propValue, attrValue );
@@ -122,6 +133,22 @@ const BindingConnector = ( {
 		attrName,
 	] );
 
+	/*
+	 * Block Attribute => Source prop
+	 * Sync from incomming attribute value to the source.
+	 */
+	useLayoutEffect( () => {
+		if ( incomingAttrValue === undefined ) {
+			return;
+		}
+
+		if ( incomingAttrValue === propValue ) {
+			return;
+		}
+
+		updatePropValue( incomingAttrValue );
+	}, [ incomingAttrValue, propValue, updatePropValue ] );
+
 	return null;
 };
 
@@ -131,13 +158,19 @@ const BindingConnector = ( {
  * to the source handlers.
  * For this, it creates a BindingConnector for each bound attribute.
  *
- * @param {Object}   props                   - The component props.
- * @param {Object}   props.blockProps        - The BlockEdit props object.
- * @param {Object}   props.bindings          - The block bindings settings.
- * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
+ * @param {Object}   props                         - The component props.
+ * @param {Object}   props.blockProps              - The BlockEdit props object.
+ * @param {Object}   props.bindings                - The block bindings settings.
+ * @param {Function} props.onPropValueChange       - The function to call when the attribute value changes.
+ * @param {Object}   props.incomingBoundAttributes - The incoming bound attributes.
  * @return {null}                              Data-handling component. Render nothing.
  */
-function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
+function BlockBindingBridge( {
+	blockProps,
+	bindings,
+	onPropValueChange,
+	incomingBoundAttributes,
+} ) {
 	const blockBindingsSources = unlock(
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
@@ -157,6 +190,9 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 						<BindingConnector
 							key={ attrName }
 							attrName={ attrName }
+							incomingAttrValue={
+								incomingBoundAttributes[ attrName ]
+							}
 							source={ source }
 							blockProps={ blockProps }
 							args={ boundAttribute.args }
@@ -220,6 +256,51 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			)
 		);
 
+		const { setAttributes } = props;
+		const [ incomingBoundAttributes, setIncomingBoundAttributes ] =
+			useState( {} );
+
+		/**
+		 * Helper function to update the block attributes.
+		 *
+		 * For unbound attributes, it calls the BlockEdit `setAttributes` callback.
+		 * For bound attributes, it updates the incoming bound attributes,
+		 * in a separate state.
+		 *
+		 * @param {Object} nextAttributes - The next attributes to update.
+		 * @return {void}
+		 */
+		const updateAttributes = useCallback(
+			( nextAttributes ) => {
+				// Collect the unbound and bound attributes.
+				const unboundAttributes = {};
+				const nextBoundAttributes = {};
+				Object.entries( nextAttributes ).reduce(
+					( acc, [ key, value ] ) => {
+						if ( ! ( key in bindings ) ) {
+							acc.unbound[ key ] = value;
+						} else {
+							acc.bound[ key ] = value;
+						}
+						return acc;
+					},
+					{ unbound: unboundAttributes, bound: nextBoundAttributes }
+				);
+
+				// Update the unbound attributes only if there are any.
+				if ( Object.keys( unboundAttributes ).length ) {
+					setAttributes( unboundAttributes );
+				}
+
+				// Update the bound attributes.
+				setIncomingBoundAttributes( ( prev ) => ( {
+					...prev,
+					...nextBoundAttributes,
+				} ) );
+			},
+			[ bindings, setAttributes ]
+		);
+
 		return (
 			<>
 				{ Object.keys( bindings ).length > 0 && (
@@ -227,12 +308,14 @@ const withBlockBindingSupport = createHigherOrderComponent(
 						blockProps={ props }
 						bindings={ bindings }
 						onPropValueChange={ updateBoundAttributes }
+						incomingBoundAttributes={ incomingBoundAttributes }
 					/>
 				) }
 
 				<BlockEdit
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
+					setAttributes={ updateAttributes }
 				/>
 			</>
 		);
