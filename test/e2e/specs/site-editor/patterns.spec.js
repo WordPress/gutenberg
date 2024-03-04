@@ -171,9 +171,7 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'no match' );
 		await expect( patterns.content ).toContainText( 'No results' );
 
-		await patterns.content
-			.getByRole( 'button', { name: 'Reset filters' } )
-			.click();
+		await patterns.content.getByRole( 'button', { name: 'Reset' } ).click();
 		await expect( searchBox ).toHaveValue( '' );
 		await expect( patterns.item ).toHaveCount( 3 );
 

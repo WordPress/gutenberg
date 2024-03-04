@@ -55,7 +55,7 @@ test.describe( 'Templates', () => {
 			.getByRole( 'link', { includeHidden: true } );
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
-		await page.getByRole( 'button', { name: 'Reset filters' } ).click();
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 		await expect( titles ).toHaveCount( 6 );
 
 		// Filter by author.
@@ -67,7 +67,7 @@ test.describe( 'Templates', () => {
 		await expect( titles.first() ).toHaveText( 'Date Archives' );
 
 		// Filter by author and text.
-		await page.getByRole( 'button', { name: 'Reset filters' } ).click();
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 		await page
 			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'archives' );
