@@ -6,9 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
-import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { useRef, useMemo } from '@wordpress/element';
+import {
+	useEntityRecord,
+	store as coreStore,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
@@ -28,38 +32,16 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { parse, cloneBlock } from '@wordpress/blocks';
-import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
-
-function getLegacyIdMap( blocks, content, nameCount = {} ) {
-	let idToClientIdMap = {};
-	for ( const block of blocks ) {
-		if ( block?.innerBlocks?.length ) {
-			idToClientIdMap = {
-				...idToClientIdMap,
-				...getLegacyIdMap( block.innerBlocks, content, nameCount ),
-			};
-		}
-
-		const id = block.attributes.metadata?.id;
-		const clientId = block.clientId;
-		if ( id && content?.[ id ] ) {
-			idToClientIdMap[ clientId ] = id;
-		}
-	}
-	return idToClientIdMap;
-}
 
 const useInferredLayout = ( blocks, parentLayout ) => {
 	const initialInferredAlignmentRef = useRef();
@@ -109,253 +91,57 @@ function hasOverridableBlocks( blocks ) {
 	} );
 }
 
-function getOverridableAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
-}
-
-function applyInitialContentValuesToInnerBlocks(
-	blocks,
-	content = {},
-	defaultValues,
-	legacyIdMap
-) {
-	return blocks.map( ( block ) => {
-		const innerBlocks = applyInitialContentValuesToInnerBlocks(
-			block.innerBlocks,
-			content,
-			defaultValues,
-			legacyIdMap
-		);
-		const metadataName =
-			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
-
-		if ( ! metadataName || ! hasOverridableAttributes( block ) ) {
-			return { ...block, innerBlocks };
-		}
-
-		const attributes = getOverridableAttributes( block );
-		const newAttributes = { ...block.attributes };
-		for ( const attributeKey of attributes ) {
-			defaultValues[ metadataName ] ??= {};
-			defaultValues[ metadataName ][ attributeKey ] =
-				block.attributes[ attributeKey ];
-
-			const contentValues = content[ metadataName ];
-			if ( contentValues?.[ attributeKey ] !== undefined ) {
-				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
-			}
-		}
-		return {
-			...block,
-			attributes: newAttributes,
-			innerBlocks,
-		};
-	} );
-}
-
-function isAttributeEqual( attribute1, attribute2 ) {
-	if (
-		attribute1 instanceof RichTextData &&
-		attribute2 instanceof RichTextData
-	) {
-		return attribute1.toString() === attribute2.toString();
-	}
-	return attribute1 === attribute2;
-}
-
-function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
-	/** @type {Record<string, { values: Record<string, unknown>}>} */
-	const content = {};
-	for ( const block of blocks ) {
-		if ( block.name === patternBlockName ) continue;
-		if ( block.innerBlocks.length ) {
-			Object.assign(
-				content,
-				getContentValuesFromInnerBlocks(
-					block.innerBlocks,
-					defaultValues,
-					legacyIdMap
-				)
-			);
-		}
-		const metadataName =
-			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
-		if ( ! metadataName || ! hasOverridableAttributes( block ) ) {
-			continue;
-		}
-
-		const attributes = getOverridableAttributes( block );
-
-		for ( const attributeKey of attributes ) {
-			if (
-				! isAttributeEqual(
-					block.attributes[ attributeKey ],
-					defaultValues?.[ metadataName ]?.[ attributeKey ]
-				)
-			) {
-				content[ metadataName ] ??= {};
-				// TODO: We need a way to represent `undefined` in the serialized overrides.
-				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				content[ metadataName ][ attributeKey ] =
-					block.attributes[ attributeKey ] === undefined
-						? // TODO: We use an empty string to represent undefined for now until
-						  // we support a richer format for overrides and the block binding API.
-						  // Currently only the `linkTarget` attribute of `core/button` is affected.
-						  ''
-						: block.attributes[ attributeKey ];
-			}
-		}
-	}
-	return Object.keys( content ).length > 0 ? content : undefined;
-}
-
-function setBlockEditMode( setEditMode, blocks, mode ) {
-	blocks.forEach( ( block ) => {
-		const editMode =
-			mode ||
-			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
-		setEditMode( block.clientId, editMode );
-
-		setBlockEditMode(
-			setEditMode,
-			block.innerBlocks,
-			// Disable editing for nested patterns.
-			block.name === patternBlockName ? 'disabled' : mode
-		);
-	} );
-}
-
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
-	clientId: patternClientId,
 	setAttributes,
 } ) {
-	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
-	const { record, editedRecord, hasResolved } = useEntityRecord(
+	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
 	);
 	const isMissing = hasResolved && ! record;
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_block',
+		{ id: ref }
+	);
 
-	// The initial value of the `content` attribute.
-	const initialContent = useRef( content );
-
-	// The default content values from the original pattern for overridable attributes.
-	// Set by the `applyInitialContentValuesToInnerBlocks` function.
-	const defaultContent = useRef( {} );
-
-	const {
-		replaceInnerBlocks,
-		__unstableMarkNextChangeAsNotPersistent,
-		setBlockEditingMode,
-	} = useDispatch( blockEditorStore );
-	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
-
-	const {
-		innerBlocks,
-		userCanEdit,
-		getBlockEditingMode,
-		onNavigateToEntityRecord,
-		editingMode,
-	} = useSelect(
+	const { userCanEdit, onNavigateToEntityRecord } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const {
-				getBlocks,
-				getSettings,
-				getBlockEditingMode: _getBlockEditingMode,
-			} = select( blockEditorStore );
-			const blocks = getBlocks( patternClientId );
+			const { getSettings } = select( blockEditorStore );
 			const canEdit = canUser( 'update', 'blocks', ref );
 
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
-				innerBlocks: blocks,
 				userCanEdit: canEdit,
-				getBlockEditingMode: _getBlockEditingMode,
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
-				editingMode: _getBlockEditingMode( patternClientId ),
 			};
 		},
-		[ patternClientId, ref ]
+		[ ref ]
 	);
 
 	// Sync the editing mode of the pattern block with the inner blocks.
-	useEffect( () => {
-		setBlockEditMode(
-			setBlockEditingMode,
-			innerBlocks,
-			// Disable editing if the pattern itself is disabled.
-			editingMode === 'disabled' ? 'disabled' : undefined
-		);
-	}, [ editingMode, innerBlocks, setBlockEditingMode ] );
+	// useEffect( () => {
+	// 	setBlockEditMode(
+	// 		setBlockEditingMode,
+	// 		innerBlocks,
+	// 		// Disable editing if the pattern itself is disabled.
+	// 		editingMode === 'disabled' ? 'disabled' : undefined
+	// 	);
+	// }, [ editingMode, innerBlocks, setBlockEditingMode ] );
 
 	const canOverrideBlocks = useMemo(
-		() => hasOverridableBlocks( innerBlocks ),
-		[ innerBlocks ]
+		() => hasOverridableBlocks( blocks ),
+		[ blocks ]
 	);
 
-	const initialBlocks = useMemo(
-		() =>
-			// Clone the blocks to generate new client IDs.
-			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
-			( editedRecord.content && typeof editedRecord.content !== 'function'
-				? parse( editedRecord.content )
-				: [] ),
-		[ editedRecord.blocks, editedRecord.content ]
-	);
-
-	const legacyIdMap = useRef( {} );
-
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
-		// Build a map of clientIds to the old nano id system to provide back compat.
-		legacyIdMap.current = getLegacyIdMap(
-			initialBlocks,
-			initialContent.current
-		);
-		defaultContent.current = {};
-		const originalEditingMode = getBlockEditingMode( patternClientId );
-		// Replace the contents of the blocks with the overrides.
-		registry.batch( () => {
-			setBlockEditingMode( patternClientId, 'default' );
-			syncDerivedUpdates( () => {
-				replaceInnerBlocks(
-					patternClientId,
-					applyInitialContentValuesToInnerBlocks(
-						initialBlocks,
-						initialContent.current,
-						defaultContent.current,
-						legacyIdMap.current
-					)
-				);
-			} );
-			setBlockEditingMode( patternClientId, originalEditingMode );
-		} );
-	}, [
-		__unstableMarkNextChangeAsNotPersistent,
-		patternClientId,
-		initialBlocks,
-		replaceInnerBlocks,
-		registry,
-		getBlockEditingMode,
-		setBlockEditingMode,
-		syncDerivedUpdates,
-	] );
-
-	const { alignment, layout } = useInferredLayout(
-		innerBlocks,
-		parentLayout
-	);
+	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	const blockProps = useBlockProps( {
@@ -368,33 +154,14 @@ export default function ReusableBlockEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: 'all',
+		value: blocks,
 		layout,
-		renderAppender: innerBlocks?.length
+		onInput,
+		onChange,
+		renderAppender: blocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
-
-	// Sync the `content` attribute from the updated blocks to the pattern block.
-	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
-	useEffect( () => {
-		const { getBlocks } = registry.select( blockEditorStore );
-		let prevBlocks = getBlocks( patternClientId );
-		return registry.subscribe( () => {
-			const blocks = getBlocks( patternClientId );
-			if ( blocks !== prevBlocks ) {
-				prevBlocks = blocks;
-				syncDerivedUpdates( () => {
-					setAttributes( {
-						content: getContentValuesFromInnerBlocks(
-							blocks,
-							defaultContent.current,
-							legacyIdMap.current
-						),
-					} );
-				} );
-			}
-		}, blockEditorStore );
-	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
 	const handleEditOriginal = () => {
 		onNavigateToEntityRecord( {
@@ -404,9 +171,7 @@ export default function ReusableBlockEdit( {
 	};
 
 	const resetContent = () => {
-		if ( content ) {
-			replaceInnerBlocks( patternClientId, initialBlocks );
-		}
+		setAttributes( { content: undefined } );
 	};
 
 	let children = null;
