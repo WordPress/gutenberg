@@ -226,5 +226,6 @@ function gutenberg_render_elements_class_name( $block_content, $block ) {
 // Remove WordPress core filters to avoid rendering duplicate elements stylesheet & attaching classes twice.
 remove_filter( 'render_block', 'wp_render_elements_support', 10, 2 );
 remove_filter( 'pre_render_block', 'wp_render_elements_support_styles', 10, 2 );
+remove_filter( 'render_block', 'wp_render_elements_class_name', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_elements_class_name', 10, 2 );
 add_filter( 'render_block_data', 'gutenberg_render_elements_support_styles', 10, 2 );
