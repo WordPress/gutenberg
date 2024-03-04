@@ -1092,7 +1092,7 @@ const blockNames = {
 	image: 'Image',
 	latestPosts: 'Latest Posts',
 	list: 'List',
-	listItem: 'List item',
+	listItem: 'List Item',
 	more: 'More',
 	paragraph: 'Paragraph',
 	search: 'Search',
