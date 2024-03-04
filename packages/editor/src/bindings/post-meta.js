@@ -41,4 +41,5 @@ export default {
 			updateValue: updateMetaValue,
 		};
 	},
+	lockAttributesEditing: false,
 };
