@@ -9,6 +9,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	ToggleControl,
+	TextControl,
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -64,6 +65,7 @@ export function PostSyncStatusModal() {
 	const { editPost } = useDispatch( editorStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ syncType, setSyncType ] = useState( undefined );
+	const [ title, setTitle ] = useState( '' );
 
 	const { postType, isNewPost } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, isCleanNewPost } =
@@ -82,14 +84,6 @@ export function PostSyncStatusModal() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	const setSyncStatus = () => {
-		editPost( {
-			meta: {
-				wp_pattern_sync_status: syncType,
-			},
-		} );
-	};
-
 	if ( postType !== 'wp_block' || ! isNewPost ) {
 		return null;
 	}
@@ -98,7 +92,7 @@ export function PostSyncStatusModal() {
 		<>
 			{ isModalOpen && (
 				<Modal
-					title={ __( 'Set pattern sync status' ) }
+					title={ __( 'Create pattern' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
@@ -108,10 +102,24 @@ export function PostSyncStatusModal() {
 						onSubmit={ ( event ) => {
 							event.preventDefault();
 							setIsModalOpen( false );
-							setSyncStatus();
+							editPost( {
+								title,
+								meta: {
+									wp_pattern_sync_status: syncType,
+								},
+							} );
 						} }
 					>
 						<VStack spacing="5">
+							<TextControl
+								label={ __( 'Name' ) }
+								value={ title }
+								onChange={ setTitle }
+								placeholder={ __( 'My pattern' ) }
+								className="patterns-create-modal__name-input"
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+							/>
 							<ReusableBlocksRenameHint />
 							<ToggleControl
 								label={ _x(
@@ -129,7 +137,12 @@ export function PostSyncStatusModal() {
 								} }
 							/>
 							<HStack justify="right">
-								<Button variant="primary" type="submit">
+								<Button
+									variant="primary"
+									type="submit"
+									disabled={ ! title }
+									__experimentalIsFocusable
+								>
 									{ __( 'Create' ) }
 								</Button>
 							</HStack>
