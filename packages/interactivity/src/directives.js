@@ -19,6 +19,7 @@ const contextAssignedObjects = new WeakMap();
 
 // Store the context proxy and fallback for each object in the context.
 const contextObjectToProxy = new WeakMap();
+const contextProxyToObject = new WeakMap();
 const contextObjectToFallback = new WeakMap();
 
 const isPlainObject = ( item ) =>
@@ -64,6 +65,11 @@ const proxifyContext = ( current, inherited = {} ) => {
 					return proxifyContext( currentProp, fallback[ k ] );
 				}
 
+				// Return the stored proxy for `currentProp` when it exists.
+				if ( contextObjectToProxy.has( currentProp ) ) {
+					return contextObjectToProxy.get( currentProp );
+				}
+
 				/*
 				 * For other cases, return the value from target, also
 				 * subscribing to changes in the parent context when the current
@@ -88,7 +94,17 @@ const proxifyContext = ( current, inherited = {} ) => {
 					contextAssignedObjects.get( obj ).add( k );
 				}
 
-				obj[ k ] = value;
+				/*
+				 * When the value is a proxy, it's because it comes from the
+				 * context, so the inner value is assigned instead.
+				 */
+				if ( contextProxyToObject.has( value ) ) {
+					const innerValue = contextProxyToObject.get( value );
+					obj[ k ] = innerValue;
+				} else {
+					obj[ k ] = value;
+				}
+
 				return true;
 			},
 			ownKeys: ( target ) => [
@@ -102,6 +118,7 @@ const proxifyContext = ( current, inherited = {} ) => {
 				descriptor( contextObjectToFallback.get( current ), k ),
 		} );
 		contextObjectToProxy.set( current, proxy );
+		contextProxyToObject.set( proxy, current );
 	}
 	return contextObjectToProxy.get( current );
 };
