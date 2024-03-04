@@ -77,9 +77,9 @@ if ( ! function_exists( 'wp_interactivity' ) ) {
 	 * It provides access to the WP_Interactivity_API instance, creating one if it
 	 * doesn't exist yet.
 	 *
-	 * @global WP_Interactivity_API $wp_interactivity
-	 *
 	 * @since 6.5.0
+	 *
+	 * @global WP_Interactivity_API $wp_interactivity
 	 *
 	 * @return WP_Interactivity_API The main WP_Interactivity_API instance.
 	 */
@@ -151,7 +151,7 @@ if ( ! function_exists( 'wp_interactivity_config' ) ) {
 	}
 }
 
-if ( ! function_exists( 'data_wp_context' ) ) {
+if ( ! function_exists( 'wp_interactivity_data_wp_context' ) ) {
 	/**
 	 * Generates a `data-wp-context` directive attribute by encoding a context
 	 * array.
@@ -162,7 +162,7 @@ if ( ! function_exists( 'data_wp_context' ) ) {
 	 *
 	 * Example:
 	 *
-	 *     <div <?php echo data_wp_context( array( 'isOpen' => true, 'count' => 0 ) ); ?>>
+	 *     <div <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => true, 'count' => 0 ) ); ?>>
 	 *
 	 * @since 6.5.0
 	 *
@@ -171,7 +171,7 @@ if ( ! function_exists( 'data_wp_context' ) ) {
 	 * @return string A complete `data-wp-context` directive with a JSON encoded value representing the context array and
 	 *                the store namespace if specified.
 	 */
-	function data_wp_context( array $context, string $store_namespace = '' ): string {
+	function wp_interactivity_data_wp_context( array $context, string $store_namespace = '' ): string {
 		return 'data-wp-context=\'' .
 		( $store_namespace ? $store_namespace . '::' : '' ) .
 		( empty( $context ) ? '{}' : wp_json_encode( $context, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP ) ) .

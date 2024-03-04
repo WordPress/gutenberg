@@ -14,6 +14,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 	CheckboxControl,
+	Spinner,
 } from '@wordpress/components';
 import {
 	forwardRef,
@@ -464,7 +465,7 @@ function ViewTable( {
 				id={ tableNoticeId }
 			>
 				{ ! hasData && (
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				) }
 			</div>
 		</div>

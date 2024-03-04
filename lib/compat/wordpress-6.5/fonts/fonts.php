@@ -86,6 +86,8 @@ function gutenberg_create_initial_post_types() {
 
 /**
  * Initializes REST routes.
+ *
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_create_initial_rest_routes() {
 	global $wp_version;
@@ -101,6 +103,8 @@ add_action( 'rest_api_init', 'gutenberg_create_initial_rest_routes' );
 
 /**
  * Initializes REST routes and post types.
+ *
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_init_font_library() {
 	global $wp_version;

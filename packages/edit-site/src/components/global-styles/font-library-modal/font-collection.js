@@ -77,7 +77,7 @@ function FontCollection( { slug } ) {
 	const {
 		collections,
 		getFontCollection,
-		installFont,
+		installFonts,
 		isInstalling,
 		notice,
 		setNotice,
@@ -214,7 +214,7 @@ function FontCollection( { slug } ) {
 		}
 
 		try {
-			await installFont( fontFamily );
+			await installFonts( [ fontFamily ] );
 			setNotice( {
 				type: 'success',
 				message: __( 'Fonts were installed successfully.' ),

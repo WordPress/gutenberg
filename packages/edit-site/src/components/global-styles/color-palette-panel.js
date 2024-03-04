@@ -13,7 +13,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import ColorVariations from './variations-color';
+import ColorVariations from './variations/variations-color';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
