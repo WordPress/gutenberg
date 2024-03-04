@@ -83,7 +83,7 @@ npm init @wordpress/block --namespace my-plugin record
 cd record
 ```
 
-2. Edit `src/index.js`. Insert the `recordId` attribute and `providesContext` property in the `registerBlockType` function and add the registration of the `record-title` block at the bottom.
+2. Edit `src/index.js`. Insert the `recordId` attribute and `providesContext` property in the `registerBlockType` function and add the registration of the `record-title` block at the bottom:
 
 ```js
 registerBlockType( 'my-plugin/record', {
@@ -126,7 +126,7 @@ registerBlockType( 'my-plugin/record-title', {
 } );
 ```
 
-3. Edit `src/edit.js` for the `record` block. Replace the `Edit` function with the following code.
+3. Edit `src/edit.js` for the `record` block. Replace the `Edit` function with the following code:
 
 ```js
 import { TextControl } from '@wordpress/components';
@@ -153,7 +153,7 @@ export default function Edit( props ) {
 }
 ```
 
-4. Edit `src/save.js` for the `record` block. Replace the `save` function with the following code.
+4. Edit `src/save.js` for the `record` block. Replace the `save` function with the following code:
 
 ```js
 export default function save( props ) {
