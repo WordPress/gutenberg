@@ -415,12 +415,13 @@ function FontLibraryProvider( { children } ) {
 			[ font.source ]: newFonts,
 		} );
 
-		const activatedFont = newFonts.find( ( f ) => f.slug === font.slug );
-		const isFaceActivated = activatedFont?.fontFace?.find(
-			( f ) =>
-				f.fontWeight === face.fontWeight &&
-				f.fontStyle === face.fontStyle
+		const isFaceActivated = isFontActivated(
+			font.slug,
+			face.fontStyle,
+			face.fontWeight,
+			font.source
 		);
+
 		if ( isFaceActivated ) {
 			// Load font faces just in the iframe because they already are in the document.
 			loadFontFaceInBrowser(
