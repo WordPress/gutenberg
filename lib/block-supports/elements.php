@@ -91,7 +91,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 				 */
 				$tags = new WP_HTML_Tag_Processor( $block_content );
 				if ( $tags->next_tag() ) {
-					$tags->add_class( wp_get_elements_class_name( $block ) );
+					$tags->add_class( wp_get_elements_class_name( $elements_style_attributes ) );
 				}
 
 				return $tags->get_updated_html();
@@ -134,7 +134,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		return null;
 	}
 
-	$class_name = wp_get_elements_class_name( $block );
+	$class_name = wp_get_elements_class_name( $element_block_styles );
 
 	$element_types = array(
 		'button'  => array(
