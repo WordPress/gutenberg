@@ -142,7 +142,7 @@ export default function PreviewIframe( {
 								: 'start'
 						}
 					>
-						{ children.map( ( child, key ) =>
+						{ [ ...children ].map( ( child, key ) =>
 							child( { ratio, key } )
 						) }
 					</motion.div>

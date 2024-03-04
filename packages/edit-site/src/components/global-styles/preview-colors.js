@@ -17,25 +17,23 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
 		>
-			{ [
-				( { ratio, key } ) => (
-					<FirstFrame key={ key }>
-						<HStack
-							spacing={ 10 * ratio }
-							justify="center"
-							style={ {
-								height: '100%',
-								overflow: 'hidden',
-							} }
-						>
-							<HighlightedColors
-								normalizedColorSwatchSize={ 66 }
-								ratio={ ratio }
-							/>
-						</HStack>
-					</FirstFrame>
-				),
-			] }
+			{ ( { ratio, key } ) => (
+				<FirstFrame key={ key }>
+					<HStack
+						spacing={ 10 * ratio }
+						justify="center"
+						style={ {
+							height: '100%',
+							overflow: 'hidden',
+						} }
+					>
+						<HighlightedColors
+							normalizedColorSwatchSize={ 66 }
+							ratio={ ratio }
+						/>
+					</HStack>
+				</FirstFrame>
+			) }
 		</PreviewIframe>
 	);
 };
