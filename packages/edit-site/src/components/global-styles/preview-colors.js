@@ -6,7 +6,7 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PreviewHighlightedColors from './preview-highlighted-colors';
+import HighlightedColors from './highlighted-colors';
 import PreviewWrapper from './preview-wrapper';
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
@@ -19,7 +19,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 				overflow: 'hidden',
 			} }
 		>
-			<PreviewHighlightedColors
+			<HighlightedColors
 				normalizedColorSwatchSize={ 66 }
 				ratio={ ratio }
 			/>

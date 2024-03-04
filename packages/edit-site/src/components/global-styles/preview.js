@@ -3,7 +3,6 @@
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
-	__unstableMotion as motion,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -14,7 +13,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from './hooks';
 import PreviewTypography from './preview-typography';
-import PreviewHighlightedColors from './preview-highlighted-colors';
+import HighlightedColors from './highlighted-colors';
 import PreviewWrapper from './preview-wrapper';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -49,7 +48,7 @@ const StylesPreview = ( { label, isFocused, withHoverView, variation } ) => {
 				variation={ variation }
 			/>
 			<VStack spacing={ 4 * ratio }>
-				<PreviewHighlightedColors
+				<HighlightedColors
 					normalizedColorSwatchSize={ 32 }
 					ratio={ ratio }
 				/>

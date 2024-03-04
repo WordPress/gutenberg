@@ -8,7 +8,7 @@ import { __unstableMotion as motion } from '@wordpress/components';
  */
 import { useStylesPreviewColors } from './hooks';
 
-export default function PreviewHighlightedColors( {
+export default function HighlightedColors( {
 	normalizedColorSwatchSize,
 	ratio,
 } ) {
