@@ -23,37 +23,6 @@ const { useGlobalStyle, useGlobalStylesOutput } = unlock(
 	blockEditorPrivateApis
 );
 
-const firstFrameVariants = {
-	start: {
-		scale: 1,
-		opacity: 1,
-	},
-	hover: {
-		scale: 0,
-		opacity: 0,
-	},
-};
-
-const midFrameVariants = {
-	hover: {
-		opacity: 1,
-	},
-	start: {
-		opacity: 0.5,
-	},
-};
-
-const secondFrameVariants = {
-	hover: {
-		scale: 1,
-		opacity: 1,
-	},
-	start: {
-		scale: 0,
-		opacity: 0,
-	},
-};
-
 const normalizedWidth = 248;
 const normalizedHeight = 152;
 
@@ -63,12 +32,9 @@ const THROTTLE_OPTIONS = {
 	leading: true,
 	trailing: true,
 };
-const noop = () => {};
 
 export default function PreviewIframe( {
-	firstFrame = noop,
-	midFrame = noop,
-	secondFrame = noop,
+	children,
 	label,
 	isFocused,
 	withHoverView,
@@ -176,46 +142,8 @@ export default function PreviewIframe( {
 								: 'start'
 						}
 					>
-						{ firstFrame && (
-							<motion.div
-								variants={ firstFrameVariants }
-								style={ {
-									height: '100%',
-									overflow: 'hidden',
-								} }
-							>
-								{ firstFrame( ratio ) }
-							</motion.div>
-						) }
-						{ midFrame && (
-							<motion.div
-								variants={ withHoverView && midFrameVariants }
-								style={ {
-									height: '100%',
-									width: '100%',
-									position: 'absolute',
-									top: 0,
-									overflow: 'hidden',
-									filter: 'blur(60px)',
-									opacity: 0.1,
-								} }
-							>
-								{ midFrame( ratio ) }
-							</motion.div>
-						) }
-						{ secondFrame && (
-							<motion.div
-								variants={ secondFrameVariants }
-								style={ {
-									height: '100%',
-									width: '100%',
-									overflow: 'hidden',
-									position: 'absolute',
-									top: 0,
-								} }
-							>
-								{ secondFrame( ratio ) }
-							</motion.div>
+						{ children.map( ( child, key ) =>
+							child( { ratio, key } )
 						) }
 					</motion.div>
 				</Iframe>

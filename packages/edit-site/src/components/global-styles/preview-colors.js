@@ -8,31 +8,35 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
  */
 import HighlightedColors from './highlighted-colors';
 import PreviewIframe from './preview-iframe';
+import { FirstFrame } from './preview-animations';
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
-	const FirstFrame = ( ratio ) => (
-		<HStack
-			spacing={ 10 * ratio }
-			justify="center"
-			style={ {
-				height: '100%',
-				overflow: 'hidden',
-			} }
-		>
-			<HighlightedColors
-				normalizedColorSwatchSize={ 66 }
-				ratio={ ratio }
-			/>
-		</HStack>
-	);
-
 	return (
 		<PreviewIframe
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
-			firstFrame={ FirstFrame }
-		/>
+		>
+			{ [
+				( { ratio, key } ) => (
+					<FirstFrame key={ key }>
+						<HStack
+							spacing={ 10 * ratio }
+							justify="center"
+							style={ {
+								height: '100%',
+								overflow: 'hidden',
+							} }
+						>
+							<HighlightedColors
+								normalizedColorSwatchSize={ 66 }
+								ratio={ ratio }
+							/>
+						</HStack>
+					</FirstFrame>
+				),
+			] }
+		</PreviewIframe>
 	);
 };
 
