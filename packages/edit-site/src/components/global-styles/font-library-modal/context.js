@@ -305,7 +305,14 @@ function FontLibraryProvider( { children } ) {
 						__( 'There were some errors installing fonts. %s' ),
 						installationErrors.reduce(
 							( errorMessageCollection, error ) => {
-								return `${ errorMessageCollection } ${ error.message }`;
+								if (
+									errorMessageCollection.indexOf(
+										error.message
+									) === -1
+								) {
+									return `${ errorMessageCollection } ${ error.message }`;
+								}
+								return errorMessageCollection;
 							},
 							''
 						)
