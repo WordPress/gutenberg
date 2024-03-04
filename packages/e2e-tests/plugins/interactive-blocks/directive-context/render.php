@@ -117,6 +117,24 @@ wp_enqueue_script_module( 'directive-context-view' );
 			>
 				obj.prop6
 			</button>
+			<button
+				data-testid="child copy obj"
+				data-wp-on--click="actions.copyObj"
+			>
+				Copy obj
+			</button>
+			<div>
+				Is proxy preserved? <span
+					data-testid="is proxy preserved"
+					data-wp-text="state.isProxyPreserved"
+				></span>
+			</div>
+			<div>
+				Is proxy preserved on copy? <span
+					data-testid="is proxy preserved on copy"
+					data-wp-text="state.isProxyPreservedOnCopy"
+				></span>
+			</div>
 		</div>
 		<br />
 

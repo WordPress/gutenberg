@@ -620,6 +620,8 @@ For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-
 </ul>
 ```
 
+### `wp-each-child`
+
 For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
 
 ```html
@@ -1040,6 +1042,28 @@ The code will log:
 	"children": ['Log'],
 	"onclick": event => { evaluate(entry, event); }
 }
+```
+
+### withScope()
+
+Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
+
+When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+
+An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
+
+```js
+store('mySliderPlugin', {
+	callbacks: {
+		initSlideShow: () => {
+			setInterval(
+				withScope( () => {
+					actions.nextImage();
+				} ),
+				3_000
+			);
+		},
+})
 ```
 
 ## Server functions

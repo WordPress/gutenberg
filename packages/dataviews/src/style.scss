@@ -524,55 +524,61 @@
 	overflow: auto;
 	border-top: 1px solid $gray-200;
 
-	.dataviews-search-widget-filter-combobox-item {
-		display: flex;
-		align-items: center;
-		gap: $grid-unit-10;
-		border-radius: $radius-block-ui;
-		box-sizing: border-box;
-		padding: $grid-unit-10 $grid-unit-15;
-		cursor: default;
-		margin-block-end: 2px;
+	.dataviews-search-widget-filter-combobox-item-value {
+		[data-user-value] {
+			font-weight: 600;
+		}
+	}
+}
 
-		&:last-child {
-			margin-block-end: 0;
+.dataviews-search-widget-listbox {
+	max-height: $grid-unit * 23;
+	padding: $grid-unit-05;
+	overflow: auto;
+}
+
+.dataviews-search-widget-listitem {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	border-radius: $radius-block-ui;
+	box-sizing: border-box;
+	padding: $grid-unit-10 $grid-unit-15;
+	cursor: default;
+	margin-block-end: 2px;
+
+	&:last-child {
+		margin-block-end: 0;
+	}
+
+	&:hover,
+	&[data-active-item],
+	&:focus {
+		background-color: var(--wp-admin-theme-color);
+		color: $white;
+
+		.dataviews-search-widget-listitem-check {
+			fill: $white;
 		}
 
-		&:hover,
-		&[data-active-item],
-		&:focus {
-			background-color: var(--wp-admin-theme-color);
+		.dataviews-search-widget-listitem-description {
 			color: $white;
-
-			.dataviews-search-widget-filter-combobox-item-check {
-				fill: $white;
-			}
-
-			.dataviews-search-widget-filter-combobox-item-description {
-				color: $white;
-			}
 		}
+	}
 
-		.dataviews-search-widget-filter-combobox-item-check {
-			width: 24px;
-			height: 24px;
-			flex-shrink: 0;
-		}
+	.dataviews-search-widget-listitem-check {
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+	}
 
-		.dataviews-search-widget-filter-combobox-item-value {
-			[data-user-value] {
-				font-weight: 600;
-			}
-		}
-
-		.dataviews-search-widget-filter-combobox-item-description {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			font-size: $helptext-font-size;
-			line-height: 16px;
-			color: $gray-700;
-		}
+	.dataviews-search-widget-listitem-description {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: $helptext-font-size;
+		line-height: 16px;
+		color: $gray-700;
 	}
 }
 
@@ -629,8 +635,12 @@
 }
 
 .dataviews-filter-summary__operators-container {
-	padding: $grid-unit-10 $grid-unit-10 $grid-unit-05;
-	padding-bottom: 0;
+	padding: $grid-unit-10 $grid-unit-10 0;
+
+	&:has(+ .dataviews-search-widget-listbox) {
+		border-bottom: 1px solid $gray-200;
+		padding-bottom: $grid-unit-10;
+	}
 
 	&:empty {
 		display: none;

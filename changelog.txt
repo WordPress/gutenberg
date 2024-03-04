@@ -1,5 +1,45 @@
 == Changelog ==
 
+= 17.8.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Colors
+- Elements: Merge element style and classname generation to single filter. ([59535](https://github.com/WordPress/gutenberg/pull/59535))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw
+
+
+= 17.8.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Colors
+- Generate element classnames from element-specific data. ([59533](https://github.com/WordPress/gutenberg/pull/59533))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@tellthemachines
+
+
 = 17.8.0 =
 
 ## Changelog

@@ -135,7 +135,7 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
-			withoutInteractiveFormatting={ true }
+			withoutInteractiveFormatting
 		/>
 	);
 	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {

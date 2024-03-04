@@ -672,7 +672,7 @@ function Navigation( {
 						panelId={ clientId }
 						{ ...colorGradientSettings }
 						gradients={ [] }
-						disableCustomGradients={ true }
+						disableCustomGradients
 					/>
 					{ enableContrastChecking && (
 						<>

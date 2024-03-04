@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import TypographyElements from './typography-elements';
-import TypographyVariations from './variations-typography';
+import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
