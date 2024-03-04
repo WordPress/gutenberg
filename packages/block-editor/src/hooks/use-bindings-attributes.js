@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
@@ -107,36 +107,17 @@ const BindingConnector = ( {
 				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
 			}
 
-			if ( prevAttrValue === newAttrValue ) {
-				return;
-			}
-
 			onPropValueChange( {
 				[ attrName ]: { newAttrValue, updateValueFunction },
 			} );
 		},
-		[ attrName, onPropValueChange ]
+		[ attrName, onPropValueChange, updateValueFunction ]
 	);
 
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			updateBoundAttibute( propValue, attrValue );
 		} else if ( placeholder ) {
-			/*
-			 * Placeholder fallback.
-			 * If the attribute is `src` or `href`,
-			 * a placeholder can't be used because it is not a valid url.
-			 * Adding this workaround until
-			 * attributes and metadata fields types are improved and include `url`.
-			 */
-			const htmlAttribute =
-				getBlockType( blockName ).attributes[ attrName ].attribute;
-
-			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
-				return;
-			}
-
 			updateBoundAttibute( placeholder );
 		}
 	}, [
@@ -197,6 +178,7 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { setAttributes } = props;
 		/*
 		 * Collect and update the bound attributes
 		 * in a separate state.
@@ -223,13 +205,17 @@ const withBlockBindingSupport = createHigherOrderComponent(
 
 		const updatedSetAttributes = useCallback(
 			( nextAttributes ) => {
-				Object.entries( nextAttributes ?? {} )
-					.filter( ( [ attribute ] ) => attribute in updateFunctions )
-					.forEach( ( [ attribute, value ] ) => {
+				for ( const [ attribute, value ] of Object.entries(
+					nextAttributes
+				) ) {
+					if ( attribute in updateFunctions ) {
 						updateFunctions[ attribute ]( value, nextAttributes );
-					} );
+					} else {
+						setAttributes( nextAttributes );
+					}
+				}
 			},
-			[ updateFunctions ]
+			[ setAttributes, updateFunctions ]
 		);
 
 		const registry = useRegistry();
