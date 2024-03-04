@@ -238,7 +238,7 @@ add_action( 'init', 'register_block_core_latest_posts' );
  * block is dynamic, the usual provisions for block migration are insufficient,
  * as they only act when a block is loaded in the editor.
  *
- * TODO: Remove when and if the bottom client-side deprecation for this block
+ * @todo Remove when and if the bottom client-side deprecation for this block
  * is removed.
  *
  * @param array $block A single parsed block object.

@@ -74,7 +74,7 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 		 * need to be manually registered.
 		 * set_up runs after init#10, therefore register the variations here with the old deprecated functions.
 		 *
-		 * TODO: After two WP versions (6.7), we can remove this.
+		 * @todo After two WP versions (6.7), we can remove this.
 		 */
 		if ( $this->pre_65_compat ) {
 			$this->handle_pre_65_post_type_variation_registration( $post_type );

@@ -226,7 +226,7 @@ class WP_Navigation_Block_Renderer {
 				$blocks = isset( $root_nav_block['innerBlocks'] ) ? $root_nav_block['innerBlocks'] : $blocks;
 			}
 
-			// TODO - this uses the full navigation block attributes for the
+			// @todo - this uses the full navigation block attributes for the
 			// context which could be refined.
 			return new WP_Block_List( $blocks, $attributes );
 		}

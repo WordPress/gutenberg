@@ -164,7 +164,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
 
 			// Check the font-family.
 			if ( empty( $font_face['font-family'] ) || ! is_string( $font_face['font-family'] ) ) {
-				// @todo replace with `wp_trigger_error()`.
+				// @todo Replace with `wp_trigger_error()`.
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Font font-family must be a non-empty string.' ),
@@ -175,7 +175,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
 
 			// Make sure that local fonts have 'src' defined.
 			if ( empty( $font_face['src'] ) || ( ! is_string( $font_face['src'] ) && ! is_array( $font_face['src'] ) ) ) {
-				// @todo replace with `wp_trigger_error()`.
+				// @todo Replace with `wp_trigger_error()`.
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Font src must be a non-empty string or an array of strings.' ),
@@ -187,7 +187,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
 			// Validate the 'src' property.
 			foreach ( (array) $font_face['src'] as $src ) {
 				if ( empty( $src ) || ! is_string( $src ) ) {
-					// @todo replace with `wp_trigger_error()`.
+					// @todo Replace with `wp_trigger_error()`.
 					_doing_it_wrong(
 						__METHOD__,
 						__( 'Each font src must be a non-empty string.' ),
@@ -199,7 +199,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
 
 			// Check the font-weight.
 			if ( ! is_string( $font_face['font-weight'] ) && ! is_int( $font_face['font-weight'] ) ) {
-				// @todo replace with `wp_trigger_error()`.
+				// @todo Replace with `wp_trigger_error()`.
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Font font-weight must be a properly formatted string or integer.' ),
