@@ -17,6 +17,10 @@ store( 'directive-context', {
 			const ctx = getContext();
 			const pointer = ctx.obj;
 			return pointer === ctx.obj;
+		},
+		get isProxyPreservedOnCopy() {
+			const { obj, obj2 } = getContext();
+			return obj === obj2;
 		}
 	},
 	actions: {
@@ -39,6 +43,10 @@ store( 'directive-context', {
 		replaceObj() {
 			const ctx = getContext();
 			ctx.obj = { overwritten: true };
+		},
+		copyObj() {
+			const ctx = getContext();
+			ctx.obj2 = ctx.obj;
 		}
 	},
 } );
