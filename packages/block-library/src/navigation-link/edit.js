@@ -173,6 +173,7 @@ export default function NavigationLinkEdit( {
 
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -192,6 +193,7 @@ export default function NavigationLinkEdit( {
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
+		firstParentClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -201,7 +203,12 @@ export default function NavigationLinkEdit( {
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
 				getBlockParentsByBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
 			} = select( blockEditorStore );
+
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const parents = getBlockParents( selectedBlockClientId );
 
 			return {
 				innerBlocks: getBlocks( clientId ),
@@ -218,6 +225,7 @@ export default function NavigationLinkEdit( {
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
+				firstParentClientId: parents[ parents.length - 1 ],
 			};
 		},
 		[ clientId ]
@@ -567,8 +575,9 @@ export default function NavigationLinkEdit( {
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
-									// Need to handle refocusing the Nav block or the inserter?
 									onReplace( [] );
+									// Focus the parent block.
+									selectBlock( firstParentClientId );
 								}
 							} }
 							anchor={ popoverAnchor }
