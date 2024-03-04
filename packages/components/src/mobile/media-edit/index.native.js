@@ -103,7 +103,7 @@ export class MediaEdit extends Component {
 				hideCancelButton
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
-				leftAlign={ true }
+				leftAlign
 				onChange={ this.onPickerSelect }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ __( 'Media options' ) }

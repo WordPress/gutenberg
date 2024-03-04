@@ -168,7 +168,7 @@ export default function PostLockedModal() {
 					? __( 'Someone else has taken over this post' )
 					: __( 'This post is already being edited' )
 			}
-			focusOnMount={ true }
+			focusOnMount
 			shouldCloseOnClickOutside={ false }
 			shouldCloseOnEsc={ false }
 			isDismissible={ false }
