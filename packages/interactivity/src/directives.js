@@ -56,7 +56,7 @@ const proxifyContext = ( current, inherited = {} ) => {
 					return fallback[ k ];
 				}
 
-				// Proxify plain objects that are not listed in `ignore`.
+				// Proxify plain objects that were not directly assigned.
 				if (
 					k in target &&
 					! contextAssignedObjects.get( target )?.has( k ) &&
