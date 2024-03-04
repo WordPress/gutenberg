@@ -8,8 +8,7 @@
 			"mappings": {
 				"wp-content/plugins/hooked-block": "./development/plugins/hooked-block",
 				"wp-content/plugins/suspended-block": "./development/plugins/suspended-block",
-				"wp-content/plugins/interactive-api": "./development/plugins/interactive-api",
-				"wp-content/themes/twentytwentyfour": "./development/themes/twentytwentyfour"
+				"wp-content/plugins/interactivity-api": "./development/plugins/interactivity-api"
 			}
 		},
 		"tests": {
