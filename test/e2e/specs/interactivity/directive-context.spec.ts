@@ -336,4 +336,46 @@ test.describe( 'data-wp-context', () => {
 		await expect( counterChild ).toHaveText( '1' );
 		await expect( changes ).toHaveText( '2' );
 	} );
+
+	test( 'references to the same context object should be preserved', async ( {
+		page,
+	} ) => {
+		const isProxyPreserved = page.getByTestId( 'is proxy preserved' );
+		await expect( isProxyPreserved ).toHaveText( 'true' );
+	} );
+
+	test( 'references to copied context objects should be preserved', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'child copy obj' ).click();
+		const isProxyPreservedOnCopy = page.getByTestId(
+			'is proxy preserved on copy'
+		);
+		await expect( isProxyPreservedOnCopy ).toHaveText( 'true' );
+	} );
+
+	test( 'objects referenced from the context inherit properties where they are originally defined ', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'child copy obj' ).click();
+
+		const childContextBefore = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContextBefore.obj2.prop4 ).toBe( 'parent' );
+		expect( childContextBefore.obj2.prop5 ).toBe( 'child' );
+		expect( childContextBefore.obj2.prop6 ).toBe( 'child' );
+
+		await page.getByTestId( 'parent replace' ).click();
+
+		const childContextAfter = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContextAfter.obj2.prop4 ).toBeUndefined();
+		expect( childContextAfter.obj2.prop5 ).toBe( 'child' );
+		expect( childContextAfter.obj2.prop6 ).toBe( 'child' );
+		expect( childContextAfter.obj2.overwritten ).toBe( true );
+	} );
 } );

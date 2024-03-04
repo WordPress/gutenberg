@@ -54,18 +54,18 @@ function gutenberg_enqueue_global_styles() {
 	// Add each block as an inline css.
 	gutenberg_add_global_styles_for_blocks();
 
-	/**
+	/*
 	 * Add the custom CSS for the global styles.
 	 * Before that, dequeue the Customizer's custom CSS
 	 * and add it before the global styles custom CSS.
+	 * Don't enqueue Customizer's custom CSS separately.
 	 */
-	// Don't enqueue Customizer's custom CSS separately.
 	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
 
 	$custom_css = wp_get_custom_css();
 
 	if ( ! wp_should_load_separate_core_block_assets() ) {
-		/**
+		/*
 		 * If loading all block assets together, add both
 		 * the base and block custom CSS at once. Else load
 		 * the base custom CSS only, and the block custom CSS

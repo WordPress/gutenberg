@@ -367,6 +367,14 @@
 	}
 }
 
+@mixin link-reset {
+	&:focus {
+		color: var(--wp-admin-theme-color--rgb);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		border-radius: $radius-block-ui;
+	}
+}
+
 // The editor input reset with increased specificity to avoid theme styles bleeding in.
 @mixin editor-input-reset() {
 	font-family: $editor-html-font !important;

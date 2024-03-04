@@ -10,6 +10,10 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Improve consistency of the block outline indicating the currently selected block [#59415]
+-   [*] Gallery block items with in-progress, paused, or failed media uploads correctly display an highlight outline when selected [#59423]
+
+## 1.114.0
 -   [*] Prevent crash when autoscrolling to blocks [#59110]
 -   [*] Remove opacity change when images are being uploaded [#59264]
 -   [*] Media & Text blocks correctly show an error message when the attached video upload fails [#59288]

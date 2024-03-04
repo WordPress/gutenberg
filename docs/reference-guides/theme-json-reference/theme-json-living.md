@@ -33,11 +33,12 @@ Setting that enables the following UI tools:
 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- shadow: defaultPresets
 
 
 ---
@@ -202,6 +203,19 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 ---
 ## Styles
 
+
+### background
+
+Background styles
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| backgroundImage | string, object |  |
+| backgroundPosition | string, object |  |
+| backgroundRepeat | string, object |  |
+| backgroundSize | string, object |  |
+
+---
 
 ### border
 
