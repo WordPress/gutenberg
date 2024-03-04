@@ -36,14 +36,14 @@ export default {
 
 		const updateValue = useCallback(
 			( newValue ) => {
-				const currentBindingValue =
-					getBlockAttributes( patternClientId )?.content;
 				if ( patternClientId ) {
+					const currentBindingValue =
+						getBlockAttributes( patternClientId )?.content;
 					updateBlockAttributes( patternClientId, {
 						content: {
 							...currentBindingValue,
 							[ blockName ]: {
-								...currentBindingValue[ blockName ],
+								...currentBindingValue?.[ blockName ],
 								[ attributeName ]: newValue,
 							},
 						},
