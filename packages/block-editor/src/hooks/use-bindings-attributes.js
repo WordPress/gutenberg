@@ -3,7 +3,7 @@
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
@@ -75,10 +75,11 @@ const BindingConnector = ( {
 	source,
 	onPropValueChange,
 } ) => {
-	const { placeholder, value: propValue } = source.useSource(
-		blockProps,
-		args
-	);
+	const {
+		placeholder,
+		value: propValue,
+		updateValue: updateValueFunction,
+	} = source.useSource( blockProps, args, attrName );
 
 	const { name: blockName } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
@@ -110,7 +111,9 @@ const BindingConnector = ( {
 				return;
 			}
 
-			onPropValueChange( { [ attrName ]: newAttrValue } );
+			onPropValueChange( {
+				[ attrName ]: { newAttrValue, updateValueFunction },
+			} );
 		},
 		[ attrName, onPropValueChange ]
 	);
@@ -194,19 +197,44 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { setAttributes } = props;
 		/*
 		 * Collect and update the bound attributes
 		 * in a separate state.
 		 */
 		const [ boundAttributes, setBoundAttributes ] = useState( {} );
-		const updateBoundAttributes = useCallback(
-			( newAttributes ) =>
+		const [ updateFunctions, setUpdateFunctions ] = useState( {} );
+		const updateBoundAttributes = useCallback( ( newAttributes ) => {
+			for ( const [ attributeName, object ] of Object.entries(
+				newAttributes
+			) ) {
+				const { newAttrValue, updateValueFunction } = object;
+
 				setBoundAttributes( ( prev ) => ( {
 					...prev,
-					...newAttributes,
-				} ) ),
-			[]
+					[ attributeName ]: newAttrValue,
+				} ) );
+				if ( updateValueFunction )
+					setUpdateFunctions( ( prev ) => ( {
+						...prev,
+						[ attributeName ]: updateValueFunction,
+					} ) );
+			}
+		}, [] );
+
+		const updatedSetAttributes = useCallback(
+			( nextAttributes ) => {
+				Object.entries( nextAttributes ?? {} )
+					.filter( ( [ attribute ] ) => attribute in updateFunctions )
+					.forEach( ( [ attribute, value ] ) => {
+						updateFunctions[ attribute ]( value );
+					} );
+				setAttributes( nextAttributes );
+			},
+			[ setAttributes, updateFunctions ]
 		);
+
+		const registry = useRegistry();
 
 		/*
 		 * Create binding object filtering
@@ -231,6 +259,11 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				<BlockEdit
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
+					setAttributes={ ( newAttributes ) => {
+						registry.batch( () => {
+							updatedSetAttributes( newAttributes );
+						} );
+					} }
 				/>
 			</>
 		);
