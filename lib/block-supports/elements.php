@@ -14,7 +14,7 @@
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content ) {
-	_deprecated_function( __FUNCTION__, '6.5.0', 'gutenberg_render_elements_class_name' );
+	_deprecated_function( __FUNCTION__, '6.5.0', 'gutenberg_render_elements_support' );
 	return $block_content;
 }
 
