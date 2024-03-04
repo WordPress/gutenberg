@@ -3,7 +3,7 @@
 /packages/interactivity/docs                    @juanmaguitar
 
 # Schemas
-/schemas/json                                   @ajlende
+/schemas/json
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr
@@ -21,10 +21,10 @@
 /packages/block-library/src/image               @artemiomorales @michalczaplinski
 
 # Duotone
-/lib/block-supports/duotone.php                       @ajlende
-/packages/block-editor/src/components/duotone-control @ajlende
-/packages/block-editor/src/hooks/duotone.js           @ajlende
-/packages/components/src/duotone-picker               @ajlende
+/lib/block-supports/duotone.php
+/packages/block-editor/src/components/duotone-control
+/packages/block-editor/src/hooks/duotone.js
+/packages/components/src/duotone-picker
 
 # Editor
 /packages/annotations                           @atimmer
