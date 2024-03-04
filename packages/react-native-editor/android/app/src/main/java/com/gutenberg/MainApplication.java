@@ -112,10 +112,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
-            }
-
-            @Override
             public void requestImageFailedRetryDialog(int mediaId) {
             }
 
@@ -224,37 +220,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onShowXpostSuggestions(Consumer<String> onResult) {
                 onResult.accept("ma.tt");
-            }
-
-            @Override
-            public void requestMediaFilesEditorLoad(
-                    ReadableArray mediaFiles,
-                    String blockId
-            ) {
-                Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
-                Toast.makeText(MainApplication.this, "requestMediaFilesFailedRetryDialog called", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
-                Toast.makeText(MainApplication.this, "requestMediaFilesUploadCancelDialog called", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
-                Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void mediaFilesBlockReplaceSync(
-                    ReadableArray mediaFiles,
-                    String blockId
-            ) {
-                Toast.makeText(MainApplication.this, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show();
             }
 
             @Override
