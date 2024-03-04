@@ -108,10 +108,6 @@ async function main() {
 		commits.map( async ( commit ) => {
 			const commitData = await fetchCommit( commit.sha );
 
-			// In the future we will want to exclude PRs based on label
-			// so we will need to fetch the full PR data for each commit.
-			// For now we can just set this to null.
-			// const fullPRData = null;
 			const fullPRData = await getPullRequestDataForCommit( commit.sha );
 
 			if ( commit.sha === '40ec1e317fc7bcad394d83ff0dfe064c847c93da' ) {
