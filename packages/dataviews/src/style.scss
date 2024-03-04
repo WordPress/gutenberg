@@ -153,6 +153,7 @@
 	thead {
 		position: sticky;
 		inset-block-start: 0;
+		z-index: z-index(".dataviews-view-table thead");
 
 		tr {
 			border: 0;

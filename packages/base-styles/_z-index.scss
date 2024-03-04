@@ -203,6 +203,9 @@ $z-layers: (
 
 	// Ensure modal footer actions appear above modal contents
 	".edit-site-start-template-options__modal__actions": 1,
+
+	// Ensure checkbox + actions don't overlap table header
+	".dataviews-view-table thead": 1,
 );
 
 @function z-index( $key ) {
