@@ -110,9 +110,6 @@ async function main() {
 
 			const fullPRData = await getPullRequestDataForCommit( commit.sha );
 
-			if ( commit.sha === '40ec1e317fc7bcad394d83ff0dfe064c847c93da' ) {
-				console.log( fullPRData );
-			}
 			// Our Issue links to the PRs associated with the commits so we must
 			// provide this data. We could also get the PR data from the commit data,
 			// using getPullRequestDataForCommit, but that requires yet another
