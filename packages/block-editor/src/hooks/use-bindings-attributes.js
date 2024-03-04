@@ -83,27 +83,6 @@ const BindingConnector = ( {
 
 	const updateBoundAttibute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
-			/*
-			 * If the attribute is a RichTextData instance,
-			 * (core/paragraph, core/heading, core/button, etc.)
-			 * compare its HTML representation with the new value.
-			 *
-			 * To do: it looks like a workaround.
-			 * Consider improving the attribute and metadata fields types.
-			 */
-			if ( prevAttrValue instanceof RichTextData ) {
-				// Bail early if the Rich Text value is the same.
-				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
-					return;
-				}
-
-				/*
-				 * To preserve the value type,
-				 * convert the new value to a RichTextData instance.
-				 */
-				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
-			}
-
 			if ( prevAttrValue === newAttrValue ) {
 				return;
 			}
@@ -195,15 +174,40 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		/*
 		 * Collect and update the bound attributes
 		 * in a separate state.
+		 * Also, it checks the attribute type.
 		 */
 		const [ boundAttributes, setBoundAttributes ] = useState( {} );
 		const updateBoundAttributes = useCallback(
-			( newAttributes ) =>
-				setBoundAttributes( ( prev ) => ( {
+			( newAttributes ) => {
+				const nextAttributes = Object.fromEntries(
+					Object.entries( newAttributes ).map(
+						( [ attrName, attrValue ] ) => {
+							/*
+							 * If the original attribute is a RichTextData instance,
+							 * (core/paragraph, core/heading, core/button, etc.),
+							 * convert the new value to a RichTextData instance, too.
+							 *
+							 * To do: it looks like a workaround.
+							 * Consider improving the attribute and metadata fields types.
+							 */
+							const originalAttr = props.attributes[ attrName ];
+							if ( originalAttr instanceof RichTextData ) {
+								return [
+									attrName,
+									RichTextData.fromHTMLString( attrValue ),
+								];
+							}
+							return [ attrName, attrValue ];
+						}
+					)
+				);
+
+				return setBoundAttributes( ( prev ) => ( {
 					...prev,
-					...newAttributes,
-				} ) ),
-			[]
+					...nextAttributes,
+				} ) );
+			},
+			[ props.attributes ]
 		);
 
 		/*
