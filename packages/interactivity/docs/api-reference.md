@@ -1044,6 +1044,28 @@ The code will log:
 }
 ```
 
+### withScope()
+
+Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
+
+When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+
+An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
+
+```js
+store('mySliderPlugin', {
+	callbacks: {
+		initSlideShow: () => {
+			setInterval(
+				withScope( () => {
+					actions.nextImage();
+				} ),
+				3_000
+			);
+		},
+})
+```
+
 ## Server functions
 
 The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
