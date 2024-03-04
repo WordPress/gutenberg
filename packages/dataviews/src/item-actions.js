@@ -169,10 +169,15 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
 						disabled={ ! secondaryActions.length }
+						className="dataviews-view-table__all-actions-button"
 					/>
 				}
 				placement="bottom-end"
 			>
+				<ActionsDropdownMenuGroup
+					actions={ primaryActions }
+					item={ item }
+				/>
 				<ActionsDropdownMenuGroup
 					actions={ secondaryActions }
 					item={ item }

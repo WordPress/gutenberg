@@ -132,14 +132,14 @@
 			}
 		}
 
-		.dataviews-view-table__actions {
+		.dataviews-view-table__actions .components-button:not(.dataviews-view-table__all-actions-button) {
 			opacity: 0;
 		}
 
 		&:focus-within,
 		&:hover {
 			.components-checkbox-control__input,
-			.dataviews-view-table__actions {
+			.dataviews-view-table__actions .components-button:not(.dataviews-view-table__all-actions-button) {
 				opacity: 1;
 			}
 		}

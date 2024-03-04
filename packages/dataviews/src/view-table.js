@@ -14,7 +14,6 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 	CheckboxControl,
-	VisuallyHidden,
 	Spinner,
 } from '@wordpress/components';
 import {
@@ -433,9 +432,7 @@ function ViewTable( {
 								className="dataviews-view-table__actions-column"
 							>
 								<span className="dataviews-view-table-header">
-									<VisuallyHidden>
-										{ __( 'Actions' ) }
-									</VisuallyHidden>
+									{ __( 'Actions' ) }
 								</span>
 							</th>
 						) }
