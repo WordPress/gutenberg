@@ -278,10 +278,13 @@ function FontCollection( { slug } ) {
 					<Flex>
 						<FlexItem>
 							<SearchControl
+								className="font-library-modal__search"
 								value={ filters.search }
 								placeholder={ __( 'Font name…' ) }
 								label={ __( 'Search' ) }
 								onChange={ debouncedUpdateSearchInput }
+								__nextHasNoMarginBottom
+								hideLabelFromVision={ false }
 							/>
 						</FlexItem>
 						<FlexItem>
