@@ -15,7 +15,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { unlock } from '../../../lock-unlock';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import PreviewTypography from '../typography-example';
+import TypographyExample from '../typography-example';
 import PreviewIframe from '../preview-iframe';
 import Subtitle from '../subtitle';
 import { getFontFamilies } from '../utils';
@@ -78,7 +78,7 @@ export default function TypographyVariations() {
 										isFocused={ isFocused }
 									>
 										{ ( { key } ) => (
-											<PreviewTypography
+											<TypographyExample
 												key={ key }
 												variation={ variation }
 											/>
