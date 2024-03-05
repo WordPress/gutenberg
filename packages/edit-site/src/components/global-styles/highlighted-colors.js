@@ -13,14 +13,15 @@ export default function HighlightedColors( {
 	ratio,
 } ) {
 	const { highlightedColors } = useStylesPreviewColors();
+	const scaledSwatchSize = normalizedColorSwatchSize * ratio;
 	return highlightedColors.map( ( { slug, color }, index ) => (
 		<motion.div
 			key={ slug }
 			style={ {
-				height: normalizedColorSwatchSize * ratio,
-				width: normalizedColorSwatchSize * ratio,
+				height: scaledSwatchSize,
+				width: scaledSwatchSize,
 				background: color,
-				borderRadius: ( normalizedColorSwatchSize * ratio ) / 2,
+				borderRadius: ( scaledSwatchSize ) / 2,
 			} }
 			animate={ {
 				scale: 1,
