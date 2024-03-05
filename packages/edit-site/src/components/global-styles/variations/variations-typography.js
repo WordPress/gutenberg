@@ -5,7 +5,6 @@ import { useContext } from '@wordpress/element';
 import {
 	__experimentalGrid as Grid,
 	__experimentalVStack as VStack,
-	__unstableMotion as motion,
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
