@@ -544,7 +544,6 @@ class WP_Navigation_Block_Renderer {
 	 * Gets the nav element directives.
 	 *
 	 * @param bool  $is_interactive Whether the block is interactive.
-	 * @param array $attributes     The block attributes.
 	 * @return string the directives for the navigation element.
 	 */
 	private static function get_nav_element_directives( $is_interactive ) {
