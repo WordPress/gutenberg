@@ -3,11 +3,6 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-/**
- * Internal dependencies
- */
-import { NAVIGATION_MOBILE_COLLAPSE } from './constants';
-
 const focusableSelectors = [
 	'a[href]',
 	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
@@ -200,27 +195,6 @@ const { state, actions } = store(
 						ref.querySelectorAll( focusableSelectors );
 					focusableElements?.[ 0 ]?.focus();
 				}
-			},
-			initNav() {
-				const context = getContext();
-				const mediaQuery = window.matchMedia(
-					`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
-				);
-
-				// Run once to set the initial state.
-				context.isCollapsed = mediaQuery.matches;
-
-				function handleCollapse( event ) {
-					context.isCollapsed = event.matches;
-				}
-
-				// Run on resize to update the state.
-				mediaQuery.addEventListener( 'change', handleCollapse );
-
-				// Remove the listener when the component is unmounted.
-				return () => {
-					mediaQuery.removeEventListener( 'change', handleCollapse );
-				};
 			},
 		},
 	},

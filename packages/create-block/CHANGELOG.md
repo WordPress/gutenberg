@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 4.36.0 (2024-02-21)
+
+### Bug Fix
+
+-   Add missing `viewScriptModule` field ([#59140](https://github.com/WordPress/gutenberg/pull/59140)).
+
+### Internal
+
+-   Remove deprecated `viewModule` field  ([#59198](https://github.com/WordPress/gutenberg/pull/59198)).
+
 ## 4.35.0 (2024-02-09)
 
 ## 4.34.0 (2024-01-24)

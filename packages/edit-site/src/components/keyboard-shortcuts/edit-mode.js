@@ -6,7 +6,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -16,7 +15,6 @@ import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcutsEditMode() {
-	const { getEditorMode } = useSelect( editorStore );
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea(
@@ -24,8 +22,6 @@ function KeyboardShortcutsEditMode() {
 			) === SIDEBAR_BLOCK,
 		[]
 	);
-	const { switchEditorMode, toggleDistractionFree } =
-		useDispatch( editorStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -72,10 +68,6 @@ function KeyboardShortcutsEditMode() {
 		}
 	} );
 
-	useShortcut( 'core/edit-site/toggle-mode', () => {
-		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
-	} );
-
 	useShortcut( 'core/edit-site/transform-heading-to-paragraph', ( event ) =>
 		handleTextLevelShortcut( event, 0 )
 	);
@@ -88,10 +80,6 @@ function KeyboardShortcutsEditMode() {
 			`core/edit-site/transform-paragraph-to-heading-${ level }`,
 			( event ) => handleTextLevelShortcut( event, level )
 		);
-	} );
-
-	useShortcut( 'core/edit-site/toggle-distraction-free', () => {
-		toggleDistractionFree();
 	} );
 
 	return null;

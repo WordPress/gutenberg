@@ -45,7 +45,7 @@ describe( 'Draggable', () => {
 			<Draggable>
 				<DraggableTrigger
 					id={ triggerId }
-					enabled={ true }
+					enabled
 					minDuration={ 500 }
 					onLongPress={ onLongPress }
 					testID="draggableTrigger"

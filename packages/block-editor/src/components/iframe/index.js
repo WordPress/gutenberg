@@ -30,7 +30,7 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
-
+import calculateScale from '../../utils/calculate-scale';
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
@@ -104,27 +104,53 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
-	scale = 1,
-	frameSize = 0,
-	expand = false,
+	shouldZoom = false,
 	readonly,
 	forwardedRef: ref,
+	title = __( 'Editor canvas' ),
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return {
-			resolvedAssets: settings.__unstableResolvedAssets,
-			isPreviewMode: settings.__unstableIsPreviewMode,
-		};
-	}, [] );
+	const { resolvedAssets, isPreviewMode, isZoomOutMode } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetEditorMode } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				resolvedAssets: settings.__unstableResolvedAssets,
+				isPreviewMode: settings.__unstableIsPreviewMode,
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			};
+		},
+		[]
+	);
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
+	const [
+		contentResizeListener,
+		{ height: contentHeight, width: contentWidth },
+	] = useResizeObserver();
+
+	// When zoom-out mode is enabled, the iframe is scaled down to fit the
+	// content within the viewport.
+	// At 1000px wide, the iframe is scaled to 45%.
+	// At 400px wide, the iframe is scaled to 90%.
+	const scale =
+		isZoomOutMode && shouldZoom
+			? calculateScale(
+					{
+						maxWidth: 1000,
+						minWidth: 400,
+						maxScale: 0.45,
+						minScale: 0.9,
+					},
+					contentWidth
+			  )
+			: 1;
+	const frameSize = isZoomOutMode ? 100 : 0;
+
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
@@ -138,6 +164,8 @@ function Iframe( {
 			const { contentDocument, ownerDocument } = node;
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
+
+			documentElement.classList.add( 'block-editor-iframe__html' );
 
 			clearerRef( documentElement );
 
@@ -218,7 +246,19 @@ function Iframe( {
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
-		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		<style>
+			html{
+				height: auto !important;
+				min-height: 100%;
+			}
+
+			body {
+				margin: 0;
+				/* Default background color in case zoom out mode background
+				colors the html element */
+				background: white;
+			}
+		</style>
 		${ styles }
 		${ scripts }
 	</head>
@@ -241,28 +281,35 @@ function Iframe( {
 	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
 	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
 
+	useEffect( () => {
+		if ( iframeDocument && scale !== 1 ) {
+			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
+			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
+			iframeDocument.documentElement.style.marginBottom = `${
+				-marginFromScaling * 2 + frameSize
+			}px`;
+			return () => {
+				iframeDocument.documentElement.style.transform = '';
+				iframeDocument.documentElement.style.marginTop = '';
+				iframeDocument.documentElement.style.marginBottom = '';
+			};
+		}
+	}, [ scale, frameSize, marginFromScaling, iframeDocument ] );
+
+	// Make sure to not render the before and after focusable div elements in view
+	// mode. They're only needed to capture focus in edit mode.
+	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+
 	return (
 		<>
-			{ tabIndex >= 0 && before }
+			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
 				style={ {
 					border: 0,
 					...props.style,
-					height: expand ? contentHeight : props.style?.height,
-					marginTop:
-						scale !== 1
-							? -marginFromScaling + frameSize
-							: props.style?.marginTop,
-					marginBottom:
-						scale !== 1
-							? -marginFromScaling + frameSize
-							: props.style?.marginBottom,
-					transform:
-						scale !== 1
-							? `scale( ${ scale } )`
-							: props.style?.transform,
+					height: props.style?.height,
 					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
@@ -271,7 +318,7 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
-				title={ __( 'Editor canvas' ) }
+				title={ title }
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
 						props.onKeyDown( event );
@@ -316,7 +363,7 @@ function Iframe( {
 						iframeDocument.documentElement
 					) }
 			</iframe>
-			{ tabIndex >= 0 && after }
+			{ shouldRenderFocusCaptureElements && after }
 		</>
 	);
 }

@@ -28,21 +28,17 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
 		 *
 		 * @since 6.5.0
-		 * @access private
-		 *
-		 * @see sanitize_font_family()
 		 *
 		 * @param string $item A font family name.
-		 * @return string The font family name with surrounding quotes if necessary.
+		 * @return string The font family name with surrounding quotes, if necessary.
 		 */
 		private static function maybe_add_quotes( $item ) {
-			// Match any non alphabetic characters (a-zA-Z), dashes -, or parenthesis ().
-			$regex = '/[^a-zA-Z\-()]+/';
+			// Matches strings that are not exclusively alphabetic characters or hyphens, and do not exactly follow the pattern generic(alphabetic characters or hyphens).
+			$regex = '/^(?!generic\([a-zA-Z\-]+\)$)(?!^[a-zA-Z\-]+$).+/';
 			$item  = trim( $item );
 			if ( preg_match( $regex, $item ) ) {
-				// Removes leading and trailing quotes.
-				$item = preg_replace( '/^["\']|["\']$/', '', $item );
-				return "\"$item\"";
+				$item = trim( $item, "\"'" );
+				return '"' . $item . '"';
 			}
 			return $item;
 		}
@@ -50,8 +46,8 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 		/**
 		 * Sanitizes and formats font family names.
 		 *
-		 * - Applies `sanitize_text_field`
-		 * - Adds surrounding quotes to names that special
+		 * - Applies `sanitize_text_field`.
+		 * - Adds surrounding quotes to names containing any characters that are not alphabetic or dashes.
 		 *
 		 * It follows the recommendations from the CSS Fonts Module Level 4.
 		 * @link https://www.w3.org/TR/css-fonts-4/#font-family-prop
@@ -69,7 +65,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				return '';
 			}
 
-			$output          = trim( sanitize_text_field( $font_family ) );
+			$output          = sanitize_text_field( $font_family );
 			$formatted_items = array();
 			if ( str_contains( $output, ',' ) ) {
 				$items = explode( ',', $output );

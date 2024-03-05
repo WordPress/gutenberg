@@ -122,7 +122,6 @@ class MainApplication : Application(), ReactApplication, GutenbergBridgeInterfac
             }
 
             override fun mediaUploadSync(mediaSelectedCallback: MediaSelectedCallback) {}
-            override fun mediaSaveSync(mediaSelectedCallback: MediaSelectedCallback) {}
             override fun requestImageFailedRetryDialog(mediaId: Int) {}
             override fun requestImageUploadCancelDialog(mediaId: Int) {}
             override fun requestImageUploadCancel(mediaId: Int) {}
@@ -180,32 +179,6 @@ class MainApplication : Application(), ReactApplication, GutenbergBridgeInterfac
 
             override fun onShowXpostSuggestions(onResult: Consumer<String>) {
                 onResult.accept("ma.tt")
-            }
-
-            override fun requestMediaFilesEditorLoad(
-                mediaFiles: ReadableArray,
-                blockId: String
-            ) {
-                Toast.makeText(this@MainApplication, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun requestMediaFilesFailedRetryDialog(mediaFiles: ReadableArray) {
-                Toast.makeText(this@MainApplication, "requestMediaFilesFailedRetryDialog called", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun requestMediaFilesUploadCancelDialog(mediaFiles: ReadableArray) {
-                Toast.makeText(this@MainApplication, "requestMediaFilesUploadCancelDialog called", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun requestMediaFilesSaveCancelDialog(mediaFiles: ReadableArray) {
-                Toast.makeText(this@MainApplication, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun mediaFilesBlockReplaceSync(
-                mediaFiles: ReadableArray,
-                blockId: String
-            ) {
-                Toast.makeText(this@MainApplication, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show()
             }
 
             override fun gutenbergDidSendButtonPressedAction(buttonType: String) {}
