@@ -1464,7 +1464,12 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	// We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
 	// all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
 	$blocks = parse_blocks( $post->post_content );
-	$markup = block_core_navigation_set_ignored_hooked_blocks_metadata( $blocks, $post );
+
+	// Block Hooks logic requires a `WP_Post` object (rather than the `stdClass` with the updates that
+	// we're getting from the `rest_pre_insert_wp_navigation` filter) as its second argument (to be
+	// used as context for hooked blocks insertion).
+	// We thus have to look it up from the DB,based on `$post->ID`.
+	$markup = block_core_navigation_set_ignored_hooked_blocks_metadata( $blocks, get_post( $post->ID ) );
 
 	$root_nav_block        = parse_blocks( $markup )[0];
 	$ignored_hooked_blocks = isset( $root_nav_block['attrs']['metadata']['ignoredHookedBlocks'] )
