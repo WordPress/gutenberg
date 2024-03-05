@@ -262,16 +262,6 @@ export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
-/**
- * Request to start listening to save events when in-progress saves are in place
- *
- * For example, when media is being saved and the user re-enters the editor
- *
- */
-export function mediaSaveSync() {
-	return RNReactNativeGutenbergBridge.mediaSaveSync();
-}
-
 export function requestImageFailedRetryDialog( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog(
 		mediaId
@@ -350,79 +340,6 @@ export function showUserSuggestions() {
 
 export function showXpostSuggestions() {
 	return RNReactNativeGutenbergBridge.showXpostSuggestions();
-}
-
-/**
- * Request the host app to show the block for editing its mediaFiles collection
- *
- * For example, a mediaFiles collection editor can make special handling of visualization
- * in this regard.
- *
- * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
- * @param {string}     blockClientId the clientId of the block.
- */
-export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
-		mediaFiles,
-		blockClientId
-	);
-}
-
-/**
- * Request the host app to show a retry dialog for mediaFiles arrays which contained items that failed
- * to upload
- *
- * For example, tapping on a failed-media overlay would trigger this request and a "Retry?" dialog
- * would be presented to the user
- *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
- */
-export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
-		mediaFiles
-	);
-}
-
-/**
- * Request the host app to show a cancel dialog for mediaFiles arrays currently being uploaded
- *
- * For example, tapping on a block containing mediaFiles that are currently being uplaoded would trigger this request
- * and a "Cancel upload?" dialog would be presented to the user.
- *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
- */
-export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
-		mediaFiles
-	);
-}
-
-/**
- * Request the host app to show a cancel dialog for mediaFiles arrays currently undergoing a save operation
- *
- * Save operations on mediaFiles collection could  be lengthy so for example, tapping on a mediaFiles-type block
- * currently being saved would trigger this request and a "Cancel save?" dialog would be presented to the user
- *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
- */
-export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
-		mediaFiles
-	);
-}
-
-/**
- * Request the host app to listen to mediaFiles collection based block replacement signals
- * in case such an event was enqueued
- *
- * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
- * @param {string}     blockClientId the clientId of the block.
- */
-export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
-	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
-		mediaFiles,
-		blockClientId
-	);
 }
 
 export function requestFocalPointPickerTooltipShown( callback ) {

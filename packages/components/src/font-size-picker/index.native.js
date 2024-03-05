@@ -111,7 +111,7 @@ function FontSizePicker( {
 						separatorType="none"
 						label={ __( 'Default' ) }
 						onPress={ onChangeValue( undefined ) }
-						leftAlign={ true }
+						leftAlign
 						key={ 'default' }
 						accessibilityRole={ 'button' }
 						accessibilityLabel={ __( 'Selected: Default' ) }
@@ -137,7 +137,7 @@ function FontSizePicker( {
 								label={ item.name }
 								subLabel={ item.sizePx }
 								onPress={ onChangeValue( item.sizePx ) }
-								leftAlign={ true }
+								leftAlign
 								key={ index }
 								accessibilityRole={ 'button' }
 								accessibilityLabel={

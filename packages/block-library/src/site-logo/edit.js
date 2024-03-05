@@ -574,7 +574,7 @@ export default function LogoEdit( {
 			<Placeholder
 				className={ placeholderClassName }
 				preview={ logoImage }
-				withIllustration={ true }
+				withIllustration
 				style={ {
 					width,
 				} }

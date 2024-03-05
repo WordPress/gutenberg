@@ -27,6 +27,7 @@ import {
 	setUIValuesNeeded,
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
+	unloadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
 	makeFontFacesFormData,
 	makeFontFamilyFormData,
@@ -363,6 +364,12 @@ function FontLibraryProvider( { children } ) {
 			...fontFamilies,
 			[ font.source ]: newCustomFonts,
 		} );
+
+		if ( font.fontFace ) {
+			font.fontFace.forEach( ( face ) => {
+				unloadFontFaceInBrowser( face, 'all' );
+			} );
+		}
 	};
 
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
@@ -398,6 +405,23 @@ function FontLibraryProvider( { children } ) {
 			...fontFamilies,
 			[ font.source ]: newFonts,
 		} );
+
+		const isFaceActivated = isFontActivated(
+			font.slug,
+			face.fontStyle,
+			face.fontWeight,
+			font.source
+		);
+
+		if ( isFaceActivated ) {
+			loadFontFaceInBrowser(
+				face,
+				getDisplaySrcFromFontFace( face.src ),
+				'all'
+			);
+		} else {
+			unloadFontFaceInBrowser( face, 'all' );
+		}
 	};
 
 	const loadFontFaceAsset = async ( fontFace ) => {

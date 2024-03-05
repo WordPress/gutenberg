@@ -329,7 +329,7 @@ function ButtonEdit( props ) {
 						title={ __( 'Unlink' ) }
 						shortcut={ displayShortcut.primaryShift( 'k' ) }
 						onClick={ unlink }
-						isActive={ true }
+						isActive
 					/>
 				) }
 			</BlockControls>

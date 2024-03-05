@@ -20,7 +20,7 @@ describe( 'PluginPostPublishPanel', () => {
 				<PluginPostPublishPanel
 					className="my-plugin-post-publish-panel"
 					title="My panel title"
-					initialOpen={ true }
+					initialOpen
 				>
 					My panel content
 				</PluginPostPublishPanel>
