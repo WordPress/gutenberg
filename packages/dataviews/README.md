@@ -108,6 +108,7 @@ Each field is an object with the following properties:
 -   `filterBy`: configuration for the filters.
     - `operators`: the list of operators supported by the field.
     - `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
+    - `singleSelection`: whether the filter should only allow single selection. `false` by default.
 
 ### `view`: `object`
 
