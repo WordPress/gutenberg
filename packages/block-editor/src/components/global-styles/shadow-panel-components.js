@@ -3,13 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalVStack as VStack,
-	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 	FlexItem,
 	Dropdown,
+	MenuGroup,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
@@ -37,24 +36,24 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const shadows = useShadowPresets( settings );
 
 	return (
-		<div className="block-editor-global-styles__shadow-popover-container">
-			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
-				<ShadowPresets
-					presets={ shadows }
-					activeShadow={ shadow }
-					onSelect={ onShadowChange }
-				/>
-				<div className="block-editor-global-styles__clear-shadow">
-					<Button
-						variant="tertiary"
-						onClick={ () => onShadowChange( undefined ) }
-					>
-						{ __( 'Clear' ) }
-					</Button>
-				</div>
-			</VStack>
-		</div>
+		<MenuGroup
+			className="block-editor-global-styles__shadow-popover-container"
+			label={ __( 'Drop shadow' ) }
+		>
+			<ShadowPresets
+				presets={ shadows }
+				activeShadow={ shadow }
+				onSelect={ onShadowChange }
+			/>
+			<div className="block-editor-global-styles__shadow-clear-wrapper">
+				<Button
+					variant="tertiary"
+					onClick={ () => onShadowChange( undefined ) }
+				>
+					{ __( 'Clear' ) }
+				</Button>
+			</div>
+		</MenuGroup>
 	);
 }
 
@@ -67,7 +66,7 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 			store={ compositeStore }
 			role="listbox"
 			className="block-editor-global-styles__shadow__list"
-			aria-label={ __( 'Drop shadows' ) }
+			aria-label={ __( 'Drop shadows.' ) }
 		>
 			{ presets.map( ( { name, slug, shadow } ) => (
 				<ShadowIndicator
@@ -92,17 +91,12 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 			role="option"
 			aria-label={ label }
 			aria-selected={ isActive }
-			className={ classNames(
-				'block-editor-global-styles__shadow__item',
-				{
-					'is-active': isActive,
-				}
-			) }
 			render={
 				<Button
 					className={ classNames(
 						'block-editor-global-styles__shadow-indicator',
 						{
+							'is-active': isActive,
 							unset: type === 'unset',
 						}
 					) }

@@ -1,23 +1,24 @@
-.block-editor-global-styles__toggle-icon {
-	fill: currentColor;
-}
+// Must equal $color-palette-circle-size and $color-palette-circle-spacing from:
+// @wordpress/components/src/circular-option-picker/style.scss
+$swatch-size: 28px;
+$swatch-gap: 12px;
 
-// @todo Ideally, popover, swatch size, and gap values should be CSS variables
-// to apply precise grid layouts.
-// https://github.com/WordPress/gutenberg/blob/954ecae571abbddc113d3a4bd8e1a72230180554/packages/block-editor/src/components/duotone-control/style.scss#L3-L9
 .block-editor-global-styles__shadow-popover-container {
-	width: 230px;
+	.components-menu-group__label {
+		padding: 0;
+	}
 }
 
 .block-editor-global-styles__shadow__list {
-	display: flex;
-	gap: 12px;
-	flex-wrap: wrap;
-	padding-bottom: $grid-unit-10;
+	display: grid;
+	grid-template-columns: repeat(6, $swatch-size);
+	gap: $swatch-gap;
 }
 
-.block-editor-global-styles__clear-shadow {
-	text-align: right;
+.block-editor-global-styles__shadow-clear-wrapper {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: $grid-unit-20;
 }
 
 .block-editor-global-styles-filters-panel__dropdown,
@@ -42,14 +43,11 @@
 	border-radius: $radius-block-ui;
 	cursor: pointer;
 	padding: 0;
-
-	height: $button-size-small + 2 * $border-width;
-	width: $button-size-small + 2 * $border-width;
-	box-sizing: border-box;
-
-	transform: scale(1);
+	height: $swatch-size;
+	width: $swatch-size;
 	transition: transform 0.1s ease;
 	will-change: transform;
+	@include reduce-motion("transition");
 
 	&:focus {
 		border: #{ $border-width * 2 } solid $gray-700;
