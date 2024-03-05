@@ -43,6 +43,12 @@
 }
 
 .edit-site-page-patterns-dataviews {
+	margin-top: 60px;
+
+	@include break-medium {
+		margin-top: 0;
+	}
+
 	.page-patterns-preview-field {
 		display: flex;
 		flex-direction: column;

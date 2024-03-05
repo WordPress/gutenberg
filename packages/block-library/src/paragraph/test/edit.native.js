@@ -12,6 +12,7 @@ import {
 	initializeEditor,
 	render,
 	setupCoreBlocks,
+	triggerBlockListLayout,
 	waitFor,
 	within,
 	withFakeTimers,
@@ -211,6 +212,41 @@ describe( 'Paragraph block', () => {
 		<p class="has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should inherit parent alignment', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Quote' );
+		await triggerBlockListLayout( getBlock( screen, 'Quote' ) );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		fireEvent.press( screen.getByLabelText( 'Navigate Up' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text right' ) );
+
+		// Assert
+		// This not an ideal assertion, as it relies implementation details of the
+		// component: prop names. However, the only aspect we can assert is the prop
+		// passed to Aztec, the native module controlling visual alignment. A less
+		// brittle alternative might be snapshotting, but RNTL does not yet support
+		// focused snapshots, which means the snapshot would be huge.
+		// https://github.com/facebook/react/pull/25329
+		expect(
+			screen.UNSAFE_queryAllByProps( {
+				value: '<p>A quick brown fox jumps over the lazy dog.</p>',
+				placeholder: 'Start writing…',
+				textAlign: 'right',
+			} ).length
+		).toBe( 2 ); // One for Aztec mock, one for the TextInput.
 	} );
 
 	it( 'should preserve alignment when split', async () => {

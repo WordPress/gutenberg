@@ -22,7 +22,6 @@
 	position: relative;
 	height: 100%;
 	display: block;
-	overflow: hidden;
 	background-color: $gray-300;
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
@@ -62,8 +61,6 @@
 
 	.components-resizable-box__container {
 		margin: 0 auto;
-		// Removing this will cancel the bottom margins in the iframe.
-		overflow: auto;
 	}
 
 	&.is-view-mode {

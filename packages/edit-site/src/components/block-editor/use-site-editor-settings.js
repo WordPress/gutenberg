@@ -162,6 +162,7 @@ export function useSpecificEditorSettings() {
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			__unstableIsPreviewMode: canvasMode === 'view',
 		};
 	}, [
 		settings,

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { h, cloneElement, render } from 'preact';
+import { batch } from '@preact/signals';
 import { deepSignal } from 'deepsignal';
 
 /**
@@ -12,6 +13,7 @@ import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive, getNamespace } from './hooks';
+import { parseInitialData, populateInitialData } from './store';
 
 export { store, getConfig } from './store';
 export { getContext, getElement } from './hooks';
@@ -43,6 +45,9 @@ export const privateApis = ( lock ): any => {
 			cloneElement,
 			render,
 			deepSignal,
+			parseInitialData,
+			populateInitialData,
+			batch,
 		};
 	}
 

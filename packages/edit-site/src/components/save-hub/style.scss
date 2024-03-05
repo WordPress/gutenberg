@@ -9,10 +9,7 @@
 .edit-site-save-hub__button {
 	color: inherit;
 	width: 100%;
-
-	&.components-button.components-button {
-		justify-content: center;
-	}
+	justify-content: center;
 
 	&[aria-disabled="true"] {
 		opacity: 1;

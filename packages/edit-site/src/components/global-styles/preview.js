@@ -23,6 +23,7 @@ import { useLayoutEffect, useState, useMemo } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from './hooks';
+import PreviewTypography from './preview-typography';
 
 const { useGlobalStyle, useGlobalStylesOutput } = unlock(
 	blockEditorPrivateApis
@@ -71,7 +72,7 @@ const THROTTLE_OPTIONS = {
 	trailing: true,
 };
 
-const StylesPreview = ( { label, isFocused, withHoverView } ) => {
+const StylesPreview = ( { label, isFocused, withHoverView, variation } ) => {
 	const [ fontWeight ] = useGlobalStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useGlobalStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useGlobalStyle(
@@ -198,19 +199,10 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 									overflow: 'hidden',
 								} }
 							>
-								<motion.div
-									style={ {
-										fontFamily: headingFontFamily,
-										fontSize: 65 * ratio,
-										color: headingColor,
-										fontWeight: headingFontWeight,
-									} }
-									animate={ { scale: 1, opacity: 1 } }
-									initial={ { scale: 0.1, opacity: 0 } }
-									transition={ { delay: 0.3, type: 'tween' } }
-								>
-									Aa
-								</motion.div>
+								<PreviewTypography
+									fontSize={ 65 * ratio }
+									variation={ variation }
+								/>
 								<VStack spacing={ 4 * ratio }>
 									{ highlightedColors.map(
 										( { slug, color }, index ) => (
