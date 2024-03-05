@@ -167,6 +167,7 @@ function UploadFonts() {
 				{ notice && (
 					<Notice
 						status={ notice.type }
+						__unstableHTML={ true }
 						onRemove={ () => setNotice( null ) }
 					>
 						{ notice.message }

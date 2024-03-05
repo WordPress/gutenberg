@@ -283,6 +283,14 @@ function FontLibraryProvider( { children } ) {
 				);
 			}
 
+			installationErrors = installationErrors.reduce(
+				( unique, item ) =>
+					unique.includes( item.message )
+						? unique
+						: [ ...unique, item.message ],
+				[]
+			);
+
 			if ( fontFamiliesToActivate.length > 0 ) {
 				// Activate the font family (add the font family to the global styles).
 				activateCustomFontFamilies( fontFamiliesToActivate );
@@ -298,24 +306,27 @@ function FontLibraryProvider( { children } ) {
 				refreshLibrary();
 			}
 
-			if ( installationErrors.length > 0 ) {
+			if ( installationErrors.length === 1 ) {
 				throw new Error(
 					sprintf(
 						/* translators: %s: Specific error message returned from server. */
+						__( 'There was an error installing fonts. %s' ),
+						installationErrors[ 0 ]
+					)
+				);
+			} else if ( installationErrors.length > 1 ) {
+				throw new Error(
+					sprintf(
+						/* translators: %s: Specific error messages returned from server. */
 						__( 'There were some errors installing fonts. %s' ),
-						installationErrors.reduce(
-							( errorMessageCollection, error ) => {
-								if (
-									errorMessageCollection.indexOf(
-										error.message
-									) === -1
-								) {
-									return `${ errorMessageCollection } ${ error.message }`;
-								}
-								return errorMessageCollection;
-							},
-							''
-						)
+						'<ul>' +
+							installationErrors.reduce(
+								( errorMessageCollection, errorMessage ) => {
+									return `${ errorMessageCollection }<li>${ errorMessage }</li>`;
+								},
+								''
+							) +
+							'</ul>'
 					)
 				);
 			}
