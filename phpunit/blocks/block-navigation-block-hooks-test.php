@@ -58,6 +58,10 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_update_ignore_hooked_blocks_meta_preserves_entities() {
+		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
+			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionalit.' );
+		}
+
 		register_block_type(
 			'tests/my-block',
 			array(
