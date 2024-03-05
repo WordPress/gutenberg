@@ -13,12 +13,7 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import {
-	alignLeft,
-	alignRight,
-	alignCenter,
-	alignJustify,
-} from '@wordpress/icons';
+import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -42,14 +37,9 @@ const TEXT_ALIGNMENT_OPTIONS = [
 		title: __( 'Align text right' ),
 		align: 'right',
 	},
-	{
-		icon: alignJustify,
-		title: __( 'Justify text' ),
-		align: 'justify',
-	},
 ];
 
-const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right', 'justify' ];
+const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
 
 /**
  * Returns the valid text alignments.
