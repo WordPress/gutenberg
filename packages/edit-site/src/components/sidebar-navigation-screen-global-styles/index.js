@@ -5,7 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
+import {
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
@@ -24,6 +27,8 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import ColorVariations from '../global-styles/variations/variations-color';
+import TypographyVariations from '../global-styles/variations/variations-typography';
 
 const noop = () => {};
 
@@ -80,7 +85,33 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<StyleVariationsContainer />
+			<VStack spacing={ 10 }>
+				<StyleVariationsContainer />
+				<div className="edit-site-global-styles-style-variations-container">
+					<h2
+						style={ {
+							textTransform: 'uppercase',
+							color: 'white',
+							fontWeight: '400',
+						} }
+					>
+						{ __( 'Colors' ) }
+					</h2>
+					<ColorVariations />
+				</div>
+				<div className="edit-site-global-styles-style-variations-container">
+					<h2
+						style={ {
+							textTransform: 'uppercase',
+							color: 'white',
+							fontWeight: '400',
+						} }
+					>
+						{ __( 'Typography' ) }
+					</h2>
+					<TypographyVariations />
+				</div>
+			</VStack>
 		</BlockEditorProvider>
 	);
 }

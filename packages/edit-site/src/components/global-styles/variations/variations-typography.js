@@ -18,6 +18,7 @@ import TypographyExample from '../typography-example';
 import PreviewIframe from '../preview-iframe';
 import { getFontFamilies } from '../utils';
 import Variation from './variation';
+import PreviewIframe from '../preview-iframe';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
