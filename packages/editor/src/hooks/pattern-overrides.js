@@ -14,7 +14,7 @@ import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 const {
-	useSetPatternBindings,
+	PatternOverridesControls,
 	ResetOverridesControl,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
@@ -38,7 +38,6 @@ const withPatternOverrideControls = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ isSupportedBlock && <BindingUpdater { ...props } /> }
 				{ props.isSelected && isSupportedBlock && (
 					<ControlsWithStoreSubscription { ...props } />
 				) }
@@ -46,15 +45,6 @@ const withPatternOverrideControls = createHigherOrderComponent(
 		);
 	}
 );
-
-function BindingUpdater( props ) {
-	const postType = useSelect(
-		( select ) => select( editorStore ).getCurrentPostType(),
-		[]
-	);
-	useSetPatternBindings( props, postType );
-	return null;
-}
 
 // Split into a separate component to avoid a store subscription
 // on every block.
@@ -73,6 +63,8 @@ function ControlsWithStoreSubscription( props ) {
 			( binding ) => binding.source === 'core/pattern-overrides'
 		);
 
+	const shouldShowPatternOverridesControls =
+		isEditingPattern && blockEditingMode === 'default';
 	const shouldShowResetOverridesControl =
 		! isEditingPattern &&
 		!! props.attributes.metadata?.name &&
@@ -81,6 +73,9 @@ function ControlsWithStoreSubscription( props ) {
 
 	return (
 		<>
+			{ shouldShowPatternOverridesControls && (
+				<PatternOverridesControls { ...props } />
+			) }
 			{ shouldShowResetOverridesControl && (
 				<ResetOverridesControl { ...props } />
 			) }

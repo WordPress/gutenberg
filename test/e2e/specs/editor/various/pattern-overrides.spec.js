@@ -87,6 +87,9 @@ test.describe( 'Pattern Overrides', () => {
 			await editorSettings
 				.getByRole( 'textbox', { name: 'Block Name' } )
 				.fill( editableParagraphName );
+			await editorSettings
+				.getByRole( 'checkbox', { name: 'Allow instance overrides' } )
+				.setChecked( true );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
