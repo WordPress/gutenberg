@@ -2,14 +2,15 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 36px;
-	padding-left: 6px;
-	padding-right: 6px;
+	padding: 6px;
 	svg {
-		stroke: var(--wp-bound-block-color);
+		fill: var(--wp-bound-block-color);
 	}
 }
 
-.edit-post-header__toolbar .selected-block-tools-wrapper .block-editor-block-toolbar .block-editor-block-bindings-toolbar-indicator {
+.edit-post-header__toolbar
+.selected-block-tools-wrapper
+.block-editor-block-toolbar
+.block-editor-block-bindings-toolbar-indicator {
 	height: 32px;
 }
