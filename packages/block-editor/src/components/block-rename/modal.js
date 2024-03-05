@@ -7,37 +7,48 @@ import {
 	Button,
 	TextControl,
 	Modal,
+	ToggleControl,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import isEmptyString from './is-empty-string';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockRenameModal( {
 	blockName,
 	originalBlockName,
 	onClose,
 	onSave,
+	initialAllowOverrides,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
+	const [ allowOverrides, setAllowOverrides ] = useState(
+		initialAllowOverrides
+	);
+	const { isEditingPattern } = useSelect(
+		( select ) => ( {
+			isEditingPattern:
+				select( blockEditorStore ).getSettings()?.postType ===
+				'wp_block',
+		} ),
+		[]
+	);
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
 	const nameIsEmpty = isEmptyString( editedBlockName );
 
 	const isNameValid = nameHasChanged || nameIsOriginal;
+	const isSaveDisabled =
+		! isNameValid && allowOverrides === initialAllowOverrides;
 
 	const autoSelectInputText = ( event ) => event.target.select();
-
-	const dialogDescription = useInstanceId(
-		BlockRenameModal,
-		`block-editor-rename-modal__description`
-	);
 
 	const handleSubmit = () => {
 		const message =
@@ -55,7 +66,10 @@ export default function BlockRenameModal( {
 
 		// Must be assertive to immediately announce change.
 		speak( message, 'assertive' );
-		onSave( editedBlockName );
+		onSave(
+			editedBlockName,
+			isEditingPattern ? allowOverrides : undefined
+		);
 
 		// Immediate close avoids ability to hit save multiple times.
 		onClose();
@@ -66,19 +80,14 @@ export default function BlockRenameModal( {
 			title={ __( 'Rename' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
-			aria={ {
-				describedby: dialogDescription,
-			} }
 			focusOnMount="firstContentElement"
+			size="small"
 		>
-			<p id={ dialogDescription }>
-				{ __( 'Enter a custom name for this block.' ) }
-			</p>
 			<form
 				onSubmit={ ( e ) => {
 					e.preventDefault();
 
-					if ( ! isNameValid ) {
+					if ( isSaveDisabled ) {
 						return;
 					}
 
@@ -91,11 +100,33 @@ export default function BlockRenameModal( {
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
-						hideLabelFromVision
+						help={ __(
+							'Naming your block will help people understand its purpose.'
+						) }
 						placeholder={ originalBlockName }
-						onChange={ setEditedBlockName }
+						onChange={ ( newName ) => {
+							setEditedBlockName( newName );
+							if ( newName === '' ) {
+								setAllowOverrides( false );
+							}
+						} }
 						onFocus={ autoSelectInputText }
 					/>
+					{ isEditingPattern ? (
+						<ToggleControl
+							label={ __( 'Allow overrides' ) }
+							help={ __(
+								'Allow overriding this block in instances where this pattern is used.'
+							) }
+							checked={ allowOverrides }
+							onChange={ ( checked ) => {
+								if ( ! nameIsEmpty ) {
+									setAllowOverrides( checked );
+								}
+							} }
+							disabled={ nameIsEmpty }
+						/>
+					) : null }
 					<HStack justify="right">
 						<Button
 							__next40pxDefaultSize
@@ -107,7 +138,7 @@ export default function BlockRenameModal( {
 
 						<Button
 							__next40pxDefaultSize
-							aria-disabled={ ! isNameValid }
+							aria-disabled={ isSaveDisabled }
 							variant="primary"
 							type="submit"
 						>

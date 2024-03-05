@@ -37,6 +37,7 @@ import {
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
+import { addBindings, removeBindings } from './hooks/use-bindings-attributes';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -74,4 +75,6 @@ lock( privateApis, {
 	requiresWrapperOnCopy,
 	PrivateRichText,
 	reusableBlocksSelectKey,
+	addBindings,
+	removeBindings,
 } );

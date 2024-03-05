@@ -13,17 +13,25 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
 import BlockRenameModal from './modal';
+import {
+	BLOCK_BINDINGS_ALLOWED_BLOCKS,
+	canBindBlock,
+	addBindings,
+	removeBindings,
+} from '../../hooks/use-bindings-attributes';
 
 export default function BlockRenameControl( { clientId } ) {
 	const [ renamingBlock, setRenamingBlock ] = useState( false );
 
-	const { metadata } = useSelect(
+	const { metadata, blockName } = useSelect(
 		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
+			const { getBlockAttributes, getBlockName } =
+				select( blockEditorStore );
 
 			const _metadata = getBlockAttributes( clientId )?.metadata;
 			return {
 				metadata: _metadata,
+				blockName: getBlockName( clientId ),
 			};
 		},
 		[ clientId ]
@@ -32,13 +40,33 @@ export default function BlockRenameControl( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const customName = metadata?.name;
+	const hasPatternOverrides =
+		!! metadata?.bindings &&
+		!! BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ]?.every(
+			( attributeName ) =>
+				metadata.bindings[ attributeName ]?.source ===
+				'core/pattern-overrides'
+		);
 
-	function onChange( newName ) {
+	function onChange( newName, allowOverrides ) {
+		const updatedMetadata = { ...metadata, name: newName };
+		if ( allowOverrides !== undefined && canBindBlock( blockName ) ) {
+			const syncedAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
+			updatedMetadata.bindings = allowOverrides
+				? addBindings(
+						updatedMetadata.bindings,
+						syncedAttributes,
+						'core/pattern-overrides'
+				  )
+				: removeBindings(
+						updatedMetadata.bindings,
+						syncedAttributes,
+						'core/pattern-overrides'
+				  );
+		}
+
 		updateBlockAttributes( [ clientId ], {
-			metadata: {
-				...( metadata && metadata ),
-				name: newName,
-			},
+			metadata: updatedMetadata,
 		} );
 	}
 
@@ -59,8 +87,9 @@ export default function BlockRenameControl( { clientId } ) {
 				<BlockRenameModal
 					blockName={ customName || '' }
 					originalBlockName={ blockInformation?.title }
+					initialAllowOverrides={ hasPatternOverrides }
 					onClose={ () => setRenamingBlock( false ) }
-					onSave={ ( newName ) => {
+					onSave={ ( newName, allowOverrides ) => {
 						// If the new value is the block's original name (e.g. `Group`)
 						// or it is an empty string then assume the intent is to reset
 						// the value. Therefore reset the metadata.
@@ -71,7 +100,7 @@ export default function BlockRenameControl( { clientId } ) {
 							newName = undefined;
 						}
 
-						onChange( newName );
+						onChange( newName, allowOverrides );
 					} }
 				/>
 			) }
