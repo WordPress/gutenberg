@@ -355,7 +355,7 @@ function ViewTable( {
 	);
 
 	return (
-		<div className="dataviews-view-table-wrapper">
+		<>
 			<table
 				className="dataviews-view-table"
 				aria-busy={ isLoading }
@@ -467,7 +467,7 @@ function ViewTable( {
 					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
 				) }
 			</div>
-		</div>
+		</>
 	);
 }
 
