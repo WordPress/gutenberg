@@ -42,6 +42,11 @@ export default {
 	className: 'editor-autocompleters__user',
 	triggerPrefix: '@',
 
+	allowContext( before ) {
+		// Triggers when at the beginning of a context or when the immediately preceding character is a space.
+		return /^$/.test( before ) || /^\s$/.test( before.slice( -1 ) );
+	},
+
 	useItems( filterValue ) {
 		const users = useSelect(
 			( select ) => {
