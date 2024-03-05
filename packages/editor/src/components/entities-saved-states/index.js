@@ -11,7 +11,10 @@ import {
 } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import {
+	__experimentalUseDialog as useDialog,
+	useInstanceId,
+} from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -183,12 +186,20 @@ export function EntitiesSavedStatesExtensible( {
 	const [ saveDialogRef, saveDialogProps ] = useDialog( {
 		onClose: () => dismissPanel(),
 	} );
+	const dialogLabel = useInstanceId( EntitiesSavedStatesExtensible, 'label' );
+	const dialogDescription = useInstanceId(
+		EntitiesSavedStatesExtensible,
+		'description'
+	);
 
 	return (
 		<div
 			ref={ saveDialogRef }
 			{ ...saveDialogProps }
 			className="entities-saved-states__panel"
+			role="dialog"
+			aria-labelledby={ dialogLabel }
+			aria-describedby={ dialogDescription }
 		>
 			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
 				<FlexItem
@@ -213,11 +224,14 @@ export function EntitiesSavedStatesExtensible( {
 			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong className="entities-saved-states__text-prompt--header">
+				<strong
+					className="entities-saved-states__text-prompt--header"
+					id={ dialogLabel }
+				>
 					{ __( 'Are you ready to save?' ) }
 				</strong>
 				{ additionalPrompt }
-				<p>
+				<p id={ dialogDescription }>
 					{ isDirty
 						? createInterpolateElement(
 								sprintf(
