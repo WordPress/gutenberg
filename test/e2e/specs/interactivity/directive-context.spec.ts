@@ -313,4 +313,69 @@ test.describe( 'data-wp-context', () => {
 		await select2.click();
 		await expect( selected ).toHaveText( 'Text 2' );
 	} );
+
+	test( 'should not subscribe to parent context props if those also exist in child', async ( {
+		page,
+	} ) => {
+		const counterParent = page.getByTestId( 'counter parent' );
+		const counterChild = page.getByTestId( 'counter child' );
+		const changes = page.getByTestId( 'counter changes' );
+
+		await expect( counterParent ).toHaveText( '0' );
+		await expect( counterChild ).toHaveText( '0' );
+		// The first render counts, so the changes counter starts at 1.
+		await expect( changes ).toHaveText( '1' );
+
+		await counterParent.click();
+		await expect( counterParent ).toHaveText( '1' );
+		await expect( counterChild ).toHaveText( '0' );
+		await expect( changes ).toHaveText( '1' );
+
+		await counterChild.click();
+		await expect( counterParent ).toHaveText( '1' );
+		await expect( counterChild ).toHaveText( '1' );
+		await expect( changes ).toHaveText( '2' );
+	} );
+
+	test( 'references to the same context object should be preserved', async ( {
+		page,
+	} ) => {
+		const isProxyPreserved = page.getByTestId( 'is proxy preserved' );
+		await expect( isProxyPreserved ).toHaveText( 'true' );
+	} );
+
+	test( 'references to copied context objects should be preserved', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'child copy obj' ).click();
+		const isProxyPreservedOnCopy = page.getByTestId(
+			'is proxy preserved on copy'
+		);
+		await expect( isProxyPreservedOnCopy ).toHaveText( 'true' );
+	} );
+
+	test( 'objects referenced from the context inherit properties where they are originally defined ', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'child copy obj' ).click();
+
+		const childContextBefore = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContextBefore.obj2.prop4 ).toBe( 'parent' );
+		expect( childContextBefore.obj2.prop5 ).toBe( 'child' );
+		expect( childContextBefore.obj2.prop6 ).toBe( 'child' );
+
+		await page.getByTestId( 'parent replace' ).click();
+
+		const childContextAfter = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContextAfter.obj2.prop4 ).toBeUndefined();
+		expect( childContextAfter.obj2.prop5 ).toBe( 'child' );
+		expect( childContextAfter.obj2.prop6 ).toBe( 'child' );
+		expect( childContextAfter.obj2.overwritten ).toBe( true );
+	} );
 } );

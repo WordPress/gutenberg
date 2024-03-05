@@ -8,7 +8,10 @@ import { useContext, useEffect, useState, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { FontLibraryContext } from './context';
-import { getFacePreviewStyle } from './utils/preview-styles';
+import {
+	getFacePreviewStyle,
+	getFamilyPreviewStyle,
+} from './utils/preview-styles';
 
 function getPreviewUrl( fontFace ) {
 	if ( fontFace.preview ) {
@@ -19,8 +22,39 @@ function getPreviewUrl( fontFace ) {
 	}
 }
 
-function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
+function getDisplayFontFace( font ) {
+	// if this IS a font face return it
+	if ( font.fontStyle || font.fontWeight ) {
+		return font;
+	}
+	// if this is a font family with a collection of font faces
+	// return the first one that is normal and 400 OR just the first one
+	if ( font.fontFace && font.fontFace.length ) {
+		return (
+			font.fontFace.find(
+				( face ) =>
+					face.fontStyle === 'normal' && face.fontWeight === '400'
+			) || font.fontFace[ 0 ]
+		);
+	}
+	// This must be a font family with no font faces
+	// return a fake font face
+	return {
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontFamily: font.fontFamily,
+		fake: true,
+	};
+}
+
+function FontDemo( { font, text } ) {
 	const ref = useRef( null );
+
+	const fontFace = getDisplayFontFace( font );
+	const style = getFamilyPreviewStyle( font );
+	text = text || font.name;
+	const customPreviewUrl = font.preview;
+
 	const [ isIntersecting, setIsIntersecting ] = useState( false );
 	const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );
 	const { loadFontFaceAsset } = useContext( FontLibraryContext );
@@ -34,8 +68,8 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 		fontSize: '18px',
 		lineHeight: 1,
 		opacity: isAssetLoaded ? '1' : '0',
-		...faceStyles,
 		...style,
+		...faceStyles,
 	};
 
 	useEffect( () => {
@@ -79,4 +113,4 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 	);
 }
 
-export default FontFaceDemo;
+export default FontDemo;

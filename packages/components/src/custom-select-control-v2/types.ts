@@ -92,7 +92,6 @@ type LegacyOnChangeObject = {
 };
 
 export type LegacyCustomSelectProps = {
-	children?: never;
 	/**
 	 * Optional classname for the component.
 	 */

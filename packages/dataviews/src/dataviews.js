@@ -20,6 +20,16 @@ import BulkActions from './bulk-actions';
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
 
+function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
+
 export default function DataViews( {
 	view,
 	onChangeView,
@@ -75,48 +85,54 @@ export default function DataViews( {
 			render: field.render || field.getValue,
 		} ) );
 	}, [ fields ] );
+
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 3 } justify="flex-start">
 				<HStack
-					alignment="flex-start"
+					alignment="top"
 					justify="start"
 					className="dataviews-filters__view-actions"
 				>
-					{ search && (
-						<Search
-							label={ searchLabel }
+					<HStack
+						justify="start"
+						className="dataviews-filters__container"
+						wrap
+					>
+						{ search && (
+							<Search
+								label={ searchLabel }
+								view={ view }
+								onChangeView={ onChangeView }
+							/>
+						) }
+						<Filters
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
+							openedFilter={ openedFilter }
+							setOpenedFilter={ setOpenedFilter }
 						/>
-					) }
-					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
-						<BulkActions
-							actions={ actions }
-							data={ data }
-							onSelectionChange={ onSetSelection }
-							selection={ selection }
-							getItemId={ getItemId }
-						/>
-					) }
+					</HStack>
+					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+						hasPossibleBulkAction && (
+							<BulkActions
+								actions={ actions }
+								data={ data }
+								onSelectionChange={ onSetSelection }
+								selection={ selection }
+								getItemId={ getItemId }
+							/>
+						) }
 					<ViewActions
 						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
-					/>
-				</HStack>
-				<HStack
-					justify="start"
-					className="dataviews-filters__container"
-					wrap
-				>
-					<Filters
-						fields={ _fields }
-						view={ view }
-						onChangeView={ onChangeView }
-						openedFilter={ openedFilter }
-						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
 				<ViewComponent

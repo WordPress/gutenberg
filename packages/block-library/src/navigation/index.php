@@ -544,7 +544,6 @@ class WP_Navigation_Block_Renderer {
 	 * Gets the nav element directives.
 	 *
 	 * @param bool  $is_interactive Whether the block is interactive.
-	 * @param array $attributes     The block attributes.
 	 * @return string the directives for the navigation element.
 	 */
 	private static function get_nav_element_directives( $is_interactive ) {
@@ -552,7 +551,7 @@ class WP_Navigation_Block_Renderer {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
-		$nav_element_context    = data_wp_context(
+		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
 				'overlayOpenedBy' => array(
 					'click' => false,
@@ -565,7 +564,7 @@ class WP_Navigation_Block_Renderer {
 			)
 		);
 		$nav_element_directives = '
-		 data-wp-interactive="core/navigation"'
+		 data-wp-interactive="core/navigation" '
 		. $nav_element_context;
 
 		return $nav_element_directives;
