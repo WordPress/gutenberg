@@ -45,7 +45,9 @@ describe( 'textAlign', () => {
 			const settings = filterRegisterBlockType( {
 				...blockSettings,
 				supports: {
-					textAlign: true,
+					typography: {
+						textAlign: true,
+					},
 				},
 			} );
 
@@ -96,7 +98,9 @@ describe( 'textAlign', () => {
 				},
 				'core/foo',
 				{
-					textAlign: 'center',
+					typography: {
+						textAlign: 'center',
+					},
 				}
 			);
 
@@ -109,7 +113,9 @@ describe( 'textAlign', () => {
 			registerBlockType( 'core/foo', {
 				...blockSettings,
 				supports: {
-					textAlign: true,
+					typography: {
+						textAlign: true,
+					},
 				},
 			} );
 

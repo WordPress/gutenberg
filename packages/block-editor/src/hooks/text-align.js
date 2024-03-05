@@ -21,6 +21,8 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
+const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
+
 const TEXT_ALIGNMENT_OPTIONS = [
 	{
 		icon: alignLeft,
@@ -78,7 +80,7 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.textAlign ?? {} ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'textAlign' ) ) {
+	if ( hasBlockSupport( settings, TEXT_ALIGN_SUPPORT_KEY ) ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -100,7 +102,7 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	setAttributes,
 } ) {
 	const validTextAlignments = getValidTextAlignments(
-		getBlockSupport( blockName, 'textAlign' )
+		getBlockSupport( blockName, TEXT_ALIGN_SUPPORT_KEY )
 	);
 	const blockEditingMode = useBlockEditingMode();
 	if ( ! validTextAlignments.length || blockEditingMode !== 'default' ) {
@@ -140,13 +142,13 @@ export default {
 	addSaveProps: addAssignedTextAlign,
 	attributeKeys: [ 'textAlign' ],
 	hasSupport( name ) {
-		return hasBlockSupport( name, 'textAlign', false );
+		return hasBlockSupport( name, TEXT_ALIGN_SUPPORT_KEY, false );
 	},
 };
 
 function useBlockProps( { name, textAlign } ) {
 	const validTextAlignments = getValidTextAlignments(
-		getBlockSupport( name, 'textAlign' )
+		getBlockSupport( name, TEXT_ALIGN_SUPPORT_KEY )
 	);
 	if ( ! validTextAlignments.length ) {
 		return null;
@@ -169,7 +171,7 @@ function useBlockProps( { name, textAlign } ) {
  */
 export function addAssignedTextAlign( props, blockType, attributes ) {
 	const { textAlign } = attributes;
-	const blockTextAlign = getBlockSupport( blockType, 'textAlign' );
+	const blockTextAlign = getBlockSupport( blockType, TEXT_ALIGN_SUPPORT_KEY );
 	const isTextAlignValid =
 		getValidTextAlignments( blockTextAlign ).includes( textAlign );
 	if ( isTextAlignValid ) {
