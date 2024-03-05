@@ -3,12 +3,7 @@
 	align-items: center;
 	height: 48px;
 	padding: 6px;
-
-	svg g {
+	svg {
 		stroke: var(--wp-bound-block-color);
-		fill: transparent;
-		stroke-width: 1.5;
-		stroke-linecap: round;
-		stroke-linejoin: round;
 	}
 }
