@@ -7,12 +7,12 @@ import {
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { Component, useCallback, useEffect } from '@wordpress/element';
+import { Component, useCallback } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -124,43 +124,44 @@ function LinkSettings( {
 	);
 
 	// Persist attributes passed from child screen.
-	// TODO: Explore a better approach to listen to navigation event.
-	useEffect( () => {
-		if ( ! route.params ) {
-			return;
-		}
+	useFocusEffect(
+		useCallback( () => {
+			if ( ! route.params ) {
+				return;
+			}
 
-		const { inputValue: newUrl, lightboxEnabled } = route.params;
+			const { inputValue: newUrl, lightboxEnabled } = route.params;
 
-		let newLinkDestination;
-		switch ( newUrl ) {
-			case attributes.url:
-				newLinkDestination = LINK_DESTINATION_MEDIA;
-				break;
-			case image?.link:
-				newLinkDestination = LINK_DESTINATION_ATTACHMENT;
-				break;
-			case '':
-				newLinkDestination = LINK_DESTINATION_NONE;
-				break;
-			default:
-				newLinkDestination = LINK_DESTINATION_CUSTOM;
-				break;
-		}
+			let newLinkDestination;
+			switch ( newUrl ) {
+				case attributes.url:
+					newLinkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case image?.link:
+					newLinkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case '':
+					newLinkDestination = LINK_DESTINATION_NONE;
+					break;
+				default:
+					newLinkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+			}
 
-		onSetLightbox( lightboxEnabled );
+			onSetLightbox( lightboxEnabled );
 
-		setMappedAttributes( {
-			url: newUrl,
-			linkDestination: newLinkDestination,
-		} );
-	}, [
-		attributes.url,
-		image?.link,
-		onSetLightbox,
-		route.params,
-		setMappedAttributes,
-	] );
+			setMappedAttributes( {
+				url: newUrl,
+				linkDestination: newLinkDestination,
+			} );
+		}, [
+			attributes.url,
+			image?.link,
+			onSetLightbox,
+			route.params,
+			setMappedAttributes,
+		] )
+	);
 
 	let valueMask;
 	switch ( linkDestination ) {
