@@ -80,19 +80,25 @@ function ListViewBlock( {
 	const blockTitle =
 		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
 
-	const { block, blockName, blockEditingMode } = useSelect(
+	const selected = useSelect(
 		( select ) => {
-			const { getBlock, getBlockName, getBlockEditingMode } =
-				select( blockEditorStore );
+			const {
+				getBlock,
+				getBlockName,
+				getBlockEditingMode,
+				hasMultiSelection,
+			} = select( blockEditorStore );
 
 			return {
 				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
 				blockEditingMode: getBlockEditingMode( clientId ),
+				hasMultiSelection: hasMultiSelection(),
 			};
 		},
 		[ clientId ]
 	);
+	const { block, blockName, blockEditingMode, hasMultiSelection } = selected;
 	const allowRightClickOverrides = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().allowRightClickOverrides,
@@ -400,31 +406,38 @@ function ListViewBlock( {
 					aria-selected={ !! isSelected }
 					ref={ settingsRef }
 				>
-					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsMenu
-							clientIds={ dropdownClientIds }
-							block={ block }
-							icon={ moreVertical }
-							label={ settingsAriaLabel }
-							popoverProps={ {
-								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
-							} }
-							toggleProps={ {
-								ref,
-								className: 'block-editor-list-view-block__menu',
-								tabIndex,
-								onClick: clearSettingsAnchorRect,
-								onFocus,
-							} }
-							disableOpenOnArrowDown
-							expand={ expand }
-							expandedState={ expandedState }
-							setInsertedBlock={ setInsertedBlock }
-							__experimentalSelectBlock={
-								updateFocusAndSelection
-							}
-						/>
-					) }
+					{ (
+						hasMultiSelection
+							? isFirstSelectedBlock
+							: isSelected || isHovered
+					)
+						? ( { ref, tabIndex, onFocus } ) => (
+								<BlockSettingsMenu
+									clientIds={ dropdownClientIds }
+									block={ block }
+									icon={ moreVertical }
+									label={ settingsAriaLabel }
+									popoverProps={ {
+										anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+									} }
+									toggleProps={ {
+										ref,
+										className:
+											'block-editor-list-view-block__menu',
+										tabIndex,
+										onClick: clearSettingsAnchorRect,
+										onFocus,
+									} }
+									disableOpenOnArrowDown
+									expand={ expand }
+									expandedState={ expandedState }
+									setInsertedBlock={ setInsertedBlock }
+									__experimentalSelectBlock={
+										updateFocusAndSelection
+									}
+								/>
+						  )
+						: null }
 				</TreeGridCell>
 			) }
 		</ListViewLeaf>
