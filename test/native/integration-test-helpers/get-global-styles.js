@@ -108,6 +108,9 @@ const GLOBAL_STYLES_RAW_FEATURES = {
 			],
 		},
 	},
+	blocks: {
+		'core/image': { lightbox: { allowEditing: true } },
+	},
 };
 
 const GLOBAL_STYLES_RAW_STYLES = {
