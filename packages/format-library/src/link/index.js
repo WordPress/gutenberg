@@ -59,7 +59,10 @@ function Edit( {
 				return;
 			}
 
-			setAddingLink( true );
+			// If the link is clicked a second time the Link UI should close.
+			setAddingLink( ( currentValue ) => {
+				return ! currentValue;
+			} );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -127,7 +130,14 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
-		setAddingLink( false );
+		// If the focus outside is triggered but the link is still active,
+		// then user has clicked on the link within the rich text again.
+		// This toggle behaviour is handled in an effect above and so
+		// state is not updated here.
+		if ( ! isActive ) {
+			setAddingLink( false );
+		}
+
 		setOpenedBy( null );
 	}
 
