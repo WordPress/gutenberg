@@ -531,7 +531,7 @@ function BackgroundToolsPanel( {
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	backgroundSize: false,
+	backgroundSize: true,
 };
 
 export default function BackgroundPanel( {
