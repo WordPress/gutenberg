@@ -341,7 +341,7 @@ function FontCollection( { slug } ) {
 					<Flex justify="flex-start">
 						<NavigatorToParentButton
 							icon={ chevronLeft }
-							isSmall
+							size="small"
 							onClick={ () => {
 								setSelectedFont( null );
 							} }
