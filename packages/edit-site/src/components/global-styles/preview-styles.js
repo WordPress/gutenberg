@@ -13,7 +13,7 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from './hooks';
-import PreviewTypography from './preview-typography';
+import PreviewTypography from './typography-example';
 import HighlightedColors from './highlighted-colors';
 import PreviewIframe from './preview-iframe';
 
