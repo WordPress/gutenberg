@@ -71,7 +71,10 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 
 		gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta( $post );
 
-		$this->assertSame( self::$original_markup . '<!-- wp:tests/my-block /-->', $post->post_content );
+		// We expect the '&' character to be replaced with its unicode representation.
+		$expected_markup = str_replace( '&', '\u0026amp;', self::$original_markup );
+
+		$this->assertSame( $expected_markup, $post->post_content );
 		$this->assertSame(
 			array( 'tests/my-block' ),
 			json_decode( get_post_meta( self::$navigation_post->ID, '_wp_ignored_hooked_blocks', true ), true )
