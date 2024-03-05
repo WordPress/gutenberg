@@ -39,6 +39,7 @@ export default function MoreMenu() {
 				label={ __( 'Options' ) }
 				popoverProps={ {
 					placement: 'bottom-end',
+					className: 'more-menu-dropdown__content',
 				} }
 				toggleProps={ {
 					tooltipPosition: 'bottom',
@@ -48,7 +49,6 @@ export default function MoreMenu() {
 				{ () => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
-							test
 							<PreferenceToggleMenuItem
 								scope="core/customize-widgets"
 								name="fixedToolbar"

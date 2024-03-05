@@ -61,6 +61,7 @@ export default function MoreMenu( { showIconLabels } ) {
 				label={ __( 'Options' ) }
 				popoverProps={ {
 					placement: 'bottom-end',
+					className: 'more-menu-dropdown__content',
 				} }
 				toggleProps={ {
 					showTooltip: ! showIconLabels,
