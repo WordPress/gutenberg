@@ -58,3 +58,9 @@
 .page-templates-description {
 	white-space: normal;
 }
+
+.edit-site-page-template-template-parts-dataviews {
+	.dataviews-pagination {
+		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
+	}
+}

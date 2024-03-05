@@ -1026,8 +1026,8 @@ test.describe( 'Links', () => {
 			pageUtils,
 			editor,
 		} ) => {
-			const textToSelect = `\u2003\u2003 spaces\u2003 `;
-			const textWithWhitespace = `Text with leading and trailing       spaces    `;
+			const textToSelect = `         spaces     `;
+			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
 
 			// Create a block with some text.
 			await editor.insertBlock( {

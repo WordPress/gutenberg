@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.20.0 (2024-02-21)
+
 ## 12.19.0 (2024-02-09)
 
 -   `FontSizePicker`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58702](https://github.com/WordPress/gutenberg/pull/58702)).

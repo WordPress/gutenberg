@@ -35,7 +35,7 @@ export default function InspectorControlsTabs( {
 
 	return (
 		<div className="block-editor-block-inspector__tabs">
-			<Tabs initialTabId={ initialTabName } key={ clientId }>
+			<Tabs defaultTabId={ initialTabName } key={ clientId }>
 				<Tabs.TabList>
 					{ tabs.map( ( tab ) => (
 						<Tabs.Tab

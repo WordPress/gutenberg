@@ -3,11 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Button,
-	DropZone,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	Button,
+	DropZone,
+	Notice,
 	FormFileUpload,
 	FlexItem,
 	privateApis as componentsPrivateApis,
@@ -22,13 +23,13 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import TabPanelLayout from './tab-panel-layout';
 import { unlock } from '../../../lock-unlock';
 
 const { ProgressBar } = unlock( componentsPrivateApis );
 
 function UploadFonts() {
-	const { installFont, notice, setNotice } = useContext( FontLibraryContext );
+	const { installFonts, notice, setNotice } =
+		useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
 
 	const handleDropZone = ( files ) => {
@@ -63,6 +64,12 @@ function UploadFonts() {
 		} );
 		if ( allowedFiles.length > 0 ) {
 			loadFiles( allowedFiles );
+		} else {
+			setNotice( {
+				type: 'error',
+				message: __( 'No fonts found to install.' ),
+			} );
+			setIsUploading( false );
 		}
 	};
 
@@ -137,19 +144,8 @@ function UploadFonts() {
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
 
-		if ( fontFamilies.length > 1 ) {
-			setNotice( {
-				type: 'error',
-				message: __(
-					'Variants from only one font family can be uploaded at a time.'
-				),
-			} );
-			setIsUploading( false );
-			return;
-		}
-
 		try {
-			await installFont( fontFamilies[ 0 ] );
+			await installFonts( fontFamilies );
 			setNotice( {
 				type: 'success',
 				message: __( 'Fonts were installed successfully.' ),
@@ -165,9 +161,17 @@ function UploadFonts() {
 	};
 
 	return (
-		<TabPanelLayout notice={ notice }>
+		<div className="font-library-modal__tabpanel-layout">
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library-modal__local-fonts">
+				{ notice && (
+					<Notice
+						status={ notice.type }
+						onRemove={ () => setNotice( null ) }
+					>
+						{ notice.message }
+					</Notice>
+				) }
 				{ isUploading && (
 					<FlexItem>
 						<div className="font-library-modal__upload-area">
@@ -180,7 +184,7 @@ function UploadFonts() {
 						accept={ ALLOWED_FILE_EXTENSIONS.map(
 							( ext ) => `.${ ext }`
 						).join( ',' ) }
-						multiple={ true }
+						multiple
 						onChange={ onFilesUpload }
 						render={ ( { openFileDialog } ) => (
 							<Button
@@ -199,7 +203,7 @@ function UploadFonts() {
 					) }
 				</Text>
 			</VStack>
-		</TabPanelLayout>
+		</div>
 	);
 }
 

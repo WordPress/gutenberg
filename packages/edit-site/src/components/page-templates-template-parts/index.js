@@ -429,6 +429,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 
 	return (
 		<Page
+			className="edit-site-page-template-template-parts-dataviews"
 			title={
 				postType === TEMPLATE_POST_TYPE
 					? __( 'Templates' )

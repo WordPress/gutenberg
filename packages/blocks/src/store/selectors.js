@@ -107,68 +107,6 @@ export function getBlockType( state, name ) {
 }
 
 /**
- * Returns the hooked blocks for a given anchor block.
- *
- * Given an anchor block name, returns an object whose keys are relative positions,
- * and whose values are arrays of block names that are hooked to the anchor block
- * at that relative position.
- *
- * @param {Object} state     Data state.
- * @param {string} blockName Anchor block type name.
- *
- * @example
- * ```js
- * import { store as blocksStore } from '@wordpress/blocks';
- * import { useSelect } from '@wordpress/data';
- *
- * const ExampleComponent = () => {
- *     const hookedBlockNames = useSelect( ( select ) =>
- *         select( blocksStore ).getHookedBlocks( 'core/navigation' ),
- *         []
- *     );
- *
- *     return (
- *         <ul>
- *             { Object.keys( hookedBlockNames ).length &&
- *                 Object.keys( hookedBlockNames ).map( ( relativePosition ) => (
- *                     <li key={ relativePosition }>{ relativePosition }>
- *                         <ul>
- *                             { hookedBlockNames[ relativePosition ].map( ( hookedBlock ) => (
- *                                 <li key={ hookedBlock }>{ hookedBlock }</li>
- *                             ) ) }
- *                         </ul>
- *                     </li>
- *             ) ) }
- *         </ul>
- *     );
- * };
- * ```
- *
- * @return {Object} Lists of hooked block names for each relative position.
- */
-export const getHookedBlocks = createSelector(
-	( state, blockName ) => {
-		const hookedBlockTypes = getBlockTypes( state ).filter(
-			( { blockHooks } ) => blockHooks && blockName in blockHooks
-		);
-
-		let hookedBlocks = {};
-		for ( const blockType of hookedBlockTypes ) {
-			const relativePosition = blockType.blockHooks[ blockName ];
-			hookedBlocks = {
-				...hookedBlocks,
-				[ relativePosition ]: [
-					...( hookedBlocks[ relativePosition ] ?? [] ),
-					blockType.name,
-				],
-			};
-		}
-		return hookedBlocks;
-	},
-	( state ) => [ state.blockTypes ]
-);
-
-/**
  * Returns block styles by block name.
  *
  * @param {Object} state Data state.

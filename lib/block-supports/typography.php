@@ -420,6 +420,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
 }
 
+
 /**
  * Returns a font-size value based on a given font-size preset.
  * Takes into account fluid typography parameters and attempts to return a CSS
@@ -430,19 +431,21 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.2.0 Added 'settings.typography.fluid.minFontSize' support.
  * @since 6.3.0 Using layout.wideSize as max viewport width, and logarithmic scale factor to calculate minimum font scale.
  * @since 6.4.0 Added configurable min and max viewport width values to the typography.fluid theme.json schema.
+ * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
  *
- * @param array $preset                     {
+ * @param array $preset       {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.
  *     @type string           $slug Kebab-case unique identifier for the font size preset.
  *     @type string|int|float $size CSS font-size value, including units where applicable.
  * }
- * @param bool  $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing. Default is `false`.
+ * @param bool|array $settings Optional Theme JSON settings array that overrides any global theme settings.
+ *                             Default is `array()`.
  *
  * @return string|null Font-size value or `null` if a size is not passed in $preset.
  */
-function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {
+function gutenberg_get_typography_font_size_value( $preset, $settings = array() ) {
 	if ( ! isset( $preset['size'] ) ) {
 		return null;
 	}
@@ -455,22 +458,35 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		return $preset['size'];
 	}
 
-	// Checks if fluid font sizes are activated.
-	$global_settings     = gutenberg_get_global_settings();
-	$typography_settings = isset( $global_settings['typography'] ) ? $global_settings['typography'] : array();
-	$layout_settings     = isset( $global_settings['layout'] ) ? $global_settings['layout'] : array();
+	/*
+	 * Backwards compatibility since 6.5.
+	 * As a bool (deprecated since 6.5), $settings acts as an override to switch fluid typography "on" (`true`) or "off" (`false`).
+	 */
+	if ( is_bool( $settings ) ) {
+		_deprecated_argument( __FUNCTION__, '6.6.0', __( '`boolean` type for second argument `$settings` is deprecated. Use `array()` instead.', 'gutenberg' ) );
+		$settings = array(
+			'typography' => array(
+				'fluid' => $settings,
+			),
+		);
+	}
 
-	$should_use_fluid_typography
-		= isset( $typography_settings['fluid'] ) &&
-		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
-		true :
-		$should_use_fluid_typography;
+	// Fallback to global settings as default.
+	$global_settings             = gutenberg_get_global_settings();
+	$settings                    = wp_parse_args(
+		$settings,
+		$global_settings
+	);
+	$typography_settings         = isset( $settings['typography'] ) ? $settings['typography'] : array();
+	$should_use_fluid_typography = ! empty( $typography_settings['fluid'] );
 
 	if ( ! $should_use_fluid_typography ) {
 		return $preset['size'];
 	}
 
-	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
+	// $typography_settings['fluid'] can be a bool or an array. Normalize to array.
+	$fluid_settings  = is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
+	$layout_settings = isset( $settings['layout'] ) ? $settings['layout'] : array();
 
 	// Defaults.
 	$default_maximum_viewport_width       = '1600px';

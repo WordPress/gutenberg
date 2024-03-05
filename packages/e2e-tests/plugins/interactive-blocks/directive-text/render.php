@@ -8,7 +8,7 @@
 wp_enqueue_script_module( 'directive-text-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-context" }'>
+<div data-wp-interactive="directive-context">
 	<div>
 		<span
 			data-wp-text="state.text"

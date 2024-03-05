@@ -300,6 +300,7 @@ function ResizableFrame( {
 			className={ classnames( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
 			} ) }
+			showHandle={ false } // Do not show the default handle, as we're using a custom one.
 		>
 			<motion.div
 				className="edit-site-resizable-frame__inner-content"

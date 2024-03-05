@@ -10,7 +10,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
-	getHookedBlocks,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -1937,16 +1936,9 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
-
-		const ignoredHookedBlocks = [
-			...new Set( Object.values( getHookedBlocks( id ) ).flat() ),
-		];
-
 		return {
 			...blockItemBase,
-			initialAttributes: ignoredHookedBlocks.length
-				? { metadata: { ignoredHookedBlocks } }
-				: {},
+			initialAttributes: {},
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
@@ -2239,56 +2231,41 @@ export const __experimentalGetAllowedBlocks = createSelector(
  * @param    {Object}         state            Editor state.
  * @param    {?string}        rootClientId     Optional root client ID of block list.
  *
- * @return {?WPDirectInsertBlock}              The block type to be directly inserted.
+ * @return {WPDirectInsertBlock|undefined}              The block type to be directly inserted.
  *
  * @typedef {Object} WPDirectInsertBlock
  * @property {string}         name             The type of block.
  * @property {?Object}        attributes       Attributes to pass to the newly created block.
  * @property {?Array<string>} attributesToCopy Attributes to be copied from adjecent blocks when inserted.
  */
-export const getDirectInsertBlock = createSelector(
-	( state, rootClientId = null ) => {
-		if ( ! rootClientId ) {
-			return;
-		}
-		const defaultBlock =
-			state.blockListSettings[ rootClientId ]?.defaultBlock;
-		const directInsert =
-			state.blockListSettings[ rootClientId ]?.directInsert;
-		if ( ! defaultBlock || ! directInsert ) {
-			return;
-		}
-		if ( typeof directInsert === 'function' ) {
-			return directInsert( getBlock( state, rootClientId ) )
-				? defaultBlock
-				: null;
-		}
-		return defaultBlock;
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.tree.get( rootClientId ),
-	]
-);
+export function getDirectInsertBlock( state, rootClientId = null ) {
+	if ( ! rootClientId ) {
+		return;
+	}
+	const { defaultBlock, directInsert } =
+		state.blockListSettings[ rootClientId ] ?? {};
+	if ( ! defaultBlock || ! directInsert ) {
+		return;
+	}
 
-export const __experimentalGetDirectInsertBlock = createSelector(
-	( state, rootClientId = null ) => {
-		deprecated(
-			'wp.data.select( "core/block-editor" ).__experimentalGetDirectInsertBlock',
-			{
-				alternative:
-					'wp.data.select( "core/block-editor" ).getDirectInsertBlock',
-				since: '6.3',
-				version: '6.4',
-			}
-		);
-		return getDirectInsertBlock( state, rootClientId );
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.tree.get( rootClientId ),
-	]
-);
+	return defaultBlock;
+}
+
+export function __experimentalGetDirectInsertBlock(
+	state,
+	rootClientId = null
+) {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).__experimentalGetDirectInsertBlock',
+		{
+			alternative:
+				'wp.data.select( "core/block-editor" ).getDirectInsertBlock',
+			since: '6.3',
+			version: '6.4',
+		}
+	);
+	return getDirectInsertBlock( state, rootClientId );
+}
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
@@ -2301,18 +2278,28 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 			if ( ! pattern ) {
 				return null;
 			}
+			const blocks = parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+			if ( blocks.length === 1 ) {
+				blocks[ 0 ].attributes = {
+					...blocks[ 0 ].attributes,
+					metadata: {
+						...( blocks[ 0 ].attributes.metadata || {} ),
+						categories: pattern.categories,
+					},
+				};
+			}
 			return {
 				...pattern,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
+				blocks,
 			};
-		}, getAllPatternsDependants )
+		}, getAllPatternsDependants( select ) )
 );
 
-const getAllowedPatternsDependants = ( state, rootClientId ) => {
+const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => {
 	return [
-		...getAllPatternsDependants( state ),
+		...getAllPatternsDependants( select )( state ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
@@ -2353,7 +2340,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			);
 
 			return patternsAllowed;
-		}, getAllowedPatternsDependants );
+		}, getAllowedPatternsDependants( select ) );
 	}
 );
 
@@ -2392,7 +2379,7 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 			return filteredPatterns;
 		},
 		( state, blockNames, rootClientId ) =>
-			getAllowedPatternsDependants( state, rootClientId )
+			getAllowedPatternsDependants( select )( state, rootClientId )
 	)
 );
 
@@ -2466,7 +2453,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 				);
 			},
 			( state, blocks, rootClientId ) =>
-				getAllowedPatternsDependants( state, rootClientId )
+				getAllowedPatternsDependants( select )( state, rootClientId )
 		)
 );
 

@@ -28,3 +28,11 @@ global.ResizeObserver = require( 'resize-observer-polyfill' );
 if ( ! window.DOMRect ) {
 	window.DOMRect = class DOMRect {};
 }
+
+/**
+ * Polyfill for Element.scrollIntoView().
+ * Necessary because it's not implemented in jsdom, and likely will never be.
+ *
+ * @see https://github.com/jsdom/jsdom/issues/1695
+ */
+global.Element.prototype.scrollIntoView = jest.fn();

@@ -36,6 +36,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 
 	// WordPress 6.4 compat.
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-templates-controller-6-4.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-block-patterns-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
@@ -53,7 +54,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
-	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
 
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
@@ -133,7 +133,6 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
-require __DIR__ . '/experimental/interactivity-api.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
@@ -192,6 +191,7 @@ require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/interactivity-api.php';
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {

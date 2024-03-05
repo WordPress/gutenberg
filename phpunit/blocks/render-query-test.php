@@ -86,7 +86,7 @@ HTML;
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
 		$this->assertSame( '{}', $p->get_attribute( 'data-wp-context' ) );
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
-		$this->assertSame( '{"namespace":"core/query"}', $p->get_attribute( 'data-wp-interactive' ) );
+		$this->assertSame( 'core/query', $p->get_attribute( 'data-wp-interactive' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-post' ) );
 		$this->assertSame( 'post-template-item-' . self::$posts[1], $p->get_attribute( 'data-wp-key' ) );

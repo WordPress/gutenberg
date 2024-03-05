@@ -19,25 +19,26 @@ import { __ } from '@wordpress/i18n';
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { mergeOrigins } from '../../store/get-block-settings';
+import { overrideOrigins } from '../../store/get-block-settings';
 import { setImmutably } from '../../utils/object';
-import { getBorderPanelLabel } from '../../hooks/border';
-import { ShadowPopover } from './shadow-panel-components';
-
-function useHasShadowControl( settings ) {
-	return !! settings?.shadow;
-}
+import { useBorderPanelLabel } from '../../hooks/border';
+import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 
 export function useHasBorderPanel( settings ) {
-	const controls = [
-		useHasBorderColorControl( settings ),
-		useHasBorderRadiusControl( settings ),
-		useHasBorderStyleControl( settings ),
-		useHasBorderWidthControl( settings ),
-		useHasShadowControl( settings ),
-	];
-
+	const controls = Object.values( useHasBorderPanelControls( settings ) );
 	return controls.some( Boolean );
+}
+
+export function useHasBorderPanelControls( settings ) {
+	const controls = {
+		hasBorderColor: useHasBorderColorControl( settings ),
+		hasBorderRadius: useHasBorderRadiusControl( settings ),
+		hasBorderStyle: useHasBorderStyleControl( settings ),
+		hasBorderWidth: useHasBorderWidthControl( settings ),
+		hasShadow: useHasShadowControl( settings ),
+	};
+
+	return controls;
 }
 
 function useHasBorderColorControl( settings ) {
@@ -54,6 +55,11 @@ function useHasBorderStyleControl( settings ) {
 
 function useHasBorderWidthControl( settings ) {
 	return settings?.border?.width;
+}
+
+function useHasShadowControl( settings ) {
+	const shadows = useShadowPresets( settings );
+	return !! settings?.shadow && shadows.length > 0;
 }
 
 function BorderToolsPanel( {
@@ -154,12 +160,10 @@ export default function BorderPanel( {
 
 	// Shadow
 	const shadow = decodeValue( inheritedValue?.shadow );
-	const shadowPresets = settings?.shadow?.presets;
-	const mergedShadowPresets = shadowPresets
-		? mergeOrigins( shadowPresets )
-		: [];
+	const shadowPresets = settings?.shadow?.presets ?? {};
+	const overriddenShadowPresets = overrideOrigins( shadowPresets ) ?? [];
 	const setShadow = ( newValue ) => {
-		const slug = mergedShadowPresets?.find(
+		const slug = overriddenShadowPresets?.find(
 			( { shadow: shadowName } ) => shadowName === newValue
 		)?.slug;
 
@@ -217,14 +221,16 @@ export default function BorderPanel( {
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
 
-	const label = getBorderPanelLabel( {
+	const hasBorderControl =
+		showBorderColor ||
+		showBorderStyle ||
+		showBorderWidth ||
+		showBorderRadius;
+
+	const label = useBorderPanelLabel( {
 		blockName: name,
 		hasShadowControl,
-		hasBorderControl:
-			showBorderColor ||
-			showBorderStyle ||
-			showBorderWidth ||
-			showBorderRadius,
+		hasBorderControl,
 	} );
 
 	return (
@@ -245,13 +251,13 @@ export default function BorderPanel( {
 				>
 					<BorderBoxControl
 						colors={ colors }
-						enableAlpha={ true }
+						enableAlpha
 						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
 						value={ border }
-						__experimentalIsRenderedInSidebar={ true }
+						__experimentalIsRenderedInSidebar
 						size={ '__unstable-large' }
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }
@@ -282,9 +288,12 @@ export default function BorderPanel( {
 					isShownByDefault={ defaultControls.shadow }
 					panelId={ panelId }
 				>
-					<BaseControl.VisualLabel as="legend">
-						{ __( 'Shadow' ) }
-					</BaseControl.VisualLabel>
+					{ hasBorderControl ? (
+						<BaseControl.VisualLabel as="legend">
+							{ __( 'Shadow' ) }
+						</BaseControl.VisualLabel>
+					) : null }
+
 					<ItemGroup isBordered isSeparated>
 						<ShadowPopover
 							shadow={ shadow }

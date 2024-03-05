@@ -476,7 +476,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
 			);
 		}
 
@@ -557,44 +560,98 @@ function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	// If there is any value in style -> layout, the block has a child layout.
+	$child_layout = $block['attrs']['style']['layout'] ?? null;
 
-	if ( ! $block_supports_layout && ! $layout_from_parent ) {
+	if ( ! $block_supports_layout && ! $child_layout ) {
 		return $block_content;
 	}
 
-	$outer_class_names = array();
+	$outer_class_names         = array();
+	$container_content_class   = wp_unique_id( 'wp-container-content-' );
+	$child_layout_declarations = array();
+	$child_layout_styles       = array();
 
-	if ( 'fixed' === $layout_from_parent || 'fill' === $layout_from_parent ) {
-		$container_content_class = wp_unique_id( 'wp-container-content-' );
+	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
 
-		$child_layout_styles = array();
+	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
+		$child_layout_declarations['box-sizing'] = 'border-box';
+	} elseif ( 'fill' === $self_stretch ) {
+		$child_layout_declarations['flex-grow'] = '1';
+	}
 
-		if ( 'fixed' === $layout_from_parent && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-			$child_layout_styles[] = array(
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'flex-basis' => $block['attrs']['style']['layout']['flexSize'],
-					'box-sizing' => 'border-box',
-				),
-			);
-		} elseif ( 'fill' === $layout_from_parent ) {
-			$child_layout_styles[] = array(
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'flex-grow' => '1',
-				),
-			);
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) ) {
+		$column_span                              = $block['attrs']['style']['layout']['columnSpan'];
+		$child_layout_declarations['grid-column'] = "span $column_span";
+	}
+	if ( isset( $block['attrs']['style']['layout']['rowSpan'] ) ) {
+		$row_span                              = $block['attrs']['style']['layout']['rowSpan'];
+		$child_layout_declarations['grid-row'] = "span $row_span";
+	}
+	$child_layout_styles[] = array(
+		'selector'     => ".$container_content_class",
+		'declarations' => $child_layout_declarations,
+	);
+
+	/*
+	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+	 * the columnSpan should be removed on small grids. If there's a minimumColumnWidth, the grid is responsive.
+	 * But if the minimumColumnWidth value wasn't changed, it won't be set. In that case, if columnCount doesn't
+	 * exist, we can assume that the grid is responsive.
+	 */
+	if ( isset( $block['attrs']['style']['layout']['columnSpan'] ) && ( isset( $block['parentLayout']['minimumColumnWidth'] ) || ! isset( $block['parentLayout']['columnCount'] ) ) ) {
+		$column_span_number  = floatval( $block['attrs']['style']['layout']['columnSpan'] );
+		$parent_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : '12rem';
+		$parent_column_value = floatval( $parent_column_width );
+		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
+		/*
+		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
+		 * to defaults.
+		 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
+		 */
+		if ( count( $parent_column_unit ) <= 1 ) {
+			$parent_column_unit  = 'rem';
+			$parent_column_value = 12;
+		} else {
+			$parent_column_unit = $parent_column_unit[1];
+
+			if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
+				$parent_column_unit = 'rem';
+			}
 		}
 
-		gutenberg_style_engine_get_stylesheet_from_css_rules(
-			$child_layout_styles,
-			array(
-				'context'  => 'block-supports',
-				'prettify' => false,
-			)
-		);
+		/*
+		 * A default gap value is used for this computation because custom gap values may not be
+		 * viable to use in the computation of the container query value.
+		 */
+		$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
+		$container_query_value = $column_span_number * $parent_column_value + ( $column_span_number - 1 ) * $default_gap_value;
+		$container_query_value = $container_query_value . $parent_column_unit;
 
+		$child_layout_styles[] = array(
+			'rules_group'  => "@container (max-width: $container_query_value )",
+			'selector'     => ".$container_content_class",
+			'declarations' => array(
+				'grid-column' => '1/-1',
+			),
+		);
+	}
+
+	/*
+	 * Add to the style engine store to enqueue and render layout styles.
+	 * Return styles here just to check if any exist.
+	 */
+	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
+		$child_layout_styles,
+		array(
+			'context'  => 'block-supports',
+			'prettify' => false,
+		)
+	);
+
+	if ( $child_css ) {
 		$outer_class_names[] = $container_content_class;
 	}
 
@@ -743,7 +800,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	/**
+	/*
 	 * Attempts to refer to the inner-block wrapping element by its class attribute.
 	 *
 	 * When examining a block's inner content, if a block has inner blocks, then
@@ -833,6 +890,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	return $processor->get_updated_html();
 }
 
+/*
+ * Add a `render_block_data` filter to fetch the parent block layout data.
+ */
+add_filter(
+	'render_block_data',
+	function ( $parsed_block, $source_block, $parent_block ) {
+		/*
+		 * Check if the parent block exists and if it has a layout attribute.
+		 * If it does, add the parent layout to the parsed block.
+		 */
+		if ( $parent_block && isset( $parent_block->parsed_block['attrs']['layout'] ) ) {
+			$parsed_block['parentLayout'] = $parent_block->parsed_block['attrs']['layout'];
+		}
+		return $parsed_block;
+	},
+	10,
+	3
+);
+
 // Register the block support. (overrides core one).
 WP_Block_Supports::get_instance()->register(
 	'layout',
@@ -869,7 +945,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	/**
+	/*
 	 * This filter runs after the layout classnames have been added to the block, so they
 	 * have to be removed from the outer wrapper and then added to the inner.
 	*/
@@ -885,7 +961,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 				}
 			}
 		} else {
-			/**
+			/*
 			* The class_list method was only added in 6.4 so this needs a temporary fallback.
 			* This fallback should be removed when the minimum supported version is 6.4.
 			*/
