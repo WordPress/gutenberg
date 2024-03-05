@@ -4,14 +4,15 @@
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
-
-	> div {
-		min-height: 100%;
-	}
 }
 
 .dataviews-filters__view-actions {
 	padding: $grid-unit-15 $grid-unit-40 0;
+	margin-bottom: $grid-unit-15;
+	flex-shrink: 0;
+	position: sticky;
+	left: 0;
+
 	.components-search-control {
 		.components-base-control__field {
 			max-width: 240px;
@@ -39,14 +40,14 @@
 }
 
 .dataviews-pagination {
-	margin-top: auto;
 	position: sticky;
 	bottom: 0;
-	background-color: rgba($white, 0.8);
-	backdrop-filter: blur(6px);
+	left: 0;
+	background-color: $white;
 	padding: $grid-unit-15 $grid-unit-40;
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
+	flex-shrink: 0;
 }
 
 .dataviews-pagination__page-selection {
@@ -58,13 +59,6 @@
 
 .dataviews-filters-options {
 	margin: $grid-unit-40 0 $grid-unit-20;
-}
-
-.dataviews-view-table-wrapper {
-	overflow-x: auto;
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
 }
 
 .dataviews-view-table {
@@ -160,17 +154,18 @@
 		}
 	}
 	thead {
+		position: sticky;
+		inset-block-start: 0;
+		z-index: z-index(".dataviews-view-table thead");
+
 		tr {
 			border: 0;
 		}
 		th {
-			position: sticky;
-			top: -1px;
 			background-color: $white;
 			box-shadow: inset 0 -#{$border-width} 0 $gray-100;
 			padding-top: $grid-unit-10;
 			padding-bottom: $grid-unit-10;
-			z-index: 1;
 			font-size: 11px;
 			text-transform: uppercase;
 			font-weight: 500;
