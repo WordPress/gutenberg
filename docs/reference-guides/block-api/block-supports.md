@@ -764,6 +764,7 @@ supports: {
 -   Subproperties:
     - `fontSize`: type `boolean`, default value `false`
     - `lineHeight`: type `boolean`, default value `false`
+    - `textAlign`: type `boolean` or `array`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -774,6 +775,8 @@ supports: {
         fontSize: true,
         // Enable support and UI control for line-height.
         lineHeight: true,
+        // Enable support and UI control for text alignment.
+        textAlign: true,
     },
 }
 ```
@@ -850,6 +853,46 @@ attributes: {
                 lineHeight: 'value'
             }
         }
+    }
+}
+```
+
+### typography.textAlign
+
+_**Note:** Since WordPress 6.6._
+
+-   Type: `boolean` or `array`
+-   Default value: `false`
+
+This property adds block toolbar controls which allow to change block's text alignment.
+
+```js
+supports: {
+    typography: {
+        // Declare support for block's text alignment.
+        // This adds support for all the options:
+        // left, center, right.
+        textAlign: true
+    }
+}
+```
+
+```js
+supports: {
+    typography: {
+        // Declare support for specific text alignment options.
+        textAlign: [ 'left', 'right' ]
+    }
+}
+```
+
+When the block declares support for `textAlign`, the attributes definition is extended to include a text align attribute with a `string` type. By default, no text alignment is assigned. The block can apply a default text alignment by specifying its own `textAlign` attribute with a default e.g.:
+
+```js
+attributes: {
+    textAlign: {
+        type: 'string',
+        default: 'right'
     }
 }
 ```
