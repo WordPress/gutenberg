@@ -34,6 +34,8 @@ import {
 	closeSmall,
 	moreVertical,
 	chevronLeft,
+	chevronLeftSmall,
+	chevronRightSmall,
 } from '@wordpress/icons';
 
 /**
@@ -432,23 +434,13 @@ function FontCollection( { slug } ) {
 					className="font-library-modal__tabpanel-layout__footer"
 				>
 					<Button
-						label={ __( 'First page' ) }
-						size="compact"
-						onClick={ () => setPage( 1 ) }
-						disabled={ page === 1 }
-						__experimentalIsFocusable
-					>
-						<span>«</span>
-					</Button>
-					<Button
 						label={ __( 'Previous page' ) }
 						size="compact"
 						onClick={ () => setPage( page - 1 ) }
 						disabled={ page === 1 }
 						__experimentalIsFocusable
-					>
-						<span>‹</span>
-					</Button>
+						icon={ chevronLeftSmall }
+					/>
 					<HStack
 						justify="flex-start"
 						expanded={ false }
@@ -492,18 +484,8 @@ function FontCollection( { slug } ) {
 						onClick={ () => setPage( page + 1 ) }
 						disabled={ page === totalPages }
 						__experimentalIsFocusable
-					>
-						<span>›</span>
-					</Button>
-					<Button
-						label={ __( 'Last page' ) }
-						size="compact"
-						onClick={ () => setPage( totalPages ) }
-						disabled={ page === totalPages }
-						__experimentalIsFocusable
-					>
-						<span>»</span>
-					</Button>
+						icon={ chevronRightSmall }
+					/>
 				</Flex>
 			) }
 		</div>
