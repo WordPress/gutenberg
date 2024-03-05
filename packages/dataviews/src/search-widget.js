@@ -15,7 +15,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { search } from '@wordpress/icons';
+import { search, check } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
 /**
@@ -48,10 +48,25 @@ function ListBox( { view, filter, onChangeView } ) {
 		// so the first item is not selected, since the focus is on the operators control.
 		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
 	} );
-	const selectedFilter = view.filters.find(
-		( _filter ) => _filter.field === filter.field
+	const currentFilter = view.filters.find(
+		( f ) => f.field === filter.field
 	);
-	const selectedValues = selectedFilter?.value;
+	const getSelectedValues = ( current ) => {
+		if ( filter.singleSelection ) {
+			return current?.value;
+		}
+
+		if ( Array.isArray( current?.value ) ) {
+			return current.value;
+		}
+
+		if ( ! Array.isArray( current?.value ) && !! current?.value ) {
+			return [ current.value ];
+		}
+
+		return [];
+	};
+	const selectedValues = getSelectedValues( currentFilter );
 	return (
 		<Composite
 			store={ compositeStore }
@@ -83,10 +98,27 @@ function ListBox( { view, filter, onChangeView } ) {
 								/>
 							}
 							onClick={ () => {
-								const currentFilter = view.filters.find(
-									( _filter ) =>
-										_filter.field === filter.field
-								);
+								const getNewValue = (
+									filterDefinition,
+									current,
+									value
+								) => {
+									if ( filterDefinition.singleSelection ) {
+										return value;
+									}
+
+									if ( Array.isArray( current?.value ) ) {
+										return current.value.includes(
+											element.value
+										)
+											? current.value.filter(
+													( v ) => v !== value
+											  )
+											: [ ...current.value, value ];
+									}
+
+									return [ value ];
+								};
 								const newFilters = currentFilter
 									? [
 											...view.filters.map(
@@ -101,7 +133,11 @@ function ListBox( { view, filter, onChangeView } ) {
 																currentFilter.operator ||
 																filter
 																	.operators[ 0 ],
-															value: element.value,
+															value: getNewValue(
+																filter,
+																currentFilter,
+																element.value
+															),
 														};
 													}
 													return _filter;
@@ -113,7 +149,11 @@ function ListBox( { view, filter, onChangeView } ) {
 											{
 												field: filter.field,
 												operator: filter.operators[ 0 ],
-												value: element.value,
+												value: getNewValue(
+													filter,
+													currentFilter,
+													element.value
+												),
 											},
 									  ];
 								onChangeView( {
@@ -126,9 +166,14 @@ function ListBox( { view, filter, onChangeView } ) {
 					}
 				>
 					<span className="dataviews-search-widget-listitem-check">
-						{ selectedValues === element.value && (
-							<Icon icon={ radioCheck } />
-						) }
+						{ filter.singleSelection &&
+							selectedValues === element.value && (
+								<Icon icon={ radioCheck } />
+							) }
+						{ ! filter.singleSelection &&
+							selectedValues.includes( element.value ) && (
+								<Icon icon={ check } />
+							) }
 					</span>
 					<span>
 						{ element.label }

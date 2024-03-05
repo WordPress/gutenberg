@@ -320,6 +320,9 @@ export default function PagePages() {
 						value: id,
 						label: name,
 					} ) ) || [],
+				filterBy: {
+					singleSelection: true,
+				},
 			},
 			{
 				header: __( 'Status' ),

@@ -43,6 +43,7 @@ const Filters = memo( function Filters( {
 					field: field.id,
 					name: field.header,
 					elements: field.elements,
+					singleSelection: !! field.filterBy?.singleSelection,
 					operators,
 					isVisible:
 						isPrimary ||

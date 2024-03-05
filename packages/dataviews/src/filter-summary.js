@@ -26,8 +26,8 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import SearchWidget from './search-widget';
 import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 
-const FilterText = ( { activeElement, filterInView, filter } ) => {
-	if ( activeElement === undefined ) {
+const FilterText = ( { activeElements, filterInView, filter } ) => {
+	if ( activeElements === undefined || activeElements.length === 0 ) {
 		return filter.name;
 	}
 
@@ -36,31 +36,25 @@ const FilterText = ( { activeElement, filterInView, filter } ) => {
 		Span2: <span className="dataviews-filter-summary__filter-text-value" />,
 	};
 
-	if (
-		activeElement !== undefined &&
-		filterInView?.operator === OPERATOR_IN
-	) {
+	if ( filterInView?.operator === OPERATOR_IN ) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is Admin". */
 				__( '<Span1>%1$s </Span1><Span2>is %2$s</Span2>' ),
 				filter.name,
-				activeElement.label
+				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
 			filterTextWrappers
 		);
 	}
 
-	if (
-		activeElement !== undefined &&
-		filterInView?.operator === OPERATOR_NOT_IN
-	) {
+	if ( filterInView?.operator === OPERATOR_NOT_IN ) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not Admin". */
 				__( '<Span1>%1$s </Span1><Span2>is not %2$s</Span2>' ),
 				filter.name,
-				activeElement.label
+				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
 			filterTextWrappers
 		);
@@ -140,9 +134,12 @@ export default function FilterSummary( {
 	const toggleRef = useRef();
 	const { filter, view, onChangeView } = commonProps;
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
-	const activeElement = filter.elements.find(
-		( element ) => element.value === filterInView?.value
-	);
+	const activeElements = filter.elements.filter( ( element ) => {
+		if ( filter.singleSelection ) {
+			return element.value === filterInView?.value;
+		}
+		return filterInView?.value?.includes( element.value );
+	} );
 	const isPrimary = filter.isPrimary;
 	const hasValues = filterInView?.value !== undefined;
 	const canResetOrRemove = ! isPrimary || hasValues;
@@ -188,7 +185,7 @@ export default function FilterSummary( {
 							ref={ toggleRef }
 						>
 							<FilterText
-								activeElement={ activeElement }
+								activeElements={ activeElements }
 								filterInView={ filterInView }
 								filter={ filter }
 							/>
