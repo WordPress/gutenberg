@@ -52,6 +52,7 @@ export function ButtonAction( {
 				className
 			) }
 			variant="tertiary"
+			size="compact"
 			{ ...additionalProps }
 		>
 			{ children }
