@@ -41,6 +41,15 @@ import { space } from '../utils/space';
 
 const noop = () => {};
 
+function useUniqueId( idProp?: string ) {
+	const id = useInstanceId(
+		UnforwardedRangeControl,
+		'inspector-range-control'
+	);
+
+	return idProp || id;
+}
+
 function UnforwardedRangeControl(
 	props: WordPressComponentProps< RangeControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
@@ -56,6 +65,7 @@ function UnforwardedRangeControl(
 		disabled = false,
 		help,
 		hideLabelFromVision = false,
+		id: idProp,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
@@ -123,10 +133,7 @@ function UnforwardedRangeControl(
 		!! marks && 'is-marked'
 	);
 
-	const id = useInstanceId(
-		UnforwardedRangeControl,
-		'inspector-range-control'
-	);
+	const id = useUniqueId( idProp );
 	const describedBy = !! help ? `${ id }__help` : undefined;
 	const enableTooltip = hasTooltip !== false && Number.isFinite( value );
 

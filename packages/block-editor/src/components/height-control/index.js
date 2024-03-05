@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import {
 	BaseControl,
@@ -68,6 +69,10 @@ export default function HeightControl( {
 	value,
 } ) {
 	const customRangeValue = parseFloat( value );
+	const id = useInstanceId( HeightControl, 'inspector-height-control' );
+	const labelId = `${ id }__label`;
+	const inputId = `${ id }__input`;
+	const rangeId = `${ id }__range`;
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
@@ -144,13 +149,14 @@ export default function HeightControl( {
 	};
 
 	return (
-		<fieldset className="block-editor-height-control">
-			<BaseControl.VisualLabel as="legend">
+		<div className="block-editor-height-control" id={ id }>
+			<BaseControl.VisualLabel as="label" for={ inputId } id={ labelId }>
 				{ label }
 			</BaseControl.VisualLabel>
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
+						id={ inputId }
 						value={ value }
 						units={ units }
 						onChange={ onChange }
@@ -164,6 +170,9 @@ export default function HeightControl( {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
+							aria-controls={ inputId }
+							aria-labelledby={ labelId }
+							id={ rangeId }
 							value={ customRangeValue }
 							min={ 0 }
 							max={
@@ -183,6 +192,6 @@ export default function HeightControl( {
 					</Spacer>
 				</FlexItem>
 			</Flex>
-		</fieldset>
+		</div>
 	);
 }
