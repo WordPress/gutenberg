@@ -207,7 +207,7 @@ const StylesPreview = ( { label, isFocused, withHoverView, variation } ) => {
 									{ highlightedColors.map(
 										( { slug, color }, index ) => (
 											<motion.div
-												key={ slug }
+												key={ slug + index }
 												style={ {
 													height:
 														normalizedColorSwatchSize *

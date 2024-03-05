@@ -174,7 +174,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 								{ highlightedColors.map(
 									( { slug, color }, index ) => (
 										<motion.div
-											key={ slug }
+											key={ slug + index }
 											style={ {
 												boxShadow:
 													'inset 0 0 0 1px #0003',
