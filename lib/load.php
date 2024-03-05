@@ -138,6 +138,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-client-side-navigation' ) ) {
+	require __DIR__ . '/experimental/full-client-side-navigation.php';
+}
+
 // Fonts API / Font Face.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
 
