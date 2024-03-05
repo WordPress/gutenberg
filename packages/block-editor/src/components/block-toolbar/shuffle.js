@@ -14,7 +14,15 @@ import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
 
-export default function Shuffle( { clientId } ) {
+function Container( props ) {
+	return (
+		<ToolbarGroup>
+			<ToolbarButton { ...props } />
+		</ToolbarGroup>
+	);
+}
+
+export default function Shuffle( { clientId, as = Container } ) {
 	const { categories, patterns } = useSelect(
 		( select ) => {
 			const {
@@ -57,30 +65,29 @@ export default function Shuffle( { clientId } ) {
 	if ( sameCategoryPatternsWithSingleWrapper.length === 0 ) {
 		return null;
 	}
+	const ComponentToUse = as;
 	return (
-		<ToolbarGroup>
-			<ToolbarButton
-				label={ __( 'Shuffle' ) }
-				icon={ shuffle }
-				onClick={ () => {
-					const randomPattern =
-						sameCategoryPatternsWithSingleWrapper[
-							Math.floor(
-								// eslint-disable-next-line no-restricted-syntax
-								Math.random() *
-									sameCategoryPatternsWithSingleWrapper.length
-							)
-						];
-					randomPattern.blocks[ 0 ].attributes = {
-						...randomPattern.blocks[ 0 ].attributes,
-						metadata: {
-							...randomPattern.blocks[ 0 ].attributes.metadata,
-							categories,
-						},
-					};
-					replaceBlocks( clientId, randomPattern.blocks );
-				} }
-			/>
-		</ToolbarGroup>
+		<ComponentToUse
+			label={ __( 'Shuffle' ) }
+			icon={ shuffle }
+			onClick={ () => {
+				const randomPattern =
+					sameCategoryPatternsWithSingleWrapper[
+						Math.floor(
+							// eslint-disable-next-line no-restricted-syntax
+							Math.random() *
+								sameCategoryPatternsWithSingleWrapper.length
+						)
+					];
+				randomPattern.blocks[ 0 ].attributes = {
+					...randomPattern.blocks[ 0 ].attributes,
+					metadata: {
+						...randomPattern.blocks[ 0 ].attributes.metadata,
+						categories,
+					},
+				};
+				replaceBlocks( clientId, randomPattern.blocks );
+			} }
+		/>
 	);
 }
