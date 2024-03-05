@@ -21,6 +21,17 @@
 
 .dataviews-filters__container {
 	padding-right: $grid-unit-40;
+
+	.dataviews-filters__reset-button[aria-disabled="true"] {
+		&,
+		&:hover {
+			opacity: 0;
+		}
+
+		&:focus {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-filters-button {
