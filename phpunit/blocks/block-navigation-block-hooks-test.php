@@ -30,13 +30,13 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * Setup method.
 	 */
 	public static function wpSetUpBeforeClass() {
-		self::$original_markup = '<!-- wp:navigation-link {"label":"News & About","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->';
+		//self::$original_markup = '<!-- wp:navigation-link {"label":"News & About","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->';
 
 		self::$navigation_post = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Navigation Menu',
-				'post_content' => self::$original_markup,
+				'post_content' => 'Original content',
 			)
 		);
 	}
@@ -57,7 +57,7 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
-	public function test_block_core_navigation_update_ignore_hooked_blocks_meta() {
+	public function test_block_core_navigation_update_ignore_hooked_blocks_meta_preserves_entities() {
 		register_block_type(
 			'tests/my-block',
 			array(
@@ -67,18 +67,25 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$post = get_post( self::$navigation_post );
+		$original_markup    = '<!-- wp:navigation-link {"label":"News & About","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->';
+		$post               = new stdClass();
+		$post->ID           = self::$navigation_post->ID;
+		$post->post_content = $original_markup;
 
-		gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta( $post );
+		$post = gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta( $post );
 
 		// We expect the '&' character to be replaced with its unicode representation.
-		$expected_markup = str_replace( '&', '\u0026amp;', self::$original_markup );
+		$expected_markup = str_replace( '&', '\u0026', $original_markup );
 
-		$this->assertSame( $expected_markup, $post->post_content );
-		$this->assertSame( $expected_markup, get_the_content( null, false, self::$navigation_post->ID ) );
+		$this->assertSame(
+			$expected_markup,
+			$post->post_content,
+			'Post content did not match expected markup with entities escaped.'
+		);
 		$this->assertSame(
 			array( 'tests/my-block' ),
-			json_decode( get_post_meta( self::$navigation_post->ID, '_wp_ignored_hooked_blocks', true ), true )
+			json_decode( get_post_meta( self::$navigation_post->ID, '_wp_ignored_hooked_blocks', true ), true ),
+			'Block was not added to ignored hooked blocks metadata.'
 		);
 	}
 }
