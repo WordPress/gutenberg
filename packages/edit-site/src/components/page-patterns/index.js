@@ -325,6 +325,7 @@ export default function DataviewsPatterns() {
 				filterBy: {
 					operators: [ OPERATOR_IN ],
 					isPrimary: true,
+					singleSelection: true,
 				},
 				enableSorting: false,
 			} );
