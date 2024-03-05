@@ -13,7 +13,7 @@ import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive, getNamespace } from './hooks';
-import { parseInitialData, populateInitialData } from './store';
+import { getConfig, parseInitialData, populateInitialData } from './store';
 
 export { store, getConfig } from './store';
 export { getContext, getElement } from './hooks';
@@ -58,3 +58,7 @@ document.addEventListener( 'DOMContentLoaded', async () => {
 	registerDirectives();
 	await init();
 } );
+
+if ( getConfig( 'core/router/experimental' ) ) {
+	import( './experiments/full-csn' );
+}
