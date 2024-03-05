@@ -21,7 +21,7 @@ export default function HighlightedColors( {
 				height: scaledSwatchSize,
 				width: scaledSwatchSize,
 				background: color,
-				borderRadius: ( scaledSwatchSize ) / 2,
+				borderRadius: scaledSwatchSize / 2,
 			} }
 			animate={ {
 				scale: 1,
