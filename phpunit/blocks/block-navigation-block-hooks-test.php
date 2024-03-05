@@ -70,7 +70,11 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 		$post = get_post( self::$navigation_post );
 
 		gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta( $post );
+
 		$this->assertSame( self::$original_markup . '<!-- wp:tests/my-block /-->', $post->post_content );
-		$this->assertSame( array( 'tests/my-block' ), get_post_meta( $post, '_wp_ignored_hooked_blocks' ) );
+		$this->assertSame(
+			array( 'tests/my-block' ),
+			json_decode( get_post_meta( self::$navigation_post->ID, '_wp_ignored_hooked_blocks', true ), true )
+		);
 	}
 }
