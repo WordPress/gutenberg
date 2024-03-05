@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import removeAccents from 'remove-accents';
 
 /**
@@ -34,7 +35,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
-import { useAddedBy, AvatarImage } from '../list/added-by';
+import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -124,14 +125,30 @@ function Title( { item, viewType } ) {
 }
 
 function AuthorField( { item, viewType } ) {
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && <AvatarImage imageUrl={ imageUrl } /> }
+			{ withIcon && imageUrl && (
+				<div
+					className={ classnames(
+						'page-templates-author-field__avatar',
+						{
+							'is-loaded': isImageLoaded,
+						}
+					) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) }
 			{ withIcon && ! imageUrl && (
-				<div className="edit-site-list-added-by__icon">
+				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
