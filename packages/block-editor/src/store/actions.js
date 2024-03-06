@@ -170,14 +170,6 @@ export function updateBlockAttributes(
 	};
 }
 
-export function syncBlockBindingsSource( source ) {
-	// console.log( { source } );
-	return {
-		type: 'SYNC_BLOCK_BINDINGS_SOURCE',
-		source,
-	};
-}
-
 /**
  * Action that updates the block with the specified client ID.
  *
