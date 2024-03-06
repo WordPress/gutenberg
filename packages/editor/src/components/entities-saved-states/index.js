@@ -226,7 +226,7 @@ export function EntitiesSavedStatesExtensible( {
 			<div className="entities-saved-states__text-prompt">
 				<div
 					className="entities-saved-states__text-prompt--header-wrapper"
-					id={ dialogDescription }
+					id={ dialogLabel }
 				>
 					<strong className="entities-saved-states__text-prompt--header">
 						{ __( 'Are you ready to save?' ) }
