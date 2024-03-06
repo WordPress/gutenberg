@@ -42,6 +42,8 @@ function Edit( {
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
+	const [ autoFocus, setAutoFocus ] = useState( true );
+
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
 		if ( ! editableContentElement ) {
@@ -56,9 +58,12 @@ function Edit( {
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
 			if ( event.target.tagName !== 'A' || ! isActive ) {
+				setAutoFocus( true );
+				setAddingLink( false );
 				return;
 			}
 
+			setAutoFocus( false );
 			setAddingLink( true );
 		}
 
@@ -90,6 +95,7 @@ function Edit( {
 			if ( target ) {
 				setOpenedBy( target );
 			}
+			setAutoFocus( true );
 			setAddingLink( true );
 		}
 	}
@@ -109,6 +115,7 @@ function Edit( {
 		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
 
 		// Close the popover
+		setAutoFocus( true );
 		setAddingLink( false );
 		// Return focus to the toolbar button or the rich text field
 		if ( openedBy?.tagName === 'BUTTON' ) {
@@ -127,6 +134,7 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
+		setAutoFocus( true );
 		setAddingLink( false );
 		setOpenedBy( null );
 	}
@@ -149,6 +157,7 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
+					setAutoFocus( true );
 					addLink( event.currentTarget );
 				} }
 				isActive={ isActive || addingLink }
@@ -166,6 +175,7 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
+					focusOnMount={ autoFocus ? 'firstElement' : false }
 				/>
 			) }
 		</>

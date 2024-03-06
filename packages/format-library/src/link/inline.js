@@ -46,6 +46,7 @@ function InlineLinkUI( {
 	onFocusOutside,
 	stopAddingLink,
 	contentRef,
+	focusOnMount,
 } ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
@@ -88,6 +89,8 @@ function InlineLinkUI( {
 		]
 	);
 
+	const hasLink = linkValue?.url;
+
 	function removeLink() {
 		const newValue = removeFormat( value, 'core/link' );
 		onChange( newValue );
@@ -96,7 +99,6 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		const hasLink = linkValue?.url;
 		const isNewLink = ! hasLink;
 
 		// Merge the next value with the current link value.
@@ -245,6 +247,10 @@ function InlineLinkUI( {
 		);
 	}
 
+	if ( ! hasLink ) {
+		return null;
+	}
+
 	return (
 		<Popover
 			anchor={ popoverAnchor }
@@ -253,6 +259,7 @@ function InlineLinkUI( {
 			placement="bottom"
 			offset={ 10 }
 			shift
+			focusOnMount={ focusOnMount }
 		>
 			<LinkControl
 				value={ linkValue }
