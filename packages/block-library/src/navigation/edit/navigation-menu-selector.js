@@ -140,7 +140,6 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
-									setIsCreatingMenu( true );
 									onSelectNavigationMenu( menuId );
 									onClose();
 								} }
