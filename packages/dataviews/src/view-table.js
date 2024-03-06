@@ -237,12 +237,39 @@ function TableRow( {
 	data,
 } ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
+	const isSelected = selection.includes( id );
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
-				'is-selected':
-					hasPossibleBulkAction && selection.includes( id ),
+				'is-selected': hasPossibleBulkAction && isSelected,
 			} ) }
+			onClickCapture={ ( event ) => {
+				if ( event.ctrlKey || event.metaKey ) {
+					event.stopPropagation();
+					event.preventDefault();
+					if ( ! isSelected ) {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId === id ||
+									selection.includes( itemId )
+								);
+							} )
+						);
+					} else {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId !== id &&
+									selection.includes( itemId )
+								);
+							} )
+						);
+					}
+				}
+			} }
 		>
 			{ hasBulkActions && (
 				<td
