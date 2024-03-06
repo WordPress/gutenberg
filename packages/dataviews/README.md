@@ -289,7 +289,7 @@ Allowed operators for fields of type `enumeration`:
 - `in`: whether an item is in a list of values.
 - `notIn`: whether an item is not in a list of values.
 
-By default, a field of type `enumeration` supports `in` and `notIn` operators — this is, it supports multiselection and negation.
+By default, a field of type `enumeration` supports `in` and `notIn` operators — this is, it supports multiselection and negation. A filter cannot mix single-selection (`equal`, `notEqual`) & multi-selection (`in`, `notIn`) operators. If a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded.
 
 ## Contributing to this package
 
