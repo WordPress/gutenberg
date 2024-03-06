@@ -75,6 +75,7 @@ function Edit( {
 	}, [ contentRef, isActive ] );
 
 	function addLink( target ) {
+		setAutoFocus( true );
 		const text = getTextContent( slice( value ) );
 
 		if ( ! isActive && text && isURL( text ) && isValidHref( text ) ) {
@@ -95,7 +96,6 @@ function Edit( {
 			if ( target ) {
 				setOpenedBy( target );
 			}
-			setAutoFocus( true );
 			setAddingLink( true );
 		}
 	}
@@ -157,7 +157,6 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					setAutoFocus( true );
 					addLink( event.currentTarget );
 				} }
 				isActive={ isActive || addingLink }

@@ -247,10 +247,6 @@ function InlineLinkUI( {
 		);
 	}
 
-	if ( ! hasLink ) {
-		return null;
-	}
-
 	return (
 		<Popover
 			anchor={ popoverAnchor }
