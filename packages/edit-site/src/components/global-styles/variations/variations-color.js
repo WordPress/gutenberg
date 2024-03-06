@@ -10,9 +10,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Subtitle from './subtitle';
+import Subtitle from '../subtitle';
 import Variation from './variation';
-import StylesPreviewColors from './preview-colors';
+import StylesPreviewColors from '../preview-colors';
 
 export default function ColorVariations( { variations } ) {
 	return (

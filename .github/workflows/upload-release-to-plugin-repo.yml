@@ -189,7 +189,7 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
+              uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
               with:
                   name: changelog trunk
                   path: trunk
@@ -247,7 +247,7 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
+              uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
               with:
                   name: changelog trunk
                   path: ${{ github.event.release.name }}

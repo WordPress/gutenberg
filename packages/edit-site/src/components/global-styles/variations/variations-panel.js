@@ -8,7 +8,7 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  * Internal dependencies
  */
 
-import { NavigationButtonAsItem } from './navigation-button';
+import { NavigationButtonAsItem } from '../navigation-button';
 
 function getCoreBlockStyles( blockStyles ) {
 	return blockStyles?.filter( ( style ) => style.source === 'block' );

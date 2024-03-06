@@ -121,6 +121,40 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 }
 
+/*
+ * Unloads the font face and remove it from the browser.
+ * It also removes it from the iframe document.
+ *
+ * Note that Font faces that were added to the set using the CSS @font-face rule
+ * remain connected to the corresponding CSS, and cannot be deleted.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
+ */
+export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
+	const unloadFontFace = ( fonts ) => {
+		fonts.forEach( ( f ) => {
+			if (
+				f.family === formatFontFaceName( fontFace.fontFamily ) &&
+				f.weight === fontFace.fontWeight &&
+				f.style === fontFace.fontStyle
+			) {
+				fonts.delete( f );
+			}
+		} );
+	};
+
+	if ( removeFrom === 'document' || removeFrom === 'all' ) {
+		unloadFontFace( document.fonts );
+	}
+
+	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
+		const iframeDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		).contentDocument;
+		unloadFontFace( iframeDocument.fonts );
+	}
+}
+
 /**
  * Retrieves the display source from a font face src.
  *

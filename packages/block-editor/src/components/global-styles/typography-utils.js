@@ -40,15 +40,16 @@ import {
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
  * @param {Preset}                     preset
- * @param {Object}                     typographyOptions
- * @param {boolean|TypographySettings} typographyOptions.fluid Whether fluid typography is enabled, and, optionally, fluid font size options.
+ * @param {Object}                     settings
+ * @param {boolean|TypographySettings} settings.typography.fluid  Whether fluid typography is enabled, and, optionally, fluid font size options.
+ * @param {Object?}                    settings.typography.layout Layout options.
  *
  * @return {string|*} A font-size value or the value of preset.size.
  */
-export function getTypographyFontSizeValue( preset, typographyOptions ) {
+export function getTypographyFontSizeValue( preset, settings ) {
 	const { size: defaultSize } = preset;
 
-	if ( ! isFluidTypographyEnabled( typographyOptions ) ) {
+	if ( ! isFluidTypographyEnabled( settings?.typography ) ) {
 		return defaultSize;
 	}
 	/*
@@ -60,9 +61,11 @@ export function getTypographyFontSizeValue( preset, typographyOptions ) {
 		return defaultSize;
 	}
 
-	const fluidTypographySettings =
-		typeof typographyOptions?.fluid === 'object'
-			? typographyOptions?.fluid
+	let fluidTypographySettings =
+		getFluidTypographyOptionsFromSettings( settings );
+	fluidTypographySettings =
+		typeof fluidTypographySettings?.fluid === 'object'
+			? fluidTypographySettings?.fluid
 			: {};
 
 	const fluidFontSizeValue = getComputedFluidTypographyValue( {

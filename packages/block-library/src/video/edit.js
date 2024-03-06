@@ -47,7 +47,7 @@ const placeholder = ( content ) => {
 	return (
 		<Placeholder
 			className="block-editor-media-placeholder"
-			withIllustration={ true }
+			withIllustration
 			icon={ icon }
 			label={ __( 'Video' ) }
 			instructions={ __(
