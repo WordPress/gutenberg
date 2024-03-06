@@ -191,13 +191,15 @@ if ( canDoClientSideNavigation() ) {
 		document.body
 	);
 	// Cache the scripts. Has to be called before fetching the assets.
-	// const body = toVdom( document.body );
 	[].map.call(
 		document.querySelectorAll( 'script[type=module]' ),
 		( script ) => {
 			scripts.set( script.getAttribute( 'src' ), script );
 		}
 	);
-	// const head = await fetchAssets( document );
-	// pages.set( cleanUrl( window.location ), Promise.resolve( { body, head } ) );
+	const head = await fetchAssets( document );
+	pages.set(
+		cleanUrl( window.location ),
+		Promise.resolve( { head, body: toVdom( document.body ) } )
+	);
 }
