@@ -8,7 +8,6 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { usePrevious } from '@wordpress/compose';
 import {
 	getTextContent,
 	applyFormat,
@@ -45,39 +44,23 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
-	const prevAddingLink = usePrevious( addingLink );
-	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
-	const [ openedBy, setOpenedBy ] = useState( null );
-
-	const preventAddingLink = useRef( false );
+	const [ clickDelay, setClickDelay ] = useState( null );
+	const openedBy = useRef( null );
+	const clickTimeoutId = useRef( null );
 
 	useEffect( () => {
-		// When prevAddingLink is undefined, it is equivalent to checking an onMount
-		if (
-			prevAddingLink === undefined ||
-			addingLink ||
-			preventAddingLink.current
-		) {
+		if ( ! clickDelay ) {
 			return;
 		}
 
-		setOpenedBy( null );
-
-		// The focus outside event fires to close the popover correctly,
-		// and then the click event is fired on the link text or toolbar
-		// button afterwards, meaning you can't have a second click on the
-		// link/toolbar button to close it.
-		//
-		// This is hacky, but we haven't found a better way to solve for this.
-		preventAddingLink.current = true;
-		const linkTimeoutId = setTimeout( () => {
-			preventAddingLink.current = false;
+		clickTimeoutId.current = setTimeout( () => {
+			setClickDelay( null );
 		}, 300 );
 
 		return () => {
-			return () => clearTimeout( linkTimeoutId );
+			return () => clearTimeout( clickTimeoutId.current );
 		};
-	}, [ addingLink ] );
+	}, [ clickDelay ] );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -92,15 +75,19 @@ function Edit( {
 			// This causes the `addingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
-			if (
-				preventAddingLink.current ||
-				event.target.tagName !== 'A' ||
-				! isActive
-			) {
+			if ( event.target.tagName !== 'A' || ! isActive ) {
+				return;
+			}
+			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
+			if ( clickTimeoutId.current && event.target === openedBy.current ) {
+				clearTimeout( clickTimeoutId.current );
+				setClickDelay( null );
+				openedBy.current = null;
 				return;
 			}
 
 			setAddingLink( true );
+			openedBy.current = event.target;
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -129,7 +116,7 @@ function Edit( {
 			);
 		} else {
 			if ( target ) {
-				setOpenedBy( target );
+				openedBy.current = target;
 			}
 			setAddingLink( true );
 		}
@@ -150,17 +137,14 @@ function Edit( {
 		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
 
 		// Close the popover
-		closeLinkUi();
+		setAddingLink( false );
 		// Return focus to the toolbar button or the rich text field
-		if ( openedBy?.tagName === 'BUTTON' ) {
-			openedBy.focus();
+		if ( openedBy.current?.tagName === 'BUTTON' ) {
+			openedBy.current.focus();
 		} else {
 			onFocus();
 		}
-	}
-
-	function closeLinkUi() {
-		setAddingLink( false );
+		openedBy.current = null;
 	}
 
 	// Test for this:
@@ -170,7 +154,8 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
-		closeLinkUi();
+		setAddingLink( false );
+		setClickDelay( true );
 	}
 
 	function onRemoveFormat() {
@@ -191,7 +176,7 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					if ( ! preventAddingLink.current ) {
+					if ( ! clickDelay ) {
 						addLink( event.currentTarget );
 					}
 				} }
