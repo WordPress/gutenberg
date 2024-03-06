@@ -257,8 +257,8 @@ function shimAttributeSource( settings, name ) {
 	};
 }
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
-	shimAttributeSource
-);
+// addFilter(
+// 	'blocks.registerBlockType',
+// 	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
+// 	shimAttributeSource
+// );
