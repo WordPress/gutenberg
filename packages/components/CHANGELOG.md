@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.1.0 (2024-03-06)
+
 ### Bug Fix
 
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
