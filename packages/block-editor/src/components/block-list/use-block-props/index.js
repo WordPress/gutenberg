@@ -29,7 +29,7 @@ import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
-import { canBindBlock } from '../../../hooks/use-bindings-attributes';
+import { canBindBlock } from '../../../../../editor/src/bindings/utils';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
