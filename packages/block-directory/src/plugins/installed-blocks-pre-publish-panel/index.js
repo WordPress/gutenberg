@@ -37,7 +37,7 @@ export default function InstalledBlocksPrePublishPanel() {
 				),
 				newBlockTypes.length
 			) }
-			initialOpen={ true }
+			initialOpen
 		>
 			<p className="installed-blocks-pre-publish-panel__copy">
 				{ _n(

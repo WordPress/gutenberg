@@ -329,7 +329,7 @@ function Iframe( {
 					// though by doing so we also trigger another React event,
 					// so we need to stop the propagation of this event to avoid
 					// duplication.
-					else if (
+					if (
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {

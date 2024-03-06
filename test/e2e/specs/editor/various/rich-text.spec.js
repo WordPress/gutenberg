@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'RichText', () => {
+test.describe( 'RichText (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -438,7 +438,7 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should keep internal selection after blur', async ( {
+	test( 'should keep internal selection after blur (-webkit)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -609,7 +609,8 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should preserve internal formatting', async ( {
+	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
+	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,
 		editor,
 		pageUtils,

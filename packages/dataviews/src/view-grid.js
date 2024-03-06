@@ -11,10 +11,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Tooltip,
+	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +35,6 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 } ) {
-	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
@@ -45,11 +44,11 @@ function GridItem( {
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
 				'is-selected': hasBulkAction && isSelected,
-				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
-			onMouseDown={ ( event ) => {
+			onClickCapture={ ( event ) => {
 				if ( hasBulkAction && ( event.ctrlKey || event.metaKey ) ) {
-					setHasNoPointerEvents( true );
+					event.stopPropagation();
+					event.preventDefault();
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
@@ -71,11 +70,6 @@ function GridItem( {
 							} )
 						);
 					}
-				}
-			} }
-			onClick={ () => {
-				if ( hasNoPointerEvents ) {
-					setHasNoPointerEvents( false );
 				}
 			} }
 		>
@@ -190,7 +184,7 @@ export default function ViewGrid( {
 						'dataviews-no-results': ! isLoading,
 					} ) }
 				>
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				</div>
 			) }
 		</>
