@@ -50,17 +50,13 @@ function UploadFonts() {
 		setIsUploading( true );
 		const uniqueFilenames = new Set();
 		const selectedFiles = [ ...files ];
+		let hasInvalidFiles = false;
 
 		// Use map to create a promise for each file check, then filter with Promise.all
 		const checkFilesPromises = selectedFiles.map( async ( file ) => {
 			const isFont = await isFontFile( file );
 			if ( ! isFont ) {
-				setNotice( {
-					type: 'error',
-					message: __(
-						'One or more of the uploaded files is not a valid font file.'
-					),
-				} );
+				hasInvalidFiles = true;
 				return null; // Return null for invalid files
 			}
 			// Check for duplicates
@@ -84,9 +80,15 @@ function UploadFonts() {
 		if ( allowedFiles.length > 0 ) {
 			loadFiles( allowedFiles );
 		} else {
+			const message = hasInvalidFiles
+				? __(
+						'One or more of the selected files are not valid fonts. Please, try again.'
+				  )
+				: __( 'No valid fonts found to install.' );
+
 			setNotice( {
 				type: 'error',
-				message: __( 'No fonts found to install.' ),
+				message,
 			} );
 			setIsUploading( false );
 		}
@@ -114,7 +116,7 @@ function UploadFonts() {
 	};
 
 	/**
-	 * Checks if a file is a valid Font Object, using the Font Class
+	 * Checks if a file is a valid Font file.
 	 *
 	 * @param {file} file The file to be checked
 	 */
