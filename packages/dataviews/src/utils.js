@@ -68,12 +68,28 @@ export function getPaginationResults( { data, view } ) {
 
 export const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;
+
+	// Assign default values.
 	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ]; // Default values.
+		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
 	}
-	return operators.filter( ( operator ) =>
+
+	// Make sure only valid operators are used.
+	operators = operators.filter( ( operator ) =>
 		ALL_OPERATORS.includes( operator )
 	);
+
+	// Do not allow mixing single & multiselection operators.
+	if (
+		operators.includes( OPERATOR_IN ) ||
+		operators.includes( OPERATOR_NOT_IN )
+	) {
+		operators = operators.filter( ( operator ) =>
+			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+		);
+	}
+
+	return operators;
 };
 
 export function WithDropDownMenuSeparators( { children } ) {
