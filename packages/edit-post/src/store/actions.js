@@ -1,13 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { speak } from '@wordpress/a11y';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 import { addFilter } from '@wordpress/hooks';
@@ -26,13 +22,7 @@ import { unlock } from '../lock-unlock';
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			dispatch.toggleDistractionFree();
-		}
+	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editPostStore.name, name );
@@ -190,30 +180,18 @@ export const toggleFeature =
 /**
  * Triggers an action used to switch editor mode.
  *
+ * @deprecated
+ *
  * @param {string} mode The editor mode.
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
-
-		// Unselect blocks when we switch to the code editor.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if (
-			mode === 'text' &&
-			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
-		) {
-			dispatch.toggleDistractionFree();
-		}
-
-		const message =
-			mode === 'visual'
-				? __( 'Visual editor selected' )
-				: __( 'Code editor selected' );
-		speak( message, 'assertive' );
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).switchEditorMode", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').switchEditorMode",
+		} );
+		registry.dispatch( editorStore ).switchEditorMode( mode );
 	};
 
 /**
@@ -503,64 +481,15 @@ export const initializeMetaBoxes =
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
+ *
+ * @deprecated
  */
 export const toggleDistractionFree =
 	() =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'fixedToolbar', false );
-		}
-		if ( ! isDistractionFree ) {
-			registry.batch( () => {
-				registry
-					.dispatch( preferencesStore )
-					.set( 'core', 'fixedToolbar', true );
-				registry.dispatch( editorStore ).setIsInserterOpened( false );
-				registry.dispatch( editorStore ).setIsListViewOpened( false );
-				dispatch.closeGeneralSidebar();
-			} );
-		}
-		registry.batch( () => {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', ! isDistractionFree );
-			registry
-				.dispatch( noticesStore )
-				.createInfoNotice(
-					isDistractionFree
-						? __( 'Distraction free off.' )
-						: __( 'Distraction free on.' ),
-					{
-						id: 'core/edit-post/distraction-free-mode/notice',
-						type: 'snackbar',
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: () => {
-									registry.batch( () => {
-										registry
-											.dispatch( preferencesStore )
-											.set(
-												'core',
-												'fixedToolbar',
-												isDistractionFree ? true : false
-											);
-										registry
-											.dispatch( preferencesStore )
-											.toggle(
-												'core',
-												'distractionFree'
-											);
-									} );
-								},
-							},
-						],
-					}
-				);
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).toggleDistractionFree", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
+		registry.dispatch( editorStore ).toggleDistractionFree();
 	};

@@ -32,13 +32,14 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- shadow: defaultPresets
 
 
 ---
@@ -73,7 +74,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
+| defaultPresets | boolean | false |  |
 | presets | array |  | name, shadow, slug |
 
 ---
@@ -108,6 +109,7 @@ Settings related to background.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 

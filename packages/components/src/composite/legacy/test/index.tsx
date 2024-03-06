@@ -178,10 +178,13 @@ describe.each( [
 		);
 		renderAndValidate( <Test /> );
 
+		await sleep();
 		await press.Tab();
 		expect( screen.getByText( 'Before' ) ).toHaveFocus();
+		await sleep();
 		await press.Tab();
 		expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
+		await sleep();
 		await press.Tab();
 		expect( screen.getByText( 'After' ) ).toHaveFocus();
 		await press.ShiftTab();
@@ -210,6 +213,7 @@ describe.each( [
 
 		expect( item2 ).toBeDisabled();
 
+		await sleep();
 		await press.Tab();
 		expect( item1 ).toHaveFocus();
 		await press.ArrowDown();
@@ -239,6 +243,7 @@ describe.each( [
 		expect( item2 ).toBeEnabled();
 		expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
 
+		await sleep();
 		await press.Tab();
 		expect( item1 ).toHaveFocus();
 		await press.ArrowDown();
@@ -318,6 +323,7 @@ describe.each( [
 		test( 'All directions work with no orientation', async () => {
 			const { item1, item2, item3 } = useOneDimensionalTest();
 
+			await sleep();
 			await press.Tab();
 			expect( item1 ).toHaveFocus();
 			await press.ArrowDown();
@@ -355,6 +361,7 @@ describe.each( [
 				orientation: 'horizontal',
 			} );
 
+			await sleep();
 			await press.Tab();
 			expect( item1 ).toHaveFocus();
 			await press.ArrowDown();
@@ -384,6 +391,7 @@ describe.each( [
 				orientation: 'vertical',
 			} );
 
+			await sleep();
 			await press.Tab();
 			expect( item1 ).toHaveFocus();
 			await press( next );
@@ -413,6 +421,7 @@ describe.each( [
 				loop: true,
 			} );
 
+			await sleep();
 			await press.Tab();
 			expect( item1 ).toHaveFocus();
 			await press.ArrowDown();
@@ -435,6 +444,7 @@ describe.each( [
 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
 				useTwoDimensionalTest();
 
+			await sleep();
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
 			await press.ArrowUp();
@@ -471,6 +481,7 @@ describe.each( [
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
 				useTwoDimensionalTest( { loop: true } );
 
+			await sleep();
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
 			await press( next );
@@ -495,6 +506,7 @@ describe.each( [
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
 				useTwoDimensionalTest( { wrap: true } );
 
+			await sleep();
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
 			await press( next );
@@ -527,6 +539,7 @@ describe.each( [
 				wrap: true,
 			} );
 
+			await sleep();
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
 			await press( previous );
@@ -542,6 +555,7 @@ describe.each( [
 		test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
 			const { itemA1, itemB1, itemB2, itemC1 } = useShiftTest( true );
 
+			await sleep();
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
 			await press.ArrowDown();
@@ -563,6 +577,7 @@ describe.each( [
 		test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
 			const { itemA1, itemB1, itemB2 } = useShiftTest( false );
 
+			await sleep();
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
 			await press.ArrowDown();

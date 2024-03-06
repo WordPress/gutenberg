@@ -15,7 +15,6 @@ import {
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
 const { DocumentTools: EditorDocumentTools } = unlock( editorPrivateApis );
@@ -26,7 +25,7 @@ export default function DocumentTools( {
 	isDistractionFree,
 } ) {
 	const { isVisualMode } = useSelect( ( select ) => {
-		const { getEditorMode } = select( editSiteStore );
+		const { getEditorMode } = select( editorStore );
 
 		return {
 			isVisualMode: getEditorMode() === 'visual',

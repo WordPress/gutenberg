@@ -28,7 +28,6 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
-	useBlockCommands,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
@@ -66,12 +65,12 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
-	useBlockCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const {
 		isDistractionFree,
+		isZoomOutMode,
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
@@ -98,6 +97,9 @@ export default function Layout() {
 				'core',
 				'distractionFree'
 			),
+			isZoomOutMode:
+				select( blockEditorStore ).__unstableGetEditorMode() ===
+				'zoom-out',
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
@@ -174,6 +176,7 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
+						'is-zoom-out': isZoomOutMode,
 					}
 				) }
 			>
@@ -251,47 +254,64 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					<NavigableRegion
-						ariaLabel={ __( 'Navigation' ) }
-						className="edit-site-layout__sidebar-region"
-					>
-						<AnimatePresence>
-							{ canvasMode === 'view' && (
-								<motion.div
-									initial={ { opacity: 0 } }
-									animate={ { opacity: 1 } }
-									exit={ { opacity: 0 } }
-									transition={ {
-										type: 'tween',
-										duration:
-											// Disable transition in mobile to emulate a full page transition.
-											disableMotion || isMobileViewport
-												? 0
-												: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
-									className="edit-site-layout__sidebar"
-								>
-									<Sidebar />
-								</motion.div>
-							) }
-						</AnimatePresence>
-					</NavigableRegion>
+					{ ( ! isMobileViewport ||
+						( isMobileViewport && ! areas.mobile ) ) && (
+						<NavigableRegion
+							ariaLabel={ __( 'Navigation' ) }
+							className="edit-site-layout__sidebar-region"
+						>
+							<AnimatePresence>
+								{ canvasMode === 'view' && (
+									<motion.div
+										initial={ { opacity: 0 } }
+										animate={ { opacity: 1 } }
+										exit={ { opacity: 0 } }
+										transition={ {
+											type: 'tween',
+											duration:
+												// Disable transition in mobile to emulate a full page transition.
+												disableMotion ||
+												isMobileViewport
+													? 0
+													: ANIMATION_DURATION,
+											ease: 'easeOut',
+										} }
+										className="edit-site-layout__sidebar"
+									>
+										<Sidebar />
+									</motion.div>
+								) }
+							</AnimatePresence>
+						</NavigableRegion>
+					) }
 
 					<SavePanel />
 
-					{ areas.content && canvasMode !== 'edit' && (
+					{ isMobileViewport && areas.mobile && (
 						<div
-							className="edit-site-layout__area"
+							className="edit-site-layout__mobile"
 							style={ {
 								maxWidth: widths?.content,
 							} }
 						>
-							{ areas.content }
+							{ areas.mobile }
 						</div>
 					) }
 
-					{ areas.preview && (
+					{ ! isMobileViewport &&
+						areas.content &&
+						canvasMode !== 'edit' && (
+							<div
+								className="edit-site-layout__area"
+								style={ {
+									maxWidth: widths?.content,
+								} }
+							>
+								{ areas.content }
+							</div>
+						) }
+
+					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }
 							{ !! canvasSize.width && (

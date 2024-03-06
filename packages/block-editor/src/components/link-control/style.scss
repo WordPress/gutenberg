@@ -34,6 +34,15 @@ $block-editor-link-control-number-of-actions: 1;
 				content: attr(aria-label);
 			}
 		}
+
+		.block-editor-link-control__search-item-top {
+			gap: $grid-unit-10;
+
+			.components-button.has-icon {
+				min-width: inherit;
+				width: min-content;
+			}
+		}
 	}
 }
 

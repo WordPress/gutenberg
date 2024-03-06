@@ -6,7 +6,6 @@
 		"types": [
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"dom-scroll-into-view",
 			"jest",
 			"@testing-library/jest-dom"
 		],

@@ -8,7 +8,7 @@
 wp_enqueue_script_module( 'directive-bind-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-bind" }'>
+<div data-wp-interactive="directive-bind">
 	<a
 		data-wp-bind--href="state.url"
 		data-testid="add missing href at hydration"

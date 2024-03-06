@@ -22,8 +22,8 @@ const translationMap = {
 	h4: __( 'H4' ),
 	h5: __( 'H5' ),
 	h6: __( 'H6' ),
-	'settings.color': __( 'Color settings' ),
-	'settings.typography': __( 'Typography settings' ),
+	'settings.color': __( 'Color' ),
+	'settings.typography': __( 'Typography' ),
 	'styles.color': __( 'Colors' ),
 	'styles.spacing': __( 'Spacing' ),
 	'styles.typography': __( 'Typography' ),
@@ -54,12 +54,7 @@ function getTranslation( key ) {
 	}
 
 	if ( keyArray?.[ 0 ] === 'elements' ) {
-		const elementName = translationMap[ keyArray[ 1 ] ] || keyArray[ 1 ];
-		return sprintf(
-			// translators: %s: element name, e.g., heading button, link, caption.
-			__( '%s element' ),
-			elementName
-		);
+		return translationMap[ keyArray[ 1 ] ] || keyArray[ 1 ];
 	}
 
 	return undefined;
@@ -114,9 +109,9 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
  *
  * @param {Object} next     The changed object to compare.
  * @param {Object} previous The original object to compare against.
- * @return {string[]}                        An array of translated changes.
+ * @return {Array[]}        A 2-dimensional array of tuples: [ "group", "translated change" ].
  */
-function getGlobalStylesChangelist( next, previous ) {
+export function getGlobalStylesChangelist( next, previous ) {
 	const cacheKey = JSON.stringify( { next, previous } );
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
@@ -160,12 +155,12 @@ function getGlobalStylesChangelist( next, previous ) {
 	const result = [ ...new Set( changedValueTree ) ]
 		/*
 		 * Translate the keys.
-		 * Remove duplicate or empty translations.
+		 * Remove empty translations.
 		 */
 		.reduce( ( acc, curr ) => {
 			const translation = getTranslation( curr );
-			if ( translation && ! acc.includes( translation ) ) {
-				acc.push( translation );
+			if ( translation ) {
+				acc.push( [ curr.split( '.' )[ 0 ], translation ] );
 			}
 			return acc;
 		}, [] );
@@ -176,29 +171,74 @@ function getGlobalStylesChangelist( next, previous ) {
 }
 
 /**
- * From a getGlobalStylesChangelist() result, returns a truncated array of translated changes.
- * Appends a translated string indicating the number of changes that were truncated.
+ * From a getGlobalStylesChangelist() result, returns an array of translated global styles changes, grouped by type.
+ * The types are 'blocks', 'elements', 'settings', and 'styles'.
  *
  * @param {Object}              next     The changed object to compare.
  * @param {Object}              previous The original object to compare against.
  * @param {{maxResults:number}} options  Options. maxResults: results to return before truncating.
- * @return {string[]}                        An array of translated changes.
+ * @return {string[]}                    An array of translated changes.
  */
 export default function getGlobalStylesChanges( next, previous, options = {} ) {
-	const changes = getGlobalStylesChangelist( next, previous );
-	const changesLength = changes.length;
+	let changeList = getGlobalStylesChangelist( next, previous );
+	const changesLength = changeList.length;
 	const { maxResults } = options;
 
-	// Truncate to `n` results if necessary.
-	if ( !! maxResults && changesLength && changesLength > maxResults ) {
-		const deleteCount = changesLength - maxResults;
-		const andMoreText = sprintf(
-			// translators: %d: number of global styles changes that are not displayed in the UI.
-			_n( '…and %d more change', '…and %d more changes', deleteCount ),
-			deleteCount
-		);
-		changes.splice( maxResults, deleteCount, andMoreText );
+	if ( changesLength ) {
+		// Truncate to `n` results if necessary.
+		if ( !! maxResults && changesLength > maxResults ) {
+			changeList = changeList.slice( 0, maxResults );
+		}
+		return Object.entries(
+			changeList.reduce( ( acc, curr ) => {
+				const group = acc[ curr[ 0 ] ] || [];
+				if ( ! group.includes( curr[ 1 ] ) ) {
+					acc[ curr[ 0 ] ] = [ ...group, curr[ 1 ] ];
+				}
+				return acc;
+			}, {} )
+		).map( ( [ key, changeValues ] ) => {
+			const changeValuesLength = changeValues.length;
+			const joinedChangesValue = changeValues.join( __( ', ' ) );
+			switch ( key ) {
+				case 'blocks': {
+					return sprintf(
+						// translators: %s: a list of block names separated by a comma.
+						_n( '%s block.', '%s blocks.', changeValuesLength ),
+						joinedChangesValue
+					);
+				}
+				case 'elements': {
+					return sprintf(
+						// translators: %s: a list of element names separated by a comma.
+						_n( '%s element.', '%s elements.', changeValuesLength ),
+						joinedChangesValue
+					);
+				}
+				case 'settings': {
+					return sprintf(
+						// translators: %s: a list of theme.json setting labels separated by a comma.
+						__( '%s settings.' ),
+						joinedChangesValue
+					);
+				}
+				case 'styles': {
+					return sprintf(
+						// translators: %s: a list of theme.json top-level styles labels separated by a comma.
+						__( '%s styles.' ),
+						joinedChangesValue
+					);
+				}
+				default: {
+					return sprintf(
+						// translators: %s: a list of global styles changes separated by a comma.
+						__( '%s.' ),
+						joinedChangesValue
+					);
+				}
+			}
+		} );
 	}
 
-	return changes;
+	return EMPTY_ARRAY;
 }
