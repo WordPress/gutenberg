@@ -52,3 +52,5 @@ export const LAYOUT_LIST = 'list';
 export const ENUMERATION_TYPE = 'enumeration';
 export const OPERATOR_IN = 'in';
 export const OPERATOR_NOT_IN = 'notIn';
+export const OPERATOR_EQUAL = 'equal';
+export const OPERATOR_NOT_EQUAL = 'notEqual';

@@ -22,13 +22,29 @@ export const ENUMERATION_TYPE = 'enumeration';
 // Filter operators.
 export const OPERATOR_IN = 'in';
 export const OPERATOR_NOT_IN = 'notIn';
+export const OPERATOR_EQUAL = 'equal';
+export const OPERATOR_NOT_EQUAL = 'notEqual';
+export const ALL_OPERATORS = [
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	OPERATOR_EQUAL,
+	OPERATOR_NOT_EQUAL,
+];
 export const OPERATORS = {
 	[ OPERATOR_IN ]: {
 		key: 'in-filter',
-		label: __( 'Is' ),
+		label: __( 'In' ),
 	},
 	[ OPERATOR_NOT_IN ]: {
 		key: 'not-in-filter',
+		label: __( 'Not in' ),
+	},
+	[ OPERATOR_EQUAL ]: {
+		key: 'equal-filter',
+		label: __( 'Is' ),
+	},
+	[ OPERATOR_NOT_EQUAL ]: {
+		key: 'not-equal-filter',
 		label: __( 'Is not' ),
 	},
 };

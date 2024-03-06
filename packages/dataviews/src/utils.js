@@ -7,7 +7,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { OPERATORS } from './constants';
+import { ALL_OPERATORS, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 import { unlock } from './lock-unlock';
 
 const { DropdownMenuSeparatorV2: DropdownMenuSeparator } = unlock(
@@ -69,10 +69,10 @@ export function getPaginationResults( { data, view } ) {
 export const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;
 	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = Object.keys( OPERATORS );
+		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ]; // Default values.
 	}
 	return operators.filter( ( operator ) =>
-		Object.keys( OPERATORS ).includes( operator )
+		ALL_OPERATORS.includes( operator )
 	);
 };
 

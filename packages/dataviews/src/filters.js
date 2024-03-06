@@ -10,7 +10,12 @@ import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
-import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import {
+	ENUMERATION_TYPE,
+	ALL_OPERATORS,
+	OPERATOR_EQUAL,
+	OPERATOR_NOT_EQUAL,
+} from './constants';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 
 const Filters = memo( function Filters( {
@@ -43,16 +48,16 @@ const Filters = memo( function Filters( {
 					field: field.id,
 					name: field.header,
 					elements: field.elements,
-					singleSelection: !! field.filterBy?.singleSelection,
+					singleSelection: operators.some( ( op ) =>
+						[ OPERATOR_EQUAL, OPERATOR_NOT_EQUAL ].includes( op )
+					),
 					operators,
 					isVisible:
 						isPrimary ||
 						view.filters.some(
 							( f ) =>
 								f.field === field.id &&
-								[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
-									f.operator
-								)
+								ALL_OPERATORS.includes( f.operator )
 						),
 					isPrimary,
 				} );

@@ -108,7 +108,6 @@ Each field is an object with the following properties:
 -   `filterBy`: configuration for the filters.
     - `operators`: the list of operators supported by the field.
     - `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
-    - `singleSelection`: whether the filter should only allow single selection. `false` by default.
 
 ### `view`: `object`
 
@@ -283,8 +282,14 @@ Callback that signals the user triggered the details for one of more items, and 
 
 ### Operators
 
-- `in`: operator to be used in filters for fields of type `enumeration`.
-- `notIn`: operator to be used in filters for fields of type `enumeration`.
+Allowed operators for fields of type `enumeration`:
+
+- `equal`: whether an item is equal to a single value.
+- `notEqual`: whether an item is not equal to a single value.
+- `in`: whether an item is in a list of values.
+- `notIn`: whether an item is not in a list of values.
+
+By default, a field of type `enumeration` supports `in` and `notIn` operators — this is, it supports multiselection and negation.
 
 ## Contributing to this package
 

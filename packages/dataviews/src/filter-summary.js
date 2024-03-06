@@ -24,7 +24,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import SearchWidget from './search-widget';
-import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
+import { ALL_OPERATORS, OPERATORS } from './constants';
 
 const FilterText = ( { activeElements, filterInView, filter } ) => {
 	if ( activeElements === undefined || activeElements.length === 0 ) {
@@ -36,24 +36,13 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		Span2: <span className="dataviews-filter-summary__filter-text-value" />,
 	};
 
-	if ( filterInView?.operator === OPERATOR_IN ) {
+	if ( ALL_OPERATORS.includes( filterInView?.operator ) ) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is Admin". */
-				__( '<Span1>%1$s </Span1><Span2>is %2$s</Span2>' ),
+				/* translators: 1: Filter name. 2: Filter operator. 3: Filter value. e.g.: "Author is Admin", "Author not in Admin, Editor". */
+				__( '<Span1>%1$s </Span1><Span2>%2$s %3$s</Span2>' ),
 				filter.name,
-				activeElements.map( ( element ) => element.label ).join( ', ' )
-			),
-			filterTextWrappers
-		);
-	}
-
-	if ( filterInView?.operator === OPERATOR_NOT_IN ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: 1: Filter name. 2: Filter value. e.g.: "Author is not Admin". */
-				__( '<Span1>%1$s </Span1><Span2>is not %2$s</Span2>' ),
-				filter.name,
+				OPERATORS[ filterInView.operator ].label,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
 			filterTextWrappers
