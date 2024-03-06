@@ -17,6 +17,7 @@ import {
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
+import { PanelBody } from '../../';
 import type {
 	ToggleGroupControlOptionProps,
 	ToggleGroupControlOptionIconProps,
@@ -139,4 +140,44 @@ export const Deselectable: StoryFn< typeof ToggleGroupControl > = Template.bind(
 Deselectable.args = {
 	...WithIcons.args,
 	isDeselectable: true,
+};
+
+export const WithVariableHeightSiblings: StoryFn<
+	typeof ToggleGroupControl
+> = ( { onChange, ...props } ) => {
+	const [ value, setValue ] =
+		useState< ToggleGroupControlProps[ 'value' ] >();
+
+	return (
+		<div style={ { overflowY: 'scroll' } }>
+			<PanelBody title="Test Panel">
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+			</PanelBody>
+			<PanelBody title="Another Panel">
+				<ToggleGroupControl
+					__nextHasNoMarginBottom
+					{ ...props }
+					onChange={ ( ...changeArgs ) => {
+						setValue( ...changeArgs );
+						onChange?.( ...changeArgs );
+					} }
+					value={ value }
+				/>
+			</PanelBody>
+		</div>
+	);
+};
+WithVariableHeightSiblings.args = {
+	...Default.args,
+	__nextHasNoMarginBottom: true,
+	__next40pxDefaultSize: true,
 };
