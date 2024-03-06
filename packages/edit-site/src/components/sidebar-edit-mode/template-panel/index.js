@@ -109,7 +109,7 @@ export default function TemplatePanel() {
 							postType={ postType }
 							postId={ postId }
 							className="edit-site-template-card__actions"
-							toggleProps={ { isSmall: true } }
+							toggleProps={ { size: 'small' } }
 							onRemove={ () => {
 								history.push( {
 									path: `/${ postType }/all`,
