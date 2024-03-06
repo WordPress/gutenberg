@@ -199,6 +199,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	return (
 		<Ariakit.ComboboxProvider
 			value={ searchValue }
+			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter
 					? [
@@ -209,11 +210,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 										operator:
 											currentFilter.operator ||
 											filter.operators[ 0 ],
-										value: getNewValue(
-											filter,
-											currentFilter,
-											value
-										),
+										value,
 									};
 								}
 								return _filter;
@@ -224,11 +221,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 							{
 								field: filter.field,
 								operator: filter.operators[ 0 ],
-								value: getNewValue(
-									filter,
-									currentFilter,
-									value
-								),
+								value,
 							},
 					  ];
 				onChangeView( {
