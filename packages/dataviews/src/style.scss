@@ -487,6 +487,10 @@
 	&.has-no-pointer-events {
 		&:hover {
 			border-color: var(--wp-admin-theme-color);
+
+			&:has(.dataviews-view-grid__overlay[aria-disabled="true"]) {
+				border-color: $gray-400;
+			}
 		}
 
 		.dataviews-view-grid__overlay {
@@ -495,7 +499,11 @@
 			left: 0;
 			right: 0;
 			bottom: 0;
-			cursor: cell;
+			cursor: pointer;
+
+			&[aria-disabled="true"] {
+				cursor: not-allowed;
+			}
 		}
 	}
 }

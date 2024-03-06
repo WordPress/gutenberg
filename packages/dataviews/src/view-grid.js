@@ -55,6 +55,7 @@ function GridItem( {
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
 				'is-selected': hasBulkAction && isSelected,
+				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
 			onClick={ ( event ) => {
 				if ( ! hasNoPointerEvents || ! hasBulkAction ) return;
@@ -91,6 +92,7 @@ function GridItem( {
 						getItemId={ getItemId }
 						data={ data }
 						primaryField={ primaryField }
+						disabled={ ! hasBulkAction }
 					/>
 					<HStack
 						id={ primaryFieldId }
@@ -128,6 +130,7 @@ function GridItem( {
 				<div
 					className="dataviews-view-grid__overlay"
 					role="checkbox"
+					aria-disabled={ ! hasBulkAction }
 					aria-labelledby={ primaryFieldId }
 					aria-checked={ isSelected }
 				/>
