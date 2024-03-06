@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
+-   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
+-   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
+-   `Button`: Place `children` before the icon when `iconPosition` is `right`  ([#59489](https://github.com/WordPress/gutenberg/pull/59489)).
+
+### Internal
+
+-   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
+-   Remove unused `useLatestRef()` hook ([#59471](https://github.com/WordPress/gutenberg/pull/59471)).
+
+### Experimental
+
+-   `CustomSelectControlV2`: Remove legacy adapter layer ([#59420](https://github.com/WordPress/gutenberg/pull/59420)).
+
 ## 27.0.0 (2024-02-21)
 
 ### Breaking Changes
@@ -19,6 +35,10 @@
 -   `FormTokenField`: Use `Element.scrollIntoView()` instead of `dom-scroll-into-view` ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
 -   Removing `dom-scroll-into-view` as a dependency of the components package ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
 -   Add higher-order function to ignore IME keydowns ([#59081](https://github.com/WordPress/gutenberg/pull/59081)).
+
+### Experimental
+
+-   `Tabs`: rename `initialTabId` prop to `defaultTabId` ([#59035](https://github.com/WordPress/gutenberg/pull/59035)).
 
 ## 26.0.1 (2024-02-13)
 

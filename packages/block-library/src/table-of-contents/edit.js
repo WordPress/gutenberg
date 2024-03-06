@@ -160,7 +160,7 @@ export default function TableOfContentsEdit( {
 				<ol>
 					<TableOfContentsList
 						nestedHeadingList={ headingTree }
-						disableLinkActivation={ true }
+						disableLinkActivation
 						onClick={ showRedirectionPreventedNotice }
 					/>
 				</ol>

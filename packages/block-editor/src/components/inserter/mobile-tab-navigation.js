@@ -31,7 +31,7 @@ function ScreenHeader( { title } ) {
 								{ minWidth: 24, padding: 0 }
 							}
 							icon={ isRTL() ? chevronRight : chevronLeft }
-							isSmall
+							size="small"
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
 						<Spacer>
