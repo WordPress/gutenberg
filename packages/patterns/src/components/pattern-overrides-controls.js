@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
+import {
+	InspectorControls,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { BaseControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -9,6 +13,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
+import { unlock } from '../lock-unlock';
+
+const { BlockRenameModal } = unlock( blockEditorPrivateApis );
 
 function removeBindings( bindings, syncedAttributes ) {
 	let updatedBindings = {};
@@ -40,7 +47,7 @@ function addBindings( bindings, syncedAttributes ) {
 }
 
 function PatternOverridesControls( { attributes, name, setAttributes } ) {
-	if ( ! attributes.metadata?.name ) return null;
+	const [ showBlockNameModal, setShowBlockNameModal ] = useState( false );
 
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 	const attributeSources = syncedAttributes.map(
@@ -51,17 +58,28 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 		( source ) => source && source !== 'core/pattern-overrides'
 	);
 
-	function updateBindings( isChecked ) {
+	function updateBindings( isChecked, customName ) {
+		if ( isChecked && ! attributes.metadata?.name && ! customName ) {
+			setShowBlockNameModal( true );
+			return;
+		}
+
 		const prevBindings = attributes?.metadata?.bindings;
 		const updatedBindings = isChecked
 			? addBindings( prevBindings, syncedAttributes )
 			: removeBindings( prevBindings, syncedAttributes );
 
+		const updatedMetadata = {
+			...attributes.metadata,
+			bindings: updatedBindings,
+		};
+
+		if ( customName ) {
+			updatedMetadata.name = customName;
+		}
+
 		setAttributes( {
-			metadata: {
-				...attributes.metadata,
-				bindings: updatedBindings,
-			},
+			metadata: updatedMetadata,
 		} );
 	}
 
@@ -69,23 +87,35 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	if ( isConnectedToOtherSources ) return null;
 
 	return (
-		<InspectorControls group="advanced">
-			<BaseControl __nextHasNoMarginBottom>
-				<BaseControl.VisualLabel>
-					{ __( 'Pattern overrides' ) }
-				</BaseControl.VisualLabel>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Allow instance overrides' ) }
-					checked={ attributeSources.some(
-						( source ) => source === 'core/pattern-overrides'
-					) }
-					onChange={ ( isChecked ) => {
-						updateBindings( isChecked );
+		<>
+			<InspectorControls group="advanced">
+				<BaseControl __nextHasNoMarginBottom>
+					<BaseControl.VisualLabel>
+						{ __( 'Pattern overrides' ) }
+					</BaseControl.VisualLabel>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						label={ __( 'Allow instance overrides' ) }
+						checked={ attributeSources.some(
+							( source ) => source === 'core/pattern-overrides'
+						) }
+						onChange={ ( isChecked ) => {
+							updateBindings( isChecked );
+						} }
+					/>
+				</BaseControl>
+			</InspectorControls>
+
+			{ showBlockNameModal && (
+				<BlockRenameModal
+					blockName={ attributes.metadata?.name || '' }
+					onClose={ () => setShowBlockNameModal( false ) }
+					onSave={ ( newName ) => {
+						updateBindings( true, newName );
 					} }
 				/>
-			</BaseControl>
-		</InspectorControls>
+			) }
+		</>
 	);
 }
 
