@@ -9,7 +9,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -48,14 +48,6 @@ export default function ActionsPanel( {
 		[]
 	);
 
-	const saveBtnRef = useRef();
-	useEffect( () => {
-		if ( isEntitiesSavedStatesOpen ) {
-			return;
-		}
-		saveBtnRef?.current?.focus();
-	}, [ isEntitiesSavedStatesOpen ] );
-
 	// It is ok for these components to be unmounted when not in visual use.
 	// We don't want more than one present at a time, decide which to render.
 	let unmountableContent;
@@ -75,7 +67,7 @@ export default function ActionsPanel( {
 					variant="secondary"
 					className="edit-post-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
-					aria-haspopup="dialog"
+					aria-expanded={ false }
 				>
 					{ __( 'Open save panel' ) }
 				</Button>
