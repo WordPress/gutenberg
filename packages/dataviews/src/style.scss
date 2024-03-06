@@ -497,6 +497,10 @@
 	position: relative;
 
 	&.has-no-pointer-events {
+		&:hover {
+			border-color: var(--wp-admin-theme-color);
+		}
+
 		.dataviews-view-grid__content {
 			pointer-events: none;
 		}

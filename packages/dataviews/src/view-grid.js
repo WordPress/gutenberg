@@ -14,7 +14,13 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 
 /**
@@ -37,6 +43,8 @@ function GridItem( {
 } ) {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
+	const primaryFieldId = useId();
+
 	return (
 		<VStack
 			spacing={ 0 }
@@ -79,7 +87,10 @@ function GridItem( {
 						data={ data }
 						primaryField={ primaryField }
 					/>
-					<HStack className="dataviews-view-grid__primary-field">
+					<HStack
+						id={ primaryFieldId }
+						className="dataviews-view-grid__primary-field"
+					>
 						{ primaryField?.render( { item } ) }
 					</HStack>
 					<ItemActions item={ item } actions={ actions } isCompact />
@@ -112,7 +123,7 @@ function GridItem( {
 				<div
 					className="dataviews-view-grid__overlay"
 					role="checkbox"
-					aria-label={ primaryField?.getValue( { item } ) }
+					aria-labelledby={ primaryFieldId }
 					aria-checked={ isSelected }
 				/>
 			) }
