@@ -224,13 +224,15 @@ export function EntitiesSavedStatesExtensible( {
 			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong
-					className="entities-saved-states__text-prompt--header"
-					id={ dialogLabel }
+				<div
+					className="entities-saved-states__text-prompt--header-wrapper"
+					id={ dialogDescription }
 				>
-					{ __( 'Are you ready to save?' ) }
-				</strong>
-				{ additionalPrompt }
+					<strong className="entities-saved-states__text-prompt--header">
+						{ __( 'Are you ready to save?' ) }
+					</strong>
+					{ additionalPrompt }
+				</div>
 				<p id={ dialogDescription }>
 					{ isDirty
 						? createInterpolateElement(
