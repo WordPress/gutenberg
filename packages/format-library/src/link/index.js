@@ -46,22 +46,29 @@ function Edit( {
 	const [ addingLink, setAddingLink ] = useState( false );
 	const openedBy = useRef( null );
 	const clickTimeout = useRef( false );
-	const clickTimeoutId = useRef( null );
 
 	useEffect( () => {
 		if ( addingLink ) {
 			return;
 		}
 
-		clickTimeout.current = true;
-		clickTimeoutId.current = setTimeout( () => {
-			clickTimeout.current = false;
+		resetClickTimeout();
+
+		clickTimeout.current = setTimeout( () => {
+			clickTimeout.current = undefined;
 		}, 100 );
 
 		return () => {
-			return () => clearTimeout( clickTimeoutId.current );
+			resetClickTimeout();
 		};
 	}, [ addingLink ] );
+
+	function resetClickTimeout() {
+		if ( clickTimeout.current ) {
+			clearTimeout( clickTimeout.current );
+			clickTimeout.current = undefined;
+		}
+	}
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -82,7 +89,6 @@ function Edit( {
 
 			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
 			if ( clickTimeout.current && event.target === openedBy.current ) {
-				// Allow a second click after this to open a link
 				openedBy.current = null;
 			} else {
 				setAddingLink( true );
@@ -90,8 +96,7 @@ function Edit( {
 			}
 
 			// Always reset at this point, as we no longer need the timeout since we've processed another click
-			clickTimeout.current = false;
-			clearTimeout( clickTimeoutId.current );
+			resetClickTimeout();
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
