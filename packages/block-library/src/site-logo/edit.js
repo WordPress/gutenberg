@@ -446,6 +446,7 @@ export default function LogoEdit( {
 		};
 	}, [] );
 	const { getSettings } = useSelect( blockEditorStore );
+	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -492,14 +493,17 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image.
+			setTemporaryURL( media?.url );
 			setLogo( undefined );
 			return;
 		}
 
+		setTemporaryURL( media?.url );
 		setLogo( media.id, shouldForceSync );
 	};
 
 	const onRemoveLogo = () => {
+		setTemporaryURL();
 		setLogo( null );
 		setAttributes( { width: undefined } );
 	};
@@ -507,6 +511,7 @@ export default function LogoEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 	};
 
 	const onFilesDrop = ( filesList ) => {
@@ -515,6 +520,7 @@ export default function LogoEdit( {
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
+					setTemporaryURL( image?.url );
 					return;
 				}
 				onInitialSelectLogo( image );
@@ -529,7 +535,7 @@ export default function LogoEdit( {
 		onError: onUploadError,
 		onRemoveLogo,
 	};
-	const controls = canUserEdit && logoUrl && (
+	const controls = canUserEdit && logoUrl && ! temporaryURL && (
 		<BlockControls group="other">
 			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
@@ -540,7 +546,13 @@ export default function LogoEdit( {
 	if ( isLoading ) {
 		logoImage = <Spinner />;
 	}
-	if ( !! logoUrl ) {
+
+	// Reset temporary url when media is available.
+	if ( logoUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
+
+	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (
 			<SiteLogo
 				alt={ alt }
@@ -549,7 +561,7 @@ export default function LogoEdit( {
 				containerRef={ ref }
 				isSelected={ isSelected }
 				setAttributes={ setAttributes }
-				logoUrl={ logoUrl }
+				logoUrl={ temporaryURL || logoUrl }
 				setLogo={ setLogo }
 				logoId={ mediaItemData?.id || siteLogoId }
 				siteUrl={ url }
@@ -581,6 +593,7 @@ export default function LogoEdit( {
 
 	const classes = classnames( className, {
 		'is-default-size': ! width,
+		'is-transient': temporaryURL,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -647,8 +660,8 @@ export default function LogoEdit( {
 		<div { ...blockProps }>
 			{ controls }
 			{ mediaInspectorPanel }
-			{ !! logoUrl && logoImage }
-			{ ! logoUrl && ! canUserEdit && (
+			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
+			{ ! temporaryURL && ! logoUrl && ! canUserEdit && (
 				<Placeholder className="site-logo_placeholder">
 					{ !! isLoading && (
 						<span className="components-placeholder__preview">
@@ -657,7 +670,7 @@ export default function LogoEdit( {
 					) }
 				</Placeholder>
 			) }
-			{ ! logoUrl && canUserEdit && (
+			{ ! temporaryURL && ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
 					onSelect={ onInitialSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }
