@@ -106,7 +106,7 @@ export default function SavePanel() {
 		if ( isSaveViewOpen ) {
 			return;
 		}
-		saveBtnRef.current.focus();
+		saveBtnRef?.current?.focus();
 	}, [ isSaveViewOpen ] );
 
 	if ( canvasMode === 'view' ) {
