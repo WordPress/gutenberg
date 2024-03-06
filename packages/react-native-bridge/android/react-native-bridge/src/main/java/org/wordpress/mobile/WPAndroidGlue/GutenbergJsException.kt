@@ -17,8 +17,7 @@ class GutenbergJsException (
     val isHandled: Boolean,
     val handledBy: String
 ) {
-
-
+    
     companion object {
         @JvmStatic
         fun fromReadableMap(rawException: ReadableMap): GutenbergJsException {
