@@ -28,7 +28,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -182,9 +182,11 @@ export default function PostFeaturedImageEdit( {
 	};
 
 	// Reset temporary url when media is available.
-	if ( media && temporaryURL ) {
-		setTemporaryURL();
-	}
+	useEffect( () => {
+		if ( media && temporaryURL ) {
+			setTemporaryURL();
+		}
+	}, [ media, temporaryURL ] );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {

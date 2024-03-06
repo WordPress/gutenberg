@@ -81,9 +81,7 @@ const SiteLogo = ( {
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const classes = classnames( 'custom-logo-link', {
-		'is-transient': isBlobURL( logoUrl ),
-	} );
+	const classes = classnames( 'custom-logo-link' );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -121,17 +119,20 @@ const SiteLogo = ( {
 	}
 
 	const img = (
-		<img
-			className="custom-logo"
-			src={ logoUrl }
-			alt={ alt }
-			onLoad={ ( event ) => {
-				setNaturalSize( {
-					naturalWidth: event.target.naturalWidth,
-					naturalHeight: event.target.naturalHeight,
-				} );
-			} }
-		/>
+		<>
+			<img
+				className="custom-logo"
+				src={ logoUrl }
+				alt={ alt }
+				onLoad={ ( event ) => {
+					setNaturalSize( {
+						naturalWidth: event.target.naturalWidth,
+						naturalHeight: event.target.naturalHeight,
+					} );
+				} }
+			/>
+			{ isBlobURL( logoUrl ) && <Spinner /> }
+		</>
 	);
 
 	let imgWrapper = img;
@@ -547,28 +548,32 @@ export default function LogoEdit( {
 		logoImage = <Spinner />;
 	}
 
-	// Reset temporary url when media is available.
-	if ( logoUrl && temporaryURL ) {
-		setTemporaryURL();
-	}
+	// Reset temporary url when logoUrl is available.
+	useEffect( () => {
+		if ( logoUrl && temporaryURL ) {
+			setTemporaryURL();
+		}
+	}, [ logoUrl, temporaryURL ] );
 
 	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (
-			<SiteLogo
-				alt={ alt }
-				attributes={ attributes }
-				className={ className }
-				containerRef={ ref }
-				isSelected={ isSelected }
-				setAttributes={ setAttributes }
-				logoUrl={ temporaryURL || logoUrl }
-				setLogo={ setLogo }
-				logoId={ mediaItemData?.id || siteLogoId }
-				siteUrl={ url }
-				setIcon={ setIcon }
-				iconId={ siteIconId }
-				canUserEdit={ canUserEdit }
-			/>
+			<>
+				<SiteLogo
+					alt={ alt }
+					attributes={ attributes }
+					className={ className }
+					containerRef={ ref }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+					logoUrl={ temporaryURL || logoUrl }
+					setLogo={ setLogo }
+					logoId={ mediaItemData?.id || siteLogoId }
+					siteUrl={ url }
+					setIcon={ setIcon }
+					iconId={ siteIconId }
+					canUserEdit={ canUserEdit }
+				/>
+			</>
 		);
 	}
 	const placeholder = ( content ) => {

@@ -6,6 +6,8 @@
 }
 
 .wp-block-site-logo {
+	position: relative;
+
 	// Make the block selectable.
 	a {
 		pointer-events: none;
@@ -17,16 +19,25 @@
 		&:focus {
 			box-shadow: none;
 		}
+	}
 
-		&.is-transient img {
-			opacity: 0.3;
-		}
+	// Shown while image is being uploaded.
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
 	}
 
 	img {
 		display: block;
 		height: auto;
 		max-width: 100%;
+	}
+
+	&.is-transient img {
+		opacity: 0.3;
 	}
 }
 
