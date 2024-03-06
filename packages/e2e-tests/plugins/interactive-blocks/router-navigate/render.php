@@ -15,6 +15,13 @@ if ( $attributes['disableNavigation'] ) {
 		array( 'clientNavigationDisabled' => true )
 	);
 }
+
+if ( isset( $attributes['data'] ) ) {
+	wp_interactivity_state(
+		'router',
+		array( 'data' => $attributes['data'] )
+	);
+}
 ?>
 
 <div
@@ -24,8 +31,12 @@ if ( $attributes['disableNavigation'] ) {
 	<h2 data-testid="title"><?php echo $attributes['title']; ?></h2>
 
 	<output
-		data-testid="router navigations"
-		data-wp-text="state.navigations"
+		data-testid="router navigations pending"
+		data-wp-text="state.navigations.pending"
+	>NaN</output>
+	<output
+		data-testid="router navigations count"
+		data-wp-text="state.navigations.count"
 	>NaN</output>
 	<output
 		data-testid="router status"
@@ -39,24 +50,30 @@ if ( $attributes['disableNavigation'] ) {
 		Timeout <span data-wp-text="state.timeout">NaN</span>
 	</button>
 
-	<?php
-	if ( isset( $attributes['links'] ) ) {
-		foreach ( $attributes['links'] as $key => $link ) {
-			$i = $key += 1;
-			echo <<<HTML
-			<a
-				data-testid="link $i"
-				data-wp-on--click="actions.navigate"
-				href="$link"
-			>link $i</a>
-			<a
-				data-testid="link $i with hash"
-				data-wp-on--click="actions.navigate"
-				data-force-navigation="true"
-				href="$link#link-$i-with-hash"
-			>link $i with hash</a>
+	<nav>
+		<?php
+		if ( isset( $attributes['links'] ) ) {
+			foreach ( $attributes['links'] as $key => $link ) {
+				$i = $key += 1;
+				echo <<<HTML
+				<a
+					data-testid="link $i"
+					data-wp-on--click="actions.navigate"
+					href="$link"
+				>link $i</a>
+				<a
+					data-testid="link $i with hash"
+					data-wp-on--click="actions.navigate"
+					data-force-navigation="true"
+					href="$link#link-$i-with-hash"
+				>link $i with hash</a>
 HTML;
+			}
 		}
-	}
-	?>
+		?>
+	</nav>
+	<div data-testid="getterProp" data-wp-text="state.data.getterProp"></div>
+	<div data-testid="prop1" data-wp-text="state.data.prop1"></div>
+	<div data-testid="prop2" data-wp-text="state.data.prop2"></div>
+	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
 </div>

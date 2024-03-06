@@ -289,13 +289,9 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected &&
-					highlightSelected &&
-					! (
-						isUploadInProgress ||
-						isUploadFailed ||
-						isUploadPaused
-					) && <View style={ imageSelectedStyles } /> }
+				{ isSelected && highlightSelected && (
+					<View style={ imageSelectedStyles } />
+				) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>

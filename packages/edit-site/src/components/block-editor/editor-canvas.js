@@ -52,8 +52,11 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}
 	}, [ canvasMode ] );
 
-	const viewModeProps = {
-		'aria-label': __( 'Editor Canvas' ),
+	// In view mode, make the canvas iframe be perceived and behave as a button
+	// to switch to edit mode, with a meaningful label and no title attribute.
+	const viewModeIframeProps = {
+		'aria-label': __( 'Edit' ),
+		title: null,
 		role: 'button',
 		tabIndex: 0,
 		onFocus: () => setIsFocused( true ),
@@ -115,7 +118,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					}
 				),
 				...props,
-				...( canvasMode === 'view' ? viewModeProps : {} ),
+				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
 		>
 			{ children }

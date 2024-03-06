@@ -96,7 +96,7 @@ function Editor( {
 			>
 				<ErrorBoundary>
 					<CommandMenu />
-					<EditorInitialization postId={ currentPost.postId } />
+					<EditorInitialization />
 					<Layout initialPost={ initialPost } />
 				</ErrorBoundary>
 				<PostLockedModal />

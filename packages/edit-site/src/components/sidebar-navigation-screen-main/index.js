@@ -20,7 +20,6 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import TemplatePartHint from './template-part-hint';
 
 export default function SidebarNavigationScreenMain() {
 	const { location } = useNavigator();
@@ -84,7 +83,6 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Patterns' ) }
 						</NavigatorButton>
 					</ItemGroup>
-					<TemplatePartHint />
 				</>
 			}
 		/>
