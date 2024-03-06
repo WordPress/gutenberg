@@ -287,11 +287,6 @@ function ListViewBlockSelectButton(
 							</Truncate>
 						</span>
 					) }
-					{ isConnected && canBindBlock( blockName ) && (
-						<span className="block-editor-list-view-block-select-button__bindings">
-							<Icon icon={ connection } />
-						</span>
-					) }
 					{ positionLabel && isSticky && (
 						<Tooltip text={ positionLabel }>
 							<Icon icon={ pinSmall } />
@@ -314,6 +309,11 @@ function ListViewBlockSelectButton(
 							) ) }
 						</span>
 					) : null }
+					{ isConnected && canBindBlock( blockName ) && (
+						<span className="block-editor-list-view-block-select-button__bindings">
+							<Icon icon={ connection } />
+						</span>
+					) }
 					{ isLocked && (
 						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />
