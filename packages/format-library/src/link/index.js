@@ -39,10 +39,26 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
+	const [ addingNewLink, setAddingNewLink ] = useState( false );
+
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
 	const [ autoFocus, setAutoFocus ] = useState( true );
+
+	function setIsEditingExistingLink( _val, { shouldAutoFocus = true } = {} ) {
+		setAddingLink( _val );
+		setAutoFocus( shouldAutoFocus );
+	}
+
+	function setIsAddingNewLink( _val ) {
+		// Don't add a new link if there is already an active link.
+		// The two states are mutually exclusive.
+		if ( _val === true && isActive ) {
+			return;
+		}
+		setAddingNewLink( _val );
+	}
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -58,13 +74,11 @@ function Edit( {
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
 			if ( event.target.tagName !== 'A' || ! isActive ) {
-				setAutoFocus( true );
-				setAddingLink( false );
+				setIsEditingExistingLink( false );
 				return;
 			}
 
-			setAutoFocus( false );
-			setAddingLink( true );
+			setIsEditingExistingLink( true, { shouldAutoFocus: false } );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -96,7 +110,11 @@ function Edit( {
 			if ( target ) {
 				setOpenedBy( target );
 			}
-			setAddingLink( true );
+			if ( ! isActive ) {
+				setIsAddingNewLink( true );
+			} else {
+				setIsEditingExistingLink( true );
+			}
 		}
 	}
 
@@ -115,8 +133,9 @@ function Edit( {
 		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
 
 		// Close the popover
-		setAutoFocus( true );
-		setAddingLink( false );
+		setIsEditingExistingLink( false );
+		setIsAddingNewLink( false );
+
 		// Return focus to the toolbar button or the rich text field
 		if ( openedBy?.tagName === 'BUTTON' ) {
 			openedBy.focus();
@@ -134,8 +153,8 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
-		setAutoFocus( true );
-		setAddingLink( false );
+		setIsEditingExistingLink( false );
+		setIsAddingNewLink( false );
 		setOpenedBy( null );
 	}
 
@@ -165,7 +184,7 @@ function Edit( {
 				aria-haspopup="true"
 				aria-expanded={ addingLink }
 			/>
-			{ addingLink && (
+			{ ( ( addingLink && isActive ) || addingNewLink ) && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }
