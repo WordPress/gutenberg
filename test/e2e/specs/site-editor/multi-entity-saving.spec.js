@@ -51,6 +51,13 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
+
+		// Check focus returns to Open save panel button.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Save panel' } )
+				.getByRole( 'button', { name: 'Open save panel' } )
+		).toBeFocused();
 	} );
 
 	test( 'save flow should allow re-saving after changing the same block attribute', async ( {
