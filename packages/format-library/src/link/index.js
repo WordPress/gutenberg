@@ -44,23 +44,24 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
-	const [ clickDelay, setClickDelay ] = useState( null );
 	const openedBy = useRef( null );
+	const clickTimeout = useRef( false );
 	const clickTimeoutId = useRef( null );
 
 	useEffect( () => {
-		if ( ! clickDelay ) {
+		if ( addingLink ) {
 			return;
 		}
 
+		clickTimeout.current = true;
 		clickTimeoutId.current = setTimeout( () => {
-			setClickDelay( null );
-		}, 300 );
+			clickTimeout.current = false;
+		}, 100 );
 
 		return () => {
 			return () => clearTimeout( clickTimeoutId.current );
 		};
-	}, [ clickDelay ] );
+	}, [ addingLink ] );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -78,16 +79,19 @@ function Edit( {
 			if ( event.target.tagName !== 'A' || ! isActive ) {
 				return;
 			}
+
 			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
-			if ( clickTimeoutId.current && event.target === openedBy.current ) {
-				clearTimeout( clickTimeoutId.current );
-				setClickDelay( null );
+			if ( clickTimeout.current && event.target === openedBy.current ) {
+				// Allow a second click after this to open a link
 				openedBy.current = null;
-				return;
+			} else {
+				setAddingLink( true );
+				openedBy.current = event.target;
 			}
 
-			setAddingLink( true );
-			openedBy.current = event.target;
+			// Always reset at this point, as we no longer need the timeout since we've processed another click
+			clickTimeout.current = false;
+			clearTimeout( clickTimeoutId.current );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -155,7 +159,6 @@ function Edit( {
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
 		setAddingLink( false );
-		setClickDelay( true );
 	}
 
 	function onRemoveFormat() {
@@ -176,7 +179,7 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					if ( ! clickDelay ) {
+					if ( ! clickTimeout.current ) {
 						addLink( event.currentTarget );
 					}
 				} }
