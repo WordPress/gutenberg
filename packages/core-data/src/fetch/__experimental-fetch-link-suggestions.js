@@ -31,11 +31,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * @typedef WPLinkSearchResult
  *
- * @property {number} id     Post or term id.
- * @property {string} url    Link url.
- * @property {string} title  Title of the link.
- * @property {string} type   The taxonomy or post type slug or type URL.
- * @property {WPKind} [kind] Link kind of post-type or taxonomy
+ * @property {number} id         Post or term id.
+ * @property {string} url        Link url.
+ * @property {string} title      Title of the link.
+ * @property {string} type       The taxonomy or post type slug or type URL.
+ * @property {WPKind} [kind]     Link kind of post-type or taxonomy
+ * @property {string} [mimeType] attachment mime type
  */
 
 /**
@@ -229,6 +230,7 @@ const fetchLinkSuggestions = async (
 						) || __( '(no title)' ),
 					type: result.subtype || result.type,
 					kind: result?.meta?.kind,
+					mimeType: result?.mime_type,
 				};
 			} );
 	} );
