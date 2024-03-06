@@ -258,6 +258,7 @@ const withBlockTree =
 		}
 
 		newState.tree = state.tree ? state.tree : new Map();
+
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {

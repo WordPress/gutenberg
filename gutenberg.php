@@ -74,3 +74,149 @@ function gutenberg_pre_init() {
 
 	require_once __DIR__ . '/lib/load.php';
 }
+
+register_meta(
+	'post',
+	'text_custom_field',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'	   => '(008) Custom Field / Default value',
+	)
+);
+register_meta(
+	'post',
+	'url_custom_field',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		// 'default'	   => 'https://wpmovies.dev/wp-content/uploads/2023/04/goncharov-poster-original-1-682x1024.jpeg',
+		'default'	   => 'https://wpmovies.dev/wp-content/uploads/2023/03/3bhkrj58Vtu7enYsRolD1fZdja1-683x1024.jpg',
+
+	)
+);
+
+register_meta(
+	'post',
+	'movie_title',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'      => 'Goncharov',
+	)
+);
+register_meta(
+	'post',
+	'poster_url',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'      => 'https://wpmovies.dev/wp-content/uploads/2023/03/3bhkrj58Vtu7enYsRolD1fZdja1-683x1024.jpg',
+	)
+);
+register_meta(
+	'post',
+	'homepage_url',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'      => 'https://wpmovies.dev/movies/12-angry-men/',
+	)
+);
+register_meta(
+	'post',
+	'runtime',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'      => '1h 37m',
+	)
+);
+register_meta(
+	'post',
+	'release',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'      => 'Release date',
+	)
+);
+register_meta(
+	'post',
+	'trailer_url',
+	array(
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'default'      => 'https://www.youtube.com/watch?v=Z4Dl1bMG_MA',
+	)
+);
+
+$id_the_godfather            = 88;
+$id_goncharov                = 94;
+$id_the_shawshank_redemption = 96;
+$id_schindlers_list          = 98;
+$id_spirited_away            = 100;
+$id_12_angry_men             = 102;
+$id_demo_movie               = 90;
+
+// Update movie title
+update_post_meta( $id_demo_movie, 'movie_title', 'The Godfather' );
+update_post_meta( $id_the_godfather, 'movie_title', 'The Godfather' );
+update_post_meta( $id_goncharov, 'movie_title', 'Goncharov' );
+update_post_meta( $id_the_shawshank_redemption, 'movie_title', 'The Shawshank Redemption' );
+update_post_meta( $id_schindlers_list, 'movie_title', 'Schindler\'s List' );
+update_post_meta( $id_spirited_away, 'movie_title', 'Spirited Away' );
+update_post_meta( $id_12_angry_men, 'movie_title', '12 Angry Men' );
+
+// Update release date
+update_post_meta( $id_demo_movie, 'release', '14th March 1972' );
+update_post_meta( $id_the_godfather, 'release', '14th March 1972' );
+update_post_meta( $id_goncharov, 'release', '15th January 1973' );
+update_post_meta( $id_the_shawshank_redemption, 'release', '23rd September 1994' );
+update_post_meta( $id_schindlers_list, 'release', '15th December 1993' );
+update_post_meta( $id_spirited_away, 'release', '20th July 2001' );
+update_post_meta( $id_12_angry_men, 'release', '10th April 1957' );
+
+// Update poster url
+update_post_meta( $id_demo_movie, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/03/3bhkrj58Vtu7enYsRolD1fZdja1-683x1024.jpg' );
+update_post_meta( $id_the_godfather, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/03/3bhkrj58Vtu7enYsRolD1fZdja1-683x1024.jpg' );
+update_post_meta( $id_goncharov, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/04/goncharov-poster-original-1-682x1024.jpeg' );
+update_post_meta( $id_the_shawshank_redemption, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/04/q6y0Go1tsGEsmtFryDOJo3dEmqu-683x1024.jpg' );
+update_post_meta( $id_schindlers_list, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/03/sF1U4EUQS8YHUYjNl3pMGNIQyr0-683x1024.jpg' );
+update_post_meta( $id_spirited_away, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/03/39wmItIWsg5sZMyRUHLkWBcuVCM-683x1024.jpg' );
+update_post_meta( $id_12_angry_men, 'poster_url', 'https://wpmovies.dev/wp-content/uploads/2023/03/ppd84D2i9W8jXmsyInGyihiSyqz-682x1024.jpg' );
+
+// Update homepage url
+update_post_meta( $id_demo_movie, 'homepage_url', 'https://wpmovies.dev/movies/the-godfather/' );
+update_post_meta( $id_the_godfather, 'homepage_url', 'https://wpmovies.dev/movies/the-godfather/' );
+update_post_meta( $id_goncharov, 'homepage_url', 'https://wpmovies.dev/movies/goncharov/' );
+update_post_meta( $id_the_shawshank_redemption, 'homepage_url', 'https://wpmovies.dev/movies/the-shawshank-redemption/' );
+update_post_meta( $id_schindlers_list, 'homepage_url', 'https://wpmovies.dev/movies/schindlers-list/' );
+update_post_meta( $id_spirited_away, 'homepage_url', 'https://wpmovies.dev/movies/spirited-away/' );
+update_post_meta( $id_12_angry_men, 'homepage_url', 'https://wpmovies.dev/movies/12-angry-men/' );
+
+// Update runtime
+update_post_meta( $id_demo_movie, 'runtime', '2h 55m' );
+update_post_meta( $id_the_godfather, 'runtime', '2h 55m' );
+update_post_meta( $id_goncharov, 'runtime', '3h 32m' );
+update_post_meta( $id_the_shawshank_redemption, 'runtime', '2h 22m' );
+update_post_meta( $id_schindlers_list, 'runtime', '3h 15m' );
+update_post_meta( $id_spirited_away, 'runtime', '2h 5m' );
+update_post_meta( $id_12_angry_men, 'runtime', '1h 37m' );
+
+// Update trailer url
+update_post_meta( $id_demo_movie, 'trailer_url', 'https://www.youtube.com/watch?v=Ew9ngL1GZvs' );
+update_post_meta( $id_the_godfather, 'trailer_url', 'https://www.youtube.com/watch?v=Ew9ngL1GZvs' );
+update_post_meta( $id_goncharov, 'trailer_url', 'https://www.youtube.com/watch?v=Z4Dl1bMG_MA' );
+update_post_meta( $id_the_shawshank_redemption, 'trailer_url', 'https://www.youtube.com/watch?v=PLl99DlL6b4' );
+update_post_meta( $id_schindlers_list, 'trailer_url', 'https://www.youtube.com/watch?v=mxphAlJID9U' );
+update_post_meta( $id_spirited_away, 'trailer_url', 'https://www.youtube.com/watch?v=ByXuk9QqQkk' );
+update_post_meta( $id_12_angry_men, 'trailer_url', 'https://www.youtube.com/watch?v=TEN-2uTi2c0' );

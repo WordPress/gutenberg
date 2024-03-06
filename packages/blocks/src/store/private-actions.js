@@ -47,11 +47,18 @@ export function addUnprocessedBlockType( name, blockType ) {
  * @param {string} source Name of the source to register.
  */
 export function registerBlockBindingsSource( source ) {
-	return {
-		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
-		sourceName: source.name,
-		sourceLabel: source.label,
-		useSource: source.useSource,
-		lockAttributesEditing: source.lockAttributesEditing,
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+			sourceName: source.name,
+			sourceLabel: source.label,
+			useSource: source.useSource,
+			lockAttributesEditing: source.lockAttributesEditing,
+		} );
+
+		// Dispatch an action for the first data sync.
+		registry
+			.dispatch( 'core/block-editor' )
+			.syncBlockBindingsSource( source );
 	};
 }
