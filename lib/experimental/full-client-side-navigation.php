@@ -4,13 +4,13 @@
  */
 
 // Add the full client-side navigation config option.
-wp_interactivity_config( 'core/router/experimental', array( 'fullClientSideNavigation' => true ) );
+wp_interactivity_config( 'core/router', array( 'fullClientSideNavigation' => true ) );
 
 // Add directives to all links.
 function gutenberg_add_client_side_navigation_directives( $content ) {
 	$p = new WP_HTML_Tag_Processor( $content );
 	while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
-		$p->set_attribute( 'data-wp-on--click', 'core/router/experimental::actions.navigate' );
+		$p->set_attribute( 'data-wp-on--click', 'core/router::actions.navigate' );
 	}
 	return (string) $p;
 }
