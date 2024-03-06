@@ -9,6 +9,7 @@ exports[`Parse exception parses stack trace 1`] = `
     "is_turbo_module_enabled": false,
     "react_native_version": "0.71.2-beta-1",
   },
+  "message": "Test exception",
   "stacktrace": [
     {
       "colno": 21,
@@ -65,6 +66,5 @@ exports[`Parse exception parses stack trace 1`] = `
     "gutenberg_mobile_version": "1.100.0",
   },
   "type": "Error",
-  "value": "Test exception",
 }
 `;
