@@ -63,13 +63,13 @@ describe( 'Parse exception', () => {
 
 	it( 'sets default error message', () => {
 		const exception = parseException( {} );
-		expect( exception.value ).toBe( 'No error message' );
+		expect( exception.message ).toBe( 'No error message' );
 	} );
 
 	it( 'sets unkown error type', () => {
 		const exception = parseException( {
 			message: { error: { message: '' } },
 		} );
-		expect( exception.value ).toBe( 'Unknown error' );
+		expect( exception.message ).toBe( 'Unknown error' );
 	} );
 } );
