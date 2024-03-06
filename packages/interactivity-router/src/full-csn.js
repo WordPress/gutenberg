@@ -139,7 +139,7 @@ const { actions } = store( 'core/router', {
 				const href = url ? url : ref.href;
 				event.preventDefault();
 				const newUrl = cleanUrl( href );
-				yield actions.prefetch( newUrl );
+				yield actions.prefetch( event, newUrl );
 				const page = yield pages.get( newUrl );
 
 				if ( page ) {
@@ -151,12 +151,14 @@ const { actions } = store( 'core/router', {
 				}
 			}
 		},
-		prefetch( url ) {
+		prefetch( event, url ) {
 			if ( ! canDoClientSideNavigation() ) return;
+			const { ref } = getElement();
+			const href = url ? url : ref.href;
 
-			url = cleanUrl( url );
-			if ( ! pages.has( url ) ) {
-				pages.set( url, fetchPage( url ) );
+			const newUrl = cleanUrl( href );
+			if ( ! pages.has( newUrl ) ) {
+				pages.set( newUrl, fetchPage( newUrl ) );
 			}
 		},
 	},

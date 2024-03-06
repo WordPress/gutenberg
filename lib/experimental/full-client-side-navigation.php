@@ -11,6 +11,7 @@ function gutenberg_add_client_side_navigation_directives( $content ) {
 	$p = new WP_HTML_Tag_Processor( $content );
 	while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
 		$p->set_attribute( 'data-wp-on--click', 'core/router::actions.navigate' );
+		$p->set_attribute( 'data-wp-on--mouseover', 'core/router::actions.prefetch' );
 	}
 	return (string) $p;
 }
