@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useState,
+	useLayoutEffect,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -42,6 +47,31 @@ function Edit( {
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
+	const preventAddingLink = useRef( false );
+
+	useEffect( () => {
+		if ( addingLink ) {
+			return;
+		}
+
+		setOpenedBy( null );
+
+		// The focus outside event fires to close the popover correctly,
+		// and then the click event is fired on the link text or toolbar
+		// button afterwards, meaning you can't have a second click on the
+		// link/toolbar button to close it.
+		//
+		// This is hacky, but we haven't found a better way to solve for this.
+		preventAddingLink.current = true;
+		const linkTimeoutId = setTimeout( () => {
+			preventAddingLink.current = false;
+		}, 300 );
+
+		return () => {
+			return () => clearTimeout( linkTimeoutId );
+		};
+	}, [ addingLink, openedBy ] );
+
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
 		if ( ! editableContentElement ) {
@@ -55,7 +85,11 @@ function Edit( {
 			// This causes the `addingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
-			if ( event.target.tagName !== 'A' || ! isActive ) {
+			if (
+				preventAddingLink.current ||
+				event.target.tagName !== 'A' ||
+				! isActive
+			) {
 				return;
 			}
 
@@ -109,15 +143,17 @@ function Edit( {
 		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
 
 		// Close the popover
-		setAddingLink( false );
+		closeLinkUi();
 		// Return focus to the toolbar button or the rich text field
 		if ( openedBy?.tagName === 'BUTTON' ) {
 			openedBy.focus();
 		} else {
 			onFocus();
 		}
-		// Remove the openedBy state
-		setOpenedBy( null );
+	}
+
+	function closeLinkUi() {
+		setAddingLink( false );
 	}
 
 	// Test for this:
@@ -127,8 +163,7 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
-		setAddingLink( false );
-		setOpenedBy( null );
+		closeLinkUi();
 	}
 
 	function onRemoveFormat() {
@@ -149,7 +184,9 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					addLink( event.currentTarget );
+					if ( ! preventAddingLink.current ) {
+						addLink( event.currentTarget );
+					}
 				} }
 				isActive={ isActive || addingLink }
 				shortcutType="primary"
