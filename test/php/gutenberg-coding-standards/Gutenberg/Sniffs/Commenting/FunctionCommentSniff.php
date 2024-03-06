@@ -4,7 +4,6 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Util\Tokens;
 
 class FunctionCommentSniff implements Sniff {
 	/**
@@ -27,6 +26,7 @@ class FunctionCommentSniff implements Sniff {
 		$tokens = $phpcsFile->getTokens();
 
 		$function_token = $phpcsFile->findNext( T_STRING, $stackPtr );
+		$function_name  = $tokens[ $function_token ]['content'];
 
 		$wrapping_tokens_to_check = array(
 			T_CLASS,
@@ -41,24 +41,52 @@ class FunctionCommentSniff implements Sniff {
 			}
 		}
 
+ 		$missing_since_tag_error_message = sprintf( '@since tag is missing for the `%s()` function.', $function_name );
+
 		// Get the docblock for the current function.
 		$doc_block_end_token = $phpcsFile->findPrevious( T_DOC_COMMENT_CLOSE_TAG, $stackPtr, null, false, null, true );
-		if ( $doc_block_end_token === false ) {
-			$phpcsFile->addError( '@since tag is missing for this function', $stackPtr, 'MissingSince' );
+		if ( false === $doc_block_end_token ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+
 			return;
 		}
 
 		// Get the docblock for the current function.
 		$doc_block_start_token = $phpcsFile->findPrevious( T_DOC_COMMENT_OPEN_TAG, $doc_block_end_token, null, false, null, true );
-		if ( $doc_block_start_token === false ) {
-			$phpcsFile->addError( '@since tag is missing for this function', $stackPtr, 'MissingSince' );
+		if ( false === $doc_block_start_token ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+
 			return;
 		}
 
 		$since_tag = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
-		if ( $since_tag === false ) {
-			$phpcsFile->addError( '@since tag is missing for this function', $stackPtr, 'MissingSince' );
+		if ( false === $since_tag ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+
 			return;
 		}
+
+		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag + 1, null, true, null, true );
+		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+
+			return;
+		}
+
+		$version_value = $tokens[ $version_token ]['content'];
+
+		if ( version_compare( $version_value, '0.0.1', '>=' ) ) {
+			return;
+		}
+
+		$phpcsFile->addError(
+			'Invalid @since tag version value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
+			$version_token,
+			'InvalidSinceTagVersionValue',
+			array(
+				$function_name,
+				$version_value
+			)
+		);
 	}
 }
