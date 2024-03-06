@@ -5,6 +5,10 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
+/**
+ * This sniff ensures that PHP functions have docblocks defined
+ * and that the `@since` tag in the docblock is present.
+ */
 class FunctionCommentSniff implements Sniff {
 	/**
 	 * Returns an array of tokens this test wants to listen for.
@@ -12,14 +16,14 @@ class FunctionCommentSniff implements Sniff {
 	 * @return array<int|string>
 	 */
 	public function register() {
-		return [ T_FUNCTION ];
+		return array( T_FUNCTION );
 	}
 
 	/**
 	 * Processes the tokens that this sniff is interested in.
 	 *
 	 * @param File $phpcsFile The file being scanned.
-	 * @param int $stackPtr The position of the current token in the stack passed in $tokens.
+	 * @param int  $stackPtr  The position of the current token in the stack passed in $tokens.
 	 */
 	public function process( File $phpcsFile, $stackPtr ) {
 		// Get the tokens of the file.
@@ -47,7 +51,6 @@ class FunctionCommentSniff implements Sniff {
 		$doc_block_end_token = $phpcsFile->findPrevious( T_DOC_COMMENT_CLOSE_TAG, $stackPtr, null, false, null, true );
 		if ( false === $doc_block_end_token ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
-
 			return;
 		}
 
@@ -55,21 +58,18 @@ class FunctionCommentSniff implements Sniff {
 		$doc_block_start_token = $phpcsFile->findPrevious( T_DOC_COMMENT_OPEN_TAG, $doc_block_end_token, null, false, null, true );
 		if ( false === $doc_block_start_token ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
-
 			return;
 		}
 
 		$since_tag = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
 		if ( false === $since_tag ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
-
 			return;
 		}
 
 		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag + 1, null, true, null, true );
 		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
-
 			return;
 		}
 
