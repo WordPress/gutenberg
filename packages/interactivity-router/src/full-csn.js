@@ -19,6 +19,7 @@ let rootFragment;
 const pages = new Map();
 const stylesheets = new Map();
 const scripts = new Map();
+const modules = new Map();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
@@ -82,24 +83,29 @@ const fetchAssets = async ( document ) => {
 	);
 	const scriptTags = await fetchScriptOrStyle(
 		document,
-		'script[src]',
+		'script:not([type="module"])[src]',
 		'src',
 		scripts,
 		'script'
 	);
-	const moduleScripts = await fetchScriptOrStyle(
-		document,
-		'script[type=module]',
-		'src',
-		scripts,
-		'script'
-	);
-	moduleScripts.forEach( ( script ) =>
-		script.setAttribute( 'type', 'module' )
+	const moduleScripts = await Promise.all(
+		[].map.call(
+			document.querySelectorAll( 'script[type=module]' ),
+			( el ) => {
+				const attributeValue = el.getAttribute( 'src' );
+				if ( ! modules.has( attributeValue ) )
+					fetch( attributeValue ).then( ( r ) =>
+						r.text( modules.set( attributeValue, el ) )
+					);
+
+				return modules.get( attributeValue );
+			}
+		)
 	);
 
 	return [
 		...scriptTags,
+		...moduleScripts,
 		document.querySelector( 'title' ),
 		...document.querySelectorAll( 'style' ),
 		...stylesFromSheets,
@@ -186,9 +192,12 @@ if ( canDoClientSideNavigation() ) {
 	);
 	// Cache the scripts. Has to be called before fetching the assets.
 	// const body = toVdom( document.body );
-	// [].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
-	// 	scripts.set( script.getAttribute( 'src' ), script.textContent );
-	// } );
+	[].map.call(
+		document.querySelectorAll( 'script[type=module]' ),
+		( script ) => {
+			scripts.set( script.getAttribute( 'src' ), script );
+		}
+	);
 	// const head = await fetchAssets( document );
 	// pages.set( cleanUrl( window.location ), Promise.resolve( { body, head } ) );
 }
