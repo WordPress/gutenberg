@@ -47,6 +47,9 @@ function Edit( {
 	const openedBy = useRef( null );
 	const clickTimeout = useRef( false );
 
+	/**
+	 * Runs when addingLink is set to false by the onFocusOutside handler via a click
+	 */
 	useEffect( () => {
 		if ( addingLink ) {
 			return;
@@ -54,7 +57,9 @@ function Edit( {
 
 		resetClickTimeout();
 
+		// This timeout will be cleared and a new openedBy set if a new link is clicked
 		clickTimeout.current = setTimeout( () => {
+			openedBy.current = null;
 			clickTimeout.current = undefined;
 		}, 100 );
 
@@ -184,6 +189,8 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
+					// If we have a clickTimeout, then the link control is being
+					// closed by the onFocusOutside event, so we don't want to re-open it
 					if ( ! clickTimeout.current ) {
 						addLink( event.currentTarget );
 					}
