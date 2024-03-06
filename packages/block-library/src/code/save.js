@@ -17,9 +17,11 @@ export default function save( { attributes } ) {
 				// prevent embedding in PHP. Ideally checks for the code block,
 				// or pre/code tags, should be made on the PHP side?
 				value={ escape(
-					attributes.content.toHTMLString( {
-						preserveWhiteSpace: true,
-					} )
+					typeof attributes.content === 'string'
+						? attributes.content
+						: attributes.content.toHTMLString( {
+								preserveWhiteSpace: true,
+						  } )
 				) }
 			/>
 		</pre>
