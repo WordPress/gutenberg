@@ -80,9 +80,9 @@ class FunctionCommentSniff implements Sniff {
 		}
 
 		$phpcsFile->addError(
-			'Invalid @since tag version value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
+			'Invalid @since tag value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
 			$version_token,
-			'InvalidSinceTagVersionValue',
+			'InvalidSinceTagValue',
 			array(
 				$function_name,
 				$version_value
