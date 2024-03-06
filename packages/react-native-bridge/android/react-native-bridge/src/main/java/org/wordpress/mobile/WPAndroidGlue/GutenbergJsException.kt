@@ -1,29 +1,41 @@
-package org.wordpress.mobile.ReactNativeGutenbergBridge
+package org.wordpress.mobile.WPAndroidGlue
 
 import com.facebook.react.bridge.ReadableMap
 
-data class GutenbergJsException(
-    var type: String,
-    var value: String,
-    var stackTrace: List<GutenbergJsExceptionStackTraceElement>,
-    var context: Map<String, Any> = emptyMap(),
-    var tags: Map<String,String> = emptyMap(),
-    var isHandled: Boolean,
-    var handledBy: String
-){
+data class JsExceptionStackTraceElement (
+    val fileName: String,
+    val lineNumber: Int,
+    val colNumber: Int,
+    val function: String,
+)
+class GutenbergJsException (
+    val type: String,
+    val message: String,
+    var stackTrace: List<JsExceptionStackTraceElement>,
+    val context: Map<String, Any> = emptyMap(),
+    val tags: Map<String,String> = emptyMap(),
+    val isHandled: Boolean,
+    val handledBy: String
+) {
+
+
     companion object {
         @JvmStatic
         fun fromReadableMap(rawException: ReadableMap): GutenbergJsException {
             val type: String = rawException.getString("type") ?: ""
-            val value: String = rawException.getString("value") ?: ""
-            val stackTrace: List<GutenbergJsExceptionStackTraceElement> = rawException.getArray("stackTrace")?.toArrayList()?.map {
+            val message: String = rawException.getString("message") ?: ""
+
+
+            val stackTrace: List<JsExceptionStackTraceElement> = rawException.getArray("stackTrace")?.toArrayList()?.map {
                 val stackTraceElement = it as ReadableMap
-                GutenbergJsExceptionStackTraceElement(
-                    stackTraceElement.getString("fileName") ?: "",
-                    stackTraceElement.getInt("lineNumber"),
+                JsExceptionStackTraceElement(
+                    stackTraceElement.getString("filename") ?: "",
+                    stackTraceElement.getInt("lineno"),
+                    stackTraceElement.getInt("colno"),
                     stackTraceElement.getString("function") ?: ""
                 )
             } ?: emptyList()
+
             val context: Map<String, Any> = rawException.getMap("context")?.toHashMap() ?: emptyMap()
             val tags: Map<String, String> = rawException.getMap("tags")?.toHashMap()?.mapValues { it.value.toString() } ?: emptyMap()
             val isHandled: Boolean = rawException.getBoolean("isHandled")
@@ -31,7 +43,7 @@ data class GutenbergJsException(
 
             return GutenbergJsException(
                 type,
-                value,
+                message,
                 stackTrace,
                 context,
                 tags,
@@ -42,8 +54,3 @@ data class GutenbergJsException(
     }
 }
 
-data class GutenbergJsExceptionStackTraceElement(
-    var fileName: String,
-    var lineNumber: Int,
-    var function: String
-)

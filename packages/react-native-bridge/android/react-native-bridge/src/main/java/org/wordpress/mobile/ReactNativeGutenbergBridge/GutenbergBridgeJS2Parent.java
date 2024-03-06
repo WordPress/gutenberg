@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
+import org.wordpress.mobile.WPAndroidGlue.GutenbergJsException;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
 
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
-
     void responseHtml(String title, String html, boolean changed, ReadableMap contentInfo);
 
     void editorDidMount(ReadableArray unsupportedBlockNames);
@@ -194,5 +194,5 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
 
-    void logException(GutenbergJsException exception, LogExceptionCallback jsCallback);
+    void logException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback);
 }

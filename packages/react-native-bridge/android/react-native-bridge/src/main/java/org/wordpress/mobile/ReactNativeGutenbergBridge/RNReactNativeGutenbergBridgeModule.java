@@ -34,6 +34,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
+import org.wordpress.mobile.WPAndroidGlue.GutenbergJsException;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.io.Serializable;
@@ -629,7 +630,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void logException(final ReadableMap rawException, final Callback jsCallback) {
         GutenbergJsException exception = GutenbergJsException.fromReadableMap(rawException);
         LogExceptionCallback logExceptionCallback = onLogExceptionCallback(jsCallback);
-
         mGutenbergBridgeJS2Parent.logException(exception, logExceptionCallback);
     }
 

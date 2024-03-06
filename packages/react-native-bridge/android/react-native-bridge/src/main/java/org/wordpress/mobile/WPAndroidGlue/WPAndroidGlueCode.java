@@ -60,7 +60,6 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.LogExceptionCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergJsException;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
@@ -279,7 +278,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnLogExceptionListener {
-        void onLogException(GutenbergJsException exception, LogExceptionCallback onLogExceptionCallback);
+        void onLogException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback);
     }
 
     public void mediaSelectionCancelled() {
@@ -627,7 +626,6 @@ public class WPAndroidGlueCode {
             @Override
             public void logException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback) {
                 mOnLogExceptionListener.onLogException(exception, logExceptionCallback);
-                logExceptionCallback.onLogException(true);
             }
         }, mIsDarkMode);
 
