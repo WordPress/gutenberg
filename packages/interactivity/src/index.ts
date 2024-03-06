@@ -13,7 +13,8 @@ import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive, getNamespace } from './hooks';
-import { getConfig, parseInitialData, populateInitialData } from './store';
+import { parseInitialData, populateInitialData } from './store';
+import { createRootFragment } from './utils';
 
 export { store, getConfig } from './store';
 export { getContext, getElement } from './hooks';
@@ -37,6 +38,7 @@ export const privateApis = ( lock ): any => {
 		return {
 			directivePrefix,
 			getRegionRootFragment,
+			createRootFragment,
 			initialVdom,
 			toVdom,
 			directive,
@@ -58,7 +60,3 @@ document.addEventListener( 'DOMContentLoaded', async () => {
 	registerDirectives();
 	await init();
 } );
-
-if ( getConfig( 'core/router/experimental' ) ) {
-	import( './experiments/full-csn' );
-}

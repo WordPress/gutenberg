@@ -19,6 +19,7 @@ module.exports = {
 	entry: {
 		index: './packages/interactivity',
 		router: './packages/interactivity-router',
+		'full-csn': './packages/interactivity-router/src/full-csn.js',
 		navigation: './packages/block-library/src/navigation/view.js',
 		query: './packages/block-library/src/query/view.js',
 		image: './packages/block-library/src/image/view.js',

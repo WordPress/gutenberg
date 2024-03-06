@@ -1,16 +1,16 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { hydrate, render } from 'preact';
+import {
+	privateApis,
+	store,
+	getConfig,
+	getElement,
+} from '@wordpress/interactivity';
 
-/**
- * Internal dependencies
- */
-import { directivePrefix } from '../constants';
-import { store, getConfig } from '../store';
-import { getElement } from '../hooks';
-import { createRootFragment } from '../utils';
-import { toVdom, hydratedIslands } from '../vdom';
+const { createRootFragment, render, toVdom } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 // The root to render the vdom (document.body).
 let rootFragment;
@@ -29,7 +29,7 @@ const cleanUrl = ( url ) => {
 
 // Helper to check if a page can do client-side navigation.
 const canDoClientSideNavigation = () =>
-	getConfig( 'core/router/experimental' ).fullClientSideNavigation;
+	getConfig( 'core/router' ).fullClientSideNavigation;
 
 /**
  * Finds the elements in the document that match the selector and fetch them.
@@ -130,16 +130,18 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
-const { actions } = store( 'core/router/experimental', {
+const { actions } = store( 'core/router', {
 	actions: {
-		*navigate( event ) {
+		*navigate( event, url ) {
 			const { ref } = getElement();
-			if ( isValidLink( ref ) && isValidEvent( event ) ) {
-				const { href } = ref;
+
+			if ( url || ( isValidLink( ref ) && isValidEvent( event ) ) ) {
+				const href = url ? url : ref.href;
 				event.preventDefault();
-				const url = cleanUrl( href );
-				yield actions.prefetch( url );
-				const page = yield pages.get( url );
+				const newUrl = cleanUrl( href );
+				yield actions.prefetch( newUrl );
+				const page = yield pages.get( newUrl );
+
 				if ( page ) {
 					document.head.replaceChildren( ...page.head );
 					render( page.body, rootFragment );
@@ -176,29 +178,15 @@ window.addEventListener( 'popstate', async () => {
 // Initialize the router with the initial DOM.
 
 if ( canDoClientSideNavigation() ) {
-	// Create the root fragment to hydrate everything.
 	rootFragment = createRootFragment(
 		document.documentElement,
 		document.body
 	);
-	const body = toVdom( document.body );
-	hydrate( body, rootFragment );
-
 	// Cache the scripts. Has to be called before fetching the assets.
-	[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
-		scripts.set( script.getAttribute( 'src' ), script.textContent );
-	} );
-
-	const head = await fetchAssets( document );
-	pages.set( cleanUrl( window.location ), Promise.resolve( { body, head } ) );
-} else {
-	document
-		.querySelectorAll( `[data-${ directivePrefix }-interactive]` )
-		.forEach( ( node ) => {
-			if ( ! hydratedIslands.has( node ) ) {
-				const fragment = createRootFragment( node.parentNode, node );
-				const vdom = toVdom( node );
-				hydrate( vdom, fragment );
-			}
-		} );
+	// const body = toVdom( document.body );
+	// [].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
+	// 	scripts.set( script.getAttribute( 'src' ), script.textContent );
+	// } );
+	// const head = await fetchAssets( document );
+	// pages.set( cleanUrl( window.location ), Promise.resolve( { body, head } ) );
 }
