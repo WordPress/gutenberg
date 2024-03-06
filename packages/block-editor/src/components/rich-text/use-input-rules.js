@@ -4,11 +4,7 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { remove, toHTMLString } from '@wordpress/rich-text';
-import {
-	getBlockTransforms,
-	findTransform,
-	lazyLoadBlock,
-} from '@wordpress/blocks';
+import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -49,12 +45,8 @@ function findPrefixTransform( prefixText ) {
 	return findTransform( prefixTransforms, ( t ) => t.prefix === prefixText );
 }
 
-function inputRule( props, ctx, onReplace ) {
-	const { getValue, onChange, selectionChange } = props;
-
-	if ( ! ctx.inserterActive ) {
-		return;
-	}
+function inputRule( props, onReplace ) {
+	const { getValue, selectionChange } = props;
 
 	// We must use getValue() here because value may be update
 	// asynchronously.
@@ -73,37 +65,29 @@ function inputRule( props, ctx, onReplace ) {
 		return;
 	}
 
-	// remove the prefix string from the input because it's going to be processed by the transform
-	onChange( remove( value, 0, start ) );
-
 	const block = transformation.transform( START_OF_SELECTED_AREA );
 	const selection = findSelection( [ block ] );
 	if ( selection ) {
-		ctx.inserterActive = selection[ 0 ].name === 'core/paragraph';
-	}
-	lazyLoadBlock( block )
-		// .then( () => new Promise( ( r ) => setTimeout( r, 1000 ) ) )
-		.then( () => {
-			if ( selection ) {
-				const [ selectedBlock, selectedAttribute ] = selection;
-				const valueStr = toHTMLString( { value: getValue() } );
-				// To do: refactor this to use rich text's selection instead, so
-				// we no longer have to use on this hack inserting a special
-				// character.
-				const newValue = selectedBlock.attributes[ selectedAttribute ]
-					.toString()
-					.replace( START_OF_SELECTED_AREA, valueStr );
+		const [ selectedBlock, selectedAttribute ] = selection;
+		// To do: refactor this to use rich text's selection instead, so
+		// we no longer have to use on this hack inserting a special
+		// character.
+		const newValue = selectedBlock.attributes[ selectedAttribute ]
+			.toString()
+			.replace(
+				START_OF_SELECTED_AREA,
+				toHTMLString( { value: remove( value, 0, start ) } )
+			);
 
-				selectedBlock.attributes[ selectedAttribute ] = newValue;
-				selectionChange(
-					selectedBlock.clientId,
-					selectedAttribute,
-					newValue.length,
-					newValue.length
-				);
-			}
-			onReplace( [ block ] );
-		} );
+		selectedBlock.attributes[ selectedAttribute ] = newValue;
+		selectionChange(
+			selectedBlock.clientId,
+			selectedAttribute,
+			newValue.length,
+			newValue.length
+		);
+	}
+	onReplace( [ block ] );
 
 	return true;
 }
@@ -117,15 +101,16 @@ export function useInputRules( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
 
-	const transformCtxRef = useRef( {
-		inserterActive: props.__unstableAllowPrefixTransformations,
-	} );
-
 	return useRefEffect( ( element ) => {
 		function onInput( event ) {
 			const { inputType, type } = event;
-			const { getValue, onChange, onReplace, formatTypes } =
-				propsRef.current;
+			const {
+				getValue,
+				onChange,
+				onReplace,
+				formatTypes,
+				__unstableAllowPrefixTransformations,
+			} = propsRef.current;
 
 			// Only run input rules when inserting text.
 			if ( inputType !== 'insertText' && type !== 'compositionend' ) {
@@ -134,14 +119,11 @@ export function useInputRules( props ) {
 
 			if (
 				onReplace &&
-				inputRule(
-					propsRef.current,
-					transformCtxRef.current,
-					( blocks ) => {
-						onReplace( blocks );
-						__unstableMarkAutomaticChange();
-					}
-				)
+				__unstableAllowPrefixTransformations &&
+				inputRule( propsRef.current, ( blocks ) => {
+					onReplace( blocks );
+					__unstableMarkAutomaticChange();
+				} )
 			) {
 				return;
 			}

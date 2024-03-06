@@ -1,3 +1,4 @@
+const BLOCK_PLACEHOLDER = '.block-placeholder';
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
@@ -26,7 +27,12 @@ export function isInSameBlock( a, b ) {
  */
 export function isInsideRootBlock( blockElement, element ) {
 	const parentBlock = element.closest(
-		[ BLOCK_SELECTOR, APPENDER_SELECTOR, BLOCK_APPENDER_CLASS ].join( ',' )
+		[
+			BLOCK_PLACEHOLDER,
+			BLOCK_SELECTOR,
+			APPENDER_SELECTOR,
+			BLOCK_APPENDER_CLASS,
+		].join( ',' )
 	);
 	return parentBlock === blockElement;
 }

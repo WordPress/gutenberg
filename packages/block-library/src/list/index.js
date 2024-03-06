@@ -44,6 +44,7 @@ const settings = {
 			},
 		],
 	},
+	template: [ [ 'core/list-item' ] ],
 	transforms,
 	lazyEdit: () => import( /* webpackChunkName: "list/editor" */ './edit' ),
 	save,

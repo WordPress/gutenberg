@@ -89,6 +89,8 @@ export function RichTextWrapper(
 		tagName = 'div',
 		value: adjustedValue = '',
 		onChange: adjustedOnChange,
+		clientId: originalClientId,
+		blockName: originalBlockName,
 		isSelected: originalIsSelected,
 		multiline,
 		inlineToolbar,
@@ -116,20 +118,18 @@ export function RichTextWrapper(
 	forwardedRef
 ) {
 	props = removeNativeProps( props );
-
-	const anchorRef = useRef();
 	const context = useBlockEditContext();
-	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
-	const blockBindings = context[ blockBindingsKey ];
+	const clientId = originalClientId ?? context.clientId;
+	const blockName = originalBlockName ?? context.blockName;
+
 	const selector = ( select ) => {
-		// Avoid subscribing to the block editor store if the block is not
-		// selected.
-		if ( ! isBlockSelected ) {
+		const { isBlockSelected, getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
+
+		if ( ! isBlockSelected( clientId ) ) {
 			return { isSelected: false };
 		}
 
-		const { getSelectionStart, getSelectionEnd } =
-			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -140,8 +140,9 @@ export function RichTextWrapper(
 				selectionStart.clientId === clientId &&
 				selectionEnd.clientId === clientId &&
 				selectionStart.attributeKey === identifier;
-		} else if ( originalIsSelected ) {
-			isSelected = selectionStart.clientId === clientId;
+		} else {
+			isSelected =
+				originalIsSelected && selectionStart.clientId === clientId;
 		}
 
 		return {
@@ -154,9 +155,9 @@ export function RichTextWrapper(
 		clientId,
 		identifier,
 		originalIsSelected,
-		isBlockSelected,
 	] );
 
+	const blockBindings = context[ blockBindingsKey ];
 	const disableBoundBlocks = useSelect(
 		( select ) => {
 			// Disable Rich Text editing if block bindings specify that.
@@ -333,10 +334,60 @@ export function RichTextWrapper(
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
+	const anchorRef = useRef();
 
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
+
+	const textRef = useMergeRefs( [
+		// Rich text ref must be first because its focus listener
+		// must be set up before any other ref calls .focus() on
+		// mount.
+		richTextRef,
+		forwardedRef,
+		autocompleteProps.ref,
+		props.ref,
+		useBeforeInputRules( { value, onChange } ),
+		useInputRules( {
+			getValue,
+			onChange,
+			__unstableAllowPrefixTransformations,
+			formatTypes,
+			onReplace,
+			selectionChange,
+		} ),
+		useInsertReplacementText(),
+		useRemoveBrowserShortcuts(),
+		useShortcuts( keyboardShortcuts ),
+		useInputEvents( inputEvents ),
+		useUndoAutomaticChange(),
+		usePasteHandler( {
+			isSelected,
+			disableFormats,
+			onChange,
+			value,
+			formatTypes,
+			tagName,
+			onReplace,
+			onSplit,
+			__unstableEmbedURLOnPaste,
+			pastePlainText,
+		} ),
+		useDelete( { value, onMerge, onRemove } ),
+		useEnter( {
+			removeEditorOnlyFormats,
+			value,
+			onReplace,
+			onSplit,
+			onChange,
+			disableLineBreaks,
+			onSplitAtEnd,
+			onSplitAtDoubleLineEnd,
+		} ),
+		useFirefoxCompat(),
+		anchorRef,
+	] );
 
 	const TagName = tagName;
 	return (
@@ -373,58 +424,7 @@ export function RichTextWrapper(
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
-				ref={ useMergeRefs( [
-					// Rich text ref must be first because its focus listener
-					// must be set up before any other ref calls .focus() on
-					// mount.
-					richTextRef,
-					forwardedRef,
-					autocompleteProps.ref,
-					props.ref,
-					useBeforeInputRules( { value, onChange } ),
-					useInputRules( {
-						getValue,
-						onChange,
-						__unstableAllowPrefixTransformations,
-						formatTypes,
-						onReplace,
-						selectionChange,
-					} ),
-					useInsertReplacementText(),
-					useRemoveBrowserShortcuts(),
-					useShortcuts( keyboardShortcuts ),
-					useInputEvents( inputEvents ),
-					useUndoAutomaticChange(),
-					usePasteHandler( {
-						isSelected,
-						disableFormats,
-						onChange,
-						value,
-						formatTypes,
-						tagName,
-						onReplace,
-						onSplit,
-						__unstableEmbedURLOnPaste,
-						pastePlainText,
-					} ),
-					useDelete( {
-						value,
-						onMerge,
-						onRemove,
-					} ),
-					useEnter( {
-						removeEditorOnlyFormats,
-						value,
-						onReplace,
-						onSplit,
-						onChange,
-						disableLineBreaks,
-						onSplitAtEnd,
-						onSplitAtDoubleLineEnd,
-					} ),
-					useFirefoxCompat(),
-					anchorRef,
-				] ) }
+				ref={ textRef }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
 				className={ classnames(

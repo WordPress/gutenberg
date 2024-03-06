@@ -355,10 +355,16 @@ export function omit( object, keys ) {
 
 export function lazyEdit( cb ) {
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const Load = lazy( cb );
+	const Load = lazy( () =>
+		cb().then(
+			( i ) => new Promise( ( r ) => setTimeout( () => r( i ), 2000 ) )
+		)
+	);
+
 	return function Edit( props ) {
+		const { FallbackEdit, clientId } = props;
 		return (
-			<Suspense fallback={ null }>
+			<Suspense fallback={ <FallbackEdit clientId={ clientId } /> }>
 				<Load { ...props } />
 			</Suspense>
 		);

@@ -13,12 +13,16 @@ import {
 	getBlockType,
 	getBlockEdit,
 } from '@wordpress/blocks';
-import { useContext, useMemo } from '@wordpress/element';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
+import { useContext, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockContext from '../block-context';
+import RichText from '../rich-text';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -30,6 +34,83 @@ import BlockContext from '../block-context';
  */
 const DEFAULT_BLOCK_CONTEXT = {};
 
+function useSelectedChildBlock( clientId ) {
+	return useSelect(
+		( select ) => {
+			const {
+				getSelectionStart,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockAttributes,
+				getBlockName,
+			} = select( blockEditorStore );
+
+			const isSelected =
+				isBlockSelected( clientId ) ||
+				hasSelectedInnerBlock( clientId, true );
+
+			if ( ! isSelected ) {
+				return {
+					selClientId: null,
+					selBlockName: null,
+					selContent: undefined,
+				};
+			}
+
+			const sClientId = getSelectionStart().clientId;
+			return {
+				selClientId: sClientId,
+				selBlockName: getBlockName( sClientId ),
+				selContent: getBlockAttributes( sClientId ).content,
+			};
+		},
+		[ clientId ]
+	);
+}
+function FallbackRichEdit( { clientId } ) {
+	const ref = useRef();
+	const { selClientId, selBlockName, selContent } =
+		useSelectedChildBlock( clientId );
+	const { updateBlockAttributes, replaceEdit } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
+	if ( ! selClientId ) {
+		return null;
+	}
+
+	const onChange = ( value ) =>
+		updateBlockAttributes( [ selClientId ], { content: value } );
+
+	const onReplace = ( blocks, indexToSelect, initialPos ) =>
+		replaceEdit( selClientId, blocks, indexToSelect, initialPos );
+
+	return (
+		<div className="block-placeholder">
+			<RichText
+				ref={ ref }
+				identifier="content"
+				clientId={ selClientId }
+				blockName={ selBlockName }
+				value={ selContent }
+				onChange={ onChange }
+				onReplace={ onReplace }
+				__unstableAllowPrefixTransformations={
+					selBlockName === 'core/paragraph'
+				}
+			/>
+		</div>
+	);
+}
+
+function FallbackEdit( { clientId } ) {
+	return (
+		<AsyncModeProvider value={ false }>
+			<FallbackRichEdit clientId={ clientId } />
+		</AsyncModeProvider>
+	);
+}
+
 const Edit = ( props ) => {
 	const { name } = props;
 	const blockType = getBlockType( name );
@@ -39,7 +120,7 @@ const Edit = ( props ) => {
 		return null;
 	}
 
-	return <Component { ...props } />;
+	return <Component FallbackEdit={ FallbackEdit } { ...props } />;
 };
 
 const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
