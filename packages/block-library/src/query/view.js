@@ -43,25 +43,21 @@ store(
 					queryRef.querySelector( firstAnchor )?.focus();
 				}
 			},
-			*prefetch() {
+			*prefetch( event ) {
 				const { ref } = getElement();
 				if ( isValidLink( ref ) ) {
-					const { actions } = yield import(
-						'@wordpress/interactivity-router'
-					);
-					yield actions.prefetch( ref.href );
+					yield import( '@wordpress/interactivity-router' );
+					store( 'core/router' ).actions.prefetch( event, ref.href );
 				}
 			},
 		},
 		callbacks: {
-			*prefetch() {
+			*prefetch( event ) {
 				const { url } = getContext();
 				const { ref } = getElement();
 				if ( url && isValidLink( ref ) ) {
-					const { actions } = yield import(
-						'@wordpress/interactivity-router'
-					);
-					yield actions.prefetch( ref.href );
+					yield import( '@wordpress/interactivity-router' );
+					store( 'core/router' ).actions.prefetch( event, ref.href );
 				}
 			},
 		},
