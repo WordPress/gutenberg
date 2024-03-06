@@ -1,44 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+import { select } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
 
+const { getCurrentPostId } = select( editorStore );
+
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
-	useSource( props, sourceAttributes ) {
-		const { getCurrentPostType } = useSelect( editorStore );
-		const { context } = props;
-		const { key: metaKey } = sourceAttributes;
-		const postType = context.postType
-			? context.postType
-			: getCurrentPostType();
+	get( blockProps, { key } ) {
+		const { getEntityRecord, getEditedEntityRecord } = select( coreStore );
+		const kind = 'postType';
+		const name = 'post';
+		const prop = 'meta';
+		const id = getCurrentPostId();
 
-		const [ meta, setMeta ] = useEntityProp(
-			'postType',
-			context.postType,
-			'meta',
-			context.postId
-		);
+		const record = getEntityRecord( kind, name, id ); // Trigger resolver.
+		const editedRecord = getEditedEntityRecord( kind, name, id );
 
-		if ( postType === 'wp_template' ) {
-			return { placeholder: metaKey };
-		}
-		const metaValue = meta[ metaKey ];
-		const updateMetaValue = ( newValue ) => {
-			setMeta( { ...meta, [ metaKey ]: newValue } );
-		};
+		const fullData =
+			record && editedRecord
+				? {
+						fullValue: record[ prop ],
+						value: editedRecord[ prop ],
+				  }
+				: {};
 
-		return {
-			placeholder: metaKey,
-			value: metaValue,
-			updateValue: updateMetaValue,
-		};
+		return fullData.value[ key ];
 	},
 };
