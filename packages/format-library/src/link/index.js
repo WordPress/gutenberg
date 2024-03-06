@@ -8,6 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
+import { usePrevious } from '@wordpress/compose';
 import {
 	getTextContent,
 	applyFormat,
@@ -44,13 +45,19 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
+	const prevAddingLink = usePrevious( addingLink );
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
 	const preventAddingLink = useRef( false );
 
 	useEffect( () => {
-		if ( addingLink ) {
+		// When prevAddingLink is undefined, it is equivalent to checking an onMount
+		if (
+			prevAddingLink === undefined ||
+			addingLink ||
+			preventAddingLink.current
+		) {
 			return;
 		}
 
@@ -70,7 +77,7 @@ function Edit( {
 		return () => {
 			return () => clearTimeout( linkTimeoutId );
 		};
-	}, [ addingLink, openedBy ] );
+	}, [ addingLink ] );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
