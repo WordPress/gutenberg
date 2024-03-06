@@ -74,7 +74,7 @@ export default function ChildLayoutControl( {
 								flexSize: newFlexSize,
 							} );
 						} }
-						isBlock={ true }
+						isBlock
 					>
 						<ToggleGroupControlOption
 							key={ 'fit' }

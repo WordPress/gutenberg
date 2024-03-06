@@ -557,3 +557,11 @@ $block-navigation-max-indent: 8;
 .list-view-appender__description {
 	display: none;
 }
+
+.block-editor-list-view-block-select-button__bindings svg g {
+	stroke: var(--wp-bound-block-color);
+	fill: transparent;
+	stroke-width: 1.5;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}

@@ -174,7 +174,7 @@ class BottomSheetStepperCell extends Component {
 
 		return (
 			<View
-				accessible={ true }
+				accessible
 				accessibilityRole="adjustable"
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityHint={ getAccessibilityHint() }
@@ -214,7 +214,7 @@ class BottomSheetStepperCell extends Component {
 						icon={ icon }
 						label={ label }
 						labelStyle={ labelStyle }
-						leftAlign={ true }
+						leftAlign
 						separatorType={ separatorType }
 						disabled={ disabled }
 					>

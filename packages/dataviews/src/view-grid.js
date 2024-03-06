@@ -11,6 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Tooltip,
+	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
@@ -29,6 +30,8 @@ import { isAppleOS } from '@wordpress/keycodes';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 
+import { useHasAPossibleBulkAction } from './bulk-actions';
+
 function GridItem( {
 	hasNoPointerEvents,
 	selection,
@@ -41,6 +44,7 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 } ) {
+	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	const primaryFieldId = useId();
@@ -50,12 +54,13 @@ function GridItem( {
 			spacing={ 0 }
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
-				'is-selected': isSelected,
-				'has-no-pointer-events': hasNoPointerEvents,
+				'is-selected': hasBulkAction && isSelected,
 			} ) }
-			onClick={ () => {
-				if ( ! hasNoPointerEvents ) return;
+			onClick={ ( event ) => {
+				if ( ! hasNoPointerEvents || ! hasBulkAction ) return;
 
+				event.stopPropagation();
+				event.preventDefault();
 				const setAsSelected = ! isSelected;
 				const selectedData = data.filter( ( _item ) => {
 					const _id = getItemId?.( _item );
@@ -240,7 +245,7 @@ export default function ViewGrid( {
 						'dataviews-no-results': ! isLoading,
 					} ) }
 				>
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				</div>
 			) }
 		</>
