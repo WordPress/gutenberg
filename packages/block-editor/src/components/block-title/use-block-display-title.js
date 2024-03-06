@@ -55,7 +55,11 @@ export default function useBlockDisplayTitle( {
 			const label = getBlockLabel( blockType, attributes, context );
 			// If the label is defined we prioritize it over a possible block variation title match.
 			if ( label !== blockType.title ) {
-				return label;
+				// Users can enter and save a label made of only spaces e.g. for
+				// navigation links. In that case we provide a fallback label.
+				// We do want to trim leading and trailing spaces anyways.
+				const trimmedLabel = label.trim();
+				return trimmedLabel === '' ? __( 'Untitled' ) : trimmedLabel;
 			}
 
 			const match = getActiveBlockVariation( blockName, attributes );
@@ -65,8 +69,8 @@ export default function useBlockDisplayTitle( {
 		[ clientId, context ]
 	);
 
-	if ( ! blockTitle || blockTitle.trim() === '' ) {
-		return __( 'Untitled' );
+	if ( ! blockTitle ) {
+		return null;
 	}
 
 	if (

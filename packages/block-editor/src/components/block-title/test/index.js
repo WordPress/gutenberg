@@ -19,6 +19,9 @@ const blockTypeMap = {
 	'name-with-label': { title: 'Block With Label' },
 	'name-with-custom-label': { title: 'Block With Custom Label' },
 	'name-with-long-label': { title: 'Block With Long Label' },
+	'name-with-only-spaces-label': {
+		title: 'Block With Label With Only Spaces',
+	},
 	'reusable-block': { title: 'Reusable Block' },
 };
 
@@ -27,6 +30,7 @@ const blockLabelMap = {
 	'Block With Long Label':
 		'This is a longer label than typical for blocks to have.',
 	'Block With Custom Label': 'A Custom Label like a Block Variation Label',
+	'Block With Label With Only Spaces': '  ',
 	'Reusable Block': 'Reuse me!',
 };
 
@@ -95,6 +99,20 @@ describe( 'BlockTitle', () => {
 		render( <BlockTitle clientId="id-name-with-label" /> );
 
 		expect( screen.getByText( 'Test Label' ) ).toBeVisible();
+	} );
+
+	it( 'renders "Untitled" if label is made of only spaces', () => {
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				getBlockName: () => 'name-with-only-spaces-label',
+				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockAttributes: () => null,
+			} ) )
+		);
+
+		render( <BlockTitle clientId="id-name-with-only-spaces-label" /> );
+
+		expect( screen.getByText( 'Untitled' ) ).toBeVisible();
 	} );
 
 	it( 'should prioritize reusable block title over title', () => {
