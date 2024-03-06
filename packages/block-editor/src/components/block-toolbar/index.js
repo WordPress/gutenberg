@@ -66,6 +66,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		isPatternOverride,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -93,8 +94,17 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = !! getBlockAttributes( selectedBlockClientId )
-			?.metadata?.bindings;
+		const bindings = getBlockAttributes( selectedBlockClientId )?.metadata
+			?.bindings;
+		const _isUsingBindings = !! bindings;
+		const _isPatternOverride = _isUsingBindings
+			? Object.keys( bindings ).some(
+					( bindingKey ) =>
+						bindings[ bindingKey ].source ===
+						'core/pattern-overrides'
+			  )
+			: false;
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -112,8 +122,9 @@ export function PrivateBlockToolbar( {
 					true
 				) &&
 				selectedBlockClientIds.length === 1 &&
-				_isDefaultEditingMode,
+				( _isDefaultEditingMode || _isPatternOverride ),
 			isUsingBindings: _isUsingBindings,
+			isPatternOverride: _isPatternOverride,
 		};
 	}, [] );
 
@@ -164,7 +175,9 @@ export function PrivateBlockToolbar( {
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
-					isDefaultEditingMode && <BlockParentSelector /> }
+					( isDefaultEditingMode || isPatternOverride ) && (
+						<BlockParentSelector />
+					) }
 				{ isUsingBindings && canBindBlock( blockName ) && (
 					<BlockBindingsIndicator />
 				) }
