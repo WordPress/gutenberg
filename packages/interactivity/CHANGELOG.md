@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.0 (2024-03-06)
+
 ### Bug Fixes
 
 -   Prevent passing state proxies as receivers to deepSignal proxy handlers. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
