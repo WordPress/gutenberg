@@ -10,11 +10,13 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function KeyboardShortcutsGlobal() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { hasNonPostEntityChanges } = useSelect( editorStore );
+	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
@@ -26,7 +28,11 @@ function KeyboardShortcutsGlobal() {
 			isSavingEntityRecord( record.kind, record.name, record.key )
 		);
 		const _hasNonPostEntityChanges = hasNonPostEntityChanges();
-		if ( ! hasDirtyEntities || ! _hasNonPostEntityChanges || isSaving ) {
+		const isViewMode = getCanvasMode() === 'view';
+		if (
+			( ! hasDirtyEntities || ! _hasNonPostEntityChanges || isSaving ) &&
+			! isViewMode
+		) {
 			return;
 		}
 		// At this point, we know that there are dirty entities, other than
