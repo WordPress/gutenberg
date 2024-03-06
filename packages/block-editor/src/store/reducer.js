@@ -14,6 +14,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+import { unlock } from '../lock-unlock';
 
 const identity = ( x ) => x;
 
@@ -88,6 +89,39 @@ function flattenBlocks( blocks, transform = identity ) {
 	}
 
 	return result;
+}
+
+const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+	'core/paragraph': [ 'content' ],
+	'core/heading': [ 'content' ],
+	'core/image': [ 'url', 'title', 'alt' ],
+	'core/button': [ 'url', 'text', 'linkTarget' ],
+};
+
+/**
+ * Based on the given block name,
+ * check if it is possible to bind the block.
+ *
+ * @param {string} blockName - The block name.
+ * @return {boolean} Whether it is possible to bind the block to sources.
+ */
+export function canBindBlock( blockName ) {
+	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+}
+
+/**
+ * Based on the given block name and attribute name,
+ * check if it is possible to bind the block attribute.
+ *
+ * @param {string} blockName     - The block name.
+ * @param {string} attributeName - The attribute name.
+ * @return {boolean} Whether it is possible to bind the block attribute.
+ */
+export function canBindAttribute( blockName, attributeName ) {
+	return (
+		canBindBlock( blockName ) &&
+		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
+	);
 }
 
 function getFlattenedClientIds( blocks ) {
@@ -628,6 +662,69 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 
 /**
  * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `RESET_BLOCKS` action together and rigth after the withBlockReset reducer.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withBlockWithBoundAttributesReset = ( reducer ) => ( state, action ) => {
+	if ( action.type !== 'RESET_BLOCKS' ) {
+		return reducer( state, action );
+	}
+
+	/*
+	 * Filter blocks with bound attributes.
+	 */
+	const boundBlocks = action.blocks.filter( ( block ) => {
+		const { name, attributes } = block;
+		if ( ! canBindBlock( name ) ) {
+			return false;
+		}
+
+		return Object.keys( attributes ).some( ( attrName ) => {
+			if ( ! canBindAttribute( name, attrName ) ) {
+				return false;
+			}
+
+			// Check if the attribute has bindings.
+			if ( ! attributes?.metadata?.bindings ) {
+				return false;
+			}
+
+			return true;
+		} );
+	} );
+
+	if ( ! boundBlocks.length ) {
+		return reducer( state, action );
+	}
+
+	const blockBindingsSources = unlock(
+		select( blocksStore )
+	).getAllBlockBindingsSources();
+
+	boundBlocks.forEach( ( block ) => {
+		const bindings = block.attributes.metadata.bindings;
+		/*
+		 * Pull the property value of the external source
+		 * and update the bound attributes.
+		 */
+		Object.entries( bindings ).forEach(
+			( [ attributeName, { args, source } ] ) => {
+				const { get } = blockBindingsSources[ source ];
+				block.attributes[ attributeName ] = get( block, args );
+			}
+		);
+
+		return block;
+	} );
+
+	return reducer( state, action );
+};
+
+/**
+ * Higher-order reducer which targets the combined blocks reducer and handles
  * the `REPLACE_INNER_BLOCKS` action. When dispatched, this action the state
  * should become equivalent to the execution of a `REMOVE_BLOCKS` action
  * containing all the child's of the root block followed by the execution of
@@ -771,6 +868,7 @@ export const blocks = pipe(
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
+	withBlockWithBoundAttributesReset, // Needs to be after withBlockReset.
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
 	withResetControlledBlocks
