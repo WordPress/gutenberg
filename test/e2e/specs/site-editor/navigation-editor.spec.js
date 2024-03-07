@@ -54,12 +54,19 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( listView ).toBeVisible();
 
 			const navBlockNode = listView.getByRole( 'link', {
-				name: 'Navigation (locked)',
+				name: 'Navigation',
 				exact: true,
 			} );
 
-			// The Navigation block should be present and locked.
+			// The Navigation block should be present.
 			await expect( navBlockNode ).toBeVisible();
+
+			// The Navigation block description should contain the locked state information.
+			const navBlockNodeDescriptionId =
+				await navBlockNode.getAttribute( 'aria-describedby' );
+			await expect(
+				listView.locator( `id=${ navBlockNodeDescriptionId }` )
+			).toHaveText( /This block is locked./ );
 
 			// The block should have no actions menu.
 			await expect(
