@@ -40,7 +40,7 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
-					{ !! typographyVariations.length && (
+					{ !! typographyVariations?.length && (
 						<TypographyVariations />
 					) }
 					{ ! window.__experimentalDisableFontLibrary && (
