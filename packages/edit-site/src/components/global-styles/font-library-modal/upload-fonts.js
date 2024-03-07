@@ -61,7 +61,7 @@ function UploadFonts() {
 			}
 			// Check for duplicates
 			if ( uniqueFilenames.has( file.name ) ) {
-				return null; // Return null for duplicates
+				return null; // Return null for duplicates.
 			}
 			// Check if the file extension is allowed.
 			const fileExtension = file.name.split( '.' ).pop().toLowerCase();
