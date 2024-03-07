@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- The filters that use `in` and `notIn` operators (the values by default) support now multi-selection. Use `is` and `isNot` for single-selection filters.
+- The filters that use `in` and `notIn` operators (the values by default) support now multi-selection. Use `is` and `isNot` for single-selection filters. Note that the value in the `filters.view` would be an array for multi-selection as well.
 
 ## 0.7.0 (2024-03-06)
 
