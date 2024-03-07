@@ -15,7 +15,8 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { unlock } from '../../../lock-unlock';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import PreviewTypography from '../preview-typography';
+import TypographyExample from '../typography-example';
+import PreviewIframe from '../preview-iframe';
 import Subtitle from '../subtitle';
 import { getFontFamilies } from '../utils';
 import Variation from './variation';
@@ -71,10 +72,18 @@ export default function TypographyVariations() {
 				{ typographyVariations && typographyVariations.length
 					? uniqueTypographyVariations.map( ( variation, index ) => (
 							<Variation key={ index } variation={ variation }>
-								{ () => (
-									<PreviewTypography
-										variation={ variation }
-									/>
+								{ ( isFocused ) => (
+									<PreviewIframe
+										label={ variation?.title }
+										isFocused={ isFocused }
+									>
+										{ ( { key } ) => (
+											<TypographyExample
+												key={ key }
+												variation={ variation }
+											/>
+										) }
+									</PreviewIframe>
 								) }
 							</Variation>
 					  ) )
