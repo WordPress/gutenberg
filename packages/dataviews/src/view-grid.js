@@ -15,6 +15,14 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { isAppleOS } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -25,6 +33,7 @@ import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
 
 function GridItem( {
+	hasNoPointerEvents,
 	selection,
 	data,
 	onSelectionChange,
@@ -38,86 +47,94 @@ function GridItem( {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
+	const primaryFieldId = useId();
+
 	return (
 		<VStack
 			spacing={ 0 }
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
 				'is-selected': hasBulkAction && isSelected,
+				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
-			onClickCapture={ ( event ) => {
-				if ( hasBulkAction && ( event.ctrlKey || event.metaKey ) ) {
-					event.stopPropagation();
-					event.preventDefault();
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
-				}
+			onClick={ ( event ) => {
+				if ( ! hasNoPointerEvents || ! hasBulkAction ) return;
+
+				event.stopPropagation();
+				event.preventDefault();
+				const setAsSelected = ! isSelected;
+				const selectedData = data.filter( ( _item ) => {
+					const _id = getItemId?.( _item );
+					const currentlyIncluded = selection.includes( _id );
+					return setAsSelected
+						? id === _id || currentlyIncluded
+						: id !== _id && currentlyIncluded;
+				} );
+				onSelectionChange( selectedData );
 			} }
 		>
-			<div className="dataviews-view-grid__media">
-				{ mediaField?.render( { item } ) }
-			</div>
-			<HStack
-				justify="space-between"
-				className="dataviews-view-grid__title-actions"
+			<div
+				className="dataviews-view-grid__content"
+				inert={ hasNoPointerEvents ? '' : undefined }
 			>
-				<SingleSelectionCheckbox
-					id={ id }
-					item={ item }
-					selection={ selection }
-					onSelectionChange={ onSelectionChange }
-					getItemId={ getItemId }
-					data={ data }
-					primaryField={ primaryField }
-					disabled={ ! hasBulkAction }
-				/>
-				<HStack className="dataviews-view-grid__primary-field">
-					{ primaryField?.render( { item } ) }
+				<div className="dataviews-view-grid__media">
+					{ mediaField?.render( { item } ) }
+				</div>
+				<HStack
+					justify="space-between"
+					className="dataviews-view-grid__title-actions"
+				>
+					<SingleSelectionCheckbox
+						id={ id }
+						item={ item }
+						selection={ selection }
+						onSelectionChange={ onSelectionChange }
+						getItemId={ getItemId }
+						data={ data }
+						primaryField={ primaryField }
+						disabled={ ! hasBulkAction }
+					/>
+					<HStack
+						id={ primaryFieldId }
+						className="dataviews-view-grid__primary-field"
+					>
+						{ primaryField?.render( { item } ) }
+					</HStack>
+					<ItemActions item={ item } actions={ actions } isCompact />
 				</HStack>
-				<ItemActions item={ item } actions={ actions } isCompact />
-			</HStack>
-			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
-				{ visibleFields.map( ( field ) => {
-					const renderedValue = field.render( {
-						item,
-					} );
-					if ( ! renderedValue ) {
-						return null;
-					}
-					return (
-						<VStack
-							className="dataviews-view-grid__field"
-							key={ field.id }
-							spacing={ 1 }
-						>
-							<Tooltip text={ field.header } placement="left">
-								<div className="dataviews-view-grid__field-value">
-									{ renderedValue }
-								</div>
-							</Tooltip>
-						</VStack>
-					);
-				} ) }
-			</VStack>
+				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+					{ visibleFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
+							<VStack
+								className="dataviews-view-grid__field"
+								key={ field.id }
+								spacing={ 1 }
+							>
+								<Tooltip text={ field.header } placement="left">
+									<div className="dataviews-view-grid__field-value">
+										{ renderedValue }
+									</div>
+								</Tooltip>
+							</VStack>
+						);
+					} ) }
+				</VStack>
+			</div>
+			{ hasNoPointerEvents && (
+				<div
+					className="dataviews-view-grid__overlay"
+					role="checkbox"
+					aria-disabled={ ! hasBulkAction }
+					aria-labelledby={ primaryFieldId }
+					aria-checked={ isSelected }
+				/>
+			) }
 		</VStack>
 	);
 }
@@ -133,6 +150,49 @@ export default function ViewGrid( {
 	selection,
 	onSelectionChange,
 } ) {
+	const gridRef = useRef( null );
+	const eventControllerRef = useRef( null );
+	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const [ pointerIsWithinBounds, setPointerIsWithinBounds ] =
+		useState( false );
+
+	const pointerIsWithinBoundsHandler = useCallback(
+		( { metaKey, ctrlKey, type } ) => {
+			const isWithinBounds = type === 'mouseenter';
+			const isKeyPressed = isAppleOS() ? metaKey : ctrlKey;
+			setPointerIsWithinBounds( isWithinBounds );
+			setHasNoPointerEvents( isWithinBounds && isKeyPressed );
+		},
+		[]
+	);
+
+	useEffect( () => {
+		if ( eventControllerRef.current ) {
+			eventControllerRef.current.abort();
+		}
+
+		const doc = gridRef.current?.ownerDocument;
+		if ( ! doc ) return;
+
+		if ( pointerIsWithinBounds ) {
+			const listener = ( { key, type } ) => {
+				if ( key === ( isAppleOS() ? 'Meta' : 'Control' ) ) {
+					setHasNoPointerEvents( type === 'keydown' );
+				}
+			};
+			const controller = new AbortController();
+			controller.signal.addEventListener( 'abort', () => {
+				eventControllerRef.current = null;
+			} );
+			const config = { capture: true, signal: controller.signal };
+			doc.body.addEventListener( 'keydown', listener, config );
+			doc.body.addEventListener( 'keyup', listener, config );
+			eventControllerRef.current = controller;
+
+			return () => controller.abort();
+		}
+	}, [ pointerIsWithinBounds ] );
+
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -153,16 +213,20 @@ export default function ViewGrid( {
 		<>
 			{ hasData && (
 				<Grid
+					ref={ gridRef }
 					gap={ 6 }
 					columns={ 2 }
 					alignment="top"
 					className="dataviews-view-grid"
 					aria-busy={ isLoading }
+					onMouseEnter={ pointerIsWithinBoundsHandler }
+					onMouseLeave={ pointerIsWithinBoundsHandler }
 				>
 					{ usedData.map( ( item ) => {
 						return (
 							<GridItem
 								key={ getItemId( item ) }
+								hasNoPointerEvents={ hasNoPointerEvents }
 								selection={ selection }
 								data={ data }
 								onSelectionChange={ onSelectionChange }
