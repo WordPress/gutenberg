@@ -38,7 +38,7 @@ function Edit( {
 	onFocus,
 	contentRef,
 } ) {
-	const [ addingLink, setAddingLink ] = useState( false );
+	const [ editingLink, setEditingLink ] = useState( false );
 	const [ addingNewLink, setAddingNewLink ] = useState( false );
 
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
@@ -47,7 +47,7 @@ function Edit( {
 	const [ autoFocus, setAutoFocus ] = useState( true );
 
 	function setIsEditingExistingLink( _val, { shouldAutoFocus = true } = {} ) {
-		setAddingLink( _val );
+		setEditingLink( _val );
 		setAutoFocus( shouldAutoFocus );
 	}
 
@@ -61,11 +61,11 @@ function Edit( {
 	}
 
 	useEffect( () => {
-		// When the link becomes inactive (i.e. isActive is false), reset the addingLink state
+		// When the link becomes inactive (i.e. isActive is false), reset the editingLink state
 		// and the isAddingNewLink state. This means that if the Link UI is displayed and the link
 		// becomes inactive (e.g. used arrow keys to move cursor outside of link bounds), the UI will close.
 		if ( ! isActive ) {
-			setAddingLink( false );
+			setEditingLink( false );
 			setAddingNewLink( false );
 		}
 	}, [ isActive ] );
@@ -80,7 +80,7 @@ function Edit( {
 			// There is a situation whereby there is an existing link in the rich text
 			// and the user clicks on the leftmost edge of that link and fails to activate
 			// the link format, but the click event still fires on the `<a>` element.
-			// This causes the `addingLink` state to be set to `true` and the link UI
+			// This causes the `editingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
 			if ( event.target.tagName !== 'A' || ! isActive ) {
@@ -173,6 +173,8 @@ function Edit( {
 		speak( __( 'Link removed.' ), 'assertive' );
 	}
 
+	const isEditingActiveLink = editingLink && isActive;
+
 	return (
 		<>
 			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
@@ -188,13 +190,13 @@ function Edit( {
 				onClick={ ( event ) => {
 					addLink( event.currentTarget );
 				} }
-				isActive={ isActive || addingLink }
+				isActive={ isActive || editingLink }
 				shortcutType="primary"
 				shortcutCharacter="k"
 				aria-haspopup="true"
-				aria-expanded={ addingLink }
+				aria-expanded={ editingLink }
 			/>
-			{ ( ( addingLink && isActive ) || addingNewLink ) && (
+			{ ( isEditingActiveLink || addingNewLink ) && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }
