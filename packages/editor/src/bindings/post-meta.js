@@ -14,7 +14,7 @@ const { getCurrentPostId } = select( editorStore );
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
-	connect( blockProps, { key }, onPropChange ) {
+	connect( blockProps, { key }, onPropChange = () => {} ) {
 		const { getEntityRecord, getEditedEntityRecord } = select( coreStore );
 		const kind = 'postType';
 		const name = 'post';
