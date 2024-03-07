@@ -14,6 +14,7 @@ import {
 	SelectControl,
 	Tooltip,
 	Icon,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
@@ -38,15 +39,21 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 	}
 
 	const filterTextWrappers = {
-		Span1: <span className="dataviews-filter-summary__filter-text-name" />,
-		Span2: <span className="dataviews-filter-summary__filter-text-value" />,
+		Name: <span className="dataviews-filter-summary__filter-text-name" />,
+		Value: (
+			<Truncate
+				limit={ 10 }
+				ellipsizeMode="tail"
+				className="dataviews-filter-summary__filter-text-value"
+			/>
+		),
 	};
 
 	if ( filterInView?.operator === OPERATOR_IN ) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author in Admin, Editor". */
-				__( '<Span1>%1$s </Span1><Span2>in %2$s</Span2>' ),
+				__( '<Name>%1$s in </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
@@ -58,7 +65,7 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author not in Admin, Editor". */
-				__( '<Span1>%1$s </Span1><Span2>not in %2$s</Span2>' ),
+				__( '<Name>%1$s not in </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
@@ -70,7 +77,7 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is Admin". */
-				__( '<Span1>%1$s </Span1><Span2>is %2$s</Span2>' ),
+				__( '<Name>%1$s is </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements[ 0 ].label
 			),
@@ -82,7 +89,7 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is not Admin". */
-				__( '<Span1>%1$s </Span1><Span2>is not %2$s</Span2>' ),
+				__( '<Span1>%1$s is not </Span1><Span2>%2$s</Span2>' ),
 				filter.name,
 				activeElements[ 0 ].label
 			),
