@@ -83,7 +83,11 @@ function Edit( {
 			// This causes the `editingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
-			if ( event.target.tagName !== 'A' || ! isActive ) {
+			if (
+				( event.target.tagName !== 'A' &&
+					event.target.parentElement.tagName !== 'A' ) || // other formats (e.g. bold) may be nested within the link.
+				! isActive
+			) {
 				setIsEditingLink( false );
 				return;
 			}
