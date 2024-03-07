@@ -15,6 +15,33 @@ import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
+/**
+ * Recursively find very first block of an specific block type.
+ *
+ * @param {Object[]} blocks List of blocks.
+ * @param {string}   name   Block name to search.
+ *
+ * @return {Object|undefined} Return block object or undefined.
+ */
+function findFirstOfSameType( blocks, name ) {
+	if ( ! Array.isArray( blocks ) || ! blocks.length ) {
+		return;
+	}
+
+	for ( const block of blocks ) {
+		if ( block.name === name ) {
+			return block;
+		}
+
+		// Search inside innerBlocks.
+		const firstBlock = findFirstOfSameType( block.innerBlocks, name );
+
+		if ( firstBlock ) {
+			return firstBlock;
+		}
+	}
+}
+
 const enhance = compose(
 	/**
 	 * For blocks whose block type doesn't support `multiple`, provides the
@@ -39,9 +66,7 @@ const enhance = compose(
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
 		const blocks = select( blockEditorStore ).getBlocks();
-		const firstOfSameType = blocks.find(
-			( { name } ) => block.name === name
-		);
+		const firstOfSameType = findFirstOfSameType( blocks, block.name );
 		const isInvalid =
 			firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {

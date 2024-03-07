@@ -12,10 +12,11 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
-	__experimentalRecursionProvider as RecursionProvider,
+	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo, forwardRef } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -27,13 +28,28 @@ import { useMergeRefs } from '@wordpress/compose';
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 
 const {
 	LayoutStyle,
 	useLayoutClasses,
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
+	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
+
+const noop = () => {};
+
+/**
+ * These post types have a special editor where they don't allow you to fill the title
+ * and they don't apply the layout styles.
+ */
+const DESIGN_POST_TYPES = [
+	'wp_block',
+	'wp_template',
+	'wp_navigation',
+	'wp_template_part',
+];
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -70,25 +86,25 @@ function checkForPostContentAtRootLevel( blocks ) {
 	return false;
 }
 
-function EditorCanvas(
-	{
-		// Ideally as we unify post and site editors, we won't need these props.
-		autoFocus,
-		className,
-		renderAppender,
-		styles,
-		disableIframe = false,
-		iframeProps,
-		children,
-	},
-	ref
-) {
+function EditorCanvas( {
+	// Ideally as we unify post and site editors, we won't need these props.
+	autoFocus,
+	className,
+	renderAppender,
+	styles,
+	disableIframe = false,
+	iframeProps,
+	children,
+} ) {
 	const {
 		renderingMode,
 		postContentAttributes,
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
+		deviceType,
+		showEditorPadding,
+		isDesignPostType,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -96,27 +112,27 @@ function EditorCanvas(
 			getCurrentTemplateId,
 			getEditorSettings,
 			getRenderingMode,
+			getDeviceType,
 		} = select( editorStore );
+		const { getPostType, canUser, getEditedEntityRecord } =
+			select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
 		let _wrapperBlockName;
 
 		if ( postTypeSlug === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
-		} else if ( ! _renderingMode === 'post-only' ) {
+		} else if ( _renderingMode === 'post-only' ) {
 			_wrapperBlockName = 'core/post-content';
 		}
 
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
-		const postType = select( coreStore ).getPostType( postTypeSlug );
-		const canEditTemplate = select( coreStore ).canUser(
-			'create',
-			'templates'
-		);
+		const postType = getPostType( postTypeSlug );
+		const canEditTemplate = canUser( 'create', 'templates' );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
-			? select( coreStore ).getEditedEntityRecord(
+			? getEditedEntityRecord(
 					'postType',
 					'wp_template',
 					currentTemplateId
@@ -125,7 +141,8 @@ function EditorCanvas(
 
 		return {
 			renderingMode: _renderingMode,
-			postContentAttributes: getEditorSettings().postContentAttributes,
+			postContentAttributes: editorSettings.postContentAttributes,
+			isDesignPostType: DESIGN_POST_TYPES.includes( postTypeSlug ),
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -134,6 +151,9 @@ function EditorCanvas(
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
+			deviceType: getDeviceType(),
+			showEditorPadding:
+				!! editorSettings.onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -151,12 +171,13 @@ function EditorCanvas(
 		};
 	}, [] );
 
+	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
 	const fallbackLayout = useMemo( () => {
-		if ( renderingMode !== 'post-only' ) {
+		if ( renderingMode !== 'post-only' || isDesignPostType ) {
 			return { type: 'default' };
 		}
 
@@ -167,7 +188,12 @@ function EditorCanvas(
 		}
 		// Set default layout for classic themes so all alignments are supported.
 		return { type: 'default' };
-	}, [ renderingMode, themeSupportsLayout, globalLayoutSettings ] );
+	}, [
+		renderingMode,
+		themeSupportsLayout,
+		globalLayoutSettings,
+		isDesignPostType,
+	] );
 
 	const newestPostContentAttributes = useMemo( () => {
 		if (
@@ -281,25 +307,37 @@ function EditorCanvas(
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const contentRef = useMergeRefs(
-		[
-			ref,
-			localRef,
-			renderingMode === 'post-only' ? typewriterRef : undefined,
-		].filter( ( r ) => !! r )
-	);
+	const contentRef = useMergeRefs( [
+		localRef,
+		renderingMode === 'post-only' ? typewriterRef : noop,
+		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
+	] );
 
 	return (
 		<BlockCanvas
-			shouldIframe={ ! disableIframe }
+			shouldIframe={
+				! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType )
+			}
 			contentRef={ contentRef }
 			styles={ styles }
 			height="100%"
-			iframeProps={ iframeProps }
+			iframeProps={ {
+				className: classnames( 'editor-canvas__iframe', {
+					'has-editor-padding': showEditorPadding,
+				} ),
+				...iframeProps,
+				style: {
+					...iframeProps?.style,
+					...deviceStyles,
+				},
+			} }
 		>
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
-				renderingMode === 'post-only' && (
+				renderingMode === 'post-only' &&
+				! isDesignPostType && (
 					<>
 						<LayoutStyle
 							selector=".editor-editor-canvas__post-title-wrapper"
@@ -318,7 +356,7 @@ function EditorCanvas(
 						) }
 					</>
 				) }
-			{ renderingMode === 'post-only' && (
+			{ renderingMode === 'post-only' && ! isDesignPostType && (
 				<div
 					className={ classnames(
 						'editor-editor-canvas__post-title-wrapper',
@@ -347,7 +385,8 @@ function EditorCanvas(
 				<BlockList
 					className={ classnames(
 						className,
-						renderingMode !== 'post-only'
+						'is-' + deviceType.toLowerCase() + '-preview',
+						renderingMode !== 'post-only' || isDesignPostType
 							? 'wp-site-blocks'
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
@@ -360,11 +399,18 @@ function EditorCanvas(
 							: localRef.current?.parentNode
 					}
 					renderAppender={ renderAppender }
+					__unstableDisableDropZone={
+						// In template preview mode, disable drop zones at the root of the template.
+						renderingMode === 'template-locked' ? true : false
+					}
 				/>
+				{ renderingMode === 'template-locked' && (
+					<EditTemplateBlocksNotification contentRef={ localRef } />
+				) }
 			</RecursionProvider>
 			{ children }
 		</BlockCanvas>
 	);
 }
 
-export default forwardRef( EditorCanvas );
+export default EditorCanvas;

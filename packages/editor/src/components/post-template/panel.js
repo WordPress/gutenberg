@@ -23,8 +23,7 @@ export default function PostTemplatePanel() {
 		};
 	}, [] );
 
-	const isVisible = true;
-	useSelect( ( select ) => {
+	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		if ( ! postType?.viewable ) {
@@ -48,7 +47,11 @@ export default function PostTemplatePanel() {
 		return canCreateTemplates;
 	}, [] );
 
-	if ( ! isBlockTheme && isVisible ) {
+	const canViewTemplates = useSelect( ( select ) => {
+		return select( coreStore ).canUser( 'read', 'templates' ) ?? false;
+	}, [] );
+
+	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
 		return (
 			<PostPanelRow label={ __( 'Template' ) }>
 				<ClassicThemeControl />

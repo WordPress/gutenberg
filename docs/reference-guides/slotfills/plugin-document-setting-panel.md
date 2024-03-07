@@ -49,10 +49,10 @@ To programmatically toggle panels, use the following:
 
 ```js
 import { useDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
+import { store as editorStore } from '@wordpress/editor';
 
 const Example = () => {
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 	return (
 		<Button
 			variant="primary"
@@ -76,10 +76,10 @@ It is also possible to remove panels from the admin using the `removeEditorPanel
 
 ```js
 import { useDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
+import { store as editorStore } from '@wordpress/editor';
 
 const Example = () => {
-	const { removeEditorPanel } = useDispatch( editPostStore );
+	const { removeEditorPanel } = useDispatch( editorStore );
 	return (
 		<Button
 			variant="primary"

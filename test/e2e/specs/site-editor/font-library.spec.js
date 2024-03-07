@@ -10,10 +10,7 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor( {
-				postId: 'emptytheme//index',
-				postType: 'wp_template',
-			} );
+			await admin.visitSiteEditor();
 			await editor.canvas.locator( 'body' ).click();
 		} );
 
@@ -35,10 +32,7 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor( {
-				postId: 'twentytwentythree//index',
-				postType: 'wp_template',
-			} );
+			await admin.visitSiteEditor();
 			await editor.canvas.locator( 'body' ).click();
 		} );
 

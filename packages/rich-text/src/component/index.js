@@ -8,7 +8,7 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { collapseWhiteSpace, create } from '../create';
+import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
@@ -70,11 +70,18 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( {
-			html: preserveWhiteSpace
-				? value
-				: collapseWhiteSpace( typeof value === 'string' ? value : '' ),
-		} );
+		record.current = value;
+		if ( ! ( value instanceof RichTextData ) ) {
+			record.current = value
+				? RichTextData.fromHTMLString( value, { preserveWhiteSpace } )
+				: RichTextData.empty();
+		}
+		// To do: make rich text internally work with RichTextData.
+		record.current = {
+			text: record.current.text,
+			formats: record.current.formats,
+			replacements: record.current.replacements,
+		};
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );
@@ -117,17 +124,18 @@ export function useRichText( {
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
 		} else {
-			_value.current = toHTMLString( {
-				value: __unstableBeforeSerialize
-					? {
-							...newRecord,
-							formats: __unstableBeforeSerialize( newRecord ),
-					  }
-					: newRecord,
-			} );
+			const newFormats = __unstableBeforeSerialize
+				? __unstableBeforeSerialize( newRecord )
+				: newRecord.formats;
+			newRecord = { ...newRecord, formats: newFormats };
+			if ( typeof value === 'string' ) {
+				_value.current = toHTMLString( { value: newRecord } );
+			} else {
+				_value.current = new RichTextData( newRecord );
+			}
 		}
 
-		const { start, end, formats, text } = newRecord;
+		const { start, end, formats, text } = record.current;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.

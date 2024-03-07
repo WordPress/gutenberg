@@ -10,11 +10,11 @@ The RichText component is extremely powerful because it provides built-in functi
 
 Unlike other components that exist in the [Component Reference](/packages/components/README.md) section, RichText lives separately because it only makes sense within the block editor, and not within other areas of WordPress.
 
-## Property Reference
+## Property reference
 
 For a list of the possible properties to pass your RichText component, [check out the component documentation on GitHub](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md).
 
-## Core Blocks Using the RichText Component
+## Core blocks using the RichText component
 
 There are a number of core blocks using the RichText component. The JavaScript edit function linked below for each block can be used as a best practice reference while creating your own blocks.
 
@@ -65,15 +65,15 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-## Common Issues & Solutions
+## Common issues and solutions
 
 While using the RichText component a number of common issues tend to appear.
 
-### HTML Formatting Tags Display in the Content
+### HTML formatting tags display in the content
 
 If the HTML tags from text formatting such as `<strong>` or `<em>` are being escaped and displayed on the frontend of the site, this is likely due to an issue in your save function. Make sure your code looks something like `<RichText.Content tagName="h2" value={ heading } />` (JSX) within your save function instead of simply outputting the value with `<h2>{ heading }</h2>`.
 
-### Unwanted Formatting Options Still Display
+### Unwanted formatting options still display
 
 Before moving forward, consider if using the RichText component makes sense at all. Would it be better to use a basic `input` or `textarea` element? If you don't think any formatting should be possible, these HTML tags may make more sense.
 
@@ -81,7 +81,7 @@ If you'd still like to use RichText, you can eliminate all of the formatting opt
 
 If you want to limit the formats allowed, you can specify using `allowedFormats` property in your code, see the example above or [the component documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md#allowedformats-array) for details.
 
-### Disable Specific Format Types in Editor
+### Disable specific format types in Editor
 
 The RichText component uses formats to display inline elements, for example images within the paragraph block. If you just want to disable a format from the editor, you can use the `unregisterFormatType` function. For example to disable inline images, use:
 

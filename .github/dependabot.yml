@@ -11,3 +11,16 @@ updates:
       labels:
           - 'GitHub Actions'
           - '[Type] Build Tooling'
+      groups:
+          github-actions:
+              patterns:
+                  - '*'
+              exclude-patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'
+          react-native:
+              patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'

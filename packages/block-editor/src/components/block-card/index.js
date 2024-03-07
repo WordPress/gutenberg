@@ -56,7 +56,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 						{ minWidth: 24, padding: 0 }
 					}
 					icon={ isRTL() ? chevronRight : chevronLeft }
-					isSmall
+					size="small"
 				/>
 			) }
 			<BlockIcon icon={ icon } showColors />

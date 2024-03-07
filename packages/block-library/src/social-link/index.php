@@ -33,7 +33,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	 * The `is_email` returns false for emails with schema.
 	 */
 	if ( is_email( $url ) ) {
-		$url = 'mailto:' . $url;
+		$url = 'mailto:' . antispambot( $url );
 	}
 
 	/**
@@ -224,11 +224,11 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 		),
 		'medium'        => array(
 			'name' => 'Medium',
-			'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M20.962,7.257l-5.457,8.867l-3.923-6.375l3.126-5.08c0.112-0.182,0.319-0.286,0.527-0.286c0.05,0,0.1,0.008,0.149,0.02 c0.039,0.01,0.078,0.023,0.114,0.041l5.43,2.715l0.006,0.003c0.004,0.002,0.007,0.006,0.011,0.008 C20.971,7.191,20.98,7.227,20.962,7.257z M9.86,8.592v5.783l5.14,2.57L9.86,8.592z M15.772,17.331l4.231,2.115 C20.554,19.721,21,19.529,21,19.016V8.835L15.772,17.331z M8.968,7.178L3.665,4.527C3.569,4.479,3.478,4.456,3.395,4.456 C3.163,4.456,3,4.636,3,4.938v11.45c0,0.306,0.224,0.669,0.498,0.806l4.671,2.335c0.12,0.06,0.234,0.088,0.337,0.088 c0.29,0,0.494-0.225,0.494-0.602V7.231C9,7.208,8.988,7.188,8.968,7.178z"></path></svg>',
+			'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M13.2,12c0,3-2.4,5.4-5.3,5.4S2.6,15,2.6,12s2.4-5.4,5.3-5.4S13.2,9,13.2,12 M19.1,12c0,2.8-1.2,5-2.7,5s-2.7-2.3-2.7-5s1.2-5,2.7-5C17.9,7,19.1,9.2,19.1,12 M21.4,12c0,2.5-0.4,4.5-0.9,4.5c-0.5,0-0.9-2-0.9-4.5s0.4-4.5,0.9-4.5C21,7.5,21.4,9.5,21.4,12"></path></svg>',
 		),
 		'patreon'       => array(
 			'name' => 'Patreon',
-			'icon' => '<svg width="24" height="24" viewBox="0 0 569 546" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><circle cx="363" cy="205" r="205" /><rect width="100" height="546" x="0" y="0" /></svg>',
+			'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M20 8.40755C19.9969 6.10922 18.2543 4.22555 16.2097 3.54588C13.6708 2.70188 10.3222 2.82421 7.89775 3.99921C4.95932 5.42355 4.03626 8.54355 4.00186 11.6552C3.97363 14.2136 4.2222 20.9517 7.92225 20.9997C10.6715 21.0356 11.0809 17.3967 12.3529 15.6442C13.258 14.3974 14.4233 14.0452 15.8578 13.6806C18.3233 13.0537 20.0036 11.0551 20 8.40755Z" /></svg>',
 		),
 		'pinterest'     => array(
 			'name' => 'Pinterest',

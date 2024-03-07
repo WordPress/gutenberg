@@ -16,8 +16,8 @@ import {
 import {
 	InspectorControls,
 	useBlockProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	ContrastChecker,
@@ -672,7 +672,7 @@ function Navigation( {
 						panelId={ clientId }
 						{ ...colorGradientSettings }
 						gradients={ [] }
-						disableCustomGradients={ true }
+						disableCustomGradients
 					/>
 					{ enableContrastChecking && (
 						<>

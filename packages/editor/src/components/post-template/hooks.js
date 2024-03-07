@@ -41,21 +41,21 @@ export function useAllowSwitchingTemplates() {
 	);
 }
 
-function useTemplates() {
+function useTemplates( postType ) {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
-				post_type: 'page',
+				post_type: postType,
 			} ),
-		[]
+		[ postType ]
 	);
 }
 
-export function useAvailableTemplates() {
+export function useAvailableTemplates( postType ) {
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
-	const templates = useTemplates();
+	const templates = useTemplates( postType );
 	return useMemo(
 		() =>
 			allowSwitchingTemplate &&
@@ -71,7 +71,7 @@ export function useAvailableTemplates() {
 
 export function useCurrentTemplateSlug() {
 	const { postType, postId } = useEditedPostContext();
-	const templates = useTemplates();
+	const templates = useTemplates( postType );
 	const entityTemplate = useSelect(
 		( select ) => {
 			const post = select( coreStore ).getEditedEntityRecord(

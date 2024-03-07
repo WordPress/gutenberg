@@ -5,15 +5,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
-import { BlockTools, store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
@@ -22,27 +19,32 @@ import { store as editSiteStore } from '../../store';
 import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
+	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import PageContentFocusNotifications from '../page-content-focus-notifications';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function SiteEditorCanvas() {
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const location = useLocation();
+	const { templateType, isFocusableEntity, isViewMode } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
-	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+			const _templateType = getEditedPostType();
 
-		const _templateType = getEditedPostType();
-
-		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			isViewMode: getCanvasMode() === 'view',
-		};
-	}, [] );
-
+			return {
+				templateType: _templateType,
+				isFocusableEntity: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isViewMode: getCanvasMode() === 'view',
+			};
+		},
+		[]
+	);
+	const isFocusMode = location.params.focusMode || isFocusableEntity;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const settings = useSiteEditorSettings();
@@ -52,58 +54,46 @@ export default function SiteEditorCanvas() {
 		isFocusMode &&
 		! isViewMode &&
 		// Disable resizing in mobile viewport.
-		! isMobileViewport;
+		! isMobileViewport &&
+		// Disable resizing when editing a template in focus mode.
+		templateType !== TEMPLATE_POST_TYPE;
 
-	const contentRef = useRef();
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 	const forceFullHeight = isNavigationFocusMode;
 
 	return (
-		<>
-			<EditorCanvasContainer.Slot>
-				{ ( [ editorCanvasView ] ) =>
-					editorCanvasView ? (
-						<div className="edit-site-visual-editor is-focus-mode">
-							{ editorCanvasView }
-						</div>
-					) : (
-						<BlockTools
-							className={ classnames( 'edit-site-visual-editor', {
-								'is-focus-mode':
-									isFocusMode || !! editorCanvasView,
-								'is-view-mode': isViewMode,
-							} ) }
-							__unstableContentRef={ contentRef }
-							onClick={ ( event ) => {
-								// Clear selected block when clicking on the gray background.
-								if ( event.target === event.currentTarget ) {
-									clearSelectedBlock();
-								}
-							} }
+		<EditorCanvasContainer.Slot>
+			{ ( [ editorCanvasView ] ) =>
+				editorCanvasView ? (
+					<div className="edit-site-visual-editor is-focus-mode">
+						{ editorCanvasView }
+					</div>
+				) : (
+					<div
+						className={ classnames( 'edit-site-visual-editor', {
+							'is-focus-mode': isFocusMode || !! editorCanvasView,
+							'is-view-mode': isViewMode,
+						} ) }
+					>
+						<ResizableEditor
+							enableResizing={ enableResizing }
+							height={
+								sizes.height && ! forceFullHeight
+									? sizes.height
+									: '100%'
+							}
 						>
-							<BackButton />
-							<ResizableEditor
+							<EditorCanvas
 								enableResizing={ enableResizing }
-								height={
-									sizes.height && ! forceFullHeight
-										? sizes.height
-										: '100%'
-								}
+								settings={ settings }
 							>
-								<EditorCanvas
-									enableResizing={ enableResizing }
-									settings={ settings }
-									contentRef={ contentRef }
-								>
-									{ resizeObserver }
-								</EditorCanvas>
-							</ResizableEditor>
-						</BlockTools>
-					)
-				}
-			</EditorCanvasContainer.Slot>
-			<PageContentFocusNotifications contentRef={ contentRef } />
-		</>
+								{ resizeObserver }
+							</EditorCanvas>
+						</ResizableEditor>
+					</div>
+				)
+			}
+		</EditorCanvasContainer.Slot>
 	);
 }

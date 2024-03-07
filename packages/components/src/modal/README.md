@@ -4,12 +4,6 @@ Modals give users information and choices related to a task they’re trying to 
 
 ![An alert modal for trashing a post](https://wordpress.org/gutenberg/files/2019/04/Modal.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage

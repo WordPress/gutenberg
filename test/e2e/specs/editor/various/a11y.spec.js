@@ -124,6 +124,13 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		page,
 		pageUtils,
 	} ) => {
+		// Note: this test depends on a particular viewport height to determine whether or not
+		// the modal content is scrollable. If this tests fails and needs to be debugged locally,
+		// double-check the viewport height when running locally versus in CI. Additionally,
+		// when adding or removing items from the preference menu, this test may need to be updated
+		// if the height of panels has changed. It would be good to find a more robust way to test
+		// this behavior.
+
 		// Open the top bar Options menu.
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
@@ -145,6 +152,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		const generalTab = preferencesModal.locator(
 			'role=tab[name="General"i]'
 		);
+		const accessibilityTab = preferencesModal.locator(
+			'role=tab[name="Accessibility"i]'
+		);
 		const blocksTab = preferencesModal.locator(
 			'role=tab[name="Blocks"i]'
 		);
@@ -165,9 +175,20 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			await tab.focus();
 		}
 
-		// The General tab panel content is short and not scrollable.
-		// Check it's not focusable.
+		// The Accessibility tab is currently short and not scrollable.
+		// Check that it cannot be focused by tabbing. Note: this test depends
+		// on a particular viewport height to determine whether or not the
+		// modal content is scrollable. If additional Accessibility options are
+		// added, then eventually this test will fail.
+		// TODO: find a more robust way to test this behavior.
 		await clickAndFocusTab( generalTab );
+		// Navigate down to the Accessibility tab.
+		await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
+		// Check the Accessibility tab panel is visible.
+		await expect(
+			preferencesModal.locator( 'role=tabpanel[name="Accessibility"i]' )
+		).toBeVisible();
+		await expect( accessibilityTab ).toBeFocused();
 		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Shift+Tab' );

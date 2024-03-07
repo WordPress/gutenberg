@@ -4,103 +4,69 @@
 import {
 	privateApis as componentsPrivateApis,
 	Button,
-	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall, plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { fields, view, onChangeView } ) {
-	const filters = [];
-	fields.forEach( ( field ) => {
-		if ( ! field.type ) {
-			return;
-		}
-
-		switch ( field.type ) {
-			case ENUMERATION_TYPE:
-				filters.push( {
-					field: field.id,
-					name: field.header,
-					elements: field.elements || [],
-					isVisible: view.filters.some(
-						( f ) => f.field === field.id
-					),
-				} );
-		}
-	} );
-
-	if ( filters.length === 0 ) {
+function AddFilter( { filters, view, onChangeView, setOpenedFilter }, ref ) {
+	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
 		return null;
 	}
-
+	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
 		<DropdownMenu
-			label={ __( 'Add filter' ) }
 			trigger={
 				<Button
-					disabled={ filters.length === view.filters?.length }
 					__experimentalIsFocusable
-					variant="tertiary"
 					size="compact"
+					className="dataviews-filters-button"
+					variant="tertiary"
+					disabled={ ! inactiveFilters.length }
+					ref={ ref }
 				>
-					<Icon icon={ plus } style={ { flexShrink: 0 } } />
 					{ __( 'Add filter' ) }
 				</Button>
 			}
 		>
-			{ filters.map( ( filter ) => {
-				if ( filter.isVisible ) {
-					return null;
-				}
-
+			{ inactiveFilters.map( ( filter ) => {
 				return (
-					<DropdownSubMenu
+					<DropdownMenuItem
 						key={ filter.field }
-						trigger={
-							<DropdownSubMenuTrigger
-								suffix={ <Icon icon={ chevronRightSmall } /> }
-							>
-								{ filter.name }
-							</DropdownSubMenuTrigger>
-						}
+						onClick={ () => {
+							setOpenedFilter( filter.field );
+							onChangeView( {
+								...view,
+								page: 1,
+								filters: [
+									...( view.filters || [] ),
+									{
+										field: filter.field,
+										value: undefined,
+										operator: filter.operators[ 0 ],
+									},
+								],
+							} );
+						} }
 					>
-						{ filter.elements.map( ( element ) => (
-							<DropdownMenuItem
-								key={ element.value }
-								onSelect={ () => {
-									onChangeView( ( currentView ) => ( {
-										...currentView,
-										page: 1,
-										filters: [
-											...currentView.filters,
-											{
-												field: filter.field,
-												operator: OPERATOR_IN,
-												value: element.value,
-											},
-										],
-									} ) );
-								} }
-							>
-								{ element.label }
-							</DropdownMenuItem>
-						) ) }
-					</DropdownSubMenu>
+						<DropdownMenuItemLabel>
+							{ filter.name }
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
 				);
 			} ) }
 		</DropdownMenu>
 	);
 }
+
+export default forwardRef( AddFilter );

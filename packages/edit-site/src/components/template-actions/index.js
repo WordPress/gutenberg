@@ -36,51 +36,12 @@ export default function TemplateActions( {
 			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
 		[ postType, postId ]
 	);
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+	const { removeTemplate } = useDispatch( editSiteStore );
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
 
 	if ( ! isRemovable && ! isRevertable ) {
 		return null;
-	}
-
-	async function revertAndSaveTemplate() {
-		try {
-			await revertTemplate( template, { allowUndo: false } );
-			await saveEditedEntityRecord(
-				'postType',
-				template.type,
-				template.id
-			);
-
-			createSuccessNotice(
-				sprintf(
-					/* translators: The template/part's name. */
-					__( '"%s" reverted.' ),
-					decodeEntities( template.title.rendered )
-				),
-				{
-					type: 'snackbar',
-					id: 'edit-site-template-reverted',
-				}
-			);
-		} catch ( error ) {
-			const fallbackErrorMessage =
-				template.type === TEMPLATE_POST_TYPE
-					? __( 'An error occurred while reverting the template.' )
-					: __(
-							'An error occurred while reverting the template part.'
-					  );
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: fallbackErrorMessage;
-
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		}
 	}
 
 	return (
@@ -109,21 +70,77 @@ export default function TemplateActions( {
 						</>
 					) }
 					{ isRevertable && (
-						<MenuItem
-							info={ __(
-								'Use the template as supplied by the theme.'
-							) }
-							onClick={ () => {
-								revertAndSaveTemplate();
-								onClose();
-							} }
-						>
-							{ __( 'Clear customizations' ) }
-						</MenuItem>
+						<ResetMenuItem
+							template={ template }
+							onClose={ onClose }
+						/>
 					) }
 				</MenuGroup>
 			) }
 		</DropdownMenu>
+	);
+}
+
+function ResetMenuItem( { template, onClose } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { revertTemplate } = useDispatch( editSiteStore );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	async function revertAndSaveTemplate() {
+		try {
+			await revertTemplate( template, { allowUndo: false } );
+			await saveEditedEntityRecord(
+				'postType',
+				template.type,
+				template.id
+			);
+			createSuccessNotice(
+				sprintf(
+					/* translators: The template/part's name. */
+					__( '"%s" reverted.' ),
+					decodeEntities( template.title.rendered )
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-template-reverted',
+				}
+			);
+		} catch ( error ) {
+			const fallbackErrorMessage =
+				template.type === TEMPLATE_POST_TYPE
+					? __( 'An error occurred while reverting the template.' )
+					: __(
+							'An error occurred while reverting the template part.'
+					  );
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: fallbackErrorMessage;
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
+	}
+	return (
+		<>
+			<MenuItem
+				info={ __( 'Use the template as supplied by the theme.' ) }
+				onClick={ () => setIsModalOpen( true ) }
+			>
+				{ __( 'Clear customizations' ) }
+			</MenuItem>
+			<ConfirmDialog
+				isOpen={ isModalOpen }
+				onConfirm={ () => {
+					revertAndSaveTemplate();
+					onClose();
+				} }
+				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Clear' ) }
+			>
+				{ __( 'Are you sure you want to clear these customizations?' ) }
+			</ConfirmDialog>
+		</>
 	);
 }
 

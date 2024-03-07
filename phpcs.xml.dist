@@ -9,7 +9,6 @@
 	</rule>
 
 	<rule ref="WordPress-Core"/>
-	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
@@ -59,48 +58,15 @@
 	<exclude-pattern>./vendor/*</exclude-pattern>
 	<exclude-pattern>./test/php/gutenberg-coding-standards/*</exclude-pattern>
 
-	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg -->
+	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg
+	     DO NOT REMOVE these rules; these files are "built" artifacts from Core
+	     and when they are removed it prevents keeping the repos in sync. -->
 	<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
-
-	<!-- These special comments are markers for the build process -->
-	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
-		<exclude-pattern>gutenberg.php</exclude-pattern>
-	</rule>
-
-	<!-- Do not require docblocks for unit tests -->
-	<rule ref="Squiz.Commenting.FunctionComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FileComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-		<exclude-pattern>test/gutenberg-test-themes/*</exclude-pattern>
-		<exclude-pattern>**/*.min.asset.php</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.ClassComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.ClassComment.SpacingAfter">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Generic.Commenting.DocComment.Empty">
-    	<exclude-pattern>phpunit/*</exclude-pattern>
-    </rule>
-	<rule ref="Generic.Commenting.DocComment.MissingShort">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.VariableComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
 
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>packages/block-library/src/navigation/index.php</exclude-pattern>
 	</rule>
 
 	<!-- Ignore empty files in tests/gutenberg-test-themes -->
@@ -127,6 +93,7 @@
 			</property>
 			<property name="classesWhiteList" type="array">
 				<element value="/^Gutenberg.+/"/>
+				<element value="/^.+_Gutenberg$/"/>
 			</property>
 		</properties>
 	</rule>
@@ -182,6 +149,25 @@
 				<element value="wp_latest_comments_draft_or_post_title"/>
 				<element value="wp_restore_footnotes_from_revision"/>
 				<element value="wp_save_footnotes_meta"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses">
+		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+		<!--
+			Refactoring required: the functions and classes prefixed with 'Gutenberg_' in the files that are being excluded
+			through the 'exclude-pattern' statements below must be guarded, as they are available only in the Gutenberg context,
+			not in Core.
+		-->
+		<exclude-pattern>./packages/block-library/src/form-input/index.php</exclude-pattern>
+		<exclude-pattern>./packages/block-library/src/form-submission-notification/index.php</exclude-pattern>
+		<exclude-pattern>./packages/block-library/src/form/index.php</exclude-pattern>
+		<properties>
+			<property name="forbidden_functions" type="array">
+				<element value="[Gg]utenberg.*"/>
+			</property>
+			<property name="forbidden_classes" type="array">
+				<element value="[Gg]utenberg.*"/>
 			</property>
 		</properties>
 	</rule>

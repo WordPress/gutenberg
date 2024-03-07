@@ -5,6 +5,7 @@
 	"title": "List item",
 	"category": "text",
 	"parent": [ "core/list" ],
+	"allowedBlocks": [ "core/list" ],
 	"description": "Create a list item.",
 	"textdomain": "default",
 	"attributes": {
@@ -12,10 +13,9 @@
 			"type": "string"
 		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "li",
-			"default": "",
 			"__experimentalRole": "content"
 		}
 	},
@@ -42,6 +42,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

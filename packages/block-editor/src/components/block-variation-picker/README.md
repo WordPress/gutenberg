@@ -10,11 +10,6 @@ This component is currently used by "Columns" and "Query Loop" blocks.
 
 ![Columns block variations](https://make.wordpress.org/core/files/2020/09/colums-block-variations.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

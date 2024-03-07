@@ -10,6 +10,7 @@ import {
 	initializeEditor,
 	triggerBlockListLayout,
 	typeInRichText,
+	openBlockSettings,
 	waitFor,
 } from 'test/helpers';
 
@@ -389,6 +390,54 @@ describe( 'Buttons block', () => {
 			fireEvent( blockSettingsModal, 'backdropPress' );
 
 			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a custom gradient background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			await openBlockSettings( screen );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap on the gradient segment
+			fireEvent.press( screen.getByLabelText( 'Gradient' ) );
+
+			// Tap one gradient color
+			fireEvent.press(
+				screen.getByLabelText( 'Light green cyan to vivid green cyan' )
+			);
+
+			// Tap on Customize Gradient
+			fireEvent.press( screen.getByLabelText( /Customize Gradient/ ) );
+
+			// Change the current angle
+			fireEvent.press( screen.getByText( '135', { hidden: true } ) );
+			const angleTextInput = screen.getByDisplayValue( '135', {
+				hidden: true,
+			} );
+			fireEvent.changeText( angleTextInput, '200' );
+
+			// Go back to the settings list.
+			fireEvent.press( await screen.findByLabelText( 'Go back' ) );
+
+			// Assert
+			const customButton = await screen.findByText( 'CUSTOM' );
+			expect( customButton ).toBeVisible();
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 	} );

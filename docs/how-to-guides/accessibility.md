@@ -4,7 +4,7 @@ Accessibility documentation for developers working on the Gutenberg Project.
 
 For more information on accessibility and WordPress see the [Make WordPress Accessibility Handbook](https://make.wordpress.org/accessibility/handbook/) and the [Accessibility Team section](https://make.wordpress.org/accessibility/).
 
-## Landmark Regions
+## Landmark regions
 
 It is a best practice to include ALL content on the page in landmarks, so that screen reader users who rely on them to navigate from section to section do not lose track of content.
 

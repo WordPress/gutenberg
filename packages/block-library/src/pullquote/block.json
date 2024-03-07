@@ -8,16 +8,15 @@
 	"textdomain": "default",
 	"attributes": {
 		"value": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "p",
 			"__experimentalRole": "content"
 		},
 		"citation": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "cite",
-			"default": "",
 			"__experimentalRole": "content"
 		},
 		"textAlign": {
@@ -35,6 +34,10 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -66,6 +69,9 @@
 				"fontSize": "1.5em",
 				"lineHeight": "1.6"
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-pullquote-editor",

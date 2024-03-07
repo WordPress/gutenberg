@@ -6,11 +6,6 @@ The `LineHeightControl` component adds a lineHeight attribute to the core Paragr
 
 _Note:_ It is worth noting that the line height setting option is an opt-in feature. [Themes need to declare support for it](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights) before it'll be available.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

@@ -812,6 +812,7 @@ export class ImageEdit extends Component {
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress
+							enablePausedUploads
 							coverUrl={ url }
 							mediaId={ id }
 							onUpdateMediaProgress={ this.updateMediaProgress }
@@ -825,6 +826,7 @@ export class ImageEdit extends Component {
 								this.mediaUploadStateReset
 							}
 							renderContent={ ( {
+								isUploadPaused,
 								isUploadInProgress,
 								isUploadFailed,
 								retryMessage,
@@ -843,6 +845,7 @@ export class ImageEdit extends Component {
 												! isCaptionSelected
 											}
 											isUploadFailed={ isUploadFailed }
+											isUploadPaused={ isUploadPaused }
 											isUploadInProgress={
 												isUploadInProgress
 											}
@@ -886,7 +889,7 @@ export class ImageEdit extends Component {
 		return (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-				isReplacingMedia={ true }
+				isReplacingMedia
 				onSelect={ this.onSelectMediaUploadOption }
 				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {

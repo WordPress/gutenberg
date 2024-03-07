@@ -1,24 +1,46 @@
 /**
  * External dependencies
  */
-import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+// eslint-disable-next-line no-restricted-imports
+import type * as Ariakit from '@ariakit/react';
+import type { Placement } from '@floating-ui/react-dom';
 
-export type DropdownMenuProps = {
+export interface DropdownMenuContext {
+	/**
+	 * The ariakit store shared across all DropdownMenu subcomponents.
+	 */
+	store: Ariakit.MenuStore;
+	/**
+	 * The variant used by the underlying menu popover.
+	 */
+	variant?: 'toolbar';
+}
+
+export interface DropdownMenuProps {
+	/**
+	 * The trigger button.
+	 */
+	trigger: React.ReactElement;
+	/**
+	 * The contents of the dropdown.
+	 */
+	children?: React.ReactNode;
 	/**
 	 * The open state of the dropdown menu when it is initially rendered. Use when
-	 * you do not need to control its open state.
+	 * not wanting to control its open state.
 	 *
+	 * @default false
 	 */
-	defaultOpen?: DropdownMenuPrimitive.DropdownMenuProps[ 'defaultOpen' ];
+	defaultOpen?: boolean;
 	/**
 	 * The controlled open state of the dropdown menu. Must be used in conjunction
 	 * with `onOpenChange`.
 	 */
-	open?: DropdownMenuPrimitive.DropdownMenuProps[ 'open' ];
+	open?: boolean;
 	/**
 	 * Event handler called when the open state of the dropdown menu changes.
 	 */
-	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps[ 'onOpenChange' ];
+	onOpenChange?: ( open: boolean ) => void;
 	/**
 	 * The modality of the dropdown menu. When set to true, interaction with
 	 * outside elements will be disabled and only menu content will be visible to
@@ -26,240 +48,132 @@ export type DropdownMenuProps = {
 	 *
 	 * @default true
 	 */
-	modal?: DropdownMenuPrimitive.DropdownMenuProps[ 'modal' ];
+	modal?: boolean;
 	/**
-	 * The preferred side of the trigger to render against when open.
-	 * Will be reversed when collisions occur and avoidCollisions is enabled.
+	 * The placement of the dropdown menu popover.
 	 *
-	 * @default 'bottom'
+	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
 	 */
-	side?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'side' ];
+	placement?: Placement;
 	/**
-	 * The distance in pixels from the trigger.
+	 * The distance between the popover and the anchor element.
 	 *
-	 * @default 0
+	 * @default 8 for root-level menus, 16 for nested menus
 	 */
-	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'sideOffset' ];
+	gutter?: number;
 	/**
-	 * The preferred alignment against the trigger.
-	 * May change when collisions occur.
+	 * The skidding of the popover along the anchor element. Can be set to
+	 * negative values to make the popover shift to the opposite side.
 	 *
-	 * @default 'start'
+	 * @default 0 for root-level menus, -8 for nested menus
 	 */
-	align?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'align' ];
+	shift?: number;
 	/**
-	 * An offset in pixels from the "start" or "end" alignment options.
+	 * Determines whether the menu popover will be hidden when the user presses
+	 * the Escape key.
 	 *
-	 * @default 0
+	 * @default `( event ) => { event.preventDefault(); return true; }`
 	 */
-	alignOffset?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'alignOffset' ];
-	/**
-	 * The trigger button.
-	 */
-	trigger: React.ReactNode;
-	/**
-	 * The contents of the dropdown
-	 */
-	children: React.ReactNode;
-};
+	hideOnEscape?:
+		| boolean
+		| ( (
+				event: KeyboardEvent | React.KeyboardEvent< Element >
+		  ) => boolean );
+}
 
-export type DropdownSubMenuTriggerProps = {
+export interface DropdownMenuGroupProps {
 	/**
-	 * The contents of the item.
+	 * The contents of the dropdown menu group.
+	 */
+	children: React.ReactNode;
+}
+
+export interface DropdownMenuItemProps {
+	/**
+	 * The contents of the menu item.
 	 */
 	children: React.ReactNode;
 	/**
-	 * The contents of the item's prefix.
+	 * The contents of the menu item's prefix.
 	 */
 	prefix?: React.ReactNode;
 	/**
-	 * The contents of the item's suffix.
-	 *
-	 * @default The standard chevron icon for a submenu trigger.
+	 * The contents of the menu item's suffix.
 	 */
 	suffix?: React.ReactNode;
-};
+	/**
+	 * Whether to hide the parent menu when the item is clicked.
+	 *
+	 * @default true
+	 */
+	hideOnClick?: boolean;
+	/**
+	 * Determines if the element is disabled.
+	 */
+	disabled?: boolean;
+}
 
-export type DropdownSubMenuProps = {
+export interface DropdownMenuCheckboxItemProps
+	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
 	/**
-	 * The open state of the submenu when it is initially rendered. Use when you
-	 * do not need to control its open state.
-	 */
-	defaultOpen?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'defaultOpen' ];
-	/**
-	 * The controlled open state of the submenu. Must be used in conjunction with
-	 * `onOpenChange`.
-	 */
-	open?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'open' ];
-	/**
-	 * Event handler called when the open state of the submenu changes.
-	 */
-	onOpenChange?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'onOpenChange' ];
-	/**
-	 * When `true`, prevents the user from interacting with the item.
-	 */
-	disabled?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'disabled' ];
-	/**
-	 * Optional text used for typeahead purposes for the trigger. By default the typeahead
-	 * behavior will use the `.textContent` of the trigger. Use this when the content
-	 * is complex, or you have non-textual content inside.
-	 */
-	textValue?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'textValue' ];
-	/**
-	 * The contents rendered inside the trigger. The trigger should be
-	 * an instance of the `DropdownSubMenuTriggerProps` component.
-	 */
-	trigger: React.ReactNode;
-	/**
-	 * The contents of the dropdown sub menu
-	 */
-	children: React.ReactNode;
-};
-
-export type DropdownMenuItemProps = {
-	/**
-	 * When true, prevents the user from interacting with the item.
+	 * Whether to hide the dropdown menu when the item is clicked.
 	 *
 	 * @default false
 	 */
-	disabled?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'disabled' ];
+	hideOnClick?: boolean;
 	/**
-	 * Event handler called when the user selects an item (via mouse or keyboard).
-	 * Calling `event.preventDefault` in this handler will prevent the dropdown
-	 * menu from closing when selecting that item.
+	 * The checkbox menu item's name.
 	 */
-	onSelect?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'onSelect' ];
+	name: string;
 	/**
-	 * Optional text used for typeahead purposes. By default the typeahead
-	 * behavior will use the `.textContent` of the item. Use this when the content
-	 * is complex, or you have non-textual content inside.
+	 * The checkbox item's value, useful when using multiple checkbox menu items
+	 * associated to the same `name`.
 	 */
-	textValue?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'textValue' ];
+	value?: string;
 	/**
-	 * The contents of the item
+	 * The controlled checked state of the checkbox menu item.
 	 */
-	children: React.ReactNode;
+	checked?: boolean;
 	/**
-	 * The contents of the item's prefix
+	 * The checked state of the checkbox menu item when it is initially rendered.
+	 * Use when not wanting to control its checked state.
 	 */
-	prefix?: React.ReactNode;
+	defaultChecked?: boolean;
 	/**
-	 * The contents of the item's suffix
+	 * Event handler called when the checked state of the checkbox menu item changes.
 	 */
-	suffix?: React.ReactNode;
-};
+	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
+}
 
-export type DropdownMenuCheckboxItemProps = {
+export interface DropdownMenuRadioItemProps
+	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
 	/**
-	 * The controlled checked state of the item.
-	 * Must be used in conjunction with `onCheckedChange`.
+	 * Whether to hide the dropdown menu when the item is clicked.
 	 *
 	 * @default false
 	 */
-	checked?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'checked' ];
+	hideOnClick?: boolean;
 	/**
-	 * Event handler called when the checked state changes.
+	 * The radio item's name.
 	 */
-	onCheckedChange?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'onCheckedChange' ];
+	name: string;
 	/**
-	 * When `true`, prevents the user from interacting with the item.
+	 * The radio item's value.
 	 */
-	disabled?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'disabled' ];
+	value: string | number;
 	/**
-	 * Event handler called when the user selects an item (via mouse or keyboard).
-	 * Calling `event.preventDefault` in this handler will prevent the dropdown
-	 * 	menu from closing when selecting that item.
+	 * The controlled checked state of the radio menu item.
 	 */
-	onSelect?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'onSelect' ];
+	checked?: boolean;
 	/**
-	 * Optional text used for typeahead purposes. By default the typeahead
-	 * behavior will use the `.textContent` of the item. Use this when the content
-	 * is complex, or you have non-textual content inside.
+	 * The checked state of the radio menu item when it is initially rendered.
+	 * Use when not wanting to control its checked state.
 	 */
-	textValue?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'textValue' ];
+	defaultChecked?: boolean;
 	/**
-	 * The contents of the checkbox item
+	 * Event handler called when the checked radio menu item changes.
 	 */
-	children: React.ReactNode;
-	/**
-	 * The contents of the checkbox item's suffix
-	 */
-	suffix?: React.ReactNode;
-};
+	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
+}
 
-export type DropdownMenuRadioGroupProps = {
-	/**
-	 * The value of the selected item in the group.
-	 */
-	value?: DropdownMenuPrimitive.DropdownMenuRadioGroupProps[ 'value' ];
-	/**
-	 * Event handler called when the value changes.
-	 */
-	onValueChange?: DropdownMenuPrimitive.DropdownMenuRadioGroupProps[ 'onValueChange' ];
-	/**
-	 * The contents of the radio group
-	 */
-	children: React.ReactNode;
-};
-
-export type DropdownMenuRadioItemProps = {
-	/**
-	 * The unique value of the item.
-	 */
-	value: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'value' ];
-	/**
-	 * When `true`, prevents the user from interacting with the item.
-	 */
-	disabled?: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'disabled' ];
-	/**
-	 * Event handler called when the user selects an item (via mouse or keyboard).
-	 * Calling `event.preventDefault` in this handler will prevent the dropdown
-	 * menu from closing when selecting that item.
-	 */
-	onSelect?: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'onSelect' ];
-	/**
-	 * Optional text used for typeahead purposes. By default the typeahead
-	 * behavior will use the `.textContent` of the item. Use this when the content
-	 * is complex, or you have non-textual content inside.
-	 */
-	textValue?: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'textValue' ];
-	/**
-	 * The contents of the radio item
-	 */
-	children: React.ReactNode;
-	/**
-	 * The contents of the radio item's suffix
-	 */
-	suffix?: React.ReactNode;
-};
-
-export type DropdownMenuLabelProps = {
-	/**
-	 * The contents of the label
-	 */
-	children: React.ReactNode;
-};
-
-export type DropdownMenuGroupProps = {
-	/**
-	 * The contents of the group
-	 */
-	children: React.ReactNode;
-};
-
-export type DropdownMenuSeparatorProps = {};
-
-export type DropdownMenuInternalContext = {
-	/**
-	 * This variant can be used to change the appearance of the component in
-	 * specific contexts, ie. when rendered inside the `Toolbar` component.
-	 */
-	variant?: 'toolbar';
-};
-
-export type DropdownMenuPrivateContext = Pick<
-	DropdownMenuInternalContext,
-	'variant'
-> & {
-	portalContainer?: HTMLElement | null;
-};
+export interface DropdownMenuSeparatorProps {}

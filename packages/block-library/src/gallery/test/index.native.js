@@ -92,7 +92,7 @@ describe( 'Gallery block', () => {
 		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 
-		getBlockSpy.mockReset();
+		getBlockSpy.mockRestore();
 	} );
 
 	it( 'selects a gallery item', async () => {
@@ -694,7 +694,7 @@ describe( 'Gallery block', () => {
 		await openBlockSettings( screen );
 
 		// Disable crop images setting
-		fireEvent.press( getByText( 'Crop images' ) );
+		fireEvent.press( getByText( 'Crop images to fit' ) );
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

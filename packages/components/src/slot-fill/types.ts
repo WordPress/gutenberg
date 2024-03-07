@@ -96,6 +96,11 @@ export type SlotFillProviderProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+
+	/**
+	 * Whether to pass slots to the parent provider if existent.
+	 */
+	passthrough?: boolean;
 };
 
 export type SlotFillBubblesVirtuallySlotRef = RefObject< HTMLElement >;

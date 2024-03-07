@@ -1,0 +1,48 @@
+$vertical-tabs-width: 160px;
+
+.preferences__tabs-tablist {
+	position: absolute;
+	top: $header-height + $grid-unit-30;
+	// Aligns button text instead of button box.
+	left: $grid-unit-20;
+	width: $vertical-tabs-width;
+
+}
+
+.preferences__tabs-tab {
+	border-radius: $radius-block-ui;
+	font-weight: 400;
+
+	&[aria-selected="true"] {
+		background: $gray-100;
+		box-shadow: none;
+		font-weight: 500;
+	}
+
+	&[aria-selected="true"]::after {
+		content: none;
+	}
+
+	&[role="tab"]:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:focus-visible::before {
+		content: none;
+	}
+}
+
+.preferences__tabs-tabpanel {
+	padding-left: $grid-unit-30;
+	margin-left: $vertical-tabs-width;
+}
+
+@media (max-width: #{ ($break-medium - 1) }) {
+	// Keep the navigator component from overflowing the modal content area
+	// to ensure that sticky position elements stick where intended.
+	.preferences__provider {
+		height: 100%;
+	}
+}

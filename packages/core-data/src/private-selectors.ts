@@ -1,7 +1,18 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+
+/**
+ * WordPress dependencies
+ */
+import { createRegistrySelector } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import type { State } from './selectors';
+import { STORE_NAME } from './name';
 
 type EntityRecordKey = string | number;
 
@@ -28,3 +39,19 @@ export function getNavigationFallbackId(
 ): EntityRecordKey | undefined {
 	return state.navigationFallbackId;
 }
+
+export const getBlockPatternsForPostType = createRegistrySelector(
+	( select: any ) =>
+		createSelector(
+			( state, postType ) =>
+				select( STORE_NAME )
+					.getBlockPatterns()
+					.filter(
+						( { postTypes } ) =>
+							! postTypes ||
+							( Array.isArray( postTypes ) &&
+								postTypes.includes( postType ) )
+					),
+			() => [ select( STORE_NAME ).getBlockPatterns() ]
+		)
+);

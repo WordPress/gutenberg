@@ -10,7 +10,6 @@ import userEvent from '@testing-library/user-event';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	BlockEditorProvider,
-	BlockTools,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -76,9 +75,7 @@ export function Editor( { testBlocks, settings = {} } ) {
 			settings={ settings }
 		>
 			<BlockInspector />
-			<BlockTools>
-				<BlockCanvas height="100%" shouldIframe={ false } />
-			</BlockTools>
+			<BlockCanvas height="100%" shouldIframe={ false } />
 		</BlockEditorProvider>
 	);
 }

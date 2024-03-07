@@ -2,7 +2,7 @@
 
 New styles options are integrated into theme.json on a regular basis. Knowing the style options available through theme.json or the styles editor at any given time can be challenging. To clarify, the table below indicates the WordPress version when each theme.json styles option became available and when a corresponding control was added to the user interface to allow management of the style from the Styles editor.
 
-## Styles Keys
+## Styles keys
 
 | Key | theme.json Since| Style Editor Since |
 | --- | :---: | :---: |

@@ -14,11 +14,7 @@ export const toggleGroupControl = ( {
 	isBlock,
 	isDeselectable,
 	size,
-	__next40pxDefaultSize,
-}: Pick<
-	ToggleGroupControlProps,
-	'isBlock' | 'isDeselectable' | '__next40pxDefaultSize'
-> & {
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
@@ -26,10 +22,9 @@ export const toggleGroupControl = ( {
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
-	padding: 2px;
 	position: relative;
 
-	${ toggleGroupControlSize( size, __next40pxDefaultSize ) }
+	${ toggleGroupControlSize( size ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
 
@@ -57,21 +52,20 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 };
 
 export const toggleGroupControlSize = (
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >,
-	__next40pxDefaultSize: ToggleGroupControlProps[ '__next40pxDefaultSize' ]
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
 ) => {
-	const heights = {
-		default: '40px',
-		'__unstable-large': '40px',
+	const styles = {
+		default: css`
+			min-height: 36px;
+			padding: 2px;
+		`,
+		'__unstable-large': css`
+			min-height: 40px;
+			padding: 3px;
+		`,
 	};
 
-	if ( ! __next40pxDefaultSize ) {
-		heights.default = '36px';
-	}
-
-	return css`
-		min-height: ${ heights[ size ] };
-	`;
+	return styles[ size ];
 };
 
 export const block = css`

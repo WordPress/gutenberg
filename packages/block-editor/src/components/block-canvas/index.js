@@ -2,16 +2,19 @@
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import BlockTools from '../block-tools';
 import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useBlockCommands } from '../use-block-commands';
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -21,13 +24,18 @@ export function ExperimentalBlockCanvas( {
 	contentRef: contentRefProp,
 	iframeProps,
 } ) {
+	useBlockCommands();
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
-	const contentRef = useMergeRefs( [ contentRefProp, clearerRef ] );
+	const localRef = useRef();
+	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
 
 	if ( ! shouldIframe ) {
 		return (
-			<>
+			<BlockTools
+				__unstableContentRef={ localRef }
+				style={ { height, display: 'flex' } }
+			>
 				<EditorStyles
 					styles={ styles }
 					scope=".editor-styles-wrapper"
@@ -36,29 +44,35 @@ export function ExperimentalBlockCanvas( {
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					tabIndex={ -1 }
-					style={ { height } }
+					style={ {
+						height: '100%',
+						width: '100%',
+					} }
 				>
 					{ children }
 				</WritingFlow>
-			</>
+			</BlockTools>
 		);
 	}
 
 	return (
-		<Iframe
-			{ ...iframeProps }
-			ref={ resetTypingRef }
-			contentRef={ contentRef }
-			style={ {
-				width: '100%',
-				height,
-				...iframeProps?.style,
-			} }
-			name="editor-canvas"
+		<BlockTools
+			__unstableContentRef={ localRef }
+			style={ { height, display: 'flex' } }
 		>
-			<EditorStyles styles={ styles } />
-			{ children }
-		</Iframe>
+			<Iframe
+				{ ...iframeProps }
+				ref={ resetTypingRef }
+				contentRef={ contentRef }
+				style={ {
+					...iframeProps?.style,
+				} }
+				name="editor-canvas"
+			>
+				<EditorStyles styles={ styles } />
+				{ children }
+			</Iframe>
+		</BlockTools>
 	);
 }
 

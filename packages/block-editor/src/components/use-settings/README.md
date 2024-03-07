@@ -9,10 +9,6 @@ It does the lookup of the settings in the following order:
 3. If that doesn't prove to be successful in getting a value, then it falls back to the settings from the block editor store.
 4. If none of the above steps prove to be successful, then it's likely to be a deprecated setting and the deprecated setting is used instead.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-
 ## Development guidelines
 
 ### Usage

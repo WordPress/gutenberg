@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -187,6 +192,9 @@ const {
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
 	__experimentalGetDefaultTemplatePartAreas,
+	isEditorPanelRemoved,
+	isInserterOpened,
+	isListViewOpened,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -3008,6 +3016,47 @@ describe( 'selectors', () => {
 			postTypes.forEach( ( state ) =>
 				expect( getPostTypeLabel( state ) ).toBeUndefined()
 			);
+		} );
+	} );
+	describe( 'isEditorPanelRemoved', () => {
+		it( 'should return false by default', () => {
+			const state = deepFreeze( {
+				removedPanels: [],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return true when panel was removed', () => {
+			const state = deepFreeze( {
+				removedPanels: [ 'post-status' ],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

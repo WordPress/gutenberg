@@ -12,12 +12,13 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import TemplateAreas from './template-areas';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { useAddedBy } from '../list/added-by';
+import { useAddedBy } from '../page-templates-template-parts/hooks';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
@@ -45,8 +46,13 @@ function useTemplateDetails( postType, postId ) {
 
 	const content =
 		record?.slug === 'home' || record?.slug === 'index' ? (
-			<HomeTemplateDetails />
-		) : null;
+			<>
+				<HomeTemplateDetails />
+				<TemplateAreas />
+			</>
+		) : (
+			<TemplateAreas />
+		);
 
 	const footer = record?.modified ? (
 		<SidebarNavigationScreenDetailsFooter record={ record } />

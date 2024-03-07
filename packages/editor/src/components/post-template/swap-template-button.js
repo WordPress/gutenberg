@@ -18,11 +18,11 @@ import { useAvailableTemplates, useEditedPostContext } from './hooks';
 
 export default function SwapTemplateButton( { onClick } ) {
 	const [ showModal, setShowModal ] = useState( false );
-	const availableTemplates = useAvailableTemplates();
 	const onClose = useCallback( () => {
 		setShowModal( false );
 	}, [] );
 	const { postType, postId } = useEditedPostContext();
+	const availableTemplates = useAvailableTemplates( postType );
 	const { editEntityRecord } = useDispatch( coreStore );
 	if ( ! availableTemplates?.length ) {
 		return null;
@@ -51,7 +51,10 @@ export default function SwapTemplateButton( { onClick } ) {
 					isFullScreen
 				>
 					<div className="editor-post-template__swap-template-modal-content">
-						<TemplatesList onSelect={ onTemplateSelect } />
+						<TemplatesList
+							postType={ postType }
+							onSelect={ onTemplateSelect }
+						/>
 					</div>
 				</Modal>
 			) }
@@ -59,8 +62,8 @@ export default function SwapTemplateButton( { onClick } ) {
 	);
 }
 
-function TemplatesList( { onSelect } ) {
-	const availableTemplates = useAvailableTemplates();
+function TemplatesList( { postType, onSelect } ) {
+	const availableTemplates = useAvailableTemplates( postType );
 	const templatesAsPatterns = useMemo(
 		() =>
 			availableTemplates.map( ( template ) => ( {

@@ -81,7 +81,6 @@ function ColorGradientControlInner( {
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
-				__nextHasNoMargin
 				value={ gradientValue }
 				onChange={
 					canChooseAColor
@@ -134,22 +133,22 @@ function ColorGradientControlInner( {
 					{ canChooseAColor && canChooseAGradient && (
 						<div>
 							<Tabs
-								initialTabId={
+								defaultTabId={
 									gradientValue
 										? TAB_IDS.gradient
 										: !! canChooseAColor && TAB_IDS.color
 								}
 							>
 								<Tabs.TabList>
-									<Tabs.Tab id={ TAB_IDS.color }>
+									<Tabs.Tab tabId={ TAB_IDS.color }>
 										{ __( 'Solid' ) }
 									</Tabs.Tab>
-									<Tabs.Tab id={ TAB_IDS.gradient }>
+									<Tabs.Tab tabId={ TAB_IDS.gradient }>
 										{ __( 'Gradient' ) }
 									</Tabs.Tab>
 								</Tabs.TabList>
 								<Tabs.TabPanel
-									id={ TAB_IDS.color }
+									tabId={ TAB_IDS.color }
 									className={
 										'block-editor-color-gradient-control__panel'
 									}
@@ -158,7 +157,7 @@ function ColorGradientControlInner( {
 									{ tabPanels.color }
 								</Tabs.TabPanel>
 								<Tabs.TabPanel
-									id={ TAB_IDS.gradient }
+									tabId={ TAB_IDS.gradient }
 									className={
 										'block-editor-color-gradient-control__panel'
 									}

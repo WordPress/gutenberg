@@ -30,7 +30,7 @@ test.describe( 'Site Editor List View', () => {
 		).toBeHidden();
 
 		// Turn on block list view by default.
-		await editor.setPreferences( 'core/edit-site', {
+		await editor.setPreferences( 'core', {
 			showListViewByDefault: true,
 		} );
 
@@ -41,7 +41,7 @@ test.describe( 'Site Editor List View', () => {
 		).toBeVisible();
 
 		// The preferences cleanup.
-		await editor.setPreferences( 'core/edit-site', {
+		await editor.setPreferences( 'core', {
 			showListViewByDefault: false,
 		} );
 	} );
@@ -117,6 +117,7 @@ test.describe( 'Site Editor List View', () => {
 		// close the list view. This is to catch a bug where elements could be
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page

@@ -5,13 +5,12 @@ import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
-import { kebabCase } from './utils/object';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
+import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
-import BlockContextualToolbar from './components/block-tools/block-contextual-toolbar';
-import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
+import { useShowBlockTools } from './components/block-tools/use-show-block-tools';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
@@ -26,6 +25,10 @@ import {
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
+import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
+import { selectBlockPatternsKey } from './store/private-keys';
+import { requiresWrapperOnCopy } from './components/writing-flow/utils';
+import { PrivateRichText } from './components/rich-text/';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -37,13 +40,12 @@ lock( privateApis, {
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,
-	kebabCase,
 	PrivateInserter,
+	PrivateQuickInserter,
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
-	BlockContextualToolbar,
-	useShouldContextualToolbarShow,
+	useShowBlockTools,
 	cleanEmptyObject,
 	useStyleOverride,
 	BlockQuickNavigation,
@@ -56,4 +58,8 @@ lock( privateApis, {
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 	usesContextKey,
+	useFlashEditableBlocks,
+	selectBlockPatternsKey,
+	requiresWrapperOnCopy,
+	PrivateRichText,
 } );

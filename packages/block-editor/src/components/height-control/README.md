@@ -2,12 +2,7 @@
 
 The `HeightControl` component adds a linked unit control and slider component for controlling the height of a block within the block editor. It supports passing a label, and is used for controlling the minimum height dimensions of Group blocks.
 
-_Note:_ It is worth noting that the minimum height option is an opt-in feature. Themes need to declare support for it before it'll be available, and a convenient way to do that is via opting in to the [appearanceTools](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls) UI controls.
-
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
+_Note:_ It is worth noting that the minimum height option is an opt-in feature. Themes need to declare support for it before it'll be available, and a convenient way to do that is via opting in to the [appearanceTools](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls) UI controls.
 
 ## Development guidelines
 
@@ -48,7 +43,7 @@ A callback function that handles the application of the height value.
 -   **Type:** `String`
 -   **Default:** `'Height'`
 
-A label for the height control. This is useful when using the height control for a feature that is controlled in the same way as height, but requires a different label. For example, "Min. height".
+A label for the height control. This is useful when using the height control for a feature that is controlled in the same way as height, but requires a different label. For example, "Minimum height".
 
 ## Related components
 

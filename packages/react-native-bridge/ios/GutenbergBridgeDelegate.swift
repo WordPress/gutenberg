@@ -30,7 +30,7 @@ public enum Capabilities: String {
     case layoutGridBlock
     case tiledGalleryBlock
     case videoPressBlock
-    case mediaFilesCollectionBlock
+    case videoPressV5Support
     case mentions
     case xposts
     case unsupportedBlockEditor
@@ -249,20 +249,6 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
 
-    // Media Collection
-
-    /// Tells the delegate that a media collection block requested to reconnect with media save coordinator.
-    ///
-    func gutenbergDidRequestMediaSaveSync()
-
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String)
-
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]])
-
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
-
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
-
     func gutenbergDidRequestPreview()
 
     /// Tells the delegate that the editor requested the block type impression counts
@@ -283,6 +269,8 @@ public protocol GutenbergBridgeDelegate: AnyObject {
     func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
     
     func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
+
+    func gutenbergDidRequestConnectionStatus() -> Bool
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -292,13 +280,4 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidLayout() { }
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) { }
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType) { }
-
-    // Media Collection
-
-    func gutenbergDidRequestMediaSaveSync() {}
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) { }
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}
 }

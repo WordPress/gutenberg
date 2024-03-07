@@ -3,6 +3,11 @@
  */
 import { Platform } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { undoIgnoreBlocks } from './undo-ignore';
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -118,35 +123,36 @@ export const privateRemoveBlocks =
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
 		const rules = ! forceRemove && select.getBlockRemovalRules();
-		if ( rules ) {
-			const blockNamesForPrompt = new Set();
 
-			// Given a list of client IDs of blocks that the user intended to
-			// remove, perform a tree search (BFS) to find all block names
-			// corresponding to "important" blocks, i.e. blocks that require a
-			// removal prompt.
-			const queue = [ ...clientIds ];
-			while ( queue.length ) {
-				const clientId = queue.shift();
-				const blockName = select.getBlockName( clientId );
-				if ( rules[ blockName ] ) {
-					blockNamesForPrompt.add( blockName );
+		if ( rules ) {
+			function flattenBlocks( blocks ) {
+				const result = [];
+				const stack = [ ...blocks ];
+				while ( stack.length ) {
+					const { innerBlocks, ...block } = stack.shift();
+					stack.push( ...innerBlocks );
+					result.push( block );
 				}
-				const innerBlocks = select.getBlockOrder( clientId );
-				queue.push( ...innerBlocks );
+				return result;
 			}
 
-			// If any such blocks were found, trigger the removal prompt and
-			// skip any other steps (thus postponing actual removal).
-			if ( blockNamesForPrompt.size ) {
-				dispatch(
-					displayBlockRemovalPrompt(
-						clientIds,
-						selectPrevious,
-						Array.from( blockNamesForPrompt )
-					)
-				);
-				return;
+			const blockList = clientIds.map( select.getBlock );
+			const flattenedBlocks = flattenBlocks( blockList );
+
+			// Find the first message and use it.
+			let message;
+			for ( const rule of rules ) {
+				message = rule.callback( flattenedBlocks );
+				if ( message ) {
+					dispatch(
+						displayBlockRemovalPrompt(
+							clientIds,
+							selectPrevious,
+							message
+						)
+					);
+					return;
+				}
 			}
 		}
 
@@ -197,28 +203,21 @@ export const ensureDefaultBlock =
  *
  * Contrast with `setBlockRemovalRules`.
  *
- * @param {string|string[]} clientIds           Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious      True if the previous block
- *                                              or the immediate parent
- *                                              (if no previous block exists)
- *                                              should be selected
- *                                              when a block is removed.
- * @param {string[]}        blockNamesForPrompt Names of the blocks that
- *                                              triggered the need for
- *                                              confirmation before removal.
+ * @param {string|string[]} clientIds      Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious True if the previous block or the
+ *                                         immediate parent (if no previous
+ *                                         block exists) should be selected
+ *                                         when a block is removed.
+ * @param {string}          message        Message to display in the prompt.
  *
  * @return {Object} Action object.
  */
-function displayBlockRemovalPrompt(
-	clientIds,
-	selectPrevious,
-	blockNamesForPrompt
-) {
+function displayBlockRemovalPrompt( clientIds, selectPrevious, message ) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
-		blockNamesForPrompt,
+		message,
 	};
 }
 
@@ -291,10 +290,89 @@ export function deleteStyleOverride( id ) {
 	};
 }
 
-export function syncDerivedBlockAttributes( clientId, attributes ) {
+/**
+ * A higher-order action that mark every change inside a callback as "non-persistent"
+ * and ignore pushing to the undo history stack. It's primarily used for synchronized
+ * derived updates from the block editor without affecting the undo history.
+ *
+ * @param {() => void} callback The synchronous callback to derive updates.
+ */
+export function syncDerivedUpdates( callback ) {
+	return ( { dispatch, select, registry } ) => {
+		registry.batch( () => {
+			// Mark every change in the `callback` as non-persistent.
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: false,
+			} );
+			callback();
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: undefined,
+			} );
+
+			// Ignore pushing undo stack for the updated blocks.
+			const updatedBlocks = select.getBlocks();
+			undoIgnoreBlocks.add( updatedBlocks );
+		} );
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param {Object} lastFocus The last focused element.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setLastFocus( lastFocus = null ) {
 	return {
-		type: 'SYNC_DERIVED_BLOCK_ATTRIBUTES',
-		clientIds: [ clientId ],
-		attributes,
+		type: 'LAST_FOCUS',
+		lastFocus,
+	};
+}
+
+/**
+ * Action that stops temporarily editing as blocks.
+ *
+ * @param {string} clientId The block's clientId.
+ */
+export function stopEditingAsBlocks( clientId ) {
+	return ( { select, dispatch } ) => {
+		const focusModeToRevert =
+			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateSettings( { focusMode: focusModeToRevert } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks();
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has begun to drag.
+ *
+ * @return {Object} Action object.
+ */
+export function startDragging() {
+	return {
+		type: 'START_DRAGGING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped dragging.
+ *
+ * @return {Object} Action object.
+ */
+export function stopDragging() {
+	return {
+		type: 'STOP_DRAGGING',
 	};
 }

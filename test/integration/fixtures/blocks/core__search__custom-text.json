@@ -10,7 +10,6 @@
 			"buttonPosition": "button-outside",
 			"buttonUseIcon": false,
 			"query": {},
-			"buttonBehavior": "expand-searchfield",
 			"isSearchFieldHidden": false
 		},
 		"innerBlocks": []

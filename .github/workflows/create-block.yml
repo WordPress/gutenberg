@@ -14,14 +14,14 @@ concurrency:
 
 jobs:
     checks:
-        name: Checks
+        name: Checks w/Node.js ${{ matrix.node }} on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['16']
-                os: [macos-latest, ubuntu-latest, windows-latest]
+                node: ['20', '21']
+                os: ['macos-latest', 'ubuntu-latest', 'windows-latest']
 
         steps:
             - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1

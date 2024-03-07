@@ -23,10 +23,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useActivateTheme } from '../../utils/use-activate-theme';
-import {
-	currentlyPreviewingTheme,
-	isPreviewingTheme,
-} from '../../utils/is-previewing-theme';
+import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 
@@ -39,19 +37,22 @@ const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 		activateSaveLabel = __( 'Activate' );
 	}
 
-	const themeName = useSelect( ( select ) => {
-		const theme = select( coreStore ).getTheme(
-			currentlyPreviewingTheme()
-		);
+	const currentTheme = useActualCurrentTheme();
 
-		return theme?.name?.rendered;
-	}, [] );
+	const previewingTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme(),
+		[]
+	);
 
 	const additionalPrompt = (
 		<p>
 			{ sprintf(
-				'Saving your changes will change your active theme to %s.',
-				themeName
+				/* translators: %1$s: The name of active theme, %2$s: The name of theme to be activated. */
+				__(
+					'Saving your changes will change your active theme from %1$s to %2$s.'
+				),
+				currentTheme?.name?.rendered ?? '...',
+				previewingTheme?.name?.rendered ?? '...'
 			) }
 		</p>
 	);
@@ -84,18 +85,37 @@ const _EntitiesSavedStates = ( { onClose } ) => {
 };
 
 export default function SavePanel() {
-	const { isSaveViewOpen, canvasMode } = useSelect( ( select ) => {
-		const { isSaveViewOpened, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+	const { isSaveViewOpen, canvasMode, isDirty, isSaving } = useSelect(
+		( select ) => {
+			const {
+				__experimentalGetDirtyEntityRecords,
+				isSavingEntityRecord,
+				isResolving,
+			} = select( coreStore );
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const isActivatingTheme = isResolving( 'activateTheme' );
+			const { isSaveViewOpened, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
-		// The currently selected entity to display.
-		// Typically template or template part in the site editor.
-		return {
-			isSaveViewOpen: isSaveViewOpened(),
-			canvasMode: getCanvasMode(),
-		};
-	}, [] );
+			// The currently selected entity to display.
+			// Typically template or template part in the site editor.
+			return {
+				isSaveViewOpen: isSaveViewOpened(),
+				canvasMode: getCanvasMode(),
+				isDirty: dirtyEntityRecords.length > 0,
+				isSaving:
+					dirtyEntityRecords.some( ( record ) =>
+						isSavingEntityRecord(
+							record.kind,
+							record.name,
+							record.key
+						)
+					) || isActivatingTheme,
+			};
+		},
+		[]
+	);
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	const onClose = () => setIsSaveViewOpened( false );
 
@@ -113,7 +133,8 @@ export default function SavePanel() {
 			</Modal>
 		) : null;
 	}
-
+	const activateSaveEnabled = isPreviewingTheme() || isDirty;
+	const disabled = isSaving || ! activateSaveEnabled;
 	return (
 		<NavigableRegion
 			className={ classnames( 'edit-site-layout__actions', {
@@ -130,6 +151,8 @@ export default function SavePanel() {
 						className="edit-site-editor__toggle-save-panel-button"
 						onClick={ () => setIsSaveViewOpened( true ) }
 						aria-expanded={ false }
+						disabled={ disabled }
+						__experimentalIsFocusable
 					>
 						{ __( 'Open save panel' ) }
 					</Button>

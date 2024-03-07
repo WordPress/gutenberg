@@ -32,6 +32,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId, WritableNativeMap metadata);
         void onMediaFileUploadFailed(int mediaId);
+        void onMediaFileUploadPaused(int mediaId);
     }
 
     interface MediaSaveEventEmitter {
@@ -58,6 +59,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     interface BlockTypeImpressionsCallback {
         void onRequestBlockTypeImpressions(ReadableMap impressions);
+    }
+
+    interface ConnectionStatusCallback {
+        void onRequestConnectionStatus(boolean isConnected);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -118,8 +123,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback);
 
-    void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback);
-
     void requestImageFailedRetryDialog(int mediaId);
 
     void requestImageUploadCancelDialog(int mediaId);
@@ -154,16 +157,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void onShowXpostSuggestions(Consumer<String> onResult);
 
-    void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId);
-
-    void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
-
-    void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles);
-
-    void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles);
-
-    void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId);
-
     void setFocalPointPickerTooltipShown(boolean tooltipShown);
 
     void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback);
@@ -183,4 +176,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void toggleUndoButton(boolean isDisabled);
 
     void toggleRedoButton(boolean isDisabled);
+
+    void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
 }

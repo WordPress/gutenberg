@@ -22,6 +22,7 @@ export default function SaveButton( {
 	showTooltip = true,
 	defaultLabel,
 	icon,
+	size,
 	__next40pxDefaultSize = false,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen, previewingThemeName } =
@@ -34,9 +35,7 @@ export default function SaveButton( {
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			const { isSaveViewOpened } = select( editSiteStore );
 			const isActivatingTheme = isResolving( 'activateTheme' );
-			const previewingTheme = select( coreStore ).getTheme(
-				currentlyPreviewingTheme()
-			);
+			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
 
 			return {
 				isDirty: dirtyEntityRecords.length > 0,
@@ -49,7 +48,12 @@ export default function SaveButton( {
 						)
 					) || isActivatingTheme,
 				isSaveViewOpen: isSaveViewOpened(),
-				previewingThemeName: previewingTheme?.name?.rendered,
+				// Do not call `getTheme` with null, it will cause a request to
+				// the server.
+				previewingThemeName: currentlyPreviewingThemeId
+					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
+							?.name?.rendered
+					: undefined,
 			};
 		}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
@@ -60,13 +64,26 @@ export default function SaveButton( {
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
-				return sprintf( 'Activating %s', previewingThemeName );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activating %s' ),
+					previewingThemeName
+				);
 			} else if ( disabled ) {
 				return __( 'Saved' );
 			} else if ( isDirty ) {
-				return sprintf( 'Activate %s & Save', previewingThemeName );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activate %s & Save' ),
+					previewingThemeName
+				);
 			}
-			return sprintf( 'Activate %s', previewingThemeName );
+
+			return sprintf(
+				/* translators: %s: The name of theme to be activated. */
+				__( 'Activate %s' ),
+				previewingThemeName
+			);
 		}
 
 		if ( isSaving ) {
@@ -103,7 +120,7 @@ export default function SaveButton( {
 			showTooltip={ showTooltip }
 			icon={ icon }
 			__next40pxDefaultSize={ __next40pxDefaultSize }
-			size="compact"
+			size={ size }
 		>
 			{ label }
 		</Button>

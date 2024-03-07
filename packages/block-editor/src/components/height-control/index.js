@@ -157,6 +157,8 @@ export default function HeightControl( {
 						onUnitChange={ handleUnitChange }
 						min={ 0 }
 						size={ '__unstable-large' }
+						label={ label }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -175,6 +177,8 @@ export default function HeightControl( {
 							withInputField={ false }
 							onChange={ handleSliderChange }
 							__nextHasNoMarginBottom
+							label={ label }
+							hideLabelFromVision
 						/>
 					</Spacer>
 				</FlexItem>
