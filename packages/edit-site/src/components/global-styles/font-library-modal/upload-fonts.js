@@ -118,7 +118,8 @@ function UploadFonts() {
 	/**
 	 * Checks if a file is a valid Font file.
 	 *
-	 * @param {file} file The file to be checked
+	 * @param {File} file The file to be checked.
+	 * @return {boolean} Whether the file is a valid font file.
 	 */
 	async function isFontFile( file ) {
 		const font = new Font( 'Uploaded Font' );
