@@ -379,7 +379,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				if (
 					filter.field === 'author' &&
 					filter.operator === OPERATOR_IN &&
-					!! filter.value
+					filter?.value?.length > 0
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return filter.value.includes( item.author_text );
@@ -387,7 +387,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				} else if (
 					filter.field === 'author' &&
 					filter.operator === OPERATOR_NOT_IN &&
-					!! filter.value
+					filter?.value?.length > 0
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return ! filter.value.includes( item.author_text );
