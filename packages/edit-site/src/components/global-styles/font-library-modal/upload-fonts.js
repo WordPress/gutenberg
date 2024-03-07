@@ -72,7 +72,7 @@ function UploadFonts() {
 			return null; // Return null for disallowed file extensions.
 		} );
 
-		// Filter out the nulls after all promises have resolved
+		// Filter out the nulls after all promises have resolved.
 		const allowedFiles = ( await Promise.all( checkFilesPromises ) ).filter(
 			( file ) => file !== null
 		);
