@@ -3,6 +3,7 @@
  * WordPress dependencies
  */
 import {
+	store as blocksStore,
 	cloneBlock,
 	__experimentalCloneSanitizedBlock,
 	createBlock,
@@ -31,6 +32,11 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
+import {
+	canBindAttribute,
+	canBindBlock,
+} from '../../../editor/src/bindings/utils';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -47,6 +53,7 @@ export const resetBlocks =
 	( blocks ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'RESET_BLOCKS', blocks } );
+		dispatch( resetBlocksWithBoundAttributes( blocks ) );
 		dispatch( validateBlocksToTemplate( blocks ) );
 	};
 
@@ -167,6 +174,63 @@ export function updateBlockAttributes(
 		clientIds: castArray( clientIds ),
 		attributes,
 		uniqueByBlock,
+	};
+}
+
+export function resetBlocksWithBoundAttributes( blocks ) {
+	return ( { dispatch, registry } ) => {
+		/*
+		 * Filter blocks with bound attributes.
+		 */
+		const blocksWithBoundAttributes = blocks.filter( ( block ) => {
+			const { name, attributes } = block;
+			if ( ! canBindBlock( name ) ) {
+				return false;
+			}
+
+			return Object.keys( attributes ).some( ( attrName ) => {
+				if ( ! canBindAttribute( name, attrName ) ) {
+					return false;
+				}
+
+				// Check if the attribute has bindings.
+				if ( ! attributes?.metadata?.bindings ) {
+					return false;
+				}
+
+				return true;
+			} );
+		} );
+
+		if ( ! blocksWithBoundAttributes.length ) {
+			return;
+		}
+
+		const blockBindingsSources = unlock(
+			registry.select( blocksStore )
+		).getAllBlockBindingsSources();
+
+		blocksWithBoundAttributes.forEach( ( block ) => {
+			const bindings = block.attributes.metadata.bindings;
+			if ( ! Object.keys( bindings ).length ) {
+				return;
+			}
+
+			/*
+			 * Pull the property value of the external source
+			 * and update the bound attributes.
+			 */
+			Object.entries( bindings ).forEach(
+				( [ attributeName, { args, source } ] ) => {
+					const { connect } = blockBindingsSources[ source ];
+					const { value } = connect( block, args );
+
+					dispatch.updateBlockAttributes( block.clientId, {
+						[ attributeName ]: value,
+					} );
+				}
+			);
+		} );
 	};
 }
 
