@@ -49,7 +49,7 @@ function NavigationMenuSelector( {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
-	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
+	const [ isUpdatingMenuRef, setIsUpdatingMenuRef ] = useState( false );
 
 	actionLabel = actionLabel || createActionLabel;
 
@@ -99,7 +99,7 @@ function NavigationMenuSelector( {
 
 	let selectorLabel = '';
 
-	if ( isCreatingMenu || isResolvingNavigationMenus ) {
+	if ( isUpdatingMenuRef || isResolvingNavigationMenus ) {
 		selectorLabel = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
@@ -111,17 +111,17 @@ function NavigationMenuSelector( {
 
 	useEffect( () => {
 		if (
-			isCreatingMenu &&
+			isUpdatingMenuRef &&
 			( createNavigationMenuIsSuccess || createNavigationMenuIsError )
 		) {
-			setIsCreatingMenu( false );
+			setIsUpdatingMenuRef( false );
 		}
 	}, [
 		hasResolvedNavigationMenus,
 		createNavigationMenuIsSuccess,
 		canUserCreateNavigationMenu,
 		createNavigationMenuIsError,
-		isCreatingMenu,
+		isUpdatingMenuRef,
 		menuUnavailable,
 		noBlockMenus,
 		noMenuSelected,
@@ -140,11 +140,16 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
-									onSelectNavigationMenu( menuId );
-									onClose();
+									setIsUpdatingMenuRef( true );
+									onSelectNavigationMenu( menuId ).then(
+										() => {
+											setIsUpdatingMenuRef( false );
+											onClose();
+										}
+									);
 								} }
 								choices={ menuChoices }
-								disabled={ isCreatingMenu }
+								disabled={ isUpdatingMenuRef }
 							/>
 						</MenuGroup>
 					) }
@@ -155,16 +160,22 @@ function NavigationMenuSelector( {
 								return (
 									<MenuItem
 										onClick={ () => {
-											setIsCreatingMenu( true );
-											onSelectClassicMenu( menu );
-											onClose();
+											setIsUpdatingMenuRef( true );
+											onSelectClassicMenu( menu ).then(
+												() => {
+													setIsUpdatingMenuRef(
+														false
+													);
+													onClose();
+												}
+											);
 										} }
 										key={ menu.id }
 										aria-label={ sprintf(
 											createActionLabel,
 											label
 										) }
-										disabled={ isCreatingMenu }
+										disabled={ isUpdatingMenuRef }
 									>
 										{ label }
 									</MenuItem>
@@ -176,11 +187,13 @@ function NavigationMenuSelector( {
 					{ canUserCreateNavigationMenu && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
-								disabled={ isCreatingMenu }
+								disabled={ isUpdatingMenuRef }
 								onClick={ () => {
-									onClose();
-									onCreateNew();
-									setIsCreatingMenu( true );
+									setIsUpdatingMenuRef( true );
+									onCreateNew().then( () => {
+										setIsUpdatingMenuRef( false );
+										onClose();
+									} );
 								} }
 							>
 								{ __( 'Create new menu' ) }
