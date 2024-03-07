@@ -121,6 +121,7 @@ function createBlockCompleter() {
 				name,
 				initialAttributes,
 				innerBlocks,
+				template,
 				syncStatus,
 				content,
 			} = inserterItem;
@@ -136,7 +137,7 @@ function createBlockCompleter() {
 								name,
 								initialAttributes,
 								createBlocksFromInnerBlocksTemplate(
-									innerBlocks
+									innerBlocks || template
 								)
 						  ),
 			};

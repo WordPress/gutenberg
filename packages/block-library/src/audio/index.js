@@ -8,7 +8,7 @@ import { audio as icon } from '@wordpress/icons';
  */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
-import edit from './edit';
+
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -27,7 +27,7 @@ export const settings = {
 	},
 	transforms,
 	deprecated,
-	edit,
+	lazyEdit: () => import( /* webpackChunkName: "audio/editor" */ './edit' ),
 	save,
 };
 

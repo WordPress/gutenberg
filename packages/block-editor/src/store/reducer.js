@@ -329,16 +329,13 @@ const withBlockTree =
 				// If there are no replaced blocks, it means we're removing blocks so we need to update their parent.
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				updateParentInnerBlocksInTree(
@@ -351,16 +348,13 @@ const withBlockTree =
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				newState.tree = new Map( newState.tree );
@@ -1342,14 +1336,14 @@ function selectionHelper( state = {}, action ) {
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				action.clientIds.indexOf( state.clientId ) === -1
+				! action.clientIds.includes( state.clientId )
 			) {
 				return state;
 			}
 
 			return {};
 		case 'REPLACE_BLOCKS': {
-			if ( action.clientIds.indexOf( state.clientId ) === -1 ) {
+			if ( ! action.clientIds.includes( state.clientId ) ) {
 				return state;
 			}
 
@@ -1372,6 +1366,20 @@ function selectionHelper( state = {}, action ) {
 	return state;
 }
 
+function selectionEqual( sel1, sel2 ) {
+	if ( sel1 === sel2 ) {
+		return true;
+	}
+	if ( ! sel1 || ! sel2 ) {
+		return false;
+	}
+	return (
+		sel1.clientId === sel2.clientId &&
+		sel1.attributeKey === sel2.attributeKey &&
+		sel1.offset === sel2.offset
+	);
+}
+
 /**
  * Reducer returning the selection state.
  *
@@ -1381,33 +1389,30 @@ function selectionHelper( state = {}, action ) {
  * @return {boolean} Updated state.
  */
 export function selection( state = {}, action ) {
+	let { selectionStart, selectionEnd } = state;
+
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
-				return {
-					selectionStart: {
-						clientId: action.clientId,
-						attributeKey: action.attributeKey,
-						offset: action.startOffset,
-					},
-					selectionEnd: {
-						clientId: action.clientId,
-						attributeKey: action.attributeKey,
-						offset: action.endOffset,
-					},
+				selectionStart = {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.startOffset,
 				};
+				selectionEnd = {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.endOffset,
+				};
+			} else {
+				selectionStart = action.start || selectionStart;
+				selectionEnd = action.end || selectionEnd;
 			}
-
-			return {
-				selectionStart: action.start || state.selectionStart,
-				selectionEnd: action.end || state.selectionEnd,
-			};
+			break;
 		case 'RESET_SELECTION':
-			const { selectionStart, selectionEnd } = action;
-			return {
-				selectionStart,
-				selectionEnd,
-			};
+			selectionStart = action.selectionStart;
+			selectionEnd = action.selectionEnd;
+			break;
 		case 'MULTI_SELECT':
 			const { start, end } = action;
 
@@ -1418,10 +1423,9 @@ export function selection( state = {}, action ) {
 				return state;
 			}
 
-			return {
-				selectionStart: { clientId: start },
-				selectionEnd: { clientId: end },
-			};
+			selectionStart = { clientId: start };
+			selectionEnd = { clientId: end };
+			break;
 		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
@@ -1437,31 +1441,26 @@ export function selection( state = {}, action ) {
 					( block ) => block.clientId === startClientId
 				)
 			) {
-				return {
-					selectionStart: {},
-					selectionEnd: {},
-				};
+				selectionStart = {};
+				selectionEnd = {};
 			}
-
 			// If the end of the selection won't exist after reset, collapse selection.
-			if (
+			else if (
 				! action.blocks.some(
 					( block ) => block.clientId === endClientId
 				)
 			) {
-				return {
-					...state,
-					selectionEnd: state.selectionStart,
-				};
+				selectionEnd = selectionStart;
 			}
+			break;
+		default:
+			selectionStart = selectionHelper( state.selectionStart, action );
+			selectionEnd = selectionHelper( state.selectionEnd, action );
 	}
 
-	const selectionStart = selectionHelper( state.selectionStart, action );
-	const selectionEnd = selectionHelper( state.selectionEnd, action );
-
 	if (
-		selectionStart === state.selectionStart &&
-		selectionEnd === state.selectionEnd
+		selectionEqual( selectionStart, state.selectionStart ) &&
+		selectionEqual( selectionEnd, state.selectionEnd )
 	) {
 		return state;
 	}
@@ -1703,36 +1702,42 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return action.blocks.reduce( ( prevState, block ) => {
-				const { attributes, name: blockName } = block;
-				let id = blockName;
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				const match = select( blocksStore ).getActiveBlockVariation(
-					blockName,
-					attributes
-				);
-				if ( match?.name ) {
-					id += '/' + match.name;
-				}
-				if ( blockName === 'core/block' ) {
-					id += '/' + attributes.ref;
-				}
+		case 'REPLACE_BLOCKS': {
+			const nextInsertUsage = action.blocks.reduce(
+				( prevUsage, block ) => {
+					const { attributes, name: blockName } = block;
+					let id = blockName;
+					// If a block variation match is found change the name to be the same with the
+					// one that is used for block variations in the Inserter (`getItemFromVariation`).
+					const match = select( blocksStore ).getActiveBlockVariation(
+						blockName,
+						attributes
+					);
+					if ( match?.name ) {
+						id += '/' + match.name;
+					}
+					if ( blockName === 'core/block' ) {
+						id += '/' + attributes.ref;
+					}
 
-				return {
-					...prevState,
-					insertUsage: {
-						...prevState.insertUsage,
+					return {
+						...prevUsage,
 						[ id ]: {
 							time: action.time,
-							count: prevState.insertUsage[ id ]
-								? prevState.insertUsage[ id ].count + 1
+							count: prevUsage[ id ]
+								? prevUsage[ id ].count + 1
 								: 1,
 						},
-					},
-				};
-			}, state );
+					};
+				},
+				state.insertUsage
+			);
+
+			return {
+				...state,
+				insertUsage: nextInsertUsage,
+			};
+		}
 	}
 
 	return state;
@@ -1905,13 +1910,10 @@ export function lastBlockInserted( state = {}, action ) {
 				return state;
 			}
 
-			const clientIds = action.blocks.map( ( block ) => {
-				return block.clientId;
-			} );
-
-			const source = action.meta?.source;
-
-			return { clientIds, source };
+			return {
+				clientIds: action.blocks.map( ( block ) => block.clientId ),
+				source: action.meta?.source,
+			};
 		case 'RESET_BLOCKS':
 			return {};
 	}

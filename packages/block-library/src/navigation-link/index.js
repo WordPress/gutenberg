@@ -11,7 +11,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
@@ -32,8 +32,8 @@ export const settings = {
 		};
 	},
 
-	edit,
-
+	lazyEdit: () =>
+		import( /* webpackChunkName: "navigation-link/editor" */ './edit' ),
 	save,
 
 	example: {

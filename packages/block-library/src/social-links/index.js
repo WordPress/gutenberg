@@ -8,7 +8,6 @@ import { share as icon } from '@wordpress/icons';
  */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
-import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 
@@ -43,7 +42,8 @@ export const settings = {
 		],
 	},
 	icon,
-	edit,
+	lazyEdit: () =>
+		import( /* webpackChunkName: "social-links/editor" */ './edit' ),
 	save,
 	deprecated,
 };

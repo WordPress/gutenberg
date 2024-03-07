@@ -17,7 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import { enhanceTemplatePartVariations } from './variations';
 
 const { name } = metadata;
@@ -47,7 +47,8 @@ export const settings = {
 			decodeEntities( entity.title ) || capitalCase( entity.slug || '' )
 		);
 	},
-	edit,
+	lazyEdit: () =>
+		import( /* webpackChunkName: "template-part/editor" */ './edit' ),
 };
 
 export const init = () => {

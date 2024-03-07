@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { insert, toHTMLString } from '@wordpress/rich-text';
+import { remove, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -21,30 +21,75 @@ function findSelection( blocks ) {
 	let i = blocks.length;
 
 	while ( i-- ) {
-		const attributeKey = retrieveSelectedAttribute(
-			blocks[ i ].attributes
-		);
+		const block = blocks[ i ];
+		const attributeKey = retrieveSelectedAttribute( block.attributes );
 
 		if ( attributeKey ) {
-			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
-				attributeKey
-			]
-				// To do: refactor this to use rich text's selection instead, so
-				// we no longer have to use on this hack inserting a special
-				// character.
-				.toString()
-				.replace( START_OF_SELECTED_AREA, '' );
-			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
+			return [ block, attributeKey ];
 		}
 
-		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
+		const nestedSelection = findSelection( block.innerBlocks );
 
 		if ( nestedSelection ) {
 			return nestedSelection;
 		}
 	}
 
-	return [];
+	return null;
+}
+
+function findPrefixTransform( prefixText ) {
+	const prefixTransforms = getBlockTransforms( 'from' ).filter(
+		( t ) => t.type === 'prefix'
+	);
+	return findTransform( prefixTransforms, ( t ) => t.prefix === prefixText );
+}
+
+function inputRule( props, onReplace ) {
+	const { getValue, selectionChange } = props;
+
+	// We must use getValue() here because value may be update
+	// asynchronously.
+	const value = getValue();
+	const { start, text } = value;
+	const characterBefore = text.slice( start - 1, start );
+
+	// The character right before the caret must be a plain space.
+	if ( characterBefore !== ' ' ) {
+		return;
+	}
+
+	const trimmedTextBefore = text.slice( 0, start ).trim();
+	const transformation = findPrefixTransform( trimmedTextBefore );
+	if ( ! transformation ) {
+		return;
+	}
+
+	const block = transformation.transform( START_OF_SELECTED_AREA );
+	const selection = findSelection( [ block ] );
+	if ( selection ) {
+		const [ selectedBlock, selectedAttribute ] = selection;
+		// To do: refactor this to use rich text's selection instead, so
+		// we no longer have to use on this hack inserting a special
+		// character.
+		const newValue = selectedBlock.attributes[ selectedAttribute ]
+			.toString()
+			.replace(
+				START_OF_SELECTED_AREA,
+				toHTMLString( { value: remove( value, 0, start ) } )
+			);
+
+		selectedBlock.attributes[ selectedAttribute ] = newValue;
+		selectionChange(
+			selectedBlock.clientId,
+			selectedAttribute,
+			newValue.length,
+			newValue.length
+		);
+	}
+	onReplace( [ block ] );
+
+	return true;
 }
 
 export function useInputRules( props ) {
@@ -52,61 +97,19 @@ export function useInputRules( props ) {
 		__unstableMarkLastChangeAsPersistent,
 		__unstableMarkAutomaticChange,
 	} = useDispatch( blockEditorStore );
+
 	const propsRef = useRef( props );
 	propsRef.current = props;
+
 	return useRefEffect( ( element ) => {
-		function inputRule() {
-			const { getValue, onReplace, selectionChange } = propsRef.current;
-
-			if ( ! onReplace ) {
-				return;
-			}
-
-			// We must use getValue() here because value may be update
-			// asynchronously.
-			const value = getValue();
-			const { start, text } = value;
-			const characterBefore = text.slice( start - 1, start );
-
-			// The character right before the caret must be a plain space.
-			if ( characterBefore !== ' ' ) {
-				return;
-			}
-
-			const trimmedTextBefore = text.slice( 0, start ).trim();
-			const prefixTransforms = getBlockTransforms( 'from' ).filter(
-				( { type } ) => type === 'prefix'
-			);
-			const transformation = findTransform(
-				prefixTransforms,
-				( { prefix } ) => {
-					return trimmedTextBefore === prefix;
-				}
-			);
-
-			if ( ! transformation ) {
-				return;
-			}
-
-			const content = toHTMLString( {
-				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
-			} );
-			const block = transformation.transform( content );
-
-			selectionChange( ...findSelection( [ block ] ) );
-			onReplace( [ block ] );
-			__unstableMarkAutomaticChange();
-
-			return true;
-		}
-
 		function onInput( event ) {
 			const { inputType, type } = event;
 			const {
 				getValue,
 				onChange,
-				__unstableAllowPrefixTransformations,
+				onReplace,
 				formatTypes,
+				__unstableAllowPrefixTransformations,
 			} = propsRef.current;
 
 			// Only run input rules when inserting text.
@@ -114,18 +117,25 @@ export function useInputRules( props ) {
 				return;
 			}
 
-			if ( __unstableAllowPrefixTransformations && inputRule() ) {
+			if (
+				onReplace &&
+				__unstableAllowPrefixTransformations &&
+				inputRule( propsRef.current, ( blocks ) => {
+					onReplace( blocks );
+					__unstableMarkAutomaticChange();
+				} )
+			) {
 				return;
 			}
 
 			const value = getValue();
 			const transformed = formatTypes.reduce(
-				( accumlator, { __unstableInputRule } ) => {
+				( accumulator, { __unstableInputRule } ) => {
 					if ( __unstableInputRule ) {
-						accumlator = __unstableInputRule( accumlator );
+						return __unstableInputRule( accumulator );
 					}
 
-					return accumlator;
+					return accumulator;
 				},
 				preventEventDiscovery( value )
 			);

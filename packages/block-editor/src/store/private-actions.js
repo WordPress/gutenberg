@@ -1,6 +1,12 @@
 /**
  * WordPress dependencies
  */
+import {
+	getDefaultBlockName,
+	switchToBlockType,
+	isUnmodifiedDefaultBlock,
+	isUnmodifiedBlock,
+} from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -374,5 +380,225 @@ export function startDragging() {
 export function stopDragging() {
 	return {
 		type: 'STOP_DRAGGING',
+	};
+}
+
+export function setAttributesEdit( clientId, newAttributes ) {
+	return ( { select, dispatch } ) => {
+		const multiSelectedBlockClientIds =
+			select.getMultiSelectedBlockClientIds();
+		const clientIds = multiSelectedBlockClientIds.length
+			? multiSelectedBlockClientIds
+			: [ clientId ];
+
+		dispatch.updateBlockAttributes( clientIds, newAttributes );
+	};
+}
+
+export function insertBlocksAfterEdit( blocks, clientId, rootClientId ) {
+	return ( { select, dispatch } ) => {
+		const index = select.getBlockIndex( clientId );
+		dispatch.insertBlocks( blocks, index + 1, rootClientId );
+	};
+}
+
+function moveFirstItemUp( clientId, changeSelection = true ) {
+	return ( { registry, select, dispatch } ) => {
+		const {
+			getBlock,
+			getBlockName,
+			getBlockOrder,
+			getBlockIndex,
+			getBlockRootClientId,
+			canInsertBlockType,
+		} = select;
+
+		const blockOrder = getBlockOrder( clientId );
+		const [ firstClientId ] = blockOrder;
+
+		if (
+			blockOrder.length === 1 &&
+			isUnmodifiedBlock( getBlock( firstClientId ) )
+		) {
+			dispatch.removeBlock( clientId );
+			return;
+		}
+
+		registry.batch( () => {
+			const targetRootClientId = getBlockRootClientId( clientId );
+			if (
+				canInsertBlockType(
+					getBlockName( firstClientId ),
+					targetRootClientId
+				)
+			) {
+				dispatch.moveBlocksToPosition(
+					[ firstClientId ],
+					clientId,
+					targetRootClientId,
+					getBlockIndex( clientId )
+				);
+			} else {
+				const replacement = switchToBlockType(
+					getBlock( firstClientId ),
+					getDefaultBlockName()
+				);
+
+				if ( replacement && replacement.length ) {
+					dispatch.insertBlocks(
+						replacement,
+						getBlockIndex( clientId ),
+						targetRootClientId,
+						changeSelection
+					);
+					dispatch.removeBlock( firstClientId, false );
+				}
+			}
+
+			if (
+				! getBlockOrder( clientId ).length &&
+				isUnmodifiedBlock( getBlock( clientId ) )
+			) {
+				dispatch.removeBlock( clientId, false );
+			}
+		} );
+	};
+}
+
+export function mergeEdit( clientId, rootClientId, forward ) {
+	return ( { registry, select, dispatch } ) => {
+		const {
+			getPreviousBlockClientId,
+			getNextBlockClientId,
+			getBlockAttributes,
+			getBlockName,
+			getBlockOrder,
+		} = select;
+
+		// For `Delete` or forward merge, we should do the exact same thing
+		// as `Backspace`, but from the other block.
+		if ( forward ) {
+			if ( rootClientId ) {
+				const nextRootClientId = getNextBlockClientId( rootClientId );
+
+				if ( nextRootClientId ) {
+					// If there is a block that follows with the same parent
+					// block name and the same attributes, merge the inner
+					// blocks.
+					if (
+						getBlockName( rootClientId ) ===
+						getBlockName( nextRootClientId )
+					) {
+						const rootAttributes =
+							getBlockAttributes( rootClientId );
+						const previousRootAttributes =
+							getBlockAttributes( nextRootClientId );
+
+						if (
+							Object.keys( rootAttributes ).every(
+								( key ) =>
+									rootAttributes[ key ] ===
+									previousRootAttributes[ key ]
+							)
+						) {
+							registry.batch( () => {
+								dispatch.moveBlocksToPosition(
+									getBlockOrder( nextRootClientId ),
+									nextRootClientId,
+									rootClientId
+								);
+								dispatch.removeBlock( nextRootClientId, false );
+							} );
+							return;
+						}
+					} else {
+						dispatch.mergeBlocks( rootClientId, nextRootClientId );
+						return;
+					}
+				}
+			}
+
+			const nextBlockClientId = getNextBlockClientId( clientId );
+
+			if ( ! nextBlockClientId ) {
+				return;
+			}
+
+			if ( getBlockOrder( nextBlockClientId ).length ) {
+				dispatch( moveFirstItemUp( nextBlockClientId, false ) );
+			} else {
+				dispatch.mergeBlocks( clientId, nextBlockClientId );
+			}
+		} else {
+			const previousBlockClientId = getPreviousBlockClientId( clientId );
+
+			if ( previousBlockClientId ) {
+				dispatch.mergeBlocks( previousBlockClientId, clientId );
+			} else if ( rootClientId ) {
+				const previousRootClientId =
+					getPreviousBlockClientId( rootClientId );
+
+				// If there is a preceding block with the same parent block
+				// name and the same attributes, merge the inner blocks.
+				if (
+					previousRootClientId &&
+					getBlockName( rootClientId ) ===
+						getBlockName( previousRootClientId )
+				) {
+					const rootAttributes = getBlockAttributes( rootClientId );
+					const previousRootAttributes =
+						getBlockAttributes( previousRootClientId );
+
+					if (
+						Object.keys( rootAttributes ).every(
+							( key ) =>
+								rootAttributes[ key ] ===
+								previousRootAttributes[ key ]
+						)
+					) {
+						registry.batch( () => {
+							dispatch.moveBlocksToPosition(
+								getBlockOrder( rootClientId ),
+								rootClientId,
+								previousRootClientId
+							);
+							dispatch.removeBlock( rootClientId, false );
+						} );
+						return;
+					}
+				}
+
+				dispatch( moveFirstItemUp( rootClientId ) );
+			} else {
+				dispatch.removeBlock( clientId );
+			}
+		}
+	};
+}
+
+export function replaceEdit(
+	clientId,
+	blocks,
+	indexToSelect,
+	initialPosition
+) {
+	return ( { dispatch } ) => {
+		if (
+			blocks.length &&
+			! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+		) {
+			dispatch.__unstableMarkLastChangeAsPersistent();
+		}
+		//Unsynced patterns are nested in an array so we need to flatten them.
+		const replacementBlocks =
+			blocks?.length === 1 && Array.isArray( blocks[ 0 ] )
+				? blocks[ 0 ]
+				: blocks;
+		dispatch.replaceBlocks(
+			[ clientId ],
+			replacementBlocks,
+			indexToSelect,
+			initialPosition
+		);
 	};
 }

@@ -8,7 +8,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { Component, isValidElement } from '@wordpress/element';
+import { Component, Suspense, lazy, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
@@ -350,5 +350,62 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 export function omit( object, keys ) {
 	return Object.fromEntries(
 		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+}
+
+export function lazyEdit( cb ) {
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const Load = lazy( () =>
+		cb().then(
+			( i ) => new Promise( ( r ) => setTimeout( () => r( i ), 2000 ) )
+		)
+	);
+
+	return function Edit( props ) {
+		const { FallbackEdit, clientId } = props;
+		return (
+			<Suspense fallback={ <FallbackEdit clientId={ clientId } /> }>
+				<Load { ...props } />
+			</Suspense>
+		);
+	};
+}
+
+const lazyEditCache = new WeakMap();
+
+export function getBlockEdit( blockType ) {
+	if ( ! blockType ) {
+		return null;
+	}
+
+	if ( blockType.lazyEdit ) {
+		let edit = lazyEditCache.get( blockType.lazyEdit );
+		if ( ! edit ) {
+			edit = lazyEdit( blockType.lazyEdit );
+			lazyEditCache.set( blockType.lazyEdit, edit );
+		}
+		return edit;
+	}
+
+	return blockType.edit || blockType.save || null;
+}
+
+function* getBlockNames( block ) {
+	yield block.name;
+	if ( ! block.innerBlocks ) {
+		return;
+	}
+	for ( const innerBlock of block.innerBlocks ) {
+		yield* getBlockNames( innerBlock );
+	}
+}
+
+export function lazyLoadBlock( block ) {
+	const blockNames = Array.from( new Set( getBlockNames( block ) ) );
+	return Promise.all(
+		blockNames.map( ( blockName ) => {
+			const blockType = getBlockType( blockName );
+			return blockType.lazyEdit?.();
+		} )
 	);
 }

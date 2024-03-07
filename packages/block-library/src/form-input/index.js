@@ -3,7 +3,6 @@
  */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
-import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import variations from './variations';
@@ -14,7 +13,8 @@ export { metadata, name };
 
 export const settings = {
 	deprecated,
-	edit,
+	lazyEdit: () =>
+		import( /* webpackChunkName: "form-input/editor" */ './edit' ),
 	save,
 	variations,
 };

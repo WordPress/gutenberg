@@ -1565,9 +1565,9 @@ const canInsertBlockTypeUnmemoized = (
 
 	// The parent block doesn't have settings indicating it doesn't support
 	// inner blocks, return false.
-	if ( rootClientId && parentBlockListSettings === undefined ) {
-		return false;
-	}
+	// if ( rootClientId && parentBlockListSettings === undefined ) {
+	// 	return false;
+	// }
 
 	const parentName = getBlockName( state, rootClientId );
 	const parentBlockType = getBlockType( parentName );
@@ -1862,7 +1862,7 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 			...item.initialAttributes,
 			...variation.attributes,
 		},
-		innerBlocks: variation.innerBlocks,
+		innerBlocks: variation.innerBlocks || item.template,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
 	};
@@ -1944,6 +1944,7 @@ const buildBlockTypeItem =
 			keywords: blockType.keywords,
 			variations: inserterVariations,
 			example: blockType.example,
+			template: blockType.template,
 			utility: 1, // Deprecated.
 		};
 	};

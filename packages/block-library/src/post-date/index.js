@@ -8,7 +8,7 @@ import { postDate as icon } from '@wordpress/icons';
  */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import deprecated from './deprecated';
 import variations from './variations';
 
@@ -17,7 +17,8 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit,
+	lazyEdit: () =>
+		import( /* webpackChunkName: "post-date/editor" */ './edit' ),
 	deprecated,
 	variations,
 };

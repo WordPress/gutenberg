@@ -8,7 +8,7 @@ import { postList as icon } from '@wordpress/icons';
  */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
-import edit from './edit';
+
 import metadata from './block.json';
 
 const { name } = metadata;
@@ -17,7 +17,8 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit,
+	lazyEdit: () =>
+		import( /* webpackChunkName: "latest-posts/editor" */ './edit' ),
 	deprecated,
 };
 

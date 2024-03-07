@@ -11,7 +11,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
 import deprecated from './deprecated';
 
 const { name } = metadata;
@@ -20,7 +19,7 @@ export { metadata, name };
 
 export const settings = {
 	deprecated,
-	edit,
+	lazyEdit: () => import( /* webpackChunkName: "block/editor" */ './edit' ),
 	icon,
 	__experimentalLabel: ( { ref } ) => {
 		if ( ! ref ) {

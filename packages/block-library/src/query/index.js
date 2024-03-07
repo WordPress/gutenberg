@@ -8,7 +8,7 @@ import { loop as icon } from '@wordpress/icons';
  */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import save from './save';
 import variations from './variations';
 import deprecated from './deprecated';
@@ -18,7 +18,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit,
+	lazyEdit: () => import( /* webpackChunkName: "query/editor" */ './edit' ),
 	save,
 	variations,
 	deprecated,

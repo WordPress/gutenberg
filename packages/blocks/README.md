@@ -126,6 +126,10 @@ _Returns_
 
 -   `string`: The block's default class.
 
+### getBlockEdit
+
+Undocumented declaration.
+
 ### getBlockFromExample
 
 Create a block object from the example API.
@@ -401,6 +405,10 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if the parameter is a valid icon and false otherwise.
+
+### lazyLoadBlock
+
+Undocumented declaration.
 
 ### normalizeIconObject
 

@@ -17,6 +17,9 @@ test.describe( 'Code', () => {
 			.click();
 		await page.keyboard.type( '```' );
 		await page.keyboard.press( 'Enter' );
+
+		await editor.canvas.locator( 'pre' ).isVisible();
+
 		await page.keyboard.type( '<?php' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -38,6 +41,7 @@ test.describe( 'Code', () => {
 
 	test( 'should paste plain text', async ( { editor, pageUtils } ) => {
 		await editor.insertBlock( { name: 'core/code' } );
+		await editor.canvas.locator( 'pre' ).isVisible();
 
 		// Test to see if HTML and white space is kept.
 		pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );

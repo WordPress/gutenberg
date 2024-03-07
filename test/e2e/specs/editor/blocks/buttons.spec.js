@@ -35,6 +35,7 @@ test.describe( 'Buttons', () => {
 			.click();
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'Content' );
 
 		// Check the content.
@@ -143,6 +144,7 @@ test.describe( 'Buttons', () => {
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'https://www.wordpress.org/' );
@@ -170,6 +172,7 @@ test.describe( 'Buttons', () => {
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'https://www.wordpress.org/' );
@@ -259,6 +262,7 @@ test.describe( 'Buttons', () => {
 
 	test( 'can resize width', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 		await page.click(
@@ -281,6 +285,7 @@ test.describe( 'Buttons', () => {
 
 	test( 'can apply named colors', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -310,6 +315,7 @@ test.describe( 'Buttons', () => {
 
 	test( 'can apply custom colors', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -345,6 +351,7 @@ test.describe( 'Buttons', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -374,6 +381,7 @@ test.describe( 'Buttons', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.locator( 'role=textbox[name="Button text"i]' ).isVisible();
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 

@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
-import edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import transforms from './transforms';
@@ -15,7 +14,7 @@ export { metadata, name };
 
 export const settings = {
 	icon: embedContentIcon,
-	edit,
+	lazyEdit: () => import( /* webpackChunkName: "embed/editor" */ './edit' ),
 	save,
 	transforms,
 	variations,

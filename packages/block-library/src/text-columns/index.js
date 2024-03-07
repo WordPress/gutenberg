@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
-import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -19,7 +18,8 @@ export const settings = {
 			return { 'data-align': width };
 		}
 	},
-	edit,
+	lazyEdit: () =>
+		import( /* webpackChunkName: "text-columns/editor" */ './edit' ),
 	save,
 };
 
