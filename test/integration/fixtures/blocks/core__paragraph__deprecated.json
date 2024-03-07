@@ -3,7 +3,7 @@
 		"name": "core/paragraph",
 		"isValid": true,
 		"attributes": {
-			"content": "Unwrapped is <em>still</em> valid.",
+			"content": "",
 			"dropCap": false
 		},
 		"innerBlocks": []

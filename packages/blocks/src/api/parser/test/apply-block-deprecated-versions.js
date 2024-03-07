@@ -134,6 +134,13 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		} );
 		const blockType = registerBlockType( 'core/test-block', {
 			...defaultBlockSettings,
+			attributes: {
+				newFruit: {
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+			},
 			save: ( props ) => <div>{ props.attributes.fruit }</div>,
 			deprecated: [
 				{

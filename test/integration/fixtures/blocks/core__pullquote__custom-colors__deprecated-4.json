@@ -4,14 +4,14 @@
 		"isValid": true,
 		"attributes": {
 			"value": "Pullquote custom color",
+			"citation": "my citation",
 			"className": "has-background is-style-default",
+			"textColor": "subtle-background",
 			"style": {
 				"border": {
 					"color": "#2207d0"
 				}
-			},
-			"citation": "my citation",
-			"textColor": "subtle-background"
+			}
 		},
 		"innerBlocks": []
 	}

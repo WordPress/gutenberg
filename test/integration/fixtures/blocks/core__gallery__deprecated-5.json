@@ -3,8 +3,37 @@
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
+			"images": [
+				{
+					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
+					"fullUrl": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-scaled.jpg",
+					"link": "http://wptest.local/classic/test-image-3/",
+					"alt": "",
+					"id": "705",
+					"caption": ""
+				},
+				{
+					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
+					"fullUrl": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-scaled.jpg",
+					"link": "http://wptest.local/test-image-2/",
+					"alt": "",
+					"id": "704",
+					"caption": ""
+				},
+				{
+					"url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+					"fullUrl": "http://wptest.local/wp-content/uploads/2020/04/test-image-scaled.jpg",
+					"link": "http://wptest.local/test-image/",
+					"alt": "",
+					"id": "703",
+					"caption": ""
+				}
+			],
+			"ids": [],
+			"shortCodeTransforms": [],
 			"caption": "",
 			"imageCrop": true,
+			"fixedHeight": true,
 			"linkTo": "media",
 			"sizeSlug": "large",
 			"allowResize": false

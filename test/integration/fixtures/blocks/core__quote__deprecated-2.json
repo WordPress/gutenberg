@@ -3,6 +3,7 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
+			"value": "<p>Testing deprecated quote block...</p>",
 			"citation": "...with a caption",
 			"textAlign": "right"
 		},

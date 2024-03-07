@@ -16,9 +16,7 @@
 				"sticky": "",
 				"inherit": true
 			},
-			"displayLayout": {
-				"type": "list"
-			}
+			"tagName": "div"
 		},
 		"innerBlocks": []
 	}
