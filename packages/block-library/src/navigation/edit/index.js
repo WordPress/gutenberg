@@ -154,8 +154,8 @@ function Navigation( {
 	} = useCreateNavigationMenu( clientId );
 
 	const createUntitledEmptyNavigationMenu = () => {
-		return new Promise( ( resolve ) => {
-			createNavigationMenu( '' );
+		return new Promise( async ( resolve ) => {
+			await createNavigationMenu( '' );
 			resolve();
 		} );
 	};
