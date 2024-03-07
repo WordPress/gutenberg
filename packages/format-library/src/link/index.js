@@ -39,25 +39,25 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ editingLink, setEditingLink ] = useState( false );
-	const [ addingNewLink, setAddingNewLink ] = useState( false );
+	const [ creatingLink, setCreatingLink ] = useState( false );
 
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
 	const [ autoFocus, setAutoFocus ] = useState( true );
 
-	function setIsEditingExistingLink( _val, { shouldAutoFocus = true } = {} ) {
+	function setIsEditingLink( _val, { shouldAutoFocus = true } = {} ) {
 		setEditingLink( _val );
 		setAutoFocus( shouldAutoFocus );
 	}
 
-	function setIsAddingNewLink( _val ) {
+	function setIsCreatingLink( _val ) {
 		// Don't add a new link if there is already an active link.
 		// The two states are mutually exclusive.
 		if ( _val === true && isActive ) {
 			return;
 		}
-		setAddingNewLink( _val );
+		setCreatingLink( _val );
 	}
 
 	useEffect( () => {
@@ -66,7 +66,7 @@ function Edit( {
 		// becomes inactive (e.g. used arrow keys to move cursor outside of link bounds), the UI will close.
 		if ( ! isActive ) {
 			setEditingLink( false );
-			setAddingNewLink( false );
+			setCreatingLink( false );
 		}
 	}, [ isActive ] );
 
@@ -84,11 +84,11 @@ function Edit( {
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
 			if ( event.target.tagName !== 'A' || ! isActive ) {
-				setIsEditingExistingLink( false );
+				setIsEditingLink( false );
 				return;
 			}
 
-			setIsEditingExistingLink( true, { shouldAutoFocus: false } );
+			setIsEditingLink( true, { shouldAutoFocus: false } );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -121,9 +121,9 @@ function Edit( {
 				setOpenedBy( target );
 			}
 			if ( ! isActive ) {
-				setIsAddingNewLink( true );
+				setIsCreatingLink( true );
 			} else {
-				setIsEditingExistingLink( true );
+				setIsEditingLink( true );
 			}
 		}
 	}
@@ -143,8 +143,8 @@ function Edit( {
 		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
 
 		// Close the popover
-		setIsEditingExistingLink( false );
-		setIsAddingNewLink( false );
+		setIsEditingLink( false );
+		setIsCreatingLink( false );
 
 		// Return focus to the toolbar button or the rich text field
 		if ( openedBy?.tagName === 'BUTTON' ) {
@@ -163,8 +163,8 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
-		setIsEditingExistingLink( false );
-		setIsAddingNewLink( false );
+		setIsEditingLink( false );
+		setIsCreatingLink( false );
 		setOpenedBy( null );
 	}
 
@@ -196,7 +196,7 @@ function Edit( {
 				aria-haspopup="true"
 				aria-expanded={ editingLink }
 			/>
-			{ ( isEditingActiveLink || addingNewLink ) && (
+			{ ( isEditingActiveLink || creatingLink ) && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }
