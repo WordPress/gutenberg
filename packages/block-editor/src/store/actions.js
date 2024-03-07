@@ -217,24 +217,25 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 			}
 
 			/*
-			 * Connect with the external source of the binding
-			 * and update the block attributes.
+			 * boundAttributes object
+			 * Collect and pull the bound attributes
+			 * to update the block attributes.
 			 */
-			Object.entries( bindings ).forEach(
-				( [ attributeName, { args, source } ] ) => {
-					const { value } = blockBindingsSources[ source ].connect(
-						block,
-						args
-					);
+			const boundAttributes = Object.fromEntries(
+				Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
+					const { connect } = blockBindingsSources[ settings.source ];
 
-					dispatch.updateBlockAttributes( block.clientId, {
-						[ attributeName ]: value,
-					} );
-				}
+					const { value } = connect( block, settings.args );
+					return [ attrName, value ];
+				} )
 			);
+
+			// First sync the attribute value with the external source.
+			dispatch.updateBlockAttributes( block.clientId, boundAttributes );
 		} );
 	};
 }
+
 
 /**
  * Action that updates the block with the specified client ID.
