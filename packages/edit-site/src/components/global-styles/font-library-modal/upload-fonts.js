@@ -74,7 +74,7 @@ function UploadFonts() {
 
 		// Filter out the nulls after all promises have resolved.
 		const allowedFiles = ( await Promise.all( checkFilesPromises ) ).filter(
-			( file ) => file !== null
+			( file ) => null !== file
 		);
 
 		if ( allowedFiles.length > 0 ) {
