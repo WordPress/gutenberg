@@ -7,7 +7,7 @@ import { click, type, press } from '@ariakit/test';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameForPosition } from '..';
+import PaletteEdit, { getNameAndSlugForPosition } from '..';
 import type { PaletteElement } from '../types';
 
 const noop = () => {};
@@ -21,12 +21,12 @@ async function clearInput( input: HTMLInputElement ) {
 	}
 }
 
-describe( 'getNameForPosition', () => {
+describe( 'getNameAndSlugForPosition', () => {
 	test( 'should return 1 by default', () => {
 		const slugPrefix = 'test-';
 		const elements: PaletteElement[] = [];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
 			'Color 1'
 		);
 	} );
@@ -41,7 +41,7 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
 			'Color 2'
 		);
 	} );
@@ -56,7 +56,7 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
 			'Color 1'
 		);
 	} );
@@ -86,7 +86,7 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
 			'Color 151'
 		);
 	} );
