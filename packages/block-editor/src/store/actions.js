@@ -178,7 +178,7 @@ export function updateBlockAttributes(
 }
 
 export function resetBlocksWithBoundAttributes( blocks ) {
-	return ( { select, dispatch, registry } ) => {
+	return ( { dispatch, registry } ) => {
 		/*
 		 * Filter blocks with bound attributes.
 		 */
@@ -212,6 +212,8 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 
 		/*
 		 * Batch the updates to avoid multiple re-renders.
+		 * It should update all bound attributes
+		 * of the block in a single batch.
 		 */
 		registry.batch( () => {
 			blocksWithBoundAttributes.forEach( ( block ) => {
@@ -235,12 +237,14 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 								block,
 								settings.args,
 								( newValue ) => {
-									dispatch.updateBlockAttributes(
-										block.clientId,
-										{
-											[ attrName ]: newValue,
-										}
-									);
+									dispatch.syncDerivedUpdates( () => {
+										dispatch.updateBlockAttributes(
+											block.clientId,
+											{
+												[ attrName ]: newValue,
+											}
+										);
+									} );
 								}
 							);
 
