@@ -100,14 +100,6 @@
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
-		"name": {
-			"type": "string",
-			"description": "Name of the font collection."
-		},
-		"description": {
-			"type": "string",
-			"description": "Description of the font collection."
-		},
 		"font_families": {
 			"type": "array",
 			"description": "Array of font families ready to be installed.",
@@ -157,23 +149,6 @@
 					}
 				},
 				"required": [ "font_family_settings" ],
-				"additionalProperties": false
-			}
-		},
-		"categories": {
-			"type": "array",
-			"description": "Array of category objects.",
-			"items": {
-				"type": "object",
-				"properties": {
-					"slug": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [ "slug", "name" ],
 				"additionalProperties": false
 			}
 		}

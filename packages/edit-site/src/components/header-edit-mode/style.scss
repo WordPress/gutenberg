@@ -256,3 +256,7 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__block-tools-toggle {
 	margin-left: 2px; // Allow focus ring to be fully visible
 }
+
+.components-popover.more-menu-dropdown__content {
+	z-index: z-index(".components-popover.more-menu__content");
+}

@@ -594,7 +594,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'declarations' => $child_layout_declarations,
 	);
 
-	/**
+	/*
 	 * If columnSpan is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
 	 * the columnSpan should be removed on small grids. If there's a minimumColumnWidth, the grid is responsive.
 	 * But if the minimumColumnWidth value wasn't changed, it won't be set. In that case, if columnCount doesn't
@@ -606,7 +606,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$parent_column_value = floatval( $parent_column_width );
 		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
 
-		/**
+		/*
 		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
 		 * to defaults.
 		 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
@@ -622,7 +622,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			}
 		}
 
-		/**
+		/*
 		 * A default gap value is used for this computation because custom gap values may not be
 		 * viable to use in the computation of the container query value.
 		 */
@@ -639,7 +639,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		);
 	}
 
-	/**
+	/*
 	 * Add to the style engine store to enqueue and render layout styles.
 	 * Return styles here just to check if any exist.
 	 */
@@ -800,7 +800,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	/**
+	/*
 	 * Attempts to refer to the inner-block wrapping element by its class attribute.
 	 *
 	 * When examining a block's inner content, if a block has inner blocks, then
@@ -890,13 +890,13 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	return $processor->get_updated_html();
 }
 
-/**
+/*
  * Add a `render_block_data` filter to fetch the parent block layout data.
  */
 add_filter(
 	'render_block_data',
 	function ( $parsed_block, $source_block, $parent_block ) {
-		/**
+		/*
 		 * Check if the parent block exists and if it has a layout attribute.
 		 * If it does, add the parent layout to the parsed block.
 		 */
@@ -945,7 +945,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	/**
+	/*
 	 * This filter runs after the layout classnames have been added to the block, so they
 	 * have to be removed from the outer wrapper and then added to the inner.
 	*/
@@ -961,7 +961,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 				}
 			}
 		} else {
-			/**
+			/*
 			* The class_list method was only added in 6.4 so this needs a temporary fallback.
 			* This fallback should be removed when the minimum supported version is 6.4.
 			*/

@@ -32,7 +32,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		let patternId;
-		let editableParagraphId;
+		const editableParagraphName = 'Editable Paragraph';
 
 		await test.step( 'Create a synced pattern and assign blocks to allow overrides', async () => {
 			await admin.visitSiteEditor( { path: '/patterns' } );
@@ -85,8 +85,8 @@ test.describe( 'Pattern Overrides', () => {
 				await advancedPanel.click();
 			}
 			await editorSettings
-				.getByRole( 'checkbox', { name: 'Allow instance overrides' } )
-				.setChecked( true );
+				.getByRole( 'textbox', { name: 'Block Name' } )
+				.fill( editableParagraphName );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -94,7 +94,7 @@ test.describe( 'Pattern Overrides', () => {
 					attributes: {
 						content: 'This paragraph can be edited',
 						metadata: {
-							id: expect.any( String ),
+							name: editableParagraphName,
 							bindings: {
 								content: {
 									source: 'core/pattern-overrides',
@@ -123,8 +123,6 @@ test.describe( 'Pattern Overrides', () => {
 			).toBeVisible();
 
 			patternId = new URL( page.url() ).searchParams.get( 'postId' );
-			const blocks = await editor.getBlocks();
-			editableParagraphId = blocks[ 0 ].attributes.metadata.id;
 		} );
 
 		await test.step( 'Create a post and insert the pattern with overrides', async () => {
@@ -176,10 +174,8 @@ test.describe( 'Pattern Overrides', () => {
 					attributes: {
 						ref: patternId,
 						content: {
-							[ editableParagraphId ]: {
-								values: {
-									content: 'I would word it this way',
-								},
+							[ editableParagraphName ]: {
+								content: 'I would word it this way',
 							},
 						},
 					},
@@ -189,10 +185,8 @@ test.describe( 'Pattern Overrides', () => {
 					attributes: {
 						ref: patternId,
 						content: {
-							[ editableParagraphId ]: {
-								values: {
-									content: 'This one is different',
-								},
+							[ editableParagraphName ]: {
+								content: 'This one is different',
 							},
 						},
 					},
@@ -276,11 +270,11 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 		context,
 	} ) => {
-		const buttonId = 'button-id';
+		const buttonName = 'Editable button';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Button with target',
 			content: `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"metadata":{"id":"${ buttonId }","bindings":{"text":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"linkTarget":{"source":"core/pattern-overrides"},"rel":{"source":"core/pattern-overrides"}}}} -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"text":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"linkTarget":{"source":"core/pattern-overrides"},"rel":{"source":"core/pattern-overrides"}}}} -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
@@ -386,21 +380,21 @@ test.describe( 'Pattern Overrides', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		const paragraphId = 'paragraph-id';
-		const headingId = 'heading-id';
+		const paragraphName = 'Editable paragraph';
+		const headingName = 'Editable heading';
 		const innerPattern = await requestUtils.createBlock( {
 			title: 'Inner Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
 <p>Inner paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 		} );
 		const outerPattern = await requestUtils.createBlock( {
 			title: 'Outer Pattern',
-			content: `<!-- wp:heading {"metadata":{"id":"${ headingId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:heading {"metadata":{"name":"${ headingName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
 <h2 class="wp-block-heading">Outer heading</h2>
 <!-- /wp:heading -->
-<!-- wp:block {"ref":${ innerPattern.id },"overrides":{"${ paragraphId }":{"content":"Inner paragraph (edited)"}}} /-->`,
+<!-- wp:block {"ref":${ innerPattern.id },"content":{"${ paragraphName }":{"content":"Inner paragraph (edited)"}}} /-->`,
 			status: 'publish',
 		} );
 
@@ -425,8 +419,8 @@ test.describe( 'Pattern Overrides', () => {
 				attributes: {
 					ref: outerPattern.id,
 					content: {
-						[ headingId ]: {
-							values: { content: 'Outer heading (edited)' },
+						[ headingName ]: {
+							content: 'Outer heading (edited)',
 						},
 					},
 				},
@@ -440,10 +434,8 @@ test.describe( 'Pattern Overrides', () => {
 						attributes: {
 							ref: innerPattern.id,
 							content: {
-								[ paragraphId ]: {
-									values: {
-										content: 'Inner paragraph (edited)',
-									},
+								[ paragraphName ]: {
+									content: 'Inner paragraph (edited)',
 								},
 							},
 						},
@@ -505,14 +497,14 @@ test.describe( 'Pattern Overrides', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		const headingId = 'heading-id';
-		const paragraphId = 'paragraph-id';
+		const headingName = 'Editable heading';
+		const paragraphName = 'Editable paragraph';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:heading {"metadata":{"id":"${ headingId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:heading {"metadata":{"name":"${ headingName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
 <h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
-<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
 <p>Paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -597,14 +589,14 @@ test.describe( 'Pattern Overrides', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		const imageId = 'image-id';
+		const imageName = 'Editable image';
 		const TEST_IMAGE_FILE_PATH = path.resolve(
 			__dirname,
 			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:image {"metadata":{"id":"${ imageId }","bindings":{"id":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"title":{"source":"core/pattern-overrides"},"alt":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"id":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"title":{"source":"core/pattern-overrides"},"alt":{"source":"core/pattern-overrides"}}}} -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->`,
 			status: 'publish',
