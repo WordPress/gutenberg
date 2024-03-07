@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59544](https://github.com/WordPress/gutenberg/issues/59544)).
+-   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
 
 ## 27.1.0 (2024-03-06)
 
