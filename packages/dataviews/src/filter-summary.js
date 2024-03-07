@@ -89,7 +89,7 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is not Admin". */
-				__( '<Span1>%1$s is not </Span1><Span2>%2$s</Span2>' ),
+				__( '<Name>%1$s is not </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements[ 0 ].label
 			),
