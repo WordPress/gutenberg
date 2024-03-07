@@ -24,7 +24,13 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import SearchWidget from './search-widget';
-import { ALL_OPERATORS, OPERATORS } from './constants';
+import {
+	OPERATORS,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	OPERATOR_EQUAL,
+	OPERATOR_NOT_EQUAL,
+} from './constants';
 
 const FilterText = ( { activeElements, filterInView, filter } ) => {
 	if ( activeElements === undefined || activeElements.length === 0 ) {
@@ -36,14 +42,49 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		Span2: <span className="dataviews-filter-summary__filter-text-value" />,
 	};
 
-	if ( ALL_OPERATORS.includes( filterInView?.operator ) ) {
+	if ( filterInView?.operator === OPERATOR_IN ) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 2: Filter operator. 3: Filter value. e.g.: "Author is Admin", "Author not in Admin, Editor". */
-				__( '<Span1>%1$s </Span1><Span2>%2$s %3$s</Span2>' ),
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author in Admin, Editor". */
+				__( '<Span1>%1$s </Span1><Span2>in %2$s</Span2>' ),
 				filter.name,
-				OPERATORS[ filterInView.operator ].label,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
+			),
+			filterTextWrappers
+		);
+	}
+
+	if ( filterInView?.operator === OPERATOR_NOT_IN ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author not in Admin, Editor". */
+				__( '<Span1>%1$s </Span1><Span2>not in %2$s</Span2>' ),
+				filter.name,
+				activeElements.map( ( element ) => element.label ).join( ', ' )
+			),
+			filterTextWrappers
+		);
+	}
+
+	if ( filterInView?.operator === OPERATOR_EQUAL ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is Admin". */
+				__( '<Span1>%1$s </Span1><Span2>is %2$s</Span2>' ),
+				filter.name,
+				activeElements[ 0 ].label
+			),
+			filterTextWrappers
+		);
+	}
+
+	if ( filterInView?.operator === OPERATOR_NOT_EQUAL ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is not Admin". */
+				__( '<Span1>%1$s </Span1><Span2>is not %2$s</Span2>' ),
+				filter.name,
+				activeElements[ 0 ].label
 			),
 			filterTextWrappers
 		);
