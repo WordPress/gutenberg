@@ -57,7 +57,7 @@ function UploadFonts() {
 			const isFont = await isFontFile( file );
 			if ( ! isFont ) {
 				hasInvalidFiles = true;
-				return null; // Return null for invalid files
+				return null; // Return null for invalid files.
 			}
 			// Check for duplicates
 			if ( uniqueFilenames.has( file.name ) ) {
