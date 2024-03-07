@@ -217,13 +217,15 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 			}
 
 			/*
-			 * Pull the property value of the external source
-			 * and update the bound attributes.
+			 * Connect with the external source of the binding
+			 * and update the block attributes.
 			 */
 			Object.entries( bindings ).forEach(
 				( [ attributeName, { args, source } ] ) => {
-					const { connect } = blockBindingsSources[ source ];
-					const { value } = connect( block, args );
+					const { value } = blockBindingsSources[ source ].connect(
+						block,
+						args
+					);
 
 					dispatch.updateBlockAttributes( block.clientId, {
 						[ attributeName ]: value,
