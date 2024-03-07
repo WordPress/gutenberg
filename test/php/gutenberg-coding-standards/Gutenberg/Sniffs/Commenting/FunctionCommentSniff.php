@@ -26,7 +26,6 @@ class FunctionCommentSniff implements Sniff {
 	 * @param int  $stackPtr  The position of the current token in the stack passed in $tokens.
 	 */
 	public function process( File $phpcsFile, $stackPtr ) {
-		// Get the tokens of the file.
 		$tokens = $phpcsFile->getTokens();
 
 		$function_token = $phpcsFile->findNext( T_STRING, $stackPtr );
@@ -47,14 +46,12 @@ class FunctionCommentSniff implements Sniff {
 
  		$missing_since_tag_error_message = sprintf( '@since tag is missing for the `%s()` function.', $function_name );
 
-		// Get the docblock for the current function.
 		$doc_block_end_token = $phpcsFile->findPrevious( T_DOC_COMMENT_CLOSE_TAG, $stackPtr, null, false, null, true );
 		if ( false === $doc_block_end_token ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
 			return;
 		}
 
-		// Get the docblock for the current function.
 		$doc_block_start_token = $phpcsFile->findPrevious( T_DOC_COMMENT_OPEN_TAG, $doc_block_end_token, null, false, null, true );
 		if ( false === $doc_block_start_token ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
@@ -76,6 +73,7 @@ class FunctionCommentSniff implements Sniff {
 		$version_value = $tokens[ $version_token ]['content'];
 
 		if ( version_compare( $version_value, '0.0.1', '>=' ) ) {
+			// Validate the version value.
 			return;
 		}
 
