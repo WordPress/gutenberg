@@ -10,6 +10,15 @@ use PHP_CodeSniffer\Sniffs\Sniff;
  * and that the `@since` tag is present in the docblock.
  */
 class FunctionCommentSniff implements Sniff {
+
+	/**
+	 * This property is used to store results returned
+	 * by the static::is_experimental_package() method.
+	 *
+	 * @var array
+	 */
+	private static $cache = array();
+
 	/**
 	 * Returns an array of tokens this test wants to listen for.
 	 *
@@ -26,6 +35,11 @@ class FunctionCommentSniff implements Sniff {
 	 * @param int  $stackPtr  The position of the current token in the stack passed in $tokens.
 	 */
 	public function process( File $phpcsFile, $stackPtr ) {
+		if ( static::is_experimental_package( $phpcsFile ) ) {
+			// This is an experimental package, so the "@since" tag is not required.
+			return;
+		}
+
 		$tokens = $phpcsFile->getTokens();
 
 		$function_token = $phpcsFile->findNext( T_STRING, $stackPtr );
@@ -86,5 +100,37 @@ class FunctionCommentSniff implements Sniff {
 				$version_value
 			)
 		);
+	}
+
+	/**
+	 * Checks if the current package is experimental.
+	 *
+	 * @param File $phpcsFile
+	 * @return bool
+	 */
+	private static function is_experimental_package( File $phpcsFile ) {
+		$block_json_filepath = dirname( $phpcsFile->getFilename() ) . DIRECTORY_SEPARATOR . 'block.json';
+		if ( isset( static::$cache[ $block_json_filepath ] ) ) {
+			return static::$cache[ $block_json_filepath ];
+		}
+		if ( ! is_file( $block_json_filepath ) || ! is_readable( $block_json_filepath ) ) {
+			static::$cache[ $block_json_filepath ] = false;
+			return static::$cache[ $block_json_filepath ];
+		}
+		$block_metadata = file_get_contents( $block_json_filepath );
+		if ( false === $block_metadata ) {
+			static::$cache[ $block_json_filepath ] = false;
+			return static::$cache[ $block_json_filepath ];
+		}
+
+		$block_metadata = json_decode( $block_metadata, true );
+		if ( null === $block_metadata ) {
+			static::$cache[ $block_json_filepath ] = false;
+			return static::$cache[ $block_json_filepath ];
+		}
+
+		$experimental_property                 = '__experimental';
+		static::$cache[ $block_json_filepath ] = array_key_exists( $experimental_property, $block_metadata ) && ( false !== $block_metadata[ $experimental_property ] );
+		return static::$cache[ $block_json_filepath ];
 	}
 }
