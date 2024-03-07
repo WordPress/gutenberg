@@ -329,16 +329,13 @@ const withBlockTree =
 				// If there are no replaced blocks, it means we're removing blocks so we need to update their parent.
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				updateParentInnerBlocksInTree(
@@ -351,16 +348,13 @@ const withBlockTree =
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				newState.tree = new Map( newState.tree );

@@ -78,7 +78,7 @@ const ImageWrapper = ( { href, children } ) => {
 		<a
 			href={ href }
 			onClick={ ( event ) => event.preventDefault() }
-			aria-disabled={ true }
+			aria-disabled
 			style={ {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
@@ -647,7 +647,7 @@ export default function Image( {
 					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
-							isShownByDefault={ true }
+							isShownByDefault
 							hasValue={ () => !! alt }
 							onDeselect={ () =>
 								setAttributes( { alt: undefined } )

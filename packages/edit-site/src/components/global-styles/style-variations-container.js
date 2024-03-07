@@ -10,8 +10,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import StylesPreview from './preview';
-import Variation from './variation';
+import PreviewStyles from './preview-styles';
+import Variation from './variations/variation';
 
 export default function StyleVariationsContainer() {
 	const variations = useSelect( ( select ) => {
@@ -43,10 +43,11 @@ export default function StyleVariationsContainer() {
 			{ withEmptyVariation.map( ( variation, index ) => (
 				<Variation key={ index } variation={ variation }>
 					{ ( isFocused ) => (
-						<StylesPreview
+						<PreviewStyles
 							label={ variation?.title }
 							withHoverView
 							isFocused={ isFocused }
+							variation={ variation }
 						/>
 					) }
 				</Variation>

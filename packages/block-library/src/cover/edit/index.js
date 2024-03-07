@@ -464,7 +464,7 @@ function CoverEdit( {
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
-								disableCustomColors={ true }
+								disableCustomColors
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
@@ -525,7 +525,7 @@ function CoverEdit( {
 				{ ! url && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-cover__image--placeholder-image"
-						withIllustration={ true }
+						withIllustration
 					/>
 				) }
 

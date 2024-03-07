@@ -40,7 +40,7 @@ function CollectionFontVariant( {
 				<CheckboxControl
 					checked={ selected }
 					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom={ true }
+					__nextHasNoMarginBottom
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>

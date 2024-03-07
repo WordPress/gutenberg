@@ -24,7 +24,7 @@ jobs:
                   check-latest: true
 
             - name: Cache NPM packages
-              uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
+              uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
               with:
                   # npm cache files are stored in `~/.npm` on Linux/macOS
                   path: ~/.npm

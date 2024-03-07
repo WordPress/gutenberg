@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 export default function RenameModal( { onClose, onConfirm } ) {
 	return (
 		<ConfirmDialog
-			isOpen={ true }
+			isOpen
 			onConfirm={ ( e ) => {
 				e.preventDefault();
 				onConfirm();

@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## 5.2.0 (2024-03-06)
+
 ### Bug Fixes
 
 -   Prevent passing state proxies as receivers to deepSignal proxy handlers. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
+-   Keep the same references to objects defined inside the context. ([#59553](https://github.com/WordPress/gutenberg/pull/59553))
 
 ## 5.1.0 (2024-02-21)
 

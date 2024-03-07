@@ -413,7 +413,7 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering={ true }
+					deferredRendering
 					supportedLayouts={ [ LAYOUT_GRID ] }
 				/>
 			</Page>

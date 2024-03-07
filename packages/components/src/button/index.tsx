@@ -223,10 +223,10 @@ export function UnforwardedButton(
 				<Icon icon={ icon } size={ iconSize } />
 			) }
 			{ text && <>{ text }</> }
+			{ children }
 			{ icon && iconPosition === 'right' && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
-			{ children }
 		</>
 	);
 
