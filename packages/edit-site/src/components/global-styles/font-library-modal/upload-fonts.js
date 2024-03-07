@@ -67,7 +67,7 @@ function UploadFonts() {
 			const fileExtension = file.name.split( '.' ).pop().toLowerCase();
 			if ( ALLOWED_FILE_EXTENSIONS.includes( fileExtension ) ) {
 				uniqueFilenames.add( file.name );
-				return file; // Return the file if it passes all checks
+				return file; // Return the file if it passes all checks.
 			}
 			return null; // Return null for disallowed file extensions
 		} );
