@@ -382,7 +382,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					!! filter.value
 				) {
 					filteredData = filteredData.filter( ( item ) => {
-						return item.author_text === filter.value;
+						return filter.value.includes( item.author_text );
 					} );
 				} else if (
 					filter.field === 'author' &&
@@ -390,7 +390,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					!! filter.value
 				) {
 					filteredData = filteredData.filter( ( item ) => {
-						return item.author_text !== filter.value;
+						return ! filter.value.includes( item.author_text );
 					} );
 				}
 			} );
