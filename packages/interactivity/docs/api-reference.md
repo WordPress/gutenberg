@@ -759,14 +759,14 @@ If the action is async and needs to await a long delay.
 
 - The user clicks the first button.
 - The scope points to the first context, where `isOpen: true`.
-- The first access to `state.isOpen` is correct because `getContext` returns the current scope.
+- The first access to `context.isOpen` is correct because `getContext` returns the current scope.
 - The action starts awaiting a long delay.
 - Before the action resumes, the user clicks the second button.
 - The scope is changed to the second context, where `isOpen: false`.
-- The first access to `state.isOpen` is correct because `getContext` returns the current scope.
+- The first access to `context.isOpen` is correct because `getContext` returns the current scope.
 - The second action starts awaiting a long delay.
 - The first action finishes awaiting and resumes its execution.
-- The second access to `state.isOpen` of the first action is incorrect, because `getContext` now returns the wrong scope.
+- The second access to `context.isOpen` of the first action is incorrect, because `getContext` now returns the wrong scope.
 
 We need to be able to know when async actions start awaiting and resume operations, so we can restore the proper scope, and that's what generators do.
 
