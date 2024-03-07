@@ -69,7 +69,7 @@ function UploadFonts() {
 				uniqueFilenames.add( file.name );
 				return file; // Return the file if it passes all checks.
 			}
-			return null; // Return null for disallowed file extensions
+			return null; // Return null for disallowed file extensions.
 		} );
 
 		// Filter out the nulls after all promises have resolved
