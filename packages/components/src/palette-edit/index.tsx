@@ -108,7 +108,7 @@ export function getNameAndSlugForPosition(
 			__( 'Color %s' ),
 			position
 		),
-		slug: slugPrefix + 'color-' + position,
+		slug: `${ slugPrefix }color-${ position }`,
 	};
 }
 
