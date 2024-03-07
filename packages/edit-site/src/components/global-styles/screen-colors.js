@@ -47,7 +47,7 @@ function ScreenColors() {
 			/>
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 3 }>
-					{ !! colorVariations.length && (
+					{ !! colorVariations?.length && (
 						<ColorVariations variations={ colorVariations } />
 					) }
 
