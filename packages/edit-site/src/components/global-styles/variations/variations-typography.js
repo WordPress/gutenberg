@@ -4,6 +4,7 @@
 import { useContext } from '@wordpress/element';
 import {
 	__experimentalGrid as Grid,
+	__experimentalVStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -18,7 +19,6 @@ import TypographyExample from '../typography-example';
 import PreviewIframe from '../preview-iframe';
 import { getFontFamilies } from '../utils';
 import Variation from './variation';
-import PreviewIframe from '../preview-iframe';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
@@ -75,11 +75,21 @@ export default function TypographyVariations() {
 										label={ variation?.title }
 										isFocused={ isFocused }
 									>
-										{ ( { key } ) => (
-											<TypographyExample
-												key={ key }
-												variation={ variation }
-											/>
+										{ ( { ratio, key } ) => (
+											<HStack
+												spacing={ 10 * ratio }
+												justify="center"
+												style={ {
+													height: '100%',
+													overflow: 'hidden',
+												} }
+											>
+												<TypographyExample
+													key={ key }
+													variation={ variation }
+													fontSize={ 85 * ratio }
+												/>
+											</HStack>
 										) }
 									</PreviewIframe>
 								) }
