@@ -349,7 +349,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0 Removed `layout.definitions`.
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 *              Added `lightbox`.
-	 *              Added `typography.WritingMode`.
+	 *              Added `typography.writingMode`.
+	 * @since 6.6.0 Added `typography.textOrientation`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -428,6 +429,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
+			'textOrientation' => null,
 		),
 	);
 
@@ -467,7 +469,9 @@ class WP_Theme_JSON_Gutenberg {
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
+	 * @since 6.4.0 Added `writingMode` to `typography`.
 	 * @since 6.6.0 Added `background` sub properties to top-level only.
+	 *              added `textOrientation` to `typography`.
 	 *
 	 * @var array
 	 */
@@ -513,16 +517,17 @@ class WP_Theme_JSON_Gutenberg {
 			'blockGap' => null,
 		),
 		'typography' => array(
-			'fontFamily'     => null,
-			'fontSize'       => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textColumns'    => null,
-			'textDecoration' => null,
-			'textTransform'  => null,
-			'writingMode'    => null,
+			'fontFamily'      => null,
+			'fontSize'        => null,
+			'fontStyle'       => null,
+			'fontWeight'      => null,
+			'letterSpacing'   => null,
+			'lineHeight'      => null,
+			'textColumns'     => null,
+			'textDecoration'  => null,
+			'textTransform'   => null,
+			'writingMode'     => null,
+			'textOrientation' => null,
 		),
 		'css'        => null,
 	);

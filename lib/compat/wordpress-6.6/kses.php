@@ -11,8 +11,8 @@
  * @param string[] $attrs Array of allowed CSS attributes.
  * @return string[] CSS attributes.
  */
-function gutenberg_safe_style_attrs_6_4( $attrs ) {
-	$attrs[] = 'writing-mode';
+function gutenberg_safe_style_attrs_6_6( $attrs ) {
+	$attrs[] = 'text-orientation';
 	return $attrs;
 }
-add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_4' );
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_6' );

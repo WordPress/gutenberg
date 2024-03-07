@@ -557,7 +557,12 @@
 							"default": true
 						},
 						"writingMode": {
-							"description": "Allow users to set the writing mode and text orientation.",
+							"description": "Allow users to set the writing mode.",
+							"type": "boolean",
+							"default": false
+						},
+						"textOrientation": {
+							"description": "Allow users to set the textOrientation.",
 							"type": "boolean",
 							"default": false
 						},
